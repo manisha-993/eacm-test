@@ -52,7 +52,6 @@ public class R100createTypeMaterialBasicViewTest extends RdhRestProxyTest {
 			CHWAnnouncement chwA = new CHWAnnouncement();
 			chwA.setAnnDocNo("123456");
 			chwA.setAnnouncementType("New");
-
 			TypeModel typeModel = new TypeModel();
 			typeModel.setType("4441");
 			typeModel.setDiv("B1");
