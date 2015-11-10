@@ -15,6 +15,7 @@ import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 
 import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.rdh.chw.caller.R100createTypeMaterialBasicView;
+import com.ibm.rdh.chw.caller.R101createGenericPlantViewforMaterial;
 import com.ibm.rdh.chw.caller.Rfc;
 import com.ibm.rdh.chw.caller.RfcReturnSeverityCodes;
 
@@ -53,7 +54,17 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 		logPromoteResultMessage(r); 				
 	}	
 	
-		
+	@Override
+	public void r101(CHWAnnouncement chwA,
+			TypeModel typeModel, CHWGeoAnn chwAg, String newFlag,
+			String loadingGrp, TypeModelUPGGeo tmUPGObj, String FromToType,
+			String pimsIdentity, String plantValue) throws Exception {
+		R101createGenericPlantViewforMaterial r = getFactory().getr101(chwA, typeModel, chwAg,  newFlag,
+				loadingGrp, tmUPGObj, FromToType,  pimsIdentity, plantValue) ;
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r); 				
+	}		
 //	public ArrayList r060( SWO swo, Announcement ann, Collection plants ) throws Exception { 
 //		R060ReadPlantViewForMaterial r = getRfcFactory().getR060( swo, ann, plants ) ; 
 //		logPromoteInfoMessage(r);
