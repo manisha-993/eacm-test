@@ -35,7 +35,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 	
 	protected static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
-	public RdhRestProxy() throws ClassNotFoundException
+	public RdhRestProxy()
 	{ 
 		super() ; 	
 		setRfcFactory( new RfcFactory()) ; 
