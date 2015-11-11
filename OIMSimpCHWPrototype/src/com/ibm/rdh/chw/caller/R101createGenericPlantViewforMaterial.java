@@ -40,21 +40,20 @@ public class R101createGenericPlantViewforMaterial extends Rfc{
 		b0Row.setTcode("MM01");
 
 		// Changes Made by Laxmi
+				
+		if((("1999").equals(plantValue)) && ((("NEW").equals(newFlag)) || (("UPG").equals(newFlag)) || (("MTC").equals(newFlag))))
+			b0Row.setLgort("CHW1");
 		
-		if((plantValue.equals("1999")) && ((newFlag.equals("NEW")) || (newFlag.equals("UPG")) || (newFlag.equals("MTC"))))
-				b0Row.setLgort("CHW1");
-		
-
-		if (newFlag.equals("NEW")) {
+		if (("NEW").equals(newFlag)) {
 		  b0Row.setMatnr(typeModel.getType()+"NEW");
 		
-		} else if (newFlag.equals("UPG")){
+		} else if (("UPG").equals(newFlag)){
 			b0Row.setMatnr(typeModel.getType()+"UPG");
 		}
-		  else if (newFlag.equals("MTC") && FromToType.equals("MTCTOTYPE")){
+		  else if (("MTC").equals(newFlag) && ("MTCTOTYPE").equals(FromToType)){
 			b0Row.setMatnr(tmUPGObj.getType()+"MTC");
 		}
-		  else if (newFlag.equals("MTC") && FromToType.equals("MTCFROMTYPE")){
+		  else if (("MTC").equals(newFlag) && ("MTCFROMTYPE").equals(FromToType)){
 			b0Row.setMatnr(tmUPGObj.getFromType()+"MTC");
 		}
 
@@ -72,7 +71,7 @@ public class R101createGenericPlantViewforMaterial extends Rfc{
 		b0Row.setXeid1("X");
 		b0Row.setXeid2("X");
 		// SAP Ledger
-		if(ConfigManager.getConfigManager().getString(PropertyKeys.KEY_SAP_LEDGER).equals("Y"))
+		if(("Y").equals(ConfigManager.getConfigManager().getString(PropertyKeys.KEY_SAP_LEDGER)))
 		{
 			System.out.println("Type Model's Vendor ID in rfc R101"+typeModel.getVendorID());
 			if (typeModel.getVendorID() != null || (!typeModel.getVendorID().equals(""))){
@@ -107,7 +106,7 @@ public class R101createGenericPlantViewforMaterial extends Rfc{
 		b1Row.setSpart(typeModel.getDiv()); 
 
 //		b1Row.setLadgr(chwPlant.getLoadingGroup());
-		if (newFlag.equals("MTC"))
+		if (("MTC").equals(newFlag))
 		{
 			b1Row.setLadgr(tmUPGObj.getLoadingGroup());
 		}
@@ -118,9 +117,9 @@ public class R101createGenericPlantViewforMaterial extends Rfc{
 		    b1Row.setMtpos("Z002");
 //			b1Row.setKtgrm("01");
 
-			if (newFlag.equals("NEW")) {
+			if (("NEW").equals(newFlag)) {
 			b1Row.setKtgrm("01");
-			} else if(newFlag.equals("UPG") || newFlag.equals("MTC")){
+			} else if(("UPG").equals(newFlag) || ("MTC").equals(newFlag)){
 				b1Row.setKtgrm("06");
 			}
 
@@ -130,7 +129,7 @@ public class R101createGenericPlantViewforMaterial extends Rfc{
 			b1Row.setXmcng("X");
 			b1Row.setSernp("ZCHW");
 			b1Row.setSbdkz("1");
-			if(plantValue.equals("1999"))
+			if(("1999").equals(plantValue))
 				b1Row.setMtvfp("NC");
 			else
 				b1Row.setMtvfp("ZE");
@@ -143,7 +142,7 @@ public class R101createGenericPlantViewforMaterial extends Rfc{
 			b1Row.setPerkz("M");
 			// SAP Ledger
 			//boolean existsPro = false;
-			if(ConfigManager.getConfigManager().getString(PropertyKeys.KEY_SAP_LEDGER).equals("Y"))
+			if(("Y").equals(ConfigManager.getConfigManager().getString(PropertyKeys.KEY_SAP_LEDGER)))
 			{
 				boolean existsPro = ProfitCenterPlantSelector.checkProfitCenterPlants(plantValue);
 				System.out.println("Printing the value of boolean exists in the rfc R101"+existsPro);
