@@ -34,15 +34,18 @@ public class R189createCFIPlantViewForType extends Rfc {
 		Bmm00Table b0Table = new Bmm00Table();
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
 		b0Row.setTcode("MM01");
-		if (newFlag.equals("New")) {
+
+		if ("New".equals(newFlag)) {
 			b0Row.setMatnr(typeModel.getType() + "New");
-		} else if (newFlag.equals("UPG")) {
+		} else if ("UPG".equals(newFlag)) {
 			b0Row.setMatnr(typeModel.getType() + "UPG");
-		} else if (newFlag.equals("MTC") && FromToType.equals("MTCTOTYPE")) {
+		} else if ("MTC".equals(newFlag) && "MTCTOTYPE".equals(FromToType)) {
 			b0Row.setMatnr(tmUPGObj.getType() + "MTC");
-		} else if (newFlag.equals("MTC") && FromToType.equals("MTCFROMTYPE")) {
+		} else if ("MTC".equals(newFlag) && "MTCFROMTYPE".equals(FromToType)) {
+
 			b0Row.setMatnr(tmUPGObj.getFromType() + "MTC");
 		}
+
 		b0Row.setXeiv4("X");
 		b0Row.setWerks(sapPlant);
 		b0Row.setMbrsh("M");
@@ -51,13 +54,12 @@ public class R189createCFIPlantViewForType extends Rfc {
 		b0Table.appendRow(b0Row);
 		rfc.setIBmm00(b0Table);
 		rfcInfo.append("IBmm00 \n");
-		rfcInfo.append(Tab + "TCODE" + b0Row.getTcode()+
-				", MATNR>>"+ b0Row.getMatnr()+ 
-				", XEIV4>>"+ b0Row.getXeiv4()+ 
-				", WERKS>>"+ b0Row.getWerks()+
-				", MBRSH>>"+ b0Row.getMbrsh()+ 
-				", MTART>>"+ b0Row.getMtart()+ 
-				"\n");
+		rfcInfo.append(Tab  + "TCODE" + b0Row.getTcode() + 
+				", MATNR>>" + b0Row.getMatnr() + 
+				", XEIV4>>" + b0Row.getXeiv4() + 
+				", WERKS>>" + b0Row.getWerks() + 
+				", MBRSH>>" + b0Row.getMbrsh() + 
+				", MTART>>" + b0Row.getMtart() + "\n");
 
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
@@ -66,16 +68,16 @@ public class R189createCFIPlantViewForType extends Rfc {
 		b1Row.setSpart(typeModel.getDiv());
 
 		b1Row.setLadgr("B001");
-		if (sapPlant.equals("1999"))
+
+		if ("1999".equals(sapPlant))
 			b1Row.setMtvfp("NC");
 		else
 			b1Row.setMtvfp("ZE");
 
 		// SAP Ledger
-		if (ConfigManager.getConfigManager()
-				.getString(PropertyKeys.KEY_SAP_LEDGER).equals("Y")) {
-			boolean existsPro = ProfitCenterPlantSelector
-					.checkProfitCenterPlants(sapPlant);
+
+		if ("Y".equals(ConfigManager.getConfigManager().getString(PropertyKeys.KEY_SAP_LEDGER))) {
+			boolean existsPro = ProfitCenterPlantSelector.checkProfitCenterPlants(sapPlant);
 			if (existsPro) {
 				if (typeModel.getProfitCenter() != null
 						|| (!typeModel.getProfitCenter().equals(""))) {
@@ -94,16 +96,13 @@ public class R189createCFIPlantViewForType extends Rfc {
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
-		rfcInfo.append(Tab + "LADGR>>" + b1Row.getLadgr() + 
-				", MTVFP>>"+ b1Row.getMtvfp()+ 
-				", PRCTR>>"+ b1Row.getPrctr()+ 
-				", MATKL>>"+ b1Row.getMatkl()+
-				", MEINS>>"+ b1Row.getMeins()+
-				", ZEINR>>"+ b1Row.getZeinr()+
-				", ZEIAR>>"+ b1Row.getZeiar()+
-				", AESZN>>"+ b1Row.getAeszn()+
-				"\n");
-		
+		rfcInfo.append(Tab + "LADGR>>" + b1Row.getLadgr() + ", MTVFP>>"
+				+ b1Row.getMtvfp() + ", PRCTR>>" + b1Row.getPrctr()
+				+ ", MATKL>>" + b1Row.getMatkl() + ", MEINS>>"
+				+ b1Row.getMeins() + ", ZEINR>>" + b1Row.getZeinr()
+				+ ", ZEIAR>>" + b1Row.getZeiar() + ", AESZN>>"
+				+ b1Row.getAeszn() + "\n");
+
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 		zdmRow.setZGeo("US");
