@@ -10,6 +10,7 @@ import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.chw.caller.R100createTypeMaterialBasicView;
 import com.ibm.rdh.chw.caller.R101createGenericPlantViewforMaterial;
+import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 
 /**
  * @author bobc
@@ -35,6 +36,14 @@ public class RfcFactory extends Object {
 		// TODO Auto-generated method stub
 		return new R101createGenericPlantViewforMaterial(chwA, typeModel, chwAg,  newFlag,
 				loadingGrp, tmUPGObj, fromToType,  pimsIdentity, plantValue);
+	}
+	public R189createCFIPlantViewForType getr189(CHWAnnouncement chwA,
+			TypeModel typeModel, String sapPlant, String newFlag,
+			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity)
+			throws Exception {
+		return new R189createCFIPlantViewForType(chwA, typeModel, sapPlant,
+				newFlag, tmUPGObj, FromToType, pimsIdentity);
+
 	}
 	
 

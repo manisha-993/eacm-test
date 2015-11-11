@@ -51,6 +51,9 @@ public abstract class RfcProxy {
 			TypeModel typeModel, CHWGeoAnn chwAg, String newFlag,
 			String loadingGrp, TypeModelUPGGeo tmUPGObj, String FromToType,
 			String pimsIdentity, String plantValue) throws Exception;
+	public abstract void  r189(CHWAnnouncement chwA,
+			TypeModel typeModel, String sapPlant, String newFlag,
+			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity) throws Exception ;
 //	public abstract ReturnDataObjectR001 r001(SWO swo) throws Exception ; 
 //	public abstract boolean r002(SWO swo, String salesOrg) throws Exception;	
 //	public abstract Vector r002DataFunction(SWO swo, GeoCountry country, int function) throws Exception;
