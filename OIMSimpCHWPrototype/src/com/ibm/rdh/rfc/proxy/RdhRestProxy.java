@@ -14,6 +14,7 @@ import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 
 
 import com.ibm.pprds.epimshw.util.LogManager;
+import com.ibm.pprds.epimshw.util.RfcLogger;
 import com.ibm.rdh.chw.caller.R100createTypeMaterialBasicView;
 import com.ibm.rdh.chw.caller.R101createGenericPlantViewforMaterial;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
@@ -32,6 +33,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 		
 	private int _sapRetryCount;
 	private long _sapRetrySleepMillis;	
+	private RfcLogger rfcLogger;
 	
 	protected static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
@@ -41,6 +43,10 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 		setRfcFactory( new RfcFactory()) ; 
 	}
 	
+	public RdhRestProxy(RfcLogger rfcLogger) {
+		this();
+		this.rfcLogger = rfcLogger;
+	}
 	
 
 	@Override
@@ -103,6 +109,11 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 		throws HWPIMSAbnormalException
 	{
 		
+		if (null != rfcLogger)
+		{
+			rfcLogger.warn(msgNum+msgText);
+		}
+		
 		if (null != logger)
 		{
 			logger.warn(msgNum+msgText);
@@ -116,7 +127,10 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 	protected void logPromoteErrorMessage(String msgNum, String msgText)
 		throws HWPIMSAbnormalException
 	{
-		
+		if (null != rfcLogger)
+		{
+			rfcLogger.error(msgNum + msgText);
+		}
 		if (null != logger)
 		{
 			logger.error(msgNum + msgText);
@@ -136,7 +150,10 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 	protected void logPromoteInfoMessage(String msgNum, String msgText)
 		throws HWPIMSAbnormalException
 	{
-	
+		if (null != rfcLogger)
+		{
+			rfcLogger.info(msgNum + msgText);
+		}
 		if (null != logger)
 		{
 			logger.info(msgNum + msgText);
@@ -152,7 +169,10 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 	protected void logPromoteInfoMessage(String msgNum, String msgText, String parameters)
 		throws HWPIMSAbnormalException
 	{
-		
+		if (null != rfcLogger)
+		{
+			rfcLogger.info(msgNum + msgText + parameters);
+		}
 		if (null != logger)
 		{
 				logger.info(msgNum +msgText + parameters);
