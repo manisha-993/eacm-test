@@ -140,7 +140,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 	protected void logPromoteInfoMessage(Rfc r)
 		throws HWPIMSAbnormalException
 	{
-		logPromoteInfoMessage(r.getMsgNum(), r.getTaskDescription(), r.getRfcParameterList());
+		logPromoteInfoMessage(r.getMsgNum(), r.getTaskDescription(), r.getRfcInfo());
 	}
 
 

@@ -315,8 +315,8 @@ public abstract class Rfc implements RfcReturnSeverityCodes
 
 	}
 
-	public java.lang.StringBuffer getRfcInfo() {
-		return rfcInfo;
+	public String getRfcInfo() {
+		return rfcInfo.toString();
 	}
 
 	/**
