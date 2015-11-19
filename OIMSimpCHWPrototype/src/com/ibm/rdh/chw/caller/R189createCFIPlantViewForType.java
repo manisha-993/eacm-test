@@ -35,8 +35,8 @@ public class R189createCFIPlantViewForType extends Rfc {
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
 		b0Row.setTcode("MM01");
 
-		if ("New".equals(newFlag)) {
-			b0Row.setMatnr(typeModel.getType() + "New");
+		if ("NEW".equals(newFlag)) {
+			b0Row.setMatnr(typeModel.getType() + "NEW");
 		} else if ("UPG".equals(newFlag)) {
 			b0Row.setMatnr(typeModel.getType() + "UPG");
 		} else if ("MTC".equals(newFlag) && "MTCTOTYPE".equals(FromToType)) {
