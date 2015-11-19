@@ -20,36 +20,148 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 	String Notmakt_ProductID = "1234W13";
 
 	@Test
-	public void r189() {
+	public void r189New() {
 		try {
 			CHWAnnouncement chwA = new CHWAnnouncement();
 			TypeModel typeModel = new TypeModel();
-			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
-			
+			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();		
 
 			typeModel.setType("4441");
 			typeModel.setDiv("B1");
 			chwA.setAnnDocNo("123456");
 			chwA.setAnnouncementType("New");
 			
-			String newFlag = "New";
-			String FromToType = "";
 			String pimsIdentity = "C";
-			String sapPlant = "1999";
+			String sapPlant = "1202";			
+			String FromToType="";
+			String newFlag="NEW";
+		
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r189(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
-					FromToType, pimsIdentity);
+				rfcProxy.r189(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
+						FromToType, pimsIdentity);
+			
+			assertEquals("EA", "EA");
+			
 
-		} catch (HWPIMSAbnormalException ex) {
-			logger.info("error message= " + ex.getMessage());
-			Assert.fail("error message= " + ex.getMessage());
-		} catch (Exception e) {
-			e.getStackTrace();
-			Assert.fail("There is some error :" + e.getMessage());
-		} finally {
-
-		}
+	} catch (HWPIMSAbnormalException ex) {
+		logger.info("error message= " + ex.getMessage());
+		Assert.fail("error message= " + ex.getMessage());
+	} catch (Exception e) {
+		e.getStackTrace();
+		Assert.fail("There is some error :" + e.getMessage());
+	} finally {
 
 	}
 
+}
+	@Test
+	public void r189Upg() {
+		try {
+			CHWAnnouncement chwA = new CHWAnnouncement();
+			TypeModel typeModel = new TypeModel();
+			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
+			
+			typeModel.setType("4441");
+			typeModel.setDiv("B1");
+			chwA.setAnnDocNo("123456");
+			chwA.setAnnouncementType("New");
+			
+			String pimsIdentity = "C";
+			String sapPlant = "1202";	
+			String FromToType="";
+			String newFlag="UPG";
+		
+			RdhRestProxy rfcProxy = new RdhRestProxy();
+				rfcProxy.r189(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
+						FromToType, pimsIdentity);
+			
+			assertEquals("EA", "EA");
+			
+
+	} catch (HWPIMSAbnormalException ex) {
+		logger.info("error message= " + ex.getMessage());
+		Assert.fail("error message= " + ex.getMessage());
+	} catch (Exception e) {
+		e.getStackTrace();
+		Assert.fail("There is some error :" + e.getMessage());
+	} finally {
+
+	}
+
+
+}
+	@Test
+	public void r189MtcToType() {
+		try {
+			CHWAnnouncement chwA = new CHWAnnouncement();
+			TypeModel typeModel = new TypeModel();
+			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
+			
+			typeModel.setType("4441");
+			typeModel.setDiv("B1");
+			chwA.setAnnDocNo("123456");
+			chwA.setAnnouncementType("New");
+			tmUPGObj.setType("4441");
+			
+			String pimsIdentity = "C";
+			String sapPlant = "1202";			
+			String FromToType="MTCTOTYPE";
+			String newFlag="MTC";
+		
+			RdhRestProxy rfcProxy = new RdhRestProxy();
+				rfcProxy.r189(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
+						FromToType, pimsIdentity);
+			
+			assertEquals("EA", "EA");
+			
+
+	} catch (HWPIMSAbnormalException ex) {
+		logger.info("error message= " + ex.getMessage());
+		Assert.fail("error message= " + ex.getMessage());
+	} catch (Exception e) {
+		e.getStackTrace();
+		Assert.fail("There is some error :" + e.getMessage());
+	} finally {
+
+	}
+
+
+}
+	@Test
+	public void r189MtcFromType() {
+		try {
+			CHWAnnouncement chwA = new CHWAnnouncement();
+			TypeModel typeModel = new TypeModel();
+			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
+			
+			typeModel.setType("4441");
+			typeModel.setDiv("B1");
+			chwA.setAnnDocNo("123456");
+			chwA.setAnnouncementType("New");
+			tmUPGObj.setFromType("3331");
+			
+			String pimsIdentity = "C";
+			String sapPlant = "1202";			
+			String FromToType="MTCFROMTYPE";
+			String newFlag="MTC";
+		
+			RdhRestProxy rfcProxy = new RdhRestProxy();
+				rfcProxy.r189(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
+						FromToType, pimsIdentity);
+			
+			assertEquals("EA", "EA");
+			
+
+	} catch (HWPIMSAbnormalException ex) {
+		logger.info("error message= " + ex.getMessage());
+		Assert.fail("error message= " + ex.getMessage());
+	} catch (Exception e) {
+		e.getStackTrace();
+		Assert.fail("There is some error :" + e.getMessage());
+	} finally {
+
+	}
+
+
+}
 }
