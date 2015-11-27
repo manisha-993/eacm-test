@@ -33,21 +33,21 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		Vector vectTaxList = new Vector();
 		// MODTAXRELEVANCE -> TAXCATAGE　－>　SALEORG
 		if (modTaxRelatorItems != null && modTaxRelatorItems.length > 0) {
-			Vector taxCntryList = new Vector();
+			abr.addDebug("TAXCATG size:" + modTaxRelatorItems.length);
 			for(EntityItem modTaxRelatorItem : modTaxRelatorItems) {
-				
 				String classification = getAttributeValue(modTaxRelatorItem, "TAXCLS");
-				
 				Vector taxLinkVct = modTaxRelatorItem.getDownLink();
 				if(taxLinkVct != null && taxLinkVct.size() > 0) {
 					EntityItem taxEntityItem = (EntityItem)taxLinkVct.get(0);
 					Vector taxCountryList = getMultiAttributeValue(taxEntityItem, "COUNTRYLIST");
-					for(int i = 0; i < taxCountryList.size();) {
+					abr.addDebug("Country size：" + taxCountryList.size() + " for TAXCATG：" + taxEntityItem.getKey());
+					for(int i = 0; i < taxCountryList.size(); i++) {
 						String country = (String)taxCountryList.get(i);
 						CntryTax cntryTax = new CntryTax();
 						cntryTax.setClassification(classification);
 						cntryTax.setCountry(country); // what kind type for country， US? 1652? or long desc
 						cntryTax.setTaxCategory(getAttributeValue(taxEntityItem, "TAXCATGATR"));
+						vectTaxList.add(cntryTax);
 					}
 				}
 			}
@@ -93,8 +93,8 @@ public class RFCMODELABR extends RfcAbrAdapter {
 				SimpleDateFormat sdf =   new SimpleDateFormat("yyyy-MM-dd");
 				chwAg.setAnnouncementDate(sdf.parse(getAttributeValue(annItem, "ANNDATE")));
 				
-				abr.addDebug(chwA.toString());
-				abr.addDebug(chwAg.toString());
+				abr.addDebug("CHWAnnouncement:" + chwA.toString());
+				abr.addDebug("CHWAnnouncementGEO:" + chwAg.toString());
 				
 				// If Type not promoted (exists in TYPE table)
 				if (!isTypeExist()) {
@@ -140,7 +140,7 @@ public class RFCMODELABR extends RfcAbrAdapter {
 					String salesOrg = "US"; // mapping not ready
 					rdhRestProxy.r102(chwA, typeModel, _plant, "NEW", null, null, pimsIdentity, flfilcd, salesOrg, vectTaxList); //NEW
 					rdhRestProxy.r102(chwA, typeModel, _plant, "UPG", null, null, pimsIdentity, flfilcd, salesOrg, vectTaxList); //UPG
-										
+								
 					// Create 001 Classification for MG_COMMON for NEW [R103]
 					rdhRestProxy.r103(typeModel, "NEW", chwA, null, null, pimsIdentity); //NEW
 					// Create 001 Classification for MG_COMMON for UPG [R103]
