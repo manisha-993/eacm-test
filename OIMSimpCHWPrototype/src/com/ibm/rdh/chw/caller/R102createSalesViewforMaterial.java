@@ -56,7 +56,8 @@ public class R102createSalesViewforMaterial extends Rfc {
 			b0Row.setMatnr(typeModel.getType() + "UPG");
 		} else if (("MTC").equals(newFlag) && ("MTCTOTYPE").equals(FromToType)) {
 			b0Row.setMatnr(tmUPGObj.getType() + "MTC");
-		} else if (("MTC").equals(newFlag) && ("MTCFROMTYPE").equals(FromToType)) {
+		} else if (("MTC").equals(newFlag)
+				&& ("MTCFROMTYPE").equals(FromToType)) {
 			b0Row.setMatnr(tmUPGObj.getFromType() + "MTC");
 		}
 		b0Row.setMbrsh("M");
@@ -70,14 +71,12 @@ public class R102createSalesViewforMaterial extends Rfc {
 		rfc.setIBmm00(b0Table);
 
 		rfcInfo.append("BMM00 \n");
-		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() 
-				+ ", MATNR>>" + b0Row.getMatnr() 
-				+ ", MBRSH>>" + b0Row.getMbrsh()
-				+ ", MTART>>" + b0Row.getMtart() 
-				+ ", XEIV4>>" + b0Row.getXeiv1() 
-				+ ", XEIV2>>" + b0Row.getXeiv2()
-				+ ", VKORG>>" + b0Row.getVkorg() 
-				+ ", VTWEG>>" + b0Row.getVtweg() + "\n");
+		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
+				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
+				+ ", MTART>>" + b0Row.getMtart() + ", XEIV4>>"
+				+ b0Row.getXeiv1() + ", XEIV2>>" + b0Row.getXeiv2()
+				+ ", VKORG>>" + b0Row.getVkorg() + ", VTWEG>>"
+				+ b0Row.getVtweg() + "\n");
 
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
@@ -85,7 +84,6 @@ public class R102createSalesViewforMaterial extends Rfc {
 		b1Row.setMeins("EA");
 		b1Row.setDwerk(sapPlant);
 		b1Row.setMtpos("Z002");
-
 
 		if ("NEW".equals(newFlag)) {
 			b1Row.setKtgrm("01");
@@ -104,12 +102,9 @@ public class R102createSalesViewforMaterial extends Rfc {
 			b1Row.setMvgr1("PCH");
 		} else if ("LSC".equals(chwA.getSegmentAcronym())) {
 			b1Row.setMvgr1("ZCH");
+		} else if (chwA.isXccOnlyDiv(typeModel.getDiv())) {
+			b1Row.setMvgr1("VRD");
 		}
-		// mark
-		/*
-		 * else if (chwA.isXccOnlyDiv(typeModel.getDiv())){ //RQ0724066720
-		 * b1Row.setMvgr1("VRD"); }
-		 */
 
 		else {
 			b1Row.setMvgr1("HWC");
@@ -127,32 +122,27 @@ public class R102createSalesViewforMaterial extends Rfc {
 
 		b1Row.setAumng("1");
 
-		//add 	
+		// add
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setMatkl("000");
-		b1Row.setSpart(typeModel.getDiv());	//RQ0724066720 changes
+		b1Row.setSpart(typeModel.getDiv()); // RQ0724066720 changes
 		b1Row.setZeiar(chwA.getAnnouncementType());
-		//b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
+		// b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
 		b1Row.setAeszn(sdff.format(curDate));
 		b1Row.setGewei("KG");
-		
-		
+
 		b1Table.appendRow(b1Row);
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
-		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins()
-				+ ", DWERK>>"+ b1Row.getDwerk() 
-				+ ", KTGRM>>" + b1Row.getKtgrm()
-				+ ", MTPOS>>" + b1Row.getMtpos() 
-				+ ", SKTOF>>" + b1Row.getSktof() 
-				+ ", SCMNG>>" + b1Row.getScmng()
-				+ ", MVGR1>>" + b1Row.getMvgr1() 
-				+ ", MVGR2>>" + b1Row.getMvgr2() 
-				+ ", MVGR3>>" + b1Row.getMvgr3()
-				+ ", VERSG>>" + b1Row.getVersg() 
-				+ ", VMSTA>>" + b1Row.getVmsta() 
-				+ ", VMSTD>>" + b1Row.getVmstd()
+		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins() + ", DWERK>>"
+				+ b1Row.getDwerk() + ", KTGRM>>" + b1Row.getKtgrm()
+				+ ", MTPOS>>" + b1Row.getMtpos() + ", SKTOF>>"
+				+ b1Row.getSktof() + ", SCMNG>>" + b1Row.getScmng()
+				+ ", MVGR1>>" + b1Row.getMvgr1() + ", MVGR2>>"
+				+ b1Row.getMvgr2() + ", MVGR3>>" + b1Row.getMvgr3()
+				+ ", VERSG>>" + b1Row.getVersg() + ", VMSTA>>"
+				+ b1Row.getVmsta() + ", VMSTD>>" + b1Row.getVmstd()
 				+ ", AUMNG>>" + b1Row.getAumng() + "\n");
 
 		Bmmh2Table b2Table = new Bmmh2Table();
@@ -168,9 +158,8 @@ public class R102createSalesViewforMaterial extends Rfc {
 				b2Table.appendRow(b2Row);
 
 				rfcInfo.append("BMMH2 \n");
-				rfcInfo.append(Tab + "ALAND>>" + b2Row.getAland() 
-						+ ", TATY1>>" + b2Row.getTaty1() 
-						+ ", TAXM1>>" + b2Row.getTaxm1()
+				rfcInfo.append(Tab + "ALAND>>" + b2Row.getAland() + ", TATY1>>"
+						+ b2Row.getTaty1() + ", TAXM1>>" + b2Row.getTaxm1()
 						+ "\n" + "\n");
 			}
 		}
