@@ -2,6 +2,8 @@ package com.ibm.rdh.rfc.proxy;
 
 
 
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
@@ -17,6 +19,9 @@ import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.pprds.epimshw.util.RfcLogger;
 import com.ibm.rdh.chw.caller.R100createTypeMaterialBasicView;
 import com.ibm.rdh.chw.caller.R101createGenericPlantViewforMaterial;
+import com.ibm.rdh.chw.caller.R102createSalesViewforMaterial;
+import com.ibm.rdh.chw.caller.R103create001ClassificationForMGCommon;
+import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.caller.Rfc;
 import com.ibm.rdh.chw.caller.RfcReturnSeverityCodes;
@@ -66,12 +71,41 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 			TypeModel typeModel, CHWGeoAnn chwAg, String newFlag,
 			String loadingGrp, TypeModelUPGGeo tmUPGObj, String FromToType,
 			String pimsIdentity, String plantValue) throws Exception {
-		R101createGenericPlantViewforMaterial r = getFactory().getr101(chwA, typeModel, chwAg,  newFlag,
-				loadingGrp, tmUPGObj, FromToType,  pimsIdentity, plantValue) ;
+		R101createGenericPlantViewforMaterial r = getFactory().getr101(chwA,
+				typeModel, chwAg,  newFlag, loadingGrp, 
+				tmUPGObj, FromToType,  pimsIdentity, plantValue) ;
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r); 				
-	}		
+	}	
+	
+	public void r102(CHWAnnouncement chwA, TypeModel typeModel,
+			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
+			String fromToType, String pimsIdentity, String flfilcd,
+			String salesOrg, Vector taxCntryList) throws Exception {
+		R102createSalesViewforMaterial r= getFactory().getr102(chwA, typeModel, sapPlant,  newFlag, tmUPGObj, fromToType, 
+				pimsIdentity, flfilcd, salesOrg, taxCntryList);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	public void r103(TypeModel typeModel, String newFlag, CHWAnnouncement chwA,
+			TypeModelUPGGeo tmUPGObj, String fromToType, String pimsIdentity) throws Exception {
+		R103create001ClassificationForMGCommon r=getFactory().getr103(typeModel, newFlag, chwA, tmUPGObj,
+				fromToType, pimsIdentity);
+			logPromoteInfoMessage(r);
+			r.evaluate();
+			logPromoteResultMessage(r);
+	}
+	public void r166(CHWAnnouncement chwA, TypeModel typeModel,
+			CHWGeoAnn chwAg, String storageLocation, String newFlag) throws Exception {
+		R166createSTPPlantViewForMaterial r=getFactory().getr166(chwA,
+			typeModel, chwAg, storageLocation, newFlag);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
 	public void r189(CHWAnnouncement chwA,
 			TypeModel typeModel, String sapPlant, String newFlag,
 			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity)throws Exception {
@@ -83,6 +117,8 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 		logPromoteResultMessage(r);
 		
 	}
+	
+	
 //	public ArrayList r060( SWO swo, Announcement ann, Collection plants ) throws Exception { 
 //		R060ReadPlantViewForMaterial r = getRfcFactory().getR060( swo, ann, plants ) ; 
 //		logPromoteInfoMessage(r);
@@ -204,4 +240,9 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 			this.logPromoteInfoMessage(msgNum, msgText);
 		}
 	}
+
+
+	
+
+	
 }
