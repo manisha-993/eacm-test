@@ -20,6 +20,8 @@ package com.ibm.rdh.rfc.proxy;
 //import com.ibm.pprds.swpims.domain.UpgradeEntitlementFeature;
 //import com.ibm.pprds.swpims.rfc.ReturnDataObjectR001;
 //
+import java.util.Vector;
+
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.TypeModel;
@@ -51,6 +53,21 @@ public abstract class RfcProxy {
 			TypeModel typeModel, CHWGeoAnn chwAg, String newFlag,
 			String loadingGrp, TypeModelUPGGeo tmUPGObj, String FromToType,
 			String pimsIdentity, String plantValue) throws Exception;
+	
+	public abstract void r102(CHWAnnouncement chwA,
+			TypeModel typeModel, String sapPlant, String newFlag,
+			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity,
+			String flfilcd, String salesOrg, Vector taxCntryList)
+			throws Exception;
+	
+	public abstract void r103(TypeModel typeModel,
+			String newFlag, CHWAnnouncement chwA, TypeModelUPGGeo tmUPGObj,
+			String FromToType, String pimsIdentity) throws Exception;
+	
+	public abstract void r166(CHWAnnouncement chwA,
+			TypeModel typeModel, CHWGeoAnn chwAg, String storageLocation,
+			String newFlag) throws Exception;
+	
 	public abstract void  r189(CHWAnnouncement chwA,
 			TypeModel typeModel, String sapPlant, String newFlag,
 			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity) throws Exception ;

@@ -78,7 +78,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 		r.evaluate();
 		logPromoteResultMessage(r); 				
 	}	
-	
+	@Override
 	public void r102(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String fromToType, String pimsIdentity, String flfilcd,
@@ -89,7 +89,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 		r.evaluate();
 		logPromoteResultMessage(r);
 	}
-
+	@Override
 	public void r103(TypeModel typeModel, String newFlag, CHWAnnouncement chwA,
 			TypeModelUPGGeo tmUPGObj, String fromToType, String pimsIdentity) throws Exception {
 		R103create001ClassificationForMGCommon r=getFactory().getr103(typeModel, newFlag, chwA, tmUPGObj,
@@ -98,6 +98,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes
 			r.evaluate();
 			logPromoteResultMessage(r);
 	}
+	@Override
 	public void r166(CHWAnnouncement chwA, TypeModel typeModel,
 			CHWGeoAnn chwAg, String storageLocation, String newFlag) throws Exception {
 		R166createSTPPlantViewForMaterial r=getFactory().getr166(chwA,
