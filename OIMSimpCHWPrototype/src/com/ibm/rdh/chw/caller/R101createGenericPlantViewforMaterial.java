@@ -39,8 +39,6 @@ public class R101createGenericPlantViewforMaterial extends Rfc{
 
 		b0Row.setTcode("MM01");
 
-		// Changes Made by Laxmi
-				
 		if((("1999").equals(plantValue)) && ((("NEW").equals(newFlag)) || (("UPG").equals(newFlag)) || (("MTC").equals(newFlag))))
 			b0Row.setLgort("CHW1");
 		
@@ -66,7 +64,6 @@ public class R101createGenericPlantViewforMaterial extends Rfc{
 		b0Row.setWerks(plantValue);
 
 //		b0Row.setLgort(storageLocation);
-
 
 		b0Row.setXeid1("X");
 		b0Row.setXeid2("X");
@@ -101,6 +98,7 @@ public class R101createGenericPlantViewforMaterial extends Rfc{
 
 		b1Row.setMeins("EA");
 		b1Row.setTragr("STD");
+//		add 3 set value
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setMatkl("000");
 		b1Row.setSpart(typeModel.getDiv()); 
@@ -154,7 +152,6 @@ public class R101createGenericPlantViewforMaterial extends Rfc{
 				if (typeModel.getVendorID() != null || (!typeModel.getVendorID().equals(""))){
 					b1Row.setEkgrp("001");
 				}
-				//if (typeModel.getVendorID() != null || (!typeModel.getVendorID().equals(""))){
 				if (!typeModel.getVendorID().equals("")){
 					b1Row.setMfrnr(typeModel.getVendorID());
 				}
