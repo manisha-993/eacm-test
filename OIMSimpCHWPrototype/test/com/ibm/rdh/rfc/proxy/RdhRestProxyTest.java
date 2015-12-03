@@ -113,30 +113,45 @@ public class RdhRestProxyTest extends Assert {
     }
    
     /**
-     * delete the data in all tables and set ID for the SWO
+     * delete the data in all tables
      * @param prodctID
      */
-//    public int prepareData(String prodctID){
-//    	//table list
-//    	//MARA, MAKT, MARM, MARC, MVKE,  MLAN,
-//
-//   			
-//		//first delete the exist data in the table
-////		int t1 = SqlHelper.runUpdateSql("delete from SAPR3.MARA where mandt='"+Constants.MANDT+"' and matnr='"+swo.getProductID()+"'", conn);
-////		int t2 = SqlHelper.runUpdateSql("delete from SAPR3.MAKT where mandt='"+Constants.MANDT+"' and matnr='"+swo.getProductID()+"'", conn);
-////		int t3 = SqlHelper.runUpdateSql("delete from SAPR3.MARM where mandt='"+Constants.MANDT+"' and matnr='"+swo.getProductID()+"'", conn);
-////		int t4 = SqlHelper.runUpdateSql("delete from SAPR3.MARC where mandt='"+Constants.MANDT+"' and matnr='"+swo.getProductID()+"'", conn);
-////		int t5 = SqlHelper.runUpdateSql("delete from SAPR3.MVKE where mandt='"+Constants.MANDT+"' and matnr='"+swo.getProductID()+"'", conn);
-////		int t6 = SqlHelper.runUpdateSql("delete from SAPR3.MLAN where mandt='"+Constants.MANDT+"' and matnr='"+swo.getProductID()+"'", conn);
-////		
-////		if(t1>=0 && t2>=0 && t3>=0 && t4>=0 && t5>=0 && t6>=0){
-////			return 0;
-////		}else{
-////			return -1;
-////		}
-//    	
-//    }
-//    
+    public int deleteDataMatmCreate(String prodctID){
+    	//table list
+    	//MARA, MAKT, MARM, MARC, MVKE,  MLAN,
+   			
+		//first delete the exist data in the table
+		int t1 = SqlHelper.runUpdateSql("delete from SAPR3.MARA where mandt='"+Constants.MANDT+"' and matnr='"+prodctID+"'", conn);
+		int t2 = SqlHelper.runUpdateSql("delete from SAPR3.MAKT where mandt='"+Constants.MANDT+"' and matnr='"+prodctID+"'", conn);
+		int t3 = SqlHelper.runUpdateSql("delete from SAPR3.MARM where mandt='"+Constants.MANDT+"' and matnr='"+prodctID+"'", conn);
+		int t4 = SqlHelper.runUpdateSql("delete from SAPR3.MARC where mandt='"+Constants.MANDT+"' and matnr='"+prodctID+"'", conn);
+		int t5 = SqlHelper.runUpdateSql("delete from SAPR3.MVKE where mandt='"+Constants.MANDT+"' and matnr='"+prodctID+"'", conn);
+		int t6 = SqlHelper.runUpdateSql("delete from SAPR3.MLAN where mandt='"+Constants.MANDT+"' and matnr='"+prodctID+"'", conn);
+		
+		if(t1>=0 && t2>=0 && t3>=0 && t4>=0 && t5>=0 && t6>=0){
+			return 0;
+		}else{
+			return -1;
+		}
+    	
+    }
+
+    public int deleteDataClassicationMaint(String prodctID){
+    	//table list
+    	//KSSK, INOB, AUSP
+   			
+		//first delete the exist data in the table
+		int t1 = SqlHelper.runUpdateSql("delete from SAPR3.KSSK where mandt='"+Constants.MANDT+"' and objek='"+prodctID+"'", conn);
+		int t2 = SqlHelper.runUpdateSql("delete from SAPR3.INOB where mandt='"+Constants.MANDT+"' and objek='"+prodctID+"'", conn);
+		int t3 = SqlHelper.runUpdateSql("delete from SAPR3.AUSP where mandt='"+Constants.MANDT+"' and objek='"+prodctID+"'", conn);
+		
+		if(t1>=0 && t2>=0 && t3>=0){
+			return 0;
+		}else{
+			return -1;
+		}
+    	
+    }
 //    /**
 //     *  input matnr
 //     * @param prodctID

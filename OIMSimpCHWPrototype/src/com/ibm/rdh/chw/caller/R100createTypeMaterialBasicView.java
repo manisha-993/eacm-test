@@ -209,7 +209,7 @@ public class R100createTypeMaterialBasicView extends Rfc {
 	@Override
 	protected String getMaterialName() {
 		// TODO Auto-generated method stub
-		return null;
+		return "Create type material basic view";
 	}
 	public void evaluate() throws Exception { 
 		execute() ; 
