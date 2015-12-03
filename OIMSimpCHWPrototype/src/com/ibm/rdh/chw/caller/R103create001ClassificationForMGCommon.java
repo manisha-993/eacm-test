@@ -193,7 +193,7 @@ public class R103create001ClassificationForMGCommon extends Rfc {
 	@Override
 	protected String getMaterialName() {
 		// TODO Auto-generated method stub
-		return null;
+		return "Create 001 Classification for MG_COMMON";
 	}
 
 	@Override
