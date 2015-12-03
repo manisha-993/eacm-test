@@ -175,7 +175,7 @@ public class R104createZDMClassification extends Rfc {
 	@Override
 	protected String getMaterialName() {
 		// TODO Auto-generated method stub
-		return null;
+		return "Create ZDM Classification";
 	}
 
 	@Override
