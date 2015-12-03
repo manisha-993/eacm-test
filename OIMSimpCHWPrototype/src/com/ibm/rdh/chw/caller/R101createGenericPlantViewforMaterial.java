@@ -62,9 +62,8 @@ public class R101createGenericPlantViewforMaterial extends Rfc{
 //		String geography = chwAg.getGeography();
 //		String plantBySalesOrg = SalesOrgToPlantMapper.getPlantBySalesOrg(geography);
 		b0Row.setWerks(plantValue);
-
+		
 //		b0Row.setLgort(storageLocation);
-
 		b0Row.setXeid1("X");
 		b0Row.setXeid2("X");
 		// SAP Ledger
@@ -98,12 +97,12 @@ public class R101createGenericPlantViewforMaterial extends Rfc{
 
 		b1Row.setMeins("EA");
 		b1Row.setTragr("STD");
-//		add 3 set value
+		//add 3 set value, In the previous epimshw code
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setMatkl("000");
 		b1Row.setSpart(typeModel.getDiv()); 
-
-//		b1Row.setLadgr(chwPlant.getLoadingGroup());
+		//end
+		
 		if (("MTC").equals(newFlag))
 		{
 			b1Row.setLadgr(tmUPGObj.getLoadingGroup());
@@ -270,7 +269,7 @@ public class R101createGenericPlantViewforMaterial extends Rfc{
 	@Override
 	protected String getMaterialName() {
 		// TODO Auto-generated method stub
-		return null;
+		return "Create Generic Plant View for material";
 	}
 	public void evaluate() throws Exception { 
 		execute() ; 

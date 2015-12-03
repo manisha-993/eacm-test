@@ -1,6 +1,8 @@
 package com.ibm.rdh.rfc.proxy;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -16,35 +18,72 @@ import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 public class R101createGenericPlantViewforMaterialTest extends RdhRestProxyTest {
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
+
 	@Test
 	public void testR101queryFound01() {
 		try {
 			logger.info("newFlag:NEW");
+			String type = "EACM";
+			String newFlag = "NEW";
+			deleteDataMatmCreate(type + newFlag);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
+					"Z_DM_SAP_MATM_CREATE", type + newFlag);
+
 			CHWAnnouncement chwA = new CHWAnnouncement();
-			chwA.setAnnDocNo("123456");
+			chwA.setAnnDocNo("123401");
 			chwA.setAnnouncementType("New");
-			TypeModel typeModel = new TypeModel();		
-			typeModel.setType("4441");
+			TypeModel typeModel = new TypeModel();
+			typeModel.setType(type);
 			typeModel.setDiv("B1");
 			typeModel.setProductHierarchy("ph");
 			CHWGeoAnn chwAg = new CHWGeoAnn();
 			chwAg.setAnnouncementDate(new Date());
-			chwAg.setAnnDocNo("123456");
+			chwAg.setAnnDocNo("123402");
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
 			tmUPGObj.setLoadingGroup("M");
-			tmUPGObj.setType("4443");
-			
-			String newFlag = "NEW";
+			tmUPGObj.setType("EACMT1");
+
 			String FromToType = "MTCTOTYPE";
 			String loadingGrp = "";
-			String pimsIdentity = "S";
+			String pimsIdentity = "C";
 			String plantValue = "1222";
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r101(chwA, typeModel, chwAg, newFlag,
-								loadingGrp, tmUPGObj, FromToType,
-								pimsIdentity, plantValue);
-					
-			assertEquals("EA", "EA");
+			rfcProxy.r101(chwA, typeModel, chwAg, newFlag, loadingGrp,
+					tmUPGObj, FromToType, pimsIdentity, plantValue);
+
+			// Test function execute success
+			Map<String, String> map = new HashMap<String, String>();
+			Map<String, Object> rowDetails;
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ZDMOBJKEY", "'" + type + newFlag + "'");
+			map.put("ZDMOBJTYP", "'MAT'");
+			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ACTIV_ID", "'Z_DM_SAP_MATM_CREATE'");
+			map.put("OBJECT_ID", "'" + type + newFlag + "'");
+			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
+			assertNotNull(rowDetails);
+			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
+
+			map.clear();
+			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Created records in parking table: 2'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Material Master created/updated successfully: "
+					+ type + newFlag + "'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			assertNotNull(rowDetails);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -62,31 +101,68 @@ public class R101createGenericPlantViewforMaterialTest extends RdhRestProxyTest 
 	public void testR101queryFound02() {
 		try {
 			logger.info("newFlag:UPG");
+			String type = "EACM";
+			String newFlag = "UPG";
+			deleteDataMatmCreate(type + newFlag);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
+					"Z_DM_SAP_MATM_CREATE", type + newFlag);
+
 			CHWAnnouncement chwA = new CHWAnnouncement();
-			chwA.setAnnDocNo("123456");
+			chwA.setAnnDocNo("123401");
 			chwA.setAnnouncementType("New");
-			TypeModel typeModel = new TypeModel();		
-			typeModel.setType("4441");
+			TypeModel typeModel = new TypeModel();
+			typeModel.setType(type);
 			typeModel.setDiv("B1");
 			typeModel.setProductHierarchy("ph");
 			CHWGeoAnn chwAg = new CHWGeoAnn();
 			chwAg.setAnnouncementDate(new Date());
-			chwAg.setAnnDocNo("123456");
+			chwAg.setAnnDocNo("123402");
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
 			tmUPGObj.setLoadingGroup("M");
-			tmUPGObj.setType("4443");
-			
-			String newFlag = "UPG";
+			tmUPGObj.setType("EACMT1");
+
 			String FromToType = "MTCTOTYPE";
 			String loadingGrp = "";
-			String pimsIdentity = "S";
+			String pimsIdentity = "C";
 			String plantValue = "1222";
+
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r101(chwA, typeModel, chwAg, newFlag,
-								loadingGrp, tmUPGObj, FromToType,
-								pimsIdentity, plantValue);
-					
-			assertEquals("EA", "EA");
+			rfcProxy.r101(chwA, typeModel, chwAg, newFlag, loadingGrp,
+					tmUPGObj, FromToType, pimsIdentity, plantValue);
+
+			// Test function execute success
+			Map<String, String> map = new HashMap<String, String>();
+			Map<String, Object> rowDetails;
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ZDMOBJKEY", "'" + type + newFlag + "'");
+			map.put("ZDMOBJTYP", "'MAT'");
+			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ACTIV_ID", "'Z_DM_SAP_MATM_CREATE'");
+			map.put("OBJECT_ID", "'" + type + newFlag + "'");
+			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
+			assertNotNull(rowDetails);
+			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
+
+			map.clear();
+			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Created records in parking table: 2'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Material Master created/updated successfully: "
+					+ type + newFlag + "'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			assertNotNull(rowDetails);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -104,31 +180,68 @@ public class R101createGenericPlantViewforMaterialTest extends RdhRestProxyTest 
 	public void testR101queryFound03() {
 		try {
 			logger.info("newFlag:MTC,FromToType:MTCTOTYPE");
+			String type = "EACMT1";
+			String newFlag = "MTC";
+			deleteDataMatmCreate(type + newFlag);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
+					"Z_DM_SAP_MATM_CREATE", type + newFlag);
+
 			CHWAnnouncement chwA = new CHWAnnouncement();
-			chwA.setAnnDocNo("123456");
+			chwA.setAnnDocNo("123401");
 			chwA.setAnnouncementType("New");
-			TypeModel typeModel = new TypeModel();		
-			typeModel.setType("4441");
+			TypeModel typeModel = new TypeModel();
+			typeModel.setType("EACM");
 			typeModel.setDiv("B1");
 			typeModel.setProductHierarchy("ph");
 			CHWGeoAnn chwAg = new CHWGeoAnn();
 			chwAg.setAnnouncementDate(new Date());
-			chwAg.setAnnDocNo("123456");
+			chwAg.setAnnDocNo("123402");
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
 			tmUPGObj.setLoadingGroup("M");
-			tmUPGObj.setType("4443");
-			
-			String newFlag = "MTC";
+			tmUPGObj.setType(type);
+
 			String FromToType = "MTCTOTYPE";
 			String loadingGrp = "";
-			String pimsIdentity = "S";
+			String pimsIdentity = "C";
 			String plantValue = "1222";
+
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r101(chwA, typeModel, chwAg, newFlag,
-								loadingGrp, tmUPGObj, FromToType,
-								pimsIdentity, plantValue);
-					
-			assertEquals("EA", "EA");
+			rfcProxy.r101(chwA, typeModel, chwAg, newFlag, loadingGrp,
+					tmUPGObj, FromToType, pimsIdentity, plantValue);
+
+			// Test function execute success
+			Map<String, String> map = new HashMap<String, String>();
+			Map<String, Object> rowDetails;
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ZDMOBJKEY", "'" + type + newFlag + "'");
+			map.put("ZDMOBJTYP", "'MAT'");
+			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ACTIV_ID", "'Z_DM_SAP_MATM_CREATE'");
+			map.put("OBJECT_ID", "'" + type + newFlag + "'");
+			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
+			assertNotNull(rowDetails);
+			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
+
+			map.clear();
+			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Created records in parking table: 2'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Material Master created/updated successfully: "
+					+ type + newFlag + "'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			assertNotNull(rowDetails);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -146,31 +259,69 @@ public class R101createGenericPlantViewforMaterialTest extends RdhRestProxyTest 
 	public void testR101queryFound04() {
 		try {
 			logger.info("newFlag:MTC,FromToType:MTCFROMTYPE");
+			String type = "EACMF1";
+			String newFlag = "MTC";
+			deleteDataMatmCreate(type + newFlag);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
+					"Z_DM_SAP_MATM_CREATE", type + newFlag);
+
 			CHWAnnouncement chwA = new CHWAnnouncement();
-			chwA.setAnnDocNo("123456");
+			chwA.setAnnDocNo("123401");
 			chwA.setAnnouncementType("New");
-			TypeModel typeModel = new TypeModel();		
-			typeModel.setType("4441");
+			TypeModel typeModel = new TypeModel();
+			typeModel.setType("EACM");
 			typeModel.setDiv("B1");
 			typeModel.setProductHierarchy("ph");
 			CHWGeoAnn chwAg = new CHWGeoAnn();
 			chwAg.setAnnouncementDate(new Date());
-			chwAg.setAnnDocNo("123456");
+			chwAg.setAnnDocNo("123402");
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
 			tmUPGObj.setLoadingGroup("M");
-			tmUPGObj.setType("4443");
-			
-			String newFlag = "MTC";
+			tmUPGObj.setType("EACMT1");
+			tmUPGObj.setFromType(type);
+
 			String FromToType = "MTCFROMTYPE";
 			String loadingGrp = "";
-			String pimsIdentity = "S";
+			String pimsIdentity = "C";
 			String plantValue = "1222";
+
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r101(chwA, typeModel, chwAg, newFlag,
-								loadingGrp, tmUPGObj, FromToType,
-								pimsIdentity, plantValue);
-					
-			assertEquals("EA", "EA");
+			rfcProxy.r101(chwA, typeModel, chwAg, newFlag, loadingGrp,
+					tmUPGObj, FromToType, pimsIdentity, plantValue);
+
+			// Test function execute success
+			Map<String, String> map = new HashMap<String, String>();
+			Map<String, Object> rowDetails;
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ZDMOBJKEY", "'" + type + newFlag + "'");
+			map.put("ZDMOBJTYP", "'MAT'");
+			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ACTIV_ID", "'Z_DM_SAP_MATM_CREATE'");
+			map.put("OBJECT_ID", "'" + type + newFlag + "'");
+			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
+			assertNotNull(rowDetails);
+			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
+
+			map.clear();
+			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Created records in parking table: 2'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Material Master created/updated successfully: "
+					+ type + newFlag + "'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			assertNotNull(rowDetails);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -184,4 +335,11 @@ public class R101createGenericPlantViewforMaterialTest extends RdhRestProxyTest 
 
 	}
 
+	// @Test
+	public void afterClass() {
+		// deleteMATMCreateData("EACMNEW");
+		// deleteMATMCreateData("EACMUPG");
+		// deleteMATMCreateData("EACMT1MTC");
+		// deleteMATMCreateData("EACMF1MTC");
+	}
 }
