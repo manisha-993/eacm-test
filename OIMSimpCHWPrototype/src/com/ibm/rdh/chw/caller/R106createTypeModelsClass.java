@@ -136,7 +136,7 @@ public class R106createTypeModelsClass extends Rfc {
 	@Override
 	protected String getMaterialName() {
 		// TODO Auto-generated method stub
-		return null;
+		return "Create type MODELS class";
 	}
 
 	@Override
