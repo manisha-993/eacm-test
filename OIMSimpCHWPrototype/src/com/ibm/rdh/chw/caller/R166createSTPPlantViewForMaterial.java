@@ -102,10 +102,11 @@ public class R166createSTPPlantViewForMaterial extends Rfc {
 		b1Row.setDisgr("Z025");
 		b1Row.setPerkz("M");
 		
-		//add 3 set
+		//add 3 set value, In the previous epimshw code
 		b1Row.setMatkl("000");
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setSpart(typeModel.getDiv());
+		//end
 		
 		b1Table.appendRow(b1Row);
 		rfc.setIBmmh1(b1Table);
@@ -205,7 +206,7 @@ public class R166createSTPPlantViewForMaterial extends Rfc {
 	@Override
 	protected String getMaterialName() {
 		// TODO Auto-generated method stub
-		return null;
+		return "Create STP Plant 1001 View for material";
 	}
 
 	@Override
