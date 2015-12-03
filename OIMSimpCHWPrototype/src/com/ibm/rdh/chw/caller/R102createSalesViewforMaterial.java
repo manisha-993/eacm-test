@@ -122,7 +122,7 @@ public class R102createSalesViewforMaterial extends Rfc {
 
 		b1Row.setAumng("1");
 
-		// add
+		// add 6 set value, In the previous epimshw code 
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setMatkl("000");
 		b1Row.setSpart(typeModel.getDiv()); // RQ0724066720 changes
@@ -130,7 +130,8 @@ public class R102createSalesViewforMaterial extends Rfc {
 		// b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
 		b1Row.setAeszn(sdff.format(curDate));
 		b1Row.setGewei("KG");
-
+		//end
+		
 		b1Table.appendRow(b1Row);
 		rfc.setIBmmh1(b1Table);
 
@@ -232,7 +233,7 @@ public class R102createSalesViewforMaterial extends Rfc {
 	@Override
 	protected String getMaterialName() {
 		// TODO Auto-generated method stub
-		return null;
+		return "Create Sales View for material";
 	}
 
 	@Override
