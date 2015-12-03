@@ -168,7 +168,7 @@ public class R189createCFIPlantViewForType extends Rfc {
 	@Override
 	protected String getMaterialName() {
 		// TODO Auto-generated method stub
-		return null;
+		return "Create CFI Plant View for Type NEW or UPG material";
 	}
 
 	@Override
