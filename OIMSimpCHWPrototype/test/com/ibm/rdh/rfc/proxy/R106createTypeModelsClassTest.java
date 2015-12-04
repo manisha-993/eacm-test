@@ -17,11 +17,6 @@ public class R106createTypeModelsClassTest extends RdhRestProxyTest {
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
 
-	String XEIxx_R001 = "K";
-	String Insert_ProductID = "1234W11";
-	String Notmara_ProductID = "1234W12";
-	String Notmakt_ProductID = "1234W13";
-
 	String activeId = "Z_DM_SAP_CLASS_MAINTAIN";
 
 	@Test
@@ -34,25 +29,19 @@ public class R106createTypeModelsClassTest extends RdhRestProxyTest {
 			chwA.setAnnDocNo("123401");
 			String pimsIdentity = "C";
 
-			String delete_klah_sql = "delete from SAPR3.KLAH where mandt = '"
-					+ Constants.MANDT + "' and ClASS ='MK_"
-					+ typeModel.getType() + "_MODELS'";
-			String delete_swor_sql = "delete from SAPR3.SWOR where mandt = '"
-					+ Constants.MANDT
-					+ "' and KSCHL= 'Models for Machine Type "
-					+ typeModel.getType()
-					+ "' and KSCHG = 'Models for Machine Type "
-					+ typeModel.getType() + "' ";
-
-			SqlHelper.runUpdateSql(delete_klah_sql, conn);
-			SqlHelper.runUpdateSql(delete_swor_sql, conn);
+			String class_id = "MK_" + typeModel.getType() + "_MODELS";
+			deleteKLAHRow("300", class_id, Constants.MANDT);
+			deleteSWORRow("300", class_id, Constants.MANDT);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId, "300"
+					+ class_id);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
+
 			rfcProxy.r106(typeModel, chwA, pimsIdentity);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
-		    String objectId = "300"+"MK_"+typeModel.getType()+"_MODELS";
+			String objectId = "300" + "MK_" + typeModel.getType() + "_MODELS";
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
@@ -67,9 +56,14 @@ public class R106createTypeModelsClassTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("STATUS", "'success'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			String logdtlText = (String) rowDetails.get("TEXT");
+
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-			assertNotNull(rowDetails);
+
+			assertNotNull("Material Master created/updated successfully",
+					logdtlText);
+
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
