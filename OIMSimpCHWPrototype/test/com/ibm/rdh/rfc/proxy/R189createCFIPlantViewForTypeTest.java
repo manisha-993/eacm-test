@@ -16,14 +16,10 @@ import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
-
-	String XEIxx_R001 = "K";
-	String Insert_ProductID = "1234W11";
-	String Notmara_ProductID = "1234W12";
-	String Notmakt_ProductID = "1234W13";
+	
 	String activeId = "Z_DM_SAP_MATM_CREATE";
 
-	@Test
+	 @Test
 	public void r189New() {
 		try {
 			CHWAnnouncement chwA = new CHWAnnouncement();
@@ -40,10 +36,12 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 			String FromToType = "";
 			String newFlag = "NEW";
 
-			String type = typeModel.getType() + newFlag;
+			int deleteDataResult = deleteDataMatmCreate(typeModel.getType()
+					+ newFlag);
+			assertEquals(deleteDataResult, 0);
 
-			int deleteRow = prepareData(type);
-			assertEquals(deleteRow, 0);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId,
+					typeModel.getType() + newFlag);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r189(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
@@ -66,9 +64,13 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("STATUS", "'success'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			String logdtlText = (String) rowDetails.get("TEXT");
+
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-			assertNotNull(rowDetails);
+
+			assertNotNull("Material Master created/updated successfully",
+					logdtlText);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -82,7 +84,7 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 
 	}
 
-	 @Test
+	@Test
 	public void r189Upg() {
 		try {
 			CHWAnnouncement chwA = new CHWAnnouncement();
@@ -98,10 +100,13 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 			String sapPlant = "Y";
 			String FromToType = "";
 			String newFlag = "UPG";
-			String type = typeModel.getType() + newFlag;
 
-			int deleteRow = prepareData(type);
-			assertEquals(deleteRow, 0);
+			int deleteDataResult = deleteDataMatmCreate(typeModel.getType()
+					+ newFlag);
+			assertEquals(deleteDataResult, 0);
+
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId,
+					typeModel.getType() + newFlag);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r189(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
@@ -124,9 +129,13 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("STATUS", "'success'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			String logdtlText = (String) rowDetails.get("TEXT");
+
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-			assertNotNull(rowDetails);
+
+			assertNotNull("Material Master created/updated successfully",
+					logdtlText);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -140,7 +149,7 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 
 	}
 
-	@Test
+	 @Test
 	public void r189MtcToType() {
 		try {
 			CHWAnnouncement chwA = new CHWAnnouncement();
@@ -157,10 +166,13 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 			String sapPlant = "Y";
 			String FromToType = "MTCTOTYPE";
 			String newFlag = "MTC";
-			String type = tmUPGObj.getType() + newFlag;
 
-			int deleteRow = prepareData(type);
-			assertEquals(deleteRow, 0);
+			int deleteDataResult = deleteDataMatmCreate(tmUPGObj.getType()
+					+ newFlag);
+			assertEquals(deleteDataResult, 0);
+
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId,
+					tmUPGObj.getType() + newFlag);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r189(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
@@ -183,9 +195,13 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("STATUS", "'success'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			String logdtlText = (String) rowDetails.get("TEXT");
+
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-			assertNotNull(rowDetails);
+
+			assertNotNull("Material Master created/updated successfully",
+					logdtlText);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -216,10 +232,13 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 			String sapPlant = "Y";
 			String FromToType = "MTCFROMTYPE";
 			String newFlag = "MTC";
-			String type = tmUPGObj.getFromType() + newFlag;
 
-			int deleteRow = prepareData(type);
-			assertEquals(deleteRow, 0);
+			int deleteDataResult = deleteDataMatmCreate(tmUPGObj.getFromType()
+					+ newFlag);
+			assertEquals(deleteDataResult, 0);
+
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId,
+					tmUPGObj.getFromType() + newFlag);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r189(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
@@ -242,9 +261,13 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("STATUS", "'success'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			String logdtlText = (String) rowDetails.get("TEXT");
+
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-			assertNotNull(rowDetails);
+
+			assertNotNull("Material Master created/updated successfully",
+					logdtlText);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -254,43 +277,6 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 			Assert.fail("There is some error :" + e.getMessage());
 		} finally {
 
-		}
-
-	}
-
-	public int prepareData(String type) {
-
-		String delete_mara_sql = "delete from SAPR3.MARA where mandt = '"
-				+ Constants.MANDT + "'and MATNR = '" + type + "'";
-
-		String delete_makt_sql = "delete from SAPR3.MAKT where mandt = '"
-				+ Constants.MANDT + "'and MATNR = '" + type + "'";
-
-		String delete_marm_sql = "delete from SAPR3.MARM where mandt = '"
-				+ Constants.MANDT + "'and MATNR = '" + type + "'";
-
-		String delete_marc_sql = "delete from SAPR3.MARC where mandt = '"
-				+ Constants.MANDT + "'and MATNR = '" + type + "'";
-
-		String delete_mvke_sql = "delete from SAPR3.MVKE where mandt = '"
-				+ Constants.MANDT + "'and MATNR = '" + type + "'";
-
-		String delete_mlan_sql = "delete from SAPR3.MLAN where mandt = '"
-				+ Constants.MANDT + "'and MATNR = '" + type + "'";
-
-		int t1 = SqlHelper.runUpdateSql(delete_mara_sql, conn);
-		int t2 = SqlHelper.runUpdateSql(delete_makt_sql, conn);
-		int t3 = SqlHelper.runUpdateSql(delete_marm_sql, conn);
-		int t4 = SqlHelper.runUpdateSql(delete_marc_sql, conn);
-		int t5 = SqlHelper.runUpdateSql(delete_mvke_sql, conn);
-		int t6 = SqlHelper.runUpdateSql(delete_mlan_sql, conn);
-
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0) {
-
-			return 0;
-
-		} else {
-			return -1;
 		}
 
 	}

@@ -31,6 +31,8 @@ public class R189createCFIPlantViewForType extends Rfc {
 
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE();
 
+		//Set Up the RFC Fields
+		//Bmm00 - B0 
 		Bmm00Table b0Table = new Bmm00Table();
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
 		b0Row.setTcode("MM01");
@@ -48,8 +50,11 @@ public class R189createCFIPlantViewForType extends Rfc {
 
 		b0Row.setXeiv4("X");
 		b0Row.setWerks(sapPlant);
+		
+		//new data add start
 		b0Row.setMbrsh("M");
-		b0Row.setMtart("ZPRT");
+		b0Row.setMtart("ZMAT");
+		//new data add end
 
 		b0Table.appendRow(b0Row);
 		rfc.setIBmm00(b0Table);
@@ -60,13 +65,21 @@ public class R189createCFIPlantViewForType extends Rfc {
 				", WERKS>>" + b0Row.getWerks() + 
 				", MBRSH>>" + b0Row.getMbrsh() + 
 				", MTART>>" + b0Row.getMtart() + "\n");
-
+		
+		//Bmmh1 - B1 
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
+		//new data add start
 		b1Row.setGewei("KG");
 		b1Row.setSpart(typeModel.getDiv());
-
+		b1Row.setMatkl("000");
+		b1Row.setMeins("EA");
+		b1Row.setZeinr(chwA.getAnnDocNo());
+		b1Row.setZeiar(chwA.getAnnouncementType());
+		b1Row.setAeszn(sdf.format(new Date()));
+		//new data add end
+	
 		b1Row.setLadgr("B001");
 
 		if ("1999".equals(sapPlant))
@@ -86,11 +99,7 @@ public class R189createCFIPlantViewForType extends Rfc {
 			}
 		}
 
-		b1Row.setMatkl("000");
-		b1Row.setMeins("EA");
-		b1Row.setZeinr(chwA.getAnnDocNo());
-		b1Row.setZeiar(chwA.getAnnouncementType());
-		b1Row.setAeszn(sdf.format(new Date()));
+		
 
 		b1Table.appendRow(b1Row);
 		rfc.setIBmmh1(b1Table);
