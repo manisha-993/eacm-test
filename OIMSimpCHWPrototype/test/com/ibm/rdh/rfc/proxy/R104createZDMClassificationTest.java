@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
@@ -18,13 +20,26 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
 
-	String XEIxx_R001 = "K";
-	String Insert_ProductID = "1234W11";
-	String Notmara_ProductID = "1234W12";
-	String Notmakt_ProductID = "1234W13";
 	String activeId = "Z_DM_SAP_CLASSIFICATION_MAINT";
 
-	@Test
+	@Before
+	public void prepareData() {
+		String sql_klah = "insert into SAPR3.KLAH select '200',CLINT,KLART, CLASS,STATU,KLAGR,BGRSE,BGRKL,BGRKP,ANAME,"
+				+ "ADATU,VNAME,VDATU,VONDT,BISDT,ANZUO,PRAUS,SICHT,DOKNR,DOKAR,DOKTL,"
+				+ "DOKVR,DINKZ,NNORM,NORMN,NORMB,NRMT1,NRMT2,AUSGD,VERSD,VERSI,LEIST,VERWE,SPART,LREF3,WWSKZ,"
+				+ "WWSSI,POTPR,CLOBK,CLMUL,CVIEW,DISST,MEINS,CLMOD,VWSTL,VWPLA,CLALT,"
+				+ "LBREI,BNAME,MAXBL,KNOBJ,SHAD_UPDATE_TS,SHAD_UPDATE_IND,SAP_TS from SAPR3.KLAH "
+				+ "where mandt='300' and KLART='ZDM' and CLASS='MD_CHW_NA'";
+
+		int t1 = SqlHelper.runUpdateSql(sql_klah, conn);
+		if (t1 >= 0) {
+			System.out.println("insert success");
+		} else {
+			System.out.println("insert failed");
+		}
+	}
+
+	 @Test
 	public void r104New() {
 
 		try {
@@ -39,11 +54,11 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 			String FromToType = "";
 			String newFlag = "NEW";
 
-			String delete_kssk_sql = "delete from SAPR3.KSSK where mandt = '"
-					+ Constants.MANDT + "' and KLART = 'ZDM' and OBJEK ='"
-					+ typeModel.getType() + "NEW'";
-
-			SqlHelper.runUpdateSql(delete_kssk_sql, conn);
+			int deleteDataResult = deleteDataClassicationMaint(typeModel
+					.getType() + newFlag);
+			assertEquals(deleteDataResult, 0);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId, "ZDM"
+					+ typeModel.getType() + newFlag);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 
@@ -52,8 +67,7 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
-		    String objectId = "ZDM"+typeModel.getType()+newFlag;
-			
+			String objectId = "ZDM" + typeModel.getType() + newFlag;
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
@@ -68,9 +82,13 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("STATUS", "'success'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			String logdtlText = (String) rowDetails.get("TEXT");
+
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-			assertNotNull(rowDetails);
+
+			assertNotNull("Material Master created/updated successfully",
+					logdtlText);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -98,11 +116,12 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			String FromToType = "";
 			String newFlag = "UPG";
-			String delete_kssk_sql = "delete from SAPR3.KSSK where mandt = '"
-					+ Constants.MANDT + "' and KLART = 'ZDM' and OBJEK ='"
-					+ typeModel.getType() + "UPG'";
 
-			SqlHelper.runUpdateSql(delete_kssk_sql, conn);
+			int deleteDataResult = deleteDataClassicationMaint(typeModel
+					.getType() + newFlag);
+			assertEquals(deleteDataResult, 0);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId, "ZDM"
+					+ typeModel.getType() + newFlag);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 
@@ -111,8 +130,7 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
-			String objectId = "ZDM"+typeModel.getType()+newFlag;
-			
+			String objectId = "ZDM" + typeModel.getType() + newFlag;
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
@@ -127,9 +145,13 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("STATUS", "'success'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			String logdtlText = (String) rowDetails.get("TEXT");
+
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-			assertNotNull(rowDetails);
+
+			assertNotNull("Material Master created/updated successfully",
+					logdtlText);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -143,7 +165,7 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 	}
 
-	 @Test
+	// @Test
 	public void r104MtcToType() {
 
 		try {
@@ -158,11 +180,12 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			String FromToType = "MTCTOTYPE";
 			String newFlag = "MTC";
-			String delete_kssk_sql = "delete from SAPR3.KSSK where mandt = '"
-					+ Constants.MANDT + "' and KLART = 'ZDM' and OBJEK ='"
-					+ tmUPGObj.getType() + "MTC'";
 
-			SqlHelper.runUpdateSql(delete_kssk_sql, conn);
+			int deleteDataResult = deleteDataClassicationMaint(typeModel
+					.getType() + newFlag);
+			assertEquals(deleteDataResult, 0);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId, "ZDM"
+					+ tmUPGObj.getType() + newFlag);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 
@@ -171,8 +194,7 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
-			String objectId = "ZDM"+tmUPGObj.getType()+newFlag;
-			
+			String objectId = "ZDM" + tmUPGObj.getType() + newFlag;
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
@@ -187,9 +209,13 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("STATUS", "'success'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			String logdtlText = (String) rowDetails.get("TEXT");
+
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-			assertNotNull(rowDetails);
+
+			assertNotNull("Material Master created/updated successfully",
+					logdtlText);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -219,11 +245,12 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 			String FromToType = "MTCFROMTYPE";
 			String newFlag = "MTC";
 
-			String delete_kssk_sql = "delete from SAPR3.KSSK where mandt = '"
-					+ Constants.MANDT + "' and KLART = 'ZDM' and OBJEK ='"
-					+ tmUPGObj.getFromType() + "MTC'";
+			int deleteDataResult = deleteDataClassicationMaint(typeModel
+					.getType() + newFlag);
+			assertEquals(deleteDataResult, 0);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId, "ZDM"
+					+ tmUPGObj.getFromType() + newFlag);
 
-			SqlHelper.runUpdateSql(delete_kssk_sql, conn);
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 
 			rfcProxy.r104(typeModel, newFlag, chwA, tmUPGObj, FromToType,
@@ -231,8 +258,7 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
-			String objectId = "ZDM"+tmUPGObj.getFromType()+newFlag;
-			
+			String objectId = "ZDM" + tmUPGObj.getFromType() + newFlag;
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
@@ -247,9 +273,13 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("STATUS", "'success'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			String logdtlText = (String) rowDetails.get("TEXT");
+
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-			assertNotNull(rowDetails);
+
+			assertNotNull("Material Master created/updated successfully",
+					logdtlText);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -261,6 +291,17 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 		}
 
+	}
+
+	@After
+	public void deleteData() {
+		String del_klah = "delete from SAPR3.KLAH where mandt='200' and KLART='ZDM' and CLASS='MD_CHW_NA'";
+		int t1 = SqlHelper.runUpdateSql(del_klah, conn);
+		if (t1 >= 0) {
+			System.out.println("delete success");
+		} else {
+			System.out.println("delete failed");
+		}
 	}
 
 }

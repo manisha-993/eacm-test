@@ -59,14 +59,14 @@ public class R104createZDMClassification extends Rfc {
 		KlahTable r2Table = new KlahTable();
 		KlahTableRow r2Row = r2Table.createEmptyRow();
 		
-		// 
+		
 		if (chwA.isXccOnlyDiv(typeModel.getDiv())) {
 			r2Row.setClass("MD_XHW_NA");
 		} else {
 			r2Row.setClass("MD_CHW_NA");
 		}
 		
-		r2Row.setClass("MD_CHW_NA");
+		
 		r2Table.appendRow(r2Row);
 		rfc.setIKlah(r2Table);
 
