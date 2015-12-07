@@ -9,6 +9,7 @@ import COM.ibm.eannounce.objects.EntityItem;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
 import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
 
+import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.SalesOrgToPlantMapper;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
@@ -22,7 +23,7 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		super(rfcAbrStatus);
 	}
 	
-	public void processThis() throws RfcAbrException, Exception {
+	public void processThis() throws RfcAbrException, HWPIMSAbnormalException, Exception {
 		abr.addDebug("RFCMODELABR start processThis()");
 		// Entity from EACM
 		EntityItem modelItem = getRooEntityItem();
@@ -67,9 +68,7 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		CHWAnnouncement chwA = new CHWAnnouncement();
 		CHWGeoAnn chwAg = new CHWGeoAnn();
 		
-		
 		// Old code， only use chwAg for LA 
-		
 		
 		String flfilcd = typeModel.getFlfilCd(typeModel.getFlfilCol());
 		abr.addDebug("Flfilcd:" + flfilcd);
@@ -138,8 +137,16 @@ public class RFCMODELABR extends RfcAbrAdapter {
 					// Create type UPG material sales view [R102]
 					String _plant = "1222"; // mapping not ready
 					String salesOrg = "US"; // mapping not ready
+					// no OIMDS role, can't create TAXCATG at BHDEV, hard code here
+					vectTaxList = new Vector();
+					CntryTax cntryTax = new CntryTax();
+					cntryTax.setClassification("2");
+					cntryTax.setCountry("US");
+					cntryTax.setTaxCategory("ZTXD");
+					vectTaxList.add(cntryTax);
 					rdhRestProxy.r102(chwA, typeModel, _plant, "NEW", null, null, pimsIdentity, flfilcd, salesOrg, vectTaxList); //NEW
 					rdhRestProxy.r102(chwA, typeModel, _plant, "UPG", null, null, pimsIdentity, flfilcd, salesOrg, vectTaxList); //UPG
+					abr.addDebug("Call R102 NEW and UPG successfully");
 								
 					// Create 001 Classification for MG_COMMON for NEW [R103]
 					rdhRestProxy.r103(typeModel, "NEW", chwA, null, null, pimsIdentity); //NEW
@@ -156,12 +163,11 @@ public class RFCMODELABR extends RfcAbrAdapter {
 					abr.addDebug("Call R106 successfully");
 				}
 			}
+			abr.addDebug("RFCMODELABR end processThis()");
 		} else {
 			throw new RfcAbrException("Not found ANNOUNCEMENT, will not promote this MODEL");
 		}
 	}
-	
-	
 	
 	private boolean isTypeExist() {
 		return false;

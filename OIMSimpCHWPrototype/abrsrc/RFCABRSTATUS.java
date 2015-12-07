@@ -7,7 +7,9 @@ package COM.ibm.eannounce.abr.sg.rfc;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
+import java.text.CharacterIterator;
 import java.text.MessageFormat;
+import java.text.StringCharacterIterator;
 import java.util.ResourceBundle;
 
 import COM.ibm.eannounce.abr.util.ABRUtil;
@@ -23,6 +25,7 @@ import COM.ibm.opicmpdh.middleware.MiddlewareException;
 import COM.ibm.opicmpdh.middleware.Stopwatch;
 import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
 
+import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
 public class RFCABRSTATUS extends PokBaseABR {
@@ -74,7 +77,11 @@ public class RFCABRSTATUS extends PokBaseABR {
 				addOutput("Promoted " + rootEntity.getKey() + " successfully");
 			} catch (RfcAbrException e) {
 				e.printStackTrace();
-				addOutput(e.getMessage());
+				addOutput("Error" + e.getMessage());
+				setReturnCode(FAIL);
+			} catch (HWPIMSAbnormalException e) {
+				e.printStackTrace();
+				addOutput("Error message from RFC web service: " + e.getMessage());
 				setReturnCode(FAIL);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -121,7 +128,7 @@ public class RFCABRSTATUS extends PokBaseABR {
 	}
 
 	public String getABRVersion() {
-		return "";
+		return "1.0";
 	}
 	
 	public static void main(String[] args) {
@@ -132,7 +139,60 @@ public class RFCABRSTATUS extends PokBaseABR {
 	 * add msg to report output
 	 */
 	protected void addOutput(String msg) {
-		rptSb.append("<p>" + msg + "</p>" + NEWLINE);
+		rptSb.append("<p>" + convertToHTML(msg) + "</p>" + NEWLINE);
+	}
+	
+	/**
+	 * Convert string into valid html. Special HTML characters are converted.
+	 *
+	 * @param txt
+	 *            String to convert
+	 * @return String
+	 */
+	private static String convertToHTML(String txt) {
+		String retVal = "";
+		StringBuffer htmlSB = new StringBuffer();
+		StringCharacterIterator sci = null;
+		char ch = ' ';
+		if (txt != null) {
+			sci = new StringCharacterIterator(txt);
+			ch = sci.first();
+			while (ch != CharacterIterator.DONE) {
+				switch (ch) {
+				case '<':
+					htmlSB.append("&lt;");
+					break;
+				case '>':
+					htmlSB.append("&gt;");
+					break;
+				case '"':
+					// double quotation marks could be saved as &quot; also.
+					// this will be &#34;
+					// this should be included too, but left out to be
+					// consistent with west coast
+					htmlSB.append("&quot;");
+					break;
+				case '\'':
+					// IE6 doesn't support &apos; to convert single quotation
+					// marks,we can use &#39; instead
+					htmlSB.append("&#" + ((int) ch) + ";");
+					break;
+				// case '&':
+				// ignore entity references such as &lt; if user typed it, user
+				// will see it
+				// could be saved as &amp; also. this will be &#38;
+				// htmlSB.append("&#"+((int)ch)+";");
+				// htmlSB.append("&amp;");
+				// break;
+				default:
+					htmlSB.append(ch);
+					break;
+				}
+				ch = sci.next();
+			}
+			retVal = htmlSB.toString();
+		}
+		return retVal;
 	}
 	
 	/**
@@ -189,7 +249,7 @@ public class RFCABRSTATUS extends PokBaseABR {
 		"<tr><th>Role: </th><td>{1}</td></tr>"+NEWLINE +
 		"<tr><th>Workgroup: </th><td>{2}</td></tr>"+NEWLINE +
 		"<tr><th>Date/Time: </th><td>{3}</td></tr>"+NEWLINE +
-		"<tr><th>Action Taken: </th><td>{4}</td></tr>"+NEWLINE+
+		"<tr><th>RFC ABR: </th><td>{4}</td></tr>"+NEWLINE+
 		"</table>"+NEWLINE+
 		"<!-- {5} -->" + NEWLINE;
 		msgf = new MessageFormat(HEADER2);
@@ -197,7 +257,7 @@ public class RFCABRSTATUS extends PokBaseABR {
 		args[1] = m_prof.getRoleDescription();
 		args[2] = m_prof.getWGName();
 		args[3] = t2DTS;
-		args[4] = "RFC ABR<br/>" + (getReturnCode() == PASS ? "Pass" : "Failed");
+		args[4] = (getReturnCode() == PASS ? "Passed" : "Failed");
 		args[5] = getABRVersion();
 		String header2 = msgf.format(args);		
 		println(header2);
