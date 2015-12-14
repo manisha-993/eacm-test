@@ -16,6 +16,8 @@ import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
+import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
+import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.caller.Rfc;
 import com.ibm.rdh.chw.caller.RfcReturnSeverityCodes;
@@ -74,6 +76,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 	}
 
+	@Override
 	public void r102(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String fromToType, String pimsIdentity, String flfilcd,
@@ -86,6 +89,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 	}
 
+	@Override
 	public void r103(TypeModel typeModel, String newFlag, CHWAnnouncement chwA,
 			TypeModelUPGGeo tmUPGObj, String fromToType, String pimsIdentity)
 			throws Exception {
@@ -119,7 +123,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 
 	}
-
+	
 	@Override
 	public void r130(String type, String featRanges, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception {
@@ -142,7 +146,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 
 	}
-
+	@Override
 	public void r166(CHWAnnouncement chwA, TypeModel typeModel,
 			CHWGeoAnn chwAg, String storageLocation, String newFlag)
 			throws Exception {
@@ -153,6 +157,27 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 	}
 
+	@Override
+	public void r176(String type, String range, String newFlag,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		R176create300ClassificationForTypeFEAT r = getFactory().getr176(type,
+				range, newFlag, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r177(String type, String range, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R177create300ClassificationForTypeUFForUPG r = getFactory().getr177(
+				type, range, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
 	public void r189(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String FromToType, String pimsIdentity) throws Exception {

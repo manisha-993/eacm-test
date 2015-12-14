@@ -81,6 +81,12 @@ public abstract class RfcProxy {
 			CHWGeoAnn chwAg, String storageLocation, String newFlag)
 			throws Exception;
 
+	public abstract void r176(String type, String range, String newFlag,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
+
+	public abstract void r177(String type, String range, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
 	public abstract void r189(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String FromToType, String pimsIdentity) throws Exception;

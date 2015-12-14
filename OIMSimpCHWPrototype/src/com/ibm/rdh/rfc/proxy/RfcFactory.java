@@ -14,6 +14,8 @@ import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
+import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
+import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
@@ -100,6 +102,20 @@ public class RfcFactory extends Object {
 			String newFlag) throws Exception {
 		return new R166createSTPPlantViewForMaterial(chwA, typeModel, chwAg,
 				storageLocation, newFlag);
+	}
+
+	public R176create300ClassificationForTypeFEAT getr176(String type,
+			String range, String newFlag, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		return new R176create300ClassificationForTypeFEAT(type, range, newFlag,
+				chwA, pimsIdentity);
+	}
+
+	public R177create300ClassificationForTypeUFForUPG getr177(String type,
+			String range, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R177create300ClassificationForTypeUFForUPG(type, range,
+				chwA, pimsIdentity);
 	}
 
 	public R189createCFIPlantViewForType getr189(CHWAnnouncement chwA,
