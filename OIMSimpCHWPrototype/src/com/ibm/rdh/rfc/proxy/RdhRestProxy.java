@@ -13,6 +13,8 @@ import com.ibm.rdh.chw.caller.R102createSalesViewforMaterial;
 import com.ibm.rdh.chw.caller.R103create001ClassificationForMGCommon;
 import com.ibm.rdh.chw.caller.R104createZDMClassification;
 import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
+import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
+import com.ibm.rdh.chw.caller.R131createTypeUFClass;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.caller.Rfc;
@@ -111,6 +113,29 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 			String pimsIdentity) throws Exception {
 
 		R106createTypeModelsClass r = getFactory().getr106(typeModel, chwA,
+				pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r130(String type, String featRanges, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R130createTypeFEATClass r = getFactory().getr130(type, featRanges,
+				chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r131(String type, String featRanges, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+
+		R131createTypeUFClass r = getFactory().getr131(type, featRanges, chwA,
 				pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();

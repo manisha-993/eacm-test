@@ -71,6 +71,12 @@ public abstract class RfcProxy {
 	public abstract void r106(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
+	public abstract void r130(String type, String featRanges,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
+
+	public abstract void r131(String type, String featRanges,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
+
 	public abstract void r166(CHWAnnouncement chwA, TypeModel typeModel,
 			CHWGeoAnn chwAg, String storageLocation, String newFlag)
 			throws Exception;
@@ -200,4 +206,5 @@ public abstract class RfcProxy {
 	protected void setRfcFactory(RfcFactory factory) {
 		_rfcFactory = factory;
 	}
+
 }

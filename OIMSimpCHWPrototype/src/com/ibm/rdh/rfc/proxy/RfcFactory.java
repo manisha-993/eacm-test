@@ -11,6 +11,8 @@ import com.ibm.rdh.chw.caller.R102createSalesViewforMaterial;
 import com.ibm.rdh.chw.caller.R103create001ClassificationForMGCommon;
 import com.ibm.rdh.chw.caller.R104createZDMClassification;
 import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
+import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
+import com.ibm.rdh.chw.caller.R131createTypeUFClass;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
@@ -74,10 +76,23 @@ public class RfcFactory extends Object {
 
 	}
 
-	public R106createTypeModelsClass getr106(TypeModel typeModel, CHWAnnouncement chwA,
-			String pimsIdentity) throws Exception {
+	public R106createTypeModelsClass getr106(TypeModel typeModel,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 
 		return new R106createTypeModelsClass(typeModel, chwA, pimsIdentity);
+	}
+
+	public R130createTypeFEATClass getr130(String type, String featRanges,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+
+		return new R130createTypeFEATClass(type, featRanges, chwA, pimsIdentity);
+
+	}
+
+	public R131createTypeUFClass getr131(String type, String featRanges,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+
+		return new R131createTypeUFClass(type, featRanges, chwA, pimsIdentity);
 	}
 
 	public R166createSTPPlantViewForMaterial getr166(CHWAnnouncement chwA,
