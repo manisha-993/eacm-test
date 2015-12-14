@@ -44,7 +44,7 @@ public class R102createSalesViewforMaterialTest extends RdhRestProxyTest {
 			String FromToType = "MTCTOTYPE";
 			String pimsIdentity = "C";
 			String flfilcd = "fl1";
-			String salesOrg = "so1";
+			String salesOrg = "0147";
 			Vector taxCntryList = new Vector();
 			CntryTax cntryTax = new CntryTax();
 			cntryTax.setCountry("US");
