@@ -2,6 +2,7 @@ package COM.ibm.eannounce.abr.sg.rfc;
 
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
@@ -161,6 +162,55 @@ public class RFCMODELABR extends RfcAbrAdapter {
 					// Create type MODELS class [R106]
 					rdhRestProxy.r106(typeModel, chwA, pimsIdentity);
 					abr.addDebug("Call R106 successfully");
+					
+					// get ranges for type from promoted type table
+					// Vector Ranges = (Vector) promotedTypeclasses.get(tmObj.getType());
+					
+					// For each class range (0000, 1000 , . . . 9000)
+					for (int fRanges = 0; fRanges <= 9; fRanges++) {
+						String featRanges = fRanges + "000";
+						String type = typeModel.getType();
+						// Create Type FEAT Range class [R130]
+						rdhRestProxy.r130(type, featRanges, chwA, pimsIdentity);
+						abr.addDebug("Call R130 successfully");
+						// Create 300 Classification for Type FEAT for NEW [R176]
+						rdhRestProxy.r176(type, featRanges, "NEW", chwA, pimsIdentity);
+						// Create 300 Classification for Type FEAT for UPG [R176]
+						rdhRestProxy.r176(type, featRanges, "UPG", chwA, pimsIdentity);
+						abr.addDebug("Call R176 NEW and UPG successfully");
+						// Create Type UF class [R131]
+						rdhRestProxy.r131(type, featRanges, chwA, pimsIdentity);
+						abr.addDebug("Call R131 NEW and UPG successfully");
+						// Create 300 Classification for Type UF for UPG [R177]
+						rdhRestProxy.r177(type, featRanges, chwA, pimsIdentity);
+						abr.addDebug("Call R177 NEW and UPG successfully");
+						
+						// Insert Type/Feature class row in PROMOTED_TYPECLASS (delayed)
+						// type not promoted, save type and range to table
+//						Hashtable promotedTypes = new Hashtable();
+//						if (!promotedTypes.containsKey(typeModel.getType())) {
+//							ptypClassCol.addPromotedType(typeModel.getType());
+//							ptypClassCol.addRange(typeModel.getType(), featRanges);
+//						}
+//						else {
+//							if (!Ranges.contains(featRanges)) {
+//								ptypClassCol.addRange(typeModel.getType(), featRanges);
+//							}
+//						}
+//						// PromotedTypeCollection , get all promoted type from table
+//						Hashtable nowPromotedTypeClasses = new Hashtable();
+//						if (!nowPromotedTypeClasses.containsKey(typeModel.getType())) {
+//							Vector nowPromotedRanges = new Vector();
+//							nowPromotedRanges.addElement(featRanges);
+//							nowPromotedTypeClasses.put(typeModel.getType(), nowPromotedRanges);
+//						} else {
+//							Vector nowPromotedRanges = (Vector) nowPromotedTypeClasses.get(typeModel.getType());
+//							if (!nowPromotedRanges.contains(featRanges)) {
+//								nowPromotedRanges.addElement(featRanges);
+//							}
+//						}
+						
+					} // end for For loop
 				}
 			}
 			abr.addDebug("RFCMODELABR end processThis()");

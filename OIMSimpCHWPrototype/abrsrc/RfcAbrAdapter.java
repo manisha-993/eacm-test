@@ -23,6 +23,9 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 	
 	public static final String LOCAL_REAL_PATH = "./properties/dev";
 	
+	/*
+	 * Check required attribute for entities when call getAttribute() method
+	 */
 	private static Vector<String> modelRequiredAttrsVct = new Vector<String>();
 	private static Vector<String> annRequiredAttrsVct = new Vector<String>();
 	private static Hashtable<String, Vector<String>> requiredTypeAttrsTbl = new Hashtable<String, Vector<String>>();

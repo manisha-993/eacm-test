@@ -78,10 +78,16 @@ public class RFCABRSTATUS extends PokBaseABR {
 			} catch (RfcAbrException e) {
 				e.printStackTrace();
 				addOutput("Error" + e.getMessage());
+				StringWriter exBuf = new StringWriter();
+				e.printStackTrace(new PrintWriter(exBuf));
+				addComment(exBuf.getBuffer().toString());
 				setReturnCode(FAIL);
 			} catch (HWPIMSAbnormalException e) {
 				e.printStackTrace();
 				addOutput("Error message from RFC web service: " + e.getMessage());
+				StringWriter exBuf = new StringWriter();
+				e.printStackTrace(new PrintWriter(exBuf));
+				addComment(exBuf.getBuffer().toString());
 				setReturnCode(FAIL);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -210,6 +216,13 @@ public class RFCABRSTATUS extends PokBaseABR {
 		if (D.EBUG_DETAIL <= DEBUG_LVL) {
 			rptSb.append("<!-- " + msg + " -->" + NEWLINE);
 		}
+	}
+	
+	/**
+     * add msg as comment to report output
+     */
+	protected void addComment(String msg) {
+		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
 	}
 	
 	private void buildReport() {
