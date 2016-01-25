@@ -13,9 +13,12 @@ import com.ibm.rdh.chw.caller.R102createSalesViewforMaterial;
 import com.ibm.rdh.chw.caller.R103create001ClassificationForMGCommon;
 import com.ibm.rdh.chw.caller.R104createZDMClassification;
 import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
+import com.ibm.rdh.chw.caller.R108createTypeMODCharacteristic;
+import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
+import com.ibm.rdh.chw.caller.R150create012ClassificationForMOD;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
@@ -128,6 +131,27 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r108(TypeModel typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R108createTypeMODCharacteristic r = getFactory().getr108(typeModel,
+				chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r110(TypeModel typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R110assignMODCharacteristicToModelsClass r = getFactory().getr110(
+				typeModel, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+
+	@Override
 	public void r123(String type, TypeModelUPGGeo tmUPGObj, String newFlag,
 			CHWAnnouncement chwA, String FromToType, String pimsIdentity)
 			throws Exception {
@@ -161,6 +185,17 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 
 	}
+
+	@Override
+	public void r150(TypeModel typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R150create012ClassificationForMOD r = getFactory().getr150(typeModel,
+				chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
 
 	@Override
 	public void r160(TypeModel typeModel, CHWAnnouncement chwA,

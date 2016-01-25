@@ -11,9 +11,12 @@ import com.ibm.rdh.chw.caller.R102createSalesViewforMaterial;
 import com.ibm.rdh.chw.caller.R103create001ClassificationForMGCommon;
 import com.ibm.rdh.chw.caller.R104createZDMClassification;
 import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
+import com.ibm.rdh.chw.caller.R108createTypeMODCharacteristic;
+import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
+import com.ibm.rdh.chw.caller.R150create012ClassificationForMOD;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
@@ -87,6 +90,21 @@ public class RfcFactory extends Object {
 		return new R106createTypeModelsClass(typeModel, chwA, pimsIdentity);
 	}
 
+	public R108createTypeMODCharacteristic getr108(TypeModel typeModel,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+
+		return new R108createTypeMODCharacteristic(typeModel, chwA,
+				pimsIdentity);
+	}
+
+	public R110assignMODCharacteristicToModelsClass getr110(
+			TypeModel typeModel, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+
+		return new R110assignMODCharacteristicToModelsClass(typeModel, chwA,
+				pimsIdentity);
+	}
+
 	public R123create300ClassificationForTypeModels getr123(String type,
 			TypeModelUPGGeo tmUPGObj, String newFlag, CHWAnnouncement chwA,
 			String FromToType, String pimsIdentity) throws Exception {
@@ -108,6 +126,11 @@ public class RfcFactory extends Object {
 		return new R131createTypeUFClass(type, featRanges, chwA, pimsIdentity);
 	}
 
+	public R150create012ClassificationForMOD getr150(TypeModel typeModel,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception{
+		return new R150create012ClassificationForMOD(typeModel, chwA, pimsIdentity);
+	}
+	
 	public R160assignChartoClassFEAT_0000 getr160(TypeModel typeModel,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 
