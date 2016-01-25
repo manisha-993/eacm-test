@@ -71,15 +71,26 @@ public abstract class RfcProxy {
 	public abstract void r106(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
+	public abstract void r123(String type, TypeModelUPGGeo tmUPGObj,
+			String newFlag, CHWAnnouncement chwA, String FromToType,
+			String pimsIdentity) throws Exception;
+
 	public abstract void r130(String type, String featRanges,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
 
 	public abstract void r131(String type, String featRanges,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
 
+	public abstract void r160(TypeModel typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
 	public abstract void r166(CHWAnnouncement chwA, TypeModel typeModel,
 			CHWGeoAnn chwAg, String storageLocation, String newFlag)
 			throws Exception;
+
+	public abstract void r175(TypeModel typemodel, TypeModelUPGGeo tmUPGObj,
+			CHWAnnouncement chwA, String newFlag, String FromToType,
+			String pimsIdentity) throws Exception;
 
 	public abstract void r176(String type, String range, String newFlag,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception;

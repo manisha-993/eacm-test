@@ -13,9 +13,12 @@ import com.ibm.rdh.chw.caller.R102createSalesViewforMaterial;
 import com.ibm.rdh.chw.caller.R103create001ClassificationForMGCommon;
 import com.ibm.rdh.chw.caller.R104createZDMClassification;
 import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
+import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
+import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
+import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
 import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
@@ -123,7 +126,19 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 
 	}
-	
+
+	@Override
+	public void r123(String type, TypeModelUPGGeo tmUPGObj, String newFlag,
+			CHWAnnouncement chwA, String FromToType, String pimsIdentity)
+			throws Exception {
+		R123create300ClassificationForTypeModels r = getFactory().getr123(type,
+				tmUPGObj, newFlag, chwA, FromToType, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
 	@Override
 	public void r130(String type, String featRanges, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception {
@@ -146,12 +161,36 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 
 	}
+
+	@Override
+	public void r160(TypeModel typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+
+		R160assignChartoClassFEAT_0000 r = getFactory().getr160(typeModel,
+				chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
 	@Override
 	public void r166(CHWAnnouncement chwA, TypeModel typeModel,
 			CHWGeoAnn chwAg, String storageLocation, String newFlag)
 			throws Exception {
 		R166createSTPPlantViewForMaterial r = getFactory().getr166(chwA,
 				typeModel, chwAg, storageLocation, newFlag);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r175(TypeModel typemodel, TypeModelUPGGeo tmUPGObj,
+			CHWAnnouncement chwA, String newFlag, String FromToType,
+			String pimsIdentity) throws Exception {
+		R175create001ClassificationForMMFieldsType r = getFactory().getr175(
+				typemodel, tmUPGObj, chwA, newFlag, FromToType, pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
