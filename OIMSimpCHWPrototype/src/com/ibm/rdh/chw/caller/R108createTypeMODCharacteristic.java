@@ -34,6 +34,10 @@ public class R108createTypeMODCharacteristic extends Rfc {
 		c0Row.setCharnumberString("3");
 		c0Row.setStatus("1");
 		c0Row.setValassignm("S");
+		
+		//add
+		c0Row.setAdditVals("X");
+		c0Row.setNegVals("X");
 
 		c0Table.appendRow(c0Row);
 		rfc.setICharacts(c0Table);
