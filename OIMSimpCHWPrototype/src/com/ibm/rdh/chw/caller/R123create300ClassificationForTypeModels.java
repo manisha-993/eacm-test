@@ -111,7 +111,6 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 		MaraTableRow r5Row = r5Table.createEmptyRow();
 
 		// Passing date
-		// r5Row.setErsdaString(sdf.format(curDate));
 		r5Row.setErsda(curDate);
 
 		r5Table.appendRow(r5Row);
@@ -123,6 +122,8 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 		// API_AUSP - R6
 		Api_auspTable r6Table = new Api_auspTable();
 		Api_auspTableRow r6Row = r6Table.createEmptyRow();
+		//not set
+		r6Row.setValue("CH");
 		if (("MTC").equals(newFlag)) {
 			if (("MTCTOTYPE").equals(FromToType)) {
 				r6Row.setCharact("MK_" + tmUPGObj.getType() + "_MOD");
