@@ -81,7 +81,6 @@ public abstract class RfcProxy {
 			CHWGeoAnn chwAg, String pimsIdentity, String plantValue)
 			throws Exception;
 
-
 	public abstract void r116(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String loadingGroup, CHWGeoAnn chwAg,
 			String storageLocation, String pimsIdentity) throws Exception;
@@ -120,11 +119,11 @@ public abstract class RfcProxy {
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String FromToType, String pimsIdentity) throws Exception;
 	
-	public abstract void r209(String material) throws Exception;
-	
 	public abstract void r207(String type, String model, String plant)
 			throws Exception;
-
+	
+	public abstract void r209(String material) throws Exception;
+	
 	// public abstract ReturnDataObjectR001 r001(SWO swo) throws Exception ;
 	// public abstract boolean r002(SWO swo, String salesOrg) throws Exception;
 	// public abstract Vector r002DataFunction(SWO swo, GeoCountry country, int

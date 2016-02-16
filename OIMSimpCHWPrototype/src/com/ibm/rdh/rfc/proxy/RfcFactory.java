@@ -195,15 +195,18 @@ public class RfcFactory extends Object {
 				newFlag, tmUPGObj, FromToType, pimsIdentity);
 
 	}
-
-	public R209ReadBasicViewOfMaterial getr209(String material)
-			throws Exception {
-		return new R209ReadBasicViewOfMaterial(material);
-	}
-
+	
 	public R207ReadPlantViewMaterial getr207(String type, String model,
 			String plant) throws Exception {
 		return new R207ReadPlantViewMaterial(type,model,plant);
 
 	}
+	
+	public R209ReadBasicViewOfMaterial getr209(String material)
+			throws Exception {
+		return new R209ReadBasicViewOfMaterial(material);
+		
+	}
+
+	
 }

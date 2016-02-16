@@ -164,6 +164,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		r.evaluate();
 		logPromoteResultMessage(r);
 	}
+	
 	@Override
 	public void r116(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String loadingGroup, CHWGeoAnn chwAg,
@@ -287,15 +288,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 
 	}
-
-	@Override
-	public void r209(String material) throws Exception {
-		R209ReadBasicViewOfMaterial r=getFactory().getr209(material);
-		logPromoteInfoMessage(r);
-		r.evaluate();
-		logPromoteResultMessage(r);
-	}
-
+	
 	@Override
 	public void r207(String type, String model, String plant) throws Exception {
 		R207ReadPlantViewMaterial r = getFactory().getr207(type, model, plant);
@@ -305,6 +298,15 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 	}
 
+	@Override
+	public void r209(String material) throws Exception {
+		R209ReadBasicViewOfMaterial r=getFactory().getr209(material);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	
 	// public ArrayList r060( SWO swo, Announcement ann, Collection plants )
 	// throws Exception {
 	// R060ReadPlantViewForMaterial r = getRfcFactory().getR060( swo, ann,
