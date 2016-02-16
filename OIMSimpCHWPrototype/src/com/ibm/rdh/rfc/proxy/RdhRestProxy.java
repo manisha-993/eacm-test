@@ -15,6 +15,7 @@ import com.ibm.rdh.chw.caller.R104createZDMClassification;
 import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
 import com.ibm.rdh.chw.caller.R108createTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
+import com.ibm.rdh.chw.caller.R116createPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
@@ -25,6 +26,7 @@ import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
 import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
+import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.Rfc;
 import com.ibm.rdh.chw.caller.RfcReturnSeverityCodes;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
@@ -150,6 +152,18 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 	}
 
+	@Override
+	public void r116(CHWAnnouncement chwA, TypeModel typeModel,
+			String sapPlant, String loadingGroup, CHWGeoAnn chwAg,
+			String storageLocation, String pimsIdentity) throws Exception {
+		R116createPlantViewForTypeModelMaterial r = getFactory().getr116(chwA,
+				typeModel, sapPlant, loadingGroup, chwAg, storageLocation,
+				pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
 
 	@Override
 	public void r123(String type, TypeModelUPGGeo tmUPGObj, String newFlag,
@@ -195,7 +209,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		r.evaluate();
 		logPromoteResultMessage(r);
 	}
-
 
 	@Override
 	public void r160(TypeModel typeModel, CHWAnnouncement chwA,
@@ -257,6 +270,15 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 			String FromToType, String pimsIdentity) throws Exception {
 		R189createCFIPlantViewForType r = getFactory().getr189(chwA, typeModel,
 				sapPlant, newFlag, tmUPGObj, FromToType, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r207(String type, String model, String plant) throws Exception {
+		R207ReadPlantViewMaterial r = getFactory().getr207(type, model, plant);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);

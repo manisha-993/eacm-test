@@ -71,12 +71,16 @@ public abstract class RfcProxy {
 	public abstract void r106(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
-	public abstract void r108(TypeModel typeModel, CHWAnnouncement chwA, 
+	public abstract void r108(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
 	public abstract void r110(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
-	
+
+	public abstract void r116(CHWAnnouncement chwA, TypeModel typeModel,
+			String sapPlant, String loadingGroup, CHWGeoAnn chwAg,
+			String storageLocation, String pimsIdentity) throws Exception;
+
 	public abstract void r123(String type, TypeModelUPGGeo tmUPGObj,
 			String newFlag, CHWAnnouncement chwA, String FromToType,
 			String pimsIdentity) throws Exception;
@@ -87,9 +91,9 @@ public abstract class RfcProxy {
 	public abstract void r131(String type, String featRanges,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
 
-	public abstract void r150(TypeModel typeModel,CHWAnnouncement chwA, 
+	public abstract void r150(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
-	
+
 	public abstract void r160(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
@@ -110,6 +114,9 @@ public abstract class RfcProxy {
 	public abstract void r189(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String FromToType, String pimsIdentity) throws Exception;
+
+	public abstract void r207(String type, String model, String plant)
+			throws Exception;
 
 	// public abstract ReturnDataObjectR001 r001(SWO swo) throws Exception ;
 	// public abstract boolean r002(SWO swo, String salesOrg) throws Exception;

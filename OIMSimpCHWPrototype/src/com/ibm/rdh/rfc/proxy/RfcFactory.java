@@ -13,6 +13,7 @@ import com.ibm.rdh.chw.caller.R104createZDMClassification;
 import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
 import com.ibm.rdh.chw.caller.R108createTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
+import com.ibm.rdh.chw.caller.R116createPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
@@ -23,6 +24,7 @@ import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
 import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
+import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.TypeModel;
@@ -30,7 +32,7 @@ import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 
 /**
  * @author bobc
- *
+ * 
  *         rjc - this factory will only create the rfc class, but NOT execute
  *         it.
  */
@@ -105,6 +107,15 @@ public class RfcFactory extends Object {
 				pimsIdentity);
 	}
 
+	public R116createPlantViewForTypeModelMaterial getr116(
+			CHWAnnouncement chwA, TypeModel typeModel, String sapPlant,
+			String loadingGroup, CHWGeoAnn chwAg, String storageLocation,
+			String pimsIdentity) throws Exception {
+
+		return new R116createPlantViewForTypeModelMaterial(chwA, typeModel,
+				sapPlant, loadingGroup, chwAg, storageLocation, pimsIdentity);
+	}
+
 	public R123create300ClassificationForTypeModels getr123(String type,
 			TypeModelUPGGeo tmUPGObj, String newFlag, CHWAnnouncement chwA,
 			String FromToType, String pimsIdentity) throws Exception {
@@ -127,10 +138,11 @@ public class RfcFactory extends Object {
 	}
 
 	public R150create012ClassificationForMOD getr150(TypeModel typeModel,
-			CHWAnnouncement chwA, String pimsIdentity) throws Exception{
-		return new R150create012ClassificationForMOD(typeModel, chwA, pimsIdentity);
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		return new R150create012ClassificationForMOD(typeModel, chwA,
+				pimsIdentity);
 	}
-	
+
 	public R160assignChartoClassFEAT_0000 getr160(TypeModel typeModel,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 
@@ -175,4 +187,9 @@ public class RfcFactory extends Object {
 
 	}
 
+	public R207ReadPlantViewMaterial getr207(String type, String model,
+			String plant) throws Exception {
+		return new R207ReadPlantViewMaterial(type,model,plant);
+
+	}
 }
