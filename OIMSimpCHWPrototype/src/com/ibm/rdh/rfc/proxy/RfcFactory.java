@@ -13,6 +13,7 @@ import com.ibm.rdh.chw.caller.R104createZDMClassification;
 import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
 import com.ibm.rdh.chw.caller.R108createTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
+import com.ibm.rdh.chw.caller.R115createTypeModelMaterialBasicView;
 import com.ibm.rdh.chw.caller.R116createPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
@@ -24,6 +25,7 @@ import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
 import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
+import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
@@ -107,6 +109,13 @@ public class RfcFactory extends Object {
 				pimsIdentity);
 	}
 
+	public R115createTypeModelMaterialBasicView getr115(CHWAnnouncement chwA,
+			TypeModel typeModel, CHWGeoAnn chwAg, String pimsIdentity,
+			String plantValue) throws Exception {
+		return new R115createTypeModelMaterialBasicView(chwA, typeModel, chwAg,
+				pimsIdentity, plantValue);
+	}
+
 	public R116createPlantViewForTypeModelMaterial getr116(
 			CHWAnnouncement chwA, TypeModel typeModel, String sapPlant,
 			String loadingGroup, CHWGeoAnn chwAg, String storageLocation,
@@ -185,6 +194,11 @@ public class RfcFactory extends Object {
 		return new R189createCFIPlantViewForType(chwA, typeModel, sapPlant,
 				newFlag, tmUPGObj, FromToType, pimsIdentity);
 
+	}
+
+	public R209ReadBasicViewOfMaterial getr209(String material)
+			throws Exception {
+		return new R209ReadBasicViewOfMaterial(material);
 	}
 
 	public R207ReadPlantViewMaterial getr207(String type, String model,

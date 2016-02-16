@@ -15,6 +15,7 @@ import com.ibm.rdh.chw.caller.R104createZDMClassification;
 import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
 import com.ibm.rdh.chw.caller.R108createTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
+import com.ibm.rdh.chw.caller.R115createTypeModelMaterialBasicView;
 import com.ibm.rdh.chw.caller.R116createPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
@@ -26,6 +27,7 @@ import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
 import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
+import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.Rfc;
 import com.ibm.rdh.chw.caller.RfcReturnSeverityCodes;
@@ -153,6 +155,16 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r115(CHWAnnouncement chwA, TypeModel typeModel,
+			CHWGeoAnn chwAg, String pimsIdentity, String plantValue)
+			throws Exception {
+		R115createTypeModelMaterialBasicView r = getFactory().getr115(chwA,
+				typeModel, chwAg, pimsIdentity, plantValue);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+	@Override
 	public void r116(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String loadingGroup, CHWGeoAnn chwAg,
 			String storageLocation, String pimsIdentity) throws Exception {
@@ -277,6 +289,14 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r209(String material) throws Exception {
+		R209ReadBasicViewOfMaterial r=getFactory().getr209(material);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
 	public void r207(String type, String model, String plant) throws Exception {
 		R207ReadPlantViewMaterial r = getFactory().getr207(type, model, plant);
 		logPromoteInfoMessage(r);
@@ -390,4 +410,5 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		}
 	}
 
+	
 }
