@@ -2,6 +2,7 @@ package com.ibm.rdh.chw.caller;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.rdh.rfc.BAPI_MATERIAL_GET_DETAIL;
+import com.ibm.rdh.rfc.BapireturnStructure;
 
 public class R209ReadBasicViewOfMaterial extends Rfc {
 
@@ -23,7 +24,11 @@ public class R209ReadBasicViewOfMaterial extends Rfc {
 	}
 
 	@Override
-	public void execute() throws Exception {
+	public void execute() throws Exception{
+		
+	}
+		
+	public BapireturnStructure execute1() throws Exception {
 		// TODO Auto-generated method stub
 		logExecution();
 		getRfc().execute();
@@ -31,6 +36,7 @@ public class R209ReadBasicViewOfMaterial extends Rfc {
 		if (getSeverity() == ERROR) {
 			throw new HWPIMSAbnormalException(getErrorInformation());
 		}
+		return getRfc().getReturn();
 	}
 
 	@Override
@@ -82,7 +88,7 @@ public class R209ReadBasicViewOfMaterial extends Rfc {
 		return ClassUtil.getSimpleClassName(getRfc());
 	}
 
-	public void evaluate() throws Exception {
-		execute();
+	public BapireturnStructure evaluate() throws Exception {
+		return execute1();
 	}
 }

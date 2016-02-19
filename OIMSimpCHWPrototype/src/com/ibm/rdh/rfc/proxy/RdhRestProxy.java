@@ -35,6 +35,7 @@ import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
+import com.ibm.rdh.rfc.BapireturnStructure;
 
 //import com.ibm.rdh.rfc.ReturnDataObjectR001;
 /**
@@ -299,11 +300,12 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
-	public void r209(String material) throws Exception {
+	public BapireturnStructure r209(String material) throws Exception {
 		R209ReadBasicViewOfMaterial r=getFactory().getr209(material);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
+		return r.evaluate();
 	}
 
 	

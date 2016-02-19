@@ -26,6 +26,7 @@ import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
+import com.ibm.rdh.rfc.BapireturnStructure;
 
 /**
  * @author Will
@@ -122,7 +123,7 @@ public abstract class RfcProxy {
 	public abstract void r207(String type, String model, String plant)
 			throws Exception;
 	
-	public abstract void r209(String material) throws Exception;
+	public abstract BapireturnStructure r209(String material) throws Exception;
 	
 	// public abstract ReturnDataObjectR001 r001(SWO swo) throws Exception ;
 	// public abstract boolean r002(SWO swo, String salesOrg) throws Exception;
