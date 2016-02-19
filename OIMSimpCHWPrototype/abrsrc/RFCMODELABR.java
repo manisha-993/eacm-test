@@ -60,10 +60,9 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		typeModel.setType(getAttributeValue(modelItem, "MACHTYPEATR"));
 		typeModel.setDiv(getDiv());
 		typeModel.setDescription(getAttributeValue(modelItem, "MKTGNAME"));
-		typeModel.setProductHierarchy(getAttributeValue(modelItem, "BHPRODHIERCD"));
+		typeModel.setProductHierarchy(getAttributeValue(modelItem, "PRODHIERCD"));
 		typeModel.setFlfilCol(getMultiAttributeValue(modelItem, "FLFILSYSINDC"));
-		String loadingGrp = "BH"; // ? LADGR PLANT.LoadingGroup PLANT.LoadingGroup
-		typeModel.setLoadingGroup(loadingGrp);
+		typeModel.setLoadingGroup(getAttributeValue(modelItem, "MODELORDERCODE")); // WS logic:if "return plant" then Set to "RETN" else Set to "B001", then this value will always B001 in RDH
 		abr.addDebug("TypeModel:" + typeModel.toString());
 		
 		CHWAnnouncement chwA = new CHWAnnouncement();
@@ -75,12 +74,12 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		abr.addDebug("Flfilcd:" + flfilcd);
 		
 		// XCC=X， else C
-		String pimsIdentity = "";
-		if (isXccOnlyDiv(typeModel.getDiv())) {
-			pimsIdentity = "X";
-		} else {
-			pimsIdentity = "C";
-		}
+		String pimsIdentity = "C";
+//		if (isXccOnlyDiv(typeModel.getDiv())) { // old code logic, but as Praveen mapping, it will always set C
+//			pimsIdentity = "X";
+//		} else {
+//			pimsIdentity = "C";
+//		}
 		abr.addDebug("PimsIdentity:" + pimsIdentity);
 		
 		if (annItems != null && annItems.length > 0) {
@@ -88,7 +87,7 @@ public class RFCMODELABR extends RfcAbrAdapter {
 				EntityItem annItem = annItems[i];
 				
 				chwA.setAnnDocNo(getAttributeValue(annItem, "ANNNUMBER"));
-				chwA.setAnnouncementType(getAttributeValue(annItem, "ANNTYPE")); //  flag value?
+				chwA.setAnnouncementType(getAttributeValue(annItem, "ANNTYPE")); //  WS logic:if feed is designated as "ePIMS/SW Migration", then set to "MIG" else set to "RFA", so flag or desc are all fine.
 						
 				SimpleDateFormat sdf =   new SimpleDateFormat("yyyy-MM-dd");
 				chwAg.setAnnouncementDate(sdf.parse(getAttributeValue(annItem, "ANNDATE")));
@@ -210,8 +209,27 @@ public class RFCMODELABR extends RfcAbrAdapter {
 //							}
 //						}
 						
+//						
+						
 					} // end for For loop
-				}
+					// Create type MOD characteristic [R108]
+					rdhRestProxy.r108(typeModel, chwA, pimsIdentity);
+					// Assign MOD characteristic to MODELS class [R110]
+					rdhRestProxy.r110(typeModel, chwA, pimsIdentity);
+					// Create 012 classification for MOD [R150]
+					rdhRestProxy.r150(typeModel, chwA, pimsIdentity);
+					rdhRestProxy.r123(typeModel.getType(), null, "NEW", chwA, null, pimsIdentity);
+					rdhRestProxy.r123(typeModel.getType(), null, "UPG", chwA, null, pimsIdentity);
+					// Assign Char to Class FEAT_0000 [R160]
+					rdhRestProxy.r160(typeModel, chwA, pimsIdentity);			
+					// Create 001 Classifcation for MM_FIELDS For NEW [175]
+					rdhRestProxy.r175(typeModel, null, chwA, "NEW", null, pimsIdentity);
+					// Create 001 Classifcation for MM_FIELDS For UPG [175]
+					rdhRestProxy.r175(typeModel, null, chwA, "UPG", null, pimsIdentity);
+					// Add to newBom Hashtable (key is Type+"||"+SAPPlant, value is empty vector)
+					// Insert type into TYPE table (delayed)
+					
+				} // End if Type not promoted
 			}
 			abr.addDebug("RFCMODELABR end processThis()");
 		} else {
@@ -223,7 +241,7 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		return false;
 	}
 	
-	// No OIMDS role on bhdev, can not create SGMNTACRNYM, hard code
+	
 	private String getDiv() throws RfcAbrException {
 		String div = "";
 		EntityItem[] sgmItems = getEntityItems("SGMNTACRNYM");
@@ -231,6 +249,11 @@ public class RFCMODELABR extends RfcAbrAdapter {
 			EntityItem sgmItem = sgmItems[0];
 			div = getAttributeFlagValue(sgmItem, "DIV");
 		}
+		// No OIMDS role on bhdev, can not create SGMNTACRNYM, hard code
+		// uncomment when FVT
+//		if("".equals(div)){
+//			throw new RfcAbrException("DIV is empty");
+//		}
 		return "4B";
 	}
 	
