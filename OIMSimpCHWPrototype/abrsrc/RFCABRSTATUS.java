@@ -11,6 +11,7 @@ import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.ResourceBundle;
+import java.util.Vector;
 
 import COM.ibm.eannounce.abr.util.ABRUtil;
 import COM.ibm.eannounce.abr.util.EACustom;
@@ -22,8 +23,10 @@ import COM.ibm.eannounce.objects.EntityItem;
 import COM.ibm.eannounce.objects.ExtractActionItem;
 import COM.ibm.opicmpdh.middleware.D;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
+import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
 import COM.ibm.opicmpdh.middleware.Stopwatch;
 import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+import COM.ibm.opicmpdh.objects.SingleFlag;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.transform.oim.eacm.util.PokUtils;
@@ -223,6 +226,55 @@ public class RFCABRSTATUS extends PokBaseABR {
      */
 	protected void addComment(String msg) {
 		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
+	}
+	
+	/**
+	 *  Sets the specified Flag Attribute on the Root Entity
+	 * @param strAttributeCode
+	 * @param strAttributeValue
+	 * @throws java.sql.SQLException
+	 * @throws COM.ibm.opicmpdh.middleware.MiddlewareException
+	 */
+	protected void setFlagValue(String strAttributeCode, String strAttributeValue, EntityItem item) throws SQLException, MiddlewareException {
+		logMessage(getDescription() + " ***** " + strAttributeCode + " set to: " + strAttributeValue);
+		addDebug("setFlagValue entered for " + strAttributeCode + " set to: " + strAttributeValue);
+		
+		// if meta does not have this attribute, there is nothing to do
+		EANMetaAttribute metaAttr = item.getEntityGroup().getMetaAttribute(strAttributeCode);
+		if (metaAttr == null) {
+			addDebug("setFlagValue: " + strAttributeCode
+					+ " was not in meta for " + item.getEntityType()
+					+ ", nothing to do");
+			logMessage(getDescription() + " ***** " + strAttributeCode
+					+ " was not in meta for " + item.getEntityType()
+					+ ", nothing to do");
+			return;
+		}
+		if (strAttributeValue != null) {
+			if (strAttributeValue.equals(getAttributeFlagEnabledValue(item, strAttributeCode))) {
+				addDebug("setFlagValue " + item.getKey() + " " + strAttributeCode + " already matches: " + strAttributeValue);
+			} else {
+				try {
+					if (m_cbOn == null) {
+						setControlBlock(); // needed for attribute updates
+					}
+					ReturnEntityKey rek = new ReturnEntityKey(item.getEntityType(), item.getEntityID(), true);
+
+					SingleFlag sf = new SingleFlag(m_prof.getEnterprise(), item.getEntityType(), item.getEntityID(), strAttributeCode, strAttributeValue, 1, m_cbOn);
+					Vector vctAtts = new Vector();
+					Vector vctReturnsEntityKeys = new Vector();
+					vctAtts.addElement(sf);
+					rek.m_vctAttributes = vctAtts;
+					vctReturnsEntityKeys.addElement(rek);
+					m_db.update(m_prof, vctReturnsEntityKeys, false, false);
+					addDebug(item.getKey() + " had " + strAttributeCode + " set to: " + strAttributeValue);
+				} finally {
+					m_db.commit();
+					m_db.freeStatement();
+					m_db.isPending("finally after update in setflag value");
+				}
+			}
+		}
 	}
 	
 	private void buildReport() {

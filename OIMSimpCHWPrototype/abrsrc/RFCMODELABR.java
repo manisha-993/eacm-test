@@ -17,6 +17,7 @@ import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.CntryTax;
 import com.ibm.rdh.chw.entity.TypeModel;
+import com.ibm.transform.oim.eacm.util.PokUtils;
 
 public class RFCMODELABR extends RfcAbrAdapter {
 	
@@ -29,6 +30,8 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		// Entity from EACM
 		EntityItem modelItem = getRooEntityItem();
 		EntityItem[] annItems = getEntityItems("ANNOUNCEMENT");
+		
+		Vector machtypeVct = PokUtils.getAllLinkedEntities(modelItem, "MODELMACHINETYPEA", "MACHTYPE");
 		
 		// Taxcatg
 		EntityItem[] modTaxRelatorItems = getEntityItems("MODTAXRELEVANCE");
@@ -55,18 +58,16 @@ public class RFCMODELABR extends RfcAbrAdapter {
 			}
 		}
 		
+		String machineTypeAtr = getAttributeValue(modelItem, "MACHTYPEATR");
 		// Type Model
 		TypeModel typeModel = new TypeModel();
-		typeModel.setType(getAttributeValue(modelItem, "MACHTYPEATR"));
+		typeModel.setType(machineTypeAtr);
 		typeModel.setDiv(getDiv());
 		typeModel.setDescription(getAttributeValue(modelItem, "MKTGNAME"));
 		typeModel.setProductHierarchy(getAttributeValue(modelItem, "PRODHIERCD"));
 		typeModel.setFlfilCol(getMultiAttributeValue(modelItem, "FLFILSYSINDC"));
 		typeModel.setLoadingGroup(getAttributeValue(modelItem, "MODELORDERCODE")); // WS logic:if "return plant" then Set to "RETN" else Set to "B001", then this value will always B001 in RDH
 		abr.addDebug("TypeModel:" + typeModel.toString());
-		
-		CHWAnnouncement chwA = new CHWAnnouncement();
-		CHWGeoAnn chwAg = new CHWGeoAnn();
 		
 		// Old code， only use chwAg for LA 
 		
@@ -85,6 +86,8 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		if (annItems != null && annItems.length > 0) {
 			for (int i = 0; i < annItems.length; i++) {
 				EntityItem annItem = annItems[i];
+				CHWAnnouncement chwA = new CHWAnnouncement();
+				CHWGeoAnn chwAg = new CHWGeoAnn();
 				
 				chwA.setAnnDocNo(getAttributeValue(annItem, "ANNNUMBER"));
 				chwA.setAnnouncementType(getAttributeValue(annItem, "ANNTYPE")); //  WS logic:if feed is designated as "ePIMS/SW Migration", then set to "MIG" else set to "RFA", so flag or desc are all fine.
@@ -96,7 +99,7 @@ public class RFCMODELABR extends RfcAbrAdapter {
 				abr.addDebug("CHWAnnouncementGEO:" + chwAg.toString());
 				
 				// If Type not promoted (exists in TYPE table)
-				if (!isTypeExist()) {
+				if (!isTypeExist(machtypeVct)) {
 					abr.addDebug("Type:" + typeModel.getType() + " not promoted");
 					// Create type NEW material basic view [R100]
 					rdhRestProxy.r100(chwA, typeModel, chwAg, "NEW", null, null, pimsIdentity);
@@ -228,7 +231,8 @@ public class RFCMODELABR extends RfcAbrAdapter {
 					rdhRestProxy.r175(typeModel, null, chwA, "UPG", null, pimsIdentity);
 					// Add to newBom Hashtable (key is Type+"||"+SAPPlant, value is empty vector)
 					// Insert type into TYPE table (delayed)
-					
+				
+					setPromotedMachtypes(machtypeVct);
 				} // End if Type not promoted
 			}
 			abr.addDebug("RFCMODELABR end processThis()");
@@ -237,10 +241,27 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		}
 	}
 	
-	private boolean isTypeExist() {
+	private boolean isTypeExist(Vector machtypeVct) throws RfcAbrException {
+		if(machtypeVct != null && machtypeVct.size() > 0) {
+			for (int i = 0; i < machtypeVct.size(); i++) {
+				EntityItem machTypeItem = (EntityItem)machtypeVct.elementAt(i);
+				String promoted = getAttributeValue(machTypeItem, "");
+				if (MACHTYPE_PROMOTED.equals(promoted)) {
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 	
+	private void setPromotedMachtypes(Vector machtypeVct) {
+		if(machtypeVct != null && machtypeVct.size() > 0) {
+			for (int i = 0; i < machtypeVct.size(); i++) {
+				EntityItem machTypeItem = (EntityItem)machtypeVct.elementAt(i);
+				setFlagValue("xxxx", MACHTYPE_PROMOTED, machTypeItem);
+			}
+		}
+	}
 	
 	private String getDiv() throws RfcAbrException {
 		String div = "";
