@@ -7,9 +7,6 @@ import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.pprds.epimshw.util.ProfitCenterPlantSelector;
-import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.TypeModel;
-import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.Bmm00Table;
 import com.ibm.rdh.rfc.Bmm00TableRow;
 import com.ibm.rdh.rfc.Bmmh1Table;
@@ -17,85 +14,67 @@ import com.ibm.rdh.rfc.Bmmh1TableRow;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 
-public class R189createCFIPlantViewForType extends Rfc {
+public class R183createCFIPlantViewForTypeModelMaterial extends Rfc {
+
 	private com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE rfc;
 
-	public R189createCFIPlantViewForType(CHWAnnouncement chwA,
-			TypeModel typeModel, String sapPlant, String newFlag,
-			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity)
-			throws Exception {
-
+	public R183createCFIPlantViewForTypeModelMaterial(String annDocNo,
+			String typemod, String sapPlant, String pimsIdentity,
+			String profitCenter) throws Exception {
 		reInitialize();
-
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
 
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE();
-
 		// Set Up the RFC Fields
-		// Bmm00 - B0
+		// Bmm00 - B0 Structure
+
 		Bmm00Table b0Table = new Bmm00Table();
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
+
 		b0Row.setTcode("MM01");
-
-		if ("NEW".equals(newFlag)) {
-			b0Row.setMatnr(typeModel.getType() + "NEW");
-		} else if ("UPG".equals(newFlag)) {
-			b0Row.setMatnr(typeModel.getType() + "UPG");
-		} else if ("MTC".equals(newFlag) && "MTCTOTYPE".equals(FromToType)) {
-			b0Row.setMatnr(tmUPGObj.getType() + "MTC");
-		} else if ("MTC".equals(newFlag) && "MTCFROMTYPE".equals(FromToType)) {
-
-			b0Row.setMatnr(tmUPGObj.getFromType() + "MTC");
-		}
-
+		b0Row.setMatnr(typemod);
 		b0Row.setXeiv4("X");
 		b0Row.setWerks(sapPlant);
 
-		// new data add start
+		// new add data start
 		b0Row.setMbrsh("M");
 		b0Row.setMtart("ZMAT");
-		// new data add end
+		// new add data end
 
 		b0Table.appendRow(b0Row);
 		rfc.setIBmm00(b0Table);
-		rfcInfo.append("IBmm00 \n");
-		rfcInfo.append(Tab + "TCODE" + b0Row.getTcode() + ", MATNR>>"
-				+ b0Row.getMatnr() + ", XEIV4>>" + b0Row.getXeiv4()
-				+ ", WERKS>>" + b0Row.getWerks() + ", MBRSH>>"
-				+ b0Row.getMbrsh() + ", MTART>>" + b0Row.getMtart() + "\n");
 
-		// Bmmh1 - B1
+		rfcInfo.append("BMM00 \n");
+		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
+				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
+				+ ", MTART>>" + b0Row.getMtart() + ", XEIV4>>"
+				+ b0Row.getXeiv4() + ", WERKS>>" + b0Row.getWerks() + "\n");
+
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
-		// new data add start
-		b1Row.setGewei("KG");
-		b1Row.setSpart(typeModel.getDiv());
+		b1Row.setLadgr("B001");
+		b1Row.setMtvfp("ZE");
+
+		// new add data start
+		b1Row.setZeinr("123401");
 		b1Row.setMatkl("000");
 		b1Row.setMeins("EA");
-		b1Row.setZeinr(chwA.getAnnDocNo());
-		b1Row.setZeiar(chwA.getAnnouncementType());
+		b1Row.setZeiar("New");
 		b1Row.setAeszn(sdf.format(new Date()));
-		// new data add end
+		b1Row.setGewei("KG");
+		b1Row.setSpart("B1");
 
-		b1Row.setLadgr("B001");
-
-		if ("1999".equals(sapPlant))
-			b1Row.setMtvfp("NC");
-		else
-			b1Row.setMtvfp("ZE");
+		// new add data end
 
 		// SAP Ledger
 
-		if ("Y".equals(ConfigManager.getConfigManager().getString(
-				PropertyKeys.KEY_SAP_LEDGER))) {
+		if (ConfigManager.getConfigManager()
+				.getString(PropertyKeys.KEY_SAP_LEDGER).equals("Y")) {
 			boolean existsPro = ProfitCenterPlantSelector
 					.checkProfitCenterPlants(sapPlant);
 			if (existsPro) {
-				if (typeModel.getProfitCenter() != null
-						|| (!typeModel.getProfitCenter().equals(""))) {
-					b1Row.setPrctr(typeModel.getProfitCenter());
-				}
+				b1Row.setPrctr(profitCenter);
 			}
 		}
 
@@ -103,29 +82,35 @@ public class R189createCFIPlantViewForType extends Rfc {
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
-		rfcInfo.append(Tab + ", GEWEI>>" + b1Row.getGewei() + ", SPART>>"
-				+ b1Row.getSpart() + ", MATKL>>" + b1Row.getMatkl()
-				+ ", MEINS>>" + b1Row.getMeins() + ", ZEINR>>"
-				+ b1Row.getZeinr() + ", ZEIAR>>" + b1Row.getZeiar()
-				+ ", AESZN>>" + b1Row.getAeszn() + "LADGR>>" + b1Row.getLadgr()
-				+ ", MTVFP>>" + b1Row.getMtvfp() + ", PRCTR>>"
-				+ b1Row.getPrctr() + "\n");
+		rfcInfo.append(Tab + "LADGR>>" + b1Row.getLadgr() + ", MTVFP>>"
+				+ b1Row.getMtvfp() + ", ZEINR>>" + b1Row.getZeinr()
+				+ ", MATKL>>" + b1Row.getMatkl() + ", MEINS>>"
+				+ b1Row.getMeins() + ", ZEIAR>>" + b1Row.getZeiar()
+				+ ", AESZN>>" + b1Row.getAeszn() + ", GEWEI>>"
+				+ b1Row.getGewei() + ", SPART>>" + b1Row.getSpart()
+				+ ", SPART>>" + b1Row.getPrctr() + "\n");
 
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
+
 		zdmRow.setZGeo("US");
+
 		zdmTable.appendRow(zdmRow);
+
 		rfc.setGeoData(zdmTable);
+
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
-
-		rfc.setRfaNum(chwA.getAnnDocNo());
+		
+		// RFANUMBER
+		rfc.setRfaNum(annDocNo);
 		rfcInfo.append("RFANUM \n");
-		rfcInfo.append(Tab + ",RFANUM>>" + chwA.getAnnDocNo() + "\n");
+		rfcInfo.append(Tab + "RFANumber>>" + annDocNo + "\n");
+
 	}
 
 	@Override
@@ -176,7 +161,7 @@ public class R189createCFIPlantViewForType extends Rfc {
 	@Override
 	protected String getMaterialName() {
 		// TODO Auto-generated method stub
-		return "Create CFI Plant View for Type NEW or UPG material";
+		return "Create CFI Plant View for Type/Model material";
 	}
 
 	@Override
