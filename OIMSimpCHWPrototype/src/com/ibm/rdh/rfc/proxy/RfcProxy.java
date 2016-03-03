@@ -116,15 +116,18 @@ public abstract class RfcProxy {
 	public abstract void r177(String type, String range, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
+	public abstract void r183(String annDocNo, String typemod, String sapPlant,
+			String pimsIdentity, String profitCenter) throws Exception;
+
 	public abstract void r189(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String FromToType, String pimsIdentity) throws Exception;
-	
+
 	public abstract void r207(String type, String model, String plant)
 			throws Exception;
-	
+
 	public abstract BapireturnStructure r209(String material) throws Exception;
-	
+
 	// public abstract ReturnDataObjectR001 r001(SWO swo) throws Exception ;
 	// public abstract boolean r002(SWO swo, String salesOrg) throws Exception;
 	// public abstract Vector r002DataFunction(SWO swo, GeoCountry country, int

@@ -26,9 +26,10 @@ import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
 import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
+import com.ibm.rdh.chw.caller.R183createCFIPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
-import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
+import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.Rfc;
 import com.ibm.rdh.chw.caller.RfcReturnSeverityCodes;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
@@ -165,7 +166,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		r.evaluate();
 		logPromoteResultMessage(r);
 	}
-	
+
 	@Override
 	public void r116(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String loadingGroup, CHWGeoAnn chwAg,
@@ -279,6 +280,17 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r183(String annDocNo, String typemod, String sapPlant,
+			String pimsIdentity, String profitCenter) throws Exception {
+		R183createCFIPlantViewForTypeModelMaterial r = getFactory().getr183(
+				annDocNo, typemod, sapPlant, pimsIdentity, profitCenter);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
 	public void r189(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String FromToType, String pimsIdentity) throws Exception {
@@ -289,7 +301,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 
 	}
-	
+
 	@Override
 	public void r207(String type, String model, String plant) throws Exception {
 		R207ReadPlantViewMaterial r = getFactory().getr207(type, model, plant);
@@ -301,14 +313,13 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 	@Override
 	public BapireturnStructure r209(String material) throws Exception {
-		R209ReadBasicViewOfMaterial r=getFactory().getr209(material);
+		R209ReadBasicViewOfMaterial r = getFactory().getr209(material);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
 		return r.evaluate();
 	}
 
-	
 	// public ArrayList r060( SWO swo, Announcement ann, Collection plants )
 	// throws Exception {
 	// R060ReadPlantViewForMaterial r = getRfcFactory().getR060( swo, ann,
@@ -414,5 +425,4 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		}
 	}
 
-	
 }

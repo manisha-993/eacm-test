@@ -24,9 +24,10 @@ import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
 import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
+import com.ibm.rdh.chw.caller.R183createCFIPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
-import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
+import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.TypeModel;
@@ -187,6 +188,13 @@ public class RfcFactory extends Object {
 				chwA, pimsIdentity);
 	}
 
+	public R183createCFIPlantViewForTypeModelMaterial getr183(String annDocNo,
+			String typemod, String sapPlant, String pimsIdentity,
+			String profitCenter) throws Exception {
+		return new R183createCFIPlantViewForTypeModelMaterial(annDocNo,
+				typemod, sapPlant, pimsIdentity, profitCenter);
+	}
+
 	public R189createCFIPlantViewForType getr189(CHWAnnouncement chwA,
 			TypeModel typeModel, String sapPlant, String newFlag,
 			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity)
@@ -195,18 +203,17 @@ public class RfcFactory extends Object {
 				newFlag, tmUPGObj, FromToType, pimsIdentity);
 
 	}
-	
+
 	public R207ReadPlantViewMaterial getr207(String type, String model,
 			String plant) throws Exception {
-		return new R207ReadPlantViewMaterial(type,model,plant);
+		return new R207ReadPlantViewMaterial(type, model, plant);
 
 	}
-	
+
 	public R209ReadBasicViewOfMaterial getr209(String material)
 			throws Exception {
 		return new R209ReadBasicViewOfMaterial(material);
-		
+
 	}
 
-	
 }
