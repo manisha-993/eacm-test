@@ -13,8 +13,6 @@ import COM.ibm.opicmpdh.middleware.Database;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
 import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
 import COM.ibm.opicmpdh.middleware.Profile;
-import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
-import COM.ibm.opicmpdh.objects.SingleFlag;
 
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
@@ -25,7 +23,7 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 	
 	public static final String LOCAL_REAL_PATH = "./properties/dev";
 	
-	public static final String MACHTYPE_PROMOTED = "";
+	public static final String MACHTYPE_PROMOTED = "PRYES";
 	/*
 	 * Check required attribute for entities when call getAttribute() method
 	 */
@@ -131,7 +129,7 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 		return attrValues;
 	}
 	
-	protected void setFlagValue(String strAttributeCode, String strAttributeValue, EntityItem item) {
+	protected void setFlagValue(String strAttributeCode, String strAttributeValue, EntityItem item) throws SQLException, MiddlewareException {
 		abr.setFlagValue(strAttributeCode, strAttributeValue, item);
 	}
 	

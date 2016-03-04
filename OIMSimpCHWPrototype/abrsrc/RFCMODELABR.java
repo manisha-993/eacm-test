@@ -254,11 +254,11 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		return false;
 	}
 	
-	private void setPromotedMachtypes(Vector machtypeVct) {
+	private void setPromotedMachtypes(Vector machtypeVct) throws SQLException, MiddlewareException {
 		if(machtypeVct != null && machtypeVct.size() > 0) {
 			for (int i = 0; i < machtypeVct.size(); i++) {
 				EntityItem machTypeItem = (EntityItem)machtypeVct.elementAt(i);
-				setFlagValue("xxxx", MACHTYPE_PROMOTED, machTypeItem);
+				setFlagValue("PROMOTED", MACHTYPE_PROMOTED, machTypeItem);
 			}
 		}
 	}
