@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import com.ibm.db2.jcc.a.b;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
