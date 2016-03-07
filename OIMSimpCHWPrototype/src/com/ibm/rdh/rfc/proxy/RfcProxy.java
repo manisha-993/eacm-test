@@ -24,6 +24,7 @@ import java.util.Vector;
 
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
+import com.ibm.rdh.chw.entity.PlannedSalesStatus;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.BapireturnStructure;
@@ -85,6 +86,12 @@ public abstract class RfcProxy {
 	public abstract void r116(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String loadingGroup, CHWGeoAnn chwAg,
 			String storageLocation, String pimsIdentity) throws Exception;
+
+	public abstract void r117(CHWAnnouncement chwA, String typemod, String div,
+			String acctAsgnGrp, PlannedSalesStatus ps, boolean bumpCtr,
+			String pimsIdentity, String flfil, String salesOrg1,
+			String productHierarchy, Vector VectTaxList, String plantValue)
+			throws Exception;
 
 	public abstract void r123(String type, TypeModelUPGGeo tmUPGObj,
 			String newFlag, CHWAnnouncement chwA, String FromToType,

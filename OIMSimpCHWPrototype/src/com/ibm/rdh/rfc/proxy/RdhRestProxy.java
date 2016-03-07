@@ -17,6 +17,7 @@ import com.ibm.rdh.chw.caller.R108createTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R115createTypeModelMaterialBasicView;
 import com.ibm.rdh.chw.caller.R116createPlantViewForTypeModelMaterial;
+import com.ibm.rdh.chw.caller.R117createTypeModelMaterialSalesView;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
@@ -34,6 +35,7 @@ import com.ibm.rdh.chw.caller.Rfc;
 import com.ibm.rdh.chw.caller.RfcReturnSeverityCodes;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
+import com.ibm.rdh.chw.entity.PlannedSalesStatus;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.BapireturnStructure;
@@ -174,6 +176,21 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		R116createPlantViewForTypeModelMaterial r = getFactory().getr116(chwA,
 				typeModel, sapPlant, loadingGroup, chwAg, storageLocation,
 				pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r117(CHWAnnouncement chwA, String typemod, String div,
+			String acctAsgnGrp, PlannedSalesStatus ps, boolean bumpCtr,
+			String pimsIdentity, String flfil, String salesOrg1,
+			String productHierarchy, Vector VectTaxList, String plantValue)
+			throws Exception {
+		R117createTypeModelMaterialSalesView r = getFactory().getr117(chwA,
+				typemod, div, acctAsgnGrp, ps, bumpCtr, pimsIdentity, flfil,
+				salesOrg1, productHierarchy, VectTaxList, plantValue);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);

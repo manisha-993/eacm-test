@@ -15,6 +15,7 @@ import com.ibm.rdh.chw.caller.R108createTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R115createTypeModelMaterialBasicView;
 import com.ibm.rdh.chw.caller.R116createPlantViewForTypeModelMaterial;
+import com.ibm.rdh.chw.caller.R117createTypeModelMaterialSalesView;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
@@ -30,6 +31,7 @@ import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
+import com.ibm.rdh.chw.entity.PlannedSalesStatus;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 
@@ -124,6 +126,16 @@ public class RfcFactory extends Object {
 
 		return new R116createPlantViewForTypeModelMaterial(chwA, typeModel,
 				sapPlant, loadingGroup, chwAg, storageLocation, pimsIdentity);
+	}
+
+	public R117createTypeModelMaterialSalesView getr117(CHWAnnouncement chwA,
+			String typemod, String div, String acctAsgnGrp,
+			PlannedSalesStatus ps, boolean bumpCtr, String pimsIdentity,
+			String flfil, String salesOrg1, String productHierarchy,
+			Vector VectTaxList, String plantValue) throws Exception {
+		return new R117createTypeModelMaterialSalesView(chwA, typemod, div,
+				acctAsgnGrp, ps, bumpCtr, pimsIdentity, flfil, salesOrg1,
+				productHierarchy, VectTaxList, plantValue);
 	}
 
 	public R123create300ClassificationForTypeModels getr123(String type,
