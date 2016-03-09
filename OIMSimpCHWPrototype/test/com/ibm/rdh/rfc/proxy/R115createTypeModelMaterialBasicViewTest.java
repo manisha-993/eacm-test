@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Test;
 
+import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
@@ -74,7 +76,13 @@ public class R115createTypeModelMaterialBasicViewTest extends RdhRestProxyTest {
 			map.put("TEXT", "'Material Master created/updated successfully: EACMnewCreate'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
 			assertNotNull(rowDetails);
+		}catch (HWPIMSAbnormalException ex) {
+			logger.info("error message= " + ex.getMessage());
+			Assert.fail("error message= " + ex.getMessage());
 		} catch (Exception e) {
+			e.getStackTrace();
+			Assert.fail("There is some error :" + e.getMessage());
+		} finally {
 
 		}
 	}
