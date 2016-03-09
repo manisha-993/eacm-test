@@ -56,12 +56,6 @@ public class R108createTypeMODCharacteristicTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("TEXT", "'Created records in parking table: 1'");
-			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			assertNotNull(rowDetails);
-
-			map.clear();
-			map.put("ZSESSION", "'" + sessionId + "'");
 			map.put("TEXT", "'Characteristic  " + charac
 					+ " created/updated successfully.'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");

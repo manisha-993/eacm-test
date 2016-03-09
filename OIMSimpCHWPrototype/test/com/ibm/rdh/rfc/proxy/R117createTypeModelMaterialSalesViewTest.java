@@ -80,12 +80,6 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("TEXT", "'Created records in parking table: 1'");
-			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			assertNotNull(rowDetails);
-
-			map.clear();
-			map.put("ZSESSION", "'" + sessionId + "'");
 			map.put("TEXT", "'Material Master created/updated successfully: "
 					+ typemod + "'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
@@ -159,12 +153,6 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 			String sessionId = (String) rowDetails.get("ZSESSION");
 			String status = (String) rowDetails.get("STATUS");
 			assertEquals(status, "success");
-
-			map.clear();
-			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("TEXT", "'Created records in parking table: 1'");
-			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			assertNotNull(rowDetails);
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
@@ -244,12 +232,6 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("TEXT", "'Created records in parking table: 1'");
-			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			assertNotNull(rowDetails);
-
-			map.clear();
-			map.put("ZSESSION", "'" + sessionId + "'");
 			map.put("TEXT", "'Material Master created/updated successfully: "
 					+ typemod + "'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
@@ -323,12 +305,6 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 			String sessionId = (String) rowDetails.get("ZSESSION");
 			String status = (String) rowDetails.get("STATUS");
 			assertEquals(status, "success");
-
-			map.clear();
-			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("TEXT", "'Created records in parking table: 1'");
-			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			assertNotNull(rowDetails);
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");

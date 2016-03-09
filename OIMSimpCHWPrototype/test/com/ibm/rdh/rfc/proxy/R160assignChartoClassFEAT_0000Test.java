@@ -79,14 +79,7 @@ public class R160assignChartoClassFEAT_0000Test extends RdhRestProxyTest {
 			String sessionId = (String) rowDetails.get("ZSESSION");
 			String status = (String) rowDetails.get("STATUS");
 			assertEquals(status, "success");
-			
-			map.clear();
-			map.put("MANDT", "'" + Constants.MANDT + "'");
-			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("TEXT", "'Created records in parking table: 1'");
-			rowDetails=selectTableRow(map,"ZDM_LOGDTL");
-			assertNotNull(rowDetails);
-			
+		
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
 			map.put("TEXT", "'Characteristic  " + "MK_SUBLINE"+",MK_RPQ_APPROVAL"

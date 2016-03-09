@@ -20,31 +20,26 @@ public class R103create001ClassificationForMGCommonTest extends
 
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
+
 	@Before
 	public void prepareData() {
-		String sql_klah = "insert into SAPR3.KLAH select '200',CLINT,KLART, CLASS,STATU,KLAGR,BGRSE,BGRKL,BGRKP,ANAME,"
-				+ "ADATU,VNAME,VDATU,VONDT,BISDT,ANZUO,PRAUS,SICHT,DOKNR,DOKAR,DOKTL,"
-				+ "DOKVR,DINKZ,NNORM,NORMN,NORMB,NRMT1,NRMT2,AUSGD,VERSD,VERSI,LEIST,VERWE,SPART,LREF3,WWSKZ,"
-				+ "WWSSI,POTPR,CLOBK,CLMUL,CVIEW,DISST,MEINS,CLMOD,VWSTL,VWPLA,CLALT,"
-				+ "LBREI,BNAME,MAXBL,KNOBJ,SHAD_UPDATE_TS,SHAD_UPDATE_IND,SAP_TS from SAPR3.KLAH "
-				+ "where mandt='300' and KLART='001' and CLASS='MG_COMMON'";
+		String sql_klah = "insert into SAPR3.KLAH (mandt, klart, class) values ('200', '001', 'MG_COMMON')";
 
-		String sql_cabn = "insert into SAPR3.CABN select '200',ATINN,ADZHL,ATNAM,ATIDN,ATFOR,ANZST,ANZDZ,ATVOR,ATSCH,ATKLE,ATKON,ATEND,ATAEN,"
-				+ "ATKLA,ATERF,ATEIN,ATAME,ATWME,MSEHI,ATDIM,ATGLO,ATGLA,ATINT,ATUNS,ATSON,ATTAB,ATFEL,ATTEI,ATPRT,ATPRR,ATPRF,ATWRD,"
-				+ "ATFOD,ATHIE,ATDEX,ATFGA,ATVSC,ANAME,ADATU,VNAME,VDATU,ATXAC,ATYAC,ATMST,ATWSO,ATBSO,DATUV,TECHV,AENNR,LKENZ,ATWRI,"
-				+ "DOKAR,DOKNR,DOKVR,DOKTL,KNOBJ,ATINP,ATVIE,WERKS,KATALOGART,AUSWAHLMGE,ATHKA,ATHKO,CLINT,ATTOL,ATZUS,ATVPL,SHAD_UPDATE_TS,"
-				+ "SHAD_UPDATE_IND,SAP_TS FROM SAPR3.CABN where mandt='300' AND ATNAM='MG_PRODUCTTYPE'";
+		String sql_cabn = "insert into SAPR3.CABN (mandt, ATNAM) values('200','MG_PRODUCTTYPE')";
 
-		String sql_ksml = "insert into sapr3.ksml select '200',CLINT,POSNR,ADZHL,ABTEI,DINKB,HERKU,IMERK,OMERK,KLART,RELEV,DATUV,TECHV,AENNR,"
-				+ "LKENZ,VMERK,DPLEN,OFFST,BLLIN,DPTXT,CUSTR,JUSTR,COLOR,INTSF,INVER,CKBOX,INPUT,AMERK,SHAD_UPDATE_TS,SHAD_UPDATE_IND,"
-				+ "SAP_TS from sapr3.ksml where clint='0000000429' and mandt = '300' and imerk='0000510805'";
+		String sql_ksml = "insert into sapr3.ksml (mandt, clint, imerk) values ('200', '0000000000', '0000000000')";
 
-		int t1=SqlHelper.runUpdateSql(sql_klah, conn);
-		int t2=SqlHelper.runUpdateSql(sql_cabn, conn);
-		int t3=SqlHelper.runUpdateSql(sql_ksml, conn);
-		if(t1>=0&&t2>=0&&t3>=0){
+		String sql_mara_1 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMT1MTC')";
+		String sql_mara_2 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMF1MTC')";
+
+		int t1 = SqlHelper.runUpdateSql(sql_klah, conn);
+		int t2 = SqlHelper.runUpdateSql(sql_cabn, conn);
+		int t3 = SqlHelper.runUpdateSql(sql_ksml, conn);
+		int t4 = SqlHelper.runUpdateSql(sql_mara_1, conn);
+		int t5 = SqlHelper.runUpdateSql(sql_mara_2, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0) {
 			System.out.println("insert success");
-		}else{
+		} else {
 			System.out.println("insert failed");
 		}
 	}
@@ -288,18 +283,24 @@ public class R103create001ClassificationForMGCommonTest extends
 
 		}
 	}
+
 	@After
-	public void deleteData(){
+	public void deleteData() {
 		String del_klah = "delete from SAPR3.KLAH where mandt='200' and KLART='001' and CLASS='MG_COMMON'";
 		String del_cabn = "delete from SAPR3.CABN where mandt='200' AND ATNAM='MG_PRODUCTTYPE'";
-		String del_ksml = "delete from sapr3.ksml where clint='0000000429' and mandt ='200' and imerk='0000510805'";
+		String del_ksml = "delete from sapr3.ksml where clint='0000000000' and mandt ='200' and imerk='0000000000'";
+		String del_mara_1 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMT1MTC'";
+		String del_mara_2 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMF1MTC'";
+		
+		int t1 = SqlHelper.runUpdateSql(del_klah, conn);
+		int t2 = SqlHelper.runUpdateSql(del_cabn, conn);
+		int t3 = SqlHelper.runUpdateSql(del_ksml, conn);
+		int t4 = SqlHelper.runUpdateSql(del_mara_1, conn);
+		int t5 = SqlHelper.runUpdateSql(del_mara_2, conn);
 
-		int t1=SqlHelper.runUpdateSql(del_klah, conn);
-		int t2=SqlHelper.runUpdateSql(del_cabn, conn);
-		int t3=SqlHelper.runUpdateSql(del_ksml, conn);
-		if(t1>=0&&t2>=0&&t3>=0){
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0) {
 			System.out.println("delete success");
-		}else{
+		} else {
 			System.out.println("delete failed");
 		}
 	}

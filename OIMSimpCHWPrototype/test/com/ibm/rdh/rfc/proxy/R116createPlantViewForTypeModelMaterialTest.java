@@ -73,12 +73,6 @@ public class R116createPlantViewForTypeModelMaterialTest extends
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("TEXT", "'Created records in parking table: 1'");
-			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			assertNotNull(rowDetails);
-
-			map.clear();
-			map.put("ZSESSION", "'" + sessionId + "'");
 			map.put("TEXT", "'Material Master created/updated successfully: "
 					+ objectId + "'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");

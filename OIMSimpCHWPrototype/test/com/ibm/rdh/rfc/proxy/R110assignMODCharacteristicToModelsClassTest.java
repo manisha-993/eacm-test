@@ -86,12 +86,6 @@ public class R110assignMODCharacteristicToModelsClassTest extends
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("TEXT", "'Created records in parking table: 1'");
-			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			assertNotNull(rowDetails);
-
-			map.clear();
-			map.put("ZSESSION", "'" + sessionId + "'");
 			map.put("TEXT", "'Characteristic  " + merkma
 					+ ", successfully assigned to classification  " + jklart
 					+ "/" + jclass +"'");
