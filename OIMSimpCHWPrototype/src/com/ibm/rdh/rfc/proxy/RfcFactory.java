@@ -16,10 +16,13 @@ import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R115createTypeModelMaterialBasicView;
 import com.ibm.rdh.chw.caller.R116createPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R117createTypeModelMaterialSalesView;
+import com.ibm.rdh.chw.caller.R118create001ClassificationForMMFieldsTypeModel;
+import com.ibm.rdh.chw.caller.R119create001ClassificationForMGCommonTypeModel;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
 import com.ibm.rdh.chw.caller.R150create012ClassificationForMOD;
+import com.ibm.rdh.chw.caller.R156createZDMClassificationForTypeModel;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
@@ -138,6 +141,21 @@ public class RfcFactory extends Object {
 				productHierarchy, VectTaxList, plantValue);
 	}
 
+	public R118create001ClassificationForMMFieldsTypeModel getr118(
+			TypeModel typeModel, CHWAnnouncement chwA, String flfilcd,
+			String warrantyPeriod, boolean remarkable, String pimsIdentity)
+			throws Exception {
+		return new R118create001ClassificationForMMFieldsTypeModel(typeModel,
+				chwA, flfilcd, warrantyPeriod, remarkable, pimsIdentity);
+	}
+
+	public R119create001ClassificationForMGCommonTypeModel getr119(
+			String typemod, CHWAnnouncement chwA, boolean mgCommon,
+			boolean bumpctr, String pimsIdentity) throws Exception {
+		return new R119create001ClassificationForMGCommonTypeModel(typemod,
+				chwA, mgCommon, bumpctr, pimsIdentity);
+	}
+
 	public R123create300ClassificationForTypeModels getr123(String type,
 			TypeModelUPGGeo tmUPGObj, String newFlag, CHWAnnouncement chwA,
 			String FromToType, String pimsIdentity) throws Exception {
@@ -163,6 +181,13 @@ public class RfcFactory extends Object {
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		return new R150create012ClassificationForMOD(typeModel, chwA,
 				pimsIdentity);
+	}
+
+	public R156createZDMClassificationForTypeModel getr156(String typemod,
+			String div, CHWAnnouncement chwA, String pimsIdentity,
+			boolean seoFlag) throws Exception {
+		return new R156createZDMClassificationForTypeModel(typemod, div, chwA,
+				pimsIdentity, seoFlag);
 	}
 
 	public R160assignChartoClassFEAT_0000 getr160(TypeModel typeModel,

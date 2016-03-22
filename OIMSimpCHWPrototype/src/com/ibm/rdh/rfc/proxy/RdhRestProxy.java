@@ -18,10 +18,13 @@ import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R115createTypeModelMaterialBasicView;
 import com.ibm.rdh.chw.caller.R116createPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R117createTypeModelMaterialSalesView;
+import com.ibm.rdh.chw.caller.R118create001ClassificationForMMFieldsTypeModel;
+import com.ibm.rdh.chw.caller.R119create001ClassificationForMGCommonTypeModel;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
 import com.ibm.rdh.chw.caller.R150create012ClassificationForMOD;
+import com.ibm.rdh.chw.caller.R156createZDMClassificationForTypeModel;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
@@ -198,6 +201,28 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r118(TypeModel typeModel, CHWAnnouncement chwA, String flfilcd,
+			String warrantyPeriod, boolean remarkable, String pimsIdentity)
+			throws Exception {
+		R118create001ClassificationForMMFieldsTypeModel r = getFactory()
+				.getr118(typeModel, chwA, flfilcd, warrantyPeriod, remarkable,
+						pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r119(String typemod, CHWAnnouncement chwA, boolean mgCommon,
+			boolean bumpctr, String pimsIdentity) throws Exception {
+		R119create001ClassificationForMGCommonTypeModel r = getFactory()
+				.getr119(typemod, chwA, mgCommon, bumpctr, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
 	public void r123(String type, TypeModelUPGGeo tmUPGObj, String newFlag,
 			CHWAnnouncement chwA, String FromToType, String pimsIdentity)
 			throws Exception {
@@ -237,6 +262,16 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 			String pimsIdentity) throws Exception {
 		R150create012ClassificationForMOD r = getFactory().getr150(typeModel,
 				chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r156(String typemod, String div, CHWAnnouncement chwA,
+			String pimsIdentity, boolean seoFlag) throws Exception {
+		R156createZDMClassificationForTypeModel r = getFactory().getr156(
+				typemod, div, chwA, pimsIdentity, seoFlag);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
