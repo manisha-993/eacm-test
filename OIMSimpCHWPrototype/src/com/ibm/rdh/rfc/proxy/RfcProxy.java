@@ -93,13 +93,16 @@ public abstract class RfcProxy {
 			String productHierarchy, Vector VectTaxList, String plantValue)
 			throws Exception;
 
-	public abstract void r118(TypeModel typeModel, CHWAnnouncement chwA,
+/*	public abstract void r118(TypeModel typeModel, CHWAnnouncement chwA,
 			String flfilcd, String warrantyPeriod, boolean remarkable,
-			String pimsIdentity) throws Exception;
+			String pimsIdentity) throws Exception;*/
 
 	public abstract void r119(String typemod, CHWAnnouncement chwA,
 			boolean mgCommon, boolean bumpctr, String pimsIdentity)
 			throws Exception;
+
+	public abstract void r120(TypeModel typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
 
 	public abstract void r123(String type, TypeModelUPGGeo tmUPGObj,
 			String newFlag, CHWAnnouncement chwA, String FromToType,
@@ -110,6 +113,9 @@ public abstract class RfcProxy {
 
 	public abstract void r131(String type, String featRanges,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
+
+	public abstract void r133(TypeModel typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
 
 	public abstract void r150(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
@@ -124,6 +130,12 @@ public abstract class RfcProxy {
 			CHWGeoAnn chwAg, String storageLocation, String newFlag)
 			throws Exception;
 
+	public abstract void r171(String typemod, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
+	public abstract void r172(TypeModel typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
 	public abstract void r175(TypeModel typemodel, TypeModelUPGGeo tmUPGObj,
 			CHWAnnouncement chwA, String newFlag, String FromToType,
 			String pimsIdentity) throws Exception;
@@ -132,6 +144,9 @@ public abstract class RfcProxy {
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
 
 	public abstract void r177(String type, String range, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
+	public abstract void r182(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
 	public abstract void r183(String annDocNo, String typemod, String sapPlant,

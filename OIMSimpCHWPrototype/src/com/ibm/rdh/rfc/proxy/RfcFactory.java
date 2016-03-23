@@ -16,18 +16,22 @@ import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R115createTypeModelMaterialBasicView;
 import com.ibm.rdh.chw.caller.R116createPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R117createTypeModelMaterialSalesView;
-import com.ibm.rdh.chw.caller.R118create001ClassificationForMMFieldsTypeModel;
 import com.ibm.rdh.chw.caller.R119create001ClassificationForMGCommonTypeModel;
+import com.ibm.rdh.chw.caller.R120maintainModelValueForTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
+import com.ibm.rdh.chw.caller.R133updateMaterialBasicViewForTypeModel;
 import com.ibm.rdh.chw.caller.R150create012ClassificationForMOD;
 import com.ibm.rdh.chw.caller.R156createZDMClassificationForTypeModel;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
+import com.ibm.rdh.chw.caller.R171markTypeModelMaterialForDeletion;
+import com.ibm.rdh.chw.caller.R172deleteModelValueFromTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
 import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
+import com.ibm.rdh.chw.caller.R182deleteModelSelectionDependency;
 import com.ibm.rdh.chw.caller.R183createCFIPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
@@ -141,19 +145,27 @@ public class RfcFactory extends Object {
 				productHierarchy, VectTaxList, plantValue);
 	}
 
-	public R118create001ClassificationForMMFieldsTypeModel getr118(
-			TypeModel typeModel, CHWAnnouncement chwA, String flfilcd,
-			String warrantyPeriod, boolean remarkable, String pimsIdentity)
-			throws Exception {
-		return new R118create001ClassificationForMMFieldsTypeModel(typeModel,
-				chwA, flfilcd, warrantyPeriod, remarkable, pimsIdentity);
-	}
+	/*
+	 * public R118create001ClassificationForMMFieldsTypeModel getr118( TypeModel
+	 * typeModel, CHWAnnouncement chwA, String flfilcd, String warrantyPeriod,
+	 * boolean remarkable, String pimsIdentity) throws Exception { return new
+	 * R118create001ClassificationForMMFieldsTypeModel(typeModel, chwA, flfilcd,
+	 * warrantyPeriod, remarkable, pimsIdentity); }
+	 */
 
 	public R119create001ClassificationForMGCommonTypeModel getr119(
 			String typemod, CHWAnnouncement chwA, boolean mgCommon,
 			boolean bumpctr, String pimsIdentity) throws Exception {
 		return new R119create001ClassificationForMGCommonTypeModel(typemod,
 				chwA, mgCommon, bumpctr, pimsIdentity);
+	}
+
+	public R120maintainModelValueForTypeMODCharacteristic getr120(
+			TypeModel typeModel, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+
+		return new R120maintainModelValueForTypeMODCharacteristic(typeModel,
+				chwA, pimsIdentity);
 	}
 
 	public R123create300ClassificationForTypeModels getr123(String type,
@@ -175,6 +187,13 @@ public class RfcFactory extends Object {
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 
 		return new R131createTypeUFClass(type, featRanges, chwA, pimsIdentity);
+	}
+
+	public R133updateMaterialBasicViewForTypeModel getr133(TypeModel typeModel,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+
+		return new R133updateMaterialBasicViewForTypeModel(typeModel, chwA,
+				pimsIdentity);
 	}
 
 	public R150create012ClassificationForMOD getr150(TypeModel typeModel,
@@ -203,6 +222,19 @@ public class RfcFactory extends Object {
 				storageLocation, newFlag);
 	}
 
+	public R171markTypeModelMaterialForDeletion getr171(String typemod,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		return new R171markTypeModelMaterialForDeletion(typemod, chwA,
+				pimsIdentity);
+	}
+
+	public R172deleteModelValueFromTypeMODCharacteristic getr172(
+			TypeModel typeModel, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R172deleteModelValueFromTypeMODCharacteristic(typeModel,
+				chwA, pimsIdentity);
+	}
+
 	public R175create001ClassificationForMMFieldsType getr175(
 			TypeModel typemodel, TypeModelUPGGeo tmUPGObj,
 			CHWAnnouncement chwA, String newFlag, String FromToType,
@@ -223,6 +255,12 @@ public class RfcFactory extends Object {
 			throws Exception {
 		return new R177create300ClassificationForTypeUFForUPG(type, range,
 				chwA, pimsIdentity);
+	}
+
+	public R182deleteModelSelectionDependency getr182(TypeModel typeModel,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		return new R182deleteModelSelectionDependency(typeModel, chwA,
+				pimsIdentity);
 	}
 
 	public R183createCFIPlantViewForTypeModelMaterial getr183(String annDocNo,
