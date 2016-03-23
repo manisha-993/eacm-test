@@ -16,8 +16,10 @@ import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R115createTypeModelMaterialBasicView;
 import com.ibm.rdh.chw.caller.R116createPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R117createTypeModelMaterialSalesView;
+import com.ibm.rdh.chw.caller.R118create001ClassificationForMMFieldsTypeModel;
 import com.ibm.rdh.chw.caller.R119create001ClassificationForMGCommonTypeModel;
 import com.ibm.rdh.chw.caller.R120maintainModelValueForTypeMODCharacteristic;
+import com.ibm.rdh.chw.caller.R121createModelSelectionDependency;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
@@ -145,13 +147,13 @@ public class RfcFactory extends Object {
 				productHierarchy, VectTaxList, plantValue);
 	}
 
-	/*
-	 * public R118create001ClassificationForMMFieldsTypeModel getr118( TypeModel
-	 * typeModel, CHWAnnouncement chwA, String flfilcd, String warrantyPeriod,
-	 * boolean remarkable, String pimsIdentity) throws Exception { return new
-	 * R118create001ClassificationForMMFieldsTypeModel(typeModel, chwA, flfilcd,
-	 * warrantyPeriod, remarkable, pimsIdentity); }
-	 */
+	public R118create001ClassificationForMMFieldsTypeModel getr118(
+			TypeModel typeModel, CHWAnnouncement chwA, String flfilcd,
+			String warrantyPeriod, boolean remarkable, String pimsIdentity)
+			throws Exception {
+		return new R118create001ClassificationForMMFieldsTypeModel(typeModel,
+				chwA, flfilcd, warrantyPeriod, remarkable, pimsIdentity);
+	}
 
 	public R119create001ClassificationForMGCommonTypeModel getr119(
 			String typemod, CHWAnnouncement chwA, boolean mgCommon,
@@ -166,6 +168,12 @@ public class RfcFactory extends Object {
 
 		return new R120maintainModelValueForTypeMODCharacteristic(typeModel,
 				chwA, pimsIdentity);
+	}
+
+	public R121createModelSelectionDependency getr121(TypeModel typeModel,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		return new R121createModelSelectionDependency(typeModel, chwA,
+				pimsIdentity);
 	}
 
 	public R123create300ClassificationForTypeModels getr123(String type,

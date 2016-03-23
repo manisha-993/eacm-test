@@ -18,8 +18,10 @@ import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R115createTypeModelMaterialBasicView;
 import com.ibm.rdh.chw.caller.R116createPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R117createTypeModelMaterialSalesView;
+import com.ibm.rdh.chw.caller.R118create001ClassificationForMMFieldsTypeModel;
 import com.ibm.rdh.chw.caller.R119create001ClassificationForMGCommonTypeModel;
 import com.ibm.rdh.chw.caller.R120maintainModelValueForTypeMODCharacteristic;
+import com.ibm.rdh.chw.caller.R121createModelSelectionDependency;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
@@ -204,15 +206,17 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 	}
 
-	/*
-	 * @Override public void r118(TypeModel typeModel, CHWAnnouncement chwA,
-	 * String flfilcd, String warrantyPeriod, boolean remarkable, String
-	 * pimsIdentity) throws Exception {
-	 * R118create001ClassificationForMMFieldsTypeModel r = getFactory()
-	 * .getr118(typeModel, chwA, flfilcd, warrantyPeriod, remarkable,
-	 * pimsIdentity); logPromoteInfoMessage(r); r.evaluate();
-	 * logPromoteResultMessage(r); }
-	 */
+	@Override
+	public void r118(TypeModel typeModel, CHWAnnouncement chwA, String flfilcd,
+			String warrantyPeriod, boolean remarkable, String pimsIdentity)
+			throws Exception {
+		R118create001ClassificationForMMFieldsTypeModel r = getFactory()
+				.getr118(typeModel, chwA, flfilcd, warrantyPeriod, remarkable,
+						pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
 
 	@Override
 	public void r119(String typemod, CHWAnnouncement chwA, boolean mgCommon,
@@ -234,6 +238,16 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		r.evaluate();
 		logPromoteResultMessage(r);
 
+	}
+
+	@Override
+	public void r121(TypeModel typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R121createModelSelectionDependency r = getFactory().getr121(typeModel,
+				chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
 	}
 
 	@Override

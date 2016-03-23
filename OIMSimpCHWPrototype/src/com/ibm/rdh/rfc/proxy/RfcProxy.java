@@ -93,15 +93,18 @@ public abstract class RfcProxy {
 			String productHierarchy, Vector VectTaxList, String plantValue)
 			throws Exception;
 
-/*	public abstract void r118(TypeModel typeModel, CHWAnnouncement chwA,
+	public abstract void r118(TypeModel typeModel, CHWAnnouncement chwA,
 			String flfilcd, String warrantyPeriod, boolean remarkable,
-			String pimsIdentity) throws Exception;*/
+			String pimsIdentity) throws Exception;
 
 	public abstract void r119(String typemod, CHWAnnouncement chwA,
 			boolean mgCommon, boolean bumpctr, String pimsIdentity)
 			throws Exception;
 
 	public abstract void r120(TypeModel typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
+	public abstract void r121(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
 	public abstract void r123(String type, TypeModelUPGGeo tmUPGObj,
