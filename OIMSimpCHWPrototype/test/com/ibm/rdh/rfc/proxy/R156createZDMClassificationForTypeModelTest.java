@@ -113,7 +113,7 @@ public class R156createZDMClassificationForTypeModelTest extends
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
 			map.put("ACTIV_ID", "'Z_DM_SAP_CLASSIFICATION_MAINT'");
-			map.put("OBJECT_ID", "'001" + typemod + "'");
+			map.put("OBJECT_ID", "'ZDM" + typemod + "'");
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
 			String sessionId = (String) rowDetails.get("ZSESSION");
