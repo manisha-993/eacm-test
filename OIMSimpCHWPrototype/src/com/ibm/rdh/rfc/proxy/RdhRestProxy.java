@@ -41,9 +41,12 @@ import com.ibm.rdh.chw.caller.R183createCFIPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.caller.R197createLifecycleRow;
 import com.ibm.rdh.chw.caller.R198updateLifecycleRow;
+import com.ibm.rdh.chw.caller.R199_deleteLifecycleRow;
+import com.ibm.rdh.chw.caller.R200_readLifecycleRow;
 import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R261PlantViewMaterial;
+import com.ibm.rdh.chw.caller.R262createPlantViewProfitCenterForMaterial;
 import com.ibm.rdh.chw.caller.Rfc;
 import com.ibm.rdh.chw.caller.RfcReturnSeverityCodes;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
@@ -443,6 +446,31 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r199(String material, String varCond, String salesStatus,
+			Date validTo, String user, String annDocNo, String check,
+			String pimsIdentity, String salesOrg) throws Exception {
+		R199_deleteLifecycleRow r = getFactory().getr199(material, varCond,
+				salesStatus, validTo, user, annDocNo, check, pimsIdentity,
+				salesOrg);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r200(String material, String varCond, String annDocNo,
+			String check, String pimsIdentity, String salesOrg)
+			throws Exception {
+		R200_readLifecycleRow r = getFactory().getr200(material, varCond,
+				annDocNo, check, pimsIdentity, salesOrg);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
 	public void r207(String type, String model, String plant) throws Exception {
 		R207ReadPlantViewMaterial r = getFactory().getr207(type, model, plant);
 		logPromoteInfoMessage(r);
@@ -465,6 +493,18 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r262(CHWAnnouncement chwA, String material, String sapPlant,
+			String pimsIdentity, String profitCenter) throws Exception {
+
+		R262createPlantViewProfitCenterForMaterial r = getFactory().getr262(
+				chwA, material, sapPlant, pimsIdentity, profitCenter);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
 	}
 
 	// public ArrayList r060( SWO swo, Announcement ann, Collection plants )

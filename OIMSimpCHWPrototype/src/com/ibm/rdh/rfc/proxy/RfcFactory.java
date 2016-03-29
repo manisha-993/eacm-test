@@ -39,9 +39,12 @@ import com.ibm.rdh.chw.caller.R183createCFIPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.caller.R197createLifecycleRow;
 import com.ibm.rdh.chw.caller.R198updateLifecycleRow;
+import com.ibm.rdh.chw.caller.R199_deleteLifecycleRow;
+import com.ibm.rdh.chw.caller.R200_readLifecycleRow;
 import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R261PlantViewMaterial;
+import com.ibm.rdh.chw.caller.R262createPlantViewProfitCenterForMaterial;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.PlannedSalesStatus;
@@ -298,9 +301,24 @@ public class RfcFactory extends Object {
 				salesOrg);
 	}
 
+	public R199_deleteLifecycleRow getr199(String material, String varCond,
+			String salesStatus, Date validTo, String user, String annDocNo,
+			String check, String pimsIdentity, String salesOrg)
+			throws Exception {
+		return new R199_deleteLifecycleRow(material, varCond, salesStatus,
+				validTo, user, annDocNo, check, pimsIdentity, salesOrg);
+	}
+
 	public R207ReadPlantViewMaterial getr207(String type, String model,
 			String plant) throws Exception {
 		return new R207ReadPlantViewMaterial(type, model, plant);
+	}
+
+	public R200_readLifecycleRow getr200(String material, String varCond,
+			String annDocNo, String check, String pimsIdentity, String salesOrg)
+			throws Exception {
+		return new R200_readLifecycleRow(material, varCond, annDocNo, check,
+				pimsIdentity, salesOrg);
 	}
 
 	public R209ReadBasicViewOfMaterial getr209(String material)
@@ -310,5 +328,12 @@ public class RfcFactory extends Object {
 
 	public R261PlantViewMaterial getr261(String material) throws Exception {
 		return new R261PlantViewMaterial(material);
+	}
+
+	public R262createPlantViewProfitCenterForMaterial getr262(
+			CHWAnnouncement chwA, String material, String sapPlant,
+			String pimsIdentity, String profitCenter) throws Exception {
+		return new R262createPlantViewProfitCenterForMaterial(chwA, material,
+				sapPlant, pimsIdentity, profitCenter);
 	}
 }

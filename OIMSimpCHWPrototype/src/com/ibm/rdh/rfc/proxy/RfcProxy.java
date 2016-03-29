@@ -170,12 +170,25 @@ public abstract class RfcProxy {
 			String annDocNo, String check, String pimsIdentity, String salesOrg)
 			throws Exception;
 
+	public abstract void r199(String material, String varCond,
+			String salesStatus, Date validTo, String user, String annDocNo,
+			String check, String pimsIdentity, String salesOrg)
+			throws Exception;
+
+	public abstract void r200(String material, String varCond, String annDocNo,
+			String check, String pimsIdentity, String salesOrg)
+			throws Exception;
+
 	public abstract void r207(String type, String model, String plant)
 			throws Exception;
 
 	public abstract BapireturnStructure r209(String material) throws Exception;
 
 	public abstract void r261(String material) throws Exception;
+
+	public abstract void r262(CHWAnnouncement chwA, String material,
+			String sapPlant, String pimsIdentity, String profitCenter)
+			throws Exception;
 
 	// public abstract ReturnDataObjectR001 r001(SWO swo) throws Exception ;
 	// public abstract boolean r002(SWO swo, String salesOrg) throws Exception;
