@@ -20,6 +20,7 @@ package com.ibm.rdh.rfc.proxy;
 //import com.ibm.pprds.swpims.domain.UpgradeEntitlementFeature;
 //import com.ibm.pprds.swpims.rfc.ReturnDataObjectR001;
 //
+import java.util.Date;
 import java.util.Vector;
 
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
@@ -159,10 +160,22 @@ public abstract class RfcProxy {
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String FromToType, String pimsIdentity) throws Exception;
 
+	public abstract void r197(String material, String varCond,
+			String salesStatus, Date validFrom, Date validTo, String user,
+			String annDocNo, String check, String pimsIdentity, String salesOrg)
+			throws Exception;
+
+	public abstract void r198(String material, String varCond,
+			String salesStatus, Date validFrom, Date validTo, String user,
+			String annDocNo, String check, String pimsIdentity, String salesOrg)
+			throws Exception;
+
 	public abstract void r207(String type, String model, String plant)
 			throws Exception;
 
 	public abstract BapireturnStructure r209(String material) throws Exception;
+
+	public abstract void r261(String material) throws Exception;
 
 	// public abstract ReturnDataObjectR001 r001(SWO swo) throws Exception ;
 	// public abstract boolean r002(SWO swo, String salesOrg) throws Exception;

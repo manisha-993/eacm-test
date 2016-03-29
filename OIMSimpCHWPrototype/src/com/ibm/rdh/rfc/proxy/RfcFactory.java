@@ -3,6 +3,7 @@
  */
 package com.ibm.rdh.rfc.proxy;
 
+import java.util.Date;
 import java.util.Vector;
 
 import com.ibm.rdh.chw.caller.R100createTypeMaterialBasicView;
@@ -36,8 +37,11 @@ import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
 import com.ibm.rdh.chw.caller.R182deleteModelSelectionDependency;
 import com.ibm.rdh.chw.caller.R183createCFIPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
+import com.ibm.rdh.chw.caller.R197createLifecycleRow;
+import com.ibm.rdh.chw.caller.R198updateLifecycleRow;
 import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
+import com.ibm.rdh.chw.caller.R261PlantViewMaterial;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.PlannedSalesStatus;
@@ -89,7 +93,6 @@ public class RfcFactory extends Object {
 			String fromToType, String pimsIdentity) throws Exception {
 		return new R103create001ClassificationForMGCommon(typeModel, newFlag,
 				chwA, tmUPGObj, fromToType, pimsIdentity);
-
 	}
 
 	public R104createZDMClassification getr104(TypeModel typeModel,
@@ -97,18 +100,15 @@ public class RfcFactory extends Object {
 			String FromToType, String pimsIdentity) throws Exception {
 		return new R104createZDMClassification(typeModel, newFlag, chwA,
 				tmUPGObj, FromToType, pimsIdentity);
-
 	}
 
 	public R106createTypeModelsClass getr106(TypeModel typeModel,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
-
 		return new R106createTypeModelsClass(typeModel, chwA, pimsIdentity);
 	}
 
 	public R108createTypeMODCharacteristic getr108(TypeModel typeModel,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
-
 		return new R108createTypeMODCharacteristic(typeModel, chwA,
 				pimsIdentity);
 	}
@@ -116,7 +116,6 @@ public class RfcFactory extends Object {
 	public R110assignMODCharacteristicToModelsClass getr110(
 			TypeModel typeModel, CHWAnnouncement chwA, String pimsIdentity)
 			throws Exception {
-
 		return new R110assignMODCharacteristicToModelsClass(typeModel, chwA,
 				pimsIdentity);
 	}
@@ -132,7 +131,6 @@ public class RfcFactory extends Object {
 			CHWAnnouncement chwA, TypeModel typeModel, String sapPlant,
 			String loadingGroup, CHWGeoAnn chwAg, String storageLocation,
 			String pimsIdentity) throws Exception {
-
 		return new R116createPlantViewForTypeModelMaterial(chwA, typeModel,
 				sapPlant, loadingGroup, chwAg, storageLocation, pimsIdentity);
 	}
@@ -165,7 +163,6 @@ public class RfcFactory extends Object {
 	public R120maintainModelValueForTypeMODCharacteristic getr120(
 			TypeModel typeModel, CHWAnnouncement chwA, String pimsIdentity)
 			throws Exception {
-
 		return new R120maintainModelValueForTypeMODCharacteristic(typeModel,
 				chwA, pimsIdentity);
 	}
@@ -179,27 +176,23 @@ public class RfcFactory extends Object {
 	public R123create300ClassificationForTypeModels getr123(String type,
 			TypeModelUPGGeo tmUPGObj, String newFlag, CHWAnnouncement chwA,
 			String FromToType, String pimsIdentity) throws Exception {
-
 		return new R123create300ClassificationForTypeModels(type, tmUPGObj,
 				newFlag, chwA, FromToType, pimsIdentity);
 	}
 
 	public R130createTypeFEATClass getr130(String type, String featRanges,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
-
 		return new R130createTypeFEATClass(type, featRanges, chwA, pimsIdentity);
 
 	}
 
 	public R131createTypeUFClass getr131(String type, String featRanges,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
-
 		return new R131createTypeUFClass(type, featRanges, chwA, pimsIdentity);
 	}
 
 	public R133updateMaterialBasicViewForTypeModel getr133(TypeModel typeModel,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
-
 		return new R133updateMaterialBasicViewForTypeModel(typeModel, chwA,
 				pimsIdentity);
 	}
@@ -287,16 +280,35 @@ public class RfcFactory extends Object {
 
 	}
 
+	public R197createLifecycleRow getr197(String material, String varCond,
+			String salesStatus, Date validFrom, Date validTo, String user,
+			String annDocNo, String check, String pimsIdentity, String salesOrg)
+			throws Exception {
+		return new R197createLifecycleRow(material, varCond, salesStatus,
+				validFrom, validTo, user, annDocNo, check, pimsIdentity,
+				salesOrg);
+	}
+
+	public R198updateLifecycleRow getr198(String material, String varCond,
+			String salesStatus, Date validFrom, Date validTo, String user,
+			String annDocNo, String check, String pimsIdentity, String salesOrg)
+			throws Exception {
+		return new R198updateLifecycleRow(material, varCond, salesStatus,
+				validFrom, validTo, user, annDocNo, check, pimsIdentity,
+				salesOrg);
+	}
+
 	public R207ReadPlantViewMaterial getr207(String type, String model,
 			String plant) throws Exception {
 		return new R207ReadPlantViewMaterial(type, model, plant);
-
 	}
 
 	public R209ReadBasicViewOfMaterial getr209(String material)
 			throws Exception {
 		return new R209ReadBasicViewOfMaterial(material);
-
 	}
 
+	public R261PlantViewMaterial getr261(String material) throws Exception {
+		return new R261PlantViewMaterial(material);
+	}
 }

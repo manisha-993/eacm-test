@@ -1,5 +1,6 @@
 package com.ibm.rdh.rfc.proxy;
 
+import java.util.Date;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -38,8 +39,11 @@ import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
 import com.ibm.rdh.chw.caller.R182deleteModelSelectionDependency;
 import com.ibm.rdh.chw.caller.R183createCFIPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
+import com.ibm.rdh.chw.caller.R197createLifecycleRow;
+import com.ibm.rdh.chw.caller.R198updateLifecycleRow;
 import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
+import com.ibm.rdh.chw.caller.R261PlantViewMaterial;
 import com.ibm.rdh.chw.caller.Rfc;
 import com.ibm.rdh.chw.caller.RfcReturnSeverityCodes;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
@@ -144,7 +148,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 	}
 
 	@Override
@@ -188,7 +191,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 	}
 
 	@Override
@@ -203,7 +205,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 	}
 
 	@Override
@@ -237,7 +238,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 	}
 
 	@Override
@@ -259,7 +259,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 	}
 
 	@Override
@@ -270,7 +269,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 	}
 
 	@Override
@@ -282,7 +280,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 	}
 
 	@Override
@@ -324,7 +321,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 	}
 
 	@Override
@@ -346,7 +342,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 	}
 
 	@Override
@@ -357,7 +352,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 	}
 
 	@Override
@@ -409,7 +403,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 	}
 
 	@Override
@@ -421,7 +414,32 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
+	}
 
+	@Override
+	public void r197(String material, String varCond, String salesStatus,
+			Date validFrom, Date validTo, String user, String annDocNo,
+			String check, String pimsIdentity, String salesOrg)
+			throws Exception {
+		R197createLifecycleRow r = getFactory().getr197(material, varCond,
+				salesStatus, validFrom, validTo, user, annDocNo, check,
+				pimsIdentity, salesOrg);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r198(String material, String varCond, String salesStatus,
+			Date validFrom, Date validTo, String user, String annDocNo,
+			String check, String pimsIdentity, String salesOrg)
+			throws Exception {
+		R198updateLifecycleRow r = getFactory().getr198(material, varCond,
+				salesStatus, validFrom, validTo, user, annDocNo, check,
+				pimsIdentity, salesOrg);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
 	}
 
 	@Override
@@ -430,7 +448,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 	}
 
 	@Override
@@ -440,6 +457,14 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		r.evaluate();
 		logPromoteResultMessage(r);
 		return r.evaluate();
+	}
+
+	@Override
+	public void r261(String material) throws Exception {
+		R261PlantViewMaterial r = getFactory().getr261(material);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
 	}
 
 	// public ArrayList r060( SWO swo, Announcement ann, Collection plants )
