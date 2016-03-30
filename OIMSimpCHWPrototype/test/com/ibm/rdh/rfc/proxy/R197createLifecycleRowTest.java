@@ -44,13 +44,6 @@ public class R197createLifecycleRowTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
-			map.put("ZDMCLASS", "'MD_DS_ALL'");
-			map.put("ZDMOBJTYP", "'PLC'");
-			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
-			assertNotNull(rowDetails);
-
-			map.clear();
-			map.put("MANDT", "'" + Constants.MANDT + "'");
 			map.put("ACTIV_ID", "'Z_DM_SAP_CHW_PRODUCT_CYCLE'");
 			map.put("OBJECT_ID", "'ZDMCHWPLC'");
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
