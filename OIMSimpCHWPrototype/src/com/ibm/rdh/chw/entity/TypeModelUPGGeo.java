@@ -12,7 +12,7 @@ import com.ibm.pprds.epimshw.util.LogManager;
  * Creation date: (4/19/2001 11:50:17 AM)
  * @author: Lizsolette Williams
  */
-public class TypeModelUPGGeo implements java.io.Serializable {
+public class TypeModelUPGGeo {
 	
 	public static Logger logger = LogManager.getLogManager().getPromoteLogger();
 	
