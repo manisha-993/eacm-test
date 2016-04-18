@@ -14,6 +14,7 @@ import com.ibm.rdh.chw.caller.R104createZDMClassification;
 import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
 import com.ibm.rdh.chw.caller.R108createTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
+import com.ibm.rdh.chw.caller.R111assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R115createTypeModelMaterialBasicView;
 import com.ibm.rdh.chw.caller.R116createPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R117createTypeModelMaterialSalesView;
@@ -22,12 +23,22 @@ import com.ibm.rdh.chw.caller.R119create001ClassificationForMGCommonTypeModel;
 import com.ibm.rdh.chw.caller.R120maintainModelValueForTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R121createModelSelectionDependency;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
+import com.ibm.rdh.chw.caller.R125create300ClassificationForTypeMCForUPG;
+import com.ibm.rdh.chw.caller.R128assignRPQTypeFeatureCharacteristicToTypeClass;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
 import com.ibm.rdh.chw.caller.R133updateMaterialBasicViewForTypeModel;
+import com.ibm.rdh.chw.caller.R134assignRPQTypeFeatureCharacteristicToTypeClass;
+import com.ibm.rdh.chw.caller.R135assignTypeFeatureCharacteristicToTypeUFClass;
+import com.ibm.rdh.chw.caller.R144updateParkStatus;
 import com.ibm.rdh.chw.caller.R150create012ClassificationForMOD;
+import com.ibm.rdh.chw.caller.R151create012ClassificationForMC;
+import com.ibm.rdh.chw.caller.R152create012ClassificationForRPQTypeFeature;
+import com.ibm.rdh.chw.caller.R153create012ClassificationForTypeFeature;
 import com.ibm.rdh.chw.caller.R156createZDMClassificationForTypeModel;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
+import com.ibm.rdh.chw.caller.R162createZDMClassificationForMKFEATCONV;
+import com.ibm.rdh.chw.caller.R165assignCharacteristicToMTCClass300;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R171markTypeModelMaterialForDeletion;
 import com.ibm.rdh.chw.caller.R172deleteModelValueFromTypeMODCharacteristic;
@@ -36,6 +47,7 @@ import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
 import com.ibm.rdh.chw.caller.R182deleteModelSelectionDependency;
 import com.ibm.rdh.chw.caller.R183createCFIPlantViewForTypeModelMaterial;
+import com.ibm.rdh.chw.caller.R188DeleteTypeFeatureCharacteristicClassificationtoUF;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.caller.R197createLifecycleRow;
 import com.ibm.rdh.chw.caller.R198updateLifecycleRow;
@@ -48,6 +60,8 @@ import com.ibm.rdh.chw.caller.R262createPlantViewProfitCenterForMaterial;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.PlannedSalesStatus;
+import com.ibm.rdh.chw.entity.TypeFeature;
+import com.ibm.rdh.chw.entity.TypeFeatureUPGGeo;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 
@@ -123,6 +137,12 @@ public class RfcFactory extends Object {
 				pimsIdentity);
 	}
 
+	public R111assignMODCharacteristicToModelsClass getr111(String type,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		return new R111assignMODCharacteristicToModelsClass(type, chwA,
+				pimsIdentity);
+	}
+
 	public R115createTypeModelMaterialBasicView getr115(CHWAnnouncement chwA,
 			TypeModel typeModel, CHWGeoAnn chwAg, String pimsIdentity,
 			String plantValue) throws Exception {
@@ -183,6 +203,20 @@ public class RfcFactory extends Object {
 				newFlag, chwA, FromToType, pimsIdentity);
 	}
 
+	public R125create300ClassificationForTypeMCForUPG getr125(String type,
+			CHWAnnouncement chwA, String newFlag, String pimsIdentity)
+			throws Exception {
+		return new R125create300ClassificationForTypeMCForUPG(type, chwA,
+				newFlag, pimsIdentity);
+	}
+
+	public R128assignRPQTypeFeatureCharacteristicToTypeClass getr128(
+			TypeFeature typeFeature, String featRanges, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		return new R128assignRPQTypeFeatureCharacteristicToTypeClass(
+				typeFeature, featRanges, chwA, pimsIdentity);
+	}
+
 	public R130createTypeFEATClass getr130(String type, String featRanges,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		return new R130createTypeFEATClass(type, featRanges, chwA, pimsIdentity);
@@ -200,9 +234,47 @@ public class RfcFactory extends Object {
 				pimsIdentity);
 	}
 
+	public R134assignRPQTypeFeatureCharacteristicToTypeClass getr134(
+			TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R134assignRPQTypeFeatureCharacteristicToTypeClass(
+				typeFeature, chwA, pimsIdentity);
+	}
+
+	public R135assignTypeFeatureCharacteristicToTypeUFClass getr135(
+			TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R135assignTypeFeatureCharacteristicToTypeUFClass(
+				typeFeature, chwA, pimsIdentity);
+	}
+
+	public R144updateParkStatus getr144(String annno, String zdmstatus,
+			String pimsIdentity) throws Exception {
+		return new R144updateParkStatus(annno, zdmstatus, pimsIdentity);
+	}
+
 	public R150create012ClassificationForMOD getr150(TypeModel typeModel,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		return new R150create012ClassificationForMOD(typeModel, chwA,
+				pimsIdentity);
+	}
+
+	public R151create012ClassificationForMC getr151(String type,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		return new R151create012ClassificationForMC(type, chwA, pimsIdentity);
+	}
+
+	public R152create012ClassificationForRPQTypeFeature getr152(
+			TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R152create012ClassificationForRPQTypeFeature(typeFeature,
+				chwA, pimsIdentity);
+	}
+
+	public R153create012ClassificationForTypeFeature getr153(
+			TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R153create012ClassificationForTypeFeature(typeFeature, chwA,
 				pimsIdentity);
 	}
 
@@ -215,8 +287,22 @@ public class RfcFactory extends Object {
 
 	public R160assignChartoClassFEAT_0000 getr160(TypeModel typeModel,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
-
 		return new R160assignChartoClassFEAT_0000(typeModel, chwA, pimsIdentity);
+	}
+
+	public R162createZDMClassificationForMKFEATCONV getr162(
+			TypeFeatureUPGGeo tfugObj, TypeModelUPGGeo tmUPGObj,
+			String newFlag, CHWAnnouncement chwA, String FromToType,
+			String pimsIdentity) throws Exception {
+		return new R162createZDMClassificationForMKFEATCONV(tfugObj, tmUPGObj,
+				newFlag, chwA, FromToType, pimsIdentity);
+	}
+
+	public R165assignCharacteristicToMTCClass300 getr165(CHWAnnouncement chwA,
+			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity)
+			throws Exception {
+		return new R165assignCharacteristicToMTCClass300(chwA, tmUPGObj,
+				FromToType, pimsIdentity);
 	}
 
 	public R166createSTPPlantViewForMaterial getr166(CHWAnnouncement chwA,
@@ -272,6 +358,13 @@ public class RfcFactory extends Object {
 			String profitCenter) throws Exception {
 		return new R183createCFIPlantViewForTypeModelMaterial(annDocNo,
 				typemod, sapPlant, pimsIdentity, profitCenter);
+	}
+
+	public R188DeleteTypeFeatureCharacteristicClassificationtoUF getr188(
+			TypeFeature tfObj, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R188DeleteTypeFeatureCharacteristicClassificationtoUF(tfObj,
+				chwA, pimsIdentity);
 	}
 
 	public R189createCFIPlantViewForType getr189(CHWAnnouncement chwA,
