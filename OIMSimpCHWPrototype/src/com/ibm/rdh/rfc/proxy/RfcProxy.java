@@ -76,7 +76,13 @@ public abstract class RfcProxy {
 	public abstract void r106(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
+	public abstract void r107(String type, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
 	public abstract void r108(TypeModel typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
+	public abstract void r109(String type, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
 	public abstract void r110(TypeModel typeModel, CHWAnnouncement chwA,
@@ -117,11 +123,23 @@ public abstract class RfcProxy {
 			String newFlag, CHWAnnouncement chwA, String FromToType,
 			String pimsIdentity) throws Exception;
 
+	public abstract void r124(Vector tmugV, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
 	public abstract void r125(String type, CHWAnnouncement chwA,
 			String newFlag, String pimsIdentity) throws Exception;
 
+	public abstract void r126(TypeFeature typeFeature, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
+	public abstract void r127(TypeFeature typeFeature, String featRanges,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
+
 	public abstract void r128(TypeFeature typeFeature, String featRanges,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
+
+	public abstract void r129(TypeFeature typeFeature, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
 
 	public abstract void r130(String type, String featRanges,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
@@ -155,6 +173,12 @@ public abstract class RfcProxy {
 
 	public abstract void r156(String typemod, String div, CHWAnnouncement chwA,
 			String pimsIdentity, boolean seoFlag) throws Exception;
+
+	public abstract void r157(CHWAnnouncement chwA, TypeModelUPGGeo tmUPGObj,
+			String FromToType, String pimsIdentity) throws Exception;
+
+	public abstract void r159(CHWAnnouncement chwA, TypeModelUPGGeo tmUPGObj,
+			String FromToType, String pimsIdentity) throws Exception;
 
 	public abstract void r160(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
@@ -192,6 +216,15 @@ public abstract class RfcProxy {
 	public abstract void r183(String annDocNo, String typemod, String sapPlant,
 			String pimsIdentity, String profitCenter) throws Exception;
 
+	public abstract void r185(TypeModelUPGGeo typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
+	public abstract void r186(TypeFeature typeFeature, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
+	public abstract void r187(TypeFeature typeFeature, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
 	public abstract void r188(TypeFeature tfObj, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
@@ -218,7 +251,7 @@ public abstract class RfcProxy {
 			String check, String pimsIdentity, String salesOrg)
 			throws Exception;
 
-	public abstract void r207(String type, String model, String plant)
+	public abstract boolean r207(String type, String model, String plant)
 			throws Exception;
 
 	public abstract BapireturnStructure r209(String material) throws Exception;

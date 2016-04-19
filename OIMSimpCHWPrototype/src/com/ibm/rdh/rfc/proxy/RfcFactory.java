@@ -12,7 +12,9 @@ import com.ibm.rdh.chw.caller.R102createSalesViewforMaterial;
 import com.ibm.rdh.chw.caller.R103create001ClassificationForMGCommon;
 import com.ibm.rdh.chw.caller.R104createZDMClassification;
 import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
+import com.ibm.rdh.chw.caller.R107createTypeMCClass;
 import com.ibm.rdh.chw.caller.R108createTypeMODCharacteristic;
+import com.ibm.rdh.chw.caller.R109createTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R111assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R115createTypeModelMaterialBasicView;
@@ -23,8 +25,12 @@ import com.ibm.rdh.chw.caller.R119create001ClassificationForMGCommonTypeModel;
 import com.ibm.rdh.chw.caller.R120maintainModelValueForTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R121createModelSelectionDependency;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
+import com.ibm.rdh.chw.caller.R124createUpgradeValueForTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R125create300ClassificationForTypeMCForUPG;
+import com.ibm.rdh.chw.caller.R126createRPQTypeFeatureCharacteristic;
+import com.ibm.rdh.chw.caller.R127createRPQClass;
 import com.ibm.rdh.chw.caller.R128assignRPQTypeFeatureCharacteristicToTypeClass;
+import com.ibm.rdh.chw.caller.R129maintainTypeFeatureCharacteristic;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
 import com.ibm.rdh.chw.caller.R133updateMaterialBasicViewForTypeModel;
@@ -36,6 +42,8 @@ import com.ibm.rdh.chw.caller.R151create012ClassificationForMC;
 import com.ibm.rdh.chw.caller.R152create012ClassificationForRPQTypeFeature;
 import com.ibm.rdh.chw.caller.R153create012ClassificationForTypeFeature;
 import com.ibm.rdh.chw.caller.R156createZDMClassificationForTypeModel;
+import com.ibm.rdh.chw.caller.R157createTypeClass;
+import com.ibm.rdh.chw.caller.R159createTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
 import com.ibm.rdh.chw.caller.R162createZDMClassificationForMKFEATCONV;
 import com.ibm.rdh.chw.caller.R165assignCharacteristicToMTCClass300;
@@ -47,6 +55,9 @@ import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
 import com.ibm.rdh.chw.caller.R182deleteModelSelectionDependency;
 import com.ibm.rdh.chw.caller.R183createCFIPlantViewForTypeModelMaterial;
+import com.ibm.rdh.chw.caller.R185deleteupgradevaluefromMCcharacteristic;
+import com.ibm.rdh.chw.caller.R186DeleteTypeFeatureCharacteristic;
+import com.ibm.rdh.chw.caller.R187DeleteTypeFeatureCharacteristicClassificationtoFEAT;
 import com.ibm.rdh.chw.caller.R188DeleteTypeFeatureCharacteristicClassificationtoUF;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.caller.R197createLifecycleRow;
@@ -124,10 +135,20 @@ public class RfcFactory extends Object {
 		return new R106createTypeModelsClass(typeModel, chwA, pimsIdentity);
 	}
 
+	public R107createTypeMCClass getr107(String type, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		return new R107createTypeMCClass(type, chwA, pimsIdentity);
+	}
+
 	public R108createTypeMODCharacteristic getr108(TypeModel typeModel,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		return new R108createTypeMODCharacteristic(typeModel, chwA,
 				pimsIdentity);
+	}
+
+	public R109createTypeMCCharacteristic getr109(String type,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		return new R109createTypeMCCharacteristic(type, chwA, pimsIdentity);
 	}
 
 	public R110assignMODCharacteristicToModelsClass getr110(
@@ -203,6 +224,12 @@ public class RfcFactory extends Object {
 				newFlag, chwA, FromToType, pimsIdentity);
 	}
 
+	public R124createUpgradeValueForTypeMCCharacteristic getr124(Vector tmugV,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		return new R124createUpgradeValueForTypeMCCharacteristic(tmugV, chwA,
+				pimsIdentity);
+	}
+
 	public R125create300ClassificationForTypeMCForUPG getr125(String type,
 			CHWAnnouncement chwA, String newFlag, String pimsIdentity)
 			throws Exception {
@@ -210,11 +237,33 @@ public class RfcFactory extends Object {
 				newFlag, pimsIdentity);
 	}
 
+	public R126createRPQTypeFeatureCharacteristic getr126(
+			TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R126createRPQTypeFeatureCharacteristic(typeFeature, chwA,
+				pimsIdentity);
+	}
+
+	public R127createRPQClass getr127(TypeFeature typeFeature,
+			String featRanges, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R127createRPQClass(typeFeature, featRanges, chwA,
+				pimsIdentity);
+	}
+
 	public R128assignRPQTypeFeatureCharacteristicToTypeClass getr128(
 			TypeFeature typeFeature, String featRanges, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception {
 		return new R128assignRPQTypeFeatureCharacteristicToTypeClass(
 				typeFeature, featRanges, chwA, pimsIdentity);
+	}
+
+	public R129maintainTypeFeatureCharacteristic getr129(
+			TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R129maintainTypeFeatureCharacteristic(typeFeature, chwA,
+				pimsIdentity);
+
 	}
 
 	public R130createTypeFEATClass getr130(String type, String featRanges,
@@ -283,6 +332,19 @@ public class RfcFactory extends Object {
 			boolean seoFlag) throws Exception {
 		return new R156createZDMClassificationForTypeModel(typemod, div, chwA,
 				pimsIdentity, seoFlag);
+	}
+
+	public R157createTypeClass getr157(CHWAnnouncement chwA,
+			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity)
+			throws Exception {
+		return new R157createTypeClass(chwA, tmUPGObj, FromToType, pimsIdentity);
+	}
+
+	public R159createTypeMCCharacteristic getr159(CHWAnnouncement chwA,
+			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity)
+			throws Exception {
+		return new R159createTypeMCCharacteristic(chwA, tmUPGObj, FromToType,
+				pimsIdentity);
 	}
 
 	public R160assignChartoClassFEAT_0000 getr160(TypeModel typeModel,
@@ -358,6 +420,26 @@ public class RfcFactory extends Object {
 			String profitCenter) throws Exception {
 		return new R183createCFIPlantViewForTypeModelMaterial(annDocNo,
 				typemod, sapPlant, pimsIdentity, profitCenter);
+	}
+
+	public R185deleteupgradevaluefromMCcharacteristic getr185(
+			TypeModelUPGGeo typeModel, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R185deleteupgradevaluefromMCcharacteristic(typeModel, chwA,
+				pimsIdentity);
+	}
+
+	public R186DeleteTypeFeatureCharacteristic getr186(TypeFeature typeFeature,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		return new R186DeleteTypeFeatureCharacteristic(typeFeature, chwA,
+				pimsIdentity);
+	}
+
+	public R187DeleteTypeFeatureCharacteristicClassificationtoFEAT getr187(
+			TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R187DeleteTypeFeatureCharacteristicClassificationtoFEAT(
+				typeFeature, chwA, pimsIdentity);
 	}
 
 	public R188DeleteTypeFeatureCharacteristicClassificationtoUF getr188(

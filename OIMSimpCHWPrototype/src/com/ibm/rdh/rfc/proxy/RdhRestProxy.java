@@ -14,7 +14,9 @@ import com.ibm.rdh.chw.caller.R102createSalesViewforMaterial;
 import com.ibm.rdh.chw.caller.R103create001ClassificationForMGCommon;
 import com.ibm.rdh.chw.caller.R104createZDMClassification;
 import com.ibm.rdh.chw.caller.R106createTypeModelsClass;
+import com.ibm.rdh.chw.caller.R107createTypeMCClass;
 import com.ibm.rdh.chw.caller.R108createTypeMODCharacteristic;
+import com.ibm.rdh.chw.caller.R109createTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R110assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R111assignMODCharacteristicToModelsClass;
 import com.ibm.rdh.chw.caller.R115createTypeModelMaterialBasicView;
@@ -25,8 +27,12 @@ import com.ibm.rdh.chw.caller.R119create001ClassificationForMGCommonTypeModel;
 import com.ibm.rdh.chw.caller.R120maintainModelValueForTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R121createModelSelectionDependency;
 import com.ibm.rdh.chw.caller.R123create300ClassificationForTypeModels;
+import com.ibm.rdh.chw.caller.R124createUpgradeValueForTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R125create300ClassificationForTypeMCForUPG;
+import com.ibm.rdh.chw.caller.R126createRPQTypeFeatureCharacteristic;
+import com.ibm.rdh.chw.caller.R127createRPQClass;
 import com.ibm.rdh.chw.caller.R128assignRPQTypeFeatureCharacteristicToTypeClass;
+import com.ibm.rdh.chw.caller.R129maintainTypeFeatureCharacteristic;
 import com.ibm.rdh.chw.caller.R130createTypeFEATClass;
 import com.ibm.rdh.chw.caller.R131createTypeUFClass;
 import com.ibm.rdh.chw.caller.R133updateMaterialBasicViewForTypeModel;
@@ -38,6 +44,8 @@ import com.ibm.rdh.chw.caller.R151create012ClassificationForMC;
 import com.ibm.rdh.chw.caller.R152create012ClassificationForRPQTypeFeature;
 import com.ibm.rdh.chw.caller.R153create012ClassificationForTypeFeature;
 import com.ibm.rdh.chw.caller.R156createZDMClassificationForTypeModel;
+import com.ibm.rdh.chw.caller.R157createTypeClass;
+import com.ibm.rdh.chw.caller.R159createTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
 import com.ibm.rdh.chw.caller.R162createZDMClassificationForMKFEATCONV;
 import com.ibm.rdh.chw.caller.R165assignCharacteristicToMTCClass300;
@@ -49,6 +57,9 @@ import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
 import com.ibm.rdh.chw.caller.R182deleteModelSelectionDependency;
 import com.ibm.rdh.chw.caller.R183createCFIPlantViewForTypeModelMaterial;
+import com.ibm.rdh.chw.caller.R185deleteupgradevaluefromMCcharacteristic;
+import com.ibm.rdh.chw.caller.R186DeleteTypeFeatureCharacteristic;
+import com.ibm.rdh.chw.caller.R187DeleteTypeFeatureCharacteristicClassificationtoFEAT;
 import com.ibm.rdh.chw.caller.R188DeleteTypeFeatureCharacteristicClassificationtoUF;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.caller.R197createLifecycleRow;
@@ -69,6 +80,7 @@ import com.ibm.rdh.chw.entity.TypeFeatureUPGGeo;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.BapireturnStructure;
+import com.ibm.rdh.rfc.Zdm_marc_dataTable;
 
 //import com.ibm.rdh.rfc.ReturnDataObjectR001;
 /**
@@ -168,6 +180,16 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r107(String type, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		R107createTypeMCClass r = getFactory()
+				.getr107(type, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
 	public void r108(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception {
 		R108createTypeMODCharacteristic r = getFactory().getr108(typeModel,
@@ -175,6 +197,17 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r109(String type, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		R109createTypeMCCharacteristic r = getFactory().getr109(type, chwA,
+				pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
 	}
 
 	@Override
@@ -289,6 +322,17 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r124(Vector tmugV, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		R124createUpgradeValueForTypeMCCharacteristic r = getFactory().getr124(
+				tmugV, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
 	public void r125(String type, CHWAnnouncement chwA, String newFlag,
 			String pimsIdentity) throws Exception {
 		R125create300ClassificationForTypeMCForUPG r = getFactory().getr125(
@@ -299,10 +343,43 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r126(TypeFeature typeFeature, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R126createRPQTypeFeatureCharacteristic r = getFactory().getr126(
+				typeFeature, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r127(TypeFeature typeFeature, String featRanges,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		R127createRPQClass r = getFactory().getr127(typeFeature, featRanges,
+				chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
 	public void r128(TypeFeature typeFeature, String featRanges,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		R128assignRPQTypeFeatureCharacteristicToTypeClass r = getFactory()
 				.getr128(typeFeature, featRanges, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r129(TypeFeature typeFeature, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+
+		R129maintainTypeFeatureCharacteristic r = getFactory().getr129(
+				typeFeature, chwA, pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
@@ -414,6 +491,27 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 			String pimsIdentity, boolean seoFlag) throws Exception {
 		R156createZDMClassificationForTypeModel r = getFactory().getr156(
 				typemod, div, chwA, pimsIdentity, seoFlag);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r157(CHWAnnouncement chwA, TypeModelUPGGeo tmUPGObj,
+			String FromToType, String pimsIdentity) throws Exception {
+		R157createTypeClass r = getFactory().getr157(chwA, tmUPGObj,
+				FromToType, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r159(CHWAnnouncement chwA, TypeModelUPGGeo tmUPGObj,
+			String FromToType, String pimsIdentity) throws Exception {
+		R159createTypeMCCharacteristic r = getFactory().getr159(chwA, tmUPGObj,
+				FromToType, pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
@@ -533,6 +631,39 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r185(TypeModelUPGGeo typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R185deleteupgradevaluefromMCcharacteristic r = getFactory().getr185(
+				typeModel, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r186(TypeFeature typeFeature, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R186DeleteTypeFeatureCharacteristic r = getFactory().getr186(
+				typeFeature, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r187(TypeFeature typeFeature, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R187DeleteTypeFeatureCharacteristicClassificationtoFEAT r = getFactory()
+				.getr187(typeFeature, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
 	public void r188(TypeFeature tfObj, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception {
 		R188DeleteTypeFeatureCharacteristicClassificationtoUF r = getFactory()
@@ -605,11 +736,29 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
-	public void r207(String type, String model, String plant) throws Exception {
+	public boolean r207(String type, String model, String plant)
+			throws Exception {
 		R207ReadPlantViewMaterial r = getFactory().getr207(type, model, plant);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
+
+		com.ibm.rdh.rfc.Z_DM_SAP_READ_MARC rfc = r.getRfc();
+		boolean plantcheck = false;
+		if (rfc != null) {
+			logger.info("R207ReadPlantViewMaterial is not null.");
+			Zdm_marc_dataTable plantvalues = rfc.getZdmMarcData();
+			int rows = plantvalues.getRowCount();
+			if (rows > 0) {
+				plantcheck = true;
+			} else if (rows == 0) {
+				plantcheck = false;
+			}
+		}else{
+			logger.info("R207ReadPlantViewMaterial is null.");
+		}
+		return plantcheck;
+
 	}
 
 	@Override
