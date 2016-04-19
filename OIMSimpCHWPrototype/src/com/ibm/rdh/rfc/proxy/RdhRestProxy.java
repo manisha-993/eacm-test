@@ -74,6 +74,7 @@ import com.ibm.rdh.chw.caller.Rfc;
 import com.ibm.rdh.chw.caller.RfcReturnSeverityCodes;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
+import com.ibm.rdh.chw.entity.LifecycleData;
 import com.ibm.rdh.chw.entity.PlannedSalesStatus;
 import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.chw.entity.TypeFeatureUPGGeo;
@@ -724,7 +725,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
-	public void r200(String material, String varCond, String annDocNo,
+	public LifecycleData  r200(String material, String varCond, String annDocNo,
 			String check, String pimsIdentity, String salesOrg)
 			throws Exception {
 		R200_readLifecycleRow r = getFactory().getr200(material, varCond,
@@ -732,7 +733,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
+		return r.evaluate();
 	}
 
 	@Override

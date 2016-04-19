@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
+import com.ibm.rdh.chw.entity.LifecycleData;
 
 public class R200_readLifecycleRowTest extends RdhRestProxyTest {
 	private static Logger logger = LogManager.getLogManager()
@@ -39,9 +40,10 @@ public class R200_readLifecycleRowTest extends RdhRestProxyTest {
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
 					"Z_DM_SAP_CHW_PRODUCT_CYCLE", "ZDMCHWPLC");
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r200(material, varCond, annDocNo, check, pimsIdentity,
+			LifecycleData lcd=rfcProxy.r200(material, varCond, annDocNo, check, pimsIdentity,
 					salesOrg);
-
+			assertEquals("FEATURE:1002", lcd.getVarCond());
+			
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
 			String objectId = "ZDMCHWPLC";

@@ -25,6 +25,7 @@ import java.util.Vector;
 
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
+import com.ibm.rdh.chw.entity.LifecycleData;
 import com.ibm.rdh.chw.entity.PlannedSalesStatus;
 import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.chw.entity.TypeFeatureUPGGeo;
@@ -247,7 +248,7 @@ public abstract class RfcProxy {
 			String check, String pimsIdentity, String salesOrg)
 			throws Exception;
 
-	public abstract void r200(String material, String varCond, String annDocNo,
+	public abstract LifecycleData r200(String material, String varCond, String annDocNo,
 			String check, String pimsIdentity, String salesOrg)
 			throws Exception;
 

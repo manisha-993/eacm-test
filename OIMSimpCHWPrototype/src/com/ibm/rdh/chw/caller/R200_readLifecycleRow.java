@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
+import com.ibm.rdh.chw.entity.LifecycleData;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 import com.ibm.rdh.rfc.ZdmchwplcTable;
@@ -12,7 +13,10 @@ import com.ibm.rdh.rfc.ZdmchwplcTableRow;
 
 public class R200_readLifecycleRow extends Rfc {
 	private com.ibm.rdh.rfc.Z_DM_SAP_CHW_PRODUCT_CYCLE rfc;
-
+	public static String PREANNOUNCE = "YA";
+	public static String ANNOUNCE = "Z0";
+	public static String WDFM = "ZJ";
+	
 	public R200_readLifecycleRow(String material, String varCond,
 			String annDocNo, String check, String pimsIdentity, String salesOrg)
 			throws Exception {
@@ -85,6 +89,40 @@ public class R200_readLifecycleRow extends Rfc {
 
 	}
 
+	public LifecycleData execute1() throws Exception {
+		logExecution();
+		getRfc().execute();
+		getLog().debug(getErrorInformation());
+		if (getSeverity() == ERROR) {
+			throw new HWPIMSAbnormalException(getErrorInformation());
+		}
+		ZdmchwplcTable tab;
+		ZdmchwplcTableRow tRow;
+		LifecycleData lcd = new LifecycleData();
+		String vmsta;
+		
+		tab = getRfc().getZdmChwPlc();
+		int rowCount = tab.getRowCount();
+		for (int i = 0; i < rowCount; i++) {
+
+			tRow = tab.getRow(i); // tab.getRow(2)
+			vmsta = tRow.getVmsta();
+			lcd.setVarCond(tRow.getVarcond());
+			if (vmsta.equals(PREANNOUNCE)) {
+				lcd.setPreAnnounceValidFrom(tRow.getDatab());
+				lcd.setPreAnnounceValidTo(tRow.getDatbi());
+			} else if (vmsta.equals(ANNOUNCE)) {
+				lcd.setAnnounceValidFrom(tRow.getDatab());
+				lcd.setAnnounceValidTo(tRow.getDatbi());
+			} else if (vmsta.equals(WDFM)) {
+				lcd.setWdfmValidFrom(tRow.getDatab());
+				lcd.setWdfmValidTo(tRow.getDatbi());
+			}
+
+		} // end CheckUpdateMode()
+		return lcd;
+	}
+	
 	@Override
 	public String getTaskDescription() {
 		StringBuffer sb = new StringBuffer();
@@ -129,7 +167,7 @@ public class R200_readLifecycleRow extends Rfc {
 		return "Read Lifecycle Row";
 	}
 
-	public void evaluate() throws Exception {
-		execute();
+	public LifecycleData evaluate() throws Exception {
+		return execute1();
 	}
 }
