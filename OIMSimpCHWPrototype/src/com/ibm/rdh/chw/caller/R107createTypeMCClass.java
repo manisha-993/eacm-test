@@ -7,7 +7,6 @@ import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.rfc.Cla_descrTable;
 import com.ibm.rdh.rfc.Cla_descrTableRow;
 import com.ibm.rdh.rfc.ClclassesTable;
@@ -15,19 +14,18 @@ import com.ibm.rdh.rfc.ClclassesTableRow;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 
-public class R106createTypeModelsClass extends Rfc {
+public class R107createTypeMCClass extends Rfc {
 
 	private com.ibm.rdh.rfc.Z_DM_SAP_CLASS_MAINTAIN rfc;
 
-	public R106createTypeModelsClass(TypeModel typeModel, CHWAnnouncement chwA,
+	public R107createTypeMCClass(String type, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception {
 
-		reInitialize();
 		Date curDate = new Date();
-
 		String sDateFormat = ConfigManager.getConfigManager().getString(
 				PropertyKeys.KEY_DATE_FORMAT, true);
 		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
+		rfcName = "Z_DM_SAP_CLASS_MAINTAIN";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CLASS_MAINTAIN();
 
 		// Set up the RFC fields
@@ -35,15 +33,16 @@ public class R106createTypeModelsClass extends Rfc {
 		ClclassesTable l0Table = new ClclassesTable();
 		ClclassesTableRow l0Row = l0Table.createEmptyRow();
 
-		String className = "MK_" + typeModel.getType() + "_MODELS";
-		l0Row.setClass(className);
+		l0Row.setClass("MK_" + type + "_MC");
 		l0Row.setClassType("300");
 		l0Row.setStatus("1");
 		l0Row.setValFrom(sdf.format(curDate));
 		l0Row.setValTo("9999-12-31");
 		l0Row.setCheckNo("X");
+
 		l0Table.appendRow(l0Row);
 		rfc.setIClclasses(l0Table);
+
 		rfcInfo.append("CLCLASSES  \n");
 		rfcInfo.append(Tab + "CLASS>>" + l0Row.get_Class() + ", CLASSTYPE>>"
 				+ l0Row.getClassType() + ", STATUS>>" + l0Row.getStatus()
@@ -54,10 +53,10 @@ public class R106createTypeModelsClass extends Rfc {
 		Cla_descrTable l1Table = new Cla_descrTable();
 		Cla_descrTableRow l1Row = l1Table.createEmptyRow();
 
-		l1Row.setClass(className);
+		l1Row.setClass("MK_" + type + "_MC");
 		l1Row.setClassType("300");
 		l1Row.setLanguage("E");
-		l1Row.setCatchword("Models for Machine Type " + typeModel.getType());
+		l1Row.setCatchword("Model Conversions for Machine Type " + type);
 
 		l1Table.appendRow(l1Row);
 
@@ -134,7 +133,7 @@ public class R106createTypeModelsClass extends Rfc {
 	@Override
 	protected String getMaterialName() {
 		// TODO Auto-generated method stub
-		return "Create type MODELS class";
+		return "Create type MC class";
 	}
 
 	@Override

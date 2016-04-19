@@ -183,11 +183,11 @@ public class R176create300ClassificationForTypeFEAT extends Rfc {
 		return ClassUtil.getSimpleClassName(getRfc());
 	}
 
-	private com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT getRfc() {
+	public com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT getRfc() {
 		return rfc;
 	}
 
-	public void evaluate() throws Exception { 
-		execute() ; 
+	public void evaluate() throws Exception {
+		execute();
 	}
 }

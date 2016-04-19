@@ -16,7 +16,6 @@ import com.ibm.rdh.rfc.Object_keyTable;
 import com.ibm.rdh.rfc.Object_keyTableRow;
 import com.ibm.rdh.rfc.RcucoTable;
 import com.ibm.rdh.rfc.RcucoTableRow;
-import com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 
@@ -58,15 +57,13 @@ public class R104createZDMClassification extends Rfc {
 		// KLAH - R2
 		KlahTable r2Table = new KlahTable();
 		KlahTableRow r2Row = r2Table.createEmptyRow();
-		
-		
+
 		if (chwA.isXccOnlyDiv(typeModel.getDiv())) {
 			r2Row.setClass("MD_XHW_NA");
 		} else {
 			r2Row.setClass("MD_CHW_NA");
 		}
-		
-		
+
 		r2Table.appendRow(r2Row);
 		rfc.setIKlah(r2Table);
 
@@ -156,7 +153,7 @@ public class R104createZDMClassification extends Rfc {
 		return ans;
 	}
 
-	public Z_DM_SAP_CLASSIFICATION_MAINT getRfc() {
+	public com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT getRfc() {
 		return rfc;
 	}
 

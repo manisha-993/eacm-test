@@ -6,7 +6,6 @@ import java.util.Date;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
-import com.ibm.rdh.rfc.Z_DM_SAP_READ_MARC;
 import com.ibm.rdh.rfc.Zdm_mat_tabTable;
 import com.ibm.rdh.rfc.Zdm_mat_tabTableRow;
 
@@ -87,7 +86,7 @@ public class R207ReadPlantViewMaterial extends Rfc {
 		return ClassUtil.getSimpleClassName(getRfc());
 	}
 
-	private Z_DM_SAP_READ_MARC getRfc() {
+	public com.ibm.rdh.rfc.Z_DM_SAP_READ_MARC getRfc() {
 		return rfc;
 	}
 

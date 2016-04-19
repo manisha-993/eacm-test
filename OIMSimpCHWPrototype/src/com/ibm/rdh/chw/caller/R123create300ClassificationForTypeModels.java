@@ -214,7 +214,7 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 		return ClassUtil.getSimpleClassName(getRfc());
 	}
 
-	private com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT getRfc() {
+	public com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT getRfc() {
 		return rfc;
 	}
 

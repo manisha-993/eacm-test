@@ -170,7 +170,7 @@ public class R133updateMaterialBasicViewForTypeModel extends Rfc {
 		return ClassUtil.getSimpleClassName(getRfc());
 	}
 
-	private com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE getRfc() {
+	public com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE getRfc() {
 		return rfc;
 	}
 

@@ -148,7 +148,7 @@ public class R121createModelSelectionDependency extends Rfc {
 		return ClassUtil.getSimpleClassName(getRfc());
 	}
 
-	private com.ibm.rdh.rfc.Z_DM_SAP_DEPD_MAINTAIN getRfc() {
+	public com.ibm.rdh.rfc.Z_DM_SAP_DEPD_MAINTAIN getRfc() {
 		return rfc;
 	}
 

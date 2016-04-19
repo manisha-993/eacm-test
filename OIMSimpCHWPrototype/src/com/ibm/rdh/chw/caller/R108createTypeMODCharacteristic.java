@@ -7,7 +7,6 @@ import com.ibm.rdh.rfc.Char_descrTable;
 import com.ibm.rdh.rfc.Char_descrTableRow;
 import com.ibm.rdh.rfc.CharactsTable;
 import com.ibm.rdh.rfc.CharactsTableRow;
-import com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 
@@ -17,7 +16,7 @@ public class R108createTypeMODCharacteristic extends Rfc {
 
 	public R108createTypeMODCharacteristic(TypeModel typeModel,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
-		
+
 		reInitialize();
 		String charac = "MK_" + typeModel.getType() + "_MOD";
 		rfcName = "Z_DM_SAP_CHAR_MAINTAIN";
@@ -34,11 +33,12 @@ public class R108createTypeMODCharacteristic extends Rfc {
 		c0Row.setCharnumberString("3");
 		c0Row.setStatus("1");
 		c0Row.setValassignm("S");
-		
-		//add
+
+		// This will be optional, but we need it now.
 		c0Row.setAdditVals("X");
 		c0Row.setNegVals("X");
-
+		// end
+		
 		c0Table.appendRow(c0Row);
 		rfc.setICharacts(c0Table);
 
@@ -115,7 +115,7 @@ public class R108createTypeMODCharacteristic extends Rfc {
 		return ans;
 	}
 
-	public Z_DM_SAP_CHAR_MAINTAIN getRfc() {
+	public com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN getRfc() {
 		return rfc;
 	}
 

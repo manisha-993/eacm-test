@@ -1,8 +1,11 @@
 package com.ibm.rdh.chw.caller;
 
+import java.util.Enumeration;
+import java.util.Vector;
+
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.TypeModel;
+import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.Char_descrTable;
 import com.ibm.rdh.rfc.Char_descrTableRow;
 import com.ibm.rdh.rfc.Char_valsTable;
@@ -19,24 +22,27 @@ import com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 
-public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
+public class R124createUpgradeValueForTypeMCCharacteristic extends Rfc {
 
 	private com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN rfc;
 
-	public R120maintainModelValueForTypeMODCharacteristic(TypeModel typeModel,
+	public R124createUpgradeValueForTypeMCCharacteristic(Vector tmugV,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		TypeModelUPGGeo typeModelUpg = null;
 		reInitialize();
-
+		typeModelUpg = (TypeModelUPGGeo) tmugV.elementAt(0);
+		String charac = "MK_" + typeModelUpg.getType() + "_MC";
+		String characupg = "MK_" + typeModelUpg.getType() + "_MC";
 		rfcName = "Z_DM_SAP_CHAR_MAINTAIN";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN();
 		// Set up the RFC fields
 		// CHARACTS
 		CharactsTable c0Table = new CharactsTable();
 		CharactsTableRow c0Row = c0Table.createEmptyRow();
-		String charac = "MK_" + typeModel.getType() + "_MOD";
+
 		c0Row.setCharact(charac);
 		c0Row.setDatatype("CHAR");
-		c0Row.setCharnumberString("3");
+		c0Row.setCharnumberString("7");
 		c0Row.setStatus("1");
 		c0Row.setValassignm("S");
 
@@ -74,50 +80,64 @@ public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
 		// end
 
 		// CHAR_VALS - C4
+		rfcInfo.append("CHAR_VALS  \n");
 		Char_valsTable c4Table = new Char_valsTable();
-		Char_valsTableRow c4Row = c4Table.createEmptyRow();
+		Enumeration etmug = tmugV.elements();
+		while (etmug.hasMoreElements()) {
+			typeModelUpg = (TypeModelUPGGeo) etmug.nextElement();
 
-		c4Row.setCharact(charac);
-		c4Row.setValue(typeModel.getModel());
+			Char_valsTableRow c4Row = c4Table.createEmptyRow();
 
-		c4Table.appendRow(c4Row);
+			c4Row.setCharact(charac);
+			c4Row.setValue(typeModelUpg.getFromModel() + "_"
+					+ typeModelUpg.getModel());
+
+			c4Table.appendRow(c4Row);
+			rfcInfo.append(Tab + "CHARACT>>" + c4Row.getCharact() + ", VALUE>>"
+					+ c4Row.getValue() + "\n");
+		}
 		rfc.setICharVals(c4Table);
 
-		rfcInfo.append("CHAR_VALS  \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c4Row.getCharact() + ", VALUE>>"
-				+ c4Row.getValue() + "\n");
-
 		// CHV_DESCR - C5
+		rfcInfo.append("CHVDESCR \n");
 		Chv_descrTable c5Table = new Chv_descrTable();
-		Chv_descrTableRow c5Row = c5Table.createEmptyRow();
+		etmug = tmugV.elements();
+		while (etmug.hasMoreElements()) {
+			typeModelUpg = (TypeModelUPGGeo) etmug.nextElement();
+			Chv_descrTableRow c5Row = c5Table.createEmptyRow();
 
-		c5Row.setCharact(charac);
-		c5Row.setValue(typeModel.getModel());
-		c5Row.setLanguage("E");
-		c5Row.setValdescr(padWithBlanks(typeModel.getDescription(), 26) + " "
-				+ typeModel.getModel());
+			c5Row.setCharact(characupg);
+			c5Row.setValue(typeModelUpg.getFromModel() + "_"
+					+ typeModelUpg.getModel());
+			c5Row.setLanguage("E");
+			c5Row.setValdescr("From " + typeModelUpg.getType() + " Model "
+					+ typeModelUpg.getFromModel() + " to "
+					+ typeModelUpg.getModel());
 
-		c5Table.appendRow(c5Row);
+			c5Table.appendRow(c5Row);
+			rfcInfo.append(Tab + "CHARACT>>" + c5Row.getCharact() + ", VALUE>>"
+					+ c5Row.getValue() + ", LANGUAGE>>" + c5Row.getLanguage()
+					+ ", VALDECSR>>" + c5Row.getValdescr() + "\n");
+		}
 		rfc.setIChvDescr(c5Table);
 
-		rfcInfo.append("CHVDESCR \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c5Row.getCharact() + ", VALUE>>"
-				+ c5Row.getValue() + ", LANGUAGE>>" + c5Row.getLanguage()
-				+ ", VALDECSR>>" + c5Row.getValdescr() + "\n");
-
 		// E1CAWNM STRUCTURE
-		E1cawnmTable e1Table = new E1cawnmTable();
-		E1cawnmTableRow e1Row = e1Table.createEmptyRow();
-
-		e1Row.setAtnam(charac);
-		e1Row.setAtwrt(typeModel.getModel());
-
-		e1Table.appendRow(e1Row);
-		rfc.setIE1cawnm(e1Table);
-
 		rfcInfo.append("E1CAWNM \n");
-		rfcInfo.append(Tab + "ATNAM>>" + e1Row.getAtnam() + ", ATWRT>>"
-				+ e1Row.getAtwrt() + "\n");
+		E1cawnmTable e1Table = new E1cawnmTable();
+		etmug = tmugV.elements();
+		while (etmug.hasMoreElements()) {
+			typeModelUpg = (TypeModelUPGGeo) etmug.nextElement();
+			E1cawnmTableRow e1Row = e1Table.createEmptyRow();
+
+			e1Row.setAtnam(characupg);
+			e1Row.setAtwrt(typeModelUpg.getFromModel() + "_"
+					+ typeModelUpg.getModel());
+
+			e1Table.appendRow(e1Row);
+			rfcInfo.append(Tab + "ATNAM>>" + e1Row.getAtnam() + ", ATWRT>>"
+					+ e1Row.getAtwrt() + "\n");
+		}
+		rfc.setIE1cawnm(e1Table);
 
 		// E1CUTXM STRUCTURE
 		E1cutxmTable e1CutTable = new E1cutxmTable();
@@ -130,7 +150,6 @@ public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
 
 		rfcInfo.append("E1CUTXM \n");
 		rfcInfo.append(Tab + "TDLINE>>" + e1CutRow.getTxtLine() + "\n");
-
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
@@ -152,25 +171,6 @@ public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
 
-	}
-
-	// This is an new add function
-	private String padWithBlanks(String inString, int totalSize) {
-		// TODO Auto-generated method stub
-		String outString;
-
-		outString = inString;
-
-		if (inString.length() < totalSize) {
-			while (outString.length() < totalSize) {
-				outString = outString + " ";
-			}
-		} else {
-			outString = outString.substring(0, totalSize);
-
-		}
-
-		return outString;
 	}
 
 	@Override
@@ -218,7 +218,7 @@ public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		return "Maintain Model value for type MOD characteristic";
+		return "Create Upgrade value for type MC characteristic";
 	}
 
 	@Override

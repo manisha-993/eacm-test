@@ -1,47 +1,54 @@
 package com.ibm.rdh.chw.caller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
+import com.ibm.pprds.epimshw.PropertyKeys;
+import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.TypeModel;
+import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.rfc.Char_descrTable;
 import com.ibm.rdh.rfc.Char_descrTableRow;
-import com.ibm.rdh.rfc.Char_valsTable;
-import com.ibm.rdh.rfc.Char_valsTableRow;
 import com.ibm.rdh.rfc.CharactsTable;
 import com.ibm.rdh.rfc.CharactsTableRow;
-import com.ibm.rdh.rfc.Chv_descrTable;
-import com.ibm.rdh.rfc.Chv_descrTableRow;
-import com.ibm.rdh.rfc.E1cawnmTable;
-import com.ibm.rdh.rfc.E1cawnmTableRow;
-import com.ibm.rdh.rfc.E1cutxmTable;
-import com.ibm.rdh.rfc.E1cutxmTableRow;
 import com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 
-public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
+public class R186DeleteTypeFeatureCharacteristic extends Rfc {
 
 	private com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN rfc;
 
-	public R120maintainModelValueForTypeMODCharacteristic(TypeModel typeModel,
+	public R186DeleteTypeFeatureCharacteristic(TypeFeature typeFeature,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		reInitialize();
-
+		Date curDate = new Date();
+		String sDateFormat = ConfigManager.getConfigManager().getString(
+				PropertyKeys.KEY_DATE_FORMAT, true);
+		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
 		rfcName = "Z_DM_SAP_CHAR_MAINTAIN";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN();
+
 		// Set up the RFC fields
 		// CHARACTS
 		CharactsTable c0Table = new CharactsTable();
 		CharactsTableRow c0Row = c0Table.createEmptyRow();
-		String charac = "MK_" + typeModel.getType() + "_MOD";
+		String charac = "MK_" + typeFeature.getType() + "_"
+				+ typeFeature.getFeature();
+
 		c0Row.setCharact(charac);
-		c0Row.setDatatype("CHAR");
-		c0Row.setCharnumberString("3");
+		c0Row.setFldelete("X");
+		c0Row.setAdditVals("X");
+
+		// These values are required, but not found in the mapping and old code.
+		c0Row.setDatatype("NUM");
+		c0Row.setCharnumberString("7");
 		c0Row.setStatus("1");
 		c0Row.setValassignm("S");
+		// end
 
 		// This will be optional, but we need it now.
-		c0Row.setAdditVals("X");
 		c0Row.setNegVals("X");
 		// end
 
@@ -49,8 +56,9 @@ public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
 		rfc.setICharacts(c0Table);
 
 		rfcInfo.append("CHARACTS \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() + ", DATATYPE>>"
-				+ c0Row.getDatatype() + ", CHARNUMBER>>"
+		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() + ", FLDELETE>>"
+				+ c0Row.getFldelete() + ", ADDITVALS>>" + c0Row.getAdditVals()
+				+ ", DATATYPE>>" + c0Row.getDatatype() + ", CHARNUMBER>>"
 				+ c0Row.getCharnumberString() + ", STATUS>>"
 				+ c0Row.getStatus() + ", VALASSIGNM>>" + c0Row.getValassignm()
 				+ "\n");
@@ -62,7 +70,7 @@ public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
 
 		c1Row.setCharact(charac);
 		c1Row.setLanguage("E");
-		c1Row.setChdescr("Models");
+		c1Row.setChdescr(typeFeature.getDescription());
 
 		c1Table.appendRow(c1Row);
 		rfc.setICharDescr(c1Table);
@@ -72,64 +80,6 @@ public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
 				+ c1Row.getLanguage() + ", CHDESCR>>" + c1Row.getChdescr()
 				+ "\n");
 		// end
-
-		// CHAR_VALS - C4
-		Char_valsTable c4Table = new Char_valsTable();
-		Char_valsTableRow c4Row = c4Table.createEmptyRow();
-
-		c4Row.setCharact(charac);
-		c4Row.setValue(typeModel.getModel());
-
-		c4Table.appendRow(c4Row);
-		rfc.setICharVals(c4Table);
-
-		rfcInfo.append("CHAR_VALS  \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c4Row.getCharact() + ", VALUE>>"
-				+ c4Row.getValue() + "\n");
-
-		// CHV_DESCR - C5
-		Chv_descrTable c5Table = new Chv_descrTable();
-		Chv_descrTableRow c5Row = c5Table.createEmptyRow();
-
-		c5Row.setCharact(charac);
-		c5Row.setValue(typeModel.getModel());
-		c5Row.setLanguage("E");
-		c5Row.setValdescr(padWithBlanks(typeModel.getDescription(), 26) + " "
-				+ typeModel.getModel());
-
-		c5Table.appendRow(c5Row);
-		rfc.setIChvDescr(c5Table);
-
-		rfcInfo.append("CHVDESCR \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c5Row.getCharact() + ", VALUE>>"
-				+ c5Row.getValue() + ", LANGUAGE>>" + c5Row.getLanguage()
-				+ ", VALDECSR>>" + c5Row.getValdescr() + "\n");
-
-		// E1CAWNM STRUCTURE
-		E1cawnmTable e1Table = new E1cawnmTable();
-		E1cawnmTableRow e1Row = e1Table.createEmptyRow();
-
-		e1Row.setAtnam(charac);
-		e1Row.setAtwrt(typeModel.getModel());
-
-		e1Table.appendRow(e1Row);
-		rfc.setIE1cawnm(e1Table);
-
-		rfcInfo.append("E1CAWNM \n");
-		rfcInfo.append(Tab + "ATNAM>>" + e1Row.getAtnam() + ", ATWRT>>"
-				+ e1Row.getAtwrt() + "\n");
-
-		// E1CUTXM STRUCTURE
-		E1cutxmTable e1CutTable = new E1cutxmTable();
-		E1cutxmTableRow e1CutRow = e1CutTable.createEmptyRow();
-
-		e1CutRow.setTxtLine(chwA.getAnnDocNo());
-
-		e1CutTable.appendRow(e1CutRow);
-		rfc.setIE1cutxm(e1CutTable);
-
-		rfcInfo.append("E1CUTXM \n");
-		rfcInfo.append(Tab + "TDLINE>>" + e1CutRow.getTxtLine() + "\n");
 
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
@@ -151,26 +101,6 @@ public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
-
-	}
-
-	// This is an new add function
-	private String padWithBlanks(String inString, int totalSize) {
-		// TODO Auto-generated method stub
-		String outString;
-
-		outString = inString;
-
-		if (inString.length() < totalSize) {
-			while (outString.length() < totalSize) {
-				outString = outString + " ";
-			}
-		} else {
-			outString = outString.substring(0, totalSize);
-
-		}
-
-		return outString;
 	}
 
 	@Override
@@ -218,7 +148,7 @@ public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		return "Maintain Model value for type MOD characteristic";
+		return "Delete Type/Feature characteristic";
 	}
 
 	@Override
