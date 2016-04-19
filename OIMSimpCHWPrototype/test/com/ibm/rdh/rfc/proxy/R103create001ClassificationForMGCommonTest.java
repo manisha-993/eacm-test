@@ -31,13 +31,15 @@ public class R103create001ClassificationForMGCommonTest extends
 
 		String sql_mara_1 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMT1MTC')";
 		String sql_mara_2 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMF1MTC')";
+		String sql_rdx = "insert into sapr3.zdm_rdxcustmodel(mandt,zdm_class,zdm_syst_default) values ('200','MD_CHW_NA','X')";
 
 		int t1 = SqlHelper.runUpdateSql(sql_klah, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_cabn, conn);
 		int t3 = SqlHelper.runUpdateSql(sql_ksml, conn);
 		int t4 = SqlHelper.runUpdateSql(sql_mara_1, conn);
 		int t5 = SqlHelper.runUpdateSql(sql_mara_2, conn);
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0) {
+		int t6 = SqlHelper.runUpdateSql(sql_rdx, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -291,14 +293,14 @@ public class R103create001ClassificationForMGCommonTest extends
 		String del_ksml = "delete from sapr3.ksml where clint='0000000000' and mandt ='200' and imerk='0000000000'";
 		String del_mara_1 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMT1MTC'";
 		String del_mara_2 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMF1MTC'";
-		
+		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'";
 		int t1 = SqlHelper.runUpdateSql(del_klah, conn);
 		int t2 = SqlHelper.runUpdateSql(del_cabn, conn);
 		int t3 = SqlHelper.runUpdateSql(del_ksml, conn);
 		int t4 = SqlHelper.runUpdateSql(del_mara_1, conn);
 		int t5 = SqlHelper.runUpdateSql(del_mara_2, conn);
-
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0) {
+		int t6 = SqlHelper.runUpdateSql(del_rdx, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");

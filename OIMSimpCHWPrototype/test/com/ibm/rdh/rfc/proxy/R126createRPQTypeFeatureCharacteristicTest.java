@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,14 +12,13 @@ import org.junit.Test;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.TypeModel;
+import com.ibm.rdh.chw.entity.TypeFeature;
 
-public class R106createTypeModelsClassTest extends RdhRestProxyTest {
+public class R126createRPQTypeFeatureCharacteristicTest extends
+		RdhRestProxyTest {
 
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
-
-	String activeId = "Z_DM_SAP_CLASS_MAINTAIN";
 
 	@Before
 	public void prepareData() {
@@ -34,40 +34,39 @@ public class R106createTypeModelsClassTest extends RdhRestProxyTest {
 	}
 
 	@Test
-	public void r106() {
+	public void r126() {
 		try {
 
 			CHWAnnouncement chwA = new CHWAnnouncement();
-			TypeModel typeModel = new TypeModel();
-			typeModel.setType("EACM");
+			TypeFeature typeFeature = new TypeFeature();
 			chwA.setAnnDocNo("123401");
+			typeFeature.setType("EACF");
+			typeFeature.setFeature("1000");
+			typeFeature.setDescription("Features");
 			String pimsIdentity = "C";
-			String class_id = "MK_" + typeModel.getType() + "_MODELS";
-			String objectId = "300" + "MK_" + typeModel.getType() + "_MODELS";
+			String charac = "MK_" + typeFeature.getType() + "_"
+					+ typeFeature.getFeature();
+			String activeId = "Z_DM_SAP_CHAR_MAINTAIN";
 
-			deleteKLAHRow("300", class_id, Constants.MANDT);
-			deleteSWORRow("300", class_id, Constants.MANDT);
-			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId, "300"
-					+ class_id);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
+					"Z_DM_SAP_CHAR_MAINTAIN", charac);
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r106(typeModel, chwA, pimsIdentity);
+			rfcProxy.r126(typeFeature, chwA, pimsIdentity);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
-			String jklart = "300";
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
-			map.put("ZDMOBJKEY", "'" + objectId + "'");
-			map.put("ZDMOBJTYP", "'CLS'");
+			map.put("ZDMOBJKEY", "'" + charac + "'");
+			map.put("ZDMOBJTYP", "'CHR'");
 			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
 			assertNotNull(rowDetails);
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
 			map.put("ACTIV_ID", "'" + activeId + "'");
-			map.put("OBJECT_ID", "'" + objectId + "'");
-
+			map.put("OBJECT_ID", "'" + charac + "'");
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
 			String sessionId = (String) rowDetails.get("ZSESSION");
@@ -76,15 +75,10 @@ public class R106createTypeModelsClassTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("TEXT", "'Characteristic "
-					+ " successfully assigned to classification  " + class_id
-					+ "'");
+			map.put("TEXT", "'Characteristic  " + charac
+					+ " created/updated successfully.'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
 			assertNotNull(rowDetails);
-
-			// map.put("TEXT", "'Characteristic  " + jklart
-			// + "successfully assigned to classification" + class_id
-			// + "'");
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -96,7 +90,22 @@ public class R106createTypeModelsClassTest extends RdhRestProxyTest {
 		} finally {
 
 		}
+	}
 
+	@After
+	public void deleteData() {
+
+		String del_cabn = "delete from SAPR3.CABN where mandt='200' and ATNAM='MK_EACF_1000'";
+		String del_cabnt = "delete from SAPR3.CABNT where mandt='200' and ATBEZ='Features'";
+		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'";
+		int t1 = SqlHelper.runUpdateSql(del_cabn, conn);
+		int t2 = SqlHelper.runUpdateSql(del_cabnt, conn);
+		int t3 = SqlHelper.runUpdateSql(del_rdx, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
+			System.out.println("delete success");
+		} else {
+			System.out.println("delete failed");
+		}
 	}
 
 }

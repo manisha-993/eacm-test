@@ -74,10 +74,16 @@ public class R108createTypeMODCharacteristicTest extends RdhRestProxyTest {
 
 	@After
 	public void deleteData() {
- 
-		String del_cabn="delete from SAPR3.CABN where mandt='200' and ATNAM='MK_EACM_MOD'";
-		SqlHelper.runUpdateSql(del_cabn, conn);
-		
+
+		String del_cabn = "delete from SAPR3.CABN where mandt='200' and ATNAM='MK_EACM_MOD'";
+		String del_cabnt = "delete from SAPR3.CABNT where mandt='200' and ATBEZ='Models'";
+		int t1 = SqlHelper.runUpdateSql(del_cabn, conn);
+		int t2 = SqlHelper.runUpdateSql(del_cabnt, conn);
+		if (t1 >= 0 && t2 >= 0) {
+			System.out.println("delete success");
+		} else {
+			System.out.println("delete failed");
+		}
 	}
 
 }

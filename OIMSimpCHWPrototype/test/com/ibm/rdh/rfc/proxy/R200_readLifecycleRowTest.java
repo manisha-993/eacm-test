@@ -58,10 +58,9 @@ public class R200_readLifecycleRowTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Successful ZDMCHWPLC action.  1 rows read '");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			String logdtlText = (String) rowDetails.get("TEXT");
-			assertNotNull("Successful ZDMCHWPLC action. <1> + rows read",
-					logdtlText);
+			assertNotNull(rowDetails);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());

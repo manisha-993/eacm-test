@@ -1,12 +1,14 @@
 package com.ibm.rdh.rfc.proxy;
 
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
@@ -21,6 +23,19 @@ public class R100createTypeMaterialBasicViewTest extends RdhRestProxyTest {
 			.getPromoteLogger();
 
 	String activeId = "Z_DM_SAP_MATM_CREATE";
+
+	@Before
+	public void prepareData() {
+		String sql_rdx = "insert into sapr3.zdm_rdxcustmodel(mandt,zdm_class,zdm_syst_default) values ('200','MD_CHW_NA','X')";
+
+		int t1 = SqlHelper.runUpdateSql(sql_rdx, conn);
+
+		if (t1 >= 0) {
+			System.out.println("insert success");
+		} else {
+			System.out.println("insert failed");
+		}
+	}
 
 	@Test
 	public void r100New() {
@@ -42,6 +57,8 @@ public class R100createTypeMaterialBasicViewTest extends RdhRestProxyTest {
 			String pimsIdentity = "C";
 			String objectId = typeModel.getType() + newFlag;
 
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
+					"Z_DM_SAP_MATM_CREATE", objectId);
 			int deleteDataResult = deleteDataMatmCreate(objectId);
 			assertEquals(deleteDataResult, 0);
 
@@ -54,26 +71,27 @@ public class R100createTypeMaterialBasicViewTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ZDMOBJKEY", "'" + objectId + "'");
+			map.put("ZDMOBJTYP", "'MAT'");
+			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
 			map.put("ACTIV_ID", "'" + activeId + "'");
 			map.put("OBJECT_ID", "'" + objectId + "'");
-
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
-			String activeId = (String) rowDetails.get("ACTIV_ID");
-			assertEquals("Z_DM_SAP_MATM_CREATE", activeId);
 			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Material Master created/updated successfully: "
+					+ objectId + "'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			String logdtlText = (String) rowDetails.get("TEXT");
-
-			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-
-			assertNotNull("Material Master created/updated successfully",
-					logdtlText);
-
-			assertEquals("EA", "EA");
+			assertNotNull(rowDetails);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -105,7 +123,8 @@ public class R100createTypeMaterialBasicViewTest extends RdhRestProxyTest {
 			String FromToType = "";
 			String pimsIdentity = "C";
 			String objectId = typeModel.getType() + newFlag;
-
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
+					"Z_DM_SAP_MATM_CREATE", objectId);
 			int deleteDataResult = deleteDataMatmCreate(objectId);
 			assertEquals(deleteDataResult, 0);
 
@@ -118,24 +137,27 @@ public class R100createTypeMaterialBasicViewTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ZDMOBJKEY", "'" + objectId + "'");
+			map.put("ZDMOBJTYP", "'MAT'");
+			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
 			map.put("ACTIV_ID", "'" + activeId + "'");
 			map.put("OBJECT_ID", "'" + objectId + "'");
-
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
-			String activeId = (String) rowDetails.get("ACTIV_ID");
-			assertEquals("Z_DM_SAP_MATM_CREATE", activeId);
 			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Material Master created/updated successfully: "
+					+ objectId + "'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			String logdtlText = (String) rowDetails.get("TEXT");
-
-			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-
-			assertNotNull("Material Master created/updated successfully",
-					logdtlText);
+			assertNotNull(rowDetails);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -170,7 +192,8 @@ public class R100createTypeMaterialBasicViewTest extends RdhRestProxyTest {
 			String newFlag = "MTC";
 			String FromToType = "MTCTOTYPE";
 			String objectId = tmUPGObj.getType() + newFlag;
-
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
+					"Z_DM_SAP_MATM_CREATE", objectId);
 			int deleteDataResult = deleteDataMatmCreate(objectId);
 			assertEquals(deleteDataResult, 0);
 
@@ -183,24 +206,27 @@ public class R100createTypeMaterialBasicViewTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ZDMOBJKEY", "'" + objectId + "'");
+			map.put("ZDMOBJTYP", "'MAT'");
+			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
 			map.put("ACTIV_ID", "'" + activeId + "'");
 			map.put("OBJECT_ID", "'" + objectId + "'");
-
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
-			String activeId = (String) rowDetails.get("ACTIV_ID");
-			assertEquals("Z_DM_SAP_MATM_CREATE", activeId);
 			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Material Master created/updated successfully: "
+					+ objectId + "'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			String logdtlText = (String) rowDetails.get("TEXT");
-
-			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-
-			assertNotNull("Material Master created/updated successfully",
-					logdtlText);
+			assertNotNull(rowDetails);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -234,7 +260,8 @@ public class R100createTypeMaterialBasicViewTest extends RdhRestProxyTest {
 			String FromToType = "MTCFROMTYPE";
 			String pimsIdentity = "C";
 			String objectId = tmUPGObj.getFromType() + newFlag;
-
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
+					"Z_DM_SAP_MATM_CREATE", objectId);
 			int deleteDataResult = deleteDataMatmCreate(objectId);
 			assertEquals(deleteDataResult, 0);
 
@@ -247,24 +274,27 @@ public class R100createTypeMaterialBasicViewTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ZDMOBJKEY", "'" + objectId + "'");
+			map.put("ZDMOBJTYP", "'MAT'");
+			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
 			map.put("ACTIV_ID", "'" + activeId + "'");
 			map.put("OBJECT_ID", "'" + objectId + "'");
-
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
-			String activeId = (String) rowDetails.get("ACTIV_ID");
-			assertEquals("Z_DM_SAP_MATM_CREATE", activeId);
 			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Material Master created/updated successfully: "
+					+ objectId + "'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			String logdtlText = (String) rowDetails.get("TEXT");
-
-			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-
-			assertNotNull("Material Master created/updated successfully",
-					logdtlText);
+			assertNotNull(rowDetails);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -276,6 +306,20 @@ public class R100createTypeMaterialBasicViewTest extends RdhRestProxyTest {
 
 		}
 
+	}
+
+	@After
+	public void deleteData() {
+
+		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'";
+
+		int t1 = SqlHelper.runUpdateSql(del_rdx, conn);
+
+		if (t1 >= 0) {
+			System.out.println("delete success");
+		} else {
+			System.out.println("delete failed");
+		}
 	}
 
 }

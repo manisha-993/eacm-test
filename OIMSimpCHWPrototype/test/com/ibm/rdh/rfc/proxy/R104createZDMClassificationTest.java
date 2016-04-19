@@ -72,7 +72,6 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
-
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
 			map.put("ACTIV_ID", "'" + activeId + "'");
@@ -80,19 +79,16 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
-			String activeId = (String) rowDetails.get("ACTIV_ID");
-			assertEquals("Z_DM_SAP_CLASSIFICATION_MAINT", activeId);
 			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Classification created / updated successfully.'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			String logdtlText = (String) rowDetails.get("TEXT");
+			assertNotNull(rowDetails);
 
-			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-
-			assertNotNull("Material Master created/updated successfully",
-					logdtlText);
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
 			Assert.fail("error message= " + ex.getMessage());
@@ -132,7 +128,6 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
-
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
 			map.put("ACTIV_ID", "'" + activeId + "'");
@@ -140,19 +135,15 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
-			String activeId = (String) rowDetails.get("ACTIV_ID");
-			assertEquals("Z_DM_SAP_CLASSIFICATION_MAINT", activeId);
 			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Classification created / updated successfully.'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			String logdtlText = (String) rowDetails.get("TEXT");
-
-			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-
-			assertNotNull("Material Master created/updated successfully",
-					logdtlText);
+			assertNotNull(rowDetails);
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
 			Assert.fail("error message= " + ex.getMessage());
@@ -193,7 +184,6 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
-
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
 			map.put("ACTIV_ID", "'" + activeId + "'");
@@ -201,19 +191,15 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
-			String activeId = (String) rowDetails.get("ACTIV_ID");
-			assertEquals("Z_DM_SAP_CLASSIFICATION_MAINT", activeId);
 			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Classification created / updated successfully.'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			String logdtlText = (String) rowDetails.get("TEXT");
-
-			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-
-			assertNotNull("Material Master created/updated successfully",
-					logdtlText);
+			assertNotNull(rowDetails);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
@@ -255,7 +241,6 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
-
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
 			map.put("ACTIV_ID", "'" + activeId + "'");
@@ -263,19 +248,15 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
-			String activeId = (String) rowDetails.get("ACTIV_ID");
-			assertEquals("Z_DM_SAP_CLASSIFICATION_MAINT", activeId);
 			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Classification created / updated successfully.'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			String logdtlText = (String) rowDetails.get("TEXT");
-
-			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
-
-			assertNotNull("Material Master created/updated successfully",
-					logdtlText);
+			assertNotNull(rowDetails);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());

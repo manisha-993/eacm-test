@@ -12,10 +12,9 @@ import org.junit.Test;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.TypeModel;
+import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 
-public class R120maintainModelValueForTypeMODCharacteristicTest extends
-		RdhRestProxyTest {
+public class R159createTypeMCCharacteristicTest extends RdhRestProxyTest {
 
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
@@ -34,24 +33,83 @@ public class R120maintainModelValueForTypeMODCharacteristicTest extends
 	}
 
 	@Test
-	public void r120() {
+	public void r159a() {
 		try {
-			TypeModel typeModel = new TypeModel();
+
 			CHWAnnouncement chwA = new CHWAnnouncement();
-
-			typeModel.setType("EACM");
-			typeModel.setModel("NEW");
-			typeModel.setDescription("EACM HW");
+			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
 			chwA.setAnnDocNo("123401");
-			String pimsIdentity = "C";
-			String charac = "MK_" + typeModel.getType() + "_MOD";
-			String activeId = "Z_DM_SAP_CHAR_MAINTAIN";
+			tmUPGObj.setType("EACM");
 
+			String pimsIdentity = "C";
+			String FromToType = "MTCTOTYPE";
+			String charac = "MK_" + tmUPGObj.getType() + "_MTC";
+
+			String activeId = "Z_DM_SAP_CHAR_MAINTAIN";
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
 					"Z_DM_SAP_CHAR_MAINTAIN", charac);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r120(typeModel, chwA, pimsIdentity);
+			rfcProxy.r159(chwA, tmUPGObj, FromToType, pimsIdentity);
+
+			Map<String, String> map = new HashMap<String, String>();
+			Map<String, Object> rowDetails;
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ZDMOBJKEY", "'" + charac + "'");
+			map.put("ZDMOBJTYP", "'CHR'");
+			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ACTIV_ID", "'" + activeId + "'");
+			map.put("OBJECT_ID", "'" + charac + "'");
+			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
+			assertNotNull(rowDetails);
+			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
+
+			map.clear();
+			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Characteristic  " + charac
+					+ " created/updated successfully.'");
+			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			assertNotNull(rowDetails);
+
+		} catch (HWPIMSAbnormalException ex) {
+			logger.info("error message= " + ex.getMessage());
+			Assert.fail("error message= " + ex.getMessage());
+
+		} catch (Exception e) {
+			e.getStackTrace();
+			Assert.fail("There is some error :" + e.getMessage());
+		} finally {
+
+		}
+	}
+
+	@Test
+	public void r159b() {
+		try {
+
+			CHWAnnouncement chwA = new CHWAnnouncement();
+			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
+			chwA.setAnnDocNo("123401");
+			tmUPGObj.setFromType("EACM");
+
+			String pimsIdentity = "C";
+			String FromToType = "MTCFROMTYPE";
+			String charac = "MK_" + tmUPGObj.getFromType() + "_MTC";
+
+			String activeId = "Z_DM_SAP_CHAR_MAINTAIN";
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
+					"Z_DM_SAP_CHAR_MAINTAIN", charac);
+
+			RdhRestProxy rfcProxy = new RdhRestProxy();
+			rfcProxy.r159(chwA, tmUPGObj, FromToType, pimsIdentity);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
@@ -95,16 +153,18 @@ public class R120maintainModelValueForTypeMODCharacteristicTest extends
 	@After
 	public void deleteData() {
 
-		String del_cabn = "delete from SAPR3.CABN where mandt='200' and ATNAM='MK_EACM_MOD'";
-		String del_cabnt = "delete from SAPR3.CABNT where mandt='200' and ATBEZ='Models'";
+		String del_cabn = "delete from SAPR3.CABN where mandt='200' and ATNAM='MK_EACM_MC'";
+		String del_cabnt = "delete from SAPR3.CABNT where mandt='200' and ATBEZ='Machine Type Conversions'";
 		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'";
 		int t1 = SqlHelper.runUpdateSql(del_cabn, conn);
 		int t2 = SqlHelper.runUpdateSql(del_cabnt, conn);
 		int t3 = SqlHelper.runUpdateSql(del_rdx, conn);
+
 		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");
 		}
 	}
+
 }

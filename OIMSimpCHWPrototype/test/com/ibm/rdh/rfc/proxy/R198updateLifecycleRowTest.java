@@ -12,7 +12,7 @@ import org.junit.Test;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
 
-public class R198updateLifecycleRowTest extends RdhRestProxyTest{
+public class R198updateLifecycleRowTest extends RdhRestProxyTest {
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
 
@@ -20,7 +20,7 @@ public class R198updateLifecycleRowTest extends RdhRestProxyTest{
 	public void testR198() {
 		try {
 			String material = "EACMNEW";
-//			deleteZdmchwplcRow(Constants.MANDT, material);
+			// deleteZdmchwplcRow(Constants.MANDT, material);
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
 					"Z_DM_SAP_CHW_PRODUCT_CYCLE", "ZDMCHWPLC");
 
@@ -49,13 +49,16 @@ public class R198updateLifecycleRowTest extends RdhRestProxyTest{
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
 			String sessionId = (String) rowDetails.get("ZSESSION");
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT",
+					"'Successful ZDMCHWPLC action.  <1> + rows updated'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			String logdtlText = (String) rowDetails.get("TEXT");
-			assertNotNull("Successful ZDMCHWPLC action.  <1> + rows updated",
-					logdtlText);
+			assertNotNull(rowDetails);
+
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
 			Assert.fail("error message= " + ex.getMessage());

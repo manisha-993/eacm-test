@@ -28,10 +28,11 @@ public class R177create300ClassificationForTypeUFForUPGTest extends
 				+ "where mandt='300' and KLART='300' and CLASS='MK_0000_UF_0000'";
 
 		String sql_mara = "insert into sapr3.mara (mandt,matnr) values('200','1234UPG')";
-
+		String sql_rdx = "insert into sapr3.zdm_rdxcustmodel(mandt,zdm_class,zdm_syst_default) values ('200','MD_CHW_NA','X')";
 		int t1 = SqlHelper.runUpdateSql(sql_klah, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_mara, conn);
-		if (t1 >= 0 && t2 >= 0) {
+		int t3 = SqlHelper.runUpdateSql(sql_rdx, conn);
+		if (t1 >= 0 && t2 >= 0&& t3 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -93,11 +94,11 @@ public class R177create300ClassificationForTypeUFForUPGTest extends
 	public void deleteData() {
 		String del_klah = "delete from SAPR3.KLAH where mandt='200' and KLART='300' and CLASS='MK_1234_UF_0000'";
 		String del_mara = "delete from SAPR3.MARA where mandt='200' and MATNR='1234UPG'";
-		
+		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'";
 		int t1 = SqlHelper.runUpdateSql(del_klah, conn);
 		int t2 = SqlHelper.runUpdateSql(del_mara, conn);
-		
-		if (t1 >= 0 && t2 >= 0) {
+		int t3 = SqlHelper.runUpdateSql(del_rdx, conn);
+		if (t1 >= 0 && t2 >= 0&& t3 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");

@@ -49,13 +49,15 @@ public class R197createLifecycleRowTest extends RdhRestProxyTest {
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
 			String sessionId = (String) rowDetails.get("ZSESSION");
-
+			String status = (String) rowDetails.get("STATUS");
+			assertEquals(status, "success");
+			
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT", "'Successful ZDMCHWPLC action.  <1> + rows inserted'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			String logdtlText = (String) rowDetails.get("TEXT");
-			assertNotNull("Successful ZDMCHWPLC action.  <1> + rows inserted",
-					logdtlText);
+			assertNotNull(rowDetails);
+			
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
 			Assert.fail("error message= " + ex.getMessage());

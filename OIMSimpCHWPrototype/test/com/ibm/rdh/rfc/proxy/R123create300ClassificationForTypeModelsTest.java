@@ -30,6 +30,7 @@ public class R123create300ClassificationForTypeModelsTest extends
 		String sql_mara_1 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','1234NEW')";
 		String sql_mara_2 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','1234UPG')";
 		String sql_mara_3 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','1234MTC')";
+		String sql_rdx = "insert into sapr3.zdm_rdxcustmodel(mandt,zdm_class,zdm_syst_default) values ('200','MD_CHW_NA','X')";
 
 		int t1 = SqlHelper.runUpdateSql(sql_klah, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_ksml, conn);
@@ -37,8 +38,10 @@ public class R123create300ClassificationForTypeModelsTest extends
 		int t4 = SqlHelper.runUpdateSql(sql_mara_1, conn);
 		int t5 = SqlHelper.runUpdateSql(sql_mara_2, conn);
 		int t6 = SqlHelper.runUpdateSql(sql_mara_3, conn);
+		int t7 = SqlHelper.runUpdateSql(sql_rdx, conn);
 
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0) {
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0
+				&& t7 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -282,6 +285,7 @@ public class R123create300ClassificationForTypeModelsTest extends
 		String del_mara_1 = "delete from SAPR3.MARA where MANDT='200' and MATNR='1234NEW'";
 		String del_mara_2 = "delete from SAPR3.MARA where MANDT='200' and MATNR='1234UPG'";
 		String del_mara_3 = "delete from SAPR3.MARA where MANDT='200' and MATNR='1234MTC'";
+		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'";
 
 		int t1 = SqlHelper.runUpdateSql(del_klah, conn);
 		int t2 = SqlHelper.runUpdateSql(del_ksml, conn);
@@ -289,8 +293,9 @@ public class R123create300ClassificationForTypeModelsTest extends
 		int t4 = SqlHelper.runUpdateSql(del_mara_1, conn);
 		int t5 = SqlHelper.runUpdateSql(del_mara_2, conn);
 		int t6 = SqlHelper.runUpdateSql(del_mara_3, conn);
-
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0) {
+		int t7 = SqlHelper.runUpdateSql(del_rdx, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0
+				&& t7 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");

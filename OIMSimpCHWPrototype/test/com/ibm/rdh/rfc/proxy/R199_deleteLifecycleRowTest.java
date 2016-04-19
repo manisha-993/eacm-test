@@ -59,7 +59,7 @@ public class R199_deleteLifecycleRowTest extends RdhRestProxyTest {
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
 			map.put("ACTIV_ID", "'Z_DM_SAP_CHW_PRODUCT_CYCLE'");
-			map.put("OBJECT_ID", "'" + objectId + "'");
+			map.put("OBJECT_ID", "'ZDMCHWPLC'");
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
 			String sessionId = (String) rowDetails.get("ZSESSION");
@@ -68,10 +68,10 @@ public class R199_deleteLifecycleRowTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
+			map.put("TEXT",
+					"'Successful ZDMCHWPLC action.  <1> + rows deleted'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
-			String logdtlText = (String) rowDetails.get("TEXT");
-			assertNotNull("Successful ZDMCHWPLC action. <1> + rows deleted",
-					logdtlText);
+			assertNotNull(rowDetails);
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
