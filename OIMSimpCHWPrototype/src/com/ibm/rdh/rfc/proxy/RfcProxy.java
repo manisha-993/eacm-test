@@ -23,6 +23,7 @@ package com.ibm.rdh.rfc.proxy;
 import java.util.Date;
 import java.util.Vector;
 
+import com.ibm.rdh.chw.entity.BasicMaterialFromSAP;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.LifecycleData;
@@ -31,7 +32,6 @@ import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.chw.entity.TypeFeatureUPGGeo;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
-import com.ibm.rdh.rfc.BapireturnStructure;
 
 /**
  * @author Will
@@ -255,7 +255,7 @@ public abstract class RfcProxy {
 	public abstract boolean r207(String type, String model, String plant)
 			throws Exception;
 
-	public abstract BapireturnStructure r209(String material) throws Exception;
+	public abstract BasicMaterialFromSAP r209(String material) throws Exception;
 
 	public abstract void r261(String material) throws Exception;
 

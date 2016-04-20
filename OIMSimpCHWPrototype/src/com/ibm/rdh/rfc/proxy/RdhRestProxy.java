@@ -72,6 +72,7 @@ import com.ibm.rdh.chw.caller.R261PlantViewMaterial;
 import com.ibm.rdh.chw.caller.R262createPlantViewProfitCenterForMaterial;
 import com.ibm.rdh.chw.caller.Rfc;
 import com.ibm.rdh.chw.caller.RfcReturnSeverityCodes;
+import com.ibm.rdh.chw.entity.BasicMaterialFromSAP;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.LifecycleData;
@@ -80,7 +81,7 @@ import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.chw.entity.TypeFeatureUPGGeo;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
-import com.ibm.rdh.rfc.BapireturnStructure;
+import com.ibm.rdh.rfc.BapimatdoaStructure;
 import com.ibm.rdh.rfc.Zdm_marc_dataTable;
 
 //import com.ibm.rdh.rfc.ReturnDataObjectR001;
@@ -763,12 +764,18 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
-	public BapireturnStructure r209(String material) throws Exception {
+	public BasicMaterialFromSAP r209(String material) throws Exception {
 		R209ReadBasicViewOfMaterial r = getFactory().getr209(material);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-		return r.evaluate();
+		
+		BasicMaterialFromSAP basicMaterialFromSAP = new BasicMaterialFromSAP();
+		BapimatdoaStructure sharedMat = r.getRfc()
+				.getMaterialGeneralData();
+		basicMaterialFromSAP.setMatlType(sharedMat.getMatlType());
+		basicMaterialFromSAP.setProdHier(sharedMat.getProdHier());
+		return basicMaterialFromSAP;
 	}
 
 	@Override
