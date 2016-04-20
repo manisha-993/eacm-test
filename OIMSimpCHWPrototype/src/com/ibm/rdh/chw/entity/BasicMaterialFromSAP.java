@@ -23,11 +23,4 @@ public class BasicMaterialFromSAP {
 	public String getProdHier() {
 		return prodHier;
 	}
-
-	@Override
-	public String toString() {
-		return "BasicMaterialFromSAP [matlType=" + matlType + ", prodHier="
-				+ prodHier + "]";
-	}
-
 }
