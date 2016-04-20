@@ -2,7 +2,6 @@ package com.ibm.rdh.chw.caller;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.rdh.rfc.BAPI_MATERIAL_GET_DETAIL;
-import com.ibm.rdh.rfc.BapireturnStructure;
 
 public class R209ReadBasicViewOfMaterial extends Rfc {
 
@@ -24,19 +23,13 @@ public class R209ReadBasicViewOfMaterial extends Rfc {
 	}
 
 	@Override
-	public void execute() throws Exception{
-		
-	}
-		
-	public BapireturnStructure execute1() throws Exception {
-		// TODO Auto-generated method stub
+	public void execute() throws Exception {
 		logExecution();
 		getRfc().execute();
 		getLog().debug(getErrorInformation());
 		if (getSeverity() == ERROR) {
 			throw new HWPIMSAbnormalException(getErrorInformation());
 		}
-		return getRfc().getReturn();
 	}
 
 	@Override
@@ -68,12 +61,12 @@ public class R209ReadBasicViewOfMaterial extends Rfc {
 	@Override
 	protected String getErrorInformation() {
 		String ans;
-	if (isSuccessful()) {
+		if (isSuccessful()) {
 			ans = RFC_OK_MESSAGE;
 		} else {
 			ans = getRfc().getReturn().getMessage();
-//			ans = formatRfcErrorMessage(getRfc().getRfcrc(), getRfc()
-//					.getErrorText());
+			// ans = formatRfcErrorMessage(getRfc().getRfcrc(), getRfc()
+			// .getErrorText());
 		}
 		return ans;
 	}
@@ -88,7 +81,7 @@ public class R209ReadBasicViewOfMaterial extends Rfc {
 		return ClassUtil.getSimpleClassName(getRfc());
 	}
 
-	public BapireturnStructure evaluate() throws Exception {
-		return execute1();
+	public void evaluate() throws Exception {
+		execute();
 	}
 }
