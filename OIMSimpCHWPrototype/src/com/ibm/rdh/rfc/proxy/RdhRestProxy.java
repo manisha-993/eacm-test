@@ -1,5 +1,6 @@
 package com.ibm.rdh.rfc.proxy;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 
@@ -83,6 +84,8 @@ import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.BapimatdoaStructure;
 import com.ibm.rdh.rfc.Zdm_marc_dataTable;
+import com.ibm.rdh.rfc.ZdmchwplcTable;
+import com.ibm.rdh.rfc.ZdmchwplcTableRow;
 
 //import com.ibm.rdh.rfc.ReturnDataObjectR001;
 /**
@@ -97,6 +100,10 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	private long _sapRetrySleepMillis;
 	private RfcLogger rfcLogger;
 
+	public static String PREANNOUNCE = "YA";
+	public static String ANNOUNCE = "Z0";
+	public static String WDFM = "ZJ";
+	
 	protected static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
 
@@ -734,7 +741,32 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-		return r.evaluate();
+		
+		ZdmchwplcTable tab;
+		ZdmchwplcTableRow tRow;
+		LifecycleData lcd = new LifecycleData();
+		String vmsta;
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		tab = r.getRfc().getZdmChwPlc();
+		int rowCount = tab.getRowCount();
+		for (int i = 0; i < rowCount; i++) {
+
+			tRow = tab.getRow(i); // tab.getRow(2)
+			vmsta = tRow.getVmsta();
+			lcd.setVarCond(tRow.getVarcond());
+			if (vmsta.equals(PREANNOUNCE)) {
+				lcd.setPreAnnounceValidFrom(sdf.parse(tRow.getDatabString()));
+				lcd.setPreAnnounceValidTo(sdf.parse(tRow.getDatbiString()));
+			} else if (vmsta.equals(ANNOUNCE)) {
+				lcd.setAnnounceValidFrom(sdf.parse(tRow.getDatabString()));
+				lcd.setAnnounceValidTo(sdf.parse(tRow.getDatbiString()));
+			} else if (vmsta.equals(WDFM)) {
+				lcd.setWdfmValidFrom(sdf.parse(tRow.getDatabString()));
+				lcd.setWdfmValidTo(sdf.parse(tRow.getDatbiString()));
+			}
+
+		} // end CheckUpdateMode()
+		return lcd;
 	}
 
 	@Override

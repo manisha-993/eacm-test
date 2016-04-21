@@ -1,5 +1,6 @@
 package com.ibm.rdh.rfc.proxy;
 
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class R200_readLifecycleRowTest extends RdhRestProxyTest {
 	@Before
 	public void prepareData() {
 		int t1 = deleteZdmchwplcRow(Constants.MANDT, "NEACMNEW");
-		String sql_insertplc = "insert into SAPR3.ZDMCHWPLC (MANDT,MATNR,VKORG,VARCOND,DATBI,DATAB,VMSTA,ZDM_RFANUM,ZDM_CREATE_DATE,ZDM_CREATE_TIME,ZDM_CREATE_USER,ZDM_CREATE_IUSER,ZDM_UPDATE_DATE,ZDM_UPDATE_TIME,ZDM_UPDATE_USER,ZDM_UPDATE_IUSER) values('200','NEACMNEW','0147','FEATURE:1002','99991231','','','','','','','','','','','')";
+		String sql_insertplc = "insert into SAPR3.ZDMCHWPLC (MANDT,MATNR,VKORG,VARCOND,DATBI,DATAB,VMSTA,ZDM_RFANUM,ZDM_CREATE_DATE,ZDM_CREATE_TIME,ZDM_CREATE_USER,ZDM_CREATE_IUSER,ZDM_UPDATE_DATE,ZDM_UPDATE_TIME,ZDM_UPDATE_USER,ZDM_UPDATE_IUSER) values('200','NEACMNEW','0147','FEATURE:1002','99991231','20160420','Z0','','','','','','','','','')";
 		int t2 = SqlHelper.runUpdateSql(sql_insertplc, conn);
 		if (t1 >= 0 && t2 >= 0) {
 			System.out.println("insert success");
@@ -31,6 +32,7 @@ public class R200_readLifecycleRowTest extends RdhRestProxyTest {
 	@Test
 	public void r200() {
 		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 			String material = "NEACMNEW";
 			String varCond = "FEATURE:1002";
 			String annDocNo = "123401";
@@ -43,6 +45,8 @@ public class R200_readLifecycleRowTest extends RdhRestProxyTest {
 			LifecycleData lcd=rfcProxy.r200(material, varCond, annDocNo, check, pimsIdentity,
 					salesOrg);
 			assertEquals("FEATURE:1002", lcd.getVarCond());
+			assertEquals(sdf.parse("20160420"), lcd.getAnnounceValidFrom());
+			assertEquals(sdf.parse("99991231"), lcd.getAnnounceValidTo());
 			
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
