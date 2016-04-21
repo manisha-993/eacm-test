@@ -257,7 +257,7 @@ public abstract class RfcProxy {
 
 	public abstract BasicMaterialFromSAP r209(String material) throws Exception;
 
-	public abstract void r261(String material) throws Exception;
+	public abstract Vector r261(String material) throws Exception;
 
 	public abstract void r262(CHWAnnouncement chwA, String material,
 			String sapPlant, String pimsIdentity, String profitCenter)

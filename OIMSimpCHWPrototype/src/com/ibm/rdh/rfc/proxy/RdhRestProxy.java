@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
+import com.ibm.pprds.epimshw.util.ProfitCenterPlantSelector;
 import com.ibm.pprds.epimshw.util.RfcLogger;
 import com.ibm.rdh.chw.caller.R100createTypeMaterialBasicView;
 import com.ibm.rdh.chw.caller.R101createGenericPlantViewforMaterial;
@@ -77,6 +78,7 @@ import com.ibm.rdh.chw.entity.BasicMaterialFromSAP;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.LifecycleData;
+import com.ibm.rdh.chw.entity.MaterailPlantData;
 import com.ibm.rdh.chw.entity.PlannedSalesStatus;
 import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.chw.entity.TypeFeatureUPGGeo;
@@ -84,9 +86,9 @@ import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.BapimatdoaStructure;
 import com.ibm.rdh.rfc.Zdm_marc_dataTable;
+import com.ibm.rdh.rfc.Zdm_marc_dataTableRow;
 import com.ibm.rdh.rfc.ZdmchwplcTable;
 import com.ibm.rdh.rfc.ZdmchwplcTableRow;
-
 //import com.ibm.rdh.rfc.ReturnDataObjectR001;
 /**
  * Read only Rfc proxy. Retrieves data via Rfcs but does not modify any SAP
@@ -103,7 +105,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	public static String PREANNOUNCE = "YA";
 	public static String ANNOUNCE = "Z0";
 	public static String WDFM = "ZJ";
-	
+
 	protected static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
 
@@ -733,7 +735,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
-	public LifecycleData  r200(String material, String varCond, String annDocNo,
+	public LifecycleData r200(String material, String varCond, String annDocNo,
 			String check, String pimsIdentity, String salesOrg)
 			throws Exception {
 		R200_readLifecycleRow r = getFactory().getr200(material, varCond,
@@ -741,7 +743,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-		
+
 		ZdmchwplcTable tab;
 		ZdmchwplcTableRow tRow;
 		LifecycleData lcd = new LifecycleData();
@@ -788,7 +790,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 			} else if (rows == 0) {
 				plantcheck = false;
 			}
-		}else{
+		} else {
 			logger.info("R207ReadPlantViewMaterial is null.");
 		}
 		return plantcheck;
@@ -801,21 +803,57 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-		
+
 		BasicMaterialFromSAP basicMaterialFromSAP = new BasicMaterialFromSAP();
-		BapimatdoaStructure sharedMat = r.getRfc()
-				.getMaterialGeneralData();
+		BapimatdoaStructure sharedMat = r.getRfc().getMaterialGeneralData();
 		basicMaterialFromSAP.setMatlType(sharedMat.getMatlType());
 		basicMaterialFromSAP.setProdHier(sharedMat.getProdHier());
 		return basicMaterialFromSAP;
 	}
 
 	@Override
-	public void r261(String material) throws Exception {
+	public Vector r261(String material) throws Exception {
 		R261PlantViewMaterial r = getFactory().getr261(material);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
+		boolean plantcheck = false;
+		Vector plantData = new Vector();
+		boolean checkProfitCenterExists = false;
+		Zdm_marc_dataTable plantvalues = r.getRfc().getZdmMarcData(); // ;
+		// charact_values = rfc.getCharactValues();
+		int rows = plantvalues.getRowCount();
+		if (rows > 0) {
+			for (int i = 0; i < rows; i++) {
+				Zdm_marc_dataTableRow plant_row = (Zdm_marc_dataTableRow) plantvalues
+						.getRow(i);
+				// plants = plant_row.getWerks();
+				String checkPlant = plant_row.getWerks();
+				// Vector v1 =
+				// ProfitCenterPlantSelector.getProfitCenterPlants();
+				checkProfitCenterExists = ProfitCenterPlantSelector
+						.checkProfitCenterPlants(checkPlant);
+				// boolean checkPlant=ProfitCenterPlantSelector.
+				System.out
+						.println("Printing the value of boolean exists in the rfc R261"
+								+ checkProfitCenterExists);
+				if (checkProfitCenterExists) {
+					MaterailPlantData matplantData = new MaterailPlantData(
+							plant_row.getWerks(), plant_row.getPrctr());
+					// mpData.setPlant(plant_row.getWerks());
+					// mpData.setProfitCenter(plant_row.getPrctr());
+					plantcheck = true;
+					logger.debug("R261's plant" + plant_row.getWerks());
+					logger.debug("R261's profitcenter" + plant_row.getPrctr());
+					plantData.add(matplantData);
+				}
+			}
+			// return plants;
+		} else if (rows == 0) {
+			// plants = null ;
+			plantcheck = false;
+		}
+		return plantData;
 	}
 
 	@Override
