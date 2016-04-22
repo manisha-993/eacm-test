@@ -35,10 +35,12 @@ public class R110assignMODCharacteristicToModelsClassTest extends
 				+ "WWSSI,POTPR,CLOBK,CLMUL,CVIEW,DISST,MEINS,CLMOD,VWSTL,VWPLA,CLALT,"
 				+ "LBREI,BNAME,MAXBL,KNOBJ,SHAD_UPDATE_TS,SHAD_UPDATE_IND,SAP_TS from SAPR3.KLAH "
 				+ "where mandt='300' and KLART='300' and CLASS='MK_0000_MODELS'";
+		String sql_rdx = "insert into sapr3.zdm_rdxcustmodel(mandt,zdm_class,zdm_syst_default) values ('200','MD_CHW_NA','X')";
 
 		int t1 = SqlHelper.runUpdateSql(sql_cabn, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_klah, conn);
-		if (t1 >= 0 && t2 >= 0) {
+		int t3 = SqlHelper.runUpdateSql(sql_rdx, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -88,7 +90,7 @@ public class R110assignMODCharacteristicToModelsClassTest extends
 			map.put("ZSESSION", "'" + sessionId + "'");
 			map.put("TEXT", "'Characteristic  " + merkma
 					+ ", successfully assigned to classification  " + jklart
-					+ "/" + jclass +"'");
+					+ "/" + jclass + "'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
 			assertNotNull(rowDetails);
 		} catch (HWPIMSAbnormalException ex) {
@@ -108,10 +110,11 @@ public class R110assignMODCharacteristicToModelsClassTest extends
 	public void deleteData() {
 		String del_cabn = "delete from SAPR3.CABN where mandt='200' and ATNAM='MK_EACM_MOD' AND ATFOR='CHAR'";
 		String del_klah = "delete from sapr3.klah where mandt='200' and klart='300' and class='MK_EACM_MODELS'";
-
+		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'";
 		int t1 = SqlHelper.runUpdateSql(del_cabn, conn);
 		int t2 = SqlHelper.runUpdateSql(del_klah, conn);
-		if (t1 >= 0 && t2 >= 0) {
+		int t3 = SqlHelper.runUpdateSql(del_rdx, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");
