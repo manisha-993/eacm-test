@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
@@ -18,6 +19,19 @@ public class R108createTypeMODCharacteristicTest extends RdhRestProxyTest {
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
 
+	@Before
+	public void prepareData() {
+		String sql_rdx = "insert into sapr3.zdm_rdxcustmodel(mandt,zdm_class,zdm_syst_default) values ('200','MD_CHW_NA','X')";
+
+		int t1 = SqlHelper.runUpdateSql(sql_rdx, conn);
+
+		if (t1 >= 0) {
+			System.out.println("insert success");
+		} else {
+			System.out.println("insert failed");
+		}
+	}
+
 	@Test
 	public void testR108QueryFound() {
 		try {
@@ -29,6 +43,7 @@ public class R108createTypeMODCharacteristicTest extends RdhRestProxyTest {
 
 			String activeId = "Z_DM_SAP_CHAR_MAINTAIN";
 			String charac = "MK_" + typeModel.getType() + "_MOD";
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId, charac);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r108(typeModel, chwA, pimsIdentity);
@@ -77,9 +92,11 @@ public class R108createTypeMODCharacteristicTest extends RdhRestProxyTest {
 
 		String del_cabn = "delete from SAPR3.CABN where mandt='200' and ATNAM='MK_EACM_MOD'";
 		String del_cabnt = "delete from SAPR3.CABNT where mandt='200' and ATBEZ='Models'";
+		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'";
 		int t1 = SqlHelper.runUpdateSql(del_cabn, conn);
 		int t2 = SqlHelper.runUpdateSql(del_cabnt, conn);
-		if (t1 >= 0 && t2 >= 0) {
+		int t3 = SqlHelper.runUpdateSql(del_rdx, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");
