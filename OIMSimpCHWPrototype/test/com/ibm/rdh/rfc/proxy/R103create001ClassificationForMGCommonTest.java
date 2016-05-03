@@ -25,9 +25,9 @@ public class R103create001ClassificationForMGCommonTest extends
 	public void prepareData() {
 		String sql_klah = "insert into SAPR3.KLAH (mandt, klart, class) values ('200', '001', 'MG_COMMON')";
 
-		String sql_cabn = "insert into SAPR3.CABN (mandt, ATNAM) values('200','MG_PRODUCTTYPE')";
+		String sql_cabn = "insert into SAPR3.CABN (mandt, ATINN, ATNAM) values('200','0000000001','MG_PRODUCTTYPE')";
 
-		String sql_ksml = "insert into sapr3.ksml (mandt, clint, imerk) values ('200', '0000000000', '0000000000')";
+		String sql_ksml = "insert into sapr3.ksml (mandt, clint, imerk) values ('200', '0000000000', '0000000001')";
 
 		String sql_mara_1 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMT1MTC')";
 		String sql_mara_2 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMF1MTC')";
@@ -289,8 +289,8 @@ public class R103create001ClassificationForMGCommonTest extends
 	@After
 	public void deleteData() {
 		String del_klah = "delete from SAPR3.KLAH where mandt='200' and KLART='001' and CLASS='MG_COMMON'";
-		String del_cabn = "delete from SAPR3.CABN where mandt='200' AND ATNAM='MG_PRODUCTTYPE'";
-		String del_ksml = "delete from sapr3.ksml where clint='0000000000' and mandt ='200' and imerk='0000000000'";
+		String del_cabn = "delete from SAPR3.CABN where mandt='200' AND ATNAM='MG_PRODUCTTYPE' and ATINN='0000000001'";
+		String del_ksml = "delete from sapr3.ksml where clint='0000000000' and mandt ='200' and imerk='0000000001'";
 		String del_mara_1 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMT1MTC'";
 		String del_mara_2 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMF1MTC'";
 		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'";
