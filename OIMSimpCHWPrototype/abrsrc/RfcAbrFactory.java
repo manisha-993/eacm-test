@@ -9,6 +9,8 @@ import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
 public class RfcAbrFactory {
 
 	private static final String MODEL_ENTITYTYPE = "MODEL";
+	private static final String FEATURE_ENTITYTYPE = "FEATURE";
+	private static final String TMF_ENTITYTYPE = "PRODSTRUCT";
 	
 	private RFCABRSTATUS rfcAbrStatus;
 	
@@ -19,6 +21,12 @@ public class RfcAbrFactory {
 		if(MODEL_ENTITYTYPE.equals(entityType)) {
 			return new RFCMODELABR(rfcAbrStatus);
 		}
+//		if(FEATURE_ENTITYTYPE.equals(entityType)) {
+//			return new RFCFEATUREABR(rfcAbrStatus);
+//		}
+//		if(TMF_ENTITYTYPE.equals(entityType)) {
+//			return new RFCPRODSTRUCTABR(rfcAbrStatus);
+//		}
 		throw new RfcAbrException("Can not get instance for entity type:" + entityType);
 	}
 

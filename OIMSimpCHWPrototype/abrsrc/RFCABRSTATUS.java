@@ -80,7 +80,7 @@ public class RFCABRSTATUS extends PokBaseABR {
 				addOutput("Promoted " + rootEntity.getKey() + " successfully");
 			} catch (RfcAbrException e) {
 				e.printStackTrace();
-				addOutput("Error" + e.getMessage());
+				addOutput("Error: " + e.getMessage());
 				StringWriter exBuf = new StringWriter();
 				e.printStackTrace(new PrintWriter(exBuf));
 				addComment(exBuf.getBuffer().toString());
@@ -226,6 +226,10 @@ public class RFCABRSTATUS extends PokBaseABR {
      */
 	protected void addComment(String msg) {
 		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
+	}
+	
+	protected String getCurrentTime() {
+		return getNow();
 	}
 	
 	/**
