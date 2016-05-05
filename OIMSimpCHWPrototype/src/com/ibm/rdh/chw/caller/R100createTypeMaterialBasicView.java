@@ -16,7 +16,6 @@ import com.ibm.rdh.rfc.Bmmh5TableRow;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 
-
 public class R100createTypeMaterialBasicView extends Rfc {
 	private com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE rfc;
 
@@ -36,13 +35,13 @@ public class R100createTypeMaterialBasicView extends Rfc {
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
 
 		b0Row.setTcode("MM01");
-		if (newFlag.equals("NEW")) {
+		if ("NEW".equals(newFlag)) {
 			b0Row.setMatnr(typeModel.getType() + "NEW");
-		} else if (newFlag.equals("UPG")) {
+		} else if ("UPG".equals(newFlag)) {
 			b0Row.setMatnr(typeModel.getType() + "UPG");
-		} else if (newFlag.equals("MTC") && FromToType.equals("MTCTOTYPE")) {
+		} else if ("MTC".equals(newFlag) && "MTCTOTYPE".equals(FromToType)) {
 			b0Row.setMatnr(tmUPGObj.getType() + "MTC");
-		} else if (newFlag.equals("MTC") && FromToType.equals("MTCFROMTYPE")) {
+		} else if ("MTC".equals(newFlag) && "MTCFROMTYPE".equals(FromToType)) {
 			b0Row.setMatnr(tmUPGObj.getFromType() + "MTC");
 		}
 
@@ -74,7 +73,7 @@ public class R100createTypeMaterialBasicView extends Rfc {
 		b1Row.setZeiar(chwA.getAnnouncementType());
 		b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
 		b1Row.setGewei("KG");
-		if (newFlag.equals("MTC")) {
+		if ("MTC".equals(newFlag)) {
 			if (tmUPGObj.getProductHierarchy() != null
 					|| (tmUPGObj.getProductHierarchy() != "")) {
 				b1Row.setPrdha(tmUPGObj.getProductHierarchy());
@@ -95,7 +94,7 @@ public class R100createTypeMaterialBasicView extends Rfc {
 				+ ", SPART>>" + b1Row.getSpart() + ", ZEIAR>>"
 				+ b1Row.getZeiar() + ", AESZN>>" + b1Row.getAeszn()
 				+ ", GEWEI>>" + b1Row.getGewei() + "\n");
-		if (newFlag.equals("MTC")) {
+		if ("MTC".equals(newFlag)) {
 			if (tmUPGObj.getProductHierarchy() != null
 					|| (tmUPGObj.getProductHierarchy() != "")) {
 				rfcInfo.append(Tab + "PRDHA>>" + b1Row.getPrdha() + "\n");
@@ -114,13 +113,13 @@ public class R100createTypeMaterialBasicView extends Rfc {
 
 		b5Row.setSpras("E");
 
-		if (newFlag.equals("NEW")) {
+		if ("NEW".equals(newFlag)) {
 			b5Row.setMaktx("Machine Type " + typeModel.getType() + " - NEW");
-		} else if (newFlag.equals("UPG")) {
+		} else if ("UPG".equals(newFlag)) {
 			b5Row.setMaktx("Machine Type " + typeModel.getType() + " - UPG");
-		} else if (newFlag.equals("MTC") && FromToType.equals("MTCTOTYPE")) {
+		} else if ("MTC".equals(newFlag) && "MTCTOTYPE".equals(FromToType)) {
 			b5Row.setMaktx("Machine Type " + tmUPGObj.getType() + " - MTC");
-		} else if (newFlag.equals("MTC") && FromToType.equals("MTCFROMTYPE")) {
+		} else if ("MTC".equals(newFlag) && "MTCFROMTYPE".equals(FromToType)) {
 			b5Row.setMaktx("Machine Type " + tmUPGObj.getFromType() + " - MTC");
 		}
 
@@ -143,12 +142,12 @@ public class R100createTypeMaterialBasicView extends Rfc {
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
-		//if (includeHWPIMSIndicator()) {
-			// rfc.setPimsIdentity("C");
+		// if (includeHWPIMSIndicator()) {
+		// rfc.setPimsIdentity("C");
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
-		//}
+		// }
 
 		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
@@ -211,7 +210,8 @@ public class R100createTypeMaterialBasicView extends Rfc {
 		// TODO Auto-generated method stub
 		return "Create type material basic view";
 	}
-	public void evaluate() throws Exception { 
-		execute() ; 
+
+	public void evaluate() throws Exception {
+		execute();
 	}
 }
