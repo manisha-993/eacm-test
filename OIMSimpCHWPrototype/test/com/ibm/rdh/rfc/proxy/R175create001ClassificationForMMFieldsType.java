@@ -25,38 +25,13 @@ public class R175create001ClassificationForMMFieldsType extends
 
 	@Before
 	public void prepareData() {
-		String sql_ksml_1 = "insert into sapr3.ksml select '200',CLINT,POSNR,ADZHL,ABTEI,DINKB,HERKU,IMERK,OMERK,KLART,RELEV,DATUV,TECHV,AENNR,"
-				+ "LKENZ,VMERK,DPLEN,OFFST,BLLIN,DPTXT,CUSTR,JUSTR,COLOR,INTSF,INVER,CKBOX,INPUT,AMERK,SHAD_UPDATE_TS,SHAD_UPDATE_IND,"
-				+ "SAP_TS from SAPR3.KSML where CLINT='9999991925' and MANDT = '300' and IMERK='0000510804'";
-		String sql_ksml_2 = "insert into sapr3.ksml select '200',CLINT,POSNR,ADZHL,ABTEI,DINKB,HERKU,IMERK,OMERK,KLART,RELEV,DATUV,TECHV,AENNR,"
-				+ "LKENZ,VMERK,DPLEN,OFFST,BLLIN,DPTXT,CUSTR,JUSTR,COLOR,INTSF,INVER,CKBOX,INPUT,AMERK,SHAD_UPDATE_TS,SHAD_UPDATE_IND,"
-				+ "SAP_TS from SAPR3.KSML where CLINT='9999991925' and MANDT = '300' and IMERK='0000510790'";
-
-		String sql_cabn_1 = "insert into SAPR3.CABN select '200',ATINN,ADZHL,ATNAM,ATIDN,ATFOR,ANZST,"
-				+ "ANZDZ,ATVOR,ATSCH,ATKLE,ATKON,ATEND,ATAEN,ATKLA,ATERF,ATEIN,ATAME,ATWME,MSEHI,ATDIM,ATGLO,"
-				+ "ATGLA,ATINT,ATUNS,ATSON,ATTAB,ATFEL,ATTEI,ATPRT,ATPRR,ATPRF,ATWRD,ATFOD,ATHIE,ATDEX,ATFGA,ATVSC,ANAME,"
-				+ "ADATU,VNAME,VDATU,ATXAC,ATYAC,ATMST,ATWSO,ATBSO,DATUV,TECHV,AENNR,LKENZ,ATWRI,DOKAR,DOKNR,"
-				+ "DOKVR,DOKTL,KNOBJ,ATINP,ATVIE,WERKS,KATALOGART,AUSWAHLMGE,ATHKA,ATHKO,CLINT,ATTOL,ATZUS,"
-				+ "ATVPL,SHAD_UPDATE_TS,SHAD_UPDATE_IND,SAP_TS from SAPR3.CABN where MANDT='300' AND ATINN='0000510804' and ATNAM='REMARKETER_REPORTER'";
-
-		String sql_cabn_2 = "insert into SAPR3.CABN select '200',ATINN,ADZHL,ATNAM,ATIDN,ATFOR,ANZST,"
-				+ "ANZDZ,ATVOR,ATSCH,ATKLE,ATKON,ATEND,ATAEN,ATKLA,ATERF,ATEIN,ATAME,ATWME,MSEHI,ATDIM,ATGLO,"
-				+ "ATGLA,ATINT,ATUNS,ATSON,ATTAB,ATFEL,ATTEI,ATPRT,ATPRR,ATPRF,ATWRD,ATFOD,ATHIE,ATDEX,ATFGA,ATVSC,ANAME,"
-				+ "ADATU,VNAME,VDATU,ATXAC,ATYAC,ATMST,ATWSO,ATBSO,DATUV,TECHV,AENNR,LKENZ,ATWRI,DOKAR,DOKNR,"
-				+ "DOKVR,DOKTL,KNOBJ,ATINP,ATVIE,WERKS,KATALOGART,AUSWAHLMGE,ATHKA,ATHKO,CLINT,ATTOL,ATZUS,"
-				+ "ATVPL,SHAD_UPDATE_TS,SHAD_UPDATE_IND,SAP_TS from SAPR3.CABN where MANDT='300' AND ATINN='0000510790' and ATNAM='MM_TYPE_MOD'";
-
 		String sql_mara_1 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMT1MTC')";
 		String sql_mara_2 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMF1MTC')";
 
-		int t1 = SqlHelper.runUpdateSql(sql_ksml_1, conn);
-		int t2 = SqlHelper.runUpdateSql(sql_ksml_2, conn);
-		int t3 = SqlHelper.runUpdateSql(sql_cabn_1, conn);
-		int t4 = SqlHelper.runUpdateSql(sql_cabn_2, conn);
-		int t5 = SqlHelper.runUpdateSql(sql_mara_1, conn);
-		int t6 = SqlHelper.runUpdateSql(sql_mara_2, conn);
+		int t1 = SqlHelper.runUpdateSql(sql_mara_1, conn);
+		int t2 = SqlHelper.runUpdateSql(sql_mara_2, conn);
 
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0) {
+		if (t1 >= 0 && t2 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -314,21 +289,13 @@ public class R175create001ClassificationForMMFieldsType extends
 
 	@After
 	public void deleteData() {
-		String del_ksml_1 = "delete from SAPR3.KSML where mandt='200'and CLINT='9999991925' and IMERK='0000510804'";
-		String del_ksml_2 = "delete from SAPR3.KSML where mandt='200'and CLINT='9999991925' and IMERK='0000510790'";
-		String del_cabn_1 = "delete from SAPR3.CABN where mandt='200'and ATNAM ='REMARKETER_REPORTER'";
-		String del_cabn_2 = "delete from SAPR3.CABN where mandt='200'and ATNAM ='MM_TYPE_MOD'";
 		String del_mara_1 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMT1MTC'";
 		String del_mara_2 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMF1MTC'";
 
-		int t1 = SqlHelper.runUpdateSql(del_ksml_1, conn);
-		int t2 = SqlHelper.runUpdateSql(del_ksml_2, conn);
-		int t3 = SqlHelper.runUpdateSql(del_cabn_1, conn);
-		int t4 = SqlHelper.runUpdateSql(del_cabn_2, conn);
-		int t5 = SqlHelper.runUpdateSql(del_mara_1, conn);
-		int t6 = SqlHelper.runUpdateSql(del_mara_2, conn);
+		int t1 = SqlHelper.runUpdateSql(del_mara_1, conn);
+		int t2 = SqlHelper.runUpdateSql(del_mara_2, conn);
 
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0) {
+		if (t1 >= 0 && t2 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");

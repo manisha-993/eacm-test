@@ -24,20 +24,13 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 	@Before
 	public void prepareData() {
-		String sql_klah = "insert into SAPR3.KLAH select '200',CLINT,KLART, CLASS,STATU,KLAGR,BGRSE,BGRKL,BGRKP,ANAME,"
-				+ "ADATU,VNAME,VDATU,VONDT,BISDT,ANZUO,PRAUS,SICHT,DOKNR,DOKAR,DOKTL,"
-				+ "DOKVR,DINKZ,NNORM,NORMN,NORMB,NRMT1,NRMT2,AUSGD,VERSD,VERSI,LEIST,VERWE,SPART,LREF3,WWSKZ,"
-				+ "WWSSI,POTPR,CLOBK,CLMUL,CVIEW,DISST,MEINS,CLMOD,VWSTL,VWPLA,CLALT,"
-				+ "LBREI,BNAME,MAXBL,KNOBJ,SHAD_UPDATE_TS,SHAD_UPDATE_IND,SAP_TS from SAPR3.KLAH "
-				+ "where mandt='300' and KLART='ZDM' and CLASS='MD_CHW_NA'";
 		String sql_mara_1 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMT1MTC')";
 		String sql_mara_2 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMF1MTC')";
 
-		int t1 = SqlHelper.runUpdateSql(sql_klah, conn);
-		int t2 = SqlHelper.runUpdateSql(sql_mara_1, conn);
-		int t3 = SqlHelper.runUpdateSql(sql_mara_2, conn);
+		int t1 = SqlHelper.runUpdateSql(sql_mara_1, conn);
+		int t2 = SqlHelper.runUpdateSql(sql_mara_2, conn);
 
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
+		if (t1 >= 0 && t2 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -272,14 +265,12 @@ public class R104createZDMClassificationTest extends RdhRestProxyTest {
 
 	@After
 	public void deleteData() {
-		String del_klah = "delete from SAPR3.KLAH where mandt='200' and KLART='ZDM' and CLASS='MD_CHW_NA'";
 		String del_mara_1 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMT1MTC'";
 		String del_mara_2 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMF1MTC'";
-		int t1 = SqlHelper.runUpdateSql(del_klah, conn);
-		int t2 = SqlHelper.runUpdateSql(del_mara_1, conn);
-		int t3 = SqlHelper.runUpdateSql(del_mara_2, conn);
+		int t1 = SqlHelper.runUpdateSql(del_mara_1, conn);
+		int t2 = SqlHelper.runUpdateSql(del_mara_2, conn);
 
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
+		if (t1 >= 0 && t2 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");

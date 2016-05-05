@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
@@ -19,19 +18,6 @@ public class R106createTypeModelsClassTest extends RdhRestProxyTest {
 			.getPromoteLogger();
 
 	String activeId = "Z_DM_SAP_CLASS_MAINTAIN";
-
-	@Before
-	public void prepareData() {
-		String sql_rdx = "insert into sapr3.zdm_rdxcustmodel(mandt,zdm_class,zdm_syst_default) values ('200','MD_CHW_NA','X')";
-
-		int t1 = SqlHelper.runUpdateSql(sql_rdx, conn);
-
-		if (t1 >= 0) {
-			System.out.println("insert success");
-		} else {
-			System.out.println("insert failed");
-		}
-	}
 
 	@Test
 	public void r106() {
@@ -54,7 +40,7 @@ public class R106createTypeModelsClassTest extends RdhRestProxyTest {
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
-			String jklart = "300";
+			//String jklart = "300";
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");

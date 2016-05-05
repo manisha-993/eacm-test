@@ -24,24 +24,20 @@ public class R123create300ClassificationForTypeModelsTest extends
 	@Before
 	public void prepareData() {
 
-		String sql_klah = "insert into SAPR3.KLAH (MANDT,KLART,CLASS) values('200','300','MK_1234_MODELS')";
-		String sql_ksml = "insert into SAPR3.KSML(MANDT,CLINT,IMERK) values('200','0000000000','0000000000') ";
-		String sql_cabn = "insert into SAPR3.CABN(MANDT,ATINN,ATNAM) values('200','0000000000','MK_1234_MOD')";
+		String sql_klah = "insert into SAPR3.KLAH (MANDT,KLART,CLASS,CLINT) values('200','300','MK_1234_MODELS','1000000000')";
+		String sql_ksml = "insert into SAPR3.KSML(MANDT,CLINT,IMERK) values('200','1000000000','1000000001') ";
+		String sql_cabn = "insert into SAPR3.CABN(MANDT,ATINN,ATNAM) values('200','1000000001','MK_1234_MOD')";
 		String sql_mara_1 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','1234NEW')";
 		String sql_mara_2 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','1234UPG')";
 		String sql_mara_3 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','1234MTC')";
-		String sql_rdx = "insert into sapr3.zdm_rdxcustmodel(mandt,zdm_class,zdm_syst_default) values ('200','MD_CHW_NA','X')";
-
 		int t1 = SqlHelper.runUpdateSql(sql_klah, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_ksml, conn);
 		int t3 = SqlHelper.runUpdateSql(sql_cabn, conn);
 		int t4 = SqlHelper.runUpdateSql(sql_mara_1, conn);
 		int t5 = SqlHelper.runUpdateSql(sql_mara_2, conn);
 		int t6 = SqlHelper.runUpdateSql(sql_mara_3, conn);
-		int t7 = SqlHelper.runUpdateSql(sql_rdx, conn);
 
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0
-				&& t7 >= 0) {
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -279,13 +275,12 @@ public class R123create300ClassificationForTypeModelsTest extends
 
 	@After
 	public void deleteData() {
-		String del_klah = "delete from SAPR3.KLAH where MANDT='200' and KLART='300' and CLASS='MK_1234_MODELS'";
-		String del_ksml = "delete from SAPR3.KSML where MANDT='200' and CLINT='0000000000' and IMERK='0000000000' ";
-		String del_cabn = "delete from SAPR3.CABN where MANDT='200' and ATINN='0000000000' AND ATNAM ='MK_1234_MOD'";
+		String del_klah = "delete from SAPR3.KLAH where MANDT='200' and KLART='300' and CLASS='MK_1234_MODELS' and CLINT='1000000000'";
+		String del_ksml = "delete from SAPR3.KSML where MANDT='200' and CLINT='1000000000' and IMERK='1000000001' ";
+		String del_cabn = "delete from SAPR3.CABN where MANDT='200' and ATINN='1000000001' AND ATNAM ='MK_1234_MOD'";
 		String del_mara_1 = "delete from SAPR3.MARA where MANDT='200' and MATNR='1234NEW'";
 		String del_mara_2 = "delete from SAPR3.MARA where MANDT='200' and MATNR='1234UPG'";
 		String del_mara_3 = "delete from SAPR3.MARA where MANDT='200' and MATNR='1234MTC'";
-		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'";
 
 		int t1 = SqlHelper.runUpdateSql(del_klah, conn);
 		int t2 = SqlHelper.runUpdateSql(del_ksml, conn);
@@ -293,9 +288,7 @@ public class R123create300ClassificationForTypeModelsTest extends
 		int t4 = SqlHelper.runUpdateSql(del_mara_1, conn);
 		int t5 = SqlHelper.runUpdateSql(del_mara_2, conn);
 		int t6 = SqlHelper.runUpdateSql(del_mara_3, conn);
-		int t7 = SqlHelper.runUpdateSql(del_rdx, conn);
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0
-				&& t7 >= 0) {
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");

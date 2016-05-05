@@ -4,9 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
@@ -19,19 +17,6 @@ public class R262createPlantViewProfitCenterForMaterialTest extends
 			.getPromoteLogger();
 
 	String activeId = "Z_DM_SAP_MATM_CREATE";
-	
-	@Before
-	public void prepareData() {
-		String sql_rdx = "insert into sapr3.zdm_rdxcustmodel(mandt,zdm_class,zdm_syst_default) values ('200','MD_CHW_NA','X')";
-		
-		int t1 = SqlHelper.runUpdateSql(sql_rdx, conn);
-
-		if (t1 >= 0 ) {
-			System.out.println("insert success");
-		} else {
-			System.out.println("insert failed");
-		}
-	}
 
 	@Test
 	public void r262() {
@@ -91,16 +76,5 @@ public class R262createPlantViewProfitCenterForMaterialTest extends
 		}
 
 	}
-	@After
-	
-	public void deleteData() {
-		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'"; 
-		int t1 = SqlHelper.runUpdateSql(del_rdx, conn);
 
-		if (t1 >= 0 ) {
-			System.out.println("delete success");
-		} else {
-			System.out.println("delete failed");
-		}
-	}
 }

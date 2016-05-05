@@ -7,7 +7,6 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
@@ -21,19 +20,6 @@ public class R124createUpgradeValueForTypeMCCharacteristicTest extends
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
 
-	@Before
-	public void prepareData() {
-		String sql_rdx = "insert into sapr3.zdm_rdxcustmodel(mandt,zdm_class,zdm_syst_default) values ('200','MD_CHW_NA','X')";
-
-		int t1 = SqlHelper.runUpdateSql(sql_rdx, conn);
-
-		if (t1 >= 0) {
-			System.out.println("insert success");
-		} else {
-			System.out.println("insert failed");
-		}
-	}
-
 	@Test
 	public void r124() {
 		try {
@@ -44,7 +30,7 @@ public class R124createUpgradeValueForTypeMCCharacteristicTest extends
 			typeModelUpg.setType("EACM");
 			typeModelUpg.setModel("MODEL");
 			typeModelUpg.setFromModel("EACMF");
-			
+
 			typeModelUpg1.setType("EACM");
 			typeModelUpg1.setModel("MODEL");
 			typeModelUpg1.setFromModel("EACMF");
@@ -108,12 +94,10 @@ public class R124createUpgradeValueForTypeMCCharacteristicTest extends
 
 		String del_cabn = "delete from SAPR3.CABN where mandt='200' and ATNAM='MK_EACM_MC'";
 		String del_cabnt = "delete from SAPR3.CABNT where mandt='200' and ATBEZ='Models'";
-		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'";
 		int t1 = SqlHelper.runUpdateSql(del_cabn, conn);
 		int t2 = SqlHelper.runUpdateSql(del_cabnt, conn);
-		int t3 = SqlHelper.runUpdateSql(del_rdx, conn);
 
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
+		if (t1 >= 0 && t2 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");
