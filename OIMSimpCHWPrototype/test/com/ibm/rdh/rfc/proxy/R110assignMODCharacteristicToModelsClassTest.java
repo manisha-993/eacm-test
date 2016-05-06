@@ -22,25 +22,12 @@ public class R110assignMODCharacteristicToModelsClassTest extends
 
 	@Before
 	public void prepareData() {
-		String sql_cabn = "insert into SAPR3.CABN select '200',ATINN,ADZHL,'MK_EACM_MOD',ATIDN,ATFOR,ANZST,"
-				+ "ANZDZ,ATVOR,ATSCH,ATKLE,ATKON,ATEND,ATAEN,ATKLA,ATERF,ATEIN,ATAME,ATWME,MSEHI,ATDIM,ATGLO,"
-				+ "ATGLA,ATINT,ATUNS,ATSON,ATTAB,ATFEL,ATTEI,ATPRT,ATPRR,ATPRF,ATWRD,ATFOD,ATHIE,ATDEX,ATFGA,ATVSC,ANAME,"
-				+ "ADATU,VNAME,VDATU,ATXAC,ATYAC,ATMST,ATWSO,ATBSO,DATUV,TECHV,AENNR,LKENZ,ATWRI,DOKAR,DOKNR,"
-				+ "DOKVR,DOKTL,KNOBJ,ATINP,ATVIE,WERKS,KATALOGART,AUSWAHLMGE,ATHKA,ATHKO,CLINT,ATTOL,ATZUS,"
-				+ "ATVPL,SHAD_UPDATE_TS,SHAD_UPDATE_IND,SAP_TS from sapr3.cabn where MANDT='300' AND ATNAM='MK_0000_MOD' AND ATFOR='CHAR'";
-
-		String sql_klah = "insert into SAPR3.KLAH select '200',CLINT,KLART,'MK_EACM_MODELS',STATU,KLAGR,BGRSE,BGRKL,BGRKP,ANAME,"
-				+ "ADATU,VNAME,VDATU,VONDT,BISDT,ANZUO,PRAUS,SICHT,DOKNR,DOKAR,DOKTL,"
-				+ "DOKVR,DINKZ,NNORM,NORMN,NORMB,NRMT1,NRMT2,AUSGD,VERSD,VERSI,LEIST,VERWE,SPART,LREF3,WWSKZ,"
-				+ "WWSSI,POTPR,CLOBK,CLMUL,CVIEW,DISST,MEINS,CLMOD,VWSTL,VWPLA,CLALT,"
-				+ "LBREI,BNAME,MAXBL,KNOBJ,SHAD_UPDATE_TS,SHAD_UPDATE_IND,SAP_TS from SAPR3.KLAH "
-				+ "where mandt='300' and KLART='300' and CLASS='MK_0000_MODELS'";
-		String sql_rdx = "insert into sapr3.zdm_rdxcustmodel(mandt,zdm_class,zdm_syst_default) values ('200','MD_CHW_NA','X')";
+		String sql_cabn = "insert into sapr3.cabn (mandt,atnam,atfor,ATINN,ADZHL) values ('200','MK_EACM_MOD','CHAR','0000000003','0000')";
+		String sql_klah = "insert into SAPR3.KLAH (mandt,KLART,CLASS,Clint) values ('200','300','MK_EACM_MODELS','0000000003')";
 
 		int t1 = SqlHelper.runUpdateSql(sql_cabn, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_klah, conn);
-		int t3 = SqlHelper.runUpdateSql(sql_rdx, conn);
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
+		if (t1 >= 0 && t2 >= 0 ) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -108,13 +95,12 @@ public class R110assignMODCharacteristicToModelsClassTest extends
 
 	@After
 	public void deleteData() {
-		String del_cabn = "delete from SAPR3.CABN where mandt='200' and ATNAM='MK_EACM_MOD' AND ATFOR='CHAR'";
-		String del_klah = "delete from sapr3.klah where mandt='200' and klart='300' and class='MK_EACM_MODELS'";
-		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'";
+		String del_cabn = "delete from SAPR3.CABN where mandt='200' and ATNAM='MK_EACM_MOD' AND ATFOR='CHAR' and ADZHL='0000' and ATINN='0000000003'";
+		String del_klah = "delete from sapr3.klah where mandt='200' and klart='300' and class='MK_EACM_MODELS' and clint='0000000003'";
+		
 		int t1 = SqlHelper.runUpdateSql(del_cabn, conn);
 		int t2 = SqlHelper.runUpdateSql(del_klah, conn);
-		int t3 = SqlHelper.runUpdateSql(del_rdx, conn);
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
+		if (t1 >= 0 && t2 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");

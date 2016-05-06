@@ -19,18 +19,16 @@ public class R165assignCharacteristicToMTCClass300Test extends RdhRestProxyTest{
 			.getPromoteLogger();
 	@Before
 	public void prepareData() {
-		String sql_cabn_1 = "insert into SAPR3.CABN(MANDT,ATINN,ATNAM) values('200','0000000001','MK_EACM_MTC')";
-		String sql_cabn_2 = "insert into SAPR3.CABN(MANDT,ATINN,ATNAM) values('200','0000000002','MK_EACMFT_MTC')";
-		String sql_klah_1 = "insert into SAPR3.KLAH (MANDT,CLINT,KLART,CLASS) values('200','0000000001','300','MK_EACM_MTC')";
-		String sql_klah_2 = "insert into SAPR3.KLAH (MANDT,CLINT,KLART,CLASS) values('200','0000000002','300','MK_EACMFT_MTC')";
-		String sql_rdx = "insert into SAPR3.ZDM_RDXCUSTMODEL (MANDT,ZDM_CLASS,ZDM_SYST_DEFAULT) values('200','MD_CHW_NA','X')";
+		String sql_cabn_1 = "insert into SAPR3.CABN(MANDT,ATINN,ATNAM,ADZHL) values('200','0000000003','MK_EACM_MTC','0000')";
+		String sql_cabn_2 = "insert into SAPR3.CABN(MANDT,ATINN,ATNAM,ADZHL) values('200','0000000004','MK_EACMFT_MTC','0000')";
+		String sql_klah_1 = "insert into SAPR3.KLAH (MANDT,CLINT,KLART,CLASS) values('200','0000000003','300','MK_EACM_MTC')";
+		String sql_klah_2 = "insert into SAPR3.KLAH (MANDT,CLINT,KLART,CLASS) values('200','0000000004','300','MK_EACMFT_MTC')";
 
 		int t1 = SqlHelper.runUpdateSql(sql_cabn_1, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_cabn_2, conn);
 		int t3 = SqlHelper.runUpdateSql(sql_klah_1, conn);
 		int t4 = SqlHelper.runUpdateSql(sql_klah_2, conn);
-		int t5 = SqlHelper.runUpdateSql(sql_rdx, conn);
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0&&t5>=0) {
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -155,19 +153,17 @@ public class R165assignCharacteristicToMTCClass300Test extends RdhRestProxyTest{
 	
 	@After
 	public void deleteData() {
-		String del_cabn_1 = "delete from SAPR3.CABN where MANDT='200' and ATINN='0000000001' AND ATNAM ='MK_EACM_MTC'";
-		String del_cabn_2 = "delete from SAPR3.CABN where MANDT='200' and ATINN='0000000002' AND ATNAM ='MK_EACMFT_MTC'";
-		String del_klah_1 = "delete from SAPR3.KLAH where MANDT='200' and KLART='300' and CLASS='MK_EACM_MTC'";
-		String del_klah_2 = "delete from SAPR3.KLAH where MANDT='200' and KLART='300' and CLASS='MK_EACMFT_MTC'";
-		String del_rdx = "delete from SAPR3.ZDM_RDXCUSTMODEL where mandt='200' and ZDM_CLASS='MD_CHW_NA' and ZDM_SYST_DEFAULT='X'";
+		String del_cabn_1 = "delete from SAPR3.CABN where MANDT='200' and ATINN='0000000003' AND ATNAM ='MK_EACM_MTC' and ADZHL='0000'";
+		String del_cabn_2 = "delete from SAPR3.CABN where MANDT='200' and ATINN='0000000004' AND ATNAM ='MK_EACMFT_MTC' and ADZHL='0000'";
+		String del_klah_1 = "delete from SAPR3.KLAH where MANDT='200' and KLART='300' and CLASS='MK_EACM_MTC' and clint='0000000003'";
+		String del_klah_2 = "delete from SAPR3.KLAH where MANDT='200' and KLART='300' and CLASS='MK_EACMFT_MTC' and clint='0000000004'";
 
 		int t1 = SqlHelper.runUpdateSql(del_cabn_1, conn);
 		int t2 = SqlHelper.runUpdateSql(del_cabn_2, conn);
 		int t3 = SqlHelper.runUpdateSql(del_klah_1, conn);
 		int t4 = SqlHelper.runUpdateSql(del_klah_2, conn);
-		int t5 = SqlHelper.runUpdateSql(del_rdx, conn);
 
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 &&t5>=0) {
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");

@@ -20,19 +20,11 @@ public class R177create300ClassificationForTypeUFForUPGTest extends
 
 	@Before
 	public void prepareData() {
-		String sql_klah = "insert into SAPR3.KLAH select '200',CLINT,KLART,'MK_1234_UF_0000',STATU,KLAGR,BGRSE,BGRKL,BGRKP,ANAME,"
-				+ "ADATU,VNAME,VDATU,VONDT,BISDT,ANZUO,PRAUS,SICHT,DOKNR,DOKAR,DOKTL,"
-				+ "DOKVR,DINKZ,NNORM,NORMN,NORMB,NRMT1,NRMT2,AUSGD,VERSD,VERSI,LEIST,VERWE,SPART,LREF3,WWSKZ,"
-				+ "WWSSI,POTPR,CLOBK,CLMUL,CVIEW,DISST,MEINS,CLMOD,VWSTL,VWPLA,CLALT,"
-				+ "LBREI,BNAME,MAXBL,KNOBJ,SHAD_UPDATE_TS,SHAD_UPDATE_IND,SAP_TS from SAPR3.KLAH "
-				+ "where mandt='300' and KLART='300' and CLASS='MK_0000_UF_0000'";
-
+		String sql_klah = "insert into SAPR3.KLAH (mandt, klart, class, clint) values ('200','300','MK_1234_UF_0000','0000000003')";
 		String sql_mara = "insert into sapr3.mara (mandt,matnr) values('200','1234UPG')";
-		String sql_rdx = "insert into sapr3.zdm_rdxcustmodel(mandt,zdm_class,zdm_syst_default) values ('200','MD_CHW_NA','X')";
 		int t1 = SqlHelper.runUpdateSql(sql_klah, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_mara, conn);
-		int t3 = SqlHelper.runUpdateSql(sql_rdx, conn);
-		if (t1 >= 0 && t2 >= 0&& t3 >= 0) {
+		if (t1 >= 0 && t2 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -92,13 +84,11 @@ public class R177create300ClassificationForTypeUFForUPGTest extends
 
 	@After
 	public void deleteData() {
-		String del_klah = "delete from SAPR3.KLAH where mandt='200' and KLART='300' and CLASS='MK_1234_UF_0000'";
+		String del_klah = "delete from SAPR3.KLAH where mandt='200' and KLART='300' and CLASS='MK_1234_UF_0000' and clint='0000000003'";
 		String del_mara = "delete from SAPR3.MARA where mandt='200' and MATNR='1234UPG'";
-		String del_rdx = "delete from sapr3.zdm_rdxcustmodel where mandt='200' and zdm_class='MD_CHW_NA' and zdm_syst_default='X'";
 		int t1 = SqlHelper.runUpdateSql(del_klah, conn);
 		int t2 = SqlHelper.runUpdateSql(del_mara, conn);
-		int t3 = SqlHelper.runUpdateSql(del_rdx, conn);
-		if (t1 >= 0 && t2 >= 0&& t3 >= 0) {
+		if (t1 >= 0 && t2 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");

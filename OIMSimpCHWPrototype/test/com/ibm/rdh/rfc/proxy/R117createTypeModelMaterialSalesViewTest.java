@@ -6,9 +6,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
@@ -21,19 +19,7 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
-	
-	@Before
-	public void prepareData() {
-		String sql_rdx = "insert into SAPR3.ZDM_RDXCUSTMODEL (MANDT,ZDM_CLASS,ZDM_SYST_DEFAULT) values('200','MD_CHW_NA','X')";
-
-		int t1 = SqlHelper.runUpdateSql(sql_rdx, conn);
-		if (t1 >= 0) {
-			System.out.println("insert success");
-		} else {
-			System.out.println("insert failed");
-		}
-	}
-	
+		
 	@Test
 	public void testR117QueryFound01() {
 		try {
@@ -336,17 +322,5 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 		} finally {
 
 		}
-	}
-	
-	@After
-	public void deleteData() {
-		String del_rdx = "delete from SAPR3.ZDM_RDXCUSTMODEL where mandt='200' and ZDM_CLASS='MD_CHW_NA' and ZDM_SYST_DEFAULT='X'";
-
-		int t1 = SqlHelper.runUpdateSql(del_rdx, conn);
-		if (t1 >= 0 ) {
-			System.out.println("delete success");
-		} else {
-			System.out.println("delete failed");
-		}
-	}
+	}	
 }

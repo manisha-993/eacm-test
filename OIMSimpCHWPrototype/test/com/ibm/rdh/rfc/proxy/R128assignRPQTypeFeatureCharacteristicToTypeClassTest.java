@@ -21,16 +21,14 @@ public class R128assignRPQTypeFeatureCharacteristicToTypeClassTest extends
 
 	@Before
 	public void prepareData() {
-		String sql_cabn = "insert into SAPR3.CABN(MANDT,ATINN,ATNAM) values('200','0000000001','MK_EACF_1000')";
-		String sql_klah_1 = "insert into SAPR3.KLAH (MANDT,CLINT,KLART,CLASS) values('200','0000000000','300','MK_EACF_RPQ')";
-		String sql_klah_2 = "insert into SAPR3.KLAH (MANDT,CLINT,KLART,CLASS) values('200','0000000001','300','MK_EACF_RPQ_EE')";
-		String sql_rdx = "insert into SAPR3.ZDM_RDXCUSTMODEL (MANDT,ZDM_CLASS,ZDM_SYST_DEFAULT) values('200','MD_CHW_NA','X')";
+		String sql_cabn = "insert into SAPR3.CABN(MANDT,ATINN,ATNAM,ADZHL) values('200','0000000003','MK_EACF_1000','0000')";
+		String sql_klah_1 = "insert into SAPR3.KLAH (MANDT,CLINT,KLART,CLASS) values('200','0000000003','300','MK_EACF_RPQ')";
+		String sql_klah_2 = "insert into SAPR3.KLAH (MANDT,CLINT,KLART,CLASS) values('200','0000000004','300','MK_EACF_RPQ_EE')";
 
 		int t1 = SqlHelper.runUpdateSql(sql_cabn, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_klah_1, conn);
 		int t3 = SqlHelper.runUpdateSql(sql_klah_2, conn);
-		int t4 = SqlHelper.runUpdateSql(sql_rdx, conn);
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0) {
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -158,17 +156,15 @@ public class R128assignRPQTypeFeatureCharacteristicToTypeClassTest extends
 
 	@After
 	public void deleteData() {
-		String del_cabn = "delete from SAPR3.CABN where MANDT='200' and ATINN='0000000001' AND ATNAM ='MK_EACF_1000'";
-		String del_klah_1 = "delete from SAPR3.KLAH where MANDT='200' and KLART='300' and CLASS='MK_EACF_RPQ'";
-		String del_klah_2 = "delete from SAPR3.KLAH where MANDT='200' and KLART='300' and CLASS='MK_EACF_RPQ_EE'";
-		String del_rdx = "delete from SAPR3.ZDM_RDXCUSTMODEL where mandt='200' and ZDM_CLASS='MD_CHW_NA' and ZDM_SYST_DEFAULT='X'";
+		String del_cabn = "delete from SAPR3.CABN where MANDT='200' and ATINN='0000000003' AND ATNAM ='MK_EACF_1000' and ADZHL='0000'";
+		String del_klah_1 = "delete from SAPR3.KLAH where MANDT='200' and KLART='300' and CLASS='MK_EACF_RPQ' and CLINT='0000000003'";
+		String del_klah_2 = "delete from SAPR3.KLAH where MANDT='200' and KLART='300' and CLASS='MK_EACF_RPQ_EE' and CLINT='0000000004'";
 
 		int t1 = SqlHelper.runUpdateSql(del_cabn, conn);
 		int t2 = SqlHelper.runUpdateSql(del_klah_1, conn);
 		int t3 = SqlHelper.runUpdateSql(del_klah_2, conn);
-		int t4 = SqlHelper.runUpdateSql(del_rdx, conn);
 
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0) {
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");
