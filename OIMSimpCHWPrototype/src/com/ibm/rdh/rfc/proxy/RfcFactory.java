@@ -36,6 +36,8 @@ import com.ibm.rdh.chw.caller.R131createTypeUFClass;
 import com.ibm.rdh.chw.caller.R133updateMaterialBasicViewForTypeModel;
 import com.ibm.rdh.chw.caller.R134assignRPQTypeFeatureCharacteristicToTypeClass;
 import com.ibm.rdh.chw.caller.R135assignTypeFeatureCharacteristicToTypeUFClass;
+import com.ibm.rdh.chw.caller.R136create300ClassificationForTypeFEAT;
+import com.ibm.rdh.chw.caller.R137create300ClassificationForTypeUFForMTC;
 import com.ibm.rdh.chw.caller.R144updateParkStatus;
 import com.ibm.rdh.chw.caller.R150create012ClassificationForMOD;
 import com.ibm.rdh.chw.caller.R151create012ClassificationForMC;
@@ -46,13 +48,16 @@ import com.ibm.rdh.chw.caller.R157createTypeClass;
 import com.ibm.rdh.chw.caller.R159createTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
 import com.ibm.rdh.chw.caller.R162createZDMClassificationForMKFEATCONV;
+import com.ibm.rdh.chw.caller.R164create300ClassificationForTypeMTC;
 import com.ibm.rdh.chw.caller.R165assignCharacteristicToMTCClass300;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
+import com.ibm.rdh.chw.caller.R168create012ClassificationForMTC;
 import com.ibm.rdh.chw.caller.R171markTypeModelMaterialForDeletion;
 import com.ibm.rdh.chw.caller.R172deleteModelValueFromTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
 import com.ibm.rdh.chw.caller.R176create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R177create300ClassificationForTypeUFForUPG;
+import com.ibm.rdh.chw.caller.R179ReadPlannedChangeForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R182deleteModelSelectionDependency;
 import com.ibm.rdh.chw.caller.R183createCFIPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R185deleteupgradevaluefromMCcharacteristic;
@@ -60,12 +65,14 @@ import com.ibm.rdh.chw.caller.R186DeleteTypeFeatureCharacteristic;
 import com.ibm.rdh.chw.caller.R187DeleteTypeFeatureCharacteristicClassificationtoFEAT;
 import com.ibm.rdh.chw.caller.R188DeleteTypeFeatureCharacteristicClassificationtoUF;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
+import com.ibm.rdh.chw.caller.R193ReadRevenueProfile;
 import com.ibm.rdh.chw.caller.R197createLifecycleRow;
 import com.ibm.rdh.chw.caller.R198updateLifecycleRow;
 import com.ibm.rdh.chw.caller.R199_deleteLifecycleRow;
 import com.ibm.rdh.chw.caller.R200_readLifecycleRow;
 import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
+import com.ibm.rdh.chw.caller.R210ReadSalesBom;
 import com.ibm.rdh.chw.caller.R261PlantViewMaterial;
 import com.ibm.rdh.chw.caller.R262createPlantViewProfitCenterForMaterial;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
@@ -297,6 +304,22 @@ public class RfcFactory extends Object {
 				typeFeature, chwA, pimsIdentity);
 	}
 
+	public R136create300ClassificationForTypeFEAT getr136(
+			TypeModelUPGGeo tmUPGObj, String range, CHWAnnouncement chwA,
+			String newFlag, String FromToType, String pimsIdentity)
+			throws Exception {
+		return new R136create300ClassificationForTypeFEAT(tmUPGObj, range,
+				chwA, newFlag, FromToType, pimsIdentity);
+	}
+
+	public R137create300ClassificationForTypeUFForMTC getr137(
+			TypeModelUPGGeo tmUPGObj, String range, CHWAnnouncement chwA,
+			String newFlag, String FromToType, String pimsIdentity)
+			throws Exception {
+		return new R137create300ClassificationForTypeUFForMTC(tmUPGObj, range,
+				chwA, newFlag, FromToType, pimsIdentity);
+	}
+
 	public R144updateParkStatus getr144(String annno, String zdmstatus,
 			String pimsIdentity) throws Exception {
 		return new R144updateParkStatus(annno, zdmstatus, pimsIdentity);
@@ -360,6 +383,13 @@ public class RfcFactory extends Object {
 				newFlag, chwA, FromToType, pimsIdentity);
 	}
 
+	public R164create300ClassificationForTypeMTC getr164(
+			TypeModelUPGGeo tmUPGObj, CHWAnnouncement chwA, String FromToType,
+			String pimsIdentity) throws Exception {
+		return new R164create300ClassificationForTypeMTC(tmUPGObj, chwA,
+				FromToType, pimsIdentity);
+	}
+
 	public R165assignCharacteristicToMTCClass300 getr165(CHWAnnouncement chwA,
 			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity)
 			throws Exception {
@@ -373,6 +403,18 @@ public class RfcFactory extends Object {
 		return new R166createSTPPlantViewForMaterial(chwA, typeModel, chwAg,
 				storageLocation, newFlag);
 	}
+
+	public R168create012ClassificationForMTC getr168(TypeModelUPGGeo tmUPGObj,
+			CHWAnnouncement chwA, String FromToType, String pimsIdentity)
+			throws Exception {
+		return new R168create012ClassificationForMTC(tmUPGObj, chwA,
+				FromToType, pimsIdentity);
+	}
+
+	// public R169ReadTypeModelsFromBOM getr169(String type, String plant,
+	// String newFlag) throws Exception {
+	// return new R169ReadTypeModelsFromBOM(type, plant, newFlag);
+	// }
 
 	public R171markTypeModelMaterialForDeletion getr171(String typemod,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
@@ -407,6 +449,13 @@ public class RfcFactory extends Object {
 			throws Exception {
 		return new R177create300ClassificationForTypeUFForUPG(type, range,
 				chwA, pimsIdentity);
+	}
+
+	public R179ReadPlannedChangeForTypeModelMaterial getr179(String typemod,
+			String annDocNo, String check, String pimsIdentity, String salesOrg)
+			throws Exception {
+		return new R179ReadPlannedChangeForTypeModelMaterial(typemod, annDocNo,
+				check, pimsIdentity, salesOrg);
 	}
 
 	public R182deleteModelSelectionDependency getr182(TypeModel typeModel,
@@ -458,6 +507,11 @@ public class RfcFactory extends Object {
 
 	}
 
+	public R193ReadRevenueProfile getr193(String type, String newFlag,
+			String _plant) throws Exception {
+		return new R193ReadRevenueProfile(type, newFlag, _plant);
+	}
+
 	public R197createLifecycleRow getr197(String material, String varCond,
 			String salesStatus, Date validFrom, Date validTo, String user,
 			String annDocNo, String check, String pimsIdentity, String salesOrg)
@@ -484,11 +538,6 @@ public class RfcFactory extends Object {
 				validTo, user, annDocNo, check, pimsIdentity, salesOrg);
 	}
 
-	public R207ReadPlantViewMaterial getr207(String type, String model,
-			String plant) throws Exception {
-		return new R207ReadPlantViewMaterial(type, model, plant);
-	}
-
 	public R200_readLifecycleRow getr200(String material, String varCond,
 			String annDocNo, String check, String pimsIdentity, String salesOrg)
 			throws Exception {
@@ -496,9 +545,28 @@ public class RfcFactory extends Object {
 				pimsIdentity, salesOrg);
 	}
 
+	// public R205ClassificationForBTProductsTypeMaterials getr205(
+	// TypeModel typeModel, TypeModelUPGGeo tmupg, String newFlag,
+	// String fromtotype, String typeProfRefresh, String type,
+	// String profile, String pimsIdentity) throws Exception {
+	// return new R205ClassificationForBTProductsTypeMaterials(typeModel,
+	// tmupg, newFlag, fromtotype, typeProfRefresh, type, profile,
+	// pimsIdentity);
+	// }
+
+	public R207ReadPlantViewMaterial getr207(String type, String model,
+			String plant) throws Exception {
+		return new R207ReadPlantViewMaterial(type, model, plant);
+	}
+
 	public R209ReadBasicViewOfMaterial getr209(String material)
 			throws Exception {
 		return new R209ReadBasicViewOfMaterial(material);
+	}
+
+	public R210ReadSalesBom getr210(String type, String newFlag, String _plant)
+			throws Exception {
+		return new R210ReadSalesBom(type, newFlag, _plant);
 	}
 
 	public R261PlantViewMaterial getr261(String material) throws Exception {

@@ -157,6 +157,14 @@ public abstract class RfcProxy {
 	public abstract void r135(TypeFeature typeFeature, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
+	public abstract void r136(TypeModelUPGGeo tmUPGObj, String range,
+			CHWAnnouncement chwA, String newFlag, String FromToType,
+			String pimsIdentity) throws Exception;
+
+	public abstract void r137(TypeModelUPGGeo tmUPGObj, String range,
+			CHWAnnouncement chwA, String newFlag, String FromToType,
+			String pimsIdentity) throws Exception;
+
 	public abstract void r144(String annno, String zdmstatus,
 			String pimsIdentity) throws Exception;
 
@@ -188,12 +196,21 @@ public abstract class RfcProxy {
 			TypeModelUPGGeo tmUPGObj, String newFlag, CHWAnnouncement chwA,
 			String FromToType, String pimsIdentity) throws Exception;
 
+	public abstract void r164(TypeModelUPGGeo tmUPGObj, CHWAnnouncement chwA,
+			String FromToType, String pimsIdentity) throws Exception;
+
 	public abstract void r165(CHWAnnouncement chwA, TypeModelUPGGeo tmUPGObj,
 			String FromToType, String pimsIdentity) throws Exception;
 
 	public abstract void r166(CHWAnnouncement chwA, TypeModel typeModel,
 			CHWGeoAnn chwAg, String storageLocation, String newFlag)
 			throws Exception;
+
+	public abstract void r168(TypeModelUPGGeo tmUPGObj, CHWAnnouncement chwA,
+			String FromToType, String pimsIdentity) throws Exception;
+
+	// public abstract void r169(String type, String plant, String newFlag)
+	// throws Exception;
 
 	public abstract void r171(String typemod, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
@@ -210,6 +227,9 @@ public abstract class RfcProxy {
 
 	public abstract void r177(String type, String range, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
+
+	public abstract Vector r179(String typemod, String annDocNo, String check,
+			String pimsIdentity, String salesOrg) throws Exception;
 
 	public abstract void r182(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
@@ -233,6 +253,9 @@ public abstract class RfcProxy {
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String FromToType, String pimsIdentity) throws Exception;
 
+	public abstract Vector r193(String type, String newFlag, String _plant)
+			throws Exception;
+
 	public abstract void r197(String material, String varCond,
 			String salesStatus, Date validFrom, Date validTo, String user,
 			String annDocNo, String check, String pimsIdentity, String salesOrg)
@@ -248,14 +271,21 @@ public abstract class RfcProxy {
 			String check, String pimsIdentity, String salesOrg)
 			throws Exception;
 
-	public abstract LifecycleData r200(String material, String varCond, String annDocNo,
-			String check, String pimsIdentity, String salesOrg)
+	public abstract LifecycleData r200(String material, String varCond,
+			String annDocNo, String check, String pimsIdentity, String salesOrg)
 			throws Exception;
+
+	// public abstract void r205(TypeModel typeModel, TypeModelUPGGeo tmupg,
+	// String newFlag, String fromtotype, String typeProfRefresh,
+	// String type, String profile, String pimsIdentity) throws Exception;
 
 	public abstract boolean r207(String type, String model, String plant)
 			throws Exception;
 
 	public abstract BasicMaterialFromSAP r209(String material) throws Exception;
+
+	public abstract Vector r210(String type, String newFlag, String _plant)
+			throws Exception;
 
 	public abstract Vector r261(String material) throws Exception;
 
