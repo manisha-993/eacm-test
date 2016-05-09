@@ -10,7 +10,6 @@ import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.SharedProductComponents;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.Csap_mbomStructure;
@@ -45,9 +44,12 @@ public class R142_createSalesBOM extends Rfc {
 
 	}
 
+	public int getR142ItemNumberCounter() {
+		return r142ItemNumberCounter;
+	}
+
 	public R142_createSalesBOM(String type, String sapPlant, Vector geoV,
-			String newFlag, CHWAnnouncement chwA,
-			SharedProductComponents spComponents, Hashtable spItem_Categ,
+			String newFlag, CHWAnnouncement chwA, Hashtable spItem_Categ,
 			String pimsIdentity) throws Exception {
 		reInitialize();
 
@@ -59,7 +61,7 @@ public class R142_createSalesBOM extends Rfc {
 		rfcName = "Z_DM_SAP_BOM_CREATE";
 		String itemNumber;
 
-		com.ibm.rdh.rfc.Z_DM_SAP_BOM_CREATE rfc = new com.ibm.rdh.rfc.Z_DM_SAP_BOM_CREATE();
+		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_BOM_CREATE();
 
 		// Set up the RFC fields
 		// CSAP_MBOM - N0
@@ -105,7 +107,10 @@ public class R142_createSalesBOM extends Rfc {
 				n1Row.setComponent(tmg.getType() + tmg.getModel());
 				n1Row.setCompQty("1");
 				n1Row.setRelSales("X");
-
+				//add 20160506
+				n1Row.setCompUnit("EA");
+				n1Row.setSortstring("57");
+				//add end
 				n1Row.setIdentifier("A" + Cnt);
 				Cnt++;
 				n1Table.appendRow(n1Row);
@@ -171,7 +176,10 @@ public class R142_createSalesBOM extends Rfc {
 				n1Row.setComponent(tm.getType() + tm.getModel());
 				n1Row.setCompQty("1");
 				n1Row.setRelSales("X");
-
+				//add 20160506
+				n1Row.setCompUnit("EA");
+				n1Row.setSortstring("57");
+				//add end
 				n1Row.setIdentifier("A" + Cnt);
 				Cnt++;
 				n1Table.appendRow(n1Row);
