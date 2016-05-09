@@ -52,6 +52,7 @@ import com.ibm.rdh.chw.caller.R164create300ClassificationForTypeMTC;
 import com.ibm.rdh.chw.caller.R165assignCharacteristicToMTCClass300;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R168create012ClassificationForMTC;
+import com.ibm.rdh.chw.caller.R169ReadTypeModelsFromBOM;
 import com.ibm.rdh.chw.caller.R171markTypeModelMaterialForDeletion;
 import com.ibm.rdh.chw.caller.R172deleteModelValueFromTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
@@ -411,10 +412,10 @@ public class RfcFactory extends Object {
 				FromToType, pimsIdentity);
 	}
 
-	// public R169ReadTypeModelsFromBOM getr169(String type, String plant,
-	// String newFlag) throws Exception {
-	// return new R169ReadTypeModelsFromBOM(type, plant, newFlag);
-	// }
+	public R169ReadTypeModelsFromBOM getr169(String type, String plant,
+			String newFlag) throws Exception {
+		return new R169ReadTypeModelsFromBOM(type, plant, newFlag);
+	}
 
 	public R171markTypeModelMaterialForDeletion getr171(String typemod,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {

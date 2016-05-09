@@ -57,6 +57,7 @@ import com.ibm.rdh.chw.caller.R164create300ClassificationForTypeMTC;
 import com.ibm.rdh.chw.caller.R165assignCharacteristicToMTCClass300;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R168create012ClassificationForMTC;
+import com.ibm.rdh.chw.caller.R169ReadTypeModelsFromBOM;
 import com.ibm.rdh.chw.caller.R171markTypeModelMaterialForDeletion;
 import com.ibm.rdh.chw.caller.R172deleteModelValueFromTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
@@ -645,35 +646,35 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 	}
 
-	// @Override
-	// public void r169(String type, BomComponent bCom, String plant,
-	// String newFlag) throws Exception {
-	// R169ReadTypeModelsFromBOM r = getFactory()
-	// .getr169(type, plant, newFlag);
-	// logPromoteInfoMessage(r);
-	// r.evaluate();
-	// logPromoteResultMessage(r);
-	// com.ibm.rdh.rfc.CSAP_MAT_BOM_READ rfc = r.getRfc();
-	//
-	// Stpo_api02Table stpo = rfc.getTStpo();
-	// int rows = stpo.getRowCount();
-	// for (int i = 0; i < rows; i++) {
-	// Stpo_api02TableRow stpoRow = (Stpo_api02TableRow) stpo.getRow(i);
-	//
-	// System.out.println("stpoRow.getComponent()"
-	// + stpoRow.getComponent());
-	//
-	// bCom.setItem_Categ(stpoRow.getItemCateg());
-	// bCom.setItem_No(stpoRow.getItemNo());
-	// bCom.setComponent(stpoRow.getComponent());
-	// bCom.setItem_Node(stpoRow.getItemNode());
-	// bCom.setItem_Count(stpoRow.getItemCount());
-	//
-	// String comp = bCom.getComponent();
-	// bomComponents.put(comp, bCom);
-	// }
-	// return bomComponents;
-	// }
+	@Override
+	public void r169(String type, String plant, String newFlag)
+			throws Exception {
+		R169ReadTypeModelsFromBOM r = getFactory()
+				.getr169(type, plant, newFlag);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+		com.ibm.rdh.rfc.CSAP_MAT_BOM_READ rfc = r.getRfc();
+
+		Stpo_api02Table stpo = rfc.getTStpo();
+		int rows = stpo.getRowCount();
+		for (int i = 0; i < rows; i++) {
+			Stpo_api02TableRow stpoRow = (Stpo_api02TableRow) stpo.getRow(i);
+
+			System.out.println("stpoRow.getComponent()"
+					+ stpoRow.getComponent());
+
+			// bCom.setItem_Categ(stpoRow.getItemCateg());
+			// bCom.setItem_No(stpoRow.getItemNo());
+			// bCom.setComponent(stpoRow.getComponent());
+			// bCom.setItem_Node(stpoRow.getItemNode());
+			// bCom.setItem_Count(stpoRow.getItemCount());
+			//
+			// String comp = bCom.getComponent();
+			// bomComponents.put(comp, bCom);
+		}
+		// return bomComponents;
+	}
 
 	@Override
 	public void r171(String typemod, CHWAnnouncement chwA, String pimsIdentity)
@@ -1018,7 +1019,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 		com.ibm.rdh.rfc.CSAP_MAT_BOM_READ rfc = r.getRfc();
 		Vector salesBOM = new Vector();
-		Vector _resVector = new Vector();
 		if (rfc != null) {
 			logger.info("R210ReadSalesBom is not null.");
 			Stpo_api02Table stpo = rfc.getTStpo();
@@ -1027,67 +1027,25 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 				Stpo_api02TableRow stpoRow = (Stpo_api02TableRow) stpo
 						.getRow(i);
-
 				String itemCatalog = stpoRow.getItemCateg();
 				String itemNo = stpoRow.getItemNo();
 				String component = stpoRow.getComponent();
 				BigInteger itemNode = stpoRow.getItemNode();
-
 				BigInteger itemCount = stpoRow.getItemCount();
 				String sortString = stpoRow.getSortstring();
-
 				DepData depData = new DepData(itemCatalog, itemNo, component,
 						sortString, null, null, itemNode, itemCount);
 
 				salesBOM.add(depData);
+			}
 
-			}// End of For
-
-			Csdep_datTable Csdep = rfc.getTDepData();
-			int deprows = Csdep.getRowCount();
-			Vector salesBOM1 = new Vector();
-
-			for (int i = 0; i < deprows; i++) {
-				Csdep_datTableRow CsdepRow = (Csdep_datTableRow) Csdep
-						.getRow(i);
-
-				String depIntern = CsdepRow.getDepIntern();
-				String status = CsdepRow.getStatus();
-				BigInteger itemNode = CsdepRow.getItemNode();
-				BigInteger itemCount = CsdepRow.getItemCount();
-				DepData depData = new DepData(null, null, null, null,
-						depIntern, status, itemNode, itemCount);
-				salesBOM1.add(depData);
-			}// End of For .
-
-			DepData _sBom_depData = new DepData();
-			for (int i = 0; i < salesBOM.size(); i++) {
-				_sBom_depData = (DepData) salesBOM.elementAt(i);
-
-				BigInteger _iNode = _sBom_depData.getItem_Node();
-
-				DepData _sBom_depData1 = new DepData();
-				for (int j = 0; j < salesBOM1.size(); j++) {
-					_sBom_depData1 = (DepData) salesBOM1.elementAt(j);
-					BigInteger _iNode1 = _sBom_depData1.getItem_Node();
-					if ((_iNode.toString()).equals((_iNode1.toString()))) {
-						_sBom_depData.setDep_Intern(_sBom_depData1
-								.getDep_Intern());
-						_sBom_depData.setStatus(_sBom_depData1.getStatus());
-						_sBom_depData.setItem_Node(_sBom_depData1
-								.getItem_Node());
-						_sBom_depData.setItem_Count(_sBom_depData1
-								.getItem_Count());
-						_resVector.addElement(_sBom_depData);
-					}// end if
-				}// bom1 for
-			}// End of For
-			return _resVector;
+			return salesBOM;
 		} else {
 			logger.info("R210ReadSalesBom is null.");
-			_resVector = null;
+			salesBOM = null;
+
 		}
-		return _resVector;
+		return salesBOM;
 	}
 
 	@Override
