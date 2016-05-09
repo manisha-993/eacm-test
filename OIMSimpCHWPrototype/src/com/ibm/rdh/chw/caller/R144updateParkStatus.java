@@ -97,7 +97,7 @@ public class R144updateParkStatus extends Rfc {
 		return ClassUtil.getSimpleClassName(getRfc());
 	}
 
-	private com.ibm.rdh.rfc.Z_DM_SAP_PARK_STATUS getRfc() {
+	public com.ibm.rdh.rfc.Z_DM_SAP_PARK_STATUS getRfc() {
 		return rfc;
 	}
 
