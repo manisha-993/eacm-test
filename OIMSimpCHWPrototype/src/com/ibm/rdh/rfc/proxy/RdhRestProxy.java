@@ -3,6 +3,7 @@ package com.ibm.rdh.rfc.proxy;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -43,6 +44,8 @@ import com.ibm.rdh.chw.caller.R134assignRPQTypeFeatureCharacteristicToTypeClass;
 import com.ibm.rdh.chw.caller.R135assignTypeFeatureCharacteristicToTypeUFClass;
 import com.ibm.rdh.chw.caller.R136create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R137create300ClassificationForTypeUFForMTC;
+import com.ibm.rdh.chw.caller.R142_createSalesBOM;
+import com.ibm.rdh.chw.caller.R143assignTypeModelAsSalesBOMItemWithDependencies;
 import com.ibm.rdh.chw.caller.R144updateParkStatus;
 import com.ibm.rdh.chw.caller.R150create012ClassificationForMOD;
 import com.ibm.rdh.chw.caller.R151create012ClassificationForMC;
@@ -53,11 +56,13 @@ import com.ibm.rdh.chw.caller.R157createTypeClass;
 import com.ibm.rdh.chw.caller.R159createTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
 import com.ibm.rdh.chw.caller.R162createZDMClassificationForMKFEATCONV;
+import com.ibm.rdh.chw.caller.R163createUpgradeValueForTypeMTCCharacteristic;
 import com.ibm.rdh.chw.caller.R164create300ClassificationForTypeMTC;
 import com.ibm.rdh.chw.caller.R165assignCharacteristicToMTCClass300;
 import com.ibm.rdh.chw.caller.R166createSTPPlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R168create012ClassificationForMTC;
 import com.ibm.rdh.chw.caller.R169ReadTypeModelsFromBOM;
+import com.ibm.rdh.chw.caller.R170removeTypeModelsFromBOM;
 import com.ibm.rdh.chw.caller.R171markTypeModelMaterialForDeletion;
 import com.ibm.rdh.chw.caller.R172deleteModelValueFromTypeMODCharacteristic;
 import com.ibm.rdh.chw.caller.R175create001ClassificationForMMFieldsType;
@@ -72,13 +77,19 @@ import com.ibm.rdh.chw.caller.R187DeleteTypeFeatureCharacteristicClassificationt
 import com.ibm.rdh.chw.caller.R188DeleteTypeFeatureCharacteristicClassificationtoUF;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.caller.R193ReadRevenueProfile;
+import com.ibm.rdh.chw.caller.R195DeleteRevenueProfile;
+import com.ibm.rdh.chw.caller.R196UpdateRevenueProfile;
 import com.ibm.rdh.chw.caller.R197createLifecycleRow;
 import com.ibm.rdh.chw.caller.R198updateLifecycleRow;
 import com.ibm.rdh.chw.caller.R199_deleteLifecycleRow;
 import com.ibm.rdh.chw.caller.R200_readLifecycleRow;
+import com.ibm.rdh.chw.caller.R201createUpgradeValueForTypeMCCharacteristic;
+import com.ibm.rdh.chw.caller.R204ReadMaterial;
 import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R210ReadSalesBom;
+import com.ibm.rdh.chw.caller.R214ReadMCclass;
+import com.ibm.rdh.chw.caller.R260updateProdHierarchyOnSalesView;
 import com.ibm.rdh.chw.caller.R261PlantViewMaterial;
 import com.ibm.rdh.chw.caller.R262createPlantViewProfitCenterForMaterial;
 import com.ibm.rdh.chw.caller.Rfc;
@@ -90,14 +101,14 @@ import com.ibm.rdh.chw.entity.DepData;
 import com.ibm.rdh.chw.entity.LifecycleData;
 import com.ibm.rdh.chw.entity.MaterailPlantData;
 import com.ibm.rdh.chw.entity.PlannedSalesStatus;
+
 import com.ibm.rdh.chw.entity.RevData;
+
 import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.chw.entity.TypeFeatureUPGGeo;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.BapimatdoaStructure;
-import com.ibm.rdh.rfc.Csdep_datTable;
-import com.ibm.rdh.rfc.Csdep_datTableRow;
 import com.ibm.rdh.rfc.Stpo_api02Table;
 import com.ibm.rdh.rfc.Stpo_api02TableRow;
 import com.ibm.rdh.rfc.Zdm_marc_dataTable;
@@ -120,6 +131,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	private int _sapRetryCount;
 	private long _sapRetrySleepMillis;
 	private RfcLogger rfcLogger;
+
 	protected int sapWaitOnRetry = 0;
 	protected int sapRFCRetries = 0;
 	protected IRfcConnection aConnection = null;
@@ -480,8 +492,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	public void r136(TypeModelUPGGeo tmUPGObj, String range,
 			CHWAnnouncement chwA, String newFlag, String FromToType,
 			String pimsIdentity) throws Exception {
-		// TODO Auto-generated method stub
-
 		R136create300ClassificationForTypeFEAT r = getFactory().getr136(
 				tmUPGObj, range, chwA, newFlag, FromToType, pimsIdentity);
 		logPromoteInfoMessage(r);
@@ -494,9 +504,31 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	public void r137(TypeModelUPGGeo tmUPGObj, String range,
 			CHWAnnouncement chwA, String newFlag, String FromToType,
 			String pimsIdentity) throws Exception {
-		// TODO Auto-generated method stub
 		R137create300ClassificationForTypeUFForMTC r = getFactory().getr137(
 				tmUPGObj, range, chwA, newFlag, FromToType, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r142(String type, String sapPlant, Vector geoV, String newFlag,
+			CHWAnnouncement chwA, Hashtable spItem_Categ, String pimsIdentity)
+			throws Exception {
+		R142_createSalesBOM r = getFactory().getr142(type, sapPlant, geoV,
+				newFlag, chwA, spItem_Categ, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r143(String type, String sapPlant, Vector geoV, String newFlag,
+			CHWAnnouncement chwA, Hashtable spItem_Categ, String pimsIdentity)
+			throws Exception {
+		R143assignTypeModelAsSalesBOMItemWithDependencies r = getFactory()
+				.getr143(type, sapPlant, geoV, newFlag, chwA, spItem_Categ,
+						pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
@@ -605,8 +637,19 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r163(String type, TypeModelUPGGeo typeModelUpg,
+			CHWAnnouncement chwA) throws Exception {
+		R163createUpgradeValueForTypeMTCCharacteristic r = getFactory()
+				.getr163(type, typeModelUpg, chwA);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
 	public void r164(TypeModelUPGGeo tmUPGObj, CHWAnnouncement chwA,
 			String FromToType, String pimsIdentity) throws Exception {
+
 		R164create300ClassificationForTypeMTC r = getFactory().getr164(
 				tmUPGObj, chwA, FromToType, pimsIdentity);
 		logPromoteInfoMessage(r);
@@ -649,6 +692,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	@Override
 	public void r169(String type, String plant, String newFlag)
 			throws Exception {
+
 		R169ReadTypeModelsFromBOM r = getFactory()
 				.getr169(type, plant, newFlag);
 		logPromoteInfoMessage(r);
@@ -674,6 +718,17 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 			// bomComponents.put(comp, bCom);
 		}
 		// return bomComponents;
+	}
+
+	@Override
+	public void r170(String type, Hashtable matches, String sapPlant,
+			String newFlag, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		R170removeTypeModelsFromBOM r = getFactory().getr170(type, matches,
+				sapPlant, newFlag, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
 	}
 
 	@Override
@@ -846,7 +901,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 		com.ibm.rdh.rfc.CSAP_MAT_BOM_READ rfc = r.getRfc();
 
 		Vector revProfileData = new Vector();
@@ -877,6 +931,30 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		}
 		return revProfileData;
 
+	}
+
+	@Override
+	public void r195(String type, String annDocNo, Vector revData,
+			Vector typeModelRevs, String revProfileName, String newFlag,
+			String pimsIdentity, String _plant) throws Exception {
+		R195DeleteRevenueProfile r = getFactory().getr195(type, annDocNo,
+				revData, typeModelRevs, revProfileName, newFlag, pimsIdentity,
+				_plant);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r196(String type, String annDocNo, Vector auoMaterials,
+			Vector TypeModelRevs, String revProfileName, String newFlag,
+			String pimsIdentity, String _plant) throws Exception {
+		R196UpdateRevenueProfile r = getFactory().getr196(type, annDocNo,
+				auoMaterials, TypeModelRevs, revProfileName, newFlag,
+				pimsIdentity, _plant);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
 	}
 
 	@Override
@@ -955,18 +1033,31 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		return lcd;
 	}
 
-	// @Override
-	// public void r205(TypeModel typeModel, TypeModelUPGGeo tmupg,
-	// String newFlag, String fromtotype, String typeProfRefresh,
-	// String type, String profile, String pimsIdentity) throws Exception {
-	// // TODO Auto-generated method stub
-	// R205ClassificationForBTProductsTypeMaterials r = getFactory().getr205(
-	// typeModel, tmupg, newFlag, fromtotype, typeProfRefresh, type,
-	// profile, pimsIdentity);
-	// logPromoteInfoMessage(r);
-	// r.evaluate();
-	// logPromoteResultMessage(r);
-	// }
+	@Override
+	public void r201(TypeModelUPGGeo typeModelUpg, CHWAnnouncement chwA,
+			String FROMTOTYPE, String pimsIdentity) throws Exception {
+		R201createUpgradeValueForTypeMCCharacteristic r = getFactory().getr201(
+				typeModelUpg, chwA, FROMTOTYPE, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public boolean r204(String material) throws Exception {
+		R204ReadMaterial r = getFactory().getr204(material);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+		boolean exists = false;
+		if ((r.getRfc().getReturn().getType()).equalsIgnoreCase("S")) {
+			exists = true;
+		} else {
+			exists = false;
+		}
+		return exists;
+	}
 
 	@Override
 	public boolean r207(String type, String model, String plant)
@@ -989,7 +1080,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 			}
 		} else {
 			logger.info("R207ReadPlantViewMaterial is null.");
-
 		}
 		return plantcheck;
 
@@ -1016,7 +1106,6 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
-
 		com.ibm.rdh.rfc.CSAP_MAT_BOM_READ rfc = r.getRfc();
 		Vector salesBOM = new Vector();
 		if (rfc != null) {
@@ -1041,11 +1130,39 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 			return salesBOM;
 		} else {
+
 			logger.info("R210ReadSalesBom is null.");
 			salesBOM = null;
 
 		}
 		return salesBOM;
+	}
+
+	@Override
+	public boolean r214(String type) throws Exception {
+		R214ReadMCclass r = getFactory().getr214(type);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+		boolean exists = false;
+		if ((r.getRfc().getReturn().getType()).equalsIgnoreCase("S")) {
+			exists = true;
+		} else {
+			exists = false;
+		}
+		return exists;
+	}
+
+	@Override
+	public void r260(CHWAnnouncement chwA, Object material,
+			String pimsIdentity, String salesOrg, String productHierarchy)
+			throws Exception {
+		R260updateProdHierarchyOnSalesView r = getFactory().getr260(chwA,
+				material, pimsIdentity, salesOrg, productHierarchy);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
 	}
 
 	@Override
@@ -1057,6 +1174,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		boolean plantcheck = false;
 		Vector plantData = new Vector();
 		boolean checkProfitCenterExists = false;
+
 		com.ibm.rdh.rfc.Z_DM_SAP_READ_MARC rfc = r.getRfc();
 		if (rfc != null) {
 			logger.info("R261PlantViewMaterial is not null.");
@@ -1067,15 +1185,19 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 				for (int i = 0; i < rows; i++) {
 					Zdm_marc_dataTableRow plant_row = (Zdm_marc_dataTableRow) plantvalues
 							.getRow(i);
+
 					String checkPlant = plant_row.getWerks();
+
 					checkProfitCenterExists = ProfitCenterPlantSelector
 							.checkProfitCenterPlants(checkPlant);
+
 					System.out
 							.println("Printing the value of boolean exists in the rfc R261"
 									+ checkProfitCenterExists);
 					if (checkProfitCenterExists) {
 						MaterailPlantData matplantData = new MaterailPlantData(
 								plant_row.getWerks(), plant_row.getPrctr());
+
 						plantcheck = true;
 						logger.debug("R261's plant" + plant_row.getWerks());
 						logger.debug("R261's profitcenter"
@@ -1088,6 +1210,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 				// plants = null ;
 				plantcheck = false;
 			}
+
 		} else {
 			logger.info("R261PlantViewMaterial is null.");
 		}
