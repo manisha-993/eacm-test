@@ -28,7 +28,13 @@ public class R209ReadBasicViewOfMaterial extends Rfc {
 		getRfc().execute();
 		getLog().debug(getErrorInformation());
 		if (getSeverity() == ERROR) {
-			throw new HWPIMSAbnormalException(getErrorInformation());
+			String errMsg = getErrorInformation();
+			//WebService not found, return errMsg is ""
+			if (errMsg != null && errMsg.contains("")) {
+				rfcInfo.append(errMsg);
+			} else {
+				throw new HWPIMSAbnormalException();
+			}			
 		}
 	}
 
