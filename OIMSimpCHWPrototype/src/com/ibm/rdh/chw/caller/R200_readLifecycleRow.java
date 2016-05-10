@@ -80,8 +80,8 @@ public class R200_readLifecycleRow extends Rfc {
 		getLog().debug(getErrorInformation());
 		if (getSeverity() == ERROR) {
 			String errMsg = getErrorInformation();
-			//WebService not found, return errMsg is "Material <1111LFM> not found in MARA table"
-			if (errMsg != null && errMsg.contains("not found")) {
+			//WebService not found, return errMsg is "No rows were found to match search criteria."
+			if (errMsg != null && errMsg.contains("No rows were found")) {
 				
 			} else {
 				throw new HWPIMSAbnormalException();
