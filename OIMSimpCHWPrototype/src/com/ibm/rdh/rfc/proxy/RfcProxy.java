@@ -25,6 +25,7 @@ import java.util.Hashtable;
 import java.util.Vector;
 
 import com.ibm.rdh.chw.entity.BasicMaterialFromSAP;
+import com.ibm.rdh.chw.entity.BomComponent;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.LifecycleData;
@@ -222,8 +223,8 @@ public abstract class RfcProxy {
 	public abstract void r168(TypeModelUPGGeo tmUPGObj, CHWAnnouncement chwA,
 			String FromToType, String pimsIdentity) throws Exception;
 
-	public abstract void r169(String type, String plant, String newFlag)
-			throws Exception;
+	public abstract Hashtable r169(String type, BomComponent bCom,
+			String plant, String newFlag) throws Exception;
 
 	public abstract void r170(String type, Hashtable matches, String sapPlant,
 			String newFlag, CHWAnnouncement chwA, String pimsIdentity)

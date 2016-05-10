@@ -97,15 +97,14 @@ import com.ibm.rdh.chw.caller.R262createPlantViewProfitCenterForMaterial;
 import com.ibm.rdh.chw.caller.Rfc;
 import com.ibm.rdh.chw.caller.RfcReturnSeverityCodes;
 import com.ibm.rdh.chw.entity.BasicMaterialFromSAP;
+import com.ibm.rdh.chw.entity.BomComponent;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.DepData;
 import com.ibm.rdh.chw.entity.LifecycleData;
 import com.ibm.rdh.chw.entity.MaterailPlantData;
 import com.ibm.rdh.chw.entity.PlannedSalesStatus;
-
 import com.ibm.rdh.chw.entity.RevData;
-
 import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.chw.entity.TypeFeatureUPGGeo;
 import com.ibm.rdh.chw.entity.TypeModel;
@@ -692,8 +691,8 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
-	public void r169(String type, String plant, String newFlag)
-			throws Exception {
+	public Hashtable r169(String type, BomComponent bCom, String plant,
+			String newFlag) throws Exception {
 
 		R169ReadTypeModelsFromBOM r = getFactory()
 				.getr169(type, plant, newFlag);
@@ -701,25 +700,28 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		r.evaluate();
 		logPromoteResultMessage(r);
 		com.ibm.rdh.rfc.CSAP_MAT_BOM_READ rfc = r.getRfc();
+		Hashtable bomComponents = new Hashtable();
+		if (rfc != null) {
+			logger.info("R169ReadTypeModelsFromBOM is not null.");
+			Stpo_api02Table stpo = rfc.getTStpo();
+			int rows = stpo.getRowCount();
+			for (int i = 0; i < rows; i++) {
+				Stpo_api02TableRow stpoRow = (Stpo_api02TableRow) stpo
+						.getRow(i);
 
-		Stpo_api02Table stpo = rfc.getTStpo();
-		int rows = stpo.getRowCount();
-		for (int i = 0; i < rows; i++) {
-			Stpo_api02TableRow stpoRow = (Stpo_api02TableRow) stpo.getRow(i);
-
-			System.out.println("stpoRow.getComponent()"
-					+ stpoRow.getComponent());
-
-			// bCom.setItem_Categ(stpoRow.getItemCateg());
-			// bCom.setItem_No(stpoRow.getItemNo());
-			// bCom.setComponent(stpoRow.getComponent());
-			// bCom.setItem_Node(stpoRow.getItemNode());
-			// bCom.setItem_Count(stpoRow.getItemCount());
-			//
-			// String comp = bCom.getComponent();
-			// bomComponents.put(comp, bCom);
+				bCom.setItem_Categ(stpoRow.getItemCateg());
+				bCom.setItem_No(stpoRow.getItemNo());
+				bCom.setComponent(stpoRow.getComponent());
+				bCom.setItem_Node(stpoRow.getItemNode());
+				bCom.setItem_Count(stpoRow.getItemCount());
+				String comp = bCom.getComponent();
+				bomComponents.put(comp, bCom);
+			}
+			return bomComponents;
+		} else {
+			logger.info("R169ReadTypeModelsFromBOM is null.");
 		}
-		// return bomComponents;
+		return bomComponents;
 	}
 
 	@Override
