@@ -83,6 +83,8 @@ import com.ibm.rdh.chw.caller.R204ReadMaterial;
 import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R210ReadSalesBom;
+import com.ibm.rdh.chw.caller.R212DeleteSalesBOMfortypeMTC;
+import com.ibm.rdh.chw.caller.R213UpdateSalesBOMItemWithtypeMTC;
 import com.ibm.rdh.chw.caller.R214ReadMCclass;
 import com.ibm.rdh.chw.caller.R260updateProdHierarchyOnSalesView;
 import com.ibm.rdh.chw.caller.R261PlantViewMaterial;
@@ -628,6 +630,20 @@ public class RfcFactory extends Object {
 			throws Exception {
 
 		return new R210ReadSalesBom(type, newFlag, _plant);
+	}
+
+	public R212DeleteSalesBOMfortypeMTC getr212(String type, String sapPlant,
+			Vector componentstoDeleteTypeMTC, String newFlag,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		return new R212DeleteSalesBOMfortypeMTC(type, sapPlant,
+				componentstoDeleteTypeMTC, newFlag, chwA, pimsIdentity);
+	}
+
+	public R213UpdateSalesBOMItemWithtypeMTC getr213(String type, String sapPlant,
+			Vector geoV, String newFlag, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		return new R213UpdateSalesBOMItemWithtypeMTC(type, sapPlant, geoV,
+				newFlag, chwA, pimsIdentity);
 	}
 
 	public R214ReadMCclass getr214(String type) throws Exception {

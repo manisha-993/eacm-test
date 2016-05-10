@@ -88,6 +88,8 @@ import com.ibm.rdh.chw.caller.R204ReadMaterial;
 import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R210ReadSalesBom;
+import com.ibm.rdh.chw.caller.R212DeleteSalesBOMfortypeMTC;
+import com.ibm.rdh.chw.caller.R213UpdateSalesBOMItemWithtypeMTC;
 import com.ibm.rdh.chw.caller.R214ReadMCclass;
 import com.ibm.rdh.chw.caller.R260updateProdHierarchyOnSalesView;
 import com.ibm.rdh.chw.caller.R261PlantViewMaterial;
@@ -1136,6 +1138,27 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 		}
 		return salesBOM;
+	}
+
+	@Override
+	public void r212(String type, String sapPlant,
+			Vector componentstoDeleteTypeMTC, String newFlag,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		R212DeleteSalesBOMfortypeMTC r = getFactory().getr212(type, sapPlant,
+				componentstoDeleteTypeMTC, newFlag, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r213(String type, String sapPlant, Vector geoV, String newFlag,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		R213UpdateSalesBOMItemWithtypeMTC r = getFactory().getr213(type,
+				sapPlant, geoV, newFlag, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
 	}
 
 	@Override

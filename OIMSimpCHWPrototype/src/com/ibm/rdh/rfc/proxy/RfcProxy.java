@@ -315,6 +315,14 @@ public abstract class RfcProxy {
 	public abstract Vector r210(String type, String newFlag, String _plant)
 			throws Exception;
 
+	public abstract void r212(String type, String sapPlant,
+			Vector componentstoDeleteTypeMTC, String newFlag,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
+
+	public abstract void r213(String type, String sapPlant, Vector geoV,
+			String newFlag, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception;
+
 	public abstract boolean r214(String type) throws Exception;
 
 	public abstract void r260(CHWAnnouncement chwA, Object material,
