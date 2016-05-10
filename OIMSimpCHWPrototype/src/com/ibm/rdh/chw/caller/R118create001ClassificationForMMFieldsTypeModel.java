@@ -156,10 +156,10 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 		// ("REVENUEPROFILE"+typeModel.getTmRev().getRevProfile().getRevenueProfile());
 		r6Row.setCharact("MM_BTPRODUCTS");
 		//waiting new entity RFAPROFILE 
-//		if (typeModel.getTmRev().getRevProfile() != null) {
+//		if (typeModel.getRevProfile() != null) {
 //			r6Row.setValue("PROCESS4");
 //		} else {
-//			r6Row.setValue("");
+			r6Row.setValue("");
 //		}
 
 		r6Vector.addElement(r6Row);
