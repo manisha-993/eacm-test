@@ -124,45 +124,46 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 
 		if (typeModel.getCustomerSetup()) {
 			r6Row.setValue("CSU");
+			r6Vector.addElement(r6Row);
 		} else {
 			r6Row.setValue("");
 		}
-
-		r6Vector.addElement(r6Row);
 
 		r6Row = r6Table.createEmptyRow();
 
 		r6Row.setCharact("MM_MODEL_PROPERTIES");
 		if (typeModel.getLicenseCode()) {
 			r6Row.setValue("LIC");
+			r6Vector.addElement(r6Row);
 		} else {
 			r6Row.setValue("");
 		}
-
-		r6Vector.addElement(r6Row);
 		
 		r6Row = r6Table.createEmptyRow();
 
 		r6Row.setCharact("MM_MODEL_PROPERTIES");
-		if (typeModel.getSystemType() == null) {
+		String systemType=typeModel.getSystemType();
+		if (systemType == null||systemType.trim().equals("")) {
 			r6Row.setValue("");
 		} else {
-			r6Row.setValue(typeModel.getSystemType());
+			r6Row.setValue(systemType);
+			r6Vector.addElement(r6Row);
 		}
 
-		r6Vector.addElement(r6Row);
+		
 
 		r6Row = r6Table.createEmptyRow();
 		// ("REVENUEPROFILE"+typeModel.getTmRev().getRevProfile().getRevenueProfile());
 		r6Row.setCharact("MM_BTPRODUCTS");
 		//waiting new entity RFAPROFILE 
 //		if (typeModel.getRevProfile() != null) {
-//			r6Row.setValue("PROCESS4");
+//			r6Row.setValue("PROCESS4");	
 //		} else {
-			r6Row.setValue("");
+//			r6Row.setValue("");
 //		}
-
+		r6Row.setValue("PROCESS4");
 		r6Vector.addElement(r6Row);
+		
 
 		// GsaLegal changes start
 		if ((flfilcd != null && flfilcd.equalsIgnoreCase("XCC"))
