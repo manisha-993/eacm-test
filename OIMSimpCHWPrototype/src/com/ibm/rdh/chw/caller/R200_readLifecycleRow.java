@@ -1,7 +1,6 @@
 package com.ibm.rdh.chw.caller;
 
 import java.text.SimpleDateFormat;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
@@ -12,7 +11,7 @@ import com.ibm.rdh.rfc.ZdmchwplcTableRow;
 
 public class R200_readLifecycleRow extends Rfc {
 	private com.ibm.rdh.rfc.Z_DM_SAP_CHW_PRODUCT_CYCLE rfc;
-		
+
 	public R200_readLifecycleRow(String material, String varCond,
 			String annDocNo, String check, String pimsIdentity, String salesOrg)
 			throws Exception {
@@ -80,10 +79,16 @@ public class R200_readLifecycleRow extends Rfc {
 		getRfc().execute();
 		getLog().debug(getErrorInformation());
 		if (getSeverity() == ERROR) {
-			throw new HWPIMSAbnormalException(getErrorInformation());
+			String errMsg = getErrorInformation();
+			//WebService not found, return errMsg is "Material <1111LFM> not found in MARA table"
+			if (errMsg != null && errMsg.contains("not found")) {
+				
+			} else {
+				throw new HWPIMSAbnormalException();
+			}
 		}
 	}
-	
+
 	@Override
 	public String getTaskDescription() {
 		StringBuffer sb = new StringBuffer();

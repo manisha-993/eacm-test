@@ -7,7 +7,6 @@ import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.KlahTable;
 import com.ibm.rdh.rfc.KlahTableRow;

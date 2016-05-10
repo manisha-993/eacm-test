@@ -41,13 +41,13 @@ public class R179ReadPlannedChangeForTypeModelMaterial extends Rfc {
 		rfcInfo.append("OBJECTKEY \n");
 		rfcInfo.append(Tab + "MATNR>>" + r0Row.getMatnr() + ", VKORG>>"
 				+ r0Row.getVkorg() + ", VTWEG>>" + r0Row.getVtweg() + "\n");
-		
-		//not set in old code
+
+		// not set in old code
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-		zdmRow.setZClass("MD_CSW_NA");
+		zdmRow.setZClass("MD_CHW_NA");
 
 		zdmTable.appendRow(zdmRow);
 
@@ -55,6 +55,8 @@ public class R179ReadPlannedChangeForTypeModelMaterial extends Rfc {
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
+		//end
+		
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + rfc.getPimsIdentity() + "\n");
