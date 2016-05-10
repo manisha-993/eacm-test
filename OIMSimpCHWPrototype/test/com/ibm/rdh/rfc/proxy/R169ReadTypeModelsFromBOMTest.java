@@ -1,8 +1,6 @@
 package com.ibm.rdh.rfc.proxy;
 
 import java.math.BigInteger;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
@@ -11,9 +9,9 @@ import org.junit.Test;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
-import com.ibm.rdh.chw.entity.DepData;
+import com.ibm.rdh.chw.entity.BomComponent;
 
-public class R210ReadSalesBomTest extends RdhRestProxyTest {
+public class R169ReadTypeModelsFromBOMTest extends RdhRestProxyTest {
 
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
@@ -38,20 +36,18 @@ public class R210ReadSalesBomTest extends RdhRestProxyTest {
 	}
 
 	@Test
-	public void r210() {
+	public void r169() {
 		try {
 			String type = "EACM";
 			String newFlag = "NEW";
-			String _plant = "1222";
-			Vector salesBOM = new Vector();
+			String plant = "1222";
+			BomComponent bCom = new BomComponent();
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			salesBOM = rfcProxy.r210(type, newFlag, _plant);
-
-			DepData depData = (DepData) salesBOM.get(0);
+			rfcProxy.r169(type, bCom, plant, newFlag);
 			BigInteger itemNode = new BigInteger("10000000");
 			BigInteger itemCount = new BigInteger("10000001");
-			assertEquals(itemNode, depData.getItem_Node());
-			assertEquals(itemCount, depData.getItem_Count());
+			assertEquals(itemNode, bCom.getItem_Node());
+			assertEquals(itemCount, bCom.getItem_Count());
 
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());

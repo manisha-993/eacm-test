@@ -11,7 +11,6 @@ import org.junit.Test;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
-import com.ibm.rdh.chw.entity.DepData;
 import com.ibm.rdh.chw.entity.RevData;
 
 public class R193ReadRevenueProfileTest extends RdhRestProxyTest {
