@@ -1,9 +1,13 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
+import java.io.IOException;
+import java.rmi.RemoteException;
 import java.sql.SQLException;
 
+import COM.ibm.eannounce.objects.EANBusinessRuleException;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
 import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
 
 
 public class RfcAbrFactory {
@@ -14,7 +18,7 @@ public class RfcAbrFactory {
 	
 	private RFCABRSTATUS rfcAbrStatus;
 	
-	public RfcAbr getRfcTypeAbr(String entityType) throws RfcAbrException, MiddlewareRequestException, SQLException, MiddlewareException {
+	public RfcAbr getRfcTypeAbr(String entityType) throws RfcAbrException, MiddlewareRequestException, SQLException, MiddlewareException, RemoteException, EANBusinessRuleException, IOException, MiddlewareShutdownInProgressException {
 		if(rfcAbrStatus == null) {
 			throw new RfcAbrException("Did not set RFCABRSTATUS instance to RfcAbrFactory");
 		}

@@ -1,17 +1,23 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
+import java.io.IOException;
+import java.rmi.RemoteException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
 import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
 import COM.ibm.eannounce.objects.AttributeChangeHistoryItem;
 import COM.ibm.eannounce.objects.EANAttribute;
+import COM.ibm.eannounce.objects.EANBusinessRuleException;
+import COM.ibm.eannounce.objects.EANEntity;
 import COM.ibm.eannounce.objects.EntityGroup;
 import COM.ibm.eannounce.objects.EntityItem;
 import COM.ibm.eannounce.objects.EntityList;
@@ -19,12 +25,14 @@ import COM.ibm.eannounce.objects.ExtractActionItem;
 import COM.ibm.opicmpdh.middleware.Database;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
 import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
+import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
 import COM.ibm.opicmpdh.middleware.Profile;
+import COM.ibm.opicmpdh.transactions.NLSItem;
 
+import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.pprds.epimshw.util.DateUtility;
-import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.DepData;
 import com.ibm.rdh.chw.entity.LifecycleData;
 import com.ibm.rdh.rfc.proxy.RdhRestProxy;
@@ -34,10 +42,15 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 	
 	public static final String LOCAL_REAL_PATH = "./properties/dev";
 	
+	public static final String STRING_SEPARATOR = "|";
+	
 	public static final String MACHTYPE_PROMOTED = "PRYES";
+	
+	public static final String ROLE_CODE = "BHFEED";
 	
 	protected static final String STATUS_PASSED = "0030";
 	protected static final String RFCABRSTATUS = "RFCABRSTATUS";
+	protected static final String PLANNEDAVAIL = "146";
 	
 	protected String m_strEpoch = "1980-01-01-00.00.00.000000";
 	
@@ -46,6 +59,36 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 	/*
 	 * Check required attribute for entities when call getAttribute() method
 	 */
+	private static final String PRIMARY_FC = "100";
+	private static final String SECONDARY_FC = "110";
+	protected static final Set FCTYPE_SET;
+	static{
+		FCTYPE_SET = new HashSet();
+		FCTYPE_SET.add(PRIMARY_FC);
+		FCTYPE_SET.add(SECONDARY_FC);
+	}
+	
+	protected static final Hashtable READ_LANGS_TBL;
+	
+	static {
+        READ_LANGS_TBL = new Hashtable();
+        // fill in with all languages defined in profile, actual languages used is based on properties file
+        READ_LANGS_TBL.put(""+Profile.ENGLISH_LANGUAGE.getNLSID(), Profile.ENGLISH_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.GERMAN_LANGUAGE.getNLSID(), Profile.GERMAN_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.ITALIAN_LANGUAGE.getNLSID(), Profile.ITALIAN_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.JAPANESE_LANGUAGE.getNLSID(), Profile.JAPANESE_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.FRENCH_LANGUAGE.getNLSID(), Profile.FRENCH_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.SPANISH_LANGUAGE.getNLSID(), Profile.SPANISH_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.UK_ENGLISH_LANGUAGE.getNLSID(), Profile.UK_ENGLISH_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.KOREAN_LANGUAGE.getNLSID(), Profile.KOREAN_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.CHINESE_LANGUAGE.getNLSID(), Profile.CHINESE_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.FRENCH_CANADIAN_LANGUAGE.getNLSID(), Profile.FRENCH_CANADIAN_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.CHINESE_SIMPLIFIED_LANGUAGE.getNLSID(), Profile.CHINESE_SIMPLIFIED_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.SPANISH_LATINAMERICAN_LANGUAGE.getNLSID(), Profile.SPANISH_LATINAMERICAN_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.PORTUGUESE_BRAZILIAN_LANGUAGE.getNLSID(), Profile.PORTUGUESE_BRAZILIAN_LANGUAGE);
+
+	}
+	
 	private static Vector<String> modelRequiredAttrsVct = new Vector<String>();
 	private static Vector<String> annRequiredAttrsVct = new Vector<String>();
 	private static Hashtable<String, Vector<String>> requiredTypeAttrsTbl = new Hashtable<String, Vector<String>>();
@@ -67,11 +110,12 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 	protected EntityList entityList;
 	protected ConfigManager configManager;
 	
-	public RfcAbrAdapter(RFCABRSTATUS rfcAbrStatus) throws MiddlewareRequestException, SQLException, MiddlewareException {
+	public RfcAbrAdapter(RFCABRSTATUS rfcAbrStatus) throws MiddlewareRequestException, SQLException, MiddlewareException, RemoteException, EANBusinessRuleException, IOException, MiddlewareShutdownInProgressException {
 		abr = rfcAbrStatus;
 		rdhRestProxy = new RdhRestProxy(new BasicRfcLogger(rfcAbrStatus));
 	
-		entityList = getEntityList(abr.getDatabase(), abr.getProfile(), getVeName(), abr.getEntityType(), abr.getEntityID());
+		Profile proFile = switchRole(ROLE_CODE);
+		entityList = getEntityList(abr.getDatabase(), proFile, getVeName(), abr.getEntityType(), abr.getEntityID());
 		abr.addDebug("EntityList for " + abr.getProfile().getValOn() + " extract " + getVeName() + " contains the following entities: \n" +
                 PokUtils.outputList(entityList));
 		
@@ -90,6 +134,39 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 		EntityList list = m_db.getEntityList(prof, new ExtractActionItem(null, m_db, prof, veName), 
 				new EntityItem[] { new EntityItem(null,	prof, entityType, entityId) });
 		return list;
+	}
+	
+	// role must have access to all attributes
+	protected Profile switchRole(String roleCode)
+			throws COM.ibm.eannounce.objects.EANBusinessRuleException,
+			java.sql.SQLException,
+			COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
+			COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
+			java.rmi.RemoteException, IOException,
+			COM.ibm.opicmpdh.middleware.MiddlewareException,
+			COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException {
+		Profile profile2 = abr.getProfile().getProfileForRoleCode(abr.getDatabase(), roleCode,
+				roleCode, 1);
+		if (profile2 == null) {
+			abr.addDebug("Could not switch to " + roleCode + " role");
+		} else {
+			abr.addDebug("Switched role from " + abr.getProfile().getRoleCode() + " to "
+					+ profile2.getRoleCode());
+
+			String nlsids = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties
+					.getNLSIDs(abr.getABRItem().getABRCode());
+			abr.addDebug("switchRole nlsids: " + nlsids);
+			StringTokenizer st1 = new StringTokenizer(nlsids, ",");
+			while (st1.hasMoreTokens()) {
+				String nlsid = st1.nextToken();
+				NLSItem nlsitem = (NLSItem) READ_LANGS_TBL.get(nlsid);
+				if (!profile2.getReadLanguages().contains(nlsitem)) {
+					profile2.getReadLanguages().addElement(nlsitem); // this is really cheating
+					abr.addDebug("added nlsitem " + nlsitem + " to new prof");
+				}
+			}
+		}
+		return profile2;
 	}
 	
 	protected EntityList getEntityList(Profile prof) throws MiddlewareRequestException, SQLException, MiddlewareException {
@@ -118,6 +195,23 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 		return entityItems;
 	}
 	
+	protected List<EntityItem> getLinkedRelator(EntityItem entityItem, String linkType) {
+		List<EntityItem> items = new ArrayList<>();
+		for (int i = 0; i < entityItem.getUpLinkCount(); i++) {
+			EANEntity entityLink = entityItem.getUpLink(i);
+			if (entityLink.getEntityType().equals(linkType)) {
+				items.add((EntityItem) entityLink);
+			}
+		}
+		for (int i = 0; i < entityItem.getDownLinkCount(); i++) {
+			EANEntity entityLink = entityItem.getDownLink(i);
+			if (entityLink.getEntityType().equals(linkType)) {
+				items.add((EntityItem) entityLink);
+			}
+		}
+		return items;
+	}
+	
 	/**
 	 * Get the current Flag code Value for the specified attribute, null if not set
 	 *
@@ -134,6 +228,9 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 				throw new RfcAbrException("For entity:" + item.getKey() + ", " + attrCode + " value can not be empty" );
 			}
 		}
+		if (attrValue == null) {
+			attrValue = "";
+		}
 		return attrValue;
 	}
 		 
@@ -148,9 +245,21 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 		return attrValue;
 	}
 	
-	protected Vector getMultiAttributeValue(EntityItem item, String attrCode) throws RfcAbrException {
+	protected Vector getAttributeMultiValue(EntityItem item, String attrCode) throws RfcAbrException {
 		Vector attrValues = new Vector();
 		String attrValue = getAttributeValue(item, attrCode);
+		if (attrValue != null) {
+			StringTokenizer st = new StringTokenizer(attrValue, PokUtils.DELIMITER);
+			while(st.hasMoreTokens()){	
+				attrValues.add(st.nextToken());
+			}
+		}
+		return attrValues;
+	}
+	
+	protected Vector getAttributeMultiFlagValue(EntityItem item, String attrCode) throws RfcAbrException {
+		Vector attrValues = new Vector();
+		String attrValue = getAttributeFlagValue(item, attrCode);
 		if (attrValue != null) {
 			StringTokenizer st = new StringTokenizer(attrValue, PokUtils.DELIMITER);
 			while(st.hasMoreTokens()){	
@@ -164,20 +273,6 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 		abr.setFlagValue(strAttributeCode, strAttributeValue, item);
 	}
 	
-	protected boolean isDiff(EntityItem t1Item, EntityItem t2Item, Vector<String> attrList) throws RfcAbrException {
-		if (t1Item == null && t2Item != null) {
-			return true;
-		}
-		if (attrList != null && attrList.size() > 0) {
-			for (String attr : attrList) {
-				if (!getAttributeValue(t1Item, attr).equals(getAttributeValue(t1Item, attr))) {
-					return true;
-				}
-			}
-		}		
-		return false;
-	}
-	
 	protected AttributeChangeHistoryGroup getAttributeHistory(EntityItem item, String attrCode) throws MiddlewareRequestException {
 		EANAttribute att = item.getAttribute(attrCode);
         if (att != null) {
@@ -187,6 +282,18 @@ public abstract class RfcAbrAdapter implements RfcAbr {
             return null;
         }	
 	}
+	
+	protected boolean isDiff(EntityItem t1Item, EntityItem t2Item, List<String> attrList) throws RfcAbrException {		
+		for (String attr : attrList) {
+			String value1 = getAttributeValue(t1Item, attr);
+			String value2 = getAttributeValue(t1Item, attr);
+			if (!value1.equals(value2)) {
+				abr.addDebug(t1Item.getKey() + " Attribute " + attr + " value " + value1 + " is different with " + t2Item.getKey() + " value " + value2);
+				return true;
+			}
+		}				
+		return false;
+	}	
 	
 	/**
      * checking whether has passed queue in RFCABRSTATUS
@@ -252,6 +359,23 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 		return Integer.toString(abr.getProfile().getOPWGID());
 	}
 	
+	/**
+	 * Get same entity item at t1
+	 * @param t1ItemS
+	 * @param t2Item
+	 * @return
+	 */
+	protected EntityItem getEntityItemAtT1(EntityItem[] t1ItemS, EntityItem t2Item) {
+		if (t1ItemS != null && t1ItemS.length > 0) {
+			for (EntityItem item : t1ItemS) {
+				if (item.getKey().equals(t2Item.getKey())) {
+					return item;
+				}
+			}
+		}
+		return null;
+	}
+	
 	protected void updateAnnLifecyle(String varCond, String material,
 			Date annDate, String annDocNo, String announcement,
 			String pimsIdentity, String salesOrg) throws Exception {
@@ -275,16 +399,23 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 		if (!announcement.equals("MIG")) {
 			// Checked with Rupal, Please use OPENID from the PDH that represents user id in EACM. OPENID is entityid for OPWG. OPWG.NAME. I am not sure what is it used for but we can use that.
 			String user = getOpwgId();
-			
-			lcd = rdhRestProxy.r200(material, varCond, annDocNo, "ann", pimsIdentity, salesOrg);
+//			try {
+				lcd = rdhRestProxy.r200(material, varCond, annDocNo, "ann", pimsIdentity, salesOrg);
+				abr.addDebug("Call R200 successfully");
+//			} catch (HWPIMSAbnormalException e) {
+//				lcd = new LifecycleData();
+//			}
 
 			if (lcd.getPreAnnounceValidFrom() == null && lcd.getAnnounceValidFrom() == null && lcd.getWdfmValidFrom() == null) {
-				// New object
+				// New object				
 				if (DateUtility.isAfterToday(annDate)) {
 					rdhRestProxy.r197(material, varCond, PREANNOUNCE, today, DateUtility.getDateMinusOne(annDate), user, annDocNo, "ann", pimsIdentity, salesOrg);
+					abr.addDebug("Call R197 successfully for PREANNOUNCE");
 					rdhRestProxy.r197(material, varCond, ANNOUNCE, annDate, DateUtility.getInfinityDate(), user, annDocNo, "ann", pimsIdentity, salesOrg);
+					abr.addDebug("Call R197 successfully for ANNOUNCE");
 				} else { //  today or before
 					rdhRestProxy.r197(material, varCond, ANNOUNCE, annDate, DateUtility.getInfinityDate(), user, annDocNo, "ann", pimsIdentity, salesOrg);
+					abr.addDebug("Call R197 successfully for ANNOUNCE");
 				}
 			} else { // Already exists
 				// Note that this does handle rare case that pre-ann is not null
@@ -293,10 +424,13 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 				if (lcd.getPreAnnounceValidFrom() != null && (lcd.getAnnounceValidFrom() == null || DateUtility.isSameDay(annDate, lcd.getAnnounceValidFrom()) == false)) {
 					if (DateUtility.dateIsTodayOrBefore(annDate, lcd.getPreAnnounceValidFrom())) { // AnnDate <= PreAnn Valid From
 						rdhRestProxy.r199(material, varCond, PREANNOUNCE, lcd.getPreAnnounceValidTo(), user, annDocNo, "ann", pimsIdentity, salesOrg);
+						abr.addDebug("Call R199 successfully for PREANNOUNCE");
 					} else {
 						// Update PreAnn status valid to date to AnnDate
 						rdhRestProxy.r199(material, varCond, PREANNOUNCE, lcd.getPreAnnounceValidTo(), user, annDocNo, "ann", pimsIdentity, salesOrg);
+						abr.addDebug("Call R199 successfully for PREANNOUNCE");
 						rdhRestProxy.r197(material, varCond, PREANNOUNCE, lcd.getPreAnnounceValidFrom(), DateUtility.getDateMinusOne(annDate), user, annDocNo, "ann", pimsIdentity, salesOrg);
+						abr.addDebug("Call R197 successfully for PREANNOUNCE");
 					}
 				}
 				if (!DateUtility.isSameDay(lcd.getAnnounceValidFrom(), annDate)) {
@@ -310,15 +444,52 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 							annValidTo = DateUtility.getInfinityDate();
 						}
 						rdhRestProxy.r197(material, varCond, ANNOUNCE, annDate, annValidTo, user, annDocNo, "ann", pimsIdentity, salesOrg);
+						abr.addDebug("Call R197 successfully for ANNOUNCE");
 					} else {
 						rdhRestProxy.r198(material, varCond, ANNOUNCE, annDate, lcd.getAnnounceValidTo(), user, annDocNo, "ann", pimsIdentity, salesOrg);
+						abr.addDebug("Call R198 successfully for ANNOUNCE");
 					}
 					if (DateUtility.isAfterToday(annDate) && lcd.getPreAnnounceValidFrom() == null) {
 						rdhRestProxy.r197(material, varCond, PREANNOUNCE, today, DateUtility.getDateMinusOne(annDate), user, annDocNo, "ann", pimsIdentity, salesOrg);
+						abr.addDebug("Call R197 successfully for PREANNOUNCE");
 					}
 				}
 			}
 		}
+	}
+	
+	protected List<SalesOrgPlants> getAllSalesorgPlants(Vector generalareaVct) throws RfcAbrException {
+		List<SalesOrgPlants> salesorgPlantsVect = new ArrayList<>();			
+		for (int i = 0; i < generalareaVct.size(); i++) {
+			EntityItem generalarea = (EntityItem)generalareaVct.get(i);
+			String salesOrg = getAttributeValue(generalarea, "SLEORG");
+			if (salesOrg != null && !"".equals(salesOrg)) {
+				SalesOrgPlants salesorgPlants = new SalesOrgPlants();
+//				salesorgPlants.setCountryCode(getAttributeValue(generalarea, "GENAREACODE"));
+				salesorgPlants.setCountryList(getAttributeValue(generalarea, "GENAREANAME"));
+				salesorgPlants.setGeo(getAttributeValue(generalarea, "GENAREAPARENT")); // 
+				salesorgPlants.setSalesorg(salesOrg);
+				salesorgPlants.setPlants(getAttributeMultiFlagValue(generalarea, "CBSLEGACYPLNTCD"));
+				salesorgPlantsVect.add(salesorgPlants);
+			} else {
+				abr.addDebug("SalesOrg value is null for " + generalarea.getKey());
+			}		
+		}
+		return salesorgPlantsVect;		
+	}
+	
+	protected Set<String> getAllPlants(List<SalesOrgPlants> salesorgPlantsVect) {
+		Set<String> plants = new HashSet<>();			
+		for (SalesOrgPlants salesorgPlants : salesorgPlantsVect) {
+			Vector<String> tmpPlants = salesorgPlants.getPlants();			
+			for (String plant : tmpPlants) {
+				plants.add(plant);
+			}
+			if (tmpPlants.size() == 0) {
+				abr.addDebug("No plant found for country code： " + salesorgPlants.getCountryList());
+			}				
+		}			
+		return plants;		
 	}
 	
 //	protected void updateMtcBomType(String mtcBomType, CHWAnnouncement announcement, String pimsIdentity) {
@@ -376,8 +547,33 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 //		}
 //	}
 	
-	private Vector getComponentsintypeMTCwithtypeNEW(Vector typeModelDeleted,
-			Vector hashtypemodelbom) {
+	/**
+	 * Re: Question for RFC call r117 05/06/2016 08:48 PM
+	 * Here's the mapping we can use PDHDOMAIN for this.
+		This field stores the name of the business unit where the  revenue will be allocated if the product is sold. Select the appropriate value from the list.
+		    Examples: 
+		" AS4 i-Series
+		" RS6 p-Series
+		" LSC z-Series
+		    This field is sent to MMLC.
+	 * @param ann
+	 * @return
+	 * @throws RfcAbrException 
+	 */
+	protected String getSegmentAcronymForAnn(EntityItem ann) throws RfcAbrException {
+		String segmentAcronym = "";
+		String domain = getAttributeValue(ann, "PDHDOMAIN");
+		if ("iSeries".equals(domain)) {
+			segmentAcronym = "AS4";
+		} else if ("pSeries".equals(domain)) {
+			segmentAcronym = "RS6";
+		} else if ("zSeries".equals(domain)) {
+			segmentAcronym = "LSC";
+		}
+		return segmentAcronym;
+	}
+	
+	private Vector getComponentsintypeMTCwithtypeNEW(Vector typeModelDeleted, Vector hashtypemodelbom) {
 
 		Vector notmatch = new Vector();
 		Vector vect1 = new Vector();
