@@ -102,7 +102,7 @@ public class R121createModelSelectionDependency extends Rfc {
 	@Override
 	public void execute() throws Exception {
 		logExecution();
-		getRfc().execute(null);//wait finsih
+		getRfc().execute();
 		getLog().debug(getErrorInformation());
 		if (getSeverity() == ERROR) {
 			throw new HWPIMSAbnormalException(getErrorInformation());
