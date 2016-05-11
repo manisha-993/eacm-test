@@ -73,7 +73,7 @@ public class R102createSalesViewforMaterial extends Rfc {
 		rfcInfo.append("BMM00 \n");
 		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
 				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
-				+ ", MTART>>" + b0Row.getMtart() + ", XEIV4>>"
+				+ ", MTART>>" + b0Row.getMtart() + ", XEIV1>>"
 				+ b0Row.getXeiv1() + ", XEIV2>>" + b0Row.getXeiv2()
 				+ ", VKORG>>" + b0Row.getVkorg() + ", VTWEG>>"
 				+ b0Row.getVtweg() + "\n");
@@ -122,20 +122,24 @@ public class R102createSalesViewforMaterial extends Rfc {
 
 		b1Row.setAumng("1");
 
-		// add 6 set value, In the previous epimshw code 
+		// add 6 set value, In the previous epimshw code
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setMatkl("000");
-		b1Row.setSpart(typeModel.getDiv()); // RQ0724066720 changes
+		b1Row.setSpart(typeModel.getDiv());
 		b1Row.setZeiar(chwA.getAnnouncementType());
-		// b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
 		b1Row.setAeszn(sdff.format(curDate));
 		b1Row.setGewei("KG");
-		//end
-		
+		// end
+
 		b1Table.appendRow(b1Row);
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
+		rfcInfo.append(Tab + ", ZEINR>>" + b1Row.getZeinr() + ", MATKL>>"
+				+ b1Row.getMatkl() + ", SPART>>" + b1Row.getSpart()
+				+ ", ZEIAR>>" + b1Row.getZeiar() + ", AESZN>>"
+				+ b1Row.getAeszn() + ", GEWEI>>" + b1Row.getGewei() + "\n");
+
 		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins() + ", DWERK>>"
 				+ b1Row.getDwerk() + ", KTGRM>>" + b1Row.getKtgrm()
 				+ ", MTPOS>>" + b1Row.getMtpos() + ", SKTOF>>"
@@ -159,6 +163,7 @@ public class R102createSalesViewforMaterial extends Rfc {
 				b2Table.appendRow(b2Row);
 
 				rfcInfo.append("BMMH2 \n");
+				
 				rfcInfo.append(Tab + "ALAND>>" + b2Row.getAland() + ", TATY1>>"
 						+ b2Row.getTaty1() + ", TAXM1>>" + b2Row.getTaxm1()
 						+ "\n" + "\n");

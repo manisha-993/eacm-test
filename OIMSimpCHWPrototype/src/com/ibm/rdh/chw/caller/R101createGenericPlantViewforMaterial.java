@@ -58,13 +58,7 @@ public class R101createGenericPlantViewforMaterial extends Rfc {
 		b0Row.setMbrsh("M");
 		b0Row.setMtart("ZMAT");
 		b0Row.setXeiv4("X");
-
-		// String geography = chwAg.getGeography();
-		// String plantBySalesOrg =
-		// SalesOrgToPlantMapper.getPlantBySalesOrg(geography);
 		b0Row.setWerks(plantValue);
-
-		// b0Row.setLgort(storageLocation);
 		b0Row.setXeid1("X");
 		b0Row.setXeid2("X");
 		// SAP Ledger
@@ -162,6 +156,9 @@ public class R101createGenericPlantViewforMaterial extends Rfc {
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
+		rfcInfo.append(Tab + ", ZEINR>>" + b1Row.getZeinr() + ", MATKL>>"
+				+ b1Row.getMatkl() + ", SPART>>" + b1Row.getSpart() + "\n");
+
 		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins() + ", TRAGR>>"
 				+ b1Row.getTragr() + ", LADGR>>" + b1Row.getLadgr()
 				+ ", MTPOS>>" + b1Row.getMtpos() + ", KTGRM>>"
@@ -177,9 +174,7 @@ public class R101createGenericPlantViewforMaterial extends Rfc {
 				+ ", DISGR>>" + b1Row.getDisgr() + ", PERKZ>>"
 				+ b1Row.getPerkz() + ", PRCTR>>" + b1Row.getPrctr()
 				+ ", EKGRP>>" + b1Row.getEkgrp() + ", MFRNR>>"
-				+ b1Row.getMfrnr() +
-
-				"\n");
+				+ b1Row.getMfrnr() + "\n");
 
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
