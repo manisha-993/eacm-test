@@ -1,5 +1,4 @@
 package com.ibm.rdh.rfc.proxy;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +13,8 @@ import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.TypeModel;
 
-public class R121createModelSelectionDependencyTest extends RdhRestProxyTest {
+public class R182deleteModelSelectionDependencyTest extends RdhRestProxyTest {
+
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
 
@@ -33,40 +33,43 @@ public class R121createModelSelectionDependencyTest extends RdhRestProxyTest {
 	}
 
 	@Test
-	public void testR121() {
+	public void r182() {
+
 		try {
 
-			TypeModel typeModel = new TypeModel();
-			typeModel.setType("EACM");
-			typeModel.setModel("MODEL");
 			CHWAnnouncement chwA = new CHWAnnouncement();
-			chwA.setAnnDocNo("123401");
-			String pimsIdentity = "C";
+			TypeModel typeModel = new TypeModel();
 
-			String depend = "SC_MK_" + typeModel.getType() + "_MODEL_"
-					+ typeModel.getModel();
-			
+			typeModel.setType("EACM");
+			typeModel.setModel("NEW");
+			chwA.setAnnDocNo("123401");
+
+			String type = typeModel.getType();
+			String model = typeModel.getModel();
+			String pimsIdentity = "C";
+			String activeId = "Z_DM_SAP_DEPD_MAINTAIN";
+			String objectId = "SC_MK_" + type + "_MODEL_" + model;
+
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
-					"Z_DM_SAP_DEPD_MAINTAIN", depend);
+					"Z_DM_SAP_DEPD_MAINTAIN", objectId);
+			RdhRestProxy rfcProxy = new RdhRestProxy();
+			rfcProxy.r182(typeModel, chwA, pimsIdentity);
+
 			
-			RdhRestProxy rdhRestProxy = new RdhRestProxy();
-			rdhRestProxy.r121(typeModel, chwA, pimsIdentity);
-			
-			// Test function execute success
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
-			map.put("ZDMOBJKEY", "'" + depend + "'");
+			map.put("ZDMOBJKEY", "'" + objectId + "'");
 			map.put("ZDMOBJTYP", "'KNO'");
 			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
 			assertNotNull(rowDetails);
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
-			map.put("ACTIV_ID", "'Z_DM_SAP_DEPD_MAINTAIN'");
-			map.put("OBJECT_ID", "'" + depend + "'");
+			map.put("ACTIV_ID", "'" + activeId + "'");
+			map.put("OBJECT_ID", "'" + objectId + "'");
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
 			String sessionId = (String) rowDetails.get("ZSESSION");
@@ -75,10 +78,11 @@ public class R121createModelSelectionDependencyTest extends RdhRestProxyTest {
 
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
-			map.put("TEXT", "'Object dependency  " + depend
-					+ " created/updated successfully.'");
+			map.put("TEXT", "'Object dependency  " + objectId
+					+ " created/updated successfully."+"'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
 			assertNotNull(rowDetails);
+
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
 			Assert.fail("error message= " + ex.getMessage());

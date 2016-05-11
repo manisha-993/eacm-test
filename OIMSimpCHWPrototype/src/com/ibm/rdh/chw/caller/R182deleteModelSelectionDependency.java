@@ -29,7 +29,7 @@ public class R182deleteModelSelectionDependency extends Rfc {
 		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
 		rfcName = "Z_DM_SAP_DEPD_MAINTAIN";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_DEPD_MAINTAIN();
-		
+
 		// Set up the RFC fields
 		// D0- Structure
 
@@ -54,7 +54,11 @@ public class R182deleteModelSelectionDependency extends Rfc {
 		DepsourceTable l2Table = new DepsourceTable();
 		DepsourceTableRow l2Row = l2Table.createEmptyRow();
 
-		l2Row.setLine("");
+		// l2Row.setLine("");
+		// line can't be null, service will report error so
+		// change to below set value
+		l2Row.setLine("MK_" + typeModel.getType() + "_MOD='"
+				+ typeModel.getModel() + "'");
 
 		l2Table.appendRow(l2Row);
 		rfc.setIDepsource(l2Table);
@@ -105,7 +109,7 @@ public class R182deleteModelSelectionDependency extends Rfc {
 	@Override
 	public void execute() throws Exception {
 		logExecution();
-		getRfc().execute(null);// has not been finished.
+		getRfc().execute();
 		getLog().debug(getErrorInformation());
 		if (getSeverity() == ERROR) {
 			throw new HWPIMSAbnormalException(getErrorInformation());
