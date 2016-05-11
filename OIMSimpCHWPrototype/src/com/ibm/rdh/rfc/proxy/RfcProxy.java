@@ -261,11 +261,11 @@ public abstract class RfcProxy {
 	public abstract void r186(TypeFeature typeFeature, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
-	public abstract void r187(TypeFeature typeFeature, CHWAnnouncement chwA,
-			String pimsIdentity) throws Exception;
-
-	public abstract void r188(TypeFeature tfObj, CHWAnnouncement chwA,
-			String pimsIdentity) throws Exception;
+//	public abstract void r187(TypeFeature typeFeature, CHWAnnouncement chwA,
+//			String pimsIdentity) throws Exception;
+//
+//	public abstract void r188(TypeFeature tfObj, CHWAnnouncement chwA,
+//			String pimsIdentity) throws Exception;
 
 	public abstract void r189(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
@@ -308,8 +308,8 @@ public abstract class RfcProxy {
 
 	public abstract boolean r204(String material) throws Exception;
 
-	public abstract boolean r207(String type, String model, String plant)
-			throws Exception;
+//	public abstract boolean r207(String type, String model, String plant)
+//			throws Exception;
 
 	public abstract BasicMaterialFromSAP r209(String material) throws Exception;
 
@@ -330,7 +330,7 @@ public abstract class RfcProxy {
 			String pimsIdentity, String salesOrg, String productHierarchy)
 			throws Exception;
 
-	public abstract Vector r261(String material) throws Exception;
+//	public abstract Vector r261(String material) throws Exception;
 
 	public abstract void r262(CHWAnnouncement chwA, String material,
 			String sapPlant, String pimsIdentity, String profitCenter)

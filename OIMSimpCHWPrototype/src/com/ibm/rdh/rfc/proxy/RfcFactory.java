@@ -68,8 +68,6 @@ import com.ibm.rdh.chw.caller.R182deleteModelSelectionDependency;
 import com.ibm.rdh.chw.caller.R183createCFIPlantViewForTypeModelMaterial;
 import com.ibm.rdh.chw.caller.R185deleteupgradevaluefromMCcharacteristic;
 import com.ibm.rdh.chw.caller.R186DeleteTypeFeatureCharacteristic;
-import com.ibm.rdh.chw.caller.R187DeleteTypeFeatureCharacteristicClassificationtoFEAT;
-import com.ibm.rdh.chw.caller.R188DeleteTypeFeatureCharacteristicClassificationtoUF;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.caller.R193ReadRevenueProfile;
 import com.ibm.rdh.chw.caller.R195DeleteRevenueProfile;
@@ -80,14 +78,12 @@ import com.ibm.rdh.chw.caller.R199_deleteLifecycleRow;
 import com.ibm.rdh.chw.caller.R200_readLifecycleRow;
 import com.ibm.rdh.chw.caller.R201createUpgradeValueForTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R204ReadMaterial;
-import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R210ReadSalesBom;
 import com.ibm.rdh.chw.caller.R212DeleteSalesBOMfortypeMTC;
 import com.ibm.rdh.chw.caller.R213UpdateSalesBOMItemWithtypeMTC;
 import com.ibm.rdh.chw.caller.R214ReadMCclass;
 import com.ibm.rdh.chw.caller.R260updateProdHierarchyOnSalesView;
-import com.ibm.rdh.chw.caller.R261PlantViewMaterial;
 import com.ibm.rdh.chw.caller.R262createPlantViewProfitCenterForMaterial;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
@@ -527,19 +523,19 @@ public class RfcFactory extends Object {
 				pimsIdentity);
 	}
 
-	public R187DeleteTypeFeatureCharacteristicClassificationtoFEAT getr187(
-			TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
-			throws Exception {
-		return new R187DeleteTypeFeatureCharacteristicClassificationtoFEAT(
-				typeFeature, chwA, pimsIdentity);
-	}
-
-	public R188DeleteTypeFeatureCharacteristicClassificationtoUF getr188(
-			TypeFeature tfObj, CHWAnnouncement chwA, String pimsIdentity)
-			throws Exception {
-		return new R188DeleteTypeFeatureCharacteristicClassificationtoUF(tfObj,
-				chwA, pimsIdentity);
-	}
+//	public R187DeleteTypeFeatureCharacteristicClassificationtoFEAT getr187(
+//			TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
+//			throws Exception {
+//		return new R187DeleteTypeFeatureCharacteristicClassificationtoFEAT(
+//				typeFeature, chwA, pimsIdentity);
+//	}
+//
+//	public R188DeleteTypeFeatureCharacteristicClassificationtoUF getr188(
+//			TypeFeature tfObj, CHWAnnouncement chwA, String pimsIdentity)
+//			throws Exception {
+//		return new R188DeleteTypeFeatureCharacteristicClassificationtoUF(tfObj,
+//				chwA, pimsIdentity);
+//	}
 
 	public R189createCFIPlantViewForType getr189(CHWAnnouncement chwA,
 			TypeModel typeModel, String sapPlant, String newFlag,
@@ -616,10 +612,10 @@ public class RfcFactory extends Object {
 		return new R204ReadMaterial(material);
 	}
 
-	public R207ReadPlantViewMaterial getr207(String type, String model,
-			String plant) throws Exception {
-		return new R207ReadPlantViewMaterial(type, model, plant);
-	}
+//	public R207ReadPlantViewMaterial getr207(String type, String model,
+//			String plant) throws Exception {
+//		return new R207ReadPlantViewMaterial(type, model, plant);
+//	}
 
 	public R209ReadBasicViewOfMaterial getr209(String material)
 			throws Exception {
@@ -657,9 +653,9 @@ public class RfcFactory extends Object {
 				pimsIdentity, salesOrg, productHierarchy);
 	}
 
-	public R261PlantViewMaterial getr261(String material) throws Exception {
-		return new R261PlantViewMaterial(material);
-	}
+//	public R261PlantViewMaterial getr261(String material) throws Exception {
+//		return new R261PlantViewMaterial(material);
+//	}
 
 	public R262createPlantViewProfitCenterForMaterial getr262(
 			CHWAnnouncement chwA, String material, String sapPlant,
