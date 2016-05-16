@@ -23,6 +23,7 @@ public class R185deleteupgradevaluefromMCcharacteristic extends Rfc {
 		String charac = "MK_" + typeModel.getType() + "_MC";
 		rfcName = "Z_DM_SAP_CHAR_MAINTAIN";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN();
+
 		// Set up the RFC fields
 		// CHARACTS
 		CharactsTable c0Table = new CharactsTable();
@@ -43,11 +44,13 @@ public class R185deleteupgradevaluefromMCcharacteristic extends Rfc {
 		rfc.setICharacts(c0Table);
 
 		rfcInfo.append("CHARACTS \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() + ", DATATYPE>>"
-				+ c0Row.getDatatype() + ", CHARNUMBER>>"
-				+ c0Row.getCharnumberString() + ", STATUS>>"
-				+ c0Row.getStatus() + ", VALASSIGNM>>" + c0Row.getValassignm()
-				+ "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() 
+				+ ", DATATYPE>>" + c0Row.getDatatype() 
+				+ ", CHARNUMBER>>" + c0Row.getCharnumberString()
+				+ ", STATUS>>" + c0Row.getStatus() 
+				+ ", VALASSIGNM>>" + c0Row.getValassignm() + "\n");
+		rfcInfo.append(Tab + "ADDITVALS>>" + c0Row.getAdditVals()
+				+ ", NEGVALS>>" + c0Row.getNegVals() + "\n");
 
 		// This part will be optional,but now is required.
 		// CHAR_DESCR - C1
@@ -62,9 +65,9 @@ public class R185deleteupgradevaluefromMCcharacteristic extends Rfc {
 		rfc.setICharDescr(c1Table);
 
 		rfcInfo.append("CHAR_DESCR  \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact() + ", LANGUAGE>>"
-				+ c1Row.getLanguage() + ", CHDESCR>>" + c1Row.getChdescr()
-				+ "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact() 
+				+ ", LANGUAGE>>" + c1Row.getLanguage()
+				+ ", CHDESCR>>" + c1Row.getChdescr() + "\n");
 		// end
 
 		// CHAR_VALS - C4
@@ -79,22 +82,23 @@ public class R185deleteupgradevaluefromMCcharacteristic extends Rfc {
 		rfc.setICharVals(c4Table);
 
 		rfcInfo.append("CHAR_VALS  \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c4Row.getCharact() + ", VALUE>>"
-				+ c4Row.getValue() + ", FLDELETE>>" + c4Row.getFldelete()
-				+ "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c4Row.getCharact() 
+				+ ", VALUE>>" + c4Row.getValue()
+				+ ", FLDELETE>>" + c4Row.getFldelete() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

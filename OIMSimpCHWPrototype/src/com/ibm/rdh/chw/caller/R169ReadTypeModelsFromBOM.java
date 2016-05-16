@@ -1,11 +1,6 @@
 package com.ibm.rdh.chw.caller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.pprds.epimshw.PropertyKeys;
-import com.ibm.pprds.epimshw.util.ConfigManager;
 
 public class R169ReadTypeModelsFromBOM extends Rfc {
 	private com.ibm.rdh.rfc.CSAP_MAT_BOM_READ rfc;
@@ -13,25 +8,24 @@ public class R169ReadTypeModelsFromBOM extends Rfc {
 	public R169ReadTypeModelsFromBOM(String type, String plant, String newFlag)
 			throws Exception {
 		reInitialize();
-		Date curDate = new Date();
+
 		rfcName = "CSAP_MAT_BOM_READ";
 		rfc = new com.ibm.rdh.rfc.CSAP_MAT_BOM_READ();
-		String sDateFormat = ConfigManager.getConfigManager().getString(
-				PropertyKeys.KEY_DATE_FORMAT, true);
-		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
-		if (newFlag.equals("NEW")) {
+
+		if ("NEW".equals(newFlag)) {
 			rfc.setMaterial(type + "NEW");
-		} else if (newFlag.equals("UPG")) {
+		} else if ("UPG".equals(newFlag)) {
 			rfc.setMaterial(type + "UPG");
-		} else if (newFlag.equals("MTC")) {
+		} else if ("MTC".equals(newFlag)) {
 			rfc.setMaterial(type + "MTC");
 		}
 
 		rfc.setPlant(plant);
 		rfc.setBomUsage("5");
 
-		rfcInfo.append(Tab + "MATERIAL>>" + rfc.getMaterial() + ", PLANT>>"
-				+ rfc.getPlant() + ", BOM_USAGE>>" + rfc.getBomUsage() + "\n");
+		rfcInfo.append(Tab + "MATERIAL>>" + rfc.getMaterial() 
+				+ ", PLANT>>" + rfc.getPlant() 
+				+ ", BOM_USAGE>>" + rfc.getBomUsage() + "\n");
 
 	}
 
@@ -85,7 +79,6 @@ public class R169ReadTypeModelsFromBOM extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		// TODO Auto-generated method stub
 		return "Read Type Models From BOM";
 	}
 

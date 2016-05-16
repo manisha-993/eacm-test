@@ -1,11 +1,8 @@
 package com.ibm.rdh.chw.caller;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.pprds.epimshw.PropertyKeys;
-import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.Api_auspTable;
@@ -31,12 +28,10 @@ public class R164create300ClassificationForTypeMTC extends Rfc {
 			throws Exception {
 		reInitialize();
 		Date curDate = new Date();
-		String sDateFormat = ConfigManager.getConfigManager().getString(
-				PropertyKeys.KEY_DATE_FORMAT, true);
-		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
 		rfcName = "Z_DM_SAP_CLASSIFICATION_MAINT";
 
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT();
+
 		// Set up the RFC fields
 		// OBJECT_KEY - R0
 		Object_keyTable r0Table = new Object_keyTable();
@@ -52,8 +47,8 @@ public class R164create300ClassificationForTypeMTC extends Rfc {
 		rfc.setIObjectKey(r0Table);
 
 		rfcInfo.append("OBJECTKEY \n");
-		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() + ", KPARAVALU>>"
-				+ r0Row.getKparaValu() + "\n");
+		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() 
+				+ ", KPARAVALU>>" + r0Row.getKparaValu() + "\n");
 
 		// KLAH - R2
 		KlahTable r2Table = new KlahTable();
@@ -97,7 +92,6 @@ public class R164create300ClassificationForTypeMTC extends Rfc {
 		MaraTable r5Table = new MaraTable();
 		MaraTableRow r5Row = r5Table.createEmptyRow();
 
-		// Passing date
 		r5Row.setErsda(curDate);
 
 		r5Table.appendRow(r5Row);
@@ -113,7 +107,7 @@ public class R164create300ClassificationForTypeMTC extends Rfc {
 		// not set
 		r6Row.setValue("CH");
 		// end
-		
+
 		if ("MTCTOTYPE".equals(FromToType)) {
 			r6Row.setCharact("MK_" + tmUPGObj.getType() + "_MTC");
 		} else if ("MTCFROMTYPE".equals(FromToType)) {
@@ -124,21 +118,22 @@ public class R164create300ClassificationForTypeMTC extends Rfc {
 		rfc.setIApiAusp(r6Table);
 
 		rfcInfo.append("API_AUSP \n");
-		rfcInfo.append(Tab + "CHARACT>> " + r6Row.getCharact() + ", VALUE>> "
-				+ r6Row.getValue() + "\n");
-
+		rfcInfo.append(Tab + "CHARACT>> " + r6Row.getCharact() 
+				+ ", VALUE>> " + r6Row.getValue() + "\n");
+		
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
-
+		
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
@@ -158,7 +153,6 @@ public class R164create300ClassificationForTypeMTC extends Rfc {
 		if (getSeverity() == ERROR) {
 			throw new HWPIMSAbnormalException(getErrorInformation());
 		}
-
 	}
 
 	@Override
@@ -192,7 +186,6 @@ public class R164create300ClassificationForTypeMTC extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		// TODO Auto-generated method stub
 		return "Create 300 Classification for type MTC for MTC";
 	}
 

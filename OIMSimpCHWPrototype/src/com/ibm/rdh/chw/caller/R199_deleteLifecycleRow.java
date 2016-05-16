@@ -62,12 +62,15 @@ public class R199_deleteLifecycleRow extends Rfc {
 
 		rfcInfo.append("DIRECT FIELDS\n");
 
+		// ACTION_CODE
 		rfc.setActionCode("D");
 		rfcInfo.append(Tab + "ACTION_CODE>>" + rfc.getActionCode() + ",");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append(Tab + "PIMS_IDENTITY>>" + rfc.getPimsIdentity() + ",");
 
+		// RFANUMBER
 		if (check.equals("wdfm")) {
 			rfc.setRfaNum(annDocNo + "_WDFM");
 		} else {
@@ -75,13 +78,13 @@ public class R199_deleteLifecycleRow extends Rfc {
 		}
 		rfcInfo.append(Tab + "RFANUM>>" + rfc.getRfaNum() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
@@ -90,7 +93,6 @@ public class R199_deleteLifecycleRow extends Rfc {
 	}
 
 	private String truncateInternetUser(String userID) {
-
 		String ans = userID;
 		if (userID == null) {
 			ans = "";
@@ -108,7 +110,6 @@ public class R199_deleteLifecycleRow extends Rfc {
 		if (getSeverity() == ERROR) {
 			throw new HWPIMSAbnormalException(getErrorInformation());
 		}
-
 	}
 
 	@Override
@@ -151,7 +152,6 @@ public class R199_deleteLifecycleRow extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		// TODO Auto-generated method stub
 		return "Delete Lifecycle Row";
 	}
 

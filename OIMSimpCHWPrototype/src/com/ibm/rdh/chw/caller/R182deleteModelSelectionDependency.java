@@ -1,11 +1,6 @@
 package com.ibm.rdh.chw.caller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.pprds.epimshw.PropertyKeys;
-import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.rfc.Dep_identStructure;
@@ -23,16 +18,12 @@ public class R182deleteModelSelectionDependency extends Rfc {
 	public R182deleteModelSelectionDependency(TypeModel typeModel,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		reInitialize();
-		Date curDate = new Date();
-		String sDateFormat = ConfigManager.getConfigManager().getString(
-				PropertyKeys.KEY_DATE_FORMAT, true);
-		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
+
 		rfcName = "Z_DM_SAP_DEPD_MAINTAIN";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_DEPD_MAINTAIN();
 
 		// Set up the RFC fields
 		// D0- Structure
-
 		String type = typeModel.getType();
 		String model = typeModel.getModel();
 
@@ -50,7 +41,6 @@ public class R182deleteModelSelectionDependency extends Rfc {
 				+ ", DESCRIPT>>" + l1Row.getDescript() + "\n");
 
 		// D2- Structure
-
 		DepsourceTable l2Table = new DepsourceTable();
 		DepsourceTableRow l2Row = l2Table.createEmptyRow();
 
@@ -66,7 +56,6 @@ public class R182deleteModelSelectionDependency extends Rfc {
 		rfcInfo.append(Tab + "LINE>>" + l2Row.getLine() + "\n");
 
 		// D3- Structure
-
 		Dep_identStructure struct = new Dep_identStructure();
 		struct.setDepExtern("SC_MK_" + type + "_MODEL_" + model);
 
@@ -74,27 +63,27 @@ public class R182deleteModelSelectionDependency extends Rfc {
 		rfcInfo.append(Tab + "DEP_EXTERN>>" + struct.getDepExtern() + "\n");
 
 		// D4- Structure
-
 		DepdatStructure depdat = new DepdatStructure();
 		depdat.setDepType("5");
 		depdat.setStatus("3");
 
 		rfc.setIDepdat(depdat);
-		rfcInfo.append(Tab + "DEP_TYPE>>" + depdat.getDepType() + ", STATUS>>"
-				+ depdat.getStatus() + "\n");
+		rfcInfo.append(Tab + "DEP_TYPE>>" + depdat.getDepType()
+				+ ", STATUS>>" + depdat.getStatus() + "\n");
+
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
-		// rfc.setPimsIdentity("C");
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
@@ -157,7 +146,6 @@ public class R182deleteModelSelectionDependency extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		// TODO Auto-generated method stub
 		return "Delete Model Selection Dependency";
 	}
 

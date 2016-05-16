@@ -16,14 +16,15 @@ public class R160assignChartoClassFEAT_0000 extends Rfc {
 
 		reInitialize();
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_ASSIGN_CHAR_TO_CLASS();
+
 		// Set up the RFC fields
 		// C0
 		rfc.setJClass("MK_" + typeModel.getType() + "_FEAT_0000");
 		rfc.setJKlart("300");
 
 		rfcInfo.append("Direct fields \n");
-		rfcInfo.append(Tab + "CLASS>>" + rfc.getJClass() + ", KLART>>"
-				+ rfc.getJKlart() + "\n");
+		rfcInfo.append(Tab + "CLASS>>" + rfc.getJClass() 
+				+ ", KLART>>" + rfc.getJKlart() + "\n");
 
 		// RMCLM - C1
 		RmclmTable c1Table = new RmclmTable();
@@ -42,19 +43,24 @@ public class R160assignChartoClassFEAT_0000 extends Rfc {
 			rfcInfo.append("RMCLM \n");
 			rfcInfo.append(Tab + "MERKMA>>" + c1Row.getMerkma() + "\n");
 		}
-
+		
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
+
 		zdmRow.setZGeo("US");
 		zdmTable.appendRow(zdmRow);
 		rfc.setGeoData(zdmTable);
+
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
-
+	
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
-
+		
+		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + ",RFANUM>>" + chwA.getAnnDocNo() + "\n");
@@ -63,7 +69,6 @@ public class R160assignChartoClassFEAT_0000 extends Rfc {
 
 	@Override
 	public void execute() throws Exception {
-		// TODO Auto-generated method stub
 		logExecution();
 		getRfc().execute();
 		getLog().debug(getErrorInformation());
@@ -74,7 +79,6 @@ public class R160assignChartoClassFEAT_0000 extends Rfc {
 
 	@Override
 	public String getTaskDescription() {
-
 		StringBuffer sb = new StringBuffer();
 		sb.append(" " + getMaterialName());
 		return sb.toString();
@@ -108,7 +112,6 @@ public class R160assignChartoClassFEAT_0000 extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		// TODO Auto-generated method stub
 		return "Assign Char to Class FEAT_0000";
 	}
 
@@ -118,7 +121,6 @@ public class R160assignChartoClassFEAT_0000 extends Rfc {
 	}
 
 	public void evaluate() throws Exception {
-
 		execute();
 	}
 

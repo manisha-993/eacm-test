@@ -1,11 +1,6 @@
 package com.ibm.rdh.chw.caller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.pprds.epimshw.PropertyKeys;
-import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.rfc.Char_descrTable;
@@ -23,10 +18,7 @@ public class R186DeleteTypeFeatureCharacteristic extends Rfc {
 	public R186DeleteTypeFeatureCharacteristic(TypeFeature typeFeature,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		reInitialize();
-		Date curDate = new Date();
-		String sDateFormat = ConfigManager.getConfigManager().getString(
-				PropertyKeys.KEY_DATE_FORMAT, true);
-		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
+
 		rfcName = "Z_DM_SAP_CHAR_MAINTAIN";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN();
 
@@ -56,12 +48,14 @@ public class R186DeleteTypeFeatureCharacteristic extends Rfc {
 		rfc.setICharacts(c0Table);
 
 		rfcInfo.append("CHARACTS \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() + ", FLDELETE>>"
-				+ c0Row.getFldelete() + ", ADDITVALS>>" + c0Row.getAdditVals()
-				+ ", DATATYPE>>" + c0Row.getDatatype() + ", CHARNUMBER>>"
-				+ c0Row.getCharnumberString() + ", STATUS>>"
-				+ c0Row.getStatus() + ", VALASSIGNM>>" + c0Row.getValassignm()
-				+ "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() 
+				+ ", FLDELETE>>" + c0Row.getFldelete()
+				+ ", ADDITVALS>>" + c0Row.getAdditVals() + "\n");
+		rfcInfo.append(Tab + "DATATYPE>>" + c0Row.getDatatype()
+				+ ", CHARNUMBER>>" + c0Row.getCharnumberString()
+				+ ", STATUS>>" + c0Row.getStatus() 
+				+ ", VALASSIGNM>>" + c0Row.getValassignm() + "\n");
+		rfcInfo.append(Tab + "NEGVALS>>" + c0Row.getNegVals() + "\n");
 
 		// This part will be optional,but now is required.
 		// CHAR_DESCR - C1
@@ -76,23 +70,24 @@ public class R186DeleteTypeFeatureCharacteristic extends Rfc {
 		rfc.setICharDescr(c1Table);
 
 		rfcInfo.append("CHAR_DESCR  \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact() + ", LANGUAGE>>"
-				+ c1Row.getLanguage() + ", CHDESCR>>" + c1Row.getChdescr()
-				+ "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact()
+				+ ", LANGUAGE>>" + c1Row.getLanguage()
+				+ ", CHDESCR>>" + c1Row.getChdescr() + "\n");
 		// end
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

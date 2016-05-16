@@ -59,10 +59,12 @@ public class R189createCFIPlantViewForType extends Rfc {
 		b0Table.appendRow(b0Row);
 		rfc.setIBmm00(b0Table);
 		rfcInfo.append("IBmm00 \n");
-		rfcInfo.append(Tab + "TCODE" + b0Row.getTcode() + ", MATNR>>"
-				+ b0Row.getMatnr() + ", XEIV4>>" + b0Row.getXeiv4()
-				+ ", WERKS>>" + b0Row.getWerks() + ", MBRSH>>"
-				+ b0Row.getMbrsh() + ", MTART>>" + b0Row.getMtart() + "\n");
+		rfcInfo.append(Tab + "TCODE" + b0Row.getTcode() 
+				+ ", MATNR>>" + b0Row.getMatnr() 
+				+ ", XEIV4>>" + b0Row.getXeiv4()
+				+ ", WERKS>>" + b0Row.getWerks() + "\n");
+		rfcInfo.append(Tab + "MBRSH>>" + b0Row.getMbrsh() 
+				+ ", MTART>>" + b0Row.getMtart() + "\n");
 
 		// Bmmh1 - B1
 		Bmmh1Table b1Table = new Bmmh1Table();
@@ -86,7 +88,6 @@ public class R189createCFIPlantViewForType extends Rfc {
 			b1Row.setMtvfp("ZE");
 
 		// SAP Ledger
-
 		if ("Y".equals(ConfigManager.getConfigManager().getString(
 				PropertyKeys.KEY_SAP_LEDGER))) {
 			boolean existsPro = ProfitCenterPlantSelector
@@ -103,26 +104,35 @@ public class R189createCFIPlantViewForType extends Rfc {
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
-		rfcInfo.append(Tab + ", GEWEI>>" + b1Row.getGewei() + ", SPART>>"
-				+ b1Row.getSpart() + ", MATKL>>" + b1Row.getMatkl()
-				+ ", MEINS>>" + b1Row.getMeins() + ", ZEINR>>"
-				+ b1Row.getZeinr() + ", ZEIAR>>" + b1Row.getZeiar()
-				+ ", AESZN>>" + b1Row.getAeszn() + "LADGR>>" + b1Row.getLadgr()
-				+ ", MTVFP>>" + b1Row.getMtvfp() + ", PRCTR>>"
-				+ b1Row.getPrctr() + "\n");
+		rfcInfo.append(Tab + "LADGR>>" + b1Row.getLadgr()
+				+ ", MTVFP>>" + b1Row.getMtvfp() 
+				+ ", PRCTR>>" + b1Row.getPrctr() + "\n");
 
+		rfcInfo.append(Tab + "GEWEI>>" + b1Row.getGewei() 
+				+ ", SPART>>" + b1Row.getSpart() 
+				+ ", MATKL>>" + b1Row.getMatkl()
+				+ ", MEINS>>" + b1Row.getMeins() 
+				+ ", ZEINR>>" + b1Row.getZeinr() 
+				+ ", ZEIAR>>" + b1Row.getZeiar()
+				+ ", AESZN>>" + b1Row.getAeszn() + "\n");
+
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
+
 		zdmRow.setZGeo("US");
 		zdmTable.appendRow(zdmRow);
 		rfc.setGeoData(zdmTable);
+
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
+		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + ",RFANUM>>" + chwA.getAnnDocNo() + "\n");
@@ -130,7 +140,6 @@ public class R189createCFIPlantViewForType extends Rfc {
 
 	@Override
 	public void execute() throws Exception {
-		// TODO Auto-generated method stub
 		logExecution();
 		getRfc().execute();
 		getLog().debug(getErrorInformation());
@@ -141,7 +150,6 @@ public class R189createCFIPlantViewForType extends Rfc {
 
 	@Override
 	public String getTaskDescription() {
-
 		StringBuffer sb = new StringBuffer();
 		sb.append(" " + getMaterialName());
 		return sb.toString();
@@ -175,7 +183,6 @@ public class R189createCFIPlantViewForType extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		// TODO Auto-generated method stub
 		return "Create CFI Plant View for Type NEW or UPG material";
 	}
 
@@ -185,7 +192,6 @@ public class R189createCFIPlantViewForType extends Rfc {
 	}
 
 	public void evaluate() throws Exception {
-
 		execute();
 	}
 

@@ -1,6 +1,5 @@
 package com.ibm.rdh.chw.caller;
 
-import java.text.SimpleDateFormat;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
@@ -18,8 +17,9 @@ public class R200_readLifecycleRow extends Rfc {
 
 		reInitialize();
 		rfcName = "Z_DM_SAP_CHW_PRODUCT_CYCLE";
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CHW_PRODUCT_CYCLE();
+		
 		// Set up the RFC fields
 		// Zdm_chw_plc
 		ZdmchwplcTable t = new ZdmchwplcTable();
@@ -46,12 +46,15 @@ public class R200_readLifecycleRow extends Rfc {
 
 		rfcInfo.append("DIRECT FIELDS\n");
 
+		// ACTION_CODE
 		rfc.setActionCode("R");
 		rfcInfo.append(Tab + "ACTION_CODE>>" + rfc.getActionCode() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append(Tab + "PIMS_IDENTITY>>" + rfc.getPimsIdentity() + "\n");
 
+		// RFANUMBER
 		if (check.equals("wdfm")) {
 			rfc.setRfaNum(annDocNo + "_WDFM");
 		} else {
@@ -59,13 +62,13 @@ public class R200_readLifecycleRow extends Rfc {
 		}
 		rfcInfo.append(Tab + "RFANUM>>" + rfc.getRfaNum() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
@@ -129,7 +132,6 @@ public class R200_readLifecycleRow extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		// TODO Auto-generated method stub
 		return "Read Lifecycle Row";
 	}
 

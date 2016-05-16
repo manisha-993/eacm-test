@@ -45,11 +45,14 @@ public class R262createPlantViewProfitCenterForMaterial extends Rfc {
 		rfc.setIBmm00(b0Table);
 
 		rfcInfo.append("BMM00 \n");
-		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
-				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
-				+ ", MTART>>" + b0Row.getMtart() + ", XEIV4>>"
-				+ b0Row.getXeiv4() + ", WERKS>>" + b0Row.getWerks() + "\n");
+		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode()
+				+ ", MATNR>>" + b0Row.getMatnr() 
+				+ ", XEIV4>>" + b0Row.getXeiv4()
+				+ ", WERKS>>" + b0Row.getWerks() + "\n");
+		rfcInfo.append(Tab + "MBRSH>>" + b0Row.getMbrsh() 
+				+ ", MTART>>" + b0Row.getMtart() + "\n");
 
+		// Bmmh1
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
@@ -76,29 +79,31 @@ public class R262createPlantViewProfitCenterForMaterial extends Rfc {
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
-		rfcInfo.append(Tab + ", GEWEI>>" + b1Row.getGewei() + ", SPART>>"
-				+ b1Row.getSpart() + ", MATKL>>" + b1Row.getMatkl()
-				+ ", MEINS>>" + b1Row.getMeins() + ", ZEINR>>"
-				+ b1Row.getZeinr() + ", ZEIAR>>" + b1Row.getZeiar()
-				+ ", AESZN>>" + b1Row.getAeszn() + ",PRCTR>>"
-				+ b1Row.getPrctr() + "\n");
+		rfcInfo.append(Tab + "PRCTR>>"+ b1Row.getPrctr() + "\n");
+		rfcInfo.append(Tab + "GEWEI>>" + b1Row.getGewei() 
+				+ ", SPART>>" + b1Row.getSpart() 
+				+ ", MATKL>>" + b1Row.getMatkl()
+				+ ", MEINS>>" + b1Row.getMeins() 
+				+ ", ZEINR>>" + b1Row.getZeinr() 
+				+ ", ZEIAR>>" + b1Row.getZeiar()
+				+ ", AESZN>>" + b1Row.getAeszn() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
-		// }
 
 		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
@@ -158,7 +163,6 @@ public class R262createPlantViewProfitCenterForMaterial extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		// TODO Auto-generated method stub
 		return "R262";
 	}
 

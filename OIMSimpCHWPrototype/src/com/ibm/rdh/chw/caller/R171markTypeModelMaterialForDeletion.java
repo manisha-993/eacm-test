@@ -1,7 +1,5 @@
 package com.ibm.rdh.chw.caller;
 
-import java.text.SimpleDateFormat;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.rfc.Bmm00Table;
@@ -15,7 +13,7 @@ public class R171markTypeModelMaterialForDeletion extends Rfc {
 	public R171markTypeModelMaterialForDeletion(String typemod,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		reInitialize();
-		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
+
 		rfcName = "Z_DM_SAP_MATM_CREATE";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE();
 
@@ -37,22 +35,24 @@ public class R171markTypeModelMaterialForDeletion extends Rfc {
 		rfc.setIBmm00(b0Table);
 
 		rfcInfo.append("B0 \n");
-		rfcInfo.append(Tab + ", MBRSH>>" + b0Row.getMbrsh() + ", MTART>>"
-				+ b0Row.getMtart() + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
-				+ b0Row.getMatnr() + "\n");
+		rfcInfo.append(Tab + ", TCODE>>" + b0Row.getTcode() 
+				+ ", MATNR>>" + b0Row.getMatnr() + "\n");
+		rfcInfo.append(Tab + ", MBRSH>>" + b0Row.getMbrsh()
+				+ ", MTART>>" + b0Row.getMtart() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity("C");
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + "C" + "\n");
@@ -106,7 +106,6 @@ public class R171markTypeModelMaterialForDeletion extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		// TODO Auto-generated method stub
 		return "Mark Type/Model material for deletion";
 	}
 

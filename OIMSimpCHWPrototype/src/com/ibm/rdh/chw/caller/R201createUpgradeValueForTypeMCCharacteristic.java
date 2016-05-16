@@ -39,7 +39,6 @@ public class R201createUpgradeValueForTypeMCCharacteristic extends Rfc {
 		CharactsTableRow c0Row = c0Table.createEmptyRow();
 
 		c0Row.setCharact(charac);
-		// As per the design chnage on 10/12/04 - From Lars for MC stuff.
 		c0Row.setDatatype("CHAR");
 		c0Row.setCharnumberString("15");
 		c0Row.setStatus("1");
@@ -53,11 +52,14 @@ public class R201createUpgradeValueForTypeMCCharacteristic extends Rfc {
 		rfc.setICharacts(c0Table);
 
 		rfcInfo.append("CHARACTS \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() + ", DATATYPE>>"
-				+ c0Row.getDatatype() + ", CHARNUMBER>>"
-				+ c0Row.getCharnumberString() + ", STATUS>>"
-				+ c0Row.getStatus() + ", VALASSIGNM>>" + c0Row.getValassignm()
-				+ "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() 
+				+ ", DATATYPE>>" + c0Row.getDatatype()
+				+ ", CHARNUMBER>>" + c0Row.getCharnumberString()
+				+ ", STATUS>>" + c0Row.getStatus() 
+				+ ", VALASSIGNM>>" + c0Row.getValassignm() + "\n");
+
+		rfcInfo.append(Tab + "NEGVALS>>" + c0Row.getNegVals() 
+				+ ", ADDITVALS>>" + c0Row.getAdditVals() + "\n");
 
 		// This part will be optional,but now is required.
 		// CHAR_DESCR - C1
@@ -72,9 +74,9 @@ public class R201createUpgradeValueForTypeMCCharacteristic extends Rfc {
 		rfc.setICharDescr(c1Table);
 
 		rfcInfo.append("CHAR_DESCR  \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact() + ", LANGUAGE>>"
-				+ c1Row.getLanguage() + ", CHDESCR>>" + c1Row.getChdescr()
-				+ "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact() 
+				+ ", LANGUAGE>>" + c1Row.getLanguage() 
+				+ ", CHDESCR>>" + c1Row.getChdescr() + "\n");
 		// end
 
 		// CHAR_VALS - C4
@@ -90,9 +92,9 @@ public class R201createUpgradeValueForTypeMCCharacteristic extends Rfc {
 		rfc.setICharVals(c4Table);
 
 		rfcInfo.append("CHAR_VALS  \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c4Row.getCharact() + ", VALUE>>"
-				+ c4Row.getValue() + ", FLDELETE>>" + c4Row.getFldelete()
-				+ "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c4Row.getCharact() 
+				+ ", VALUE>>" + c4Row.getValue()
+				+ ", FLDELETE>>" + c4Row.getFldelete() + "\n");
 
 		// CHV_DESCR - C5
 		Chv_descrTable c5Table = new Chv_descrTable();
@@ -110,15 +112,16 @@ public class R201createUpgradeValueForTypeMCCharacteristic extends Rfc {
 		rfc.setIChvDescr(c5Table);
 
 		rfcInfo.append("CHVDESCR \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c5Row.getCharact() + ", VALUE>>"
-				+ c5Row.getValue() + ", LANGUAGE>>" + c5Row.getLanguage()
+		rfcInfo.append(Tab + "CHARACT>>" + c5Row.getCharact() 
+				+ ", VALUE>>" + c5Row.getValue() 
+				+ ", LANGUAGE>>" + c5Row.getLanguage()
 				+ ", VALDECSR>>" + c5Row.getValdescr() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
 
 		rfc.setGeoData(zdmTable);
@@ -126,6 +129,7 @@ public class R201createUpgradeValueForTypeMCCharacteristic extends Rfc {
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

@@ -22,24 +22,24 @@ public class R165assignCharacteristicToMTCClass300 extends Rfc {
 
 		// Set up the RFC fields
 		// C0
-		if (FromToType.equals("MTCTOTYPE")) {
+		if ("MTCTOTYPE".equals(FromToType)) {
 			rfc.setJClass("MK_" + tmUPGObj.getType() + "_MTC");
-		} else if (FromToType.equals("MTCFROMTYPE")) {
+		} else if ("MTCFROMTYPE".equals(FromToType)) {
 			rfc.setJClass("MK_" + tmUPGObj.getFromType() + "_MTC");
 		}
 		rfc.setJKlart("300");
 
 		rfcInfo.append("Direct fields \n");
-		rfcInfo.append(Tab + "CLASS>>" + rfc.getJClass() + ", KLART>>"
-				+ rfc.getJKlart() + "\n");
+		rfcInfo.append(Tab + "CLASS>>" + rfc.getJClass() 
+				+ ", KLART>>" + rfc.getJKlart() + "\n");
 
 		// RMCLM - C1
 		RmclmTable c1Table = new RmclmTable();
 		RmclmTableRow c1Row = c1Table.createEmptyRow();
 
-		if (FromToType.equals("MTCTOTYPE")) {
+		if ("MTCTOTYPE".equals(FromToType)) {
 			c1Row.setMerkma("MK_" + tmUPGObj.getType() + "_MTC");
-		} else if (FromToType.equals("MTCFROMTYPE")) {
+		} else if ("MTCFROMTYPE".equals(FromToType)) {
 			c1Row.setMerkma("MK_" + tmUPGObj.getFromType() + "_MTC");
 		}
 
@@ -49,19 +49,20 @@ public class R165assignCharacteristicToMTCClass300 extends Rfc {
 
 		rfcInfo.append("RMCLM \n");
 		rfcInfo.append(Tab + "MERKMA>>" + c1Row.getMerkma() + "\n");
-
+		
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
-
+		
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

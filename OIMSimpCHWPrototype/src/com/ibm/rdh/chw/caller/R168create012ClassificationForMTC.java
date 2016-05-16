@@ -1,13 +1,10 @@
 package com.ibm.rdh.chw.caller;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.pprds.epimshw.PropertyKeys;
-import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.Api_auspTable;
@@ -35,9 +32,6 @@ public class R168create012ClassificationForMTC extends Rfc {
 
 		reInitialize();
 		Date curDate = new Date();
-		String sDateFormat = ConfigManager.getConfigManager().getString(
-				PropertyKeys.KEY_DATE_FORMAT, true);
-		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
 		rfcName = "Z_DM_SAP_CLASSIFICATION_MAINT";
 
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT();
@@ -57,8 +51,8 @@ public class R168create012ClassificationForMTC extends Rfc {
 		rfc.setIObjectKey(r0Table);
 
 		rfcInfo.append("OBJECTKEY \n");
-		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() + ", KPARAVALU>>"
-				+ r0Row.getKparaValu() + "\n");
+		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() 
+				+ ", KPARAVALU>>" + r0Row.getKparaValu() + "\n");
 
 		// KLAH - R2
 		KlahTable r2Table = new KlahTable();
@@ -100,7 +94,6 @@ public class R168create012ClassificationForMTC extends Rfc {
 		MaraTable r5Table = new MaraTable();
 		MaraTableRow r5Row = r5Table.createEmptyRow();
 
-		// Passing date
 		r5Row.setErsda(curDate);
 
 		r5Table.appendRow(r5Row);
@@ -140,18 +133,19 @@ public class R168create012ClassificationForMTC extends Rfc {
 		}
 		rfc.setIApiAusp(r6Table);
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
@@ -205,7 +199,6 @@ public class R168create012ClassificationForMTC extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		// TODO Auto-generated method stub
 		return "Create 012 Classification for MTC";
 	}
 

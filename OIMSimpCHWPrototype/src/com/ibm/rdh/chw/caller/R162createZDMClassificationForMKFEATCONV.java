@@ -39,11 +39,11 @@ public class R162createZDMClassificationForMKFEATCONV extends Rfc {
 
 		r0Row.setKeyFeld("MATNR");
 
-		if (newFlag.equals("UPG")) {
+		if ("UPG".equals(newFlag)) {
 			r0Row.setKparaValu(tfugObj.getType() + "UPG");
-		} else if (newFlag.equals("MTC") && FromToType.equals("MTCTOTYPE")) {
+		} else if ("MTC".equals(newFlag) && "MTCTOTYPE".equals(FromToType)) {
 			r0Row.setKparaValu(tmUPGObj.getType() + "MTC");
-		} else if (newFlag.equals("MTC") && FromToType.equals("MTCFROMTYPE")) {
+		} else if ("MTC".equals(newFlag) && "MTCFROMTYPE".equals(FromToType)) {
 			r0Row.setKparaValu(tmUPGObj.getFromType() + "MTC");
 		}
 
@@ -51,8 +51,8 @@ public class R162createZDMClassificationForMKFEATCONV extends Rfc {
 		rfc.setIObjectKey(r0Table);
 
 		rfcInfo.append("OBJECTKEY \n");
-		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() + ", KPARAVALU>>"
-				+ r0Row.getKparaValu() + "\n");
+		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() 
+				+ ", KPARAVALU>>" + r0Row.getKparaValu() + "\n");
 
 		// KLAH - R2
 		KlahTable r2Table = new KlahTable();
@@ -94,7 +94,6 @@ public class R162createZDMClassificationForMKFEATCONV extends Rfc {
 		MaraTable r5Table = new MaraTable();
 		MaraTableRow r5Row = r5Table.createEmptyRow();
 
-		// Passing date
 		r5Row.setErsda(curDate);
 
 		r5Table.appendRow(r5Row);
@@ -102,19 +101,20 @@ public class R162createZDMClassificationForMKFEATCONV extends Rfc {
 
 		rfcInfo.append("MARA  \n");
 		rfcInfo.append(Tab + "ERSDA>>" + r5Row.getErsdaString() + "\n");
-
+		
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
-
+		
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

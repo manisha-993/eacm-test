@@ -1,13 +1,10 @@
 package com.ibm.rdh.chw.caller;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.pprds.epimshw.PropertyKeys;
-import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
@@ -36,10 +33,9 @@ public class R175create001ClassificationForMMFieldsType extends Rfc {
 
 		reInitialize();
 		Date curDate = new Date();
-		String sDateFormat = ConfigManager.getConfigManager().getString(
-				PropertyKeys.KEY_DATE_FORMAT, true);
-		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
+
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT();
+
 		// Set up the RFC fields
 		// OBJECT_KEY - R0
 		Object_keyTable r0Table = new Object_keyTable();
@@ -62,8 +58,8 @@ public class R175create001ClassificationForMMFieldsType extends Rfc {
 		rfc.setIObjectKey(r0Table);
 
 		rfcInfo.append("OBJECTKEY \n");
-		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() + ", KPARAVALU>>"
-				+ r0Row.getKparaValu() + "\n");
+		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld()
+				+ ", KPARAVALU>>" + r0Row.getKparaValu() + "\n");
 
 		// KLAH - R2
 		KlahTable r2Table = new KlahTable();
@@ -105,8 +101,6 @@ public class R175create001ClassificationForMMFieldsType extends Rfc {
 		MaraTable r5Table = new MaraTable();
 		MaraTableRow r5Row = r5Table.createEmptyRow();
 
-		// Passing date
-		// r5Row.setErsdaString(sdf.format(curDate));
 		r5Row.setErsda(curDate);
 
 		r5Table.appendRow(r5Row);
@@ -154,27 +148,31 @@ public class R175create001ClassificationForMMFieldsType extends Rfc {
 		}
 		rfc.setIApiAusp(r6Table);
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
+
 		zdmRow.setZGeo("US");
 		zdmTable.appendRow(zdmRow);
 		rfc.setGeoData(zdmTable);
+
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
+		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
-		rfcInfo.append(Tab + ",RFANUM>>" + chwA.getAnnDocNo() + "\n");
+		rfcInfo.append(Tab + "RFANUM>>" + chwA.getAnnDocNo() + "\n");
 
 	}
 
 	@Override
 	public void execute() throws Exception {
-		// TODO Auto-generated method stub
 		logExecution();
 		getRfc().execute();
 		getLog().debug(getErrorInformation());
@@ -185,7 +183,6 @@ public class R175create001ClassificationForMMFieldsType extends Rfc {
 
 	@Override
 	public String getTaskDescription() {
-
 		StringBuffer sb = new StringBuffer();
 		sb.append(" " + getMaterialName());
 		return sb.toString();
@@ -219,7 +216,6 @@ public class R175create001ClassificationForMMFieldsType extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		// TODO Auto-generated method stub
 		return "Create 001 Classification for MM_FIELDS type";
 	}
 
@@ -229,7 +225,6 @@ public class R175create001ClassificationForMMFieldsType extends Rfc {
 	}
 
 	public void evaluate() throws Exception {
-
 		execute();
 	}
 

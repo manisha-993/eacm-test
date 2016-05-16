@@ -23,14 +23,15 @@ public class R159createTypeMCCharacteristic extends Rfc {
 
 		rfcName = "Z_DM_SAP_CHAR_MAINTAIN";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN();
+		
 		// Set up the RFC fields
 		// CHARACTS
 		CharactsTable c0Table = new CharactsTable();
 		CharactsTableRow c0Row = c0Table.createEmptyRow();
-		if (FromToType.equals("MTCTOTYPE")) {
+		if ("MTCTOTYPE".equals(FromToType)) {
 			String charac = "MK_" + tmUPGObj.getType() + "_MTC";
 			c0Row.setCharact(charac);
-		} else if (FromToType.equals("MTCFROMTYPE")) {
+		} else if ("MTCFROMTYPE".equals(FromToType)) {
 			String charac = "MK_" + tmUPGObj.getFromType() + "_MTC";
 			c0Row.setCharact(charac);
 		}
@@ -39,29 +40,31 @@ public class R159createTypeMCCharacteristic extends Rfc {
 		c0Row.setCharnumberString("15");
 		c0Row.setStatus("1");
 		c0Row.setValassignm("S");
-		
+
 		// This will be optional, but we need it now.
 		c0Row.setNegVals("X");
 		c0Row.setAdditVals("X");
 		// end
-		
+
 		c0Table.appendRow(c0Row);
 		rfc.setICharacts(c0Table);
 
 		rfcInfo.append("CHARACTS \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() + ", DATATYPE>>"
-				+ c0Row.getDatatype() + ", CHARNUMBER>>"
-				+ c0Row.getCharnumberString() + ", STATUS>>"
-				+ c0Row.getStatus() + ", VALASSIGNM>>" + c0Row.getValassignm()
-				+ "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() 
+				+ ", DATATYPE>>" + c0Row.getDatatype() 
+				+ ", CHARNUMBER>>" + c0Row.getCharnumberString() 
+				+ ", STATUS>>" + c0Row.getStatus() 
+				+ ", VALASSIGNM>>" + c0Row.getValassignm() + "\n");
+		rfcInfo.append(Tab + "NEGVALS>>" + c0Row.getNegVals() 
+				+ ", ADDITVALS>>" + c0Row.getAdditVals() + "\n");
 
 		// CHAR_DESCR - C1
 		Char_descrTable c1Table = new Char_descrTable();
 		Char_descrTableRow c1Row = c1Table.createEmptyRow();
-		if (FromToType.equals("MTCTOTYPE")) {
+		if ("MTCTOTYPE".equals(FromToType)) {
 			String charac = "MK_" + tmUPGObj.getType() + "_MTC";
 			c1Row.setCharact(charac);
-		} else if (FromToType.equals("MTCFROMTYPE")) {
+		} else if ("MTCFROMTYPE".equals(FromToType)) {
 			String charac = "MK_" + tmUPGObj.getFromType() + "_MTC";
 			c1Row.setCharact(charac);
 		}
@@ -73,21 +76,23 @@ public class R159createTypeMCCharacteristic extends Rfc {
 		rfc.setICharDescr(c1Table);
 
 		rfcInfo.append("CHAR_DESCR  \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact() + ", LANGUAGE>>"
-				+ c1Row.getLanguage() + ", CHDESCR>>" + c1Row.getChdescr()
-				+ "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact()
+				+ ", LANGUAGE>>" + c1Row.getLanguage()
+				+ ", CHDESCR>>" + c1Row.getChdescr() + "\n");
+
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

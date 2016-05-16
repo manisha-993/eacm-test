@@ -37,10 +37,10 @@ public class R157createTypeClass extends Rfc {
 		ClclassesTable l0Table = new ClclassesTable();
 		ClclassesTableRow l0Row = l0Table.createEmptyRow();
 
-		if (FromToType.equals("MTCTOTYPE")) {
+		if ("MTCTOTYPE".equals(FromToType)) {
 			String className = "MK_" + tmUPGObj.getType() + "_MTC";
 			l0Row.setClass(className);
-		} else if (FromToType.equals("MTCFROMTYPE")) {
+		} else if ("MTCFROMTYPE".equals(FromToType)) {
 			String className = "MK_" + tmUPGObj.getFromType() + "_MTC";
 			l0Row.setClass(className);
 		}
@@ -51,57 +51,64 @@ public class R157createTypeClass extends Rfc {
 		l0Row.setCheckNo("X");
 
 		l0Table.appendRow(l0Row);
-
 		rfc.setIClclasses(l0Table);
 
 		rfcInfo.append("CLCLASSES  \n");
-		rfcInfo.append(Tab + "CLASS>>" + l0Row.get_Class() + ", CLASSTYPE>>"
-				+ l0Row.getClassType() + ", STATUS>>" + l0Row.getStatus()
-				+ ", VALFROM>>" + l0Row.getValFrom() + ", VALTO>>"
-				+ l0Row.getValTo() + ", CHECKNO>>" + l0Row.getCheckNo() + "\n");
+		rfcInfo.append(Tab + "CLASS>>" + l0Row.get_Class() 
+				+ ", CLASSTYPE>>" + l0Row.getClassType() 
+				+ ", STATUS>>" + l0Row.getStatus()
+				+ ", VALFROM>>" + l0Row.getValFrom() 
+				+ ", VALTO>>" + l0Row.getValTo() 
+				+ ", CHECKNO>>" + l0Row.getCheckNo() + "\n");
 
 		// Cla_descr - L1
 		Cla_descrTable l1Table = new Cla_descrTable();
 		Cla_descrTableRow l1Row = l1Table.createEmptyRow();
 
-		if (FromToType.equals("MTCTOTYPE")) {
+		if ("MTCTOTYPE".equals(FromToType)) {
 			String className = "MK_" + tmUPGObj.getType() + "_MTC";
 			l1Row.setClass(className);
-		} else if (FromToType.equals("MTCFROMTYPE")) {
+		} else if ("MTCFROMTYPE".equals(FromToType)) {
 			String className = "MK_" + tmUPGObj.getFromType() + "_MTC";
 			l1Row.setClass(className);
 		}
 
 		l1Row.setClassType("300");
 		l1Row.setLanguage("E");
-		if (FromToType.equals("MTCTOTYPE")) {
+		if ("MTCTOTYPE".equals(FromToType)) {
 			l1Row.setCatchword("Model Conversions for Machine Type "
 					+ tmUPGObj.getType());
-		} else if (FromToType.equals("MTCFROMTYPE")) {
+		} else if ("MTCFROMTYPE".equals(FromToType)) {
 			l1Row.setCatchword("Model Conversions for Machine Type "
 					+ tmUPGObj.getFromType());
 		}
+		
 		l1Table.appendRow(l1Row);
-
 		rfc.setIClaDescr(l1Table);
 
 		rfcInfo.append("CHAR_DESCR \n");
-		rfcInfo.append(Tab + "CLASS>>" + l1Row.get_Class() + ", CLASSTYPE>>"
-				+ l1Row.getClassType() + ", LANGUAGE>>" + l1Row.getLanguage()
+		rfcInfo.append(Tab + "CLASS>>" + l1Row.get_Class() 
+				+ ", CLASSTYPE>>" + l1Row.getClassType() 
+				+ ", LANGUAGE>>" + l1Row.getLanguage()
 				+ ", CATCHWORD>>" + l1Row.getCatchword() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
+
 		zdmRow.setZGeo("US");
 		zdmTable.appendRow(zdmRow);
 		rfc.setGeoData(zdmTable);
+
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
+		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + ",RFANUM>>" + chwA.getAnnDocNo() + "\n");
@@ -110,7 +117,6 @@ public class R157createTypeClass extends Rfc {
 
 	@Override
 	public void execute() throws Exception {
-		// TODO Auto-generated method stub
 		logExecution();
 		getRfc().execute();
 		getLog().debug(getErrorInformation());
@@ -155,7 +161,6 @@ public class R157createTypeClass extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		// TODO Auto-generated method stub
 		return "Create type MTC class";
 	}
 
@@ -165,7 +170,6 @@ public class R157createTypeClass extends Rfc {
 	}
 
 	public void evaluate() throws Exception {
-
 		execute();
 	}
 

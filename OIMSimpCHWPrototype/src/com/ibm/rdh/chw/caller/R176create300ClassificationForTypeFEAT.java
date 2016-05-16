@@ -43,11 +43,11 @@ public class R176create300ClassificationForTypeFEAT extends Rfc {
 
 		r0Row.setKeyFeld("MATNR");
 
-		if (newFlag.equals("NEW")) {
+		if ("NEW".equals(newFlag)) {
 			r0Row.setKparaValu(type + "NEW");
-		} else if (newFlag.equals("UPG")) {
+		} else if ("UPG".equals(newFlag)) {
 			r0Row.setKparaValu(type + "UPG");
-		} else if (newFlag.equals("MTC")) {
+		} else if ("MTC".equals(newFlag)) {
 			r0Row.setKparaValu(type + "MTC");
 		}
 
@@ -55,12 +55,10 @@ public class R176create300ClassificationForTypeFEAT extends Rfc {
 		rfc.setIObjectKey(r0Table);
 
 		rfcInfo.append("OBJECTKEY \n");
-		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() + ", KPARAVALU>>"
-				+ r0Row.getKparaValu() + "\n");
+		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld()
+				+ ", KPARAVALU>>" + r0Row.getKparaValu() + "\n");
 
-		String className;
-
-		className = "MK_" + type + "_FEAT_" + range;
+		String className = "MK_" + type + "_FEAT_" + range;
 		// KLAH - R2
 		KlahTable r2Table = new KlahTable();
 		KlahTableRow r2Row = r2Table.createEmptyRow();
@@ -101,8 +99,6 @@ public class R176create300ClassificationForTypeFEAT extends Rfc {
 		MaraTable r5Table = new MaraTable();
 		MaraTableRow r5Row = r5Table.createEmptyRow();
 
-		// Passing date
-		// r5Row.setErsdaString(sdf.format(curDate));
 		r5Row.setErsda(curDate);
 
 		r5Table.appendRow(r5Row);
@@ -111,18 +107,19 @@ public class R176create300ClassificationForTypeFEAT extends Rfc {
 		rfcInfo.append("MARA  \n");
 		rfcInfo.append(Tab + "ERSDA>>" + sdf.format(r5Row.getErsda()) + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

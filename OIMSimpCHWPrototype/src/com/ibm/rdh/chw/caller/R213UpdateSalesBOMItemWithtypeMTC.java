@@ -32,7 +32,6 @@ public class R213UpdateSalesBOMItemWithtypeMTC extends Rfc {
 				PropertyKeys.KEY_DATE_FORMAT, true);
 		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
 		rfcName = "Z_DM_SAP_BOM_MAINTAIN";
-		String itemNumber;
 
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_BOM_MAINTAIN();
 
@@ -40,11 +39,11 @@ public class R213UpdateSalesBOMItemWithtypeMTC extends Rfc {
 		// CSAP_MBOM - M0
 		Csap_mbomStructure m0 = new Csap_mbomStructure();
 
-		if (newFlag.equals("NEW")) {
+		if ("NEW".equals(newFlag)) {
 			m0.setMatnr(type + "NEW");
-		} else if (newFlag.equals("UPG")) {
+		} else if ("UPG".equals(newFlag)) {
 			m0.setMatnr(type + "UPG");
-		} else if (newFlag.equals("MTC")) {
+		} else if ("MTC".equals(newFlag)) {
 			m0.setMatnr(type + "MTC");
 		}
 
@@ -55,22 +54,20 @@ public class R213UpdateSalesBOMItemWithtypeMTC extends Rfc {
 		rfc.setJCsapMbom(m0);
 
 		rfcInfo.append("CSAP_MBOM \n");
-		rfcInfo.append(Tab + "MATNR>>" + m0.getMatnr() + ", WERKS>>"
-				+ m0.getWerks() + ", STLAN>>" + m0.getStlan() + ", DATUV>>"
-				+ m0.getDatuv() + "\n");
+		rfcInfo.append(Tab + "MATNR>>" + m0.getMatnr()
+				+ ", WERKS>>" + m0.getWerks() 
+				+ ", STLAN>>" + m0.getStlan() 
+				+ ", DATUV>>" + m0.getDatuv() + "\n");
 
 		// STPO_API03 - M1
 		if (newFlag.equals("MTC")) {
 			Enumeration e = geoV.elements();
 			Stpo_api03Table m1Table = new Stpo_api03Table();
-			// int Cnt = 1;
 			while (e.hasMoreElements()) {
 				DepData tmg = (DepData) e.nextElement();
 				Stpo_api03TableRow m1Row = m1Table.createEmptyRow();
 
 				m1Row.setItemCateg(tmg.getItem_Categ());
-
-				// itemNumber = generateItemNumberString("r143");
 
 				//add 20160510
 				m1Row.setCompUnit("EA");
@@ -80,18 +77,18 @@ public class R213UpdateSalesBOMItemWithtypeMTC extends Rfc {
 				m1Row.setComponent(tmg.getComponent());
 				m1Row.setCompQty("1");
 				m1Row.setRelSales("X");
-				// Made to ask Greg in Design Document in page 97 it says
-				// IDENTIFIER "A1"
 				m1Row.setIdentifier(tmg.getItem_Node().toString());
 				m1Table.appendRow(m1Row);
 
 				rfcInfo.append("STPO_API03  \n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + m1Row.getItemCateg()
-						+ ", ITEM_NO>>" + m1Row.getItemNo() + ", COMPONENT>>"
-						+ m1Row.getComponent() + ", COMP_QTY>>"
-						+ m1Row.getCompQty() + ", REL_SALES>>"
-						+ m1Row.getRelSales() + ", IDENTIFIER>>"
-						+ m1Row.getIdentifier() + "\n");
+						+ ", ITEM_NO>>" + m1Row.getItemNo() 
+						+ ", COMPONENT>>" + m1Row.getComponent() 
+						+ ", COMP_QTY>>" + m1Row.getCompQty() 
+						+ ", REL_SALES>>" + m1Row.getRelSales() 
+						+ ", IDENTIFIER>>" + m1Row.getIdentifier() + "\n");
+				rfcInfo.append(Tab + "COMPUNIT>>" + m1Row.getCompUnit()
+						+ ", SORTSTRING>>" + m1Row.getSortstring() + "\n");
 			}
 
 			rfc.setJStpoApi03(m1Table);
@@ -100,7 +97,6 @@ public class R213UpdateSalesBOMItemWithtypeMTC extends Rfc {
 			e = geoV.elements();
 			Csdep_datTable m2Table = new Csdep_datTable();
 
-			// Cnt = 1;
 			while (e.hasMoreElements()) {
 				DepData tmg = (DepData) e.nextElement();
 
@@ -108,18 +104,16 @@ public class R213UpdateSalesBOMItemWithtypeMTC extends Rfc {
 
 				m2Row.setDepIntern(tmg.getDep_Intern());
 				m2Row.setStatus("1");
-				// Based on Above Answer I have set whether it is "A" or "A1"
 				m2Row.setIdentifier(tmg.getItem_Node().toString());
-				// Cnt++;
 				m2Row.setObjectId("2");
 
 				m2Table.appendRow(m2Row);
 
 				rfcInfo.append("CSDEP_DAT Row \n");
 				rfcInfo.append(Tab + "DEP_INTERN>>" + m2Row.getDepIntern()
-						+ ", STATUS>>" + m2Row.getStatus() + ", IDENTIFIER>>"
-						+ m2Row.getIdentifier() + ", OBJECT_ID>>"
-						+ m2Row.getObjectId() + "\n");
+						+ ", STATUS>>" + m2Row.getStatus()
+						+ ", IDENTIFIER>>" + m2Row.getIdentifier() 
+						+ ", OBJECT_ID>>" + m2Row.getObjectId() + "\n");
 			}
 
 			rfc.setJCsdepDat(m2Table);
@@ -134,18 +128,19 @@ public class R213UpdateSalesBOMItemWithtypeMTC extends Rfc {
 
 		rfc.setJCsdata(m8);
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + rfc.getPimsIdentity() + "\n");

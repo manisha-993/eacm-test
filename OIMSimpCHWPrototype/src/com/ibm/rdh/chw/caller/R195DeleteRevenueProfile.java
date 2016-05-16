@@ -41,14 +41,11 @@ public class R195DeleteRevenueProfile extends Rfc {
 			throws Exception {
 		reInitialize();
 
-		// setR195ItemNumberCounter(1);
-
 		Date curDate = new Date();
 		String sDateFormat = ConfigManager.getConfigManager().getString(
 				PropertyKeys.KEY_DATE_FORMAT, true);
 		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
 		rfcName = "Z_DM_SAP_BOM_MAINTAIN";
-		String itemNumber;
 
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_BOM_MAINTAIN();
 
@@ -56,17 +53,14 @@ public class R195DeleteRevenueProfile extends Rfc {
 		// CSAP_MBOM - M0
 		Csap_mbomStructure m0 = new Csap_mbomStructure();
 
-		// Changes Made by Laxmi
-
-		if (newFlag.equals("NEW")) {
+		if ("NEW".equals(newFlag)) {
 			m0.setMatnr(type + "NEW");
-		} else if (newFlag.equals("UPG")) {
+		} else if ("UPG".equals(newFlag)) {
 			m0.setMatnr(type + "UPG");
-		} else if (newFlag.equals("MTC")) {
+		} else if ("MTC".equals(newFlag)) {
 			m0.setMatnr(type + "MTC");
 		}
 
-		// m0.setWerks("1222");
 		m0.setWerks(_plant);
 		m0.setStlan("Y");
 		m0.setDatuv(sdf.format(curDate));
@@ -74,36 +68,26 @@ public class R195DeleteRevenueProfile extends Rfc {
 		rfc.setJCsapMbom(m0);
 
 		rfcInfo.append("CSAP_MBOM \n");
-		rfcInfo.append(Tab + "MATNR>>" + m0.getMatnr() + ", WERKS>>"
-				+ m0.getWerks() + ", STLAN>>" + m0.getStlan() + ", DATUV>>"
-				+ m0.getDatuv() + "\n");
+		rfcInfo.append(Tab + "MATNR>>" + m0.getMatnr() 
+				+ ", WERKS>>" + m0.getWerks() 
+				+ ", STLAN>>" + m0.getStlan()
+				+ ", DATUV>>" + m0.getDatuv() + "\n");
 
 		// STPO_API03 - M1
 		Enumeration e = revData.elements();
 		Stpo_api03Table m1Table = new Stpo_api03Table();
 
-		// int Cnt = 1;
 		while (e.hasMoreElements()) {
 			RevData revdata = (RevData) e.nextElement();
 			Stpo_api03TableRow m1Row = m1Table.createEmptyRow();
 
-			// m1Row.setItemCateg(revdata.getItem_Categ());
 			// As per the Design.
 			m1Row.setItemCateg("Y");
-
-			// itemNumber = generateItemNumberString("r195");
 
 			m1Row.setItemNo(revdata.getItem_No());
 			m1Row.setComponent(revdata.getComponent());
 			m1Row.setItemNode(revdata.getItem_Node());
 			m1Row.setItemCount(revdata.getItem_Count());
-			/*
-			 * m1Row.setCompQty("1"); m1Row.setRelSales("X"); // Made to ask
-			 * Greg in Design Document in page 97 it says IDENTIFIER "A1"
-			 * 
-			 * 
-			 * m1Row.setIdentifier("A" + Cnt); Cnt++;
-			 */
 
 			m1Row.setFldelete("X");
 			m1Table.appendRow(m1Row);
@@ -111,21 +95,15 @@ public class R195DeleteRevenueProfile extends Rfc {
 			rfcInfo.append("STPO_API03  \n");
 			rfcInfo.append(Tab + "ITEM_CATEG>>" + m1Row.getItemCateg()
 					+ ", ITEM_NO>>" + m1Row.getItemNo()
-					+ ", COMPONENT>>"
-					+ m1Row.getComponent()
-					+
-					// ", COMP_QTY>>"+m1Row.getCompQty()+
-					", ITEMNODE>>" + m1Row.getItemNode() + ", ITEMCOUNT>>"
-					+ m1Row.getItemCount() + ", FLDELETE>>"
-					+ m1Row.getFldelete() +
-
-					// ", REL_SALES>>"+m1Row.getRelSales()+
-					// ", IDENTIFIER>>"+m1Row.getIdentifier()+
-					"\n");
+					+ ", COMPONENT>>" + m1Row.getComponent() 
+					+ ", ITEMNODE>>" + m1Row.getItemNode() 
+					+ ", ITEMCOUNT>>" + m1Row.getItemCount()
+					+ ", FLDELETE>>" + m1Row.getFldelete() + "\n");
 		}
 
 		rfc.setJStpoApi03(m1Table);
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
@@ -138,6 +116,7 @@ public class R195DeleteRevenueProfile extends Rfc {
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + rfc.getPimsIdentity() + "\n");

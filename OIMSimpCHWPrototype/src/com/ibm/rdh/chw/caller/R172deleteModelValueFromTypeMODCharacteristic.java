@@ -39,16 +39,18 @@ public class R172deleteModelValueFromTypeMODCharacteristic extends Rfc {
 		c0Row.setAdditVals("X");
 		c0Row.setNegVals("X");
 		// end
-		
+
 		c0Table.appendRow(c0Row);
 		rfc.setICharacts(c0Table);
 
 		rfcInfo.append("CHARACTS \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() + ", DATATYPE>>"
-				+ c0Row.getDatatype() + ", CHARNUMBER>>"
-				+ c0Row.getCharnumberString() + ", STATUS>>"
-				+ c0Row.getStatus() + ", VALASSIGNM>>" + c0Row.getValassignm()
-				+ "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() 
+				+ ", DATATYPE>>" + c0Row.getDatatype() 
+				+ ", CHARNUMBER>>" + c0Row.getCharnumberString() 
+				+ ", STATUS>>" + c0Row.getStatus() 
+				+ ", VALASSIGNM>>" + c0Row.getValassignm() + "\n");
+		rfcInfo.append(Tab + "ADDITVALS>>" + c0Row.getAdditVals()
+				+ ", NEGVALS>>" + c0Row.getNegVals() + "\n");
 
 		// This part will be optional,but now is required.
 		// CHAR_DESCR - C1
@@ -63,9 +65,9 @@ public class R172deleteModelValueFromTypeMODCharacteristic extends Rfc {
 		rfc.setICharDescr(c1Table);
 
 		rfcInfo.append("CHAR_DESCR  \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact() + ", LANGUAGE>>"
-				+ c1Row.getLanguage() + ", CHDESCR>>" + c1Row.getChdescr()
-				+ "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact()
+				+ ", LANGUAGE>>" + c1Row.getLanguage() 
+				+ ", CHDESCR>>" + c1Row.getChdescr() + "\n");
 		// end
 
 		// CHAR_VALS - C4
@@ -80,22 +82,23 @@ public class R172deleteModelValueFromTypeMODCharacteristic extends Rfc {
 		rfc.setICharVals(c4Table);
 
 		rfcInfo.append("CHAR_VALS  \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c4Row.getCharact() + ", VALUE>>"
-				+ c4Row.getValue() + ", FLDELETE>>" + c4Row.getFldelete()
-				+ "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c4Row.getCharact()
+				+ ", VALUE>>" + c4Row.getValue() 
+				+ ", FLDELETE>>" + c4Row.getFldelete() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

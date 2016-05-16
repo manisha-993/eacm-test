@@ -64,11 +64,15 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 		rfc.setIBmm00(b0Table);
 
 		rfcInfo.append("BMM00 \n");
-		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
-				+ b0Row.getMatnr() + ", XEIV1>>" + b0Row.getXeiv1()
-				+ ", VKORG>>" + b0Row.getVkorg() + ", VTWEG>>"
-				+ b0Row.getVtweg() + "\n");
+		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() 
+				+ ", MATNR>>" + b0Row.getMatnr() 
+				+ ", XEIV1>>" + b0Row.getXeiv1()
+				+ ", VKORG>>" + b0Row.getVkorg() 
+				+ ", VTWEG>>" + b0Row.getVtweg() + "\n");
+		rfcInfo.append(Tab + "MBRSH>>" + b0Row.getMbrsh() 
+				+ ", MTART>>" + b0Row.getMtart() + "\n");
 
+		// Bmmh1
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
@@ -87,7 +91,15 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 
 		rfcInfo.append("B1 \n");
 		rfcInfo.append(Tab + "PRODH>>" + b1Row.getProdh() + "\n");
+		rfcInfo.append(Tab + "MATKL>>" + b1Row.getMatkl() 
+				+ "MEINS>>" + b1Row.getMeins() 
+				+ "ZEINR>>" + b1Row.getZeinr() 
+				+ "ZEIAR>>" + b1Row.getZeiar() 
+				+ "AESZN>>" + b1Row.getAeszn() 
+				+ "SPART>>" + b1Row.getSpart() 
+				+ "GEWEI>>" + b1Row.getGewei() + "\n");
 
+		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
@@ -97,13 +109,13 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");

@@ -57,6 +57,7 @@ public class R197createLifecycleRow extends Rfc {
 		tRow.setZdmCreateIuser(truncateInternetUser(user));
 		rfcInfo.append(Tab + "ZDM_CREATE_IUSER>>" + tRow.getZdmCreateIuser()
 				+ ",");
+
 		if (check.equals("wdfm")) {
 			tRow.setZdmRfanum(annDocNo + "_WDFM");
 		} else {
@@ -65,17 +66,19 @@ public class R197createLifecycleRow extends Rfc {
 		rfcInfo.append(Tab + "ZDM_RFANUM>>" + tRow.getZdmRfanum());
 
 		t.appendRow(tRow);
-
 		rfc.setZdmChwPlc(t);
 
 		rfcInfo.append("DIRECT FIELDS\n");
 
+		// ACTION_CODE
 		rfc.setActionCode("I");
 		rfcInfo.append(Tab + "ACTION_CODE>>" + rfc.getActionCode() + ",");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append(Tab + "PIMS_IDENTITY>>" + rfc.getPimsIdentity() + ",");
 
+		// RFANUMBER
 		if (check.equals("wdfm")) {
 			rfc.setRfaNum(annDocNo + "_WDFM");
 		} else {
@@ -83,13 +86,13 @@ public class R197createLifecycleRow extends Rfc {
 		}
 		rfcInfo.append(Tab + "RFANUM>>" + rfc.getRfaNum() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
 
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
@@ -120,7 +123,6 @@ public class R197createLifecycleRow extends Rfc {
 
 	@Override
 	public String getTaskDescription() {
-
 		StringBuffer sb = new StringBuffer();
 		sb.append(" " + getMaterialName());
 		return sb.toString();
