@@ -30,9 +30,6 @@ public class R138create300ClassificationForTypeRPQ extends Rfc {
 		reInitialize();
 		rfcName = "Z_DM_SAP_CLASSIFICATION_MAINT";
 		TypeFeature tf;
-		// First check and see if tfc is empty and we do not need to do
-		// anything.
-
 		Date curDate = new Date();
 		String sDateFormat = ConfigManager.getConfigManager().getString(
 				PropertyKeys.KEY_DATE_FORMAT, true);
@@ -114,6 +111,7 @@ public class R138create300ClassificationForTypeRPQ extends Rfc {
 		rfcInfo.append("MARA  \n");
 		rfcInfo.append(Tab + "ERSDA>>" + sdf.format(r5Row.getErsda()) + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 		zdmRow.setZGeo("US");
@@ -122,10 +120,12 @@ public class R138create300ClassificationForTypeRPQ extends Rfc {
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
+		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + ",RFANUM>>" + chwA.getAnnDocNo() + "\n");
