@@ -40,17 +40,62 @@ import com.ibm.transform.oim.eacm.util.PokUtils;
 
 public abstract class RfcAbrAdapter implements RfcAbr {
 	
+	// Entity 
+	protected static final String MODEL = "MODEL";
+	protected static final String AVAIL = "AVAIL";
+	protected static final String ANNOUNCEMENT = "ANNOUNCEMENT";
+	protected static final String MACHTYPE = "MACHTYPE";
+	protected static final String GENERALAREA = "GENERALAREA";
+	protected static final String GBT = "GBT";
+	protected static final String TAXCATG = "TAXCATG";
+	protected static final String MODTAXRELEVANCE = "MODTAXRELEVANCE";
+	protected static final String SGMNTACRNYM = "SGMNTACRNYM";
+	// Entity attribute
+	protected static final String MACHTYPE_PROMOTED = "PROMOTED";
+	protected static final String MODEL_MACHTYPEATR = "MACHTYPEATR";
+	protected static final String MODEL_MODELATR = "MODELATR";
+	protected static final String MODEL_MKTGNAME = "MKTGNAME";
+	protected static final String MODEL_ACCTASGNGRP = "ACCTASGNGRP";
+	protected static final String MODEL_PRFTCTR = "PRFTCTR";
+	protected static final String MODEL_INSTALL = "INSTALL";
+	protected static final String MODEL_LICNSINTERCD = "LICNSINTERCD";
+	protected static final String MODEL_SYSTEMTYPE = "SYSTEMTYPE";
+	protected static final String MODEL_SYSIDUNIT = "SYSIDUNIT";
+	protected static final String MODEL_MODELORDERCODE = "MODELORDERCODE";
+	
+	protected static final String AVAIL_COUNTRYLIST = "COUNTRYLIST";
+	
+	protected static final String ANNOUNCEMENT_ANNTYPE = "ANNTYPE";
+	protected static final String ANNOUNCEMENT_ANNDATE = "ANNDATE";
+	protected static final String ANNOUNCEMENT_PDHDOMAIN = "PDHDOMAIN";
+	
+	protected static final String GENERALAREA_SLEORG = "SLEORG";
+	protected static final String GENERALAREA_GENAREACODE = "GENAREACODE";
+	protected static final String GENERALAREA_GENAREANAME = "GENAREANAME";
+	protected static final String GENERALAREA_GENAREAPARENT = "GENAREAPARENT";
+	protected static final String GENERALAREA_CBSLEGACYPLNTCD = "CBSLEGACYPLNTCD";
+	
+	protected static final String GBT_SAPPRIMBRANDCD = "SAPPRIMBRANDCD";
+	protected static final String GBT_SAPPRODFMLYCD = "SAPPRODFMLYCD";
+	
+	protected static final String TAXCATG_COUNTRYLIST = "COUNTRYLIST";
+	protected static final String TAXCATG_TAXCATGATR = "TAXCATGATR";
+	protected static final String MODTAXRELEVANCE_TAXCLS = "TAXCLS";
+	
+	protected static final String SGMNTACRNYM_DIV = "DIV";
+	// Attribute value
+	public static final String MACHTYPE_PROMOTED_YES = "PRYES";
+	protected static final String PLANNEDAVAIL = "146";
+	protected static final String STATUS_PASSED = "0030";
+
 	public static final String LOCAL_REAL_PATH = "./properties/dev";
 	
 	public static final String STRING_SEPARATOR = "|";
 	
-	public static final String MACHTYPE_PROMOTED = "PRYES";
-	
 	public static final String ROLE_CODE = "BHFEED";
 	
-	protected static final String STATUS_PASSED = "0030";
 	protected static final String RFCABRSTATUS = "RFCABRSTATUS";
-	protected static final String PLANNEDAVAIL = "146";
+	
 	
 	protected String m_strEpoch = "1980-01-01-00.00.00.000000";
 	
@@ -412,14 +457,14 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 		List<SalesOrgPlants> salesorgPlantsVect = new ArrayList<>();			
 		for (int i = 0; i < generalareaVct.size(); i++) {
 			EntityItem generalarea = (EntityItem)generalareaVct.get(i);
-			String salesOrg = getAttributeValue(generalarea, "SLEORG");
+			String salesOrg = getAttributeValue(generalarea, GENERALAREA_SLEORG);
 			if (salesOrg != null && !"".equals(salesOrg)) {
 				SalesOrgPlants salesorgPlants = new SalesOrgPlants();
-				salesorgPlants.setGenAreaCode(getAttributeValue(generalarea, "GENAREACODE"));
-				salesorgPlants.setGenAreaName(getAttributeFlagValue(generalarea, "GENAREANAME"));
-				salesorgPlants.setGeo(getAttributeValue(generalarea, "GENAREAPARENT")); // 
+				salesorgPlants.setGenAreaCode(getAttributeValue(generalarea, GENERALAREA_GENAREACODE));
+				salesorgPlants.setGenAreaName(getAttributeFlagValue(generalarea, GENERALAREA_GENAREANAME));
+				salesorgPlants.setGeo(getAttributeValue(generalarea, GENERALAREA_GENAREAPARENT)); // 
 				salesorgPlants.setSalesorg(salesOrg);
-				salesorgPlants.setPlants(getAttributeMultiFlagValue(generalarea, "CBSLEGACYPLNTCD"));
+				salesorgPlants.setPlants(getAttributeMultiFlagValue(generalarea, GENERALAREA_CBSLEGACYPLNTCD));
 				salesorgPlantsVect.add(salesorgPlants);
 			} else {
 				abr.addDebug("SalesOrg value is null for " + generalarea.getKey());
@@ -512,7 +557,7 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 	 */
 	protected String getSegmentAcronymForAnn(EntityItem ann) throws RfcAbrException {
 		String segmentAcronym = "";
-		String domain = getAttributeValue(ann, "PDHDOMAIN");
+		String domain = getAttributeValue(ann, ANNOUNCEMENT_PDHDOMAIN);
 		if ("iSeries".equals(domain)) {
 			segmentAcronym = "AS4";
 		} else if ("pSeries".equals(domain)) {
