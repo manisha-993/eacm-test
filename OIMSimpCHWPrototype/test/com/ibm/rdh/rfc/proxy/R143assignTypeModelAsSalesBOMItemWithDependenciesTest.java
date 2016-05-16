@@ -35,11 +35,10 @@ public class R143assignTypeModelAsSalesBOMItemWithDependenciesTest extends
 		String sql_mast_1 = "insert into sapr3.MAST (mandt,matnr,werks,stlan) values ('200','EACMNEW','0010','5')";
 		String sql_mast_2 = "insert into sapr3.MAST (mandt,matnr,werks,stlan) values ('200','EACMUPG','0010','5')";
 		String sql_mast_3 = "insert into sapr3.MAST (mandt,matnr,werks,stlan) values ('200','EACMMTC','0010','5')";
-		String sql_mara_1 ="insert into sapr3.MARA (mandt,MATNR) values('200','EACMAAA')";
-		String sql_mara_2 ="insert into sapr3.MARA (mandt,MATNR) values('200','EACMBBB')";
-		String sql_marc_4 = "insert into sapr3.MARC (mandt,matnr,werks) values('200','EACMAAA','0010')";
-		String sql_marc_5 = "insert into sapr3.MARC (mandt,matnr,werks) values('200','EACMBBB','0010')";
-		
+		String sql_mara_1 = "insert into sapr3.MARA (mandt,MATNR) values('200','EACMNEW')";
+		String sql_mara_2 = "insert into sapr3.MARA (mandt,MATNR) values('200','EACMUPG')";
+		String sql_mara_3 = "insert into sapr3.MARA (mandt,MATNR) values('200','EACMMTC')";
+
 		int t1 = SqlHelper.runUpdateSql(sql_t001W, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_marc_1, conn);
 		int t3 = SqlHelper.runUpdateSql(sql_marc_2, conn);
@@ -49,9 +48,9 @@ public class R143assignTypeModelAsSalesBOMItemWithDependenciesTest extends
 		int t7 = SqlHelper.runUpdateSql(sql_mast_3, conn);
 		int t8 = SqlHelper.runUpdateSql(sql_mara_1, conn);
 		int t9 = SqlHelper.runUpdateSql(sql_mara_2, conn);
-		int t10 = SqlHelper.runUpdateSql(sql_marc_4, conn);
-		int t11= SqlHelper.runUpdateSql(sql_marc_5, conn);
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0 && t7 >= 0 && t8 >= 0 && t9 >= 0 && t10 >= 0 && t11 >= 0) {
+		int t10 = SqlHelper.runUpdateSql(sql_mara_3, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0
+				&& t7 >= 0 && t8 >= 0 && t9 >= 0 && t10 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -67,10 +66,10 @@ public class R143assignTypeModelAsSalesBOMItemWithDependenciesTest extends
 			Vector geoV = new Vector();
 			TypeModel typeModel1 = new TypeModel();
 			typeModel1.setType("EACM");
-			typeModel1.setModel("AAA");
+			typeModel1.setModel("NEW");
 			TypeModel typeModel2 = new TypeModel();
 			typeModel2.setType("EACM");
-			typeModel2.setModel("BBB");
+			typeModel2.setModel("UPG");
 			geoV.add(typeModel1);
 			geoV.add(typeModel2);
 			String newFlag = "NEW";
@@ -133,10 +132,10 @@ public class R143assignTypeModelAsSalesBOMItemWithDependenciesTest extends
 			Vector geoV = new Vector();
 			TypeModel typeModel1 = new TypeModel();
 			typeModel1.setType("EACM");
-			typeModel1.setModel("AAA");
+			typeModel1.setModel("NEW");
 			TypeModel typeModel2 = new TypeModel();
 			typeModel2.setType("EACM");
-			typeModel2.setModel("BBB");
+			typeModel2.setModel("UPG");
 			geoV.add(typeModel1);
 			geoV.add(typeModel2);
 			String newFlag = "UPG";
@@ -189,6 +188,7 @@ public class R143assignTypeModelAsSalesBOMItemWithDependenciesTest extends
 
 		}
 	}
+
 	@Test
 	public void testR14303() {
 		try {
@@ -198,10 +198,10 @@ public class R143assignTypeModelAsSalesBOMItemWithDependenciesTest extends
 			Vector geoV = new Vector();
 			TypeModelUPGGeo typeModelUpg1 = new TypeModelUPGGeo();
 			typeModelUpg1.setType("EACM");
-			typeModelUpg1.setModel("AAA");
+			typeModelUpg1.setModel("NEW");
 			TypeModelUPGGeo typeModelUpg2 = new TypeModelUPGGeo();
 			typeModelUpg2.setType("EACM");
-			typeModelUpg2.setModel("BBB");
+			typeModelUpg2.setModel("UPG");
 			geoV.add(typeModelUpg1);
 			geoV.add(typeModelUpg2);
 			String newFlag = "MTC";
@@ -258,9 +258,9 @@ public class R143assignTypeModelAsSalesBOMItemWithDependenciesTest extends
 	@After
 	public void deleteData() {
 		String del_t001W = "delete from sapr3.T001W where mandt='200' and werks='0010'";
-		String del_marc = "delete from sapr3.marc where mandt='200' and matnr in ('EACMNEW','EACMUPG','EACMMTC','EACMAAA','EACMBBB') and werks='0010'";
+		String del_marc = "delete from sapr3.marc where mandt='200' and matnr in ('EACMNEW','EACMUPG','EACMMTC') and werks='0010'";
 		String del_mast = "delete from sapr3.mast where mandt='200' and matnr in ('EACMNEW','EACMUPG','EACMMTC') and werks='0010' and stlan='5'";
-		String del_mara="delete from sapr3.mara where mandt='200' and MATNR in ('EACMAAA','EACMBBB')";
+		String del_mara = "delete from sapr3.mara where mandt='200' and MATNR in ('EACMNEW','EACMUPG','EACMMTC')";
 		int t1 = SqlHelper.runUpdateSql(del_t001W, conn);
 		int t2 = SqlHelper.runUpdateSql(del_marc, conn);
 		int t3 = SqlHelper.runUpdateSql(del_mast, conn);

@@ -33,7 +33,7 @@ public class R144updateParkStatusTest extends RdhRestProxyTest {
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
 			map.put("ACTIV_ID", "'Z_DM_SAP_PARK_STATUS'");
-			map.put("OBJECT_ID", annno);
+			map.put("OBJECT_ID", "'" + annno + "'");
 			rowDetails = selectTableRow(map, "ZDM_LOGHDR");
 			assertNotNull(rowDetails);
 			String sessionId = (String) rowDetails.get("ZSESSION");

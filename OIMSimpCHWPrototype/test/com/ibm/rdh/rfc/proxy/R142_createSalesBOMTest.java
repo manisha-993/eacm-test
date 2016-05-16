@@ -17,10 +17,10 @@ import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 
-public class R142_createSalesBOMTest extends RdhRestProxyTest{
+public class R142_createSalesBOMTest extends RdhRestProxyTest {
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
-	
+
 	@Before
 	public void prepareData() {
 		String sql_t001W = "insert into sapr3.T001W select IBMSNAP_INTENTSEQ,IBMSNAP_OPERATION,IBMSNAP_COMMITSEQ,"
@@ -31,11 +31,12 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 		String sql_marc_1 = "insert into sapr3.MARC (mandt,matnr,werks) values('200','EACMNEW','0011')";
 		String sql_marc_2 = "insert into sapr3.MARC (mandt,matnr,werks) values('200','EACMUPG','0011')";
 		String sql_marc_3 = "insert into sapr3.MARC (mandt,matnr,werks) values('200','EACMMTC','0011')";
-		String sql_mara_1 ="insert into sapr3.MARA (mandt,MATNR) values('200','EACMAAA')";
-		String sql_mara_2 ="insert into sapr3.MARA (mandt,MATNR) values('200','EACMBBB')";
+		String sql_mara_1 = "insert into sapr3.MARA (mandt,MATNR) values('200','EACMNEW')";
+		String sql_mara_2 = "insert into sapr3.MARA (mandt,MATNR) values('200','EACMUPG')";
+		String sql_mara_3 = "insert into sapr3.MARA (mandt,MATNR) values('200','EACMMTC')";
 		String sql_marc_4 = "insert into sapr3.MARC (mandt,matnr,werks) values('200','EACMAAA','0011')";
 		String sql_marc_5 = "insert into sapr3.MARC (mandt,matnr,werks) values('200','EACMBBB','0011')";
-		 
+
 		int t1 = SqlHelper.runUpdateSql(sql_t001W, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_marc_1, conn);
 		int t3 = SqlHelper.runUpdateSql(sql_marc_2, conn);
@@ -43,16 +44,18 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 		int t5 = SqlHelper.runUpdateSql(sql_mara_1, conn);
 		int t6 = SqlHelper.runUpdateSql(sql_mara_2, conn);
 		int t7 = SqlHelper.runUpdateSql(sql_marc_4, conn);
-		int t8= SqlHelper.runUpdateSql(sql_marc_5, conn);
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0 && t7 >= 0 && t8 >= 0) {
+		int t8 = SqlHelper.runUpdateSql(sql_marc_5, conn);
+		int t9 = SqlHelper.runUpdateSql(sql_mara_3, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0
+				&& t7 >= 0 && t8 >= 0 && t9 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
 		}
 	}
-	
+
 	@Test
-	public void testR14201(){
+	public void testR14201() {
 		try {
 			logger.info("newFlag:NEW");
 			String type = "EACM";
@@ -60,10 +63,10 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 			Vector geoV = new Vector();
 			TypeModel typeModel1 = new TypeModel();
 			typeModel1.setType("EACM");
-			typeModel1.setModel("AAA");
+			typeModel1.setModel("NEW");
 			TypeModel typeModel2 = new TypeModel();
 			typeModel2.setType("EACM");
-			typeModel2.setModel("BBB");
+			typeModel2.setModel("UPG");
 			geoV.add(typeModel1);
 			geoV.add(typeModel2);
 			String newFlag = "NEW";
@@ -74,8 +77,8 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 			String pimsIdentity = "C";
 
 			String object_id = type + "NEW/" + sapPlant + "/5";
-			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
-					"Z_DM_SAP_BOM_CREATE", object_id);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, "Z_DM_SAP_BOM_CREATE",
+					object_id);
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r142(type, sapPlant, geoV, newFlag, chwA, spItem_Categ,
 					pimsIdentity);
@@ -92,14 +95,14 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 			String sessionId = (String) rowDetails.get("ZSESSION");
 			String status = (String) rowDetails.get("STATUS");
 			assertEquals(status, "success");
-			
+
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
-			map.put("ZDM_SESSION", "'"+sessionId+"'");
+			map.put("ZDM_SESSION", "'" + sessionId + "'");
 			map.put("ZDMOBJTYP", "'BMP'");
 			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
 			assertNotNull(rowDetails);
-			
+
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
 			map.put("TEXT", "'Success'");
@@ -116,9 +119,9 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 
 		}
 	}
-	
+
 	@Test
-	public void testR14202(){
+	public void testR14202() {
 		try {
 			logger.info("newFlag:UPG");
 			String type = "EACM";
@@ -126,10 +129,10 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 			Vector geoV = new Vector();
 			TypeModel typeModel1 = new TypeModel();
 			typeModel1.setType("EACM");
-			typeModel1.setModel("AAA");
+			typeModel1.setModel("NEW");
 			TypeModel typeModel2 = new TypeModel();
 			typeModel2.setType("EACM");
-			typeModel2.setModel("BBB");
+			typeModel2.setModel("UPG");
 			geoV.add(typeModel1);
 			geoV.add(typeModel2);
 			String newFlag = "UPG";
@@ -140,8 +143,8 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 			String pimsIdentity = "C";
 
 			String object_id = type + "UPG/" + sapPlant + "/5";
-			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
-					"Z_DM_SAP_BOM_CREATE", object_id);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, "Z_DM_SAP_BOM_CREATE",
+					object_id);
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r142(type, sapPlant, geoV, newFlag, chwA, spItem_Categ,
 					pimsIdentity);
@@ -161,11 +164,11 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
-			map.put("ZDM_SESSION", "'"+sessionId+"'");
+			map.put("ZDM_SESSION", "'" + sessionId + "'");
 			map.put("ZDMOBJTYP", "'BMP'");
 			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
 			assertNotNull(rowDetails);
-			
+
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
 			map.put("TEXT", "'Success'");
@@ -184,7 +187,7 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 	}
 
 	@Test
-	public void testR14203(){
+	public void testR14203() {
 		try {
 			logger.info("newFlag:MTC");
 			String type = "EACM";
@@ -192,10 +195,10 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 			Vector geoV = new Vector();
 			TypeModelUPGGeo typeModelUpg1 = new TypeModelUPGGeo();
 			typeModelUpg1.setType("EACM");
-			typeModelUpg1.setModel("AAA");
+			typeModelUpg1.setModel("NEW");
 			TypeModelUPGGeo typeModelUpg2 = new TypeModelUPGGeo();
 			typeModelUpg2.setType("EACM");
-			typeModelUpg2.setModel("BBB");
+			typeModelUpg2.setModel("UPG");
 			geoV.add(typeModelUpg1);
 			geoV.add(typeModelUpg2);
 			String newFlag = "MTC";
@@ -206,8 +209,8 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 			String pimsIdentity = "C";
 
 			String object_id = type + "MTC/" + sapPlant + "/5";
-			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
-					"Z_DM_SAP_BOM_CREATE", object_id);
+			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, "Z_DM_SAP_BOM_CREATE",
+					object_id);
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r142(type, sapPlant, geoV, newFlag, chwA, spItem_Categ,
 					pimsIdentity);
@@ -227,11 +230,11 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
-			map.put("ZDM_SESSION", "'"+sessionId+"'");
+			map.put("ZDM_SESSION", "'" + sessionId + "'");
 			map.put("ZDMOBJTYP", "'BMP'");
 			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
 			assertNotNull(rowDetails);
-			
+
 			map.clear();
 			map.put("ZSESSION", "'" + sessionId + "'");
 			map.put("TEXT", "'Success'");
@@ -248,13 +251,13 @@ public class R142_createSalesBOMTest extends RdhRestProxyTest{
 
 		}
 	}
-	
+
 	@After
 	public void deleteData() {
 		String del_t001W = "delete from sapr3.T001W where mandt='200' and werks='0011'";
-		String del_marc = "delete from sapr3.marc where mandt='200' and matnr in ('EACMNEW','EACMUPG','EACMMTC','EACMAAA','EACMBBB') and werks='0011'";
+		String del_marc = "delete from sapr3.marc where mandt='200' and matnr in ('EACMNEW','EACMUPG','EACMMTC') and werks='0011'";
 		String del_mast = "delete from sapr3.mast where mandt='200' and matnr in ('EACMNEW','EACMUPG','EACMMTC') and werks='0011' and stlan='5'";
-		String del_mara = "delete from sapr3.mara where mandt='200' and MATNR in ('EACMAAA','EACMBBB')";
+		String del_mara = "delete from sapr3.mara where mandt='200' and MATNR in ('EACMNEW','EACMUPG','EACMMTC')";
 
 		int t1 = SqlHelper.runUpdateSql(del_t001W, conn);
 		int t2 = SqlHelper.runUpdateSql(del_marc, conn);

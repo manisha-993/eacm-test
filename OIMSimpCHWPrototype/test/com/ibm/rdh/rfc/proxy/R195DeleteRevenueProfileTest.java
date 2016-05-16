@@ -31,6 +31,9 @@ public class R195DeleteRevenueProfileTest extends RdhRestProxyTest{
 		String sql_mast_1 = "insert into sapr3.MAST (mandt,matnr,werks,stlan) values ('200','EACMNEW','0010','Y')";
 		String sql_mast_2 = "insert into sapr3.MAST (mandt,matnr,werks,stlan) values ('200','EACMUPG','0010','Y')";
 		String sql_mast_3 = "insert into sapr3.MAST (mandt,matnr,werks,stlan) values ('200','EACMMTC','0010','Y')";
+		String sql_mara_1 ="insert into sapr3.MARA (mandt,MATNR) values('200','EACMNEW')";
+		String sql_mara_2 ="insert into sapr3.MARA (mandt,MATNR) values('200','EACMUPG')";
+		String sql_mara_3 ="insert into sapr3.MARA (mandt,MATNR) values('200','EACMMTC')";
 		
 		int t1 = SqlHelper.runUpdateSql(sql_t001W, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_marc_1, conn);
@@ -39,7 +42,11 @@ public class R195DeleteRevenueProfileTest extends RdhRestProxyTest{
 		int t5 = SqlHelper.runUpdateSql(sql_mast_1, conn);
 		int t6 = SqlHelper.runUpdateSql(sql_mast_2, conn);
 		int t7 = SqlHelper.runUpdateSql(sql_mast_3, conn);
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0 && t7 >= 0) {
+		int t8 = SqlHelper.runUpdateSql(sql_mara_1, conn);
+		int t9 = SqlHelper.runUpdateSql(sql_mara_2, conn);
+		int t10 = SqlHelper.runUpdateSql(sql_mara_3, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0
+				&& t7 >= 0 && t8 >= 0 && t9 >= 0 && t10 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -222,11 +229,13 @@ public class R195DeleteRevenueProfileTest extends RdhRestProxyTest{
 		String del_t001W = "delete from sapr3.T001W where mandt='200' and werks='0010'";
 		String del_marc = "delete from sapr3.marc where mandt='200' and matnr in ('EACMNEW','EACMUPG','EACMMTC') and werks='0010'";
 		String del_mast = "delete from sapr3.mast where mandt='200' and matnr in ('EACMNEW','EACMUPG','EACMMTC') and werks='0010' and stlan='Y'";
+		String del_mara="delete from sapr3.mara where mandt='200' and MATNR in ('EACMNEW','EACMUPG','EACMMTC')";
 		
 		int t1 = SqlHelper.runUpdateSql(del_t001W, conn);
 		int t2 = SqlHelper.runUpdateSql(del_marc, conn);
 		int t3 = SqlHelper.runUpdateSql(del_mast, conn);  
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
+		int t4 = SqlHelper.runUpdateSql(del_mara, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");

@@ -16,10 +16,10 @@ import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.rdh.chw.entity.BomComponent;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 
-public class R170removeTypeModelsFromBOMTest extends RdhRestProxyTest{
+public class R170removeTypeModelsFromBOMTest extends RdhRestProxyTest {
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
-	
+
 	@Before
 	public void prepareData() {
 		String sql_t001W = "insert into sapr3.T001W select IBMSNAP_INTENTSEQ,IBMSNAP_OPERATION,IBMSNAP_COMMITSEQ,"
@@ -33,10 +33,10 @@ public class R170removeTypeModelsFromBOMTest extends RdhRestProxyTest{
 		String sql_mast_1 = "insert into sapr3.MAST (mandt,matnr,werks,stlan) values ('200','EACMNEW','0010','5')";
 		String sql_mast_2 = "insert into sapr3.MAST (mandt,matnr,werks,stlan) values ('200','EACMUPG','0010','5')";
 		String sql_mast_3 = "insert into sapr3.MAST (mandt,matnr,werks,stlan) values ('200','EACMMTC','0010','5')";
-		String sql_mara_1 ="insert into sapr3.MARA (mandt,MATNR) values('200','R170')";
-		String sql_marc_4 = "insert into sapr3.MARC (mandt,matnr,werks) values('200','R170','0010')";
-		String sql_stpo="insert into sapr3.stpo(mandt,stlty,stlkn,stpoz) values('200','M','11010001','11010001')";
-		
+		String sql_mara_1 = "insert into sapr3.MARA (mandt,MATNR) values('200','EACMNEW')";
+		String sql_mara_2 = "insert into sapr3.MARA (mandt,MATNR) values('200','EACMUPG')";
+		String sql_mara_3 = "insert into sapr3.MARA (mandt,MATNR) values('200','EACMMTC')";
+
 		int t1 = SqlHelper.runUpdateSql(sql_t001W, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_marc_1, conn);
 		int t3 = SqlHelper.runUpdateSql(sql_marc_2, conn);
@@ -45,40 +45,41 @@ public class R170removeTypeModelsFromBOMTest extends RdhRestProxyTest{
 		int t6 = SqlHelper.runUpdateSql(sql_mast_2, conn);
 		int t7 = SqlHelper.runUpdateSql(sql_mast_3, conn);
 		int t8 = SqlHelper.runUpdateSql(sql_mara_1, conn);
-		int t9 = SqlHelper.runUpdateSql(sql_marc_4, conn);
-		int t10 = SqlHelper.runUpdateSql(sql_stpo, conn);
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0 && t7 >= 0 && t8 >= 0 && t9 >= 0 && t10 >= 0) {
+		int t9 = SqlHelper.runUpdateSql(sql_mara_2, conn);
+		int t10 = SqlHelper.runUpdateSql(sql_mara_3, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0
+				&& t7 >= 0 && t8 >= 0 && t9 >= 0 && t10 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
 		}
 	}
-	
+
 	@Test
-	public void testR19601() {
+	public void testR17001() {
 		try {
 			logger.info("newFlag:NEW");
-			String type="EACM";
-			Hashtable matches=new Hashtable();
-			BomComponent bc1=new BomComponent();
-			bc1.setComponent("R170");
+			String type = "EACM";
+			Hashtable matches = new Hashtable();
+			BomComponent bc1 = new BomComponent();
+			bc1.setComponent("EACMNEW");
 			bc1.setItem_Categ("L");
 			bc1.setItem_No("01");
 			bc1.setItem_Node(new BigInteger("00000001"));
 			bc1.setItem_Count(new BigInteger("00000001"));
 			matches.put("001", bc1);
-			String sapPlant="0010";
-			String newFlag="NEW";
-			CHWAnnouncement chwA=new CHWAnnouncement();
+			String sapPlant = "0010";
+			String newFlag = "NEW";
+			CHWAnnouncement chwA = new CHWAnnouncement();
 			chwA.setAnnDocNo("123401");
-			String pimsIdentity="C";
-			
+			String pimsIdentity = "C";
+
 			String object_id = type + "NEW/" + sapPlant + "/5";
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
 					"Z_DM_SAP_BOM_MAINTAIN", object_id);
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r170(type, matches, sapPlant, newFlag, chwA, pimsIdentity);
-			
+
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
 
@@ -115,38 +116,38 @@ public class R170removeTypeModelsFromBOMTest extends RdhRestProxyTest{
 
 		}
 	}
-	
+
 	@Test
-	public void testR19602() {
+	public void testR17002() {
 		try {
 			logger.info("newFlag:UPG");
-			String type="EACM";
-			Hashtable matches=new Hashtable();
-			BomComponent bc1=new BomComponent();
-			bc1.setComponent("R170");
+			String type = "EACM";
+			Hashtable matches = new Hashtable();
+			BomComponent bc1 = new BomComponent();
+			bc1.setComponent("EACMUPG");
 			bc1.setItem_Categ("L");
 			bc1.setItem_No("01");
 			bc1.setItem_Node(new BigInteger("00000001"));
 			bc1.setItem_Count(new BigInteger("00000001"));
 			matches.put("001", bc1);
-			String sapPlant="0010";
-			String newFlag="UPG";
-			CHWAnnouncement chwA=new CHWAnnouncement();
+			String sapPlant = "0010";
+			String newFlag = "UPG";
+			CHWAnnouncement chwA = new CHWAnnouncement();
 			chwA.setAnnDocNo("123401");
-			String pimsIdentity="C";
-			
+			String pimsIdentity = "C";
+
 			String object_id = type + "UPG/" + sapPlant + "/5";
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
 					"Z_DM_SAP_BOM_MAINTAIN", object_id);
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r170(type, matches, sapPlant, newFlag, chwA, pimsIdentity);
-			
+
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
-			map.put("ZDMOBJKEY", "'EACMNEW           00105'");
+			map.put("ZDMOBJKEY", "'EACMUPG           00105'");
 			map.put("ZDMOBJTYP", "'BEC'");
 			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
 			assertNotNull(rowDetails);
@@ -177,38 +178,38 @@ public class R170removeTypeModelsFromBOMTest extends RdhRestProxyTest{
 
 		}
 	}
-	
+
 	@Test
-	public void testR19603() {
+	public void testR17003() {
 		try {
 			logger.info("newFlag:MTC");
-			String type="EACM";
-			Hashtable matches=new Hashtable();
-			BomComponent bc1=new BomComponent();
-			bc1.setComponent("R170");
+			String type = "EACM";
+			Hashtable matches = new Hashtable();
+			BomComponent bc1 = new BomComponent();
+			bc1.setComponent("EACMMTC");
 			bc1.setItem_Categ("L");
 			bc1.setItem_No("01");
 			bc1.setItem_Node(new BigInteger("00000001"));
 			bc1.setItem_Count(new BigInteger("00000001"));
 			matches.put("001", bc1);
-			String sapPlant="0010";
-			String newFlag="MTC";
-			CHWAnnouncement chwA=new CHWAnnouncement();
+			String sapPlant = "0010";
+			String newFlag = "MTC";
+			CHWAnnouncement chwA = new CHWAnnouncement();
 			chwA.setAnnDocNo("123401");
-			String pimsIdentity="C";
-			
+			String pimsIdentity = "C";
+
 			String object_id = type + "MTC/" + sapPlant + "/5";
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
 					"Z_DM_SAP_BOM_MAINTAIN", object_id);
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r170(type, matches, sapPlant, newFlag, chwA, pimsIdentity);
-			
+
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
 
 			map.clear();
 			map.put("MANDT", "'" + Constants.MANDT + "'");
-			map.put("ZDMOBJKEY", "'EACMNEW           00105'");
+			map.put("ZDMOBJKEY", "'EACMMTC           00105'");
 			map.put("ZDMOBJTYP", "'BEC'");
 			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
 			assertNotNull(rowDetails);
@@ -239,21 +240,19 @@ public class R170removeTypeModelsFromBOMTest extends RdhRestProxyTest{
 
 		}
 	}
-	
+
 	@After
 	public void deleteData() {
 		String del_t001W = "delete from sapr3.T001W where mandt='200' and werks='0010'";
-		String del_marc = "delete from sapr3.marc where mandt='200' and matnr in ('EACMNEW','EACMUPG','EACMMTC','R170') and werks='0010'";
+		String del_marc = "delete from sapr3.marc where mandt='200' and matnr in ('EACMNEW','EACMUPG','EACMMTC') and werks='0010'";
 		String del_mast = "delete from sapr3.mast where mandt='200' and matnr in ('EACMNEW','EACMUPG','EACMMTC') and werks='0010' and stlan='5'";
-		String del_mara="delete from sapr3.mara where mandt='200' and MATNR='R170'";
-		String del_stpo="delete from sapr3.stpo where mandt='200' and stlty='M' and stlkn='11010001' and stpoz='11010001'";
-		
+		String del_mara = "delete from sapr3.mara where mandt='200' and MATNR in ('EACMNEW','EACMUPG','EACMMTC')";
+
 		int t1 = SqlHelper.runUpdateSql(del_t001W, conn);
 		int t2 = SqlHelper.runUpdateSql(del_marc, conn);
-		int t3 = SqlHelper.runUpdateSql(del_mast, conn); 
+		int t3 = SqlHelper.runUpdateSql(del_mast, conn);
 		int t4 = SqlHelper.runUpdateSql(del_mara, conn);
-		int t5 = SqlHelper.runUpdateSql(del_stpo, conn);
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0) {
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");

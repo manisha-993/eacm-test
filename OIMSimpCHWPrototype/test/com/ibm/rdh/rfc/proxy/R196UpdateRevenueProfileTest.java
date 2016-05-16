@@ -14,10 +14,10 @@ import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.rdh.chw.entity.AUOMaterial;
 
-public class R196UpdateRevenueProfileTest extends RdhRestProxyTest{
+public class R196UpdateRevenueProfileTest extends RdhRestProxyTest {
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
-	
+
 	@Before
 	public void prepareData() {
 		String sql_t001W = "insert into sapr3.T001W select IBMSNAP_INTENTSEQ,IBMSNAP_OPERATION,IBMSNAP_COMMITSEQ,"
@@ -31,7 +31,10 @@ public class R196UpdateRevenueProfileTest extends RdhRestProxyTest{
 		String sql_mast_1 = "insert into sapr3.MAST (mandt,matnr,werks,stlan) values ('200','EACMNEW','0010','Y')";
 		String sql_mast_2 = "insert into sapr3.MAST (mandt,matnr,werks,stlan) values ('200','EACMUPG','0010','Y')";
 		String sql_mast_3 = "insert into sapr3.MAST (mandt,matnr,werks,stlan) values ('200','EACMMTC','0010','Y')";
-		
+		String sql_mara_1 = "insert into sapr3.MARA (mandt,MATNR) values('200','EACMNEW')";
+		String sql_mara_2 = "insert into sapr3.MARA (mandt,MATNR) values('200','EACMUPG')";
+		String sql_mara_3 = "insert into sapr3.MARA (mandt,MATNR) values('200','EACMMTC')";
+
 		int t1 = SqlHelper.runUpdateSql(sql_t001W, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_marc_1, conn);
 		int t3 = SqlHelper.runUpdateSql(sql_marc_2, conn);
@@ -39,32 +42,37 @@ public class R196UpdateRevenueProfileTest extends RdhRestProxyTest{
 		int t5 = SqlHelper.runUpdateSql(sql_mast_1, conn);
 		int t6 = SqlHelper.runUpdateSql(sql_mast_2, conn);
 		int t7 = SqlHelper.runUpdateSql(sql_mast_3, conn);
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0 && t7 >= 0) {
+		int t8 = SqlHelper.runUpdateSql(sql_mara_1, conn);
+		int t9 = SqlHelper.runUpdateSql(sql_mara_2, conn);
+		int t10 = SqlHelper.runUpdateSql(sql_mara_3, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0 && t5 >= 0 && t6 >= 0
+				&& t7 >= 0 && t8 >= 0 && t9 >= 0 && t10 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
 		}
 	}
-	
+
 	@Test
 	public void testR19601() {
 		try {
 			logger.info("newFlag:NEW");
-			String type="EACM";
-			String annDocNo="123401";
-			Vector auoMaterials=new Vector();
-			AUOMaterial auoMaterial=new AUOMaterial("196a","100");
-			Vector typeModelRevs=new Vector();
-			String revProfileName="R196";
-			String newFlag="NEW";
-			String pimsIdentity="C";
-			String _plant="0010";
+			String type = "EACM";
+			String annDocNo = "123401";
+			Vector auoMaterials = new Vector();
+			AUOMaterial auoMaterial = new AUOMaterial("196a", "100");
+			Vector typeModelRevs = new Vector();
+			String revProfileName = "R196";
+			String newFlag = "NEW";
+			String pimsIdentity = "C";
+			String _plant = "0010";
 
 			String object_id = type + "NEW/" + _plant + "/Y";
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
 					"Z_DM_SAP_BOM_MAINTAIN", object_id);
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r196(type, annDocNo, auoMaterials, typeModelRevs, revProfileName, newFlag, pimsIdentity, _plant);
+			rfcProxy.r196(type, annDocNo, auoMaterials, typeModelRevs,
+					revProfileName, newFlag, pimsIdentity, _plant);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
@@ -102,26 +110,27 @@ public class R196UpdateRevenueProfileTest extends RdhRestProxyTest{
 
 		}
 	}
-	
+
 	@Test
 	public void testR19602() {
 		try {
 			logger.info("newFlag:UPG");
-			String type="EACM";
-			String annDocNo="123401";
-			Vector auoMaterials=new Vector();
-			AUOMaterial auoMaterial=new AUOMaterial("196a","100");
-			Vector typeModelRevs=new Vector();
-			String revProfileName="R196";
-			String newFlag="UPG";
-			String pimsIdentity="C";
-			String _plant="0010";
+			String type = "EACM";
+			String annDocNo = "123401";
+			Vector auoMaterials = new Vector();
+			AUOMaterial auoMaterial = new AUOMaterial("196a", "100");
+			Vector typeModelRevs = new Vector();
+			String revProfileName = "R196";
+			String newFlag = "UPG";
+			String pimsIdentity = "C";
+			String _plant = "0010";
 
 			String object_id = type + "UPG/" + _plant + "/Y";
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
 					"Z_DM_SAP_BOM_MAINTAIN", object_id);
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r196(type, annDocNo, auoMaterials, typeModelRevs, revProfileName, newFlag, pimsIdentity, _plant);
+			rfcProxy.r196(type, annDocNo, auoMaterials, typeModelRevs,
+					revProfileName, newFlag, pimsIdentity, _plant);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
@@ -159,26 +168,27 @@ public class R196UpdateRevenueProfileTest extends RdhRestProxyTest{
 
 		}
 	}
-	
+
 	@Test
 	public void testR19603() {
 		try {
 			logger.info("newFlag:MTC");
-			String type="EACM";
-			String annDocNo="123401";
-			Vector auoMaterials=new Vector();
-			AUOMaterial auoMaterial=new AUOMaterial("196a","100");
-			Vector typeModelRevs=new Vector();
-			String revProfileName="R196";
-			String newFlag="MTC";
-			String pimsIdentity="C";
-			String _plant="0010";
+			String type = "EACM";
+			String annDocNo = "123401";
+			Vector auoMaterials = new Vector();
+			AUOMaterial auoMaterial = new AUOMaterial("196a", "100");
+			Vector typeModelRevs = new Vector();
+			String revProfileName = "R196";
+			String newFlag = "MTC";
+			String pimsIdentity = "C";
+			String _plant = "0010";
 
 			String object_id = type + "MTC/" + _plant + "/Y";
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
 					"Z_DM_SAP_BOM_MAINTAIN", object_id);
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r196(type, annDocNo, auoMaterials, typeModelRevs, revProfileName, newFlag, pimsIdentity, _plant);
+			rfcProxy.r196(type, annDocNo, auoMaterials, typeModelRevs,
+					revProfileName, newFlag, pimsIdentity, _plant);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
@@ -216,17 +226,19 @@ public class R196UpdateRevenueProfileTest extends RdhRestProxyTest{
 
 		}
 	}
-	
+
 	@After
 	public void deleteData() {
 		String del_t001W = "delete from sapr3.T001W where mandt='200' and werks='0010'";
 		String del_marc = "delete from sapr3.marc where mandt='200' and matnr in ('EACMNEW','EACMUPG','EACMMTC') and werks='0010'";
 		String del_mast = "delete from sapr3.mast where mandt='200' and matnr in ('EACMNEW','EACMUPG','EACMMTC') and werks='0010' and stlan='Y'";
-		
+		String del_mara = "delete from sapr3.mara where mandt='200' and MATNR in ('EACMNEW','EACMUPG','EACMMTC')";
+
 		int t1 = SqlHelper.runUpdateSql(del_t001W, conn);
 		int t2 = SqlHelper.runUpdateSql(del_marc, conn);
-		int t3 = SqlHelper.runUpdateSql(del_mast, conn);  
-		if (t1 >= 0 && t2 >= 0 && t3 >= 0) {
+		int t3 = SqlHelper.runUpdateSql(del_mast, conn);
+		int t4 = SqlHelper.runUpdateSql(del_mara, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");

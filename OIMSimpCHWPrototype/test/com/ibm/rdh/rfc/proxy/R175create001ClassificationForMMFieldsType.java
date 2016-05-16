@@ -27,11 +27,14 @@ public class R175create001ClassificationForMMFieldsType extends
 	public void prepareData() {
 		String sql_mara_1 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMT1MTC')";
 		String sql_mara_2 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMF1MTC')";
+		String sql_mara_3 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMNEW')";
+		String sql_mara_4 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMUPG')";
 
 		int t1 = SqlHelper.runUpdateSql(sql_mara_1, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_mara_2, conn);
-
-		if (t1 >= 0 && t2 >= 0) {
+		int t3 = SqlHelper.runUpdateSql(sql_mara_3, conn);
+		int t4 = SqlHelper.runUpdateSql(sql_mara_4, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -291,11 +294,14 @@ public class R175create001ClassificationForMMFieldsType extends
 	public void deleteData() {
 		String del_mara_1 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMT1MTC'";
 		String del_mara_2 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMF1MTC'";
+		String del_mara_3 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMNEW'";
+		String del_mara_4 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMUPG'";
 
 		int t1 = SqlHelper.runUpdateSql(del_mara_1, conn);
 		int t2 = SqlHelper.runUpdateSql(del_mara_2, conn);
-
-		if (t1 >= 0 && t2 >= 0) {
+		int t3 = SqlHelper.runUpdateSql(del_mara_3, conn);
+		int t4 = SqlHelper.runUpdateSql(del_mara_4, conn);
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");
