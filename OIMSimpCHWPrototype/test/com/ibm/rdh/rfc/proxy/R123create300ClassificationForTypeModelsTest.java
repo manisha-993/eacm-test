@@ -25,7 +25,7 @@ public class R123create300ClassificationForTypeModelsTest extends
 	public void prepareData() {
 
 		String sql_klah = "insert into SAPR3.KLAH (MANDT,KLART,CLASS,CLINT) values('200','300','MK_1234_MODELS','1000000000')";
-		String sql_ksml = "insert into SAPR3.KSML(MANDT,CLINT,IMERK) values('200','1000000000','1000000001') ";
+		String sql_ksml = "insert into SAPR3.KSML(MANDT,CLINT,IMERK,POSNR,ADZHL) values('200','1000000000','1000000001','100','1000') ";
 		String sql_cabn = "insert into SAPR3.CABN(MANDT,ATINN,ATNAM) values('200','1000000001','MK_1234_MOD')";
 		String sql_mara_1 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','1234NEW')";
 		String sql_mara_2 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','1234UPG')";
@@ -276,7 +276,7 @@ public class R123create300ClassificationForTypeModelsTest extends
 	@After
 	public void deleteData() {
 		String del_klah = "delete from SAPR3.KLAH where MANDT='200' and KLART='300' and CLASS='MK_1234_MODELS' and CLINT='1000000000'";
-		String del_ksml = "delete from SAPR3.KSML where MANDT='200' and CLINT='1000000000' and IMERK='1000000001' ";
+		String del_ksml = "delete from SAPR3.KSML where MANDT='200' and CLINT='1000000000' and IMERK='1000000001' and POSNR='100' and ADZHL='1000'";
 		String del_cabn = "delete from SAPR3.CABN where MANDT='200' and ATINN='1000000001' AND ATNAM ='MK_1234_MOD'";
 		String del_mara_1 = "delete from SAPR3.MARA where MANDT='200' and MATNR='1234NEW'";
 		String del_mara_2 = "delete from SAPR3.MARA where MANDT='200' and MATNR='1234UPG'";
