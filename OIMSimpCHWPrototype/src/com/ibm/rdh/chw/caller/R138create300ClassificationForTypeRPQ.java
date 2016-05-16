@@ -1,11 +1,13 @@
 package com.ibm.rdh.chw.caller;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
+import com.ibm.pprds.epimshw.PropertyKeys;
+import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.TypeModel;
-import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
+import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.rfc.KlahTable;
 import com.ibm.rdh.rfc.KlahTableRow;
 import com.ibm.rdh.rfc.KsskTable;
@@ -19,32 +21,41 @@ import com.ibm.rdh.rfc.RcucoTableRow;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 
-public class R104createZDMClassification extends Rfc {
+public class R138create300ClassificationForTypeRPQ extends Rfc {
 	private com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT rfc;
 
-	public R104createZDMClassification(TypeModel typeModel, String newFlag,
-			CHWAnnouncement chwA, TypeModelUPGGeo tmUPGObj, String FromToType,
-			String pimsIdentity) throws Exception {
-
+	public R138create300ClassificationForTypeRPQ(TypeFeature tfc,
+			String newFlag, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
 		reInitialize();
+		rfcName = "Z_DM_SAP_CLASSIFICATION_MAINT";
+		TypeFeature tf;
+		// First check and see if tfc is empty and we do not need to do
+		// anything.
+
 		Date curDate = new Date();
+		String sDateFormat = ConfigManager.getConfigManager().getString(
+				PropertyKeys.KEY_DATE_FORMAT, true);
+		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
 
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT();
+
+		// Use the first type feature to get the type and range
+		tf = (TypeFeature) tfc.getTfCollection().elementAt(0);
 
 		// Set up the RFC fields
 		// OBJECT_KEY - R0
 		Object_keyTable r0Table = new Object_keyTable();
 		Object_keyTableRow r0Row = r0Table.createEmptyRow();
-		r0Row.setKeyFeld("MATNR");
-		if ("NEW".equals(newFlag)) {
-			r0Row.setKparaValu(typeModel.getType() + "NEW");
-		} else if ("UPG".equals(newFlag)) {
-			r0Row.setKparaValu(typeModel.getType() + "UPG");
-		} else if ("MTC".equals(newFlag) && "MTCTOTYPE".equals(FromToType)) {
-			r0Row.setKparaValu(tmUPGObj.getType() + "MTC");
-		} else if ("MTC".equals(newFlag) && "MTCFROMTYPE".equals(FromToType)) {
 
-			r0Row.setKparaValu(tmUPGObj.getFromType() + "MTC");
+		r0Row.setKeyFeld("MATNR");
+
+		if ("NEW".equals(newFlag)) {
+			r0Row.setKparaValu(tf.getType() + "NEW");
+		} else if ("UPG".equals(newFlag)) {
+			r0Row.setKparaValu(tf.getType() + "UPG");
+		} else if ("MTC".equals(newFlag)) {
+			r0Row.setKparaValu(tf.getType() + "MTC");
 		}
 
 		r0Table.appendRow(r0Row);
@@ -58,14 +69,11 @@ public class R104createZDMClassification extends Rfc {
 		KlahTable r2Table = new KlahTable();
 		KlahTableRow r2Row = r2Table.createEmptyRow();
 
-		if (chwA.isXccOnlyDiv(typeModel.getDiv())) {
-			r2Row.setClass("MD_XHW_NA");
-		} else {
-			r2Row.setClass("MD_CHW_NA");
-		}
+		r2Row.setClass("MK_" + tf.getType() + "_RPQ");
 
 		r2Table.appendRow(r2Row);
 		rfc.setIKlah(r2Table);
+
 		rfcInfo.append("KLAH \n");
 		rfcInfo.append(Tab + "CLASS>>" + r2Row.get_Class() + "\n");
 
@@ -73,10 +81,11 @@ public class R104createZDMClassification extends Rfc {
 		KsskTable r3Table = new KsskTable();
 		KsskTableRow r3Row = r3Table.createEmptyRow();
 
-		r3Row.setKlart("ZDM");
+		r3Row.setKlart("300");
 
 		r3Table.appendRow(r3Row);
 		rfc.setIKssk(r3Table);
+
 		rfcInfo.append("KSSK \n");
 		rfcInfo.append(Tab + "KLART>>" + r3Row.getKlart() + "\n");
 
@@ -88,6 +97,7 @@ public class R104createZDMClassification extends Rfc {
 
 		r4Table.appendRow(r4Row);
 		rfc.setIRcuco(r4Table);
+
 		rfcInfo.append("RCUCO \n");
 		rfcInfo.append(Tab + "OBTAB>>" + r4Row.getObtab() + "\n");
 
@@ -100,30 +110,25 @@ public class R104createZDMClassification extends Rfc {
 
 		r5Table.appendRow(r5Row);
 		rfc.setIMara(r5Table);
-		rfcInfo.append("MARA  \n");
-		rfcInfo.append(Tab + "ERSDA>>" + r5Row.getErsdaString() + "\n");
 
-		// ZDM_GEO_TO_CLASS
+		rfcInfo.append("MARA  \n");
+		rfcInfo.append(Tab + "ERSDA>>" + sdf.format(r5Row.getErsda()) + "\n");
+
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
-
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
 		rfc.setGeoData(zdmTable);
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
-		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
-		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + ",RFANUM>>" + chwA.getAnnDocNo() + "\n");
-
 	}
 
 	@Override
@@ -174,7 +179,7 @@ public class R104createZDMClassification extends Rfc {
 	@Override
 	protected String getMaterialName() {
 		// TODO Auto-generated method stub
-		return "Create ZDM Classification";
+		return "Create 300 Classification for type RPQ";
 	}
 
 	@Override

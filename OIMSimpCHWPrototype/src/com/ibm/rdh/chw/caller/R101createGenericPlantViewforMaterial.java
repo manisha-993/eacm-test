@@ -25,20 +25,16 @@ public class R101createGenericPlantViewforMaterial extends Rfc {
 			String loadingGrp, TypeModelUPGGeo tmUPGObj, String FromToType,
 			String pimsIdentity, String plantValue) throws Exception {
 		reInitialize();
-		String storageLocationValue;
-
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
 		rfcName = "Z_DM_SAP_MATM_CREATE";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE();
 
 		// Set Up the RFC Fields
 		// Bmm00 - B0 Structure
-
 		Bmm00Table b0Table = new Bmm00Table();
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
 
 		b0Row.setTcode("MM01");
-
 		if (("1999".equals(plantValue))
 				&& (("NEW".equals(newFlag)) || ("UPG".equals(newFlag)) || ("MTC"
 						.equals(newFlag))))
@@ -46,7 +42,6 @@ public class R101createGenericPlantViewforMaterial extends Rfc {
 
 		if ("NEW".equals(newFlag)) {
 			b0Row.setMatnr(typeModel.getType() + "NEW");
-
 		} else if ("UPG".equals(newFlag)) {
 			b0Row.setMatnr(typeModel.getType() + "UPG");
 		} else if ("MTC".equals(newFlag) && "MTCTOTYPE".equals(FromToType)) {
@@ -54,7 +49,6 @@ public class R101createGenericPlantViewforMaterial extends Rfc {
 		} else if ("MTC".equals(newFlag) && "MTCFROMTYPE".equals(FromToType)) {
 			b0Row.setMatnr(tmUPGObj.getFromType() + "MTC");
 		}
-
 		b0Row.setMbrsh("M");
 		b0Row.setMtart("ZMAT");
 		b0Row.setXeiv4("X");
@@ -84,11 +78,13 @@ public class R101createGenericPlantViewforMaterial extends Rfc {
 				+ b0Row.getXeid1() + ", XEID2>>" + b0Row.getXeid2()
 				+ ", XEIE1>>" + b0Row.getXeie1() + "\n");
 
+		// Bmmh1 - B1
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
 		b1Row.setMeins("EA");
 		b1Row.setTragr("STD");
+
 		// add 3 set value, In the previous epimshw code
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setMatkl("000");
@@ -101,8 +97,6 @@ public class R101createGenericPlantViewforMaterial extends Rfc {
 			b1Row.setLadgr(loadingGrp);
 		}
 		b1Row.setMtpos("Z002");
-		// b1Row.setKtgrm("01");
-
 		if ("NEW".equals(newFlag)) {
 			b1Row.setKtgrm("01");
 		} else if ("UPG".equals(newFlag) || "MTC".equals(newFlag)) {
@@ -165,29 +159,27 @@ public class R101createGenericPlantViewforMaterial extends Rfc {
 				+ b1Row.getKtgrm() + ", ZEIAR>>" + b1Row.getZeiar()
 				+ ", AESZN>>" + b1Row.getAeszn() + ", GEWEI>>"
 				+ b1Row.getGewei() + ", XMCNG>>" + b1Row.getXmcng()
-				+ ", SERNP>>" + b1Row.getSernp() + ", DISKZ>>"
-				+ b1Row.getDiskz() + ", SBDKZ>>" + b1Row.getSbdkz()
-				+ ", MTVFP>>" + b1Row.getMtvfp() + ", DISMM>>"
-				+ b1Row.getDismm() + ", DISPO>>" + b1Row.getDispo()
-				+ ", FHORI>>" + b1Row.getFhori() + ", DISLS>>"
-				+ b1Row.getDisls() + ", MAABC>>" + b1Row.getMaabc()
-				+ ", DISGR>>" + b1Row.getDisgr() + ", PERKZ>>"
-				+ b1Row.getPerkz() + ", PRCTR>>" + b1Row.getPrctr()
-				+ ", EKGRP>>" + b1Row.getEkgrp() + ", MFRNR>>"
-				+ b1Row.getMfrnr() + "\n");
+				+ ", SERNP>>" + b1Row.getSernp() + ", SBDKZ>>"
+				+ b1Row.getSbdkz() + ", MTVFP>>" + b1Row.getMtvfp()
+				+ ", DISMM>>" + b1Row.getDismm() + ", DISPO>>"
+				+ b1Row.getDispo() + ", FHORI>>" + b1Row.getFhori()
+				+ ", DISLS>>" + b1Row.getDisls() + ", MAABC>>"
+				+ b1Row.getMaabc() + ", DISGR>>" + b1Row.getDisgr()
+				+ ", PERKZ>>" + b1Row.getPerkz() + ", PRCTR>>"
+				+ b1Row.getPrctr() + ", EKGRP>>" + b1Row.getEkgrp()
+				+ ", MFRNR>>" + b1Row.getMfrnr() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

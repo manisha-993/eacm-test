@@ -25,12 +25,11 @@ public class R100createTypeMaterialBasicView extends Rfc {
 			throws Exception {
 		reInitialize();
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
-
+		rfcName = "Z_DM_SAP_MATM_CREATE";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE();
 
 		// Set Up the RFC Fields
 		// Bmm00 - B0 Structure
-
 		Bmm00Table b0Table = new Bmm00Table();
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
 
@@ -44,11 +43,8 @@ public class R100createTypeMaterialBasicView extends Rfc {
 		} else if ("MTC".equals(newFlag) && "MTCFROMTYPE".equals(FromToType)) {
 			b0Row.setMatnr(tmUPGObj.getFromType() + "MTC");
 		}
-
 		b0Row.setMbrsh("M");
 		b0Row.setMtart("ZMAT");
-		// b0Row.setXeiv4("X");
-
 		b0Row.setXeik1("X");
 
 		b0Table.appendRow(b0Row);
@@ -58,18 +54,16 @@ public class R100createTypeMaterialBasicView extends Rfc {
 		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
 				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
 				+ ", MTART>>" + b0Row.getMtart() + ", XEIK1>>"
-				+ b0Row.getXeik1() +
-				// ", XEIV4>>"+b0Row.getXeiv4()+
-				"\n");
+				+ b0Row.getXeik1() + "\n");
 
+		// Bmmh1 - B1
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
 		b1Row.setMeins("EA");
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setMatkl("000");
-
-		b1Row.setSpart(typeModel.getDiv()); // RQ0724066720 changes
+		b1Row.setSpart(typeModel.getDiv());
 		b1Row.setZeiar(chwA.getAnnouncementType());
 		b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
 		b1Row.setGewei("KG");
@@ -107,12 +101,10 @@ public class R100createTypeMaterialBasicView extends Rfc {
 		}
 
 		// Bmmh5 - B5 Structure
-
 		Bmmh5Table b5Table = new Bmmh5Table();
 		Bmmh5TableRow b5Row = b5Table.createEmptyRow();
 
 		b5Row.setSpras("E");
-
 		if ("NEW".equals(newFlag)) {
 			b5Row.setMaktx("Machine Type " + typeModel.getType() + " - NEW");
 		} else if ("UPG".equals(newFlag)) {
@@ -130,24 +122,19 @@ public class R100createTypeMaterialBasicView extends Rfc {
 		rfcInfo.append(Tab + "SPRAS>>" + b5Row.getSpras() + ", MAKTX>>"
 				+ b5Row.getMaktx() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
-
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
-		// if (includeHWPIMSIndicator()) {
-		// rfc.setPimsIdentity("C");
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
-		// }
 
 		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());

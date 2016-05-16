@@ -9,7 +9,8 @@ public class R144updateParkStatus extends Rfc {
 
 	private com.ibm.rdh.rfc.Z_DM_SAP_PARK_STATUS rfc;
 
-	public R144updateParkStatus(String annno, String zdmstatus, String pimsIdentity) throws Exception {
+	public R144updateParkStatus(String annno, String zdmstatus,
+			String pimsIdentity) throws Exception {
 		reInitialize();
 
 		rfcName = "Z_DM_SAP_PARK_STATUS";
@@ -19,10 +20,9 @@ public class R144updateParkStatus extends Rfc {
 		ZdmprktblTable zdmParkTable = new ZdmprktblTable();
 		ZdmprktblTableRow zdmParkRow = zdmParkTable.createEmptyRow();
 
-		// zdmParkRow.setZdmrelnum(chwA.getAnnDocNo());
 		zdmParkRow.setZdmrelnum(annno);
 		zdmParkRow.setZdmstatus(zdmstatus);
-		// add 20160407
+		// This value not set in epims code but we need it.
 		zdmParkRow.setZdmclass("MD_CHW_NA");
 		// add end
 		zdmParkTable.appendRow(zdmParkRow);
@@ -30,18 +30,18 @@ public class R144updateParkStatus extends Rfc {
 		rfc.setIPrktbl(zdmParkTable);
 
 		rfcInfo.append("ZDMPRKTBL \n");
+		rfcInfo.append(Tab + "ZDMCLASS>>" + zdmParkRow.getZdmclass() + "\n");
 		rfcInfo.append(Tab + "ZDMRELNUM>>" + zdmParkRow.getZdmrelnum()
 				+ ", ZDMSTATUS>>" + zdmParkRow.getZdmstatus() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classStructure zdmStructure = new Zdm_geo_to_classStructure();
-
 		zdmStructure.setZGeo("US");
-
 		rfc.setGeoData(zdmStructure);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmStructure.getZGeo() + "\n");
-		// add 20160407
+
+		// PIMS_IDENTITY not set in the epims code.
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + rfc.getPimsIdentity() + "\n");
@@ -89,7 +89,7 @@ public class R144updateParkStatus extends Rfc {
 
 	@Override
 	protected String getMaterialName() {
-		return "Assign RPQ Type/Feature char to TYPE RPQ class";
+		return "Update Park Status";
 	}
 
 	@Override

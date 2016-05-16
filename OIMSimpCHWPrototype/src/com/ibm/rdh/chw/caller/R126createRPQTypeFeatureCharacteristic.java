@@ -42,7 +42,6 @@ public class R126createRPQTypeFeatureCharacteristic extends Rfc {
 
 		c0Table.appendRow(c0Row);
 		rfc.setICharacts(c0Table);
-
 		rfcInfo.append("CHARACTS \n");
 		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() + ", DATATYPE>>"
 				+ c0Row.getDatatype() + ", CHARNUMBER>>"
@@ -61,7 +60,6 @@ public class R126createRPQTypeFeatureCharacteristic extends Rfc {
 
 		c1Table.appendRow(c1Row);
 		rfc.setICharDescr(c1Table);
-
 		rfcInfo.append("CHAR_DESCR  \n");
 		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact() + ", LANGUAGE>>"
 				+ c1Row.getLanguage() + ", CHDESCR>>" + c1Row.getChdescr()
@@ -76,7 +74,6 @@ public class R126createRPQTypeFeatureCharacteristic extends Rfc {
 
 		e1Table.appendRow(e1Row);
 		rfc.setIE1cawnm(e1Table);
-
 		rfcInfo.append("E1CAWNM \n");
 		rfcInfo.append(Tab + "ATNAM>>" + e1Row.getAtnam() + ", ATWRT>>"
 				+ e1Row.getAtwrt() + "\n");
@@ -89,21 +86,20 @@ public class R126createRPQTypeFeatureCharacteristic extends Rfc {
 
 		e1CutTable.appendRow(e1CutRow);
 		rfc.setIE1cutxm(e1CutTable);
-
 		rfcInfo.append("E1CUTXM \n");
 		rfcInfo.append(Tab + "TDLINE>>" + e1CutRow.getTxtLine() + "\n");
+
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

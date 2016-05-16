@@ -1,11 +1,7 @@
 package com.ibm.rdh.chw.caller;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.pprds.epimshw.PropertyKeys;
-import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.rfc.Api_auspTable;
 import com.ibm.rdh.rfc.Api_auspTableRow;
@@ -30,9 +26,7 @@ public class R125create300ClassificationForTypeMCForUPG extends Rfc {
 			throws Exception {
 		reInitialize();
 		Date curDate = new Date();
-		String sDateFormat = ConfigManager.getConfigManager().getString(
-				PropertyKeys.KEY_DATE_FORMAT, true);
-		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
+
 		rfcName = "Z_DM_SAP_CLASSIFICATION_MAINT";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT();
 
@@ -49,7 +43,6 @@ public class R125create300ClassificationForTypeMCForUPG extends Rfc {
 		}
 		r0Table.appendRow(r0Row);
 		rfc.setIObjectKey(r0Table);
-
 		rfcInfo.append("OBJECTKEY \n");
 		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() + ", KPARAVALU>>"
 				+ r0Row.getKparaValu() + "\n");
@@ -62,7 +55,6 @@ public class R125create300ClassificationForTypeMCForUPG extends Rfc {
 
 		r2Table.appendRow(r2Row);
 		rfc.setIKlah(r2Table);
-
 		rfcInfo.append("KLAH \n");
 		rfcInfo.append(Tab + "CLASS>>" + r2Row.get_Class() + "\n");
 
@@ -74,7 +66,6 @@ public class R125create300ClassificationForTypeMCForUPG extends Rfc {
 
 		r3Table.appendRow(r3Row);
 		rfc.setIKssk(r3Table);
-
 		rfcInfo.append("KSSK \n");
 		rfcInfo.append(Tab + "KLART>>" + r3Row.getKlart() + "\n");
 
@@ -86,7 +77,6 @@ public class R125create300ClassificationForTypeMCForUPG extends Rfc {
 
 		r4Table.appendRow(r4Row);
 		rfc.setIRcuco(r4Table);
-
 		rfcInfo.append("RCUCO \n");
 		rfcInfo.append(Tab + "OBTAB>>" + r4Row.getObtab() + "\n");
 
@@ -95,12 +85,10 @@ public class R125create300ClassificationForTypeMCForUPG extends Rfc {
 		MaraTableRow r5Row = r5Table.createEmptyRow();
 
 		// Passing date
-		// r5Row.setErsdaString(sdf.format(curDate));
 		r5Row.setErsda(curDate);
 
 		r5Table.appendRow(r5Row);
 		rfc.setIMara(r5Table);
-
 		rfcInfo.append("MARA  \n");
 		rfcInfo.append(Tab + "ERSDA>>" + r5Row.getErsdaString() + "\n");
 
@@ -109,29 +97,29 @@ public class R125create300ClassificationForTypeMCForUPG extends Rfc {
 		Api_auspTableRow r6Row = r6Table.createEmptyRow();
 
 		r6Row.setCharact("MK_" + type + "_MC");
-		//add on 20160412
+		// not set in the epims code but we need it.
 		r6Row.setValue("CH");
-		//add end
+		// add end
 		r6Table.appendRow(r6Row);
 		rfc.setIApiAusp(r6Table);
 
 		rfcInfo.append("API_AUSP \n");
+		rfcInfo.append(Tab + "VALUE" + r6Row.getValue());
 		rfcInfo.append(Tab + "CHARACT>> " + r6Row.getCharact() +
 		// ", VALUE>> "+r6Row.getValue()+
 				"\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

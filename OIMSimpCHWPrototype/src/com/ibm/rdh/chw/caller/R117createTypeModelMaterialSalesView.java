@@ -47,10 +47,8 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
 
 		b0Row.setTcode("MM01");
-		b0Row.setMatnr(typemod); // RQ0724066720 changes
-
+		b0Row.setMatnr(typemod);
 		b0Row.setMbrsh("M");
-
 		b0Row.setMtart("ZPRT");
 		b0Row.setXeib1("X");
 		b0Row.setXeiv1("X");
@@ -62,46 +60,40 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		rfc.setIBmm00(b0Table);
 
 		rfcInfo.append("B0 \n");
-		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() 
-				+ ", MATNR>>" + b0Row.getMatnr() 
-				+ ", XEIB1>>" + b0Row.getXeib1()
-				+ ", MBRSH>>" + b0Row.getMbrsh() 
-				+ ", MTART>>" + b0Row.getMtart() 
-				+ ", XEIV1>>" + b0Row.getXeiv1()
-				+ ", XEIV2>>" + b0Row.getXeiv2() 
-				+ ", VKORG>>" + b0Row.getVkorg() 
-				+ ", VTWEG>>" + b0Row.getVtweg() + "\n");
+		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
+				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
+				+ ", MTART>>" + b0Row.getMtart() + ", XEIB1>>"
+				+ b0Row.getXeib1() + ", XEIV1>>" + b0Row.getXeiv1()
+				+ ", XEIV2>>" + b0Row.getXeiv2() + ", VKORG>>"
+				+ b0Row.getVkorg() + ", VTWEG>>" + b0Row.getVtweg() + "\n");
 
+		// Bmmh1 - B1
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
 		b1Row.setMeins("EA");
-
 		b1Row.setDwerk(plantValue);
-		b1Row.setProdh(productHierarchy); // RQ0615062020 Changes
+		b1Row.setProdh(productHierarchy);
 		b1Row.setMtpos("ZSUP");
-
-		b1Row.setKtgrm(acctAsgnGrp); // RQ0411077139 Changes
+		b1Row.setKtgrm(acctAsgnGrp);
 		b1Row.setSktof("X");
 		b1Row.setScmng("1");
-		// add at 20160301
+		// add 6 set value, In the previous epimshw code
 		b1Row.setMatkl("000");
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setAeszn(sdff.format(curDate));
 		b1Row.setGewei("KG");
 		b1Row.setSpart(div);
 		b1Row.setZeiar(chwA.getAnnouncementType());
-		//end of add
-		
+		// end of add
+
 		if (chwA.getSegmentAcronym().equals("RSS")) {
 			b1Row.setMvgr1("POS");
 		} else if (chwA.getSegmentAcronym().equals("AS4")) {
 			b1Row.setMvgr1("ICH");
 		} else if (chwA.getSegmentAcronym().equals("RS6")) {
 			b1Row.setMvgr1("PCH");
-		}
-		// CR0217061532
-		else if (chwA.isXccOnlyDiv(div)) { // RQ0724066720 changes
+		} else if (chwA.isXccOnlyDiv(div)) {
 			b1Row.setMvgr1("VRD");
 
 		} else {
@@ -170,30 +162,28 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		b1Table.appendRow(b1Row);
 		rfc.setIBmmh1(b1Table);
 
-		rfcInfo.append("B1 \n");
-		rfcInfo.append(Tab
-				+ "MEINS>>" + b1Row.getMeins()
-				+ ", DWERK>>" + b1Row.getDwerk()
-				+ ", PRODH>>" + b1Row.getProdh()
-				// RQ0615062020 Changes
-				+ ", MTPOS>>" + b1Row.getMtpos() 
-				+ ", KTGRM>>" + b1Row.getKtgrm()
-				+ ", SKTOF>>" + b1Row.getSktof() 
-				+ ", SCMNG>>" + b1Row.getScmng() 
-				+ ", MVGR1>>" + b1Row.getMvgr1()
-				+ ", MVGR2>>" + b1Row.getMvgr2() 
-				+ ", MVGR3>>" + b1Row.getMvgr3() 
-				+ ", VERSG>>" + b1Row.getVersg()
-				+ ", VMSTA>>" + b1Row.getVmsta() 
-				+ ", VMSTD>>" + b1Row.getVmstd() 
-				+ ", AUMNG>>" + b1Row.getAumng()
-				+ ", VPRSV>>" + b1Row.getVprsv() 
-				+ ", PEINH>>" + b1Row.getPeinh() 
-				+ ", STPRS>>" + b1Row.getStprs()
-				+ ", BKLAS>>" + b1Row.getBklas() + "\n");
+		rfcInfo.append("BMMH1 \n");
+		rfcInfo.append(Tab + ", MATKL>>" + b1Row.getMatkl() + ", ZEINR>>"
+				+ b1Row.getZeinr() + ", AESZN>>" + b1Row.getAeszn()
+				+ ", GEWEI>>" + b1Row.getGewei() + ", SPART>>"
+				+ b1Row.getSpart() + ", ZEIAR>>" + b1Row.getZeiar() + "\n");
 
+		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins() + ", DWERK>>"
+				+ b1Row.getDwerk() + ", PRODH>>" + b1Row.getProdh()
+				+ ", MTPOS>>" + b1Row.getMtpos() + ", KTGRM>>"
+				+ b1Row.getKtgrm() + ", SKTOF>>" + b1Row.getSktof()
+				+ ", SCMNG>>" + b1Row.getScmng() + ", MVGR1>>"
+				+ b1Row.getMvgr1() + ", MVGR2>>" + b1Row.getMvgr2()
+				+ ", MVGR3>>" + b1Row.getMvgr3() + ", VERSG>>"
+				+ b1Row.getVersg() + ", VMSTA>>" + b1Row.getVmsta()
+				+ ", VMSTD>>" + b1Row.getVmstd() + ", AUMNG>>"
+				+ b1Row.getAumng() + ", VPRSV>>" + b1Row.getVprsv()
+				+ ", PEINH>>" + b1Row.getPeinh() + ", STPRS>>"
+				+ b1Row.getStprs() + ", BKLAS>>" + b1Row.getBklas() + "\n");
+
+		// Bmmh2 - B2 Structure
 		Bmmh2Table b2Table = new Bmmh2Table();
-		
+
 		if (VectTaxList != null) {
 			Enumeration e = VectTaxList.elements();
 			while (e.hasMoreElements()) {
@@ -209,27 +199,25 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 				b2Table.appendRow(b2Row);
 
 				rfcInfo.append("B2 \n");
-				rfcInfo.append(Tab + "ALAND>>" + b2Row.getAland() 
-						+ ", TATY1>>" + b2Row.getTaty1() 
-						+ ", TAXM1>>" + b2Row.getTaxm1()
+				rfcInfo.append(Tab + "ALAND>>" + b2Row.getAland() + ", TATY1>>"
+						+ b2Row.getTaty1() + ", TAXM1>>" + b2Row.getTaxm1()
 						+ "\n" + "\n");
 			}
 		}
 
 		rfc.setIBmmh2(b2Table);
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
-
+		
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
@@ -299,6 +287,5 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 
 		execute();
 	}
-
 
 }

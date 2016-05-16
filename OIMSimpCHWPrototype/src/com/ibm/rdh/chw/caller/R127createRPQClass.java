@@ -30,7 +30,7 @@ public class R127createRPQClass extends Rfc {
 		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
 		rfcName = "Z_DM_SAP_CLASS_MAINTAIN";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CLASS_MAINTAIN();
-		
+
 		// Set up the RFC fields
 		// Clclasses - L0
 		ClclassesTable l0Table = new ClclassesTable();
@@ -50,9 +50,7 @@ public class R127createRPQClass extends Rfc {
 		l0Row.setCheckNo("X");
 
 		l0Table.appendRow(l0Row);
-
 		rfc.setIClclasses(l0Table);
-
 		rfcInfo.append("CLCLASSES  \n");
 		rfcInfo.append(Tab + "CLASS>>" + l0Row.get_Class() + ", CLASSTYPE>>"
 				+ l0Row.getClassType() + ", STATUS>>" + l0Row.getStatus()
@@ -70,14 +68,13 @@ public class R127createRPQClass extends Rfc {
 				+ typeFeature.getType());
 
 		l1Table.appendRow(l1Row);
-
 		rfc.setIClaDescr(l1Table);
-
 		rfcInfo.append("CHAR_DESCR \n");
 		rfcInfo.append(Tab + "CLASS>>" + l1Row.get_Class() + ", CLASSTYPE>>"
 				+ l1Row.getClassType() + ", LANGUAGE>>" + l1Row.getLanguage()
 				+ ", CATCHWORD>>" + l1Row.getCatchword() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 		zdmRow.setZGeo("US");
@@ -86,10 +83,12 @@ public class R127createRPQClass extends Rfc {
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
+		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + ",RFANUM>>" + chwA.getAnnDocNo() + "\n");

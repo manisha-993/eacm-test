@@ -1,13 +1,9 @@
 package com.ibm.rdh.chw.caller;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.pprds.epimshw.PropertyKeys;
-import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.rfc.Api_auspTable;
@@ -35,12 +31,6 @@ public class R152create012ClassificationForRPQTypeFeature extends Rfc {
 		reInitialize();
 		Date curDate = new Date();
 		rfcName = "Z_DM_SAP_CLASSIFICATION_MAINT";
-		int rowCnt;
-		Api_auspTableRow r6Row;
-		String sDateFormat = ConfigManager.getConfigManager().getString(
-				PropertyKeys.KEY_DATE_FORMAT, true);
-		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
-
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT();
 
 		// Set up the RFC fields
@@ -54,7 +44,6 @@ public class R152create012ClassificationForRPQTypeFeature extends Rfc {
 
 		r0Table.appendRow(r0Row);
 		rfc.setIObjectKey(r0Table);
-
 		rfcInfo.append("OBJECTKEY \n");
 		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() + ", KPARAVALU>>"
 				+ r0Row.getKparaValu() + "\n");
@@ -67,7 +56,6 @@ public class R152create012ClassificationForRPQTypeFeature extends Rfc {
 
 		r2Table.appendRow(r2Row);
 		rfc.setIKlah(r2Table);
-
 		rfcInfo.append("KLAH \n");
 		rfcInfo.append(Tab + "CLASS>>" + r2Row.get_Class() + "\n");
 
@@ -79,7 +67,6 @@ public class R152create012ClassificationForRPQTypeFeature extends Rfc {
 
 		r3Table.appendRow(r3Row);
 		rfc.setIKssk(r3Table);
-
 		rfcInfo.append("KSSK \n");
 		rfcInfo.append(Tab + "KLART>>" + r3Row.getKlart() + "\n");
 
@@ -91,7 +78,6 @@ public class R152create012ClassificationForRPQTypeFeature extends Rfc {
 
 		r4Table.appendRow(r4Row);
 		rfc.setIRcuco(r4Table);
-
 		rfcInfo.append("RCUCO \n");
 		rfcInfo.append(Tab + "OBTAB>>" + r4Row.getObtab() + "\n");
 
@@ -100,16 +86,16 @@ public class R152create012ClassificationForRPQTypeFeature extends Rfc {
 		MaraTableRow r5Row = r5Table.createEmptyRow();
 
 		// Passing date
-		// r5Row.setErsdaString(sdf.format(curDate));
 		r5Row.setErsda(curDate);
 
 		r5Table.appendRow(r5Row);
 		rfc.setIMara(r5Table);
-
 		rfcInfo.append("MARA  \n");
 		rfcInfo.append(Tab + "ERSDA>>" + r5Row.getErsdaString() + "\n");
 
 		// API_AUSP - R6
+		int rowCnt;
+		Api_auspTableRow r6Row;
 		Api_auspTable r6Table = new Api_auspTable();
 		Vector r6Vector = new Vector(1, 1);
 
@@ -156,8 +142,6 @@ public class R152create012ClassificationForRPQTypeFeature extends Rfc {
 			r6Row.setValue("REMOVAL PRICING");
 		}
 
-		// Changes Made By Laxmi Have to conform this from Greg .
-
 		if (typeFeature.getCustomerSetup()) {
 			r6Row = r6Table.createEmptyRow();
 			r6Vector.addElement(r6Row);
@@ -188,18 +172,17 @@ public class R152create012ClassificationForRPQTypeFeature extends Rfc {
 		}
 		rfc.setIApiAusp(r6Table);
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

@@ -46,9 +46,7 @@ public class R130createTypeFEATClass extends Rfc {
 		l0Row.setCheckNo("X");
 
 		l0Table.appendRow(l0Row);
-
 		rfc.setIClclasses(l0Table);
-
 		rfcInfo.append("CLCLASSES  \n");
 		rfcInfo.append(Tab + "CLASS>>" + l0Row.get_Class() + ", CLASSTYPE>>"
 				+ l0Row.getClassType() + ", STATUS>>" + l0Row.getStatus()
@@ -65,27 +63,28 @@ public class R130createTypeFEATClass extends Rfc {
 		l1Row.setCatchword("Features for Machine Type " + type);
 
 		l1Table.appendRow(l1Row);
-
 		rfc.setIClaDescr(l1Table);
-
 		rfcInfo.append("CHAR_DESCR \n");
 		rfcInfo.append(Tab + "CLASS>>" + l1Row.get_Class() + ", CLASSTYPE>>"
 				+ l1Row.getClassType() + ", LANGUAGE>>" + l1Row.getLanguage()
 				+ ", CATCHWORD>>" + l1Row.getCatchword() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
+
 		zdmRow.setZGeo("US");
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
+		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + ",RFANUM>>" + chwA.getAnnDocNo() + "\n");

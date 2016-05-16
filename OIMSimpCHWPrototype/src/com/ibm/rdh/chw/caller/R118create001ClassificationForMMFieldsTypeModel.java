@@ -1,13 +1,9 @@
 package com.ibm.rdh.chw.caller;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.pprds.epimshw.PropertyKeys;
-import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.rfc.Api_auspTable;
@@ -34,9 +30,6 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 			boolean remarkable, String pimsIdentity) throws Exception {
 		reInitialize();
 		Date curDate = new Date();
-		String sDateFormat = ConfigManager.getConfigManager().getString(
-				PropertyKeys.KEY_DATE_FORMAT, true);
-		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
 		rfcName = "Z_DM_SAP_CLASSIFICATION_MAINT";
 
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT();
@@ -51,7 +44,6 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 
 		r0Table.appendRow(r0Row);
 		rfc.setIObjectKey(r0Table);
-
 		rfcInfo.append("OBJECTKEY \n");
 		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() + ", KPARAVALU>>"
 				+ r0Row.getKparaValu() + "\n");
@@ -61,10 +53,8 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 		KlahTableRow r2Row = r2Table.createEmptyRow();
 
 		r2Row.setClass("MM_FIELDS");
-
 		r2Table.appendRow(r2Row);
 		rfc.setIKlah(r2Table);
-
 		rfcInfo.append("KLAH \n");
 		rfcInfo.append(Tab + "CLASS>>" + r2Row.get_Class() + "\n");
 
@@ -73,10 +63,8 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 		KsskTableRow r3Row = r3Table.createEmptyRow();
 
 		r3Row.setKlart("001");
-
 		r3Table.appendRow(r3Row);
 		rfc.setIKssk(r3Table);
-
 		rfcInfo.append("KSSK \n");
 		rfcInfo.append(Tab + "KLART>>" + r3Row.getKlart() + "\n");
 
@@ -85,10 +73,8 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 		RcucoTableRow r4Row = r4Table.createEmptyRow();
 
 		r4Row.setObtab("MARA");
-
 		r4Table.appendRow(r4Row);
 		rfc.setIRcuco(r4Table);
-
 		rfcInfo.append("RCUCO \n");
 		rfcInfo.append(Tab + "OBTAB>>" + r4Row.getObtab() + "\n");
 
@@ -97,21 +83,15 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 		MaraTableRow r5Row = r5Table.createEmptyRow();
 
 		// Passing date
-		// r5Row.setErsdaString(sdf.format(curDate));
 		r5Row.setErsda(curDate);
-
 		r5Table.appendRow(r5Row);
 		rfc.setIMara(r5Table);
-
 		rfcInfo.append("MARA  \n");
 		rfcInfo.append(Tab + "ERSDA>>" + r5Row.getErsdaString() + "\n");
 
 		// API_AUSP - R6
 		Api_auspTable r6Table = new Api_auspTable();
 		Vector r6Vector = new Vector(1, 1);
-
-		// Need to Know more about the if and else part in the Design
-		// Need to clarify this with Greg .
 
 		Api_auspTableRow r6Row = r6Table.createEmptyRow();
 		if (!remarkable) {
@@ -138,34 +118,23 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 		} else {
 			r6Row.setValue("");
 		}
-		
+
 		r6Row = r6Table.createEmptyRow();
 
 		r6Row.setCharact("MM_MODEL_PROPERTIES");
-		String systemType=typeModel.getSystemType();
-		if (systemType == null||systemType.trim().equals("")) {
+		String systemType = typeModel.getSystemType();
+		if (systemType == null || systemType.trim().equals("")) {
 			r6Row.setValue("");
 		} else {
 			r6Row.setValue(systemType);
 			r6Vector.addElement(r6Row);
 		}
 
-		
-
 		r6Row = r6Table.createEmptyRow();
-		// ("REVENUEPROFILE"+typeModel.getTmRev().getRevProfile().getRevenueProfile());
 		r6Row.setCharact("MM_BTPRODUCTS");
-		//waiting new entity RFAPROFILE 
-//		if (typeModel.getRevProfile() != null) {
-//			r6Row.setValue("PROCESS4");	
-//		} else {
-//			r6Row.setValue("");
-//		}
 		r6Row.setValue("PROCESS4");
 		r6Vector.addElement(r6Row);
-		
 
-		// GsaLegal changes start
 		if ((flfilcd != null && flfilcd.equalsIgnoreCase("XCC"))
 				&& (warrantyPeriod != null)) {
 			r6Row = r6Table.createEmptyRow();
@@ -173,8 +142,7 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 			r6Row.setValue(warrantyPeriod);
 			r6Vector.addElement(r6Row);
 		}
-		// GsaLegal changes end
-		// CR for TIR-6LSREE-SIU indicator needs to be set on all materials - VJ
+
 		r6Row = r6Table.createEmptyRow();
 
 		r6Row.setCharact("MM_SIU");
@@ -185,19 +153,14 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 		}
 
 		r6Vector.addElement(r6Row);
-		// CR for TIR-6LSREE-SIU indicator needs to be set on all materials - VJ
-
-		// CQ00002610-RQ / CQ00002496 changes start
 		r6Row = r6Table.createEmptyRow();
 
 		r6Row.setCharact("MM_TYPE_MOD");
 		r6Row.setValue(typeModel.getType() + typeModel.getModel());
 		r6Vector.addElement(r6Row);
-		// CQ00002610-RQ / CQ00002496 changes end
 
 		// Add the data to rfcInfo
 		Enumeration em6 = r6Vector.elements();
-
 		int rowCnt = 0;
 		while (em6.hasMoreElements()) {
 			r6Row = (Api_auspTableRow) em6.nextElement();
@@ -211,27 +174,28 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 		}
 		rfc.setIApiAusp(r6Table);
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
 		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
-		rfc.setCharvalRefresh("1");
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
+
+		// CharvalRefresh
+		rfc.setCharvalRefresh("1");
 		rfcInfo.append("CharvalRefresh\n");
 		rfcInfo.append(Tab + "CharvalRefresh>>" + "1" + "\n");
 
@@ -290,7 +254,8 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 	protected String getMaterialName() {
 		return "Create 001 Classification for MM_FIELDS type/model";
 	}
-	public void evaluate() throws Exception { 
-		execute() ; 
+
+	public void evaluate() throws Exception {
+		execute();
 	}
 }

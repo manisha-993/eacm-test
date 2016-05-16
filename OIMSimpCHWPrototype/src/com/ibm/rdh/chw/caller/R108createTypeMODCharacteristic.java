@@ -38,7 +38,7 @@ public class R108createTypeMODCharacteristic extends Rfc {
 		c0Row.setAdditVals("X");
 		c0Row.setNegVals("X");
 		// end
-		
+
 		c0Table.appendRow(c0Row);
 		rfc.setICharacts(c0Table);
 
@@ -65,18 +65,17 @@ public class R108createTypeMODCharacteristic extends Rfc {
 				+ c1Row.getLanguage() + ", CHDESCR>>" + c1Row.getChdescr()
 				+ "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

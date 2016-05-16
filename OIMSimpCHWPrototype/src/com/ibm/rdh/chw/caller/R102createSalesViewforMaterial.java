@@ -33,7 +33,6 @@ public class R102createSalesViewforMaterial extends Rfc {
 
 		reInitialize();
 		Date curDate = new Date();
-		// SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
 		String sDateFormat = ConfigManager.getConfigManager().getString(
 				PropertyKeys.KEY_DATE_FORMAT, true);
 		SimpleDateFormat sdff = new SimpleDateFormat("ddMMyy");
@@ -44,12 +43,10 @@ public class R102createSalesViewforMaterial extends Rfc {
 
 		// Set Up the RFC Fields
 		// Bmm00 - B0 Structure
-
 		Bmm00Table b0Table = new Bmm00Table();
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
 
 		b0Row.setTcode("MM01");
-
 		if (("NEW").equals(newFlag)) {
 			b0Row.setMatnr(typeModel.getType() + "NEW");
 		} else if (("UPG").equals(newFlag)) {
@@ -78,22 +75,20 @@ public class R102createSalesViewforMaterial extends Rfc {
 				+ ", VKORG>>" + b0Row.getVkorg() + ", VTWEG>>"
 				+ b0Row.getVtweg() + "\n");
 
+		// Bmmh1 - B1
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
 		b1Row.setMeins("EA");
 		b1Row.setDwerk(sapPlant);
 		b1Row.setMtpos("Z002");
-
 		if ("NEW".equals(newFlag)) {
 			b1Row.setKtgrm("01");
 		} else if ("UPG".equals(newFlag) || "MTC".equals(newFlag)) {
 			b1Row.setKtgrm("06");
 		}
-
 		b1Row.setSktof("X");
 		b1Row.setScmng("1");
-
 		if ("RSS".equals(chwA.getSegmentAcronym())) {
 			b1Row.setMvgr1("POS");
 		} else if ("AS4".equals(chwA.getSegmentAcronym())) {
@@ -104,9 +99,7 @@ public class R102createSalesViewforMaterial extends Rfc {
 			b1Row.setMvgr1("ZCH");
 		} else if (chwA.isXccOnlyDiv(typeModel.getDiv())) {
 			b1Row.setMvgr1("VRD");
-		}
-
-		else {
+		} else {
 			b1Row.setMvgr1("HWC");
 		}
 
@@ -119,7 +112,6 @@ public class R102createSalesViewforMaterial extends Rfc {
 		b1Row.setVersg("1");
 		b1Row.setVmsta("Z0");
 		b1Row.setVmstd(sdf.format(curDate));
-
 		b1Row.setAumng("1");
 
 		// add 6 set value, In the previous epimshw code
@@ -141,8 +133,8 @@ public class R102createSalesViewforMaterial extends Rfc {
 				+ b1Row.getAeszn() + ", GEWEI>>" + b1Row.getGewei() + "\n");
 
 		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins() + ", DWERK>>"
-				+ b1Row.getDwerk() + ", KTGRM>>" + b1Row.getKtgrm()
-				+ ", MTPOS>>" + b1Row.getMtpos() + ", SKTOF>>"
+				+ b1Row.getDwerk() + ", MTPOS>>" + b1Row.getMtpos()
+				+ ", KTGRM>>" + b1Row.getKtgrm() + ", SKTOF>>"
 				+ b1Row.getSktof() + ", SCMNG>>" + b1Row.getScmng()
 				+ ", MVGR1>>" + b1Row.getMvgr1() + ", MVGR2>>"
 				+ b1Row.getMvgr2() + ", MVGR3>>" + b1Row.getMvgr3()
@@ -150,6 +142,7 @@ public class R102createSalesViewforMaterial extends Rfc {
 				+ b1Row.getVmsta() + ", VMSTD>>" + b1Row.getVmstd()
 				+ ", AUMNG>>" + b1Row.getAumng() + "\n");
 
+		// Bmmh2 -B2
 		Bmmh2Table b2Table = new Bmmh2Table();
 		if (taxCntryList != null) {
 			Enumeration e = taxCntryList.elements();
@@ -161,29 +154,25 @@ public class R102createSalesViewforMaterial extends Rfc {
 				b2Row.setTaxm1(cntry.getClassification());
 
 				b2Table.appendRow(b2Row);
-
 				rfcInfo.append("BMMH2 \n");
-				
 				rfcInfo.append(Tab + "ALAND>>" + b2Row.getAland() + ", TATY1>>"
 						+ b2Row.getTaty1() + ", TAXM1>>" + b2Row.getTaxm1()
-						+ "\n" + "\n");
+						+ "\n");
 			}
 		}
 		rfc.setIBmmh2(b2Table);
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
-		// rfc.setPimsIdentity("C");
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

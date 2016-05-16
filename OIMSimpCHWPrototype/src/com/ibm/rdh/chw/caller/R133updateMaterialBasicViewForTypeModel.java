@@ -33,7 +33,7 @@ public class R133updateMaterialBasicViewForTypeModel extends Rfc {
 		b0Row.setTcode("MM02");
 		b0Row.setMatnr(typeModel.getType() + typeModel.getModel());
 
-		// Two commented out values
+		// Two commented out values in the epims code, but we need it.
 		b0Row.setMbrsh("M");
 		b0Row.setMtart("ZPRT");
 		// End
@@ -44,11 +44,12 @@ public class R133updateMaterialBasicViewForTypeModel extends Rfc {
 		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
 				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
 				+ ", MTART>>" + b0Row.getMtart() + "\n");
+
+		// Bmmh1 - B1
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
 		b1Row.setSpart(typeModel.getDiv());
-
 		if ((typeModel.getEanUPCCode()) != null
 				&& !typeModel.getEanUPCCode().equals("")) {
 			String upccd = typeModel.getEanUPCCode();
@@ -84,7 +85,6 @@ public class R133updateMaterialBasicViewForTypeModel extends Rfc {
 				+ ", GEWEI>>" + b1Row.getGewei() + "\n");
 
 		// Bmmh5 - B5 Structure
-
 		Bmmh5Table b5Table = new Bmmh5Table();
 		Bmmh5TableRow b5Row = b5Table.createEmptyRow();
 
@@ -96,18 +96,17 @@ public class R133updateMaterialBasicViewForTypeModel extends Rfc {
 		rfcInfo.append("B5 \n");
 		rfcInfo.append(Tab + "SPRAS>>" + b5Row.getSpras() + ", MAKTX>>"
 				+ b5Row.getMaktx() + "\n");
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity("C");
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + "C" + "\n");

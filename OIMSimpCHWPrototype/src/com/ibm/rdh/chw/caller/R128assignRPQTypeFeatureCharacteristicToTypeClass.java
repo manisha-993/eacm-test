@@ -30,8 +30,8 @@ public class R128assignRPQTypeFeatureCharacteristicToTypeClass extends Rfc {
 		rfc.setJKlart("300");
 
 		rfcInfo.append("Direct fields \n");
-		rfcInfo.append(Tab + "CLASS>>" + rfc.getJClass() 
-				+ ", KLART>>" + rfc.getJKlart() + "\n");
+		rfcInfo.append(Tab + "CLASS>>" + rfc.getJClass() + ", KLART>>"
+				+ rfc.getJKlart() + "\n");
 
 		// RMCLM - V1
 		RmclmTable c1Table = new RmclmTable();
@@ -43,22 +43,20 @@ public class R128assignRPQTypeFeatureCharacteristicToTypeClass extends Rfc {
 		c1Table.appendRow(c1Row);
 
 		rfc.setJMultichar(c1Table);
-
 		rfcInfo.append("RMCLM \n");
 		rfcInfo.append(Tab + "MERKMA>>" + c1Row.getMerkma() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

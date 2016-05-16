@@ -22,10 +22,8 @@ public class R134assignRPQTypeFeatureCharacteristicToTypeClass extends Rfc {
 
 		// Set up the RFC fields
 		// C0
-
 		String className;
 		String range = typeFeature.calculateRange100();
-		// hard code range, wait to add calculateRange1000() method
 		className = "MK_" + typeFeature.getType() + "_FEAT"
 				+ formatRange(range);
 		rfc.setJClass(className);
@@ -41,26 +39,23 @@ public class R134assignRPQTypeFeatureCharacteristicToTypeClass extends Rfc {
 
 		charac = "MK_" + typeFeature.getType() + "_" + typeFeature.getFeature();
 		c1Row.setMerkma(charac);
-
 		c1Table.appendRow(c1Row);
 
 		rfc.setJMultichar(c1Table);
-
 		rfcInfo.append("RMCLM \n");
 		rfcInfo.append(Tab + "MERKMA>>" + c1Row.getMerkma() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + rfc.getPimsIdentity() + "\n");

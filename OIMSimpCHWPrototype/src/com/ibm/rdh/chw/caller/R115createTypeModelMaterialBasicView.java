@@ -26,7 +26,6 @@ public class R115createTypeModelMaterialBasicView extends Rfc {
 		reInitialize();
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
 		rfcName = "Z_DM_SAP_MATM_CREATE";
-
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE();
 
 		// Set Up the RFC Fields
@@ -38,66 +37,42 @@ public class R115createTypeModelMaterialBasicView extends Rfc {
 		b0Row.setTcode("MM01");
 		b0Row.setMatnr(typeModel.getType() + typeModel.getModel());
 		b0Row.setMbrsh("M");
-
 		b0Row.setMtart("ZPRT");
-
 		b0Row.setXeik1("X");
 		b0Row.setXeib1("X");
-		// String geography = chwAg.getGeography();
-		// String plantBySalesOrg =
-		// SalesOrgToPlantMapper.getPlantBySalesOrg(geography);
 		b0Row.setWerks(plantValue);
 
 		b0Table.appendRow(b0Row);
 		rfc.setIBmm00(b0Table);
-
 		rfcInfo.append("B0 \n");
 		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
 				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
-				+ ", MTART>>" + b0Row.getMtart()
-				+
-				// ", XEIV4>>"+b0Row.getXeiv4()+
-				", XEIK1>>" + b0Row.getXeik1() + ", XEIB1>>" + b0Row.getXeib1()
+				+ ", MTART>>" + b0Row.getMtart() + ", XEIK1>>"
+				+ b0Row.getXeik1() + ", XEIB1>>" + b0Row.getXeib1()
 				+ ", WERKS>>" + b0Row.getWerks() + "\n");
 
+		// Bmmh1 - B1 Structure
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
 		b1Row.setMeins("EA");
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setMatkl("000");
-		b1Row.setSpart(typeModel.getDiv()); // RQ0724066720 changes
-
+		b1Row.setSpart(typeModel.getDiv());
 		b1Row.setZeiar(chwA.getAnnouncementType());
 		b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
 		b1Row.setGewei("KG");
-
-		// chw4.2 change
-		// b1Row.setVprsv("S");
-
-		// chw4.2 change
-		// b1Row.setStprs("1");
-
-		/*
-		 * if (!typeModel.getEanUPCCode().equals("")) {
-		 * b1Row.setEan11(typeModel.getEanUPCCode()); b1Row.setNumtp("UC"); }
-		 */
-
-		// code drop A
 		if (!typeModel.getEanUPCCode().equals("")) {
 			String upccd = typeModel.getEanUPCCode();
 			if (upccd.length() == 12 && upccd.charAt(0) == '0') {
 				b1Row.setEan11(upccd.substring(1, upccd.length()));
-			} else // by venkat
-			{
+			} else {
 				b1Row.setEan11(upccd);
 			}
 			b1Row.setNumtp("UC");
 
 		}
 
-		// if (typeModel.getProductHierarchy() != null ||
-		// (!typeModel.getProductHierarchy().equals(""))) {
 		if (!typeModel.getProductHierarchy().equals("")) {
 			b1Row.setPrdha(typeModel.getProductHierarchy());
 		}
@@ -111,22 +86,18 @@ public class R115createTypeModelMaterialBasicView extends Rfc {
 				+ ", SPART>>" + b1Row.getSpart() + ", ZEIAR>>"
 				+ b1Row.getZeiar() + ", AESZN>>" + b1Row.getAeszn()
 				+ ", GEWEI>>" + b1Row.getGewei());
-		/*
-		 * ", STPRS>>"+b1Row.getStprs()+ ", VPRSV>>"+b1Row.getVprsv());
-		 */
+
 		if (!typeModel.getEanUPCCode().equals("")) {
 			rfcInfo.append(Tab + "EAN11>>" + b1Row.getEan11() + ", NUMTP>>"
 					+ b1Row.getNumtp() + "\n");
 		}
-		// if (typeModel.getProductHierarchy() != null ||
-		// (!typeModel.getProductHierarchy().equals(""))) {
+
 		if (!typeModel.getProductHierarchy().equals("")) {
 			rfcInfo.append(Tab + "PRDHA>>" + b1Row.getPrdha() + "\n");
 		}
 		rfcInfo.append("\n");
 
 		// Bmmh5 - B5 Structure
-
 		Bmmh5Table b5Table = new Bmmh5Table();
 		Bmmh5TableRow b5Row = b5Table.createEmptyRow();
 
@@ -135,23 +106,21 @@ public class R115createTypeModelMaterialBasicView extends Rfc {
 
 		b5Table.appendRow(b5Row);
 		rfc.setIBmmh5(b5Table);
-
 		rfcInfo.append("B5 \n");
 		rfcInfo.append(Tab + "SPRAS>>" + b5Row.getSpras() + ", MAKTX>>"
 				+ b5Row.getMaktx() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
@@ -162,6 +131,7 @@ public class R115createTypeModelMaterialBasicView extends Rfc {
 		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
 
 	}
+
 	@Override
 	public void execute() throws Exception {
 		logExecution();
@@ -192,7 +162,7 @@ public class R115createTypeModelMaterialBasicView extends Rfc {
 	public Z_DM_SAP_MATM_CREATE getRfc() {
 		return rfc;
 	}
-	
+
 	@Override
 	protected String getErrorInformation() {
 		String ans;

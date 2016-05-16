@@ -48,8 +48,6 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 		// CSAP_MBOM - M0
 		Csap_mbomStructure m0 = new Csap_mbomStructure();
 
-		// Changes Made by Laxmi
-
 		if (newFlag.equals("NEW")) {
 			m0.setMatnr(type + "NEW");
 		} else if (newFlag.equals("UPG")) {
@@ -63,7 +61,6 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 		m0.setDatuv(sdf.format(curDate));
 
 		rfc.setJCsapMbom(m0);
-
 		rfcInfo.append("CSAP_MBOM \n");
 		rfcInfo.append(Tab + "MATNR>>" + m0.getMatnr() + ", WERKS>>"
 				+ m0.getWerks() + ", STLAN>>" + m0.getStlan() + ", DATUV>>"
@@ -86,18 +83,19 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 				m1Row.setComponent(tmg.getType() + tmg.getModel());
 				m1Row.setCompQty("1");
 				m1Row.setRelSales("X");
-				//add 20160504
+				// These two values are not defined in epims code but we need
+				// them.
 				m1Row.setCompUnit("EA");
 				m1Row.setSortstring("57");
-				//add end
-				// Made to ask Greg in Design Document in page 97 it says
-				// IDENTIFIER "A1"
+				// add end
 				m1Row.setIdentifier("A" + Cnt);
 				Cnt++;
 
 				m1Table.appendRow(m1Row);
 
 				rfcInfo.append("STPO_API03  \n");
+				rfcInfo.append(Tab + "COMPUNIT" + m1Row.getCompUnit()
+						+ "SORTSTRING" + m1Row.getSortstring() + "\n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + m1Row.getItemCateg()
 						+ ", ITEM_NO>>" + m1Row.getItemNo() + ", COMPONENT>>"
 						+ m1Row.getComponent() + ", COMP_QTY>>"
@@ -117,7 +115,6 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 				TypeModelUPGGeo tmg = (TypeModelUPGGeo) e.nextElement();
 
 				Csdep_datTableRow m2Row = m2Table.createEmptyRow();
-
 				m2Row.setDepIntern("SC_MK_" + tmg.getType() + "_MODEL_"
 						+ tmg.getModel());
 				m2Row.setStatus("1");
@@ -125,7 +122,6 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 				m2Row.setIdentifier("A" + Cnt);
 				Cnt++;
 				m2Row.setObjectId("2");
-
 				m2Table.appendRow(m2Row);
 
 				rfcInfo.append("CSDEP_DAT Row \n");
@@ -151,23 +147,22 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 				}
 
 				itemNumber = generateItemNumberString("r143");
-
 				m1Row.setItemNo(itemNumber);
 				m1Row.setComponent(tm.getType() + tm.getModel());
 				m1Row.setCompQty("1");
 				m1Row.setRelSales("X");
-				//add 20160504
+				// These two values are not defined in epims code but we need
+				// them.
 				m1Row.setCompUnit("EA");
 				m1Row.setSortstring("57");
-				//add end
-				// Made to ask Greg in Design Document in page 97 it says
-				// IDENTIFIER "A1"
+				// add end
 				m1Row.setIdentifier("A" + Cnt);
 				Cnt++;
-
 				m1Table.appendRow(m1Row);
 
 				rfcInfo.append("STPO_API03  \n");
+				rfcInfo.append(Tab + "COMPUNIT" + m1Row.getCompUnit()
+						+ "SORTSTRING" + m1Row.getSortstring() + "\n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + m1Row.getItemCateg()
 						+ ", ITEM_NO>>" + m1Row.getItemNo() + ", COMPONENT>>"
 						+ m1Row.getComponent() + ", COMP_QTY>>"
@@ -185,9 +180,7 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 			Cnt = 1;
 			while (e.hasMoreElements()) {
 				TypeModel tm = (TypeModel) e.nextElement();
-
 				Csdep_datTableRow m2Row = m2Table.createEmptyRow();
-
 				m2Row.setDepIntern("SC_MK_" + tm.getType() + "_MODEL_"
 						+ tm.getModel());
 				m2Row.setStatus("1");
@@ -195,7 +188,6 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 				m2Row.setIdentifier("A" + Cnt);
 				Cnt++;
 				m2Row.setObjectId("2");
-
 				m2Table.appendRow(m2Row);
 
 				rfcInfo.append("CSDEP_DAT Row \n");
@@ -213,21 +205,19 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 
 		rfcInfo.append("CSDATASTRUCTURE \n");
 		rfcInfo.append(Tab + "CHAR1>>" + m8.getChar1() + "\n");
-
 		rfc.setJCsdata(m8);
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + rfc.getPimsIdentity() + "\n");
@@ -246,7 +236,7 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 	public int getR143ItemNumberCounter() {
 		return r143ItemNumberCounter;
 	}
-	
+
 	/**
 	 * Will take the appropriate counter; multiple by 10; and then convert to 4
 	 * character string with leading zeros. The counter is also incremented for

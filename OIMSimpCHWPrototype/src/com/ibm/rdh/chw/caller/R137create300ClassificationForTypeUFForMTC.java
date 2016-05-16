@@ -50,7 +50,6 @@ public class R137create300ClassificationForTypeUFForMTC extends Rfc {
 
 		r0Table.appendRow(r0Row);
 		rfc.setIObjectKey(r0Table);
-
 		rfcInfo.append("OBJECTKEY \n");
 		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() + ", KPARAVALU>>"
 				+ r0Row.getKparaValu() + "\n");
@@ -66,7 +65,6 @@ public class R137create300ClassificationForTypeUFForMTC extends Rfc {
 
 		r2Table.appendRow(r2Row);
 		rfc.setIKlah(r2Table);
-
 		rfcInfo.append("KLAH \n");
 		rfcInfo.append(Tab + "CLASS>>" + r2Row.get_Class() + "\n");
 
@@ -78,7 +76,6 @@ public class R137create300ClassificationForTypeUFForMTC extends Rfc {
 
 		r3Table.appendRow(r3Row);
 		rfc.setIKssk(r3Table);
-
 		rfcInfo.append("KSSK \n");
 		rfcInfo.append(Tab + "KLART>>" + r3Row.getKlart() + "\n");
 
@@ -90,23 +87,21 @@ public class R137create300ClassificationForTypeUFForMTC extends Rfc {
 
 		r4Table.appendRow(r4Row);
 		rfc.setIRcuco(r4Table);
-
 		rfcInfo.append("RCUCO \n");
 		rfcInfo.append(Tab + "OBTAB>>" + r4Row.getObtab() + "\n");
 
 		// MARA - R5
 		MaraTable r5Table = new MaraTable();
 		MaraTableRow r5Row = r5Table.createEmptyRow();
-
 		// Passing date
 		r5Row.setErsda(curDate);
 
 		r5Table.appendRow(r5Row);
 		rfc.setIMara(r5Table);
-
 		rfcInfo.append("MARA  \n");
 		rfcInfo.append(Tab + "ERSDA>>" + sdf.format(r5Row.getErsda()) + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 		zdmRow.setZGeo("US");
@@ -115,10 +110,12 @@ public class R137create300ClassificationForTypeUFForMTC extends Rfc {
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
+		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + ",RFANUM>>" + chwA.getAnnDocNo() + "\n");

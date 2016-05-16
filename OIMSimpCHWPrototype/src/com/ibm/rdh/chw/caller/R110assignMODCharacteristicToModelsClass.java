@@ -18,7 +18,6 @@ public class R110assignMODCharacteristicToModelsClass extends Rfc {
 
 		reInitialize();
 		rfcName = "Z_DM_SAP_ASSIGN_CHAR_TO_CLASS";
-
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_ASSIGN_CHAR_TO_CLASS();
 
 		// Set up the RFC fields
@@ -37,24 +36,21 @@ public class R110assignMODCharacteristicToModelsClass extends Rfc {
 		c1Row.setMerkma("MK_" + typeModel.getType() + "_MOD");
 
 		c1Table.appendRow(c1Row);
-
 		rfc.setJMultichar(c1Table);
-
 		rfcInfo.append("RMCLM \n");
 		rfcInfo.append(Tab + "MERKMA>>" + c1Row.getMerkma() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
@@ -96,7 +92,7 @@ public class R110assignMODCharacteristicToModelsClass extends Rfc {
 	public Z_DM_SAP_ASSIGN_CHAR_TO_CLASS getRfc() {
 		return rfc;
 	}
-	
+
 	@Override
 	protected String getErrorInformation() {
 		String ans;
