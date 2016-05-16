@@ -68,27 +68,6 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 		FCTYPE_SET.add(SECONDARY_FC);
 	}
 	
-	protected static final Hashtable READ_LANGS_TBL;
-	
-	static {
-        READ_LANGS_TBL = new Hashtable();
-        // fill in with all languages defined in profile, actual languages used is based on properties file
-        READ_LANGS_TBL.put(""+Profile.ENGLISH_LANGUAGE.getNLSID(), Profile.ENGLISH_LANGUAGE);
-        READ_LANGS_TBL.put(""+Profile.GERMAN_LANGUAGE.getNLSID(), Profile.GERMAN_LANGUAGE);
-        READ_LANGS_TBL.put(""+Profile.ITALIAN_LANGUAGE.getNLSID(), Profile.ITALIAN_LANGUAGE);
-        READ_LANGS_TBL.put(""+Profile.JAPANESE_LANGUAGE.getNLSID(), Profile.JAPANESE_LANGUAGE);
-        READ_LANGS_TBL.put(""+Profile.FRENCH_LANGUAGE.getNLSID(), Profile.FRENCH_LANGUAGE);
-        READ_LANGS_TBL.put(""+Profile.SPANISH_LANGUAGE.getNLSID(), Profile.SPANISH_LANGUAGE);
-        READ_LANGS_TBL.put(""+Profile.UK_ENGLISH_LANGUAGE.getNLSID(), Profile.UK_ENGLISH_LANGUAGE);
-        READ_LANGS_TBL.put(""+Profile.KOREAN_LANGUAGE.getNLSID(), Profile.KOREAN_LANGUAGE);
-        READ_LANGS_TBL.put(""+Profile.CHINESE_LANGUAGE.getNLSID(), Profile.CHINESE_LANGUAGE);
-        READ_LANGS_TBL.put(""+Profile.FRENCH_CANADIAN_LANGUAGE.getNLSID(), Profile.FRENCH_CANADIAN_LANGUAGE);
-        READ_LANGS_TBL.put(""+Profile.CHINESE_SIMPLIFIED_LANGUAGE.getNLSID(), Profile.CHINESE_SIMPLIFIED_LANGUAGE);
-        READ_LANGS_TBL.put(""+Profile.SPANISH_LATINAMERICAN_LANGUAGE.getNLSID(), Profile.SPANISH_LATINAMERICAN_LANGUAGE);
-        READ_LANGS_TBL.put(""+Profile.PORTUGUESE_BRAZILIAN_LANGUAGE.getNLSID(), Profile.PORTUGUESE_BRAZILIAN_LANGUAGE);
-
-	}
-	
 	private static Vector<String> modelRequiredAttrsVct = new Vector<String>();
 	private static Vector<String> annRequiredAttrsVct = new Vector<String>();
 	private static Hashtable<String, Vector<String>> requiredTypeAttrsTbl = new Hashtable<String, Vector<String>>();
@@ -114,8 +93,13 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 		abr = rfcAbrStatus;
 		rdhRestProxy = new RdhRestProxy(new BasicRfcLogger(rfcAbrStatus));
 	
-		Profile proFile = switchRole(ROLE_CODE);
-		entityList = getEntityList(abr.getDatabase(), proFile, getVeName(), abr.getEntityType(), abr.getEntityID());
+		String t2DTS = abr.getCurrentTime();
+		Profile profileT2 = abr.switchRole(ROLE_CODE);
+		profileT2.setValOnEffOn(t2DTS, t2DTS);
+        profileT2.setEndOfDay(t2DTS); 
+        profileT2.setReadLanguage(Profile.ENGLISH_LANGUAGE); // default to US english
+        profileT2.setLoginTime(t2DTS); 
+		entityList = getEntityList(abr.getDatabase(), profileT2, getVeName(), abr.getEntityType(), abr.getEntityID());
 		abr.addDebug("EntityList for " + abr.getProfile().getValOn() + " extract " + getVeName() + " contains the following entities: \n" +
                 PokUtils.outputList(entityList));
 		
@@ -126,7 +110,7 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 	
 	
 	public String getVeName() {
-		return "RFCABRSTATUS";
+		return "dummy";
 	} 
 	
 	private EntityList getEntityList(Database m_db, Profile prof, String veName, String entityType, int entityId) 
@@ -134,39 +118,6 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 		EntityList list = m_db.getEntityList(prof, new ExtractActionItem(null, m_db, prof, veName), 
 				new EntityItem[] { new EntityItem(null,	prof, entityType, entityId) });
 		return list;
-	}
-	
-	// role must have access to all attributes
-	protected Profile switchRole(String roleCode)
-			throws COM.ibm.eannounce.objects.EANBusinessRuleException,
-			java.sql.SQLException,
-			COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
-			COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-			java.rmi.RemoteException, IOException,
-			COM.ibm.opicmpdh.middleware.MiddlewareException,
-			COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException {
-		Profile profile2 = abr.getProfile().getProfileForRoleCode(abr.getDatabase(), roleCode,
-				roleCode, 1);
-		if (profile2 == null) {
-			abr.addDebug("Could not switch to " + roleCode + " role");
-		} else {
-			abr.addDebug("Switched role from " + abr.getProfile().getRoleCode() + " to "
-					+ profile2.getRoleCode());
-
-			String nlsids = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties
-					.getNLSIDs(abr.getABRItem().getABRCode());
-			abr.addDebug("switchRole nlsids: " + nlsids);
-			StringTokenizer st1 = new StringTokenizer(nlsids, ",");
-			while (st1.hasMoreTokens()) {
-				String nlsid = st1.nextToken();
-				NLSItem nlsitem = (NLSItem) READ_LANGS_TBL.get(nlsid);
-				if (!profile2.getReadLanguages().contains(nlsitem)) {
-					profile2.getReadLanguages().addElement(nlsitem); // this is really cheating
-					abr.addDebug("added nlsitem " + nlsitem + " to new prof");
-				}
-			}
-		}
-		return profile2;
 	}
 	
 	protected EntityList getEntityList(Profile prof) throws MiddlewareRequestException, SQLException, MiddlewareException {
@@ -365,12 +316,11 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 	 * @param t2Item
 	 * @return
 	 */
-	protected EntityItem getEntityItemAtT1(EntityItem[] t1ItemS, EntityItem t2Item) {
-		if (t1ItemS != null && t1ItemS.length > 0) {
-			for (EntityItem item : t1ItemS) {
-				if (item.getKey().equals(t2Item.getKey())) {
-					return item;
-				}
+	protected EntityItem getEntityItemAtT1(Vector t1Items, EntityItem t2Item) {
+		for (int i = 0; i < t1Items.size(); i++) {
+			EntityItem item = (EntityItem)t1Items.get(i);
+			if (item.getKey().equals(t2Item.getKey())) {
+				return item;
 			}
 		}
 		return null;
@@ -465,8 +415,8 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 			String salesOrg = getAttributeValue(generalarea, "SLEORG");
 			if (salesOrg != null && !"".equals(salesOrg)) {
 				SalesOrgPlants salesorgPlants = new SalesOrgPlants();
-//				salesorgPlants.setCountryCode(getAttributeValue(generalarea, "GENAREACODE"));
-				salesorgPlants.setCountryList(getAttributeValue(generalarea, "GENAREANAME"));
+				salesorgPlants.setGenAreaCode(getAttributeValue(generalarea, "GENAREACODE"));
+				salesorgPlants.setGenAreaName(getAttributeFlagValue(generalarea, "GENAREANAME"));
 				salesorgPlants.setGeo(getAttributeValue(generalarea, "GENAREAPARENT")); // 
 				salesorgPlants.setSalesorg(salesOrg);
 				salesorgPlants.setPlants(getAttributeMultiFlagValue(generalarea, "CBSLEGACYPLNTCD"));
@@ -486,7 +436,7 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 				plants.add(plant);
 			}
 			if (tmpPlants.size() == 0) {
-				abr.addDebug("No plant found for country code： " + salesorgPlants.getCountryList());
+				abr.addDebug("No plant found for country code： " + salesorgPlants.getGenAreaCode());
 			}				
 		}			
 		return plants;		

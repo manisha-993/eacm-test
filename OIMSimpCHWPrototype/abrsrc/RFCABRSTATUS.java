@@ -4,13 +4,16 @@
 //its trade secrets, irrespective of what has been deposited with the U.S. Copyright office.
 package COM.ibm.eannounce.abr.sg.rfc;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
+import java.util.Hashtable;
 import java.util.ResourceBundle;
+import java.util.StringTokenizer;
 import java.util.Vector;
 
 import COM.ibm.eannounce.abr.util.ABRUtil;
@@ -23,10 +26,12 @@ import COM.ibm.eannounce.objects.EntityItem;
 import COM.ibm.eannounce.objects.ExtractActionItem;
 import COM.ibm.opicmpdh.middleware.D;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
+import COM.ibm.opicmpdh.middleware.Profile;
 import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
 import COM.ibm.opicmpdh.middleware.Stopwatch;
 import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
 import COM.ibm.opicmpdh.objects.SingleFlag;
+import COM.ibm.opicmpdh.transactions.NLSItem;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.transform.oim.eacm.util.PokUtils;
@@ -34,6 +39,26 @@ import com.ibm.transform.oim.eacm.util.PokUtils;
 public class RFCABRSTATUS extends PokBaseABR {
 	
 	protected static final String NEWLINE = "\n";
+	
+	protected static final Hashtable READ_LANGS_TBL;
+	
+	static {
+        READ_LANGS_TBL = new Hashtable();
+        // fill in with all languages defined in profile, actual languages used is based on properties file
+        READ_LANGS_TBL.put(""+Profile.ENGLISH_LANGUAGE.getNLSID(), Profile.ENGLISH_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.GERMAN_LANGUAGE.getNLSID(), Profile.GERMAN_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.ITALIAN_LANGUAGE.getNLSID(), Profile.ITALIAN_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.JAPANESE_LANGUAGE.getNLSID(), Profile.JAPANESE_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.FRENCH_LANGUAGE.getNLSID(), Profile.FRENCH_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.SPANISH_LANGUAGE.getNLSID(), Profile.SPANISH_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.UK_ENGLISH_LANGUAGE.getNLSID(), Profile.UK_ENGLISH_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.KOREAN_LANGUAGE.getNLSID(), Profile.KOREAN_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.CHINESE_LANGUAGE.getNLSID(), Profile.CHINESE_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.FRENCH_CANADIAN_LANGUAGE.getNLSID(), Profile.FRENCH_CANADIAN_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.CHINESE_SIMPLIFIED_LANGUAGE.getNLSID(), Profile.CHINESE_SIMPLIFIED_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.SPANISH_LATINAMERICAN_LANGUAGE.getNLSID(), Profile.SPANISH_LATINAMERICAN_LANGUAGE);
+        READ_LANGS_TBL.put(""+Profile.PORTUGUESE_BRAZILIAN_LANGUAGE.getNLSID(), Profile.PORTUGUESE_BRAZILIAN_LANGUAGE);
+	}
 	
 	private StringBuffer rptSb = new StringBuffer();
 	private static int DEBUG_LVL = ABRServerProperties.getABRDebugLevel("RFCABRSTATUS");
@@ -279,6 +304,38 @@ public class RFCABRSTATUS extends PokBaseABR {
 				}
 			}
 		}
+	}
+	
+	// role must have access to all attributes
+	protected Profile switchRole(String roleCode)
+			throws COM.ibm.eannounce.objects.EANBusinessRuleException,
+			java.sql.SQLException,
+			COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException,
+			COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
+			java.rmi.RemoteException, IOException,
+			COM.ibm.opicmpdh.middleware.MiddlewareException,
+			COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException {
+		Profile profile2 = m_prof.getProfileForRoleCode(m_db, roleCode, roleCode, 1);
+		if (profile2 == null) {
+			addDebug("Could not switch to " + roleCode + " role");
+		} else {
+			addDebug("Switched role from " + m_prof.getRoleCode() + " to "
+					+ profile2.getRoleCode());
+
+			String nlsids = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties
+					.getNLSIDs(m_abri.getABRCode());
+			addDebug("switchRole nlsids: " + nlsids);
+			StringTokenizer st1 = new StringTokenizer(nlsids, ",");
+			while (st1.hasMoreTokens()) {
+				String nlsid = st1.nextToken();
+				NLSItem nlsitem = (NLSItem) READ_LANGS_TBL.get(nlsid);
+				if (!profile2.getReadLanguages().contains(nlsitem)) {
+					profile2.getReadLanguages().addElement(nlsitem); // this is really cheating
+					addDebug("added nlsitem " + nlsitem + " to new prof");
+				}
+			}
+		}
+		return profile2;
 	}
 	
 	private void buildReport() {

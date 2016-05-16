@@ -4,30 +4,30 @@ import java.util.Vector;
 
 public class SalesOrgPlants {
 
-	// private String countryCode;
-	private String countryList;
+	private String genAreaCode;
+	private String genAreaName;
 	private String geo;
 	private String salesorg;
 	private Vector<String> plants;
 
-	// public String getCountryCode() {
-	// return countryCode;
-	// }
-	//
-	// public void setCountryCode(String countryCode) {
-	// this.countryCode = countryCode;
-	// }
+	public String getGenAreaCode() {
+		return genAreaCode;
+	}
+
+	public void setGenAreaCode(String genAreaCode) {
+		this.genAreaCode = genAreaCode;
+	}
+
+	public String getGenAreaName() {
+		return genAreaName;
+	}
+
+	public void setGenAreaName(String genAreaName) {
+		this.genAreaName = genAreaName;
+	}
 
 	public String getGeo() {
 		return geo;
-	}
-
-	public String getCountryList() {
-		return countryList;
-	}
-
-	public void setCountryList(String countryList) {
-		this.countryList = countryList;
 	}
 
 	public void setGeo(String geo) {
