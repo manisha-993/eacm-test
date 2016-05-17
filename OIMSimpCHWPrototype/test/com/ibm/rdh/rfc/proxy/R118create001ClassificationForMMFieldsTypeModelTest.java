@@ -38,7 +38,7 @@ public class R118create001ClassificationForMMFieldsTypeModelTest extends
 			typeModel.setType("EACM");
 			typeModel.setModel("MODEL");
 			typeModel.setCustomerSetup(false);
-//			typeModel.setRevProfile();
+			typeModel.setHasRevProfile(true);
 			CHWAnnouncement chwA = new CHWAnnouncement();
 			chwA.setAnnDocNo("123401");
 			String flfilcd = "fl1";

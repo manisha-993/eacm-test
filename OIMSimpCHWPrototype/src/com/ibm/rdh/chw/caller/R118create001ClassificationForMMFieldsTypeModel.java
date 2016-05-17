@@ -132,9 +132,11 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 
 		r6Row = r6Table.createEmptyRow();
 		r6Row.setCharact("MM_BTPRODUCTS");
-		r6Row.setValue("PROCESS4");
-		r6Vector.addElement(r6Row);
-
+		if(typeModel.isHasRevProfile()){
+			r6Row.setValue("PROCESS4");
+			r6Vector.addElement(r6Row);
+		}
+		
 		if ((flfilcd != null && flfilcd.equalsIgnoreCase("XCC"))
 				&& (warrantyPeriod != null)) {
 			r6Row = r6Table.createEmptyRow();
