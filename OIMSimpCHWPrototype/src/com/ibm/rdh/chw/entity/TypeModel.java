@@ -96,8 +96,18 @@ public class TypeModel
     private String matrlGrp1;
     private String matrlGrp3;
     private String systemDesc;
+    
+    private boolean hasRevProfile;
 
-    /**
+    public boolean isHasRevProfile() {
+		return hasRevProfile;
+	}
+
+	public void setHasRevProfile(boolean hasRevProfile) {
+		this.hasRevProfile = hasRevProfile;
+	}
+
+	/**
      * Returns the loadingGroup from all type model geos with precedence US
      * first and then first non-blank geo
      * 
@@ -1361,7 +1371,7 @@ public class TypeModel
         s.append("gaDate >> " + gaDate + "\n");
         s.append("annDocNo >> " + annDocNo + "\n");
         s.append("customerSetup >> " + customerSetup + "\n");
-
+        s.append("profitCenter >> " + profitCenter + "\n");
         s.append("modificationReason >> " + modificationReason + "\n");
         s.append("functionClass >> " + functionClass + "\n");
         s.append("rentalPlan >> " + rentalPlan + "\n");
@@ -1408,7 +1418,8 @@ public class TypeModel
         s.append("matrlgrp1 >>"+matrlGrp1+"\n");
         s.append("matrlgrp3 >>"+matrlGrp3+"\n");
         s.append("systemDesc >>"+systemDesc+"\n");
-
+        s.append("hasRevProfile >>"+hasRevProfile+"\n");
+        
         //CHW4.1
         //s.append(tmRev.toString());
 
