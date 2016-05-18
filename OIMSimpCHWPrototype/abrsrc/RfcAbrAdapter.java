@@ -13,15 +13,20 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import org.w3c.dom.Element;
+
 import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
 import COM.ibm.eannounce.objects.AttributeChangeHistoryItem;
 import COM.ibm.eannounce.objects.EANAttribute;
 import COM.ibm.eannounce.objects.EANBusinessRuleException;
 import COM.ibm.eannounce.objects.EANEntity;
+import COM.ibm.eannounce.objects.EANFlagAttribute;
+import COM.ibm.eannounce.objects.EANMetaAttribute;
 import COM.ibm.eannounce.objects.EntityGroup;
 import COM.ibm.eannounce.objects.EntityItem;
 import COM.ibm.eannounce.objects.EntityList;
 import COM.ibm.eannounce.objects.ExtractActionItem;
+import COM.ibm.eannounce.objects.MetaFlag;
 import COM.ibm.opicmpdh.middleware.Database;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
 import COM.ibm.opicmpdh.middleware.MiddlewareRequestException;
@@ -42,6 +47,10 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 	
 	// Entity 
 	protected static final String MODEL = "MODEL";
+	protected static final String FEATURE = "FEATURE";
+	protected static final String TMF = "PRODSTRUCT";
+	protected static final String FCTRANSACTION = "FCTRANSACTION";
+	protected static final String MODELCONVERT = "MODELCONVERT";
 	protected static final String AVAIL = "AVAIL";
 	protected static final String ANNOUNCEMENT = "ANNOUNCEMENT";
 	protected static final String MACHTYPE = "MACHTYPE";
@@ -50,7 +59,8 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 	protected static final String TAXCATG = "TAXCATG";
 	protected static final String MODTAXRELEVANCE = "MODTAXRELEVANCE";
 	protected static final String SGMNTACRNYM = "SGMNTACRNYM";
-	// Entity attribute
+	protected static final String REVPROF = "REVPROF";
+	// Entity attribute	
 	protected static final String MACHTYPE_PROMOTED = "PROMOTED";
 	protected static final String MODEL_MACHTYPEATR = "MACHTYPEATR";
 	protected static final String MODEL_MODELATR = "MODELATR";
@@ -62,8 +72,17 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 	protected static final String MODEL_SYSTEMTYPE = "SYSTEMTYPE";
 	protected static final String MODEL_SYSIDUNIT = "SYSIDUNIT";
 	protected static final String MODEL_MODELORDERCODE = "MODELORDERCODE";
-	
+	protected static final String FEATURE_FEATURECODE = "FEATURECODE";
+	protected static final String FEATURE_INVNAME = "INVNAME";
+	protected static final String FEATURE_HWFCCAT = "HWFCCAT";
+	protected static final String FEATURE_PRICEDFEATURE = "PRICEDFEATURE";
+	protected static final String FEATURE_ZEROPRICE = "ZEROPRICE";
+	protected static final String FEATURE_FCTYPE = "FCTYPE";
+	protected static final String TMF_INSTALL = "INSTALL";
+	protected static final String TMF_REMOVEPRICE = "REMOVEPRICE";
+	protected static final String TMF_RETURNEDPARTS = "RETURNEDPARTS";
 	protected static final String AVAIL_COUNTRYLIST = "COUNTRYLIST";
+	protected static final String AVAIL_AVAILTYPE = "AVAILTYPE";
 	
 	protected static final String ANNOUNCEMENT_ANNTYPE = "ANNTYPE";
 	protected static final String ANNOUNCEMENT_ANNDATE = "ANNDATE";
@@ -87,6 +106,11 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 	public static final String MACHTYPE_PROMOTED_YES = "PRYES";
 	protected static final String PLANNEDAVAIL = "146";
 	protected static final String STATUS_PASSED = "0030";
+	// Attribute type
+	protected static final String ATTR_FLAG = "F";
+	protected static final String ATTR_TEXT = "T";
+	protected static final String ATTR_MULTI_FLAG = "MF";
+	protected static final String ATTR_MULTI_TEXT = "MT";
 
 	public static final String LOCAL_REAL_PATH = "./properties/dev";
 	
@@ -226,6 +250,58 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 		}
 		if (attrValue == null) {
 			attrValue = "";
+		}
+		return attrValue;
+	}
+	
+	/**
+	 * Get attribute short value
+	 * @param item
+	 * @param attrCode
+	 * @return
+	 */
+	protected String getAttributeShortValue(EntityItem item, String attrCode) {
+		String attrValue = "";
+		EntityGroup egrp = item.getEntityGroup();
+		EANMetaAttribute metaAttr = egrp.getMetaAttribute(attrCode);
+		if (metaAttr == null) {
+			attrValue = "Error: Attribute " + attrCode + " not found in "
+					+ item.getEntityType() + " META data.";
+		} else {
+			if (metaAttr.getAttributeType().equals("U") || metaAttr.getAttributeType().equals("S")) {
+				EANFlagAttribute fAtt = (EANFlagAttribute) item.getAttribute(attrCode);
+				if (fAtt != null && fAtt.toString().length() > 0) {
+					// Get the selected Flag code
+					MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
+					for (int i = 0; i < mfArray.length; i++) {
+						// get selection
+						if (mfArray[i].isSelected()) {
+							attrValue = mfArray[i].getShortDescription();							
+							break;
+						} // metaflag is selected
+					}// end of flagcodes
+				}
+			} else if (metaAttr.getAttributeType().equals("F")) { // MultiFlagAttribute
+				// get attr, it is F
+				EANFlagAttribute fAtt = (EANFlagAttribute) item.getAttribute(attrCode);
+				if (fAtt != null && fAtt.toString().length() > 0) {
+					StringBuffer sb = new StringBuffer();
+					// Get the selected Flag codes.
+					MetaFlag[] mfArray = (MetaFlag[]) fAtt.get();
+					for (int i = 0; i < mfArray.length; i++) {
+						// get selection
+						if (mfArray[i].isSelected()) {
+							if (sb.length() > 0) {
+								sb.append(PokUtils.DELIMITER);
+							}
+							sb.append(mfArray[i].getShortDescription());
+						} 
+					}
+					if (sb.length() > 0) {
+						attrValue = sb.toString();
+					}					
+				}
+			}
 		}
 		return attrValue;
 	}
@@ -400,7 +476,9 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 //			} catch (HWPIMSAbnormalException e) {
 //				lcd = new LifecycleData();
 //			}
-
+			abr.addDebug("updateAnnLifecyle getPreAnnounceValidFrom:" + lcd.getPreAnnounceValidFrom() + " getAnnounceValidFrom:" 
+					+ lcd.getAnnounceValidFrom() + " getWdfmValidFrom:" + lcd.getWdfmValidFrom() + " getAnnounceValidTo:" + lcd.getAnnounceValidTo());
+			
 			if (lcd.getPreAnnounceValidFrom() == null && lcd.getAnnounceValidFrom() == null && lcd.getWdfmValidFrom() == null) {
 				// New object				
 				if (DateUtility.isAfterToday(annDate)) {
@@ -453,7 +531,7 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 		}
 	}
 	
-	protected List<SalesOrgPlants> getAllSalesorgPlants(Vector generalareaVct) throws RfcAbrException {
+	protected List<SalesOrgPlants> getAllSalesOrgPlant(Vector generalareaVct) throws RfcAbrException {
 		List<SalesOrgPlants> salesorgPlantsVect = new ArrayList<>();			
 		for (int i = 0; i < generalareaVct.size(); i++) {
 			EntityItem generalarea = (EntityItem)generalareaVct.get(i);
@@ -467,13 +545,25 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 				salesorgPlants.setPlants(getAttributeMultiFlagValue(generalarea, GENERALAREA_CBSLEGACYPLNTCD));
 				salesorgPlantsVect.add(salesorgPlants);
 			} else {
-				abr.addDebug("SalesOrg value is null for " + generalarea.getKey());
+				abr.addDebug("getAllSalesOrgPlant SalesOrg value is null for " + generalarea.getKey());
 			}		
 		}
+		abr.addDebug("getAllSalesOrgPlant GENERALAREA size: " + generalareaVct.size() + " SalesorgPlants size: " + salesorgPlantsVect.size());
 		return salesorgPlantsVect;		
 	}
 	
-	protected Set<String> getAllPlants(List<SalesOrgPlants> salesorgPlantsVect) {
+	protected List<SalesOrgPlants> getAllSalesOrgPlantByCountryList(List<SalesOrgPlants> salesOrgPlnatList, List<String> countryList) throws RfcAbrException {
+		List<SalesOrgPlants> salesorgPlantsVect = new ArrayList<>();
+		for (SalesOrgPlants salesOrgPlants : salesOrgPlnatList) {
+			if (countryList.contains(salesOrgPlants.getGenAreaName())) {
+				salesorgPlantsVect.add(salesOrgPlants);
+			}
+		}
+		abr.addDebug("getAllSalesOrgPlantByCountryList SalesOrgPlants size: " + salesorgPlantsVect.size() + " for country list: " + countryList);
+		return salesorgPlantsVect;		
+	}
+	
+	protected Set<String> getAllPlant(List<SalesOrgPlants> salesorgPlantsVect) {
 		Set<String> plants = new HashSet<>();			
 		for (SalesOrgPlants salesorgPlants : salesorgPlantsVect) {
 			Vector<String> tmpPlants = salesorgPlants.getPlants();			
@@ -481,7 +571,7 @@ public abstract class RfcAbrAdapter implements RfcAbr {
 				plants.add(plant);
 			}
 			if (tmpPlants.size() == 0) {
-				abr.addDebug("No plant found for country code： " + salesorgPlants.getGenAreaCode());
+				abr.addDebug("getAllPlant No plant found for country code： " + salesorgPlants.getGenAreaCode());
 			}				
 		}			
 		return plants;		

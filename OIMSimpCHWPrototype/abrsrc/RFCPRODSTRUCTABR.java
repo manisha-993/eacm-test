@@ -31,9 +31,9 @@ private static List<String> feaMarkChangedAttrs;
 	
 	static {
 		tmfMarkChangedAttrs = new ArrayList<>();
-		tmfMarkChangedAttrs.add("INSTALL");
+		tmfMarkChangedAttrs.add(TMF_INSTALL);
 		feaMarkChangedAttrs = new ArrayList<>();
-		feaMarkChangedAttrs.add("INVNAME");
+		feaMarkChangedAttrs.add(FEATURE_INVNAME);
 	}
 
 	public RFCPRODSTRUCTABR(RFCABRSTATUS rfcAbrStatus) throws MiddlewareRequestException, SQLException, MiddlewareException, RemoteException, EANBusinessRuleException, IOException, MiddlewareShutdownInProgressException {
@@ -47,26 +47,26 @@ private static List<String> feaMarkChangedAttrs;
 		// TMF
 		EntityItem tmfItem = getRooEntityItem();
 		// MODEL
-		EntityItem[] mdlItems = getEntityItems("MODEL");
+		EntityItem[] mdlItems = getEntityItems(MODEL);
 		if (mdlItems == null || mdlItems.length == 0) {
 			throw new RfcAbrException("Can not find the linked MODEL for " + tmfItem.getKey());
 		}
 		EntityItem mdlItem = mdlItems[0];
 		// FEATURE
-		EntityItem[] feaItems = getEntityItems("FEATURE");
+		EntityItem[] feaItems = getEntityItems(FEATURE);
 		if (feaItems == null || feaItems.length == 0) {
 			throw new RfcAbrException("Can not find the linked FEATURE for " + tmfItem.getKey());
 		}
 		EntityItem feaItem = feaItems[0];
 		// AVAIL
-		Vector availVct = PokUtils.getAllLinkedEntities(tmfItem, "OOFAVAIL", "AVAIL");
-		Vector planAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, "AVAILTYPE", PLANNEDAVAIL);
+		Vector availVct = PokUtils.getAllLinkedEntities(tmfItem, "OOFAVAIL", AVAIL);
+		Vector planAvailVct = PokUtils.getEntitiesWithMatchedAttr(availVct, AVAIL_AVAILTYPE, PLANNEDAVAIL);
 		abr.addDebug("getAvails OOFAVAIL all availVct: " + availVct.size() + " plannedavail: " + planAvailVct.size());
 		if (planAvailVct.size() == 0) {
 			throw new RfcAbrException("There is no avail for this PRODSTRUCT, it will not promote this PRODSTRUCT");
 		}
 		// ANNOUNCEMENT
-		EntityItem[] annItems = getEntityItems("ANNOUNCEMENT");
+		EntityItem[] annItems = getEntityItems(ANNOUNCEMENT);
 		if (annItems == null || annItems.length == 0) {
 			throw new RfcAbrException("There is no ANNOUNCEMENT for this PRODSTRUCT, it will not promote this PRODSTRUCT");
 		}	
@@ -76,9 +76,9 @@ private static List<String> feaMarkChangedAttrs;
 		
 		boolean isRPQ = isRPQ(feaItem);
 		
-		String machType = getAttributeValue(mdlItem, "MACHTYPEATR");
-		String model = getAttributeValue(mdlItem, "MODELATR");
-		String feaCode = getAttributeValue(feaItem, "FEATURECODE");
+		String machType = getAttributeValue(mdlItem, MODEL_MACHTYPEATR);
+		String model = getAttributeValue(mdlItem, MODEL_MODELATR);
+		String feaCode = getAttributeValue(feaItem, FEATURE_FEATURECODE);
 		
 		// ----------------------- Create RFC input entities -----------------------
 		// Type Feature
@@ -88,15 +88,15 @@ private static List<String> feaMarkChangedAttrs;
 		} else {
 			tfObj.setFeatureID("R");
 		}		
-		tfObj.setFeature(getAttributeValue(feaItem, "FEATURECODE"));
+		tfObj.setFeature(feaCode);
 		tfObj.setType(machType);
-		tfObj.setDescription(getAttributeValue(feaItem, "INVNAME"));
+		tfObj.setDescription(getAttributeValue(feaItem, FEATURE_INVNAME));
 		tfObj.setNoChargePurchase(getNoChargePurchase(feaItem));
 		tfObj.setNetPriceMES(getNetPriceMES(mdlItem));
 		tfObj.setItemReturned(getItemReturn(tmfItem));
 		tfObj.setRemovalCharge(getRemovalCharge(tmfItem));
-		tfObj.setCustomerSetup("CE".equals(getAttributeValue(tmfItem, "INSTALL")));
-		tfObj.setCapOnDemand("202".equals(getAttributeFlagValue(feaItem, "HWFCCAT")));
+		tfObj.setCustomerSetup("CE".equals(getAttributeValue(tmfItem, TMF_INSTALL)));
+		tfObj.setCapOnDemand("202".equals(getAttributeFlagValue(feaItem, FEATURE_HWFCCAT)));
 		tfObj.setApprovalRPQ(isRPQ);
 		tfObj.calculateRange100(); //?
 		tfObj.setUFLinked(false);// from Rupal UFLink not required for EACM.
@@ -128,13 +128,13 @@ private static List<String> feaMarkChangedAttrs;
 	            // TMF at T1
 	            EntityItem t1TmfItem = t1EntityList.getParentEntityGroup().getEntityItem(0);
 	            // MODEL at T1
-	            EntityItem[] t1MdlItems = getEntityItems(t1EntityList, "MODEL");
+	            EntityItem[] t1MdlItems = getEntityItems(t1EntityList, MODEL);
 	    		if (t1MdlItems == null || t1MdlItems.length == 0) {
 	    			throw new RfcAbrException("Can not find the linked MODEL for T1" + tmfItem.getKey());
 	    		}
 	    		EntityItem t1MdlItem = t1MdlItems[0];
 	            // FEATURE at T1
-	            EntityItem[] t1FeaItems = getEntityItems(t1EntityList, "FEATURE");
+	            EntityItem[] t1FeaItems = getEntityItems(t1EntityList, FEATURE);
 	    		if (t1FeaItems == null || t1FeaItems.length == 0) {
 	    			throw new RfcAbrException("Can not find the linked FEATURE for T1 " + tmfItem.getKey());
 	    		}
@@ -155,25 +155,25 @@ private static List<String> feaMarkChangedAttrs;
 		}
 		
 //		Vector<String> ranges = null;
-		String thisRange = getAttributeValue(feaItem, "FEATURECODE");
+		String thisRange = getAttributeValue(feaItem, FEATURE_FEATURECODE);
 		
 		for (int i = 0; i < planAvailVct.size(); i++) {
 			EntityItem availItem = (EntityItem)planAvailVct.get(i);
-			Vector annVect = PokUtils.getAllLinkedEntities(availItem, "AVAILANNA", "ANNOUNCEMENT");
+			Vector annVect = PokUtils.getAllLinkedEntities(availItem, "AVAILANNA", ANNOUNCEMENT);
 			if (annVect.size() > 0) {
 				EntityItem annItem = (EntityItem) annVect.get(0); // AVAIL must only link one ANNOUNCEMENT
 				abr.addDebug("Promote Type Feature for " + annItem.getKey() + " " + availItem.getKey());
 				
 				// Get all salesorg and plants from GENERALAREA linked to AVAIL
-				Vector generalareaVct = PokUtils.getAllLinkedEntities(availItem, "AVAILGAA", "GENERALAREA");
-				List<SalesOrgPlants> salesorgPlantsVect = getAllSalesorgPlants(generalareaVct);
+				Vector generalareaVct = PokUtils.getAllLinkedEntities(availItem, "AVAILGAA", GENERALAREA);
+				List<SalesOrgPlants> salesorgPlantsVect = getAllSalesOrgPlant(generalareaVct);
 				abr.addDebug("GENERALAREA size: " + generalareaVct.size() + " SalesorgPlants size: " + salesorgPlantsVect.size());
-				Set<String> plants = getAllPlants(salesorgPlantsVect);
+				Set<String> plants = getAllPlant(salesorgPlantsVect);
 				abr.addDebug("All plants size: " + plants.size() + " values: " + plants);
 				
 				if (isTFPromoted) {
 					if (t1EntityList != null) {
-						EntityItem[] t1Avails = getEntityItems(t1EntityList, "AVAIL");							
+						EntityItem[] t1Avails = getEntityItems(t1EntityList, AVAIL);							
 						isTFGeoPromoted = isTypeFeatureGeoPromoted(t1Avails, availItem);
 						if (isTFGeoPromoted) {
 							EntityItem[] t1Anns = getEntityItems(t1EntityList, "ANNOUNCEMENT");
@@ -188,13 +188,13 @@ private static List<String> feaMarkChangedAttrs;
 				// ----------------------- Create RFC input entitie CHWAnnouncement and CHWGeoAnn -----------------------
 				CHWAnnouncement chwA = new CHWAnnouncement();
 				chwA.setAnnDocNo(machType + STRING_SEPARATOR + model + STRING_SEPARATOR + feaCode); // MACHTYPEATR|MODELATR|FEATURECODE
-				chwA.setAnnouncementType(getAttributeValue(annItem, "ANNTYPE")); //  WS logic:if feed is designated as "ePIMS/SW Migration", then set to "MIG" else set to "RFA", so flag or desc are all fine.
+				chwA.setAnnouncementType(getAttributeValue(annItem, ANNOUNCEMENT_ANNTYPE)); //  WS logic:if feed is designated as "ePIMS/SW Migration", then set to "MIG" else set to "RFA", so flag or desc are all fine.
 				chwA.setSegmentAcronym(getSegmentAcronymForAnn(annItem));
 				abr.addDebug("CHWAnnouncement: " + chwA.toString());
 				
 				CHWGeoAnn chwAg = new CHWGeoAnn();
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-				chwAg.setAnnouncementDate(sdf.parse(getAttributeValue(annItem, "ANNDATE")));
+				chwAg.setAnnouncementDate(sdf.parse(getAttributeValue(annItem, ANNOUNCEMENT_ANNDATE)));
 				abr.addDebug("CHWAnnouncementGEO: " + chwAg.toString());
 				
 				// ----------------------- Type Feature Promote -----------------------
@@ -300,7 +300,7 @@ private static List<String> feaMarkChangedAttrs;
 		if(isDiff(t1Item, t2Item, attrList)) {
 			return true;
 		} else {
-			if ("FEATURE".equals(t2Item.getEntityType())) {
+			if (FEATURE.equals(t2Item.getEntityType())) {
 				boolean t1IsRPQ = isRPQ(t1Item);
 				boolean t2IsRPQ = isRPQ(t2Item);
 				if (t1IsRPQ != t2IsRPQ) {
@@ -312,7 +312,7 @@ private static List<String> feaMarkChangedAttrs;
 					return true;
 				}
 			}
-			if ("PRODSTRUCT".equals(t2Item.getEntityType())) {
+			if (TMF.equals(t2Item.getEntityType())) {
 				boolean t1ItemReturn = getItemReturn(t1Item);
 				boolean t2ItemReturn = getItemReturn(t2Item);
 				if (t1ItemReturn != t2ItemReturn) {
@@ -347,7 +347,7 @@ private static List<String> feaMarkChangedAttrs;
 	
 	private boolean isTypeFeatureGeoChanged(EntityItem t1AnnItem, EntityItem t2AnnItem) throws RfcAbrException {
 		Vector<String> attrs = new Vector<>();
-		attrs.add("ANNDATE");
+		attrs.add(ANNOUNCEMENT_ANNDATE);
 		if (isDiff(t1AnnItem, t2AnnItem, attrs)) {
 			return true;
 		}
@@ -355,13 +355,13 @@ private static List<String> feaMarkChangedAttrs;
 	}
 	
 	private boolean isRPQ(EntityItem feaItem){
-		return !PokUtils.contains(feaItem, "FCTYPE", FCTYPE_SET);
+		return !PokUtils.contains(feaItem, FEATURE_FCTYPE, FCTYPE_SET);
 	}
 	
 	private boolean getNoChargePurchase(EntityItem feaItem) throws RfcAbrException {
 		boolean noChargePurchase = false;
-		String pricedFeature = getAttributeValue(feaItem, "PRICEDFEATURE");
-		String zeroPrice = getAttributeValue(feaItem, "ZEROPRICE");
+		String pricedFeature = getAttributeValue(feaItem, FEATURE_PRICEDFEATURE);
+		String zeroPrice = getAttributeValue(feaItem, FEATURE_ZEROPRICE);
 		if ("Yes".equals(pricedFeature)) {
 			noChargePurchase = true;
 		} else if("No".equals(zeroPrice)) {
@@ -380,8 +380,8 @@ private static List<String> feaMarkChangedAttrs;
 	 * @throws RfcAbrException
 	 */
 	private boolean getNetPriceMES(EntityItem mdlItem) throws RfcAbrException {
-		String machType = getAttributeValue(mdlItem, "MACHTYPEATR");
-		String model = getAttributeValue(mdlItem, "MODELATR");
+		String machType = getAttributeValue(mdlItem, MODEL_MACHTYPEATR);
+		String model = getAttributeValue(mdlItem, MODEL_MODELATR);
 		
 		Profile m_prof = mdlItem.getProfile();
 		Vector attrVct = new Vector();
@@ -394,21 +394,21 @@ private static List<String> feaMarkChangedAttrs;
 		valVct.add(model);
 		// Search FCTRANSACTION with FROMMACHTYPE and FROMMODEL
 		String searchAction = "SRDFCTRANSACTION1";
-		String srchType = "FCTRANSACTION";
+		String srchType = FCTRANSACTION;
 		abr.addDebug("searchFCTRANSACTION from/to FROMMACHTYPE=" + machType + " and FROMMODEL" + model + " with role=" + m_prof.getRoleCode());
 		if(isEntitySearched(searchAction, srchType, attrVct, valVct, debugSb)) {
 			return true;
 		}
 		// Search MODELCONVERT with FROMMACHTYPE and FROMMODEL
 		searchAction = "SRDMODELCONVERT";
-		srchType = "MODELCONVERT";
+		srchType = MODELCONVERT;
 		abr.addDebug("searchMODELCONVERT from/to FROMMACHTYPE=" + machType + " and FROMMODEL" + model + " with role=" + m_prof.getRoleCode());
 		if(isEntitySearched(searchAction, srchType, attrVct, valVct, debugSb)) {
 			return true;
 		}
 		// Search FCTRANSACTION with TOMACHTYPE and TOMODEL
 		searchAction = "SRDFCTRANSACTION1";
-		srchType = "FCTRANSACTION";
+		srchType = FCTRANSACTION;
 		attrVct.clear();
 		attrVct.add("TOMACHTYPE");
 		attrVct.add("TOMODEL");
@@ -418,7 +418,7 @@ private static List<String> feaMarkChangedAttrs;
 		}
 		// Search MODELCONVERT with TOMACHTYPE and TOMODEL
 		searchAction = "SRDMODELCONVERT";
-		srchType = "MODELCONVERT";
+		srchType = MODELCONVERT;
 		abr.addDebug("searchMODELCONVERT from/to TOMACHTYPE=" + machType + " and TOMODEL" + model + " with role=" + m_prof.getRoleCode());
 		if(isEntitySearched(searchAction, srchType, attrVct, valVct, debugSb)) {
 			return true;
@@ -441,7 +441,7 @@ private static List<String> feaMarkChangedAttrs;
 	
 	private boolean getItemReturn(EntityItem tmfItem) throws RfcAbrException {
 		boolean itemReturn = false;
-		String returndParts = getAttributeFlagValue(tmfItem, "RETURNEDPARTS");
+		String returndParts = getAttributeFlagValue(tmfItem, TMF_RETURNEDPARTS);
 		if ("5100".equals(returndParts)) {
 			itemReturn = true;
 		} else if ("5101".equals(returndParts)) {
@@ -452,7 +452,7 @@ private static List<String> feaMarkChangedAttrs;
 	
 	private boolean getRemovalCharge(EntityItem tmfItem) throws RfcAbrException {
 		boolean removalCharge = false;
-		String returndParts = getAttributeFlagValue(tmfItem, "REMOVEPRICE");
+		String returndParts = getAttributeFlagValue(tmfItem, TMF_REMOVEPRICE);
 		if ("5082".equals(returndParts)) {
 			removalCharge = true;
 		} else if ("5083".equals(returndParts)) {

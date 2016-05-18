@@ -40,9 +40,8 @@ public class RFCMODELABR extends RfcAbrAdapter {
 	
 	static {
 		modelMarkChangedAttrs = new ArrayList<>();
-		modelMarkChangedAttrs.add("MKTGNAME");
-		modelMarkChangedAttrs.add("LICNSINTERCD");
-		modelMarkChangedAttrs.add("BHPRODHIERCD");
+		modelMarkChangedAttrs.add(MODEL_MKTGNAME);
+		modelMarkChangedAttrs.add(MODEL_LICNSINTERCD);
 	}
 	
 	public RFCMODELABR(RFCABRSTATUS rfcAbrStatus) throws MiddlewareRequestException, SQLException, MiddlewareException, RemoteException, EANBusinessRuleException, IOException, MiddlewareShutdownInProgressException {
@@ -90,9 +89,10 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		// if "CE" yes rest is "N"  
 		typeModel.setCustomerSetup("CE".equals(getAttributeValue(modelItem, MODEL_INSTALL)));
 		typeModel.setLicenseCode("Yes".equals(getAttributeValue(modelItem, MODEL_LICNSINTERCD))); 
-		typeModel.setSystemType(getAttributeFlagValue(modelItem, MODEL_SYSTEMTYPE));		
+		typeModel.setSystemType(getAttributeValue(modelItem, MODEL_SYSTEMTYPE));		
 		typeModel.setCPU("S00010".equals(getAttributeFlagValue(modelItem, MODEL_SYSIDUNIT))); // When MODEL.SYSIDUNIT = "SIU - CPU"
-		typeModel.setLoadingGroup(getAttributeFlagValue(modelItem, MODEL_MODELORDERCODE));
+		typeModel.setLoadingGroup(getAttributeShortValue(modelItem, MODEL_MODELORDERCODE)); //
+		typeModel.setHasRevProfile(getRevProfile(modelItem));
 		abr.addDebug("TypeModel:" + typeModel.toString());
 		
 		// epims code, when both XCC and ZIP then BTH, when XCC then XCC, when ZIP then ZIP, when no value then EMPTY
@@ -136,9 +136,9 @@ public class RFCMODELABR extends RfcAbrAdapter {
 	            abr.addDebug("Get t1 entity list for t1DTS: " + t1DTS + " t2DTS: " + t2DTS);
 	            t1EntityList = getEntityList(profileT1);
 	            abr.addDebug("EntityList for T1 " + profileT1.getValOn() + " extract " + getVeName() + " contains the following entities: \n" + PokUtils.outputList(t1EntityList));
-	            
 	            t1ModelItem = t1EntityList.getParentEntityGroup().getEntityItem(0);
-	            isTMChanged = isTypeModelChanged(modelItem, t1ModelItem, modelMarkChangedAttrs);
+	            
+	            isTMChanged = isTypeModelChanged(t1ModelItem, modelItem, modelMarkChangedAttrs);
 			}			
 		}		
 		
@@ -151,22 +151,26 @@ public class RFCMODELABR extends RfcAbrAdapter {
 				abr.addDebug("Promote MODEL for " + annItem.getKey() + " " + availItem.getKey());
 				
 				// Get all salesorg and plants from GENERALAREA linked to AVAIL
-				Vector generalareaVct = PokUtils.getAllLinkedEntities(availItem, "AVAILGAA", GENERALAREA);
-				List<SalesOrgPlants> salesorgPlantsVect = getAllSalesorgPlants(generalareaVct);
-				abr.addDebug("GENERALAREA size: " + generalareaVct.size() + " SalesorgPlants size: " + salesorgPlantsVect.size());
-				Set<String> plants = getAllPlants(salesorgPlantsVect);
+				Vector t2GaVct = PokUtils.getAllLinkedEntities(availItem, "AVAILGAA", GENERALAREA);
+				
+				List<SalesOrgPlants> salesOrgPlantList = getAllSalesOrgPlant(t2GaVct);
+				Set<String> plants = getAllPlant(salesOrgPlantList);
 				// TAXCATG
-				Vector<CntryTax> taxList = getAllTaxListBySalesOrgPlants(modelItem, salesorgPlantsVect);
+				Vector<CntryTax> taxList = getAllTaxListBySalesOrgPlants(modelItem, salesOrgPlantList);
 				// ----------------------- Check TypeModelGeo promoted or changed -----------------------
 				if (isTMPromoted) {
 					if (t1EntityList != null) {
 						Vector t1AvailVct = PokUtils.getAllLinkedEntities(t1ModelItem, "MODELAVAIL", AVAIL);
-						Vector t1PlanAvailVct = PokUtils.getEntitiesWithMatchedAttr(t1AvailVct, "AVAILTYPE", PLANNEDAVAIL);
-						isTMGeoPromoted = isTypeModelGeoPromoted(t1PlanAvailVct, availItem);
+						Vector t1PlanAvailVct = PokUtils.getEntitiesWithMatchedAttr(t1AvailVct, AVAIL_AVAILTYPE, PLANNEDAVAIL);
+						
+						List<String> t2NewCountries = getNewCountries(t1PlanAvailVct, availItem);
+						isTMGeoPromoted = t2NewCountries.size() == 0;
 						if (isTMGeoPromoted) {
 							isTMGeoChanged = isTypeModelGeoChanged(t1PlanAvailVct, availItem);
 						} else {
 							isTMGeoChanged = true;
+							// Get salesOrg for new countries
+							salesOrgPlantList = getAllSalesOrgPlantByCountryList(salesOrgPlantList, t2NewCountries);
 						}
 					}						
 				} else {
@@ -224,8 +228,8 @@ public class RFCMODELABR extends RfcAbrAdapter {
 						abr.addDebug("Call R189 NEW and UPG successfully for Extra Plant :" + sPlant);
 					}					
 					
-					abr.addDebug("R102 SalesOrgPlants size： " + salesorgPlantsVect.size());
-					for (SalesOrgPlants salesorgPlants : salesorgPlantsVect) {
+					abr.addDebug("R102 SalesOrgPlants size： " + salesOrgPlantList.size());
+					for (SalesOrgPlants salesorgPlants : salesOrgPlantList) {
 						String salesOrg = salesorgPlants.getSalesorg();
 						Vector vectTaxList = getTaxListBySalesOrgPlants(taxList, salesorgPlants);
 						Vector<String> _plants = salesorgPlants.getPlants();
@@ -301,8 +305,8 @@ public class RFCMODELABR extends RfcAbrAdapter {
 					abr.addDebug("----------------------- Start Type:" + typeModel.getType() + " already promoted -----------------------");
 					// each TypeModelGeo
 					if (!isTMGeoPromoted) {		
-						abr.addDebug("R102 SalesOrgPlants size： " + salesorgPlantsVect.size());
-						for (SalesOrgPlants salesorgPlants : salesorgPlantsVect) {
+						abr.addDebug("R102 SalesOrgPlants size： " + salesOrgPlantList.size());
+						for (SalesOrgPlants salesorgPlants : salesOrgPlantList) {
 							String salesOrg = salesorgPlants.getSalesorg();
 							Vector vectTaxList = getTaxListBySalesOrgPlants(taxList, salesorgPlants);																				
 							Vector<String> _plants = salesorgPlants.getPlants();
@@ -348,7 +352,7 @@ public class RFCMODELABR extends RfcAbrAdapter {
 				abr.addDebug("ProductHierarchy from EACM is " + productHierarchy);
 				if ((materialType != null && !materialType.equals("")) && (isProductHierarchyDifferent(productHierarchy, basicMaterialFromSAP.getProdHier()))) {
 					abr.addDebug("Material exists and ProductHierarchy is different");
-					Vector supportedSalesOrgV = getSupportedSalesOrgCol(salesorgPlantsVect);
+					Vector supportedSalesOrgV = getSupportedSalesOrgCol(salesOrgPlantList);
 					abr.addDebug("All supported salesOrg size:" + supportedSalesOrgV.size() + " values:" + supportedSalesOrgV);
 					callR260updateProdHierarchyOnSalesView(supportedSalesOrgV, typeModel, chwA, productHierarchy, pimsIdentity);
 				} else {
@@ -413,8 +417,8 @@ public class RFCMODELABR extends RfcAbrAdapter {
 					abr.addDebug("Call R156 successfully");
 					
 					// for each tmGeo
-					abr.addDebug("salesorgPlantsVect size： " + salesorgPlantsVect.size());
-					for (SalesOrgPlants salesorgPlants : salesorgPlantsVect) {
+					abr.addDebug("salesorgPlantsVect size： " + salesOrgPlantList.size());
+					for (SalesOrgPlants salesorgPlants : salesOrgPlantList) {
 						String salesOrg = salesorgPlants.getSalesorg();
 						ps = checkForNewPlannedSalesStatus(chwAg.getAnnouncementDate(), false); 
 						if ((salesOrg.equalsIgnoreCase("0147") && (!spComponents.getSharedProductIn0147()))|| !salesOrg.equalsIgnoreCase("0147")) {
@@ -442,13 +446,13 @@ public class RFCMODELABR extends RfcAbrAdapter {
 					 // End each tmGeo		
 							
 					if (spComponents.getSharedProduct()) {
-//						rdhRestProxy.r118(typeModel, chwA, flfilcd, warrPeriod, true, pimsIdentity);
-//						abr.addDebug("Call R118 successfully for SharedProduct：" + true);
+						rdhRestProxy.r118(typeModel, chwA, flfilcd, warrPeriod, true, pimsIdentity);
+						abr.addDebug("Call R118 successfully for SharedProduct：" + true);
 						rdhRestProxy.r119(typeModel.getType() + typeModel.getModel(), chwA, true, true, pimsIdentity);
 						abr.addDebug("Call R119 successfully for SharedProduct：" + true);
 					} else {
-//						rdhRestProxy.r118(typeModel, chwA, flfilcd, warrPeriod, false, pimsIdentity);
-//						abr.addDebug("Call R118 successfully for SharedProduct：" + false);
+						rdhRestProxy.r118(typeModel, chwA, flfilcd, warrPeriod, false, pimsIdentity);
+						abr.addDebug("Call R118 successfully for SharedProduct：" + false);
 						rdhRestProxy.r119(typeModel.getType() + typeModel.getModel(), chwA, false, true, pimsIdentity);
 						abr.addDebug("Call R119 successfully for SharedProduct：" + false);
 					}
@@ -471,7 +475,7 @@ public class RFCMODELABR extends RfcAbrAdapter {
 					if (configManager.getConfigManager().getString(PropertyKeys.KEY_SAP_LEDGER).equals("Y")) {
 						boolean isProfitCenterChanged = false;
 						if (t1ModelItem != null) {
-							String t1ProfitCenter = getAttributeFlagValue(t1ModelItem, MODEL_PRFTCTR);
+							String t1ProfitCenter = getAttributeValue(t1ModelItem, MODEL_PRFTCTR);
 							if (!profitCenter.equals(t1ProfitCenter)) {
 								isProfitCenterChanged = true;
 							}
@@ -501,8 +505,8 @@ public class RFCMODELABR extends RfcAbrAdapter {
 					// each TypeModelGeo
 					if (isTMGeoChanged || !isTMGeoPromoted) {
 						// epims: changedTMGs promotedTMGs		
-						abr.addDebug("salesorgPlantsVect size： " + salesorgPlantsVect.size());
-						for (SalesOrgPlants salesorgPlants : salesorgPlantsVect) {
+						abr.addDebug("salesorgPlantsVect size： " + salesOrgPlantList.size());
+						for (SalesOrgPlants salesorgPlants : salesOrgPlantList) {
 							String salesOrg = salesorgPlants.getSalesorg();
 							LifecycleDataGenerator lcdGen = new LifecycleDataGenerator(typeModel);
 							Date annDate = chwAg.getAnnouncementDate(); // epims: tmGeoObj.getAnnouncementDate(); confirmed with Bin we use ANNDATE of ANNOUNCEMENT
@@ -540,11 +544,11 @@ public class RFCMODELABR extends RfcAbrAdapter {
 					rdhRestProxy.r120(typeModel, chwA, pimsIdentity);
 					abr.addDebug("Call R120 successfully");
 					if ((spComponents.getSharedProduct())) {
-//						rdhRestProxy.r118(typeModel, chwA, flfilcd, warrPeriod, true, pimsIdentity);
-//						abr.addDebug("Call R118 successfully for SharedProduct:" + true);
+						rdhRestProxy.r118(typeModel, chwA, flfilcd, warrPeriod, true, pimsIdentity);
+						abr.addDebug("Call R118 successfully for SharedProduct:" + true);
 					} else {
-//						rdhRestProxy.r118(typeModel, chwA, flfilcd, warrPeriod, false, pimsIdentity);
-//						abr.addDebug("Call R118 successfully for SharedProduct:" + false);
+						rdhRestProxy.r118(typeModel, chwA, flfilcd, warrPeriod, false, pimsIdentity);
+						abr.addDebug("Call R118 successfully for SharedProduct:" + false);
 					}
 					
 					// SAP Ledger
@@ -552,7 +556,7 @@ public class RFCMODELABR extends RfcAbrAdapter {
 					if (configManager.getString(PropertyKeys.KEY_SAP_LEDGER).equals("Y")) {
 						boolean isProfitCenterChanged = false;
 						if (t1ModelItem != null) {
-							String t1ProfitCenter = getAttributeFlagValue(t1ModelItem, MODEL_PRFTCTR);
+							String t1ProfitCenter = getAttributeValue(t1ModelItem, MODEL_PRFTCTR);
 							if (!profitCenter.equals(t1ProfitCenter)) {
 								isProfitCenterChanged = true;
 							}
@@ -811,24 +815,22 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		for (EntityItem modTaxRelator : modTaxRelators) {
 			List<EntityItem> taxcatgs = getLinkedRelator(modTaxRelator, TAXCATG);
 			for (EntityItem taxcatg : taxcatgs) {
-				for (SalesOrgPlants salesOrgPlants : salesorgPlantsVect) {
-					Vector countryList = getAttributeMultiFlagValue(taxcatg, TAXCATG_COUNTRYLIST);
-					for (int i = 0; i < countryList.size(); i++) {
-						String country = (String)countryList.get(i);
+				Vector countryList = getAttributeMultiFlagValue(taxcatg, TAXCATG_COUNTRYLIST);
+				for (int i = 0; i < countryList.size(); i++) {
+					String country = (String)countryList.get(i);
+					for (int j = 0; j < salesorgPlantsVect.size(); j++) {	
+						SalesOrgPlants salesOrgPlants = salesorgPlantsVect.get(j);
 						if (country.equals(salesOrgPlants.getGenAreaName())) {
 							CntryTax cntryTax = new CntryTax();
 							String taxCls = getAttributeValue(modTaxRelator, MODTAXRELEVANCE_TAXCLS);
-							if (taxCls == null) {
-								taxCls = "";
-							}
 							cntryTax.setClassification(taxCls);
 							cntryTax.setCountry(salesOrgPlants.getGenAreaCode());
 							cntryTax.setTaxCategory(getAttributeValue(taxcatg, TAXCATG_TAXCATGATR));
 							taxVect.add(cntryTax);
 							break;
 						}
-						if (i == countryList.size() - 1) {
-							abr.addDebug("getAllTaxListBySalesOrgPlants No SalesOrgPlant for " + taxcatg.getKey() + " coutry " + country + " salesOrg " + salesOrgPlants.getSalesorg());
+						if (j == salesorgPlantsVect.size() - 1) {
+							abr.addDebug("getAllTaxListBySalesOrgPlants No SalesOrgPlant for " + taxcatg.getKey() + " coutry " + country);
 						}
 					}					
 				}
@@ -843,14 +845,14 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		for (CntryTax cntryTax : taxList) {
 			if (cntryTax.getCountry().equals(salesOrgPlants.getGenAreaCode())) {
 				tmpTax.add(cntryTax);
-				break; // TODO
+				break; // Confirmed with Rupal one TAXCATG one country
 			}
 		}		
 		abr.addDebug("getTaxListBySalesOrgPlants TaxList size: " + tmpTax.size() + " for country: " + salesOrgPlants.getGenAreaName() + " salesOrg: " + salesOrgPlants.getSalesorg());
 		return tmpTax;		
 	}
 
-	protected Set<String> getAllPlants(List<SalesOrgPlants> salesorgPlantsVect) {
+	protected Set<String> getAllPlant(List<SalesOrgPlants> salesorgPlantsVect) {
 		Set<String> plants = new HashSet<>();			
 		for (SalesOrgPlants salesorgPlants : salesorgPlantsVect) {
 			Vector<String> tmpPlants = salesorgPlants.getPlants();			
@@ -863,6 +865,16 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		}			
 		abr.addDebug("getAllPlants All plants size: " + plants.size() + " values: " + plants);
 		return plants;		
+	}
+	
+	private Set<String> getAllSalesOrg(List<SalesOrgPlants> salesorgPlantsVect) {
+		Set<String> salesOrgSet = new HashSet<>();			
+		for (SalesOrgPlants salesorgPlants : salesorgPlantsVect) {
+			String salesOrg = salesorgPlants.getSalesorg();			
+			salesOrgSet.add(salesOrg);	
+		}			
+		abr.addDebug("getAllSalesOrg All salesOrg size: " + salesOrgSet.size() + " values: " + salesOrgSet);
+		return salesOrgSet;		
 	}
 	
 	private Vector getSupportedSalesOrgCol(List<SalesOrgPlants> salesorgPlantsVect) {		
@@ -895,31 +907,91 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		return prodHireCd;
 	}
 	
+	private boolean getRevProfile(EntityItem mdlItem) throws RfcAbrException {
+		Vector revProfile = PokUtils.getAllLinkedEntities(mdlItem, "MODREVPROFILE", REVPROF);
+		if (revProfile.size() > 0) {
+			return true;
+		}
+		return false;
+	}	
 	
 	private boolean isTypeModelChanged(EntityItem t1ModelItem, EntityItem t2ModelItem, List<String> attrList) throws RfcAbrException {
-		return isDiff(t1ModelItem, t2ModelItem, attrList);
+		boolean isTypeModelChanged = false;
+		if (isDiff(t1ModelItem, t2ModelItem, attrList)) {
+			isTypeModelChanged = true;
+		} else {
+			String t1ProdHireCd = getProdHireCd(t1ModelItem);
+			String t2ProdHireCd = getProdHireCd(t2ModelItem);
+			if (!t1ProdHireCd.equals(t2ProdHireCd)) {
+				abr.addDebug("PRODHIRECODE value " + t1ProdHireCd + " at t1 is different with " + t2ProdHireCd + " at t2");
+				isTypeModelChanged = true;
+			}
+		}
+		return isTypeModelChanged;
 	}
 	
 	private boolean isTypeModelGeoPromoted(Vector t1Avails, EntityItem t2Avail) throws RfcAbrException {
-		List<String> t1Countries = new ArrayList<>();
-		for (int i = 0; i < t1Avails.size(); i++) {
-			EntityItem t1Avail = (EntityItem)t1Avails.get(i);
-			Vector t1CountryVct = getAttributeMultiFlagValue(t1Avail, AVAIL_COUNTRYLIST);
-			for (int j = 0; j < t1CountryVct.size(); j++) {
-				String t1Country = (String)t1CountryVct.get(j);
-				t1Countries.add(t1Country);	
-			}
-		}
-		abr.addDebug("isTypeModelGeoPromoted Country size:" + t1Countries.size() + " at T1: " + t1Countries);
-		Vector countryVct = getAttributeMultiFlagValue(t2Avail, AVAIL_COUNTRYLIST);
-		for (int i = 0; i < countryVct.size(); i++) {
-			String country = (String)countryVct.get(i);
-			if (!t1Countries.contains(country)) {
-				abr.addDebug("isTypeModelGeoPromoted country: " + country + " at T2 not found at T1");
-				return false;
-			}
+		List<String> t1Countries = getEntitiesAttributeValues(t1Avails, AVAIL_COUNTRYLIST, ATTR_MULTI_FLAG);
+		List<String> countryVct = getEntitiyAttributeValues(t2Avail, AVAIL_COUNTRYLIST, ATTR_MULTI_FLAG);
+		abr.addDebug("isTypeModelGeoPromoted T1 Country size:" + t1Countries.size() + " values: " + t1Countries 
+				+ " T2 Country size:" + countryVct.size() + " values: " + countryVct);
+		countryVct.removeAll(t1Countries);
+		abr.addDebug("isTypeModelGeoPromoted new county size:" + countryVct.size() + " values:" + countryVct);
+		if (countryVct.size() > 0) {
+			return false;
 		}
 		return true;		
+	}
+	
+	private List<String> getNewCountries(Vector t1Avails, EntityItem t2Avail) throws RfcAbrException {
+		List<String> t1Countries = getEntitiesAttributeValues(t1Avails, AVAIL_COUNTRYLIST, ATTR_MULTI_FLAG);
+		List<String> countryVct = getEntitiyAttributeValues(t2Avail, AVAIL_COUNTRYLIST, ATTR_MULTI_FLAG);
+		abr.addDebug("isTypeModelGeoPromoted T1 all Country size:" + t1Countries.size() + " values: " + t1Countries);
+		abr.addDebug("isTypeModelGeoPromoted T2 avail Country size:" + countryVct.size() + " values: " + countryVct);
+		countryVct.removeAll(t1Countries);
+		abr.addDebug("isTypeModelGeoPromoted new county size:" + countryVct.size() + " values:" + countryVct);
+		return countryVct;
+	}
+	
+	/*
+	 * Get all values for attribute of the entity vector
+	 */
+	private List<String> getEntitiesAttributeValues(Vector entities, String attrCode, String attrType) throws RfcAbrException {
+		List<String> values = new ArrayList<>();
+		for (int i = 0; i < entities.size(); i++) {
+			EntityItem item = (EntityItem)entities.get(i);
+			values.addAll(getEntitiyAttributeValues(item, attrCode, attrType));
+		}
+		return values;
+	}
+	
+	/*
+	 * Get all values for attribute of the entity
+	 */
+	private List<String> getEntitiyAttributeValues(EntityItem item, String attrCode, String attrType) throws RfcAbrException {
+		List<String> values = new ArrayList<>();
+		if (ATTR_FLAG.equals(attrType)) {
+			String value = getAttributeFlagValue(item, attrCode);
+			values.add(value);
+		} else if (ATTR_TEXT.equals(attrType)) {
+			String value = getAttributeValue(item, attrCode);
+			values.add(value);
+		} else if (ATTR_MULTI_FLAG.equals(attrType)) {
+			Vector tmpValues = getAttributeMultiFlagValue(item, attrCode);
+			for (int j = 0; j < tmpValues.size(); j++) {
+				String tmpValue = (String)tmpValues.get(j);
+				values.add(tmpValue);	
+			}
+		} else if (ATTR_MULTI_TEXT.equals(attrType)) {
+			Vector tmpValues = getAttributeMultiValue(item, attrCode);
+			for (int j = 0; j < tmpValues.size(); j++) {
+				String tmpValue = (String)tmpValues.get(j);
+				values.add(tmpValue);	
+			}
+		} else {
+			throw new RfcAbrException("Unknow attribute type:" + attrType);
+		}		
+		return values;
 	}
 	
 	/**
@@ -967,13 +1039,13 @@ public class RFCMODELABR extends RfcAbrAdapter {
 		for (int i = 0; i < t1PlanAvailVct.size(); i++) {
 			EntityItem t1AvailItem = (EntityItem)t1PlanAvailVct.get(i);
 			Vector t1GenAreaVct = PokUtils.getAllLinkedEntities(t1AvailItem, "AVAILGAA", GENERALAREA);
-			List<SalesOrgPlants> t1SalesOrgPlantsVct = getAllSalesorgPlants(t1GenAreaVct);
-			t1Plants.addAll(getAllPlants(t1SalesOrgPlantsVct));
+			List<SalesOrgPlants> t1SalesOrgPlantsVct = getAllSalesOrgPlant(t1GenAreaVct);
+			t1Plants.addAll(getAllPlant(t1SalesOrgPlantsVct));
 		}
 		// Get all plants for the avail at T2
 		Vector t2GenAreaVct = PokUtils.getAllLinkedEntities(availItem, "AVAILGAA", GENERALAREA);
-		List<SalesOrgPlants> t2SalesOrgPlantsVct = getAllSalesorgPlants(t2GenAreaVct);
-		Set<String> t2Plants = getAllPlants(t2SalesOrgPlantsVct);
+		List<SalesOrgPlants> t2SalesOrgPlantsVct = getAllSalesOrgPlant(t2GenAreaVct);
+		Set<String> t2Plants = getAllPlant(t2SalesOrgPlantsVct);
 		abr.addDebug("isTypeModelGeoChanged T1 all plant size: " + t1Plants.size() + " values: " + t1Plants);
 		abr.addDebug("isTypeModelGeoChanged T2 for " + availItem.getKey()  + " plant size: " + t2Plants.size() + " values: " + t2Plants);
 		if (!t1Plants.containsAll(t2Plants)) {
