@@ -49,7 +49,7 @@ public class R116createPlantViewForTypeModelMaterial extends Rfc {
 		if (ConfigManager.getConfigManager()
 				.getString(PropertyKeys.KEY_SAP_LEDGER).equals("Y")) {
 			if (typeModel.getVendorID() != null
-					|| (!typeModel.getVendorID().equals(""))) {
+					&& (!"".equals(typeModel.getVendorID()))) {
 				b0Row.setXeie1("X");
 			}
 		}
@@ -121,11 +121,11 @@ public class R116createPlantViewForTypeModelMaterial extends Rfc {
 				}
 			}
 			if (typeModel.getVendorID() != null
-					|| (!typeModel.getVendorID().equals(""))) {
+					&& (!"".equals(typeModel.getVendorID()))) {
 				b1Row.setEkgrp("001");
 			}
 
-			if (!typeModel.getVendorID().equals("")) {
+			if (!"".equals(typeModel.getVendorID())) {
 				b1Row.setMfrnr(typeModel.getVendorID());
 			} else {
 				b1Row.setMfrnr("?");

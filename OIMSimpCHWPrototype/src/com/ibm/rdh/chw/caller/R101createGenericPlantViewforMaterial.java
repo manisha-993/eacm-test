@@ -61,7 +61,7 @@ public class R101createGenericPlantViewforMaterial extends Rfc {
 			System.out.println("Type Model's Vendor ID in rfc R101"
 					+ typeModel.getVendorID());
 			if (typeModel.getVendorID() != null
-					|| (!typeModel.getVendorID().equals(""))) {
+					&& (!"".equals(typeModel.getVendorID()))) {
 				b0Row.setXeie1("X");
 			}
 		}
@@ -131,12 +131,12 @@ public class R101createGenericPlantViewforMaterial extends Rfc {
 							+ existsPro);
 			if (existsPro) {
 				if (typeModel.getProfitCenter() != null
-						|| (!typeModel.getProfitCenter().equals(""))) {
+						&& (!"".equals(typeModel.getProfitCenter()))) {
 					b1Row.setPrctr(typeModel.getProfitCenter());
 				}
 			}
 			if (typeModel.getVendorID() != null
-					|| (!typeModel.getVendorID().equals(""))) {
+					&& (!"".equals(typeModel.getVendorID()))) {
 				b1Row.setEkgrp("001");
 			}
 			if (!typeModel.getVendorID().equals("")) {

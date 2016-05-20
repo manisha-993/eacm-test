@@ -73,7 +73,7 @@ public class R115createTypeModelMaterialBasicView extends Rfc {
 
 		}
 
-		if (!typeModel.getProductHierarchy().equals("")) {
+		if (!"".equals(typeModel.getProductHierarchy())) {
 			b1Row.setPrdha(typeModel.getProductHierarchy());
 		}
 
@@ -87,12 +87,12 @@ public class R115createTypeModelMaterialBasicView extends Rfc {
 				+ b1Row.getZeiar() + ", AESZN>>" + b1Row.getAeszn()
 				+ ", GEWEI>>" + b1Row.getGewei());
 
-		if (!typeModel.getEanUPCCode().equals("")) {
+		if (!"".equals(typeModel.getEanUPCCode())) {
 			rfcInfo.append(Tab + "EAN11>>" + b1Row.getEan11() + ", NUMTP>>"
 					+ b1Row.getNumtp() + "\n");
 		}
 
-		if (!typeModel.getProductHierarchy().equals("")) {
+		if (!"".equals(typeModel.getProductHierarchy())) {
 			rfcInfo.append(Tab + "PRDHA>>" + b1Row.getPrdha() + "\n");
 		}
 		rfcInfo.append("\n");

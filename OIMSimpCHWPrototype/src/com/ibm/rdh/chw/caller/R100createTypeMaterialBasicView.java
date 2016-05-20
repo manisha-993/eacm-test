@@ -69,12 +69,12 @@ public class R100createTypeMaterialBasicView extends Rfc {
 		b1Row.setGewei("KG");
 		if ("MTC".equals(newFlag)) {
 			if (tmUPGObj.getProductHierarchy() != null
-					|| (tmUPGObj.getProductHierarchy() != "")) {
+					&& (!"".equals(tmUPGObj.getProductHierarchy()))) {
 				b1Row.setPrdha(tmUPGObj.getProductHierarchy());
 			}
 		} else {
 			if (typeModel.getProductHierarchy() != null
-					|| (typeModel.getProductHierarchy() != "")) {
+					&& (!"".equals(typeModel.getProductHierarchy()))) {
 				b1Row.setPrdha(typeModel.getProductHierarchy());
 			}
 		}
@@ -90,12 +90,12 @@ public class R100createTypeMaterialBasicView extends Rfc {
 				+ ", GEWEI>>" + b1Row.getGewei() + "\n");
 		if ("MTC".equals(newFlag)) {
 			if (tmUPGObj.getProductHierarchy() != null
-					|| (tmUPGObj.getProductHierarchy() != "")) {
+					&& (!"".equals(tmUPGObj.getProductHierarchy()))) {
 				rfcInfo.append(Tab + "PRDHA>>" + b1Row.getPrdha() + "\n");
 			}
 		} else {
 			if (typeModel.getProductHierarchy() != null
-					|| (typeModel.getProductHierarchy() != "")) {
+					&& (!"".equals(typeModel.getProductHierarchy()))) {
 				rfcInfo.append(Tab + "PRDHA>>" + b1Row.getPrdha() + "\n");
 			}
 		}
