@@ -23,10 +23,10 @@ public class R201createUpgradeValueForTypeMCCharacteristic extends Rfc {
 			String FROMTOTYPE, String pimsIdentity) throws Exception {
 		reInitialize();
 		String charac = null;
-		if (FROMTOTYPE.equalsIgnoreCase("FROMTYPE")) {
+		if ("FROMTYPE".equalsIgnoreCase(FROMTOTYPE)) {
 			charac = "MK_" + typeModelUpg.getFromType() + "_MTC";
 		}
-		if (FROMTOTYPE.equalsIgnoreCase("TOTYPE")) {
+		if ("TOTYPE".equalsIgnoreCase(FROMTOTYPE)) {
 			charac = "MK_" + typeModelUpg.getType() + "_MTC";
 		}
 		rfcName = "Z_DM_SAP_CHAR_MAINTAIN";

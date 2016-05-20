@@ -44,7 +44,7 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 		r0Row.setKeyFeld("MATNR");
 		if (("NEW").equals(newFlag)) {
 			r0Row.setKparaValu(type + "NEW");
-		} else if (newFlag.equals("UPG")) {
+		} else if ("UPG".equals(newFlag)) {
 			r0Row.setKparaValu(type + "UPG");
 		} else if (("MTC").equals(newFlag)) {
 			if (("MTCTOTYPE").equals(FromToType)) {
@@ -58,8 +58,8 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 		rfc.setIObjectKey(r0Table);
 
 		rfcInfo.append("OBJECTKEY \n");
-		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() + ", KPARAVALU>>"
-				+ r0Row.getKparaValu() + "\n");
+		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() 
+				+ ", KPARAVALU>>" + r0Row.getKparaValu() + "\n");
 
 		// KLAH - R2
 		KlahTable r2Table = new KlahTable();
@@ -139,8 +139,8 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 
 		rfcInfo.append("API_AUSP \n");
 
-		rfcInfo.append(Tab + "CHARACT>> " + r6Row.getCharact() + ", VALUE>> "
-				+ r6Row.getValue() + "\n");
+		rfcInfo.append(Tab + "CHARACT>> " + r6Row.getCharact()
+				+ ", VALUE>> " + r6Row.getValue() + "\n");
 
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();

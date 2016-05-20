@@ -60,7 +60,7 @@ public class R198updateLifecycleRow extends Rfc {
 		rfcInfo.append(Tab + "ZDM_UPDATE_IUSER>>" + tRow.getZdmUpdateIuser()
 				+ ",");
 
-		if (check.equals("wdfm")) {
+		if ("wdfm".equals(check)) {
 			tRow.setZdmRfanum(annDocNo + "_WDFM");
 		} else {
 			tRow.setZdmRfanum(annDocNo);
@@ -82,7 +82,7 @@ public class R198updateLifecycleRow extends Rfc {
 		rfcInfo.append(Tab + "PIMS_IDENTITY>>" + rfc.getPimsIdentity() + ",");
 
 		// RFANUMBER
-		if (check.equals("wdfm")) {
+		if ("wdfm".equals(check)) {
 			rfc.setRfaNum(annDocNo + "_WDFM");
 		} else {
 			rfc.setRfaNum(annDocNo);

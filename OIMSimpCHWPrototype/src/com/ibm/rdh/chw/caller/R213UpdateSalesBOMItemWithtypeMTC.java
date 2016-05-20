@@ -60,7 +60,7 @@ public class R213UpdateSalesBOMItemWithtypeMTC extends Rfc {
 				+ ", DATUV>>" + m0.getDatuv() + "\n");
 
 		// STPO_API03 - M1
-		if (newFlag.equals("MTC")) {
+		if ("MTC".equals(newFlag)) {
 			Enumeration e = geoV.elements();
 			Stpo_api03Table m1Table = new Stpo_api03Table();
 			while (e.hasMoreElements()) {

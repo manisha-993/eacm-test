@@ -45,8 +45,8 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 		r0Table.appendRow(r0Row);
 		rfc.setIObjectKey(r0Table);
 		rfcInfo.append("OBJECTKEY \n");
-		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() + ", KPARAVALU>>"
-				+ r0Row.getKparaValu() + "\n");
+		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() 
+				+ ", KPARAVALU>>" + r0Row.getKparaValu() + "\n");
 
 		// KLAH - R2
 		KlahTable r2Table = new KlahTable();
@@ -123,7 +123,7 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 
 		r6Row.setCharact("MM_MODEL_PROPERTIES");
 		String systemType = typeModel.getSystemType();
-		if (systemType == null || systemType.trim().equals("")) {
+		if (systemType == null && "".equals(systemType.trim())) {
 			r6Row.setValue("");
 		} else {
 			r6Row.setValue(systemType);
@@ -137,7 +137,7 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 			r6Vector.addElement(r6Row);
 		}
 		
-		if ((flfilcd != null && flfilcd.equalsIgnoreCase("XCC"))
+		if ((flfilcd != null && "XCC".equalsIgnoreCase(flfilcd))
 				&& (warrantyPeriod != null)) {
 			r6Row = r6Table.createEmptyRow();
 			r6Row.setCharact("MM_WARRANTY_PERIOD_US");

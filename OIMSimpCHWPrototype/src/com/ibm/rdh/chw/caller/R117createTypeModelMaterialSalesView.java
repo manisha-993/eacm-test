@@ -60,12 +60,15 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		rfc.setIBmm00(b0Table);
 
 		rfcInfo.append("B0 \n");
-		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
-				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
-				+ ", MTART>>" + b0Row.getMtart() + ", XEIB1>>"
-				+ b0Row.getXeib1() + ", XEIV1>>" + b0Row.getXeiv1()
-				+ ", XEIV2>>" + b0Row.getXeiv2() + ", VKORG>>"
-				+ b0Row.getVkorg() + ", VTWEG>>" + b0Row.getVtweg() + "\n");
+		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() 
+				+ ", MATNR>>" + b0Row.getMatnr() 
+				+ ", MBRSH>>" + b0Row.getMbrsh()
+				+ ", MTART>>" + b0Row.getMtart() 
+				+ ", XEIB1>>" + b0Row.getXeib1() 
+				+ ", XEIV1>>" + b0Row.getXeiv1()
+				+ ", XEIV2>>" + b0Row.getXeiv2() 
+				+ ", VKORG>>" + b0Row.getVkorg() 
+				+ ", VTWEG>>" + b0Row.getVtweg() + "\n");
 
 		// Bmmh1 - B1
 		Bmmh1Table b1Table = new Bmmh1Table();
@@ -87,11 +90,11 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		b1Row.setZeiar(chwA.getAnnouncementType());
 		// end of add
 
-		if (chwA.getSegmentAcronym().equals("RSS")) {
+		if ("RSS".equals(chwA.getSegmentAcronym())) {
 			b1Row.setMvgr1("POS");
-		} else if (chwA.getSegmentAcronym().equals("AS4")) {
+		} else if ("AS4".equals(chwA.getSegmentAcronym())) {
 			b1Row.setMvgr1("ICH");
-		} else if (chwA.getSegmentAcronym().equals("RS6")) {
+		} else if ("RS6".equals(chwA.getSegmentAcronym())) {
 			b1Row.setMvgr1("PCH");
 		} else if (chwA.isXccOnlyDiv(div)) {
 			b1Row.setMvgr1("VRD");
@@ -100,13 +103,13 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 			b1Row.setMvgr1("HWC");
 		}
 
-		if (flfil.equalsIgnoreCase("BTH")) {
+		if ("BTH".equalsIgnoreCase(flfil)) {
 			b1Row.setMvgr2("BTH");
-		} else if (flfil.equalsIgnoreCase("XCC")) {
+		} else if ("XCC".equalsIgnoreCase(flfil)) {
 			b1Row.setMvgr2("XCC");
-		} else if (flfil.equalsIgnoreCase("ZIP")) {
+		} else if ("ZIP".equalsIgnoreCase(flfil)) {
 			b1Row.setMvgr2("ZIP");
-		} else if (flfil.equalsIgnoreCase("EMPTY")) {
+		} else if ("EMPTY".equalsIgnoreCase(flfil)) {
 
 		} else {
 		}
@@ -114,14 +117,14 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		b1Row.setVersg("1");
 
 		if (ps != null) {
-			if (flfil.equalsIgnoreCase("BTH")) {
+			if ("BTH".equalsIgnoreCase(flfil)) {
 
 				if (ps.getCurrentSalesStatus() != null) {
 					b1Row.setVmsta(ps.getCurrentSalesStatus());
 				} else {
 					b1Row.setVmsta("Z0");
 				}
-			} else if (flfil.equalsIgnoreCase("XCC")) {
+			} else if ("XCC".equalsIgnoreCase(flfil)) {
 				if (ps.getCurrentSalesStatus() != null) {
 					b1Row.setVmsta(ps.getCurrentSalesStatus());
 				} else {
@@ -133,13 +136,13 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 				b1Row.setVmsta("Z0");
 			}
 
-			if (flfil.equalsIgnoreCase("BTH")) {
+			if ("BTH".equalsIgnoreCase(flfil)) {
 				if ((ps.getCurrentEffectiveDate()) == null) {
 					b1Row.setVmstd(sdf.format(curDate));
 				} else {
 					b1Row.setVmstd(sdf.format(ps.getCurrentEffectiveDate()));
 				}
-			} else if (flfil.equalsIgnoreCase("XCC")) {
+			} else if ("XCC".equalsIgnoreCase(flfil)) {
 				if ((ps.getCurrentEffectiveDate()) == null) {
 					b1Row.setVmstd(sdf.format(curDate));
 				} else {
@@ -163,23 +166,31 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
-		rfcInfo.append(Tab + ", MATKL>>" + b1Row.getMatkl() + ", ZEINR>>"
-				+ b1Row.getZeinr() + ", AESZN>>" + b1Row.getAeszn()
-				+ ", GEWEI>>" + b1Row.getGewei() + ", SPART>>"
-				+ b1Row.getSpart() + ", ZEIAR>>" + b1Row.getZeiar() + "\n");
+		rfcInfo.append(Tab + ", MATKL>>" + b1Row.getMatkl() 
+				+ ", ZEINR>>" + b1Row.getZeinr() 
+				+ ", AESZN>>" + b1Row.getAeszn()
+				+ ", GEWEI>>" + b1Row.getGewei() 
+				+ ", SPART>>" + b1Row.getSpart() 
+				+ ", ZEIAR>>" + b1Row.getZeiar() + "\n");
 
-		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins() + ", DWERK>>"
-				+ b1Row.getDwerk() + ", PRODH>>" + b1Row.getProdh()
-				+ ", MTPOS>>" + b1Row.getMtpos() + ", KTGRM>>"
-				+ b1Row.getKtgrm() + ", SKTOF>>" + b1Row.getSktof()
-				+ ", SCMNG>>" + b1Row.getScmng() + ", MVGR1>>"
-				+ b1Row.getMvgr1() + ", MVGR2>>" + b1Row.getMvgr2()
-				+ ", MVGR3>>" + b1Row.getMvgr3() + ", VERSG>>"
-				+ b1Row.getVersg() + ", VMSTA>>" + b1Row.getVmsta()
-				+ ", VMSTD>>" + b1Row.getVmstd() + ", AUMNG>>"
-				+ b1Row.getAumng() + ", VPRSV>>" + b1Row.getVprsv()
-				+ ", PEINH>>" + b1Row.getPeinh() + ", STPRS>>"
-				+ b1Row.getStprs() + ", BKLAS>>" + b1Row.getBklas() + "\n");
+		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins()
+				+ ", DWERK>>" + b1Row.getDwerk() 
+				+ ", PRODH>>" + b1Row.getProdh()
+				+ ", MTPOS>>" + b1Row.getMtpos() 
+				+ ", KTGRM>>" + b1Row.getKtgrm() 
+				+ ", SKTOF>>" + b1Row.getSktof()
+				+ ", SCMNG>>" + b1Row.getScmng() 
+				+ ", MVGR1>>" + b1Row.getMvgr1() 
+				+ ", MVGR2>>" + b1Row.getMvgr2()
+				+ ", MVGR3>>" + b1Row.getMvgr3() 
+				+ ", VERSG>>" + b1Row.getVersg() 
+				+ ", VMSTA>>" + b1Row.getVmsta()
+				+ ", VMSTD>>" + b1Row.getVmstd() 
+				+ ", AUMNG>>" + b1Row.getAumng() 
+				+ ", VPRSV>>" + b1Row.getVprsv()
+				+ ", PEINH>>" + b1Row.getPeinh() 
+				+ ", STPRS>>" + b1Row.getStprs() 
+				+ ", BKLAS>>" + b1Row.getBklas() + "\n");
 
 		// Bmmh2 - B2 Structure
 		Bmmh2Table b2Table = new Bmmh2Table();
@@ -191,17 +202,17 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 				CntryTax cntry = (CntryTax) e.nextElement();
 				b2Row.setAland(cntry.getCountry());
 				b2Row.setTaty1(cntry.getTaxCategory());
-				if ((cntry.getCountry().equals("US"))
-						&& (div.equals("46") || div.equals("48")))
+				if (("US".equals(cntry.getCountry()))
+						&& ("46".equals(div) || "48".equals(div)))
 					b2Row.setTaxm1("1");
 				else
 					b2Row.setTaxm1(cntry.getClassification());
 				b2Table.appendRow(b2Row);
 
 				rfcInfo.append("B2 \n");
-				rfcInfo.append(Tab + "ALAND>>" + b2Row.getAland() + ", TATY1>>"
-						+ b2Row.getTaty1() + ", TAXM1>>" + b2Row.getTaxm1()
-						+ "\n" + "\n");
+				rfcInfo.append(Tab + "ALAND>>" + b2Row.getAland() 
+						+ ", TATY1>>" + b2Row.getTaty1() 
+						+ ", TAXM1>>" + b2Row.getTaxm1() + "\n");
 			}
 		}
 

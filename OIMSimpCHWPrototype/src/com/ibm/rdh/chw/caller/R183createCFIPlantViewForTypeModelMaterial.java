@@ -69,8 +69,8 @@ public class R183createCFIPlantViewForTypeModelMaterial extends Rfc {
 		// new add data end
 
 		// SAP Ledger
-		if (ConfigManager.getConfigManager()
-				.getString(PropertyKeys.KEY_SAP_LEDGER).equals("Y")) {
+		if ("Y".equals(ConfigManager.getConfigManager()
+				.getString(PropertyKeys.KEY_SAP_LEDGER))) {
 			boolean existsPro = ProfitCenterPlantSelector
 					.checkProfitCenterPlants(sapPlant);
 			if (existsPro) {

@@ -51,7 +51,7 @@ public class R169ReadTypeModelsFromBOM extends Rfc {
 	protected boolean isSuccessful() {
 		boolean ans = true;
 		String type = getRfc().getFlWarning();
-		if (type.equals("X")) {
+		if ("X".equals(type)) {
 			ans = false;
 		}
 		return ans;

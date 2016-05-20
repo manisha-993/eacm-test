@@ -30,7 +30,7 @@ public class R142_createSalesBOM extends Rfc {
 		String tempString;
 		String outString = "0010";
 
-		if (rfcString.equals("r142")) {
+		if ("r142".equals(rfcString)) {
 			tempString = ("0000" + Integer.toString(r142ItemNumberCounter * 10));
 			outString = tempString.substring(tempString.length() - 4);
 			r142ItemNumberCounter++;
@@ -69,11 +69,11 @@ public class R142_createSalesBOM extends Rfc {
 
 		// Changes Made by Laxmi
 
-		if (newFlag.equals("NEW")) {
+		if ("NEW".equals(newFlag)) {
 			n0.setMatnr(type + "NEW");
-		} else if (newFlag.equals("UPG")) {
+		} else if ("UPG".equals(newFlag)) {
 			n0.setMatnr(type + "UPG");
-		} else if (newFlag.equals("MTC")) {
+		} else if ("MTC".equals(newFlag)) {
 			n0.setMatnr(type + "MTC");
 		}
 
@@ -84,12 +84,13 @@ public class R142_createSalesBOM extends Rfc {
 		rfc.setJCsapMbom(n0);
 
 		rfcInfo.append("CSAP_MBOM \n");
-		rfcInfo.append(Tab + "MATNR>>" + n0.getMatnr() + ", WERKS>>"
-				+ n0.getWerks() + ", STLAN>>" + n0.getStlan() + ", DATUV>>"
-				+ n0.getDatuv() + "\n");
+		rfcInfo.append(Tab + "MATNR>>" + n0.getMatnr() 
+				+ ", WERKS>>" + n0.getWerks() 
+				+ ", STLAN>>" + n0.getStlan() 
+				+ ", DATUV>>" + n0.getDatuv() + "\n");
 
 		// STPO_API01 - N1
-		if (newFlag.equals("MTC")) {
+		if ("MTC".equals(newFlag)) {
 			Enumeration e = geoV.elements();
 			Stpo_api01Table n1Table = new Stpo_api01Table();
 			int Cnt = 1;
@@ -117,11 +118,11 @@ public class R142_createSalesBOM extends Rfc {
 
 				rfcInfo.append("STPO_API01  \n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + n1Row.getItemCateg()
-						+ ", ITEM_NO>>" + n1Row.getItemNo() + ", COMPONENT>>"
-						+ n1Row.getComponent() + ", COMP_QTY>>"
-						+ n1Row.getCompQty() + ", REL_SALES>>"
-						+ n1Row.getRelSales() + ", IDENTIFIER>>"
-						+ n1Row.getIdentifier() + "\n");
+						+ ", ITEM_NO>>" + n1Row.getItemNo()
+						+ ", COMPONENT>>" + n1Row.getComponent() 
+						+ ", COMP_QTY>>" + n1Row.getCompQty()
+						+ ", REL_SALES>>" + n1Row.getRelSales() 
+						+ ", IDENTIFIER>>" + n1Row.getIdentifier() + "\n");
 			}
 
 			rfc.setJStpoApi01(n1Table);
@@ -147,9 +148,9 @@ public class R142_createSalesBOM extends Rfc {
 
 				rfcInfo.append("CSDEP_DAT  \n");
 				rfcInfo.append(Tab + "DEP_INTERN>>" + n2Row.getDepIntern()
-						+ ", STATUS>>" + n2Row.getStatus() + ", IDENTIFIER>>"
-						+ n2Row.getIdentifier() + ", OBJECT_ID>>"
-						+ n2Row.getObjectId() + "\n");
+						+ ", STATUS>>" + n2Row.getStatus() 
+						+ ", IDENTIFIER>>" + n2Row.getIdentifier() 
+						+ ", OBJECT_ID>>" + n2Row.getObjectId() + "\n");
 			}
 			rfc.setJCsdepDat(n2Table);
 
@@ -186,11 +187,11 @@ public class R142_createSalesBOM extends Rfc {
 
 				rfcInfo.append("STPO_API01  \n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + n1Row.getItemCateg()
-						+ ", ITEM_NO>>" + n1Row.getItemNo() + ", COMPONENT>>"
-						+ n1Row.getComponent() + ", COMP_QTY>>"
-						+ n1Row.getCompQty() + ", REL_SALES>>"
-						+ n1Row.getRelSales() + ", IDENTIFIER>>"
-						+ n1Row.getIdentifier() + "\n");
+						+ ", ITEM_NO>>" + n1Row.getItemNo()
+						+ ", COMPONENT>>" + n1Row.getComponent() 
+						+ ", COMP_QTY>>" + n1Row.getCompQty() 
+						+ ", REL_SALES>>" + n1Row.getRelSales()
+						+ ", IDENTIFIER>>" + n1Row.getIdentifier() + "\n");
 			}
 
 			rfc.setJStpoApi01(n1Table);
@@ -216,9 +217,9 @@ public class R142_createSalesBOM extends Rfc {
 
 				rfcInfo.append("CSDEP_DAT  \n");
 				rfcInfo.append(Tab + "DEP_INTERN>>" + n2Row.getDepIntern()
-						+ ", STATUS>>" + n2Row.getStatus() + ", IDENTIFIER>>"
-						+ n2Row.getIdentifier() + ", OBJECT_ID>>"
-						+ n2Row.getObjectId() + "\n");
+						+ ", STATUS>>" + n2Row.getStatus() 
+						+ ", IDENTIFIER>>" + n2Row.getIdentifier() 
+						+ ", OBJECT_ID>>" + n2Row.getObjectId() + "\n");
 			}
 			rfc.setJCsdepDat(n2Table);
 

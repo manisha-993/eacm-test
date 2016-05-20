@@ -48,11 +48,11 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 		// CSAP_MBOM - M0
 		Csap_mbomStructure m0 = new Csap_mbomStructure();
 
-		if (newFlag.equals("NEW")) {
+		if ("NEW".equals(newFlag)) {
 			m0.setMatnr(type + "NEW");
-		} else if (newFlag.equals("UPG")) {
+		} else if ("UPG".equals(newFlag)) {
 			m0.setMatnr(type + "UPG");
-		} else if (newFlag.equals("MTC")) {
+		} else if ("MTC".equals(newFlag)) {
 			m0.setMatnr(type + "MTC");
 		}
 
@@ -62,12 +62,13 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 
 		rfc.setJCsapMbom(m0);
 		rfcInfo.append("CSAP_MBOM \n");
-		rfcInfo.append(Tab + "MATNR>>" + m0.getMatnr() + ", WERKS>>"
-				+ m0.getWerks() + ", STLAN>>" + m0.getStlan() + ", DATUV>>"
-				+ m0.getDatuv() + "\n");
+		rfcInfo.append(Tab + "MATNR>>" + m0.getMatnr() 
+				+ ", WERKS>>" + m0.getWerks()
+				+ ", STLAN>>" + m0.getStlan() 
+				+ ", DATUV>>" + m0.getDatuv() + "\n");
 
 		// STPO_API03 - M1
-		if (newFlag.equals("MTC")) {
+		if ("MTC".equals(newFlag)) {
 			Enumeration e = geoV.elements();
 			Stpo_api03Table m1Table = new Stpo_api03Table();
 			int Cnt = 1;
@@ -97,11 +98,11 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 				rfcInfo.append(Tab + "COMPUNIT" + m1Row.getCompUnit()
 						+ "SORTSTRING" + m1Row.getSortstring() + "\n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + m1Row.getItemCateg()
-						+ ", ITEM_NO>>" + m1Row.getItemNo() + ", COMPONENT>>"
-						+ m1Row.getComponent() + ", COMP_QTY>>"
-						+ m1Row.getCompQty() + ", REL_SALES>>"
-						+ m1Row.getRelSales() + ", IDENTIFIER>>"
-						+ m1Row.getIdentifier() + "\n");
+						+ ", ITEM_NO>>" + m1Row.getItemNo() 
+						+ ", COMPONENT>>" + m1Row.getComponent() 
+						+ ", COMP_QTY>>" + m1Row.getCompQty() 
+						+ ", REL_SALES>>" + m1Row.getRelSales() 
+						+ ", IDENTIFIER>>" + m1Row.getIdentifier() + "\n");
 			}
 
 			rfc.setJStpoApi03(m1Table);
@@ -126,9 +127,9 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 
 				rfcInfo.append("CSDEP_DAT Row \n");
 				rfcInfo.append(Tab + "DEP_INTERN>>" + m2Row.getDepIntern()
-						+ ", STATUS>>" + m2Row.getStatus() + ", IDENTIFIER>>"
-						+ m2Row.getIdentifier() + ", OBJECT_ID>>"
-						+ m2Row.getObjectId() + "\n");
+						+ ", STATUS>>" + m2Row.getStatus()
+						+ ", IDENTIFIER>>" + m2Row.getIdentifier() 
+						+ ", OBJECT_ID>>" + m2Row.getObjectId() + "\n");
 			}
 
 			rfc.setJCsdepDat(m2Table);
@@ -164,11 +165,11 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 				rfcInfo.append(Tab + "COMPUNIT" + m1Row.getCompUnit()
 						+ "SORTSTRING" + m1Row.getSortstring() + "\n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + m1Row.getItemCateg()
-						+ ", ITEM_NO>>" + m1Row.getItemNo() + ", COMPONENT>>"
-						+ m1Row.getComponent() + ", COMP_QTY>>"
-						+ m1Row.getCompQty() + ", REL_SALES>>"
-						+ m1Row.getRelSales() + ", IDENTIFIER>>"
-						+ m1Row.getIdentifier() + "\n");
+						+ ", ITEM_NO>>" + m1Row.getItemNo() 
+						+ ", COMPONENT>>" + m1Row.getComponent() 
+						+ ", COMP_QTY>>" + m1Row.getCompQty() 
+						+ ", REL_SALES>>" + m1Row.getRelSales() 
+						+ ", IDENTIFIER>>" + m1Row.getIdentifier() + "\n");
 			}
 
 			rfc.setJStpoApi03(m1Table);
@@ -192,9 +193,9 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 
 				rfcInfo.append("CSDEP_DAT Row \n");
 				rfcInfo.append(Tab + "DEP_INTERN>>" + m2Row.getDepIntern()
-						+ ", STATUS>>" + m2Row.getStatus() + ", IDENTIFIER>>"
-						+ m2Row.getIdentifier() + ", OBJECT_ID>>"
-						+ m2Row.getObjectId() + "\n");
+						+ ", STATUS>>" + m2Row.getStatus() 
+						+ ", IDENTIFIER>>" + m2Row.getIdentifier() 
+						+ ", OBJECT_ID>>" + m2Row.getObjectId() + "\n");
 			}
 
 			rfc.setJCsdepDat(m2Table);
@@ -251,7 +252,7 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 		String tempString;
 		String outString = "0010";
 
-		if (rfcString.equals("r143")) {
+		if ("r143".equals(rfcString)) {
 			tempString = ("0000" + Integer.toString(r143ItemNumberCounter * 10));
 			outString = tempString.substring(tempString.length() - 4);
 			r143ItemNumberCounter++;

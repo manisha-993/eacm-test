@@ -71,7 +71,7 @@ public class R199_deleteLifecycleRow extends Rfc {
 		rfcInfo.append(Tab + "PIMS_IDENTITY>>" + rfc.getPimsIdentity() + ",");
 
 		// RFANUMBER
-		if (check.equals("wdfm")) {
+		if ("wdfm".equals(check)) {
 			rfc.setRfaNum(annDocNo + "_WDFM");
 		} else {
 			rfc.setRfaNum(annDocNo);

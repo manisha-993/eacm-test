@@ -36,7 +36,7 @@ public class R127createRPQClass extends Rfc {
 		ClclassesTable l0Table = new ClclassesTable();
 		ClclassesTableRow l0Row = l0Table.createEmptyRow();
 		String className = "";
-		if (featRanges.equalsIgnoreCase("RPQ"))
+		if ("RPQ".equalsIgnoreCase(featRanges))
 			className = "MK_" + typeFeature.getType() + "_RPQ";
 		else
 			className = "MK_" + typeFeature.getType() + "_RPQ" + "_"
@@ -52,10 +52,12 @@ public class R127createRPQClass extends Rfc {
 		l0Table.appendRow(l0Row);
 		rfc.setIClclasses(l0Table);
 		rfcInfo.append("CLCLASSES  \n");
-		rfcInfo.append(Tab + "CLASS>>" + l0Row.get_Class() + ", CLASSTYPE>>"
-				+ l0Row.getClassType() + ", STATUS>>" + l0Row.getStatus()
-				+ ", VALFROM>>" + l0Row.getValFrom() + ", VALTO>>"
-				+ l0Row.getValTo() + ", CHECKNO>>" + l0Row.getCheckNo() + "\n");
+		rfcInfo.append(Tab + "CLASS>>" + l0Row.get_Class() 
+				+ ", CLASSTYPE>>" + l0Row.getClassType() 
+				+ ", STATUS>>" + l0Row.getStatus()
+				+ ", VALFROM>>" + l0Row.getValFrom() 
+				+ ", VALTO>>" + l0Row.getValTo() 
+				+ ", CHECKNO>>" + l0Row.getCheckNo() + "\n");
 
 		// Cla_descr - L1
 		Cla_descrTable l1Table = new Cla_descrTable();
@@ -70,8 +72,9 @@ public class R127createRPQClass extends Rfc {
 		l1Table.appendRow(l1Row);
 		rfc.setIClaDescr(l1Table);
 		rfcInfo.append("CHAR_DESCR \n");
-		rfcInfo.append(Tab + "CLASS>>" + l1Row.get_Class() + ", CLASSTYPE>>"
-				+ l1Row.getClassType() + ", LANGUAGE>>" + l1Row.getLanguage()
+		rfcInfo.append(Tab + "CLASS>>" + l1Row.get_Class()
+				+ ", CLASSTYPE>>" + l1Row.getClassType() 
+				+ ", LANGUAGE>>" + l1Row.getLanguage()
 				+ ", CATCHWORD>>" + l1Row.getCatchword() + "\n");
 
 		// ZDM_GEO_TO_CLASS

@@ -22,7 +22,7 @@ public class R128assignRPQTypeFeatureCharacteristicToTypeClass extends Rfc {
 
 		// Set up the RFC fields
 		// C0
-		if (featRanges.equalsIgnoreCase("RPQ"))
+		if ("RPQ".equalsIgnoreCase(featRanges))
 			rfc.setJClass("MK_" + typeFeature.getType() + "_RPQ");
 		else
 			rfc.setJClass("MK_" + typeFeature.getType() + "_RPQ" + "_"
@@ -30,8 +30,8 @@ public class R128assignRPQTypeFeatureCharacteristicToTypeClass extends Rfc {
 		rfc.setJKlart("300");
 
 		rfcInfo.append("Direct fields \n");
-		rfcInfo.append(Tab + "CLASS>>" + rfc.getJClass() + ", KLART>>"
-				+ rfc.getJKlart() + "\n");
+		rfcInfo.append(Tab + "CLASS>>" + rfc.getJClass() 
+				+ ", KLART>>" + rfc.getJKlart() + "\n");
 
 		// RMCLM - V1
 		RmclmTable c1Table = new RmclmTable();

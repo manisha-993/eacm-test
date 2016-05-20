@@ -94,7 +94,7 @@ public class R189createCFIPlantViewForType extends Rfc {
 					.checkProfitCenterPlants(sapPlant);
 			if (existsPro) {
 				if (typeModel.getProfitCenter() != null
-						|| (!typeModel.getProfitCenter().equals(""))) {
+						&& (!"".equals(typeModel.getProfitCenter()))) {
 					b1Row.setPrctr(typeModel.getProfitCenter());
 				}
 			}

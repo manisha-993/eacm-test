@@ -50,13 +50,9 @@ public class R209ReadBasicViewOfMaterial extends Rfc {
 	protected boolean isSuccessful() {
 		boolean ans = false;
 		String type = getRfc().getReturn().getType();
-		if (type.equals("S")) {
+		if ("S".equals(type)) {
 			ans = true;
 		}
-		// rc = getRfc().getRfcrc();
-		// if (0 == rc) {
-		// ans = true;
-		// }
 		return ans;
 	}
 
