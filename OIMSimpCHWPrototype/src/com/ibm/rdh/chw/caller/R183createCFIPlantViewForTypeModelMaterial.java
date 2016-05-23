@@ -59,7 +59,7 @@ public class R183createCFIPlantViewForTypeModelMaterial extends Rfc {
 		b1Row.setMtvfp("ZE");
 
 		// new add data start
-		b1Row.setZeinr("123401");
+		b1Row.setZeinr(annDocNo);
 		b1Row.setMatkl("000");
 		b1Row.setMeins("EA");
 		b1Row.setZeiar("New");
