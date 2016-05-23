@@ -23,8 +23,6 @@ package com.ibm.rdh.rfc.proxy;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
-
-import com.ibm.rdh.chw.caller.R138create300ClassificationForTypeRPQ;
 import com.ibm.rdh.chw.entity.BasicMaterialFromSAP;
 import com.ibm.rdh.chw.entity.BomComponent;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
