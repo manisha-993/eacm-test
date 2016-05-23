@@ -90,6 +90,7 @@ public class R183createCFIPlantViewForTypeModelMaterial extends Rfc {
 				+ ", ZEIAR>>" + b1Row.getZeiar() 
 				+ ", AESZN>>" + b1Row.getAeszn()
 				+ ", GEWEI>>" + b1Row.getGewei()
+				+ ", PRCTR>>" + b1Row.getPrctr()
 				+ ", SPART>>" + b1Row.getSpart() + "\n");
 
 		// ZDM_GEO_TO_CLASS
