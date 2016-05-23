@@ -76,6 +76,14 @@ public class R168create012ClassificationForMTCTest extends RdhRestProxyTest {
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
 			assertNotNull(rowDetails);
 
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ZDMOBJKEY", "'" + objectId + "'");
+			map.put("ZDMOBJTYP", "'CLF'");
+			map.put("ZDM_SESSION", "'" + sessionId + "'");
+			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
+			assertNotNull(rowDetails);
+
 		} catch (HWPIMSAbnormalException ex) {
 			logger.info("error message= " + ex.getMessage());
 			Assert.fail("error message= " + ex.getMessage());
@@ -129,6 +137,14 @@ public class R168create012ClassificationForMTCTest extends RdhRestProxyTest {
 			map.put("ZSESSION", "'" + sessionId + "'");
 			map.put("TEXT", "'Classification created / updated successfully.'");
 			rowDetails = selectTableRow(map, "ZDM_LOGDTL");
+			assertNotNull(rowDetails);
+
+			map.clear();
+			map.put("MANDT", "'" + Constants.MANDT + "'");
+			map.put("ZDMOBJKEY", "'" + objectId + "'");
+			map.put("ZDMOBJTYP", "'CLF'");
+			map.put("ZDM_SESSION", "'" + sessionId + "'");
+			rowDetails = selectTableRow(map, "ZDM_PARKTABLE");
 			assertNotNull(rowDetails);
 
 		} catch (HWPIMSAbnormalException ex) {
