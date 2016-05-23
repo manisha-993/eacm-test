@@ -123,7 +123,7 @@ public class R118create001ClassificationForMMFieldsTypeModel extends Rfc {
 
 		r6Row.setCharact("MM_MODEL_PROPERTIES");
 		String systemType = typeModel.getSystemType();
-		if (systemType == null && "".equals(systemType.trim())) {
+		if (systemType == null || "".equals(systemType.trim())) {
 			r6Row.setValue("");
 		} else {
 			r6Row.setValue(systemType);
