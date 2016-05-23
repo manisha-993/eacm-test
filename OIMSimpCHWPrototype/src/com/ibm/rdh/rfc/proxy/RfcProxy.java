@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import com.ibm.rdh.chw.caller.R138create300ClassificationForTypeRPQ;
 import com.ibm.rdh.chw.entity.BasicMaterialFromSAP;
 import com.ibm.rdh.chw.entity.BomComponent;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
@@ -164,9 +165,11 @@ public abstract class RfcProxy {
 			String pimsIdentity) throws Exception;
 
 	public abstract void r137(TypeModelUPGGeo tmUPGObj, String range,
+			CHWAnnouncement chwA, String newFlag, String FromToType,
+			String pimsIdentity) throws Exception;
 
-	CHWAnnouncement chwA, String newFlag, String FromToType, String pimsIdentity)
-			throws Exception;
+	public abstract void r138(TypeFeature tfc, String newFlag,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
 
 	public abstract void r142(String type, String sapPlant, Vector geoV,
 			String newFlag, CHWAnnouncement chwA, Hashtable spItem_Categ,
@@ -202,6 +205,9 @@ public abstract class RfcProxy {
 
 	public abstract void r160(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
+
+//	public abstract void r161(String type, String newFlag,
+//			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
 
 	public abstract void r162(TypeFeatureUPGGeo tfugObj,
 			TypeModelUPGGeo tmUPGObj, String newFlag, CHWAnnouncement chwA,
@@ -261,11 +267,11 @@ public abstract class RfcProxy {
 	public abstract void r186(TypeFeature typeFeature, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
-//	public abstract void r187(TypeFeature typeFeature, CHWAnnouncement chwA,
-//			String pimsIdentity) throws Exception;
-//
-//	public abstract void r188(TypeFeature tfObj, CHWAnnouncement chwA,
-//			String pimsIdentity) throws Exception;
+	// public abstract void r187(TypeFeature typeFeature, CHWAnnouncement chwA,
+	// String pimsIdentity) throws Exception;
+	//
+	// public abstract void r188(TypeFeature tfObj, CHWAnnouncement chwA,
+	// String pimsIdentity) throws Exception;
 
 	public abstract void r189(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
@@ -273,6 +279,10 @@ public abstract class RfcProxy {
 
 	public abstract Vector r193(String type, String newFlag, String _plant)
 			throws Exception;
+
+	public abstract void r194(String type, String annDocNo,
+			Vector auoMaterials, Vector typeModelRevs, String revProfileName,
+			String newFlag, String pimsIdentity, String plant) throws Exception;
 
 	public abstract void r195(String type, String annDocNo, Vector revData,
 			Vector typeModelRevs, String revProfileName, String newFlag,
@@ -308,8 +318,8 @@ public abstract class RfcProxy {
 
 	public abstract boolean r204(String material) throws Exception;
 
-//	public abstract boolean r207(String type, String model, String plant)
-//			throws Exception;
+	// public abstract boolean r207(String type, String model, String plant)
+	// throws Exception;
 
 	public abstract BasicMaterialFromSAP r209(String material) throws Exception;
 
@@ -330,7 +340,7 @@ public abstract class RfcProxy {
 			String pimsIdentity, String salesOrg, String productHierarchy)
 			throws Exception;
 
-//	public abstract Vector r261(String material) throws Exception;
+	// public abstract Vector r261(String material) throws Exception;
 
 	public abstract void r262(CHWAnnouncement chwA, String material,
 			String sapPlant, String pimsIdentity, String profitCenter)

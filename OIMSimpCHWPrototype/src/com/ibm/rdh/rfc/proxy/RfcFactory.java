@@ -39,6 +39,7 @@ import com.ibm.rdh.chw.caller.R134assignRPQTypeFeatureCharacteristicToTypeClass;
 import com.ibm.rdh.chw.caller.R135assignTypeFeatureCharacteristicToTypeUFClass;
 import com.ibm.rdh.chw.caller.R136create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R137create300ClassificationForTypeUFForMTC;
+import com.ibm.rdh.chw.caller.R138create300ClassificationForTypeRPQ;
 import com.ibm.rdh.chw.caller.R142_createSalesBOM;
 import com.ibm.rdh.chw.caller.R143assignTypeModelAsSalesBOMItemWithDependencies;
 import com.ibm.rdh.chw.caller.R144updateParkStatus;
@@ -50,6 +51,7 @@ import com.ibm.rdh.chw.caller.R156createZDMClassificationForTypeModel;
 import com.ibm.rdh.chw.caller.R157createTypeClass;
 import com.ibm.rdh.chw.caller.R159createTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
+import com.ibm.rdh.chw.caller.R161createZDMClassificationForMKFEX;
 import com.ibm.rdh.chw.caller.R162createZDMClassificationForMKFEATCONV;
 import com.ibm.rdh.chw.caller.R163createUpgradeValueForTypeMTCCharacteristic;
 import com.ibm.rdh.chw.caller.R164create300ClassificationForTypeMTC;
@@ -70,6 +72,7 @@ import com.ibm.rdh.chw.caller.R185deleteupgradevaluefromMCcharacteristic;
 import com.ibm.rdh.chw.caller.R186DeleteTypeFeatureCharacteristic;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.caller.R193ReadRevenueProfile;
+import com.ibm.rdh.chw.caller.R194CreateRevenueProfile;
 import com.ibm.rdh.chw.caller.R195DeleteRevenueProfile;
 import com.ibm.rdh.chw.caller.R196UpdateRevenueProfile;
 import com.ibm.rdh.chw.caller.R197createLifecycleRow;
@@ -330,6 +333,13 @@ public class RfcFactory extends Object {
 				chwA, newFlag, FromToType, pimsIdentity);
 	}
 
+	public R138create300ClassificationForTypeRPQ getr138(TypeFeature tfc,
+			String newFlag, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R138create300ClassificationForTypeRPQ(tfc, newFlag, chwA,
+				pimsIdentity);
+	}
+
 	public R142_createSalesBOM getr142(String type, String sapPlant,
 			Vector geoV, String newFlag, CHWAnnouncement chwA,
 			Hashtable spItem_Categ, String pimsIdentity) throws Exception {
@@ -399,6 +409,13 @@ public class RfcFactory extends Object {
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		return new R160assignChartoClassFEAT_0000(typeModel, chwA, pimsIdentity);
 	}
+
+//	public R161createZDMClassificationForMKFEX getr161(String type,
+//			String newFlag, CHWAnnouncement chwA, String pimsIdentity)
+//			throws Exception {
+//		return new R161createZDMClassificationForMKFEX(type, newFlag, chwA,
+//				pimsIdentity);
+//	}
 
 	public R162createZDMClassificationForMKFEATCONV getr162(
 			TypeFeatureUPGGeo tfugObj, TypeModelUPGGeo tmUPGObj,
@@ -523,19 +540,19 @@ public class RfcFactory extends Object {
 				pimsIdentity);
 	}
 
-//	public R187DeleteTypeFeatureCharacteristicClassificationtoFEAT getr187(
-//			TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
-//			throws Exception {
-//		return new R187DeleteTypeFeatureCharacteristicClassificationtoFEAT(
-//				typeFeature, chwA, pimsIdentity);
-//	}
-//
-//	public R188DeleteTypeFeatureCharacteristicClassificationtoUF getr188(
-//			TypeFeature tfObj, CHWAnnouncement chwA, String pimsIdentity)
-//			throws Exception {
-//		return new R188DeleteTypeFeatureCharacteristicClassificationtoUF(tfObj,
-//				chwA, pimsIdentity);
-//	}
+	// public R187DeleteTypeFeatureCharacteristicClassificationtoFEAT getr187(
+	// TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
+	// throws Exception {
+	// return new R187DeleteTypeFeatureCharacteristicClassificationtoFEAT(
+	// typeFeature, chwA, pimsIdentity);
+	// }
+	//
+	// public R188DeleteTypeFeatureCharacteristicClassificationtoUF getr188(
+	// TypeFeature tfObj, CHWAnnouncement chwA, String pimsIdentity)
+	// throws Exception {
+	// return new R188DeleteTypeFeatureCharacteristicClassificationtoUF(tfObj,
+	// chwA, pimsIdentity);
+	// }
 
 	public R189createCFIPlantViewForType getr189(CHWAnnouncement chwA,
 			TypeModel typeModel, String sapPlant, String newFlag,
@@ -550,6 +567,13 @@ public class RfcFactory extends Object {
 			String _plant) throws Exception {
 
 		return new R193ReadRevenueProfile(type, newFlag, _plant);
+	}
+
+	public R194CreateRevenueProfile getr194(String type, String annDocNo,
+			Vector auoMaterials, Vector typeModelRevs, String revProfileName,
+			String newFlag, String pimsIdentity, String plant) throws Exception {
+		return new R194CreateRevenueProfile(type, annDocNo, auoMaterials,
+				typeModelRevs, revProfileName, newFlag, pimsIdentity, plant);
 	}
 
 	public R195DeleteRevenueProfile getr195(String type, String annDocNo,
@@ -612,10 +636,10 @@ public class RfcFactory extends Object {
 		return new R204ReadMaterial(material);
 	}
 
-//	public R207ReadPlantViewMaterial getr207(String type, String model,
-//			String plant) throws Exception {
-//		return new R207ReadPlantViewMaterial(type, model, plant);
-//	}
+	// public R207ReadPlantViewMaterial getr207(String type, String model,
+	// String plant) throws Exception {
+	// return new R207ReadPlantViewMaterial(type, model, plant);
+	// }
 
 	public R209ReadBasicViewOfMaterial getr209(String material)
 			throws Exception {
@@ -635,8 +659,8 @@ public class RfcFactory extends Object {
 				componentstoDeleteTypeMTC, newFlag, chwA, pimsIdentity);
 	}
 
-	public R213UpdateSalesBOMItemWithtypeMTC getr213(String type, String sapPlant,
-			Vector geoV, String newFlag, CHWAnnouncement chwA,
+	public R213UpdateSalesBOMItemWithtypeMTC getr213(String type,
+			String sapPlant, Vector geoV, String newFlag, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception {
 		return new R213UpdateSalesBOMItemWithtypeMTC(type, sapPlant, geoV,
 				newFlag, chwA, pimsIdentity);
@@ -653,9 +677,9 @@ public class RfcFactory extends Object {
 				pimsIdentity, salesOrg, productHierarchy);
 	}
 
-//	public R261PlantViewMaterial getr261(String material) throws Exception {
-//		return new R261PlantViewMaterial(material);
-//	}
+	// public R261PlantViewMaterial getr261(String material) throws Exception {
+	// return new R261PlantViewMaterial(material);
+	// }
 
 	public R262createPlantViewProfitCenterForMaterial getr262(
 			CHWAnnouncement chwA, String material, String sapPlant,

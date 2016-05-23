@@ -43,6 +43,7 @@ import com.ibm.rdh.chw.caller.R134assignRPQTypeFeatureCharacteristicToTypeClass;
 import com.ibm.rdh.chw.caller.R135assignTypeFeatureCharacteristicToTypeUFClass;
 import com.ibm.rdh.chw.caller.R136create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R137create300ClassificationForTypeUFForMTC;
+import com.ibm.rdh.chw.caller.R138create300ClassificationForTypeRPQ;
 import com.ibm.rdh.chw.caller.R142_createSalesBOM;
 import com.ibm.rdh.chw.caller.R143assignTypeModelAsSalesBOMItemWithDependencies;
 import com.ibm.rdh.chw.caller.R144updateParkStatus;
@@ -54,6 +55,7 @@ import com.ibm.rdh.chw.caller.R156createZDMClassificationForTypeModel;
 import com.ibm.rdh.chw.caller.R157createTypeClass;
 import com.ibm.rdh.chw.caller.R159createTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
+import com.ibm.rdh.chw.caller.R161createZDMClassificationForMKFEX;
 import com.ibm.rdh.chw.caller.R162createZDMClassificationForMKFEATCONV;
 import com.ibm.rdh.chw.caller.R163createUpgradeValueForTypeMTCCharacteristic;
 import com.ibm.rdh.chw.caller.R164create300ClassificationForTypeMTC;
@@ -74,6 +76,7 @@ import com.ibm.rdh.chw.caller.R185deleteupgradevaluefromMCcharacteristic;
 import com.ibm.rdh.chw.caller.R186DeleteTypeFeatureCharacteristic;
 import com.ibm.rdh.chw.caller.R189createCFIPlantViewForType;
 import com.ibm.rdh.chw.caller.R193ReadRevenueProfile;
+import com.ibm.rdh.chw.caller.R194CreateRevenueProfile;
 import com.ibm.rdh.chw.caller.R195DeleteRevenueProfile;
 import com.ibm.rdh.chw.caller.R196UpdateRevenueProfile;
 import com.ibm.rdh.chw.caller.R197createLifecycleRow;
@@ -505,6 +508,16 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r138(TypeFeature tfc, String newFlag, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R138create300ClassificationForTypeRPQ r = getFactory().getr138(tfc,
+				newFlag, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
 	public void r142(String type, String sapPlant, Vector geoV, String newFlag,
 			CHWAnnouncement chwA, Hashtable spItem_Categ, String pimsIdentity)
 			throws Exception {
@@ -617,6 +630,17 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		r.evaluate();
 		logPromoteResultMessage(r);
 	}
+
+//	@Override
+//	public void r161(String type, String newFlag, CHWAnnouncement chwA,
+//			String pimsIdentity) throws Exception {
+//		R161createZDMClassificationForMKFEX r = getFactory().getr161(type,
+//				newFlag, chwA, pimsIdentity);
+//		logPromoteInfoMessage(r);
+//		r.evaluate();
+//		logPromoteResultMessage(r);
+//
+//	}
 
 	@Override
 	public void r162(TypeFeatureUPGGeo tfugObj, TypeModelUPGGeo tmUPGObj,
@@ -858,26 +882,26 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 	}
 
-//	@Override
-//	public void r187(TypeFeature typeFeature, CHWAnnouncement chwA,
-//			String pimsIdentity) throws Exception {
-//		R187DeleteTypeFeatureCharacteristicClassificationtoFEAT r = getFactory()
-//				.getr187(typeFeature, chwA, pimsIdentity);
-//		logPromoteInfoMessage(r);
-//		r.evaluate();
-//		logPromoteResultMessage(r);
-//
-//	}
+	// @Override
+	// public void r187(TypeFeature typeFeature, CHWAnnouncement chwA,
+	// String pimsIdentity) throws Exception {
+	// R187DeleteTypeFeatureCharacteristicClassificationtoFEAT r = getFactory()
+	// .getr187(typeFeature, chwA, pimsIdentity);
+	// logPromoteInfoMessage(r);
+	// r.evaluate();
+	// logPromoteResultMessage(r);
+	//
+	// }
 
-//	@Override
-//	public void r188(TypeFeature tfObj, CHWAnnouncement chwA,
-//			String pimsIdentity) throws Exception {
-//		R188DeleteTypeFeatureCharacteristicClassificationtoUF r = getFactory()
-//				.getr188(tfObj, chwA, pimsIdentity);
-//		logPromoteInfoMessage(r);
-//		r.evaluate();
-//		logPromoteResultMessage(r);
-//	}
+	// @Override
+	// public void r188(TypeFeature tfObj, CHWAnnouncement chwA,
+	// String pimsIdentity) throws Exception {
+	// R188DeleteTypeFeatureCharacteristicClassificationtoUF r = getFactory()
+	// .getr188(tfObj, chwA, pimsIdentity);
+	// logPromoteInfoMessage(r);
+	// r.evaluate();
+	// logPromoteResultMessage(r);
+	// }
 
 	@Override
 	public void r189(CHWAnnouncement chwA, TypeModel typeModel,
@@ -926,6 +950,19 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 			revProfileData = null;
 		}
 		return revProfileData;
+
+	}
+
+	@Override
+	public void r194(String type, String annDocNo, Vector auoMaterials,
+			Vector typeModelRevs, String revProfileName, String newFlag,
+			String pimsIdentity, String plant) throws Exception {
+		R194CreateRevenueProfile r = getFactory().getr194(type, annDocNo,
+				auoMaterials, typeModelRevs, revProfileName, newFlag,
+				pimsIdentity, plant);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
 
 	}
 
@@ -1055,31 +1092,31 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		return exists;
 	}
 
-//	@Override
-//	public boolean r207(String type, String model, String plant)
-//			throws Exception {
-//		R207ReadPlantViewMaterial r = getFactory().getr207(type, model, plant);
-//		logPromoteInfoMessage(r);
-//		r.evaluate();
-//		logPromoteResultMessage(r);
-//
-//		com.ibm.rdh.rfc.Z_DM_SAP_READ_MARC rfc = r.getRfc();
-//		boolean plantcheck = false;
-//		if (rfc != null) {
-//			logger.info("R207ReadPlantViewMaterial is not null.");
-//			Zdm_marc_dataTable plantvalues = rfc.getZdmMarcData();
-//			int rows = plantvalues.getRowCount();
-//			if (rows > 0) {
-//				plantcheck = true;
-//			} else if (rows == 0) {
-//				plantcheck = false;
-//			}
-//		} else {
-//			logger.info("R207ReadPlantViewMaterial is null.");
-//		}
-//		return plantcheck;
-//
-//	}
+	// @Override
+	// public boolean r207(String type, String model, String plant)
+	// throws Exception {
+	// R207ReadPlantViewMaterial r = getFactory().getr207(type, model, plant);
+	// logPromoteInfoMessage(r);
+	// r.evaluate();
+	// logPromoteResultMessage(r);
+	//
+	// com.ibm.rdh.rfc.Z_DM_SAP_READ_MARC rfc = r.getRfc();
+	// boolean plantcheck = false;
+	// if (rfc != null) {
+	// logger.info("R207ReadPlantViewMaterial is not null.");
+	// Zdm_marc_dataTable plantvalues = rfc.getZdmMarcData();
+	// int rows = plantvalues.getRowCount();
+	// if (rows > 0) {
+	// plantcheck = true;
+	// } else if (rows == 0) {
+	// plantcheck = false;
+	// }
+	// } else {
+	// logger.info("R207ReadPlantViewMaterial is null.");
+	// }
+	// return plantcheck;
+	//
+	// }
 
 	@Override
 	public BasicMaterialFromSAP r209(String material) throws Exception {
@@ -1182,58 +1219,58 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 	}
 
-//	@Override
-//	public Vector r261(String material) throws Exception {
-//		R261PlantViewMaterial r = getFactory().getr261(material);
-//		logPromoteInfoMessage(r);
-//		r.evaluate();
-//		logPromoteResultMessage(r);
-//		boolean plantcheck = false;
-//		Vector plantData = new Vector();
-//		boolean checkProfitCenterExists = false;
-//
-//		com.ibm.rdh.rfc.Z_DM_SAP_READ_MARC rfc = r.getRfc();
-//		if (rfc != null) {
-//			logger.info("R261PlantViewMaterial is not null.");
-//			Zdm_marc_dataTable plantvalues = rfc.getZdmMarcData();
-//			int rows = plantvalues.getRowCount();
-//
-//			if (rows > 0) {
-//				for (int i = 0; i < rows; i++) {
-//					Zdm_marc_dataTableRow plant_row = (Zdm_marc_dataTableRow) plantvalues
-//							.getRow(i);
-//
-//					String checkPlant = plant_row.getWerks();
-//
-//					checkProfitCenterExists = ProfitCenterPlantSelector
-//							.checkProfitCenterPlants(checkPlant);
-//
-//					System.out
-//							.println("Printing the value of boolean exists in the rfc R261"
-//									+ checkProfitCenterExists);
-//					if (checkProfitCenterExists) {
-//						MaterailPlantData matplantData = new MaterailPlantData(
-//								plant_row.getWerks(), plant_row.getPrctr());
-//
-//						plantcheck = true;
-//						logger.debug("R261's plant" + plant_row.getWerks());
-//						logger.debug("R261's profitcenter"
-//								+ plant_row.getPrctr());
-//						plantData.add(matplantData);
-//					}
-//				}
-//				// return plants;
-//			} else if (rows == 0) {
-//				// plants = null ;
-//				plantcheck = false;
-//			}
-//
-//		} else {
-//			logger.info("R261PlantViewMaterial is null.");
-//		}
-//		return plantData;
-//
-//	}
+	// @Override
+	// public Vector r261(String material) throws Exception {
+	// R261PlantViewMaterial r = getFactory().getr261(material);
+	// logPromoteInfoMessage(r);
+	// r.evaluate();
+	// logPromoteResultMessage(r);
+	// boolean plantcheck = false;
+	// Vector plantData = new Vector();
+	// boolean checkProfitCenterExists = false;
+	//
+	// com.ibm.rdh.rfc.Z_DM_SAP_READ_MARC rfc = r.getRfc();
+	// if (rfc != null) {
+	// logger.info("R261PlantViewMaterial is not null.");
+	// Zdm_marc_dataTable plantvalues = rfc.getZdmMarcData();
+	// int rows = plantvalues.getRowCount();
+	//
+	// if (rows > 0) {
+	// for (int i = 0; i < rows; i++) {
+	// Zdm_marc_dataTableRow plant_row = (Zdm_marc_dataTableRow) plantvalues
+	// .getRow(i);
+	//
+	// String checkPlant = plant_row.getWerks();
+	//
+	// checkProfitCenterExists = ProfitCenterPlantSelector
+	// .checkProfitCenterPlants(checkPlant);
+	//
+	// System.out
+	// .println("Printing the value of boolean exists in the rfc R261"
+	// + checkProfitCenterExists);
+	// if (checkProfitCenterExists) {
+	// MaterailPlantData matplantData = new MaterailPlantData(
+	// plant_row.getWerks(), plant_row.getPrctr());
+	//
+	// plantcheck = true;
+	// logger.debug("R261's plant" + plant_row.getWerks());
+	// logger.debug("R261's profitcenter"
+	// + plant_row.getPrctr());
+	// plantData.add(matplantData);
+	// }
+	// }
+	// // return plants;
+	// } else if (rows == 0) {
+	// // plants = null ;
+	// plantcheck = false;
+	// }
+	//
+	// } else {
+	// logger.info("R261PlantViewMaterial is null.");
+	// }
+	// return plantData;
+	//
+	// }
 
 	@Override
 	public void r262(CHWAnnouncement chwA, String material, String sapPlant,
