@@ -37,9 +37,6 @@ public class R138create300ClassificationForTypeRPQ extends Rfc {
 
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT();
 
-		// Use the first type feature to get the type and range
-		tf = (TypeFeature) tfc.getTfCollection().elementAt(0);
-
 		// Set up the RFC fields
 		// OBJECT_KEY - R0
 		Object_keyTable r0Table = new Object_keyTable();
@@ -48,11 +45,11 @@ public class R138create300ClassificationForTypeRPQ extends Rfc {
 		r0Row.setKeyFeld("MATNR");
 
 		if ("NEW".equals(newFlag)) {
-			r0Row.setKparaValu(tf.getType() + "NEW");
+			r0Row.setKparaValu(tfc.getType() + "NEW");
 		} else if ("UPG".equals(newFlag)) {
-			r0Row.setKparaValu(tf.getType() + "UPG");
+			r0Row.setKparaValu(tfc.getType() + "UPG");
 		} else if ("MTC".equals(newFlag)) {
-			r0Row.setKparaValu(tf.getType() + "MTC");
+			r0Row.setKparaValu(tfc.getType() + "MTC");
 		}
 
 		r0Table.appendRow(r0Row);
@@ -66,7 +63,7 @@ public class R138create300ClassificationForTypeRPQ extends Rfc {
 		KlahTable r2Table = new KlahTable();
 		KlahTableRow r2Row = r2Table.createEmptyRow();
 
-		r2Row.setClass("MK_" + tf.getType() + "_RPQ");
+		r2Row.setClass("MK_" + tfc.getType() + "_RPQ");
 
 		r2Table.appendRow(r2Row);
 		rfc.setIKlah(r2Table);
