@@ -41,9 +41,8 @@ public class R133updateMaterialBasicViewForTypeModel extends Rfc {
 		b0Table.appendRow(b0Row);
 		rfc.setIBmm00(b0Table);
 		rfcInfo.append("B0 \n");
-		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() 
-				+ ", MATNR>>" + b0Row.getMatnr() 
-				+ ", MBRSH>>" + b0Row.getMbrsh()
+		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
+				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
 				+ ", MTART>>" + b0Row.getMtart() + "\n");
 
 		// Bmmh1 - B1
@@ -66,10 +65,10 @@ public class R133updateMaterialBasicViewForTypeModel extends Rfc {
 			b1Row.setPrdha(typeModel.getProductHierarchy());
 		}
 		// New add data start
-		b1Row.setZeinr("123401");
+		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setMatkl("000");
 		b1Row.setMeins("EA");
-		b1Row.setZeiar("New");
+		b1Row.setZeiar(chwA.getAnnouncementType());
 		b1Row.setAeszn(sdf.format(new Date()));
 		b1Row.setGewei("KG");
 		// New add data end
@@ -77,15 +76,12 @@ public class R133updateMaterialBasicViewForTypeModel extends Rfc {
 		b1Table.appendRow(b1Row);
 		rfc.setIBmmh1(b1Table);
 		rfcInfo.append("B1 \n");
-		rfcInfo.append(Tab + ", SPART>>" + b1Row.getSpart() 
-				+ ", EAN11>>" + b1Row.getEan11() 
-				+ ", NUMTP>>" + b1Row.getNumtp()
-				+ ", PRDHA>>" + b1Row.getPrdha() 
-				+ ", ZEINR>>" + b1Row.getZeinr()
-				+ ", MATKL>>" + b1Row.getMatkl()
-				+ ", MEINS>>" + b1Row.getMeins() 
-				+ ", ZEIAR>>" + b1Row.getZeiar() 
-				+ ", AESZN>>" + b1Row.getAeszn()
+		rfcInfo.append(Tab + ", SPART>>" + b1Row.getSpart() + ", EAN11>>"
+				+ b1Row.getEan11() + ", NUMTP>>" + b1Row.getNumtp()
+				+ ", PRDHA>>" + b1Row.getPrdha() + ", ZEINR>>"
+				+ b1Row.getZeinr() + ", MATKL>>" + b1Row.getMatkl()
+				+ ", MEINS>>" + b1Row.getMeins() + ", ZEIAR>>"
+				+ b1Row.getZeiar() + ", AESZN>>" + b1Row.getAeszn()
 				+ ", GEWEI>>" + b1Row.getGewei() + "\n");
 
 		// Bmmh5 - B5 Structure
@@ -98,9 +94,9 @@ public class R133updateMaterialBasicViewForTypeModel extends Rfc {
 		rfc.setIBmmh5(b5Table);
 
 		rfcInfo.append("B5 \n");
-		rfcInfo.append(Tab + "SPRAS>>" + b5Row.getSpras() 
-				+ ", MAKTX>>"+ b5Row.getMaktx() + "\n");
-		
+		rfcInfo.append(Tab + "SPRAS>>" + b5Row.getSpras() + ", MAKTX>>"
+				+ b5Row.getMaktx() + "\n");
+
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
