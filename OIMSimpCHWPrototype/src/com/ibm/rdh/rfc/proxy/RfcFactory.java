@@ -43,6 +43,8 @@ import com.ibm.rdh.chw.caller.R138create300ClassificationForTypeRPQ;
 import com.ibm.rdh.chw.caller.R142_createSalesBOM;
 import com.ibm.rdh.chw.caller.R143assignTypeModelAsSalesBOMItemWithDependencies;
 import com.ibm.rdh.chw.caller.R144updateParkStatus;
+import com.ibm.rdh.chw.caller.R148_createConfigurationProfileForNewMaterial;
+import com.ibm.rdh.chw.caller.R149_createConfigurationProfileForUPGMaterial;
 import com.ibm.rdh.chw.caller.R150create012ClassificationForMOD;
 import com.ibm.rdh.chw.caller.R151create012ClassificationForMC;
 import com.ibm.rdh.chw.caller.R152create012ClassificationForRPQTypeFeature;
@@ -51,6 +53,7 @@ import com.ibm.rdh.chw.caller.R156createZDMClassificationForTypeModel;
 import com.ibm.rdh.chw.caller.R157createTypeClass;
 import com.ibm.rdh.chw.caller.R159createTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
+
 //import com.ibm.rdh.chw.caller.R161createZDMClassificationForMKFEX;
 import com.ibm.rdh.chw.caller.R162createZDMClassificationForMKFEATCONV;
 import com.ibm.rdh.chw.caller.R163createUpgradeValueForTypeMTCCharacteristic;
@@ -80,9 +83,11 @@ import com.ibm.rdh.chw.caller.R198updateLifecycleRow;
 import com.ibm.rdh.chw.caller.R199_deleteLifecycleRow;
 import com.ibm.rdh.chw.caller.R200_readLifecycleRow;
 import com.ibm.rdh.chw.caller.R201createUpgradeValueForTypeMCCharacteristic;
+import com.ibm.rdh.chw.caller.R202_createConfigurationProfileForMTCMaterial;
 import com.ibm.rdh.chw.caller.R204ReadMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R210ReadSalesBom;
+import com.ibm.rdh.chw.caller.R211CreateSalesBOMfortypeMTC;
 import com.ibm.rdh.chw.caller.R212DeleteSalesBOMfortypeMTC;
 import com.ibm.rdh.chw.caller.R213UpdateSalesBOMItemWithtypeMTC;
 import com.ibm.rdh.chw.caller.R214ReadMCclass;
@@ -360,6 +365,20 @@ public class RfcFactory extends Object {
 		return new R144updateParkStatus(annno, zdmstatus, pimsIdentity);
 	}
 
+	public R148_createConfigurationProfileForNewMaterial getr148(
+			String typeStr, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R148_createConfigurationProfileForNewMaterial(typeStr, chwA,
+				pimsIdentity);
+	}
+
+	public R149_createConfigurationProfileForUPGMaterial getr149(
+			String typeStr, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R149_createConfigurationProfileForUPGMaterial(typeStr, chwA,
+				pimsIdentity);
+	}
+
 	public R150create012ClassificationForMOD getr150(TypeModel typeModel,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		return new R150create012ClassificationForMOD(typeModel, chwA,
@@ -632,6 +651,13 @@ public class RfcFactory extends Object {
 				chwA, FROMTOTYPE, pimsIdentity);
 	}
 
+	public R202_createConfigurationProfileForMTCMaterial getr202(
+			String typeStr, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R202_createConfigurationProfileForMTCMaterial(typeStr, chwA,
+				pimsIdentity);
+	}
+
 	public R204ReadMaterial getr204(String material) throws Exception {
 		return new R204ReadMaterial(material);
 	}
@@ -648,8 +674,14 @@ public class RfcFactory extends Object {
 
 	public R210ReadSalesBom getr210(String type, String newFlag, String _plant)
 			throws Exception {
-
 		return new R210ReadSalesBom(type, newFlag, _plant);
+	}
+
+	public R211CreateSalesBOMfortypeMTC getr211(String type, String sapPlant,
+			Vector geoV, String newFlag, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		return new R211CreateSalesBOMfortypeMTC(type, sapPlant, geoV, newFlag,
+				chwA, pimsIdentity);
 	}
 
 	public R212DeleteSalesBOMfortypeMTC getr212(String type, String sapPlant,

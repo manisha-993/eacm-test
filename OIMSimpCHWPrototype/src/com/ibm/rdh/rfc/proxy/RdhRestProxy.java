@@ -47,6 +47,8 @@ import com.ibm.rdh.chw.caller.R138create300ClassificationForTypeRPQ;
 import com.ibm.rdh.chw.caller.R142_createSalesBOM;
 import com.ibm.rdh.chw.caller.R143assignTypeModelAsSalesBOMItemWithDependencies;
 import com.ibm.rdh.chw.caller.R144updateParkStatus;
+import com.ibm.rdh.chw.caller.R148_createConfigurationProfileForNewMaterial;
+import com.ibm.rdh.chw.caller.R149_createConfigurationProfileForUPGMaterial;
 import com.ibm.rdh.chw.caller.R150create012ClassificationForMOD;
 import com.ibm.rdh.chw.caller.R151create012ClassificationForMC;
 import com.ibm.rdh.chw.caller.R152create012ClassificationForRPQTypeFeature;
@@ -55,6 +57,7 @@ import com.ibm.rdh.chw.caller.R156createZDMClassificationForTypeModel;
 import com.ibm.rdh.chw.caller.R157createTypeClass;
 import com.ibm.rdh.chw.caller.R159createTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
+
 //import com.ibm.rdh.chw.caller.R161createZDMClassificationForMKFEX;
 import com.ibm.rdh.chw.caller.R162createZDMClassificationForMKFEATCONV;
 import com.ibm.rdh.chw.caller.R163createUpgradeValueForTypeMTCCharacteristic;
@@ -84,9 +87,11 @@ import com.ibm.rdh.chw.caller.R198updateLifecycleRow;
 import com.ibm.rdh.chw.caller.R199_deleteLifecycleRow;
 import com.ibm.rdh.chw.caller.R200_readLifecycleRow;
 import com.ibm.rdh.chw.caller.R201createUpgradeValueForTypeMCCharacteristic;
+import com.ibm.rdh.chw.caller.R202_createConfigurationProfileForMTCMaterial;
 import com.ibm.rdh.chw.caller.R204ReadMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R210ReadSalesBom;
+import com.ibm.rdh.chw.caller.R211CreateSalesBOMfortypeMTC;
 import com.ibm.rdh.chw.caller.R212DeleteSalesBOMfortypeMTC;
 import com.ibm.rdh.chw.caller.R213UpdateSalesBOMItemWithtypeMTC;
 import com.ibm.rdh.chw.caller.R214ReadMCclass;
@@ -545,6 +550,26 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 			throws Exception {
 		R144updateParkStatus r = getFactory().getr144(annno, zdmstatus,
 				pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r148(String typeStr, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		R148_createConfigurationProfileForNewMaterial r = getFactory().getr148(
+				typeStr, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r149(String typeStr, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		R149_createConfigurationProfileForUPGMaterial r = getFactory().getr149(
+				typeStr, chwA, pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
@@ -1077,6 +1102,16 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r202(String typeStr, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		R202_createConfigurationProfileForMTCMaterial r = getFactory().getr202(
+				typeStr, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
 	public boolean r204(String material) throws Exception {
 		R204ReadMaterial r = getFactory().getr204(material);
 		logPromoteInfoMessage(r);
@@ -1169,6 +1204,16 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 		}
 		return salesBOM;
+	}
+
+	@Override
+	public void r211(String type, String sapPlant, Vector geoV, String newFlag,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		R211CreateSalesBOMfortypeMTC r = getFactory().getr211(type, sapPlant,
+				geoV, newFlag, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
 	}
 
 	@Override

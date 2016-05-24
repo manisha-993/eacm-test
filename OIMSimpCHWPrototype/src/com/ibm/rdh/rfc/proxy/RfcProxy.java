@@ -180,6 +180,12 @@ public abstract class RfcProxy {
 	public abstract void r144(String annno, String zdmstatus,
 			String pimsIdentity) throws Exception;
 
+	public abstract void r148(String typeStr, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
+	public abstract void r149(String typeStr, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
 	public abstract void r150(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
@@ -314,6 +320,9 @@ public abstract class RfcProxy {
 			CHWAnnouncement chwA, String FROMTOTYPE, String pimsIdentity)
 			throws Exception;
 
+	public abstract void r202(String typeStr, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
 	public abstract boolean r204(String material) throws Exception;
 
 	// public abstract boolean r207(String type, String model, String plant)
@@ -322,6 +331,10 @@ public abstract class RfcProxy {
 	public abstract BasicMaterialFromSAP r209(String material) throws Exception;
 
 	public abstract Vector r210(String type, String newFlag, String _plant)
+			throws Exception;
+
+	public abstract void r211(String type, String sapPlant, Vector geoV,
+			String newFlag, CHWAnnouncement chwA, String pimsIdentity)
 			throws Exception;
 
 	public abstract void r212(String type, String sapPlant,
