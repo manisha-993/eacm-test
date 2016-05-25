@@ -62,10 +62,9 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 
 		rfc.setJCsapMbom(m0);
 		rfcInfo.append("CSAP_MBOM \n");
-		rfcInfo.append(Tab + "MATNR>>" + m0.getMatnr() 
-				+ ", WERKS>>" + m0.getWerks()
-				+ ", STLAN>>" + m0.getStlan() 
-				+ ", DATUV>>" + m0.getDatuv() + "\n");
+		rfcInfo.append(Tab + "MATNR>>" + m0.getMatnr() + ", WERKS>>"
+				+ m0.getWerks() + ", STLAN>>" + m0.getStlan() + ", DATUV>>"
+				+ m0.getDatuv() + "\n");
 
 		// STPO_API03 - M1
 		if ("MTC".equals(newFlag)) {
@@ -95,14 +94,14 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 				m1Table.appendRow(m1Row);
 
 				rfcInfo.append("STPO_API03  \n");
-				rfcInfo.append(Tab + "COMPUNIT" + m1Row.getCompUnit()
-						+ "SORTSTRING" + m1Row.getSortstring() + "\n");
+				rfcInfo.append(Tab + "COMPUNIT>>" + m1Row.getCompUnit()
+						+ ", SORTSTRING>>" + m1Row.getSortstring() + "\n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + m1Row.getItemCateg()
-						+ ", ITEM_NO>>" + m1Row.getItemNo() 
-						+ ", COMPONENT>>" + m1Row.getComponent() 
-						+ ", COMP_QTY>>" + m1Row.getCompQty() 
-						+ ", REL_SALES>>" + m1Row.getRelSales() 
-						+ ", IDENTIFIER>>" + m1Row.getIdentifier() + "\n");
+						+ ", ITEM_NO>>" + m1Row.getItemNo() + ", COMPONENT>>"
+						+ m1Row.getComponent() + ", COMP_QTY>>"
+						+ m1Row.getCompQty() + ", REL_SALES>>"
+						+ m1Row.getRelSales() + ", IDENTIFIER>>"
+						+ m1Row.getIdentifier() + "\n");
 			}
 
 			rfc.setJStpoApi03(m1Table);
@@ -127,9 +126,9 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 
 				rfcInfo.append("CSDEP_DAT Row \n");
 				rfcInfo.append(Tab + "DEP_INTERN>>" + m2Row.getDepIntern()
-						+ ", STATUS>>" + m2Row.getStatus()
-						+ ", IDENTIFIER>>" + m2Row.getIdentifier() 
-						+ ", OBJECT_ID>>" + m2Row.getObjectId() + "\n");
+						+ ", STATUS>>" + m2Row.getStatus() + ", IDENTIFIER>>"
+						+ m2Row.getIdentifier() + ", OBJECT_ID>>"
+						+ m2Row.getObjectId() + "\n");
 			}
 
 			rfc.setJCsdepDat(m2Table);
@@ -162,14 +161,14 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 				m1Table.appendRow(m1Row);
 
 				rfcInfo.append("STPO_API03  \n");
-				rfcInfo.append(Tab + "COMPUNIT" + m1Row.getCompUnit()
-						+ "SORTSTRING" + m1Row.getSortstring() + "\n");
+				rfcInfo.append(Tab + "COMPUNIT>>" + m1Row.getCompUnit()
+						+ ", SORTSTRING>>" + m1Row.getSortstring() + "\n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + m1Row.getItemCateg()
-						+ ", ITEM_NO>>" + m1Row.getItemNo() 
-						+ ", COMPONENT>>" + m1Row.getComponent() 
-						+ ", COMP_QTY>>" + m1Row.getCompQty() 
-						+ ", REL_SALES>>" + m1Row.getRelSales() 
-						+ ", IDENTIFIER>>" + m1Row.getIdentifier() + "\n");
+						+ ", ITEM_NO>>" + m1Row.getItemNo() + ", COMPONENT>>"
+						+ m1Row.getComponent() + ", COMP_QTY>>"
+						+ m1Row.getCompQty() + ", REL_SALES>>"
+						+ m1Row.getRelSales() + ", IDENTIFIER>>"
+						+ m1Row.getIdentifier() + "\n");
 			}
 
 			rfc.setJStpoApi03(m1Table);
@@ -193,9 +192,9 @@ public class R143assignTypeModelAsSalesBOMItemWithDependencies extends Rfc {
 
 				rfcInfo.append("CSDEP_DAT Row \n");
 				rfcInfo.append(Tab + "DEP_INTERN>>" + m2Row.getDepIntern()
-						+ ", STATUS>>" + m2Row.getStatus() 
-						+ ", IDENTIFIER>>" + m2Row.getIdentifier() 
-						+ ", OBJECT_ID>>" + m2Row.getObjectId() + "\n");
+						+ ", STATUS>>" + m2Row.getStatus() + ", IDENTIFIER>>"
+						+ m2Row.getIdentifier() + ", OBJECT_ID>>"
+						+ m2Row.getObjectId() + "\n");
 			}
 
 			rfc.setJCsdepDat(m2Table);

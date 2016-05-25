@@ -76,18 +76,17 @@ public class R121createModelSelectionDependency extends Rfc {
 		rfcInfo.append(Tab + "DEPTYPE>>" + d4.getDepType() + ", STATUS>>"
 				+ d4.getStatus() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");

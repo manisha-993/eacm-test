@@ -107,10 +107,8 @@ public class R149_createConfigurationProfileForUPGMaterial extends Rfc {
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 

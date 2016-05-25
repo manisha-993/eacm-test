@@ -67,8 +67,6 @@ public class R142_createSalesBOM extends Rfc {
 		// CSAP_MBOM - N0
 		Csap_mbomStructure n0 = new Csap_mbomStructure();
 
-		// Changes Made by Laxmi
-
 		if ("NEW".equals(newFlag)) {
 			n0.setMatnr(type + "NEW");
 		} else if ("UPG".equals(newFlag)) {
@@ -84,10 +82,9 @@ public class R142_createSalesBOM extends Rfc {
 		rfc.setJCsapMbom(n0);
 
 		rfcInfo.append("CSAP_MBOM \n");
-		rfcInfo.append(Tab + "MATNR>>" + n0.getMatnr() 
-				+ ", WERKS>>" + n0.getWerks() 
-				+ ", STLAN>>" + n0.getStlan() 
-				+ ", DATUV>>" + n0.getDatuv() + "\n");
+		rfcInfo.append(Tab + "MATNR>>" + n0.getMatnr() + ", WERKS>>"
+				+ n0.getWerks() + ", STLAN>>" + n0.getStlan() + ", DATUV>>"
+				+ n0.getDatuv() + "\n");
 
 		// STPO_API01 - N1
 		if ("MTC".equals(newFlag)) {
@@ -108,21 +105,22 @@ public class R142_createSalesBOM extends Rfc {
 				n1Row.setComponent(tmg.getType() + tmg.getModel());
 				n1Row.setCompQty("1");
 				n1Row.setRelSales("X");
-				//add 20160506
+				// Two new add value, these are not set in old code but we need
+				// them.
 				n1Row.setCompUnit("EA");
 				n1Row.setSortstring("57");
-				//add end
+				// end
 				n1Row.setIdentifier("A" + Cnt);
 				Cnt++;
 				n1Table.appendRow(n1Row);
 
 				rfcInfo.append("STPO_API01  \n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + n1Row.getItemCateg()
-						+ ", ITEM_NO>>" + n1Row.getItemNo()
-						+ ", COMPONENT>>" + n1Row.getComponent() 
-						+ ", COMP_QTY>>" + n1Row.getCompQty()
-						+ ", REL_SALES>>" + n1Row.getRelSales() 
-						+ ", IDENTIFIER>>" + n1Row.getIdentifier() + "\n");
+						+ ", ITEM_NO>>" + n1Row.getItemNo() + ", COMPONENT>>"
+						+ n1Row.getComponent() + ", COMP_QTY>>"
+						+ n1Row.getCompQty() + ", REL_SALES>>"
+						+ n1Row.getRelSales() + ", IDENTIFIER>>"
+						+ n1Row.getIdentifier() + "\n");
 			}
 
 			rfc.setJStpoApi01(n1Table);
@@ -148,9 +146,9 @@ public class R142_createSalesBOM extends Rfc {
 
 				rfcInfo.append("CSDEP_DAT  \n");
 				rfcInfo.append(Tab + "DEP_INTERN>>" + n2Row.getDepIntern()
-						+ ", STATUS>>" + n2Row.getStatus() 
-						+ ", IDENTIFIER>>" + n2Row.getIdentifier() 
-						+ ", OBJECT_ID>>" + n2Row.getObjectId() + "\n");
+						+ ", STATUS>>" + n2Row.getStatus() + ", IDENTIFIER>>"
+						+ n2Row.getIdentifier() + ", OBJECT_ID>>"
+						+ n2Row.getObjectId() + "\n");
 			}
 			rfc.setJCsdepDat(n2Table);
 
@@ -177,21 +175,22 @@ public class R142_createSalesBOM extends Rfc {
 				n1Row.setComponent(tm.getType() + tm.getModel());
 				n1Row.setCompQty("1");
 				n1Row.setRelSales("X");
-				//add 20160506
+				// Two new add value, these are not set in old code but we need
+				// them.
 				n1Row.setCompUnit("EA");
 				n1Row.setSortstring("57");
-				//add end
+				// add end
 				n1Row.setIdentifier("A" + Cnt);
 				Cnt++;
 				n1Table.appendRow(n1Row);
 
 				rfcInfo.append("STPO_API01  \n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + n1Row.getItemCateg()
-						+ ", ITEM_NO>>" + n1Row.getItemNo()
-						+ ", COMPONENT>>" + n1Row.getComponent() 
-						+ ", COMP_QTY>>" + n1Row.getCompQty() 
-						+ ", REL_SALES>>" + n1Row.getRelSales()
-						+ ", IDENTIFIER>>" + n1Row.getIdentifier() + "\n");
+						+ ", ITEM_NO>>" + n1Row.getItemNo() + ", COMPONENT>>"
+						+ n1Row.getComponent() + ", COMP_QTY>>"
+						+ n1Row.getCompQty() + ", REL_SALES>>"
+						+ n1Row.getRelSales() + ", IDENTIFIER>>"
+						+ n1Row.getIdentifier() + "\n");
 			}
 
 			rfc.setJStpoApi01(n1Table);
@@ -217,9 +216,9 @@ public class R142_createSalesBOM extends Rfc {
 
 				rfcInfo.append("CSDEP_DAT  \n");
 				rfcInfo.append(Tab + "DEP_INTERN>>" + n2Row.getDepIntern()
-						+ ", STATUS>>" + n2Row.getStatus() 
-						+ ", IDENTIFIER>>" + n2Row.getIdentifier() 
-						+ ", OBJECT_ID>>" + n2Row.getObjectId() + "\n");
+						+ ", STATUS>>" + n2Row.getStatus() + ", IDENTIFIER>>"
+						+ n2Row.getIdentifier() + ", OBJECT_ID>>"
+						+ n2Row.getObjectId() + "\n");
 			}
 			rfc.setJCsdepDat(n2Table);
 
@@ -237,18 +236,17 @@ public class R142_createSalesBOM extends Rfc {
 		rfcInfo.append(Tab + "BASE_QUAN>>" + n7.getBaseQuan()
 				+ ", BOM_STATUS>>" + n7.getBomStatus() + "\n");
 
+		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
 
 		zdmRow.setZGeo("US");
-
 		zdmTable.appendRow(zdmRow);
-
 		rfc.setGeoData(zdmTable);
-
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 
+		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + rfc.getPimsIdentity() + "\n");

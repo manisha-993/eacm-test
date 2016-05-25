@@ -166,7 +166,7 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
-		rfcInfo.append(Tab + ", MATKL>>" + b1Row.getMatkl() 
+		rfcInfo.append(Tab + "MATKL>>" + b1Row.getMatkl() 
 				+ ", ZEINR>>" + b1Row.getZeinr() 
 				+ ", AESZN>>" + b1Row.getAeszn()
 				+ ", GEWEI>>" + b1Row.getGewei() 

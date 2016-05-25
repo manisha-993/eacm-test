@@ -55,8 +55,8 @@ public class R124createUpgradeValueForTypeMCCharacteristic extends Rfc {
 		rfc.setICharacts(c0Table);
 
 		rfcInfo.append("CHARACTS \n");
-		rfcInfo.append(Tab + "ADDITVALS" + c0Row.getAdditVals() + "NEGVALS"
-				+ c0Row.getNegVals() + "\n");
+		rfcInfo.append(Tab + "ADDITVALS>>" + c0Row.getAdditVals()
+				+ ", NEGVALS>>" + c0Row.getNegVals() + "\n");
 		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() + ", DATATYPE>>"
 				+ c0Row.getDatatype() + ", CHARNUMBER>>"
 				+ c0Row.getCharnumberString() + ", STATUS>>"
