@@ -2,33 +2,41 @@ package com.ibm.rdh.chw.caller;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 
-public class R204ReadMaterial extends Rfc{
+public class R204ReadMaterial extends Rfc {
 
 	private com.ibm.rdh.rfc.BAPI_MATERIAL_GET_DETAIL rfc;
 
-	public R204ReadMaterial(String material) throws Exception{
+	public R204ReadMaterial(String material) throws Exception {
 		reInitialize();
 		rfcName = "BAPI_MATERIAL_GET_DETAIL";
 
 		reInitialize();
-		// First check and see if tfc is empty and we do not need to do anything.
+		// First check and see if tfc is empty and we do not need to do
+		// anything.
 
 		rfc = new com.ibm.rdh.rfc.BAPI_MATERIAL_GET_DETAIL();
 
 		rfc.setMaterial(material);
 		rfcInfo.append("MATERIAL \n");
-		rfcInfo.append(Tab+"MATERIAL>>"+rfc.getMaterial()+
-			"\n");
+		rfcInfo.append(Tab + "MATERIAL>>" + rfc.getMaterial() + "\n");
 
 	}
-	
+
+
 	@Override
 	public void execute() throws Exception {
 		logExecution();
 		getRfc().execute();
 		getLog().debug(getErrorInformation());
 		if (getSeverity() == ERROR) {
-			throw new HWPIMSAbnormalException(getErrorInformation());
+			String errMsg = getErrorInformation();
+			// WebService not found, return errMsg is "Material <material> not found in MARA table."
+			if (errMsg != null
+					&& errMsg.contains("not found in MARA table")) {
+				rfcInfo.append(errMsg);
+			} else {
+				throw new HWPIMSAbnormalException();
+			}
 		}
 	}
 
