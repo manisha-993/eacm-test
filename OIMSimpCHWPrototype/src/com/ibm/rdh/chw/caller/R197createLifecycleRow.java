@@ -63,7 +63,7 @@ public class R197createLifecycleRow extends Rfc {
 		} else {
 			tRow.setZdmRfanum(annDocNo);
 		}
-		rfcInfo.append(Tab + "ZDM_RFANUM>>" + tRow.getZdmRfanum());
+		rfcInfo.append(Tab + "ZDM_RFANUM>>" + tRow.getZdmRfanum() + "\n");
 
 		t.appendRow(tRow);
 		rfc.setZdmChwPlc(t);
