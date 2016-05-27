@@ -122,7 +122,7 @@ public class R104createZDMClassification extends Rfc {
 		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
-		rfcInfo.append(Tab + ",RFANUM>>" + chwA.getAnnDocNo() + "\n");
+		rfcInfo.append(Tab + "RFANUM>>" + chwA.getAnnDocNo() + "\n");
 
 	}
 

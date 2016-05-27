@@ -150,7 +150,7 @@ public class R101createGenericPlantViewforMaterial extends Rfc {
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
-		rfcInfo.append(Tab + ", ZEINR>>" + b1Row.getZeinr() + ", MATKL>>"
+		rfcInfo.append(Tab + "ZEINR>>" + b1Row.getZeinr() + ", MATKL>>"
 				+ b1Row.getMatkl() + ", SPART>>" + b1Row.getSpart() + "\n");
 
 		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins() + ", TRAGR>>"

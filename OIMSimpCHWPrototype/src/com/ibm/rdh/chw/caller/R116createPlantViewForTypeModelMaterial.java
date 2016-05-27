@@ -137,7 +137,7 @@ public class R116createPlantViewForTypeModelMaterial extends Rfc {
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
-		rfcInfo.append(Tab + ", ZEIAR>>" + b1Row.getZeiar() + ", ZEINR>>"
+		rfcInfo.append(Tab + "ZEIAR>>" + b1Row.getZeiar() + ", ZEINR>>"
 				+ b1Row.getZeinr() + ", AESZN>>" + b1Row.getAeszn()
 				+ ", SPART>>" + b1Row.getSpart() + "\n");
 
@@ -158,9 +158,7 @@ public class R116createPlantViewForTypeModelMaterial extends Rfc {
 				+ ", STPRS>>" + b1Row.getStprs() + ", BKLAS>>"
 				+ b1Row.getBklas() + ", PRCTR>>" + b1Row.getPrctr()
 				+ ", EKGRP>>" + b1Row.getEkgrp() + ", MFRNR>>"
-				+ b1Row.getMfrnr() +
-
-				"\n");
+				+ b1Row.getMfrnr() +"\n");
 
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
@@ -179,7 +177,7 @@ public class R116createPlantViewForTypeModelMaterial extends Rfc {
 		// RFANUMBER
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
-		rfcInfo.append(Tab + ",RFANUM>>" + chwA.getAnnDocNo() + "\n");
+		rfcInfo.append(Tab + "RFANUM>>" + chwA.getAnnDocNo() + "\n");
 
 	}
 

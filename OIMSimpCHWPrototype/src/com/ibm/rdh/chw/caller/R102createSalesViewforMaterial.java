@@ -127,7 +127,7 @@ public class R102createSalesViewforMaterial extends Rfc {
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
-		rfcInfo.append(Tab + ", ZEINR>>" + b1Row.getZeinr() + ", MATKL>>"
+		rfcInfo.append(Tab + "ZEINR>>" + b1Row.getZeinr() + ", MATKL>>"
 				+ b1Row.getMatkl() + ", SPART>>" + b1Row.getSpart()
 				+ ", ZEIAR>>" + b1Row.getZeiar() + ", AESZN>>"
 				+ b1Row.getAeszn() + ", GEWEI>>" + b1Row.getGewei() + "\n");

@@ -85,7 +85,7 @@ public class R115createTypeModelMaterialBasicView extends Rfc {
 				+ b1Row.getZeinr() + ", MATKL>>" + b1Row.getMatkl()
 				+ ", SPART>>" + b1Row.getSpart() + ", ZEIAR>>"
 				+ b1Row.getZeiar() + ", AESZN>>" + b1Row.getAeszn()
-				+ ", GEWEI>>" + b1Row.getGewei());
+				+ ", GEWEI>>" + b1Row.getGewei() + "\n");
 
 		if (!"".equals(typeModel.getEanUPCCode())) {
 			rfcInfo.append(Tab + "EAN11>>" + b1Row.getEan11() + ", NUMTP>>"
