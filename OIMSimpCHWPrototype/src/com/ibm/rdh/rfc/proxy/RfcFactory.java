@@ -53,8 +53,7 @@ import com.ibm.rdh.chw.caller.R156createZDMClassificationForTypeModel;
 import com.ibm.rdh.chw.caller.R157createTypeClass;
 import com.ibm.rdh.chw.caller.R159createTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
-
-//import com.ibm.rdh.chw.caller.R161createZDMClassificationForMKFEX;
+import com.ibm.rdh.chw.caller.R161createZDMClassificationForMKFEX;
 import com.ibm.rdh.chw.caller.R162createZDMClassificationForMKFEATCONV;
 import com.ibm.rdh.chw.caller.R163createUpgradeValueForTypeMTCCharacteristic;
 import com.ibm.rdh.chw.caller.R164create300ClassificationForTypeMTC;
@@ -100,6 +99,7 @@ import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.chw.entity.TypeFeatureUPGGeo;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
+//import com.ibm.rdh.chw.caller.R161createZDMClassificationForMKFEX;
 
 /**
  * @author bobc
@@ -429,12 +429,12 @@ public class RfcFactory extends Object {
 		return new R160assignChartoClassFEAT_0000(typeModel, chwA, pimsIdentity);
 	}
 
-//	public R161createZDMClassificationForMKFEX getr161(String type,
-//			String newFlag, CHWAnnouncement chwA, String pimsIdentity)
-//			throws Exception {
-//		return new R161createZDMClassificationForMKFEX(type, newFlag, chwA,
-//				pimsIdentity);
-//	}
+	public R161createZDMClassificationForMKFEX getr161(String type,
+			String newFlag, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R161createZDMClassificationForMKFEX(type, newFlag, chwA,
+				pimsIdentity);
+	}
 
 	public R162createZDMClassificationForMKFEATCONV getr162(
 			TypeFeatureUPGGeo tfugObj, TypeModelUPGGeo tmUPGObj,

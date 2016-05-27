@@ -210,8 +210,8 @@ public abstract class RfcProxy {
 	public abstract void r160(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
-//	public abstract void r161(String type, String newFlag,
-//			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
+	public abstract void r161(String type, String newFlag,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
 
 	public abstract void r162(TypeFeatureUPGGeo tfugObj,
 			TypeModelUPGGeo tmUPGObj, String newFlag, CHWAnnouncement chwA,

@@ -57,8 +57,7 @@ import com.ibm.rdh.chw.caller.R156createZDMClassificationForTypeModel;
 import com.ibm.rdh.chw.caller.R157createTypeClass;
 import com.ibm.rdh.chw.caller.R159createTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R160assignChartoClassFEAT_0000;
-
-//import com.ibm.rdh.chw.caller.R161createZDMClassificationForMKFEX;
+import com.ibm.rdh.chw.caller.R161createZDMClassificationForMKFEX;
 import com.ibm.rdh.chw.caller.R162createZDMClassificationForMKFEATCONV;
 import com.ibm.rdh.chw.caller.R163createUpgradeValueForTypeMTCCharacteristic;
 import com.ibm.rdh.chw.caller.R164create300ClassificationForTypeMTC;
@@ -119,6 +118,7 @@ import com.ibm.rdh.rfc.Zdm_mat_psales_statusTableRow;
 import com.ibm.rdh.rfc.ZdmchwplcTable;
 import com.ibm.rdh.rfc.ZdmchwplcTableRow;
 import com.sap.rfc.IRfcConnection;
+//import com.ibm.rdh.chw.caller.R161createZDMClassificationForMKFEX;
 
 //import com.ibm.rdh.rfc.ReturnDataObjectR001;
 /**
@@ -656,16 +656,16 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 	}
 
-//	@Override
-//	public void r161(String type, String newFlag, CHWAnnouncement chwA,
-//			String pimsIdentity) throws Exception {
-//		R161createZDMClassificationForMKFEX r = getFactory().getr161(type,
-//				newFlag, chwA, pimsIdentity);
-//		logPromoteInfoMessage(r);
-//		r.evaluate();
-//		logPromoteResultMessage(r);
-//
-//	}
+	@Override
+	public void r161(String type, String newFlag, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R161createZDMClassificationForMKFEX r = getFactory().getr161(type,
+				newFlag, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
 
 	@Override
 	public void r162(TypeFeatureUPGGeo tfugObj, TypeModelUPGGeo tmUPGObj,
