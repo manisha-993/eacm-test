@@ -24,15 +24,15 @@ public class R138create300ClassificationForTypeRPQTest extends RdhRestProxyTest 
 	@Before
 	public void prepareData() {
 
-		String sql_klah_1 = "insert into SAPR3.KLAH (mandt, klart, class,clint) values ('200', '300', 'MK_EACM_RPQ','1000000000')";
+		String sql_klah = "insert into SAPR3.KLAH (mandt, klart, class,clint) values ('200', '300', 'MK_EACM_RPQ','1000000000')";
 		String sql_mara_1 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMMTC')";
 		String sql_mara_2 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMNEW')";
 		String sql_mara_3 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMUPG')";
-		int t1 = SqlHelper.runUpdateSql(sql_klah_1, conn);
+		int t1 = SqlHelper.runUpdateSql(sql_klah, conn);
 		int t2 = SqlHelper.runUpdateSql(sql_mara_1, conn);
 		int t3 = SqlHelper.runUpdateSql(sql_mara_2, conn);
 		int t4 = SqlHelper.runUpdateSql(sql_mara_3, conn);
-		if (t1 >= 0 && t2 >= 0) {
+		if (t1 >= 0 && t2 >= 0 && t3 >= 0 && t4 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -224,10 +224,10 @@ public class R138create300ClassificationForTypeRPQTest extends RdhRestProxyTest 
 
 	@After
 	public void deleteData() {
-		String del_klah_1 = "delete from SAPR3.KLAH where mandt='200' and KLART='300' and CLASS='MK_EACM_RPQ' and clint='1000000000'";
-		String del_mara_1 = "delete from SAPR3.MARA where mandt='200' and MATNR IN ('EACMMTC','EACMUPG','EACMNEW')";
-		int t1 = SqlHelper.runUpdateSql(del_klah_1, conn);
-		int t2 = SqlHelper.runUpdateSql(del_mara_1, conn);
+		String del_klah = "delete from SAPR3.KLAH where mandt='200' and KLART='300' and CLASS='MK_EACM_RPQ' and clint='1000000000'";
+		String del_mara = "delete from SAPR3.MARA where mandt='200' and MATNR IN ('EACMMTC','EACMUPG','EACMNEW')";
+		int t1 = SqlHelper.runUpdateSql(del_klah, conn);
+		int t2 = SqlHelper.runUpdateSql(del_mara, conn);
 		if (t1 >= 0 && t2 >= 0) {
 
 			System.out.println("delete success");
