@@ -89,15 +89,15 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 		b1Table.appendRow(b1Row);
 		rfc.setIBmmh1(b1Table);
 
-		rfcInfo.append("B1 \n");
+		rfcInfo.append("BMMH1 \n");
 		rfcInfo.append(Tab + "PRODH>>" + b1Row.getProdh() + "\n");
 		rfcInfo.append(Tab + "MATKL>>" + b1Row.getMatkl() 
-				+ "MEINS>>" + b1Row.getMeins() 
-				+ "ZEINR>>" + b1Row.getZeinr() 
-				+ "ZEIAR>>" + b1Row.getZeiar() 
-				+ "AESZN>>" + b1Row.getAeszn() 
-				+ "SPART>>" + b1Row.getSpart() 
-				+ "GEWEI>>" + b1Row.getGewei() + "\n");
+				+ ", MEINS>>" + b1Row.getMeins() 
+				+ ", ZEINR>>" + b1Row.getZeinr() 
+				+ ", ZEIAR>>" + b1Row.getZeiar() 
+				+ ", AESZN>>" + b1Row.getAeszn() 
+				+ ", SPART>>" + b1Row.getSpart() 
+				+ ", GEWEI>>" + b1Row.getGewei() + "\n");
 
 		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
