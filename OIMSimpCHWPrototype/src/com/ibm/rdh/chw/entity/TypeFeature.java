@@ -218,22 +218,34 @@ public class TypeFeature {
 	 *            com.ibm.pprds.epimshw.TypeFeature
 	 */
 	public String calculateRange100() {
-		String range;
-		if (this.getFeatureID().equals("Q")) {
+		String range = "";
+		if ("Q".equals(this.getFeatureID())) {
 			range = "RPQ";
 			return range;
-		} else {
-			int strLen = this.getFeature().length();
-			for (int i = 0; i < strLen; i++) {
-				if (Character.isLetter(this.getFeature().charAt(i))) {
-					range = "";
-					return range;
-				}
+		} else {		
+			if (ifAlphaNumeric()) {
+				return "A000";
+			} else {
+				range = this.getFeature().substring(0, 1) + "000";
+				return range;
 			}
-		}
-		range = this.getFeature().substring(0, 1)
-				+ this.getFeature().substring(1, 2) + "00";
-		return range;
+		}	
+//		String range;
+//		if (this.getFeatureID().equals("Q")) {
+//			range = "RPQ";
+//			return range;
+//		} else {
+//			int strLen = this.getFeature().length();
+//			for (int i = 0; i < strLen; i++) {
+//				if (Character.isLetter(this.getFeature().charAt(i))) {
+//					range = "";
+//					return range;
+//				}
+//			}
+//		}
+//		range = this.getFeature().substring(0, 1)
+//				+ this.getFeature().substring(1, 2) + "00";
+//		return range;
 	}
 
 	/**
