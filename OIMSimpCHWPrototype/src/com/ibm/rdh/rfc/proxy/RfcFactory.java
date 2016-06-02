@@ -135,11 +135,11 @@ public class RfcFactory extends Object {
 	public R102createSalesViewforMaterial getr102(CHWAnnouncement chwA,
 			TypeModel typeModel, String sapPlant, String newFlag,
 			TypeModelUPGGeo tmUPGObj, String fromToType, String pimsIdentity,
-			String flfilcd, String salesOrg, Vector taxCntryList)
-			throws Exception {
+			String flfilcd, String salesOrg, Vector taxCntryList,
+			CHWGeoAnn chwAg) throws Exception {
 		return new R102createSalesViewforMaterial(chwA, typeModel, sapPlant,
 				newFlag, tmUPGObj, fromToType, pimsIdentity, flfilcd, salesOrg,
-				taxCntryList);
+				taxCntryList, chwAg);
 	}
 
 	public R103create001ClassificationForMGCommon getr103(TypeModel typeModel,
@@ -209,10 +209,11 @@ public class RfcFactory extends Object {
 			String typemod, String div, String acctAsgnGrp,
 			PlannedSalesStatus ps, boolean bumpCtr, String pimsIdentity,
 			String flfil, String salesOrg1, String productHierarchy,
-			Vector VectTaxList, String plantValue) throws Exception {
+			Vector VectTaxList, String plantValue, CHWGeoAnn chwAg)
+			throws Exception {
 		return new R117createTypeModelMaterialSalesView(chwA, typemod, div,
 				acctAsgnGrp, ps, bumpCtr, pimsIdentity, flfil, salesOrg1,
-				productHierarchy, VectTaxList, plantValue);
+				productHierarchy, VectTaxList, plantValue, chwAg);
 	}
 
 	public R118create001ClassificationForMMFieldsTypeModel getr118(
@@ -304,9 +305,10 @@ public class RfcFactory extends Object {
 	}
 
 	public R133updateMaterialBasicViewForTypeModel getr133(TypeModel typeModel,
-			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+			CHWAnnouncement chwA, String pimsIdentity, CHWGeoAnn chwAg)
+			throws Exception {
 		return new R133updateMaterialBasicViewForTypeModel(typeModel, chwA,
-				pimsIdentity);
+				pimsIdentity, chwAg);
 	}
 
 	public R134assignRPQTypeFeatureCharacteristicToTypeClass getr134(

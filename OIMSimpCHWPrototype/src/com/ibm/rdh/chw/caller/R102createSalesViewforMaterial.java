@@ -9,6 +9,7 @@ import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
+import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.CntryTax;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
@@ -28,7 +29,7 @@ public class R102createSalesViewforMaterial extends Rfc {
 	public R102createSalesViewforMaterial(CHWAnnouncement chwA,
 			TypeModel typeModel, String sapPlant, String newFlag,
 			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity,
-			String flfilcd, String salesOrg, Vector taxCntryList)
+			String flfilcd, String salesOrg, Vector taxCntryList,CHWGeoAnn chwAg)
 			throws Exception {
 
 		reInitialize();
@@ -119,7 +120,7 @@ public class R102createSalesViewforMaterial extends Rfc {
 		b1Row.setMatkl("000");
 		b1Row.setSpart(typeModel.getDiv());
 		b1Row.setZeiar(chwA.getAnnouncementType());
-		b1Row.setAeszn(sdff.format(curDate));
+		b1Row.setAeszn(sdff.format(chwAg.getAnnouncementDate()));
 		b1Row.setGewei("KG");
 		// end
 

@@ -12,6 +12,7 @@ import org.junit.Test;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
+import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.CntryTax;
 import com.ibm.rdh.chw.entity.PlannedSalesStatus;
 
@@ -19,7 +20,7 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 
 	private static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
-		
+
 	@Test
 	public void testR117QueryFound01() {
 		try {
@@ -33,6 +34,8 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 			chwA.setSegmentAcronym("RSS");
 			chwA.setAnnDocNo("123401");
 			chwA.setAnnouncementType("New");
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
 			String div = "46";
 			String acctAsgnGrp = "06";
 			PlannedSalesStatus ps = new PlannedSalesStatus();
@@ -55,7 +58,7 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 
 			rfcProxy.r117(chwA, typemod, div, acctAsgnGrp, ps, bumpCtr,
 					pimsIdentity, flfil, salesOrg1, productHierarchy,
-					VectTaxList, plantValue);
+					VectTaxList, plantValue, chwAg);
 
 			// Test function execute success
 			Map<String, String> map = new HashMap<String, String>();
@@ -95,7 +98,7 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 
 		}
 	}
-	
+
 	@Test
 	public void testR117QueryFound02() {
 		try {
@@ -109,6 +112,8 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 			chwA.setSegmentAcronym("AS4");
 			chwA.setAnnDocNo("123401");
 			chwA.setAnnouncementType("New");
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
 			String div = "46";
 			String acctAsgnGrp = "06";
 			PlannedSalesStatus ps = new PlannedSalesStatus();
@@ -131,7 +136,7 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 
 			rfcProxy.r117(chwA, typemod, div, acctAsgnGrp, ps, bumpCtr,
 					pimsIdentity, flfil, salesOrg1, productHierarchy,
-					VectTaxList, plantValue);
+					VectTaxList, plantValue, chwAg);
 
 			// Test function execute success
 			Map<String, String> map = new HashMap<String, String>();
@@ -171,7 +176,7 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 
 		}
 	}
-	
+
 	@Test
 	public void testR117QueryFound03() {
 		try {
@@ -185,6 +190,8 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 			chwA.setSegmentAcronym("RS6");
 			chwA.setAnnDocNo("123401");
 			chwA.setAnnouncementType("New");
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
 			String div = "46";
 			String acctAsgnGrp = "01";
 			PlannedSalesStatus ps = new PlannedSalesStatus();
@@ -207,7 +214,7 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 
 			rfcProxy.r117(chwA, typemod, div, acctAsgnGrp, ps, bumpCtr,
 					pimsIdentity, flfil, salesOrg1, productHierarchy,
-					VectTaxList, plantValue);
+					VectTaxList, plantValue, chwAg);
 
 			// Test function execute success
 			Map<String, String> map = new HashMap<String, String>();
@@ -247,7 +254,7 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 
 		}
 	}
-	
+
 	@Test
 	public void testR117QueryFound04() {
 		try {
@@ -261,6 +268,8 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 			chwA.setSegmentAcronym("RS6");
 			chwA.setAnnDocNo("123401");
 			chwA.setAnnouncementType("New");
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
 			String div = "46";
 			String acctAsgnGrp = "01";
 			PlannedSalesStatus ps = new PlannedSalesStatus();
@@ -283,7 +292,7 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 
 			rfcProxy.r117(chwA, typemod, div, acctAsgnGrp, ps, bumpCtr,
 					pimsIdentity, flfil, salesOrg1, productHierarchy,
-					VectTaxList, plantValue);
+					VectTaxList, plantValue, chwAg);
 
 			// Test function execute success
 			Map<String, String> map = new HashMap<String, String>();
@@ -322,5 +331,5 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 		} finally {
 
 		}
-	}	
+	}
 }

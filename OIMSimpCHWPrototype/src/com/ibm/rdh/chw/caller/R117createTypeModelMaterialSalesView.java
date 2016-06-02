@@ -9,6 +9,7 @@ import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
+import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.CntryTax;
 import com.ibm.rdh.chw.entity.PlannedSalesStatus;
 import com.ibm.rdh.rfc.Bmm00Table;
@@ -28,7 +29,7 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 			String typemod, String div, String acctAsgnGrp,
 			PlannedSalesStatus ps, boolean bumpCtr, String pimsIdentity,
 			String flfil, String salesOrg1, String productHierarchy,
-			Vector VectTaxList, String plantValue) throws Exception {
+			Vector VectTaxList, String plantValue,CHWGeoAnn chwAg) throws Exception {
 		reInitialize();
 		Date curDate = new Date();
 		String sDateFormat = ConfigManager.getConfigManager().getString(
@@ -84,7 +85,7 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		// add 6 set value, In the previous epimshw code
 		b1Row.setMatkl("000");
 		b1Row.setZeinr(chwA.getAnnDocNo());
-		b1Row.setAeszn(sdff.format(curDate));
+		b1Row.setAeszn(sdff.format(chwAg.getAnnouncementDate()));
 		b1Row.setGewei("KG");
 		b1Row.setSpart(div);
 		b1Row.setZeiar(chwA.getAnnouncementType());

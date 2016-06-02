@@ -189,10 +189,11 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	public void r102(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String fromToType, String pimsIdentity, String flfilcd,
-			String salesOrg, Vector taxCntryList) throws Exception {
+			String salesOrg, Vector taxCntryList, CHWGeoAnn chwAg)
+			throws Exception {
 		R102createSalesViewforMaterial r = getFactory().getr102(chwA,
 				typeModel, sapPlant, newFlag, tmUPGObj, fromToType,
-				pimsIdentity, flfilcd, salesOrg, taxCntryList);
+				pimsIdentity, flfilcd, salesOrg, taxCntryList, chwAg);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
@@ -310,11 +311,11 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	public void r117(CHWAnnouncement chwA, String typemod, String div,
 			String acctAsgnGrp, PlannedSalesStatus ps, boolean bumpCtr,
 			String pimsIdentity, String flfil, String salesOrg1,
-			String productHierarchy, Vector VectTaxList, String plantValue)
-			throws Exception {
+			String productHierarchy, Vector VectTaxList, String plantValue,
+			CHWGeoAnn chwAg) throws Exception {
 		R117createTypeModelMaterialSalesView r = getFactory().getr117(chwA,
 				typemod, div, acctAsgnGrp, ps, bumpCtr, pimsIdentity, flfil,
-				salesOrg1, productHierarchy, VectTaxList, plantValue);
+				salesOrg1, productHierarchy, VectTaxList, plantValue, chwAg);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
@@ -461,9 +462,9 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 	@Override
 	public void r133(TypeModel typeModel, CHWAnnouncement chwA,
-			String pimsIdentity) throws Exception {
+			String pimsIdentity, CHWGeoAnn chwAg) throws Exception {
 		R133updateMaterialBasicViewForTypeModel r = getFactory().getr133(
-				typeModel, chwA, pimsIdentity);
+				typeModel, chwA, pimsIdentity, chwAg);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);

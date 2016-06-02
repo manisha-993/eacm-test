@@ -5,6 +5,7 @@ import java.util.Date;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
+import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.rfc.Bmm00Table;
 import com.ibm.rdh.rfc.Bmm00TableRow;
@@ -19,7 +20,8 @@ public class R133updateMaterialBasicViewForTypeModel extends Rfc {
 	private com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE rfc;
 
 	public R133updateMaterialBasicViewForTypeModel(TypeModel typeModel,
-			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+			CHWAnnouncement chwA, String pimsIdentity, CHWGeoAnn chwAg)
+			throws Exception {
 		reInitialize();
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
 		rfcName = "Z_DM_SAP_MATM_CREATE";
@@ -69,7 +71,7 @@ public class R133updateMaterialBasicViewForTypeModel extends Rfc {
 		b1Row.setMatkl("000");
 		b1Row.setMeins("EA");
 		b1Row.setZeiar(chwA.getAnnouncementType());
-		b1Row.setAeszn(sdf.format(new Date()));
+		b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
 		b1Row.setGewei("KG");
 		// New add data end
 

@@ -1,5 +1,6 @@
 package com.ibm.rdh.rfc.proxy;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
+import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.CntryTax;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
@@ -41,6 +43,8 @@ public class R102createSalesViewforMaterialTest extends RdhRestProxyTest {
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
 			tmUPGObj.setType("EACMT1");
 			tmUPGObj.setFromType("EACMF1");
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
 			String FromToType = "MTCTOTYPE";
 			String pimsIdentity = "C";
 			String flfilcd = "fl1";
@@ -54,7 +58,7 @@ public class R102createSalesViewforMaterialTest extends RdhRestProxyTest {
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r102(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
-					FromToType, pimsIdentity, flfilcd, salesOrg, taxCntryList);
+					FromToType, pimsIdentity, flfilcd, salesOrg, taxCntryList,chwAg);
 
 			// Test function execute success
 			Map<String, String> map = new HashMap<String, String>();
@@ -116,6 +120,8 @@ public class R102createSalesViewforMaterialTest extends RdhRestProxyTest {
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
 			tmUPGObj.setType("EACMT1");
 			tmUPGObj.setFromType("EACMF1");
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
 			String FromToType = "MTCTOTYPE";
 			String pimsIdentity = "C";
 			String flfilcd = "fl1";
@@ -129,7 +135,7 @@ public class R102createSalesViewforMaterialTest extends RdhRestProxyTest {
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r102(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
-					FromToType, pimsIdentity, flfilcd, salesOrg, taxCntryList);
+					FromToType, pimsIdentity, flfilcd, salesOrg, taxCntryList,chwAg);
 
 			// Test function execute success
 			Map<String, String> map = new HashMap<String, String>();
@@ -190,6 +196,8 @@ public class R102createSalesViewforMaterialTest extends RdhRestProxyTest {
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
 			tmUPGObj.setType(type);
 			tmUPGObj.setFromType("EACMF1");
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
 			String FromToType = "MTCTOTYPE";
 			String pimsIdentity = "C";
 			String flfilcd = "fl1";
@@ -203,7 +211,7 @@ public class R102createSalesViewforMaterialTest extends RdhRestProxyTest {
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r102(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
-					FromToType, pimsIdentity, flfilcd, salesOrg, taxCntryList);
+					FromToType, pimsIdentity, flfilcd, salesOrg, taxCntryList,chwAg);
 
 			// Test function execute success
 			Map<String, String> map = new HashMap<String, String>();
@@ -264,6 +272,8 @@ public class R102createSalesViewforMaterialTest extends RdhRestProxyTest {
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
 			tmUPGObj.setType("EACMT1");
 			tmUPGObj.setFromType(type);
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
 			String FromToType = "MTCFROMTYPE";
 			String pimsIdentity = "C";
 			String flfilcd = "EMPTY";
@@ -277,7 +287,7 @@ public class R102createSalesViewforMaterialTest extends RdhRestProxyTest {
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r102(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
-					FromToType, pimsIdentity, flfilcd, salesOrg, taxCntryList);
+					FromToType, pimsIdentity, flfilcd, salesOrg, taxCntryList,chwAg);
 
 			// Test function execute success
 			Map<String, String> map = new HashMap<String, String>();

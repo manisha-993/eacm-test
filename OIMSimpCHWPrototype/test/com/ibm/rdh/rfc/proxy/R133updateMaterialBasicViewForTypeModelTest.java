@@ -1,5 +1,6 @@
 package com.ibm.rdh.rfc.proxy;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import org.junit.Test;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
+import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.TypeModel;
 
 public class R133updateMaterialBasicViewForTypeModelTest extends
@@ -33,6 +35,8 @@ public class R133updateMaterialBasicViewForTypeModelTest extends
 			typeModel.setEanUPCCode("");
 			typeModel.setProductHierarchy("ph");
 			typeModel.setDescription("new create model");
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
 			String pimsIdentity = "C";
 			String objectId = typeModel.getType() + typeModel.getModel();
 
@@ -41,7 +45,7 @@ public class R133updateMaterialBasicViewForTypeModelTest extends
 
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId, objectId);
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r133(typeModel, chwA, pimsIdentity);
+			rfcProxy.r133(typeModel, chwA, pimsIdentity, chwAg);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;

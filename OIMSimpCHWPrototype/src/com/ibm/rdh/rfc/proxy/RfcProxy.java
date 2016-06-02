@@ -65,7 +65,8 @@ public abstract class RfcProxy {
 	public abstract void r102(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String FromToType, String pimsIdentity, String flfilcd,
-			String salesOrg, Vector taxCntryList) throws Exception;
+			String salesOrg, Vector taxCntryList, CHWGeoAnn chwAg)
+			throws Exception;
 
 	public abstract void r103(TypeModel typeModel, String newFlag,
 			CHWAnnouncement chwA, TypeModelUPGGeo tmUPGObj, String FromToType,
@@ -104,8 +105,8 @@ public abstract class RfcProxy {
 	public abstract void r117(CHWAnnouncement chwA, String typemod, String div,
 			String acctAsgnGrp, PlannedSalesStatus ps, boolean bumpCtr,
 			String pimsIdentity, String flfil, String salesOrg1,
-			String productHierarchy, Vector VectTaxList, String plantValue)
-			throws Exception;
+			String productHierarchy, Vector VectTaxList, String plantValue,
+			CHWGeoAnn chwAg) throws Exception;
 
 	public abstract void r118(TypeModel typeModel, CHWAnnouncement chwA,
 			String flfilcd, String warrantyPeriod, boolean remarkable,
@@ -150,7 +151,7 @@ public abstract class RfcProxy {
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
 
 	public abstract void r133(TypeModel typeModel, CHWAnnouncement chwA,
-			String pimsIdentity) throws Exception;
+			String pimsIdentity, CHWGeoAnn chwAg) throws Exception;
 
 	public abstract void r134(TypeFeature typeFeature, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;

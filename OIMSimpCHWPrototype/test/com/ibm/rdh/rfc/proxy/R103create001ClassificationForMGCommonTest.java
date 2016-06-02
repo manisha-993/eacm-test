@@ -279,7 +279,7 @@ public class R103create001ClassificationForMGCommonTest extends
 	public void deleteData() {
 		String del_mara_1 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMT1MTC'";
 		String del_mara_2 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMF1MTC'";
-		
+
 		int t1 = SqlHelper.runUpdateSql(del_mara_1, conn);
 		int t2 = SqlHelper.runUpdateSql(del_mara_2, conn);
 		if (t1 >= 0 && t2 >= 0) {
