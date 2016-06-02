@@ -1,5 +1,6 @@
 package com.ibm.rdh.rfc.proxy;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import org.junit.Test;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
+import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 
@@ -35,6 +37,8 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 			String sapPlant = "Y";
 			String FromToType = "";
 			String newFlag = "NEW";
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
 
 			int deleteDataResult = deleteDataMatmCreate(typeModel.getType()
 					+ newFlag);
@@ -45,7 +49,7 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r189(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
-					FromToType, pimsIdentity);
+					FromToType, pimsIdentity, chwAg);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
@@ -103,7 +107,9 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 			String sapPlant = "Y";
 			String FromToType = "";
 			String newFlag = "UPG";
-
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
+			
 			int deleteDataResult = deleteDataMatmCreate(typeModel.getType()
 					+ newFlag);
 			assertEquals(deleteDataResult, 0);
@@ -113,7 +119,7 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r189(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
-					FromToType, pimsIdentity);
+					FromToType, pimsIdentity, chwAg);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
@@ -172,7 +178,9 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 			String sapPlant = "Y";
 			String FromToType = "MTCTOTYPE";
 			String newFlag = "MTC";
-
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
+			
 			int deleteDataResult = deleteDataMatmCreate(tmUPGObj.getType()
 					+ newFlag);
 			assertEquals(deleteDataResult, 0);
@@ -182,7 +190,7 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r189(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
-					FromToType, pimsIdentity);
+					FromToType, pimsIdentity,chwAg);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
@@ -241,7 +249,9 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 			String sapPlant = "Y";
 			String FromToType = "MTCFROMTYPE";
 			String newFlag = "MTC";
-
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
+			
 			int deleteDataResult = deleteDataMatmCreate(tmUPGObj.getFromType()
 					+ newFlag);
 			assertEquals(deleteDataResult, 0);
@@ -251,7 +261,7 @@ public class R189createCFIPlantViewForTypeTest extends RdhRestProxyTest {
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r189(chwA, typeModel, sapPlant, newFlag, tmUPGObj,
-					FromToType, pimsIdentity);
+					FromToType, pimsIdentity, chwAg);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;

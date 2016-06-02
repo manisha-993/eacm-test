@@ -1,12 +1,12 @@
 package com.ibm.rdh.chw.caller;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.pprds.epimshw.util.ProfitCenterPlantSelector;
+import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.rfc.Bmm00Table;
 import com.ibm.rdh.rfc.Bmm00TableRow;
 import com.ibm.rdh.rfc.Bmmh1Table;
@@ -20,7 +20,7 @@ public class R183createCFIPlantViewForTypeModelMaterial extends Rfc {
 
 	public R183createCFIPlantViewForTypeModelMaterial(String annDocNo,
 			String typemod, String sapPlant, String pimsIdentity,
-			String profitCenter) throws Exception {
+			String profitCenter, CHWGeoAnn chwAg) throws Exception {
 		reInitialize();
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
 
@@ -63,7 +63,7 @@ public class R183createCFIPlantViewForTypeModelMaterial extends Rfc {
 		b1Row.setMatkl("000");
 		b1Row.setMeins("EA");
 		b1Row.setZeiar("New");
-		b1Row.setAeszn(sdf.format(new Date()));
+		b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
 		b1Row.setGewei("KG");
 		b1Row.setSpart("B1");
 		// new add data end

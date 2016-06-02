@@ -1,11 +1,11 @@
 package com.ibm.rdh.chw.caller;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.ProfitCenterPlantSelector;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
+import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.rfc.Bmm00Table;
 import com.ibm.rdh.rfc.Bmm00TableRow;
 import com.ibm.rdh.rfc.Bmmh1Table;
@@ -18,7 +18,7 @@ public class R262createPlantViewProfitCenterForMaterial extends Rfc {
 
 	public R262createPlantViewProfitCenterForMaterial(CHWAnnouncement chwA,
 			String material, String sapPlant, String pimsIdentity,
-			String profitCenter) throws Exception {
+			String profitCenter, CHWGeoAnn chwAg) throws Exception {
 
 		reInitialize();
 		rfcName = "Z_DM_SAP_MATM_CREATE";
@@ -72,7 +72,7 @@ public class R262createPlantViewProfitCenterForMaterial extends Rfc {
 		b1Row.setMeins("EA");
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setZeiar(chwA.getAnnouncementType());
-		b1Row.setAeszn(sdf.format(new Date()));
+		b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
 		// new add data end
 
 		b1Table.appendRow(b1Row);

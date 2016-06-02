@@ -1,13 +1,13 @@
 package com.ibm.rdh.chw.caller;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.pprds.epimshw.util.ProfitCenterPlantSelector;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
+import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.Bmm00Table;
@@ -22,8 +22,8 @@ public class R189createCFIPlantViewForType extends Rfc {
 
 	public R189createCFIPlantViewForType(CHWAnnouncement chwA,
 			TypeModel typeModel, String sapPlant, String newFlag,
-			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity)
-			throws Exception {
+			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity,
+			CHWGeoAnn chwAg) throws Exception {
 
 		reInitialize();
 
@@ -77,7 +77,7 @@ public class R189createCFIPlantViewForType extends Rfc {
 		b1Row.setMeins("EA");
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setZeiar(chwA.getAnnouncementType());
-		b1Row.setAeszn(sdf.format(new Date()));
+		b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
 		// new data add end
 
 		b1Row.setLadgr("B001");

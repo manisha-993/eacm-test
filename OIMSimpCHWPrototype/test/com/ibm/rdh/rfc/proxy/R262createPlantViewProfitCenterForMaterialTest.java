@@ -1,5 +1,6 @@
 package com.ibm.rdh.rfc.proxy;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import org.junit.Test;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
+import com.ibm.rdh.chw.entity.CHWGeoAnn;
 
 public class R262createPlantViewProfitCenterForMaterialTest extends
 		RdhRestProxyTest {
@@ -28,13 +30,16 @@ public class R262createPlantViewProfitCenterForMaterialTest extends
 			String material = "EACMnewCreate";
 			String sapPlant = "Y";
 			String profitCenter = "EA";
+			CHWGeoAnn chwAg = new CHWGeoAnn();
+			chwAg.setAnnouncementDate(new Date());
 
 			int deleteDataResult = deleteDataMatmCreate(material);
 			assertEquals(deleteDataResult, 0);
 
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId, material);
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r262(chwA, material, sapPlant, pimsIdentity, profitCenter);
+			rfcProxy.r262(chwA, material, sapPlant, pimsIdentity, profitCenter,
+					chwAg);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;

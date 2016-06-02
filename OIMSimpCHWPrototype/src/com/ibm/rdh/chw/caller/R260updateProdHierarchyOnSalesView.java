@@ -1,10 +1,10 @@
 package com.ibm.rdh.chw.caller;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
+import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.rfc.Bmm00Table;
 import com.ibm.rdh.rfc.Bmm00TableRow;
@@ -19,9 +19,8 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 
 	public R260updateProdHierarchyOnSalesView(CHWAnnouncement chwA,
 			Object material, String pimsIdentity, String salesOrg,
-			String productHierarchy) throws Exception {
+			String productHierarchy, CHWGeoAnn chwAg) throws Exception {
 		reInitialize();
-		Date curDate = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
 		rfcName = "Z_DM_SAP_MATM_CREATE";
 
@@ -82,7 +81,7 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 		b1Row.setMeins("EA");
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setZeiar(chwA.getAnnouncementType());
-		b1Row.setAeszn(sdf.format(curDate));
+		b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
 		b1Row.setSpart("B1");
 		b1Row.setGewei("KG");
 		// end
