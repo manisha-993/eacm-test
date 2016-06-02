@@ -263,7 +263,8 @@ public abstract class RfcProxy {
 			String pimsIdentity) throws Exception;
 
 	public abstract void r183(String annDocNo, String typemod, String sapPlant,
-			String pimsIdentity, String profitCenter) throws Exception;
+			String pimsIdentity, String profitCenter, CHWGeoAnn chwAg)
+			throws Exception;
 
 	public abstract void r185(TypeModelUPGGeo typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
@@ -279,7 +280,8 @@ public abstract class RfcProxy {
 
 	public abstract void r189(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
-			String FromToType, String pimsIdentity) throws Exception;
+			String FromToType, String pimsIdentity, CHWGeoAnn chwAg)
+			throws Exception;
 
 	public abstract Vector r193(String type, String newFlag, String _plant)
 			throws Exception;
@@ -348,14 +350,14 @@ public abstract class RfcProxy {
 	public abstract boolean r214(String type) throws Exception;
 
 	public abstract void r260(CHWAnnouncement chwA, Object material,
-			String pimsIdentity, String salesOrg, String productHierarchy)
-			throws Exception;
+			String pimsIdentity, String salesOrg, String productHierarchy,
+			CHWGeoAnn chwAg) throws Exception;
 
 	// public abstract Vector r261(String material) throws Exception;
 
 	public abstract void r262(CHWAnnouncement chwA, String material,
-			String sapPlant, String pimsIdentity, String profitCenter)
-			throws Exception;
+			String sapPlant, String pimsIdentity, String profitCenter,
+			CHWGeoAnn chwAg) throws Exception;
 
 	// public abstract ReturnDataObjectR001 r001(SWO swo) throws Exception ;
 	// public abstract boolean r002(SWO swo, String salesOrg) throws Exception;

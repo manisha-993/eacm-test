@@ -877,9 +877,10 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 	@Override
 	public void r183(String annDocNo, String typemod, String sapPlant,
-			String pimsIdentity, String profitCenter) throws Exception {
+			String pimsIdentity, String profitCenter, CHWGeoAnn chwAg)
+			throws Exception {
 		R183createCFIPlantViewForTypeModelMaterial r = getFactory().getr183(
-				annDocNo, typemod, sapPlant, pimsIdentity, profitCenter);
+				annDocNo, typemod, sapPlant, pimsIdentity, profitCenter, chwAg);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
@@ -931,9 +932,10 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	@Override
 	public void r189(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
-			String FromToType, String pimsIdentity) throws Exception {
+			String FromToType, String pimsIdentity, CHWGeoAnn chwAg)
+			throws Exception {
 		R189createCFIPlantViewForType r = getFactory().getr189(chwA, typeModel,
-				sapPlant, newFlag, tmUPGObj, FromToType, pimsIdentity);
+				sapPlant, newFlag, tmUPGObj, FromToType, pimsIdentity, chwAg);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
@@ -1255,10 +1257,10 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 	@Override
 	public void r260(CHWAnnouncement chwA, Object material,
-			String pimsIdentity, String salesOrg, String productHierarchy)
-			throws Exception {
+			String pimsIdentity, String salesOrg, String productHierarchy,
+			CHWGeoAnn chwAg) throws Exception {
 		R260updateProdHierarchyOnSalesView r = getFactory().getr260(chwA,
-				material, pimsIdentity, salesOrg, productHierarchy);
+				material, pimsIdentity, salesOrg, productHierarchy, chwAg);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
@@ -1319,10 +1321,10 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 	@Override
 	public void r262(CHWAnnouncement chwA, String material, String sapPlant,
-			String pimsIdentity, String profitCenter) throws Exception {
-
+			String pimsIdentity, String profitCenter, CHWGeoAnn chwAg)
+			throws Exception {
 		R262createPlantViewProfitCenterForMaterial r = getFactory().getr262(
-				chwA, material, sapPlant, pimsIdentity, profitCenter);
+				chwA, material, sapPlant, pimsIdentity, profitCenter, chwAg);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);

@@ -542,9 +542,9 @@ public class RfcFactory extends Object {
 
 	public R183createCFIPlantViewForTypeModelMaterial getr183(String annDocNo,
 			String typemod, String sapPlant, String pimsIdentity,
-			String profitCenter) throws Exception {
+			String profitCenter, CHWGeoAnn chwAg) throws Exception {
 		return new R183createCFIPlantViewForTypeModelMaterial(annDocNo,
-				typemod, sapPlant, pimsIdentity, profitCenter);
+				typemod, sapPlant, pimsIdentity, profitCenter, chwAg);
 	}
 
 	public R185deleteupgradevaluefromMCcharacteristic getr185(
@@ -576,10 +576,10 @@ public class RfcFactory extends Object {
 
 	public R189createCFIPlantViewForType getr189(CHWAnnouncement chwA,
 			TypeModel typeModel, String sapPlant, String newFlag,
-			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity)
-			throws Exception {
+			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity,
+			CHWGeoAnn chwAg) throws Exception {
 		return new R189createCFIPlantViewForType(chwA, typeModel, sapPlant,
-				newFlag, tmUPGObj, FromToType, pimsIdentity);
+				newFlag, tmUPGObj, FromToType, pimsIdentity, chwAg);
 
 	}
 
@@ -705,9 +705,9 @@ public class RfcFactory extends Object {
 
 	public R260updateProdHierarchyOnSalesView getr260(CHWAnnouncement chwA,
 			Object material, String pimsIdentity, String salesOrg,
-			String productHierarchy) throws Exception {
+			String productHierarchy, CHWGeoAnn chwAg) throws Exception {
 		return new R260updateProdHierarchyOnSalesView(chwA, material,
-				pimsIdentity, salesOrg, productHierarchy);
+				pimsIdentity, salesOrg, productHierarchy, chwAg);
 	}
 
 	// public R261PlantViewMaterial getr261(String material) throws Exception {
@@ -716,8 +716,9 @@ public class RfcFactory extends Object {
 
 	public R262createPlantViewProfitCenterForMaterial getr262(
 			CHWAnnouncement chwA, String material, String sapPlant,
-			String pimsIdentity, String profitCenter) throws Exception {
+			String pimsIdentity, String profitCenter, CHWGeoAnn chwAg)
+			throws Exception {
 		return new R262createPlantViewProfitCenterForMaterial(chwA, material,
-				sapPlant, pimsIdentity, profitCenter);
+				sapPlant, pimsIdentity, profitCenter, chwAg);
 	}
 }
