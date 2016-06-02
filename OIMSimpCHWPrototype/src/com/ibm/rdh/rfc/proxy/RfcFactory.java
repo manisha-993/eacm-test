@@ -99,6 +99,7 @@ import com.ibm.rdh.chw.entity.TypeFeature;
 import com.ibm.rdh.chw.entity.TypeFeatureUPGGeo;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
+
 //import com.ibm.rdh.chw.caller.R161createZDMClassificationForMKFEX;
 
 /**
@@ -445,10 +446,10 @@ public class RfcFactory extends Object {
 	}
 
 	public R163createUpgradeValueForTypeMTCCharacteristic getr163(String type,
-			TypeModelUPGGeo typeModelUpg, CHWAnnouncement chwA)
-			throws Exception {
+			TypeModelUPGGeo typeModelUpg, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
 		return new R163createUpgradeValueForTypeMTCCharacteristic(type,
-				typeModelUpg, chwA);
+				typeModelUpg, chwA, pimsIdentity);
 	}
 
 	public R164create300ClassificationForTypeMTC getr164(

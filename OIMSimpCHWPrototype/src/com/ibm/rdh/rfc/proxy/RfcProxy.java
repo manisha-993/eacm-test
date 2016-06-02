@@ -218,7 +218,7 @@ public abstract class RfcProxy {
 			String FromToType, String pimsIdentity) throws Exception;
 
 	public abstract void r163(String type, TypeModelUPGGeo typeModelUpg,
-			CHWAnnouncement chwA) throws Exception;
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
 
 	public abstract void r164(TypeModelUPGGeo tmUPGObj, CHWAnnouncement chwA,
 			String FromToType, String pimsIdentity) throws Exception;

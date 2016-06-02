@@ -27,13 +27,14 @@ public class R163createUpgradeValueForTypeMTCCharacteristicTest extends RdhRestP
 			typeModelUpg.setModel("EMODE");
 			CHWAnnouncement chwA=new CHWAnnouncement();
 			chwA.setAnnDocNo("123401");
+			String pimsIdentity="C";
 			
 			String charac= "MK_" + type + "_MTC";
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
 					"Z_DM_SAP_CHAR_MAINTAIN", charac);
 			
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r163(type, typeModelUpg, chwA);
+			rfcProxy.r163(type, typeModelUpg, chwA, pimsIdentity);
 			
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;

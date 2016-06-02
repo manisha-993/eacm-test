@@ -23,7 +23,7 @@ public class R163createUpgradeValueForTypeMTCCharacteristic extends Rfc {
 	private com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN rfc;
 
 	public R163createUpgradeValueForTypeMTCCharacteristic(String type,
-			TypeModelUPGGeo typeModelUpg, CHWAnnouncement chwA)
+			TypeModelUPGGeo typeModelUpg, CHWAnnouncement chwA, String pimsIdentity)
 			throws Exception {
 		reInitialize();
 		String charac = "MK_" + type + "_MTC";
@@ -153,7 +153,7 @@ public class R163createUpgradeValueForTypeMTCCharacteristic extends Rfc {
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
 		
 		// PIMSIdentity
-		rfc.setPimsIdentity("C");
+		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");
 		rfcInfo.append(Tab + "PIMSIdentity>>" + rfc.getPimsIdentity() + "\n");
 

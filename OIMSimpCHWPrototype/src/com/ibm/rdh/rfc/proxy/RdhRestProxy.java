@@ -680,9 +680,9 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 
 	@Override
 	public void r163(String type, TypeModelUPGGeo typeModelUpg,
-			CHWAnnouncement chwA) throws Exception {
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		R163createUpgradeValueForTypeMTCCharacteristic r = getFactory()
-				.getr163(type, typeModelUpg, chwA);
+				.getr163(type, typeModelUpg, chwA, pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
