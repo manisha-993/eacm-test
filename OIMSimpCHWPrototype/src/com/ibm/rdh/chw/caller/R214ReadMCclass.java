@@ -37,7 +37,13 @@ public class R214ReadMCclass extends Rfc{
 		getRfc().execute();
 		getLog().debug(getErrorInformation());
 		if (getSeverity() == ERROR) {
-			throw new HWPIMSAbnormalException(getErrorInformation());
+			String errMsg = getErrorInformation();
+			//WebService not found, return errMsg is "Class type <300> and Class name <MK_+type+_MC> combination does not exist."
+			if(errMsg != null && errMsg.contains("combination does not exist")){
+				rfcInfo.append(errMsg);
+			}else{
+				throw new HWPIMSAbnormalException(errMsg);
+			}
 		}
 
 	}
