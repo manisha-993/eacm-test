@@ -27,6 +27,9 @@ public class TypeModelUPGGeo {
 	private java.lang.String description;
 	private java.lang.String productHierarchy;
 	private java.lang.String loadingGroup;
+	
+	private boolean isFromTMRevProfileExist;
+	private boolean isToTMRevProfileExist;
 
 //	private TypeModelRev FromTmRev;
 //	private TypeModelRev ToTmRev;
@@ -292,6 +295,24 @@ public void setLoadingGroup(java.lang.String loadinggrp) {
 public void setType(java.lang.String newType) {
 	type = newType;
 }
+
+
+public boolean isFromTMRevProfileExist() {
+	return isFromTMRevProfileExist;
+}
+
+public void setFromTMRevProfileExist(boolean isFromTMRevProfileExist) {
+	this.isFromTMRevProfileExist = isFromTMRevProfileExist;
+}
+
+public boolean isToTMRevProfileExist() {
+	return isToTMRevProfileExist;
+}
+
+public void setToTMRevProfileExist(boolean isToTMRevProfileExist) {
+	this.isToTMRevProfileExist = isToTMRevProfileExist;
+}
+
 /**
  * Returns a String that represents the value of this object.
  * @return a string representation of the receiver
@@ -311,6 +332,8 @@ public String toString() {
 	s.append("Loading Group >> " +loadingGroup+"\n");
 	s.append("Description >> " +description+"\n");
 	s.append("Product Hierarchy >> " +productHierarchy+"\n");
+	s.append("From TypeModel RevProfile Exist >> " +isFromTMRevProfileExist+"\n");
+	s.append("To TypeModel RevProfile Exist >> " +isToTMRevProfileExist+"\n");
 	
 	return s.toString();
 }
