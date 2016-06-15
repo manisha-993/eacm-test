@@ -23,6 +23,7 @@ package com.ibm.rdh.rfc.proxy;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
+
 import com.ibm.rdh.chw.entity.BasicMaterialFromSAP;
 import com.ibm.rdh.chw.entity.BomComponent;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
@@ -327,6 +328,10 @@ public abstract class RfcProxy {
 			String pimsIdentity) throws Exception;
 
 	public abstract boolean r204(String material) throws Exception;
+
+	public abstract void r205(TypeModel typeModel, TypeModelUPGGeo tmupg,
+			String newFlag, String fromtotype, String typeProfRefresh,
+			String type, String profile, String pimsIdentity) throws Exception;
 
 	// public abstract boolean r207(String type, String model, String plant)
 	// throws Exception;

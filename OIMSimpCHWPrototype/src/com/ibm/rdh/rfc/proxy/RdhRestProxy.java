@@ -88,6 +88,7 @@ import com.ibm.rdh.chw.caller.R200_readLifecycleRow;
 import com.ibm.rdh.chw.caller.R201createUpgradeValueForTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R202_createConfigurationProfileForMTCMaterial;
 import com.ibm.rdh.chw.caller.R204ReadMaterial;
+import com.ibm.rdh.chw.caller.R205ClassificationForBTProductsTypeMaterials;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R210ReadSalesBom;
 import com.ibm.rdh.chw.caller.R211CreateSalesBOMfortypeMTC;
@@ -1109,6 +1110,18 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 			throws Exception {
 		R202_createConfigurationProfileForMTCMaterial r = getFactory().getr202(
 				typeStr, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r205(TypeModel typeModel, TypeModelUPGGeo tmupg,
+			String newFlag, String fromtotype, String typeProfRefresh,
+			String type, String profile, String pimsIdentity) throws Exception {
+		R205ClassificationForBTProductsTypeMaterials r = getFactory().getr205(
+				typeModel, tmupg, newFlag, fromtotype, typeProfRefresh, type,
+				profile, pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
