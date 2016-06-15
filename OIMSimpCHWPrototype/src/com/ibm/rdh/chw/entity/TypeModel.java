@@ -2,7 +2,9 @@ package com.ibm.rdh.chw.entity;
 
 
 import java.sql.ResultSet;
+
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
+
 //import com.ibm.pprds.epimshw.revenue.TypeModelRev;
 //import com.ibm.pprds.epimshw.seovalidation.SeoAbnormalValidationException;
 import java.util.Enumeration;
@@ -97,6 +99,8 @@ public class TypeModel
     private String matrlGrp3;
     private String systemDesc;
     
+    private RevProfile revProfile;
+   
     private boolean hasRevProfile;
 
     public boolean isHasRevProfile() {
@@ -1419,6 +1423,7 @@ public class TypeModel
         s.append("matrlgrp3 >>"+matrlGrp3+"\n");
         s.append("systemDesc >>"+systemDesc+"\n");
         s.append("hasRevProfile >>"+hasRevProfile+"\n");
+        s.append("RevProfile >>"+revProfile+"\n");
         
         //CHW4.1
         //s.append(tmRev.toString());
@@ -1585,7 +1590,16 @@ public class TypeModel
      * following function is added to check for ffindicator
      */
 
-    public boolean hasXcc()
+
+	public RevProfile getRevProfile() {
+		return revProfile;
+	}
+
+	public void setRevProfile(RevProfile revProfile) {
+		this.revProfile = revProfile;
+	}
+
+	public boolean hasXcc()
     {
         boolean ans = false;
 
