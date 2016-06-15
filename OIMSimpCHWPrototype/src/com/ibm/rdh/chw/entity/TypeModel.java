@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 
-//import com.ibm.pprds.epimshw.revenue.TypeModelRev;
+import com.ibm.pprds.epimshw.revenue.TypeModelRev;
 //import com.ibm.pprds.epimshw.seovalidation.SeoAbnormalValidationException;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -73,7 +73,7 @@ public class TypeModel
 
 
     // CHW4.1 added by Laxmi
-    //private TypeModelRev TmRev;
+    private TypeModelRev TmRev;
 
     private java.lang.String warrantyPer;
     private boolean containsMTC = false;
@@ -662,10 +662,10 @@ public class TypeModel
 
 
     //CHW4.1
-//    public TypeModelRev getTmRev()
-//    {
-//        return TmRev;
-//    }
+    public TypeModelRev getTmRev()
+    {
+        return TmRev;
+    }
 
     /**
      * Insert the method's description here. Creation date: (4/19/2001 11:37:08
