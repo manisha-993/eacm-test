@@ -171,6 +171,10 @@ public abstract class RfcProxy {
 	public abstract void r138(TypeFeature tfc, String newFlag,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
 
+	public abstract void r138(TypeModelUPGGeo tmUPGObj, String newFlag,
+			CHWAnnouncement chwA, String FromToType, String pimsIdentity)
+			throws Exception;
+
 	public abstract void r142(String type, String sapPlant, Vector geoV,
 			String newFlag, CHWAnnouncement chwA, Hashtable spItem_Categ,
 			String pimsIdentity) throws Exception;

@@ -39,6 +39,7 @@ import com.ibm.rdh.chw.caller.R134assignRPQTypeFeatureCharacteristicToTypeClass;
 import com.ibm.rdh.chw.caller.R135assignTypeFeatureCharacteristicToTypeUFClass;
 import com.ibm.rdh.chw.caller.R136create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R137create300ClassificationForTypeUFForMTC;
+import com.ibm.rdh.chw.caller.R138_mtccreate300ClassificationForTypeRPQ;
 import com.ibm.rdh.chw.caller.R138create300ClassificationForTypeRPQ;
 import com.ibm.rdh.chw.caller.R142_createSalesBOM;
 import com.ibm.rdh.chw.caller.R143assignTypeModelAsSalesBOMItemWithDependencies;
@@ -347,6 +348,13 @@ public class RfcFactory extends Object {
 			throws Exception {
 		return new R138create300ClassificationForTypeRPQ(tfc, newFlag, chwA,
 				pimsIdentity);
+	}
+
+	public R138_mtccreate300ClassificationForTypeRPQ getr138(
+			TypeModelUPGGeo tmUPGObj, String newFlag, CHWAnnouncement chwA,
+			String FromToType, String pimsIdentity) throws Exception {
+		return new R138_mtccreate300ClassificationForTypeRPQ(tmUPGObj, newFlag,
+				chwA, FromToType, pimsIdentity);
 	}
 
 	public R142_createSalesBOM getr142(String type, String sapPlant,

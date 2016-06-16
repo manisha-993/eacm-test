@@ -43,6 +43,7 @@ import com.ibm.rdh.chw.caller.R134assignRPQTypeFeatureCharacteristicToTypeClass;
 import com.ibm.rdh.chw.caller.R135assignTypeFeatureCharacteristicToTypeUFClass;
 import com.ibm.rdh.chw.caller.R136create300ClassificationForTypeFEAT;
 import com.ibm.rdh.chw.caller.R137create300ClassificationForTypeUFForMTC;
+import com.ibm.rdh.chw.caller.R138_mtccreate300ClassificationForTypeRPQ;
 import com.ibm.rdh.chw.caller.R138create300ClassificationForTypeRPQ;
 import com.ibm.rdh.chw.caller.R142_createSalesBOM;
 import com.ibm.rdh.chw.caller.R143assignTypeModelAsSalesBOMItemWithDependencies;
@@ -519,6 +520,17 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 			String pimsIdentity) throws Exception {
 		R138create300ClassificationForTypeRPQ r = getFactory().getr138(tfc,
 				newFlag, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r138(TypeModelUPGGeo tmUPGObj, String newFlag,
+			CHWAnnouncement chwA, String FromToType, String pimsIdentity)
+			throws Exception {
+		R138_mtccreate300ClassificationForTypeRPQ r = getFactory().getr138(
+				tmUPGObj, newFlag, chwA, FromToType, pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
