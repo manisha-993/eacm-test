@@ -222,9 +222,11 @@ public class R205ClassificationForBTProductsTypeMaterials extends Rfc {
 			}
 		} else {
 			if (newFlag.equals("NEW")) {
-				rfc.setRfaNum(typeModel.getRevProfile() + "_REV");
+				rfc.setRfaNum(typeModel.getRevProfile().getRevenueProfile()
+						+ "_REV");
 			} else if (newFlag.equals("UPG")) {
-				rfc.setRfaNum(typeModel.getRevProfile() + "_REV");
+				rfc.setRfaNum(typeModel.getRevProfile().getRevenueProfile()
+						+ "_REV");
 			} else if (newFlag.equals("MTC") && fromtotype.equals("FROMTYPE")) {
 				System.out.println("From Type RFA Number ***** "
 						+ tmupg.getFromTMRevProfile().getRevenueProfile());
