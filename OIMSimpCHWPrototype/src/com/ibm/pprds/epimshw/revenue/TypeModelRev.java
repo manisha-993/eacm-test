@@ -1,6 +1,7 @@
 package com.ibm.pprds.epimshw.revenue;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
+import com.ibm.rdh.chw.entity.RevProfile;
 
 /**
  * @author laxmi
