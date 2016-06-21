@@ -23,13 +23,11 @@ public class R210ReadSalesBom extends Rfc {
 		rfc.setPlant(_plant);
 		rfc.setBomUsage("5");
 
-		System.out.println("***" + Tab 
-				+ "MATERIAL>>" + rfc.getMaterial()
-				+ ", PLANT>>" + rfc.getPlant()
-				+ ", BOM_USAGE>>" + rfc.getBomUsage());
-		rfcInfo.append(Tab + "MATERIAL>>" + rfc.getMaterial() 
-				+ ", PLANT>>" + rfc.getPlant()
-				+ ", BOM_USAGE>>" + rfc.getBomUsage() + "\n");
+		System.out.println("***" + Tab + "MATERIAL>>" + rfc.getMaterial()
+				+ ", PLANT>>" + rfc.getPlant() + ", BOM_USAGE>>"
+				+ rfc.getBomUsage());
+		rfcInfo.append(Tab + "MATERIAL>>" + rfc.getMaterial() + ", PLANT>>"
+				+ rfc.getPlant() + ", BOM_USAGE>>" + rfc.getBomUsage() + "\n");
 
 	}
 
@@ -38,8 +36,17 @@ public class R210ReadSalesBom extends Rfc {
 		logExecution();
 		getRfc().execute();
 		getLog().debug(getErrorInformation());
+
 		if (getSeverity() == ERROR) {
-			throw new HWPIMSAbnormalException(getErrorInformation());
+			String errMsg = getErrorInformation();
+			// WebService not found, return errMsg is
+			// "Material<type+newflag> not found in MAST table."
+			if (errMsg != null && errMsg.contains("not found")) {
+				rfcInfo.append(errMsg);
+			} else {
+				throw new HWPIMSAbnormalException();
+			}
+
 		}
 
 	}
