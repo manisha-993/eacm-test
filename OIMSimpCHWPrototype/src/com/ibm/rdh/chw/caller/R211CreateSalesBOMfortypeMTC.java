@@ -11,8 +11,6 @@ import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.DepData;
 import com.ibm.rdh.rfc.Csap_mbomStructure;
-import com.ibm.rdh.rfc.Csdep_datTable;
-import com.ibm.rdh.rfc.Csdep_datTableRow;
 import com.ibm.rdh.rfc.Stko_api01Structure;
 import com.ibm.rdh.rfc.Stpo_api01Table;
 import com.ibm.rdh.rfc.Stpo_api01TableRow;
@@ -55,10 +53,9 @@ public class R211CreateSalesBOMfortypeMTC extends Rfc {
 		rfc.setJCsapMbom(n0);
 
 		rfcInfo.append("CSAP_MBOM \n");
-		rfcInfo.append(Tab + "MATNR>>" + n0.getMatnr() 
-				+ ", WERKS>>" + n0.getWerks() 
-				+ ", STLAN>>" + n0.getStlan()
-				+ ", DATUV>>" + n0.getDatuv() + "\n");
+		rfcInfo.append(Tab + "MATNR>>" + n0.getMatnr() + ", WERKS>>"
+				+ n0.getWerks() + ", STLAN>>" + n0.getStlan() + ", DATUV>>"
+				+ n0.getDatuv() + "\n");
 
 		// STPO_API01 - N1
 		if ("MTC".equals(newFlag)) {
@@ -76,19 +73,19 @@ public class R211CreateSalesBOMfortypeMTC extends Rfc {
 				n1Row.setRelSales("X");
 				n1Row.setIdentifier(tmg.getItem_Node().toString());
 
-				//add 20160517
+				// add 20160517
 				n1Row.setCompUnit("EA");
 				n1Row.setSortstring("57");
-				//add end
+				// add end
 				n1Table.appendRow(n1Row);
 
 				rfcInfo.append("STPO_API01  \n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + n1Row.getItemCateg()
-						+ ", ITEM_NO>>" + n1Row.getItemNo() 
-						+ ", COMPONENT>>" + n1Row.getComponent() 
-						+ ", COMP_QTY>>" + n1Row.getCompQty() 
-						+ ", REL_SALES>>" + n1Row.getRelSales() 
-						+ ", IDENTIFIER>>" + n1Row.getIdentifier() + "\n");
+						+ ", ITEM_NO>>" + n1Row.getItemNo() + ", COMPONENT>>"
+						+ n1Row.getComponent() + ", COMP_QTY>>"
+						+ n1Row.getCompQty() + ", REL_SALES>>"
+						+ n1Row.getRelSales() + ", IDENTIFIER>>"
+						+ n1Row.getIdentifier() + "\n");
 				rfcInfo.append(Tab + "COMPUNIT>>" + n1Row.getCompUnit()
 						+ ", SORTSTRING>>" + n1Row.getSortstring() + "\n");
 			}
@@ -96,31 +93,31 @@ public class R211CreateSalesBOMfortypeMTC extends Rfc {
 			rfc.setJStpoApi01(n1Table);
 
 			// CSDEP_DAT - N2 STRUCTURE
-			e = geoV.elements();
-			Csdep_datTable n2Table = new Csdep_datTable();
-	
-			while (e.hasMoreElements()) {
-				DepData tmg = (DepData) e.nextElement();
+			// e = geoV.elements();
+			// Csdep_datTable n2Table = new Csdep_datTable();
+			//
+			// while (e.hasMoreElements()) {
+			// DepData tmg = (DepData) e.nextElement();
+			//
+			// Csdep_datTableRow n2Row = n2Table.createEmptyRow();
+			//
+			// n2Row.setDepIntern(tmg.getDep_Intern());
+			// n2Row.setStatus("1");
+			// n2Row.setIdentifier((tmg.getItem_Node()).toString());
+			// n2Row.setObjectId("2");
+			//
+			// n2Table.appendRow(n2Row);
+			//
+			// rfcInfo.append("CSDEP_DAT  \n");
+			// rfcInfo.append(Tab + "DEP_INTERN>>" + n2Row.getDepIntern()
+			// + ", STATUS>>" + n2Row.getStatus()
+			// + ", IDENTIFIER>>" + n2Row.getIdentifier()
+			// + ", OBJECT_ID>>" + n2Row.getObjectId() + "\n");
+			// }
+			// rfc.setJCsdepDat(n2Table);
+		}
 
-				Csdep_datTableRow n2Row = n2Table.createEmptyRow();
-
-				n2Row.setDepIntern(tmg.getDep_Intern());
-				n2Row.setStatus("1");
-				n2Row.setIdentifier((tmg.getItem_Node()).toString());			
-				n2Row.setObjectId("2");
-
-				n2Table.appendRow(n2Row);
-
-				rfcInfo.append("CSDEP_DAT  \n");
-				rfcInfo.append(Tab + "DEP_INTERN>>" + n2Row.getDepIntern()
-						+ ", STATUS>>" + n2Row.getStatus() 
-						+ ", IDENTIFIER>>" + n2Row.getIdentifier() 
-						+ ", OBJECT_ID>>" + n2Row.getObjectId() + "\n");
-			}
-			rfc.setJCsdepDat(n2Table);
-		} 
-		
-		// STPO_API01 - N7
+		// STKO_API01 - N7
 		Stko_api01Structure n7 = new Stko_api01Structure();
 
 		n7.setBaseQuan("1");
@@ -213,6 +210,5 @@ public class R211CreateSalesBOMfortypeMTC extends Rfc {
 	public void evaluate() throws Exception {
 		execute();
 	}
-
 
 }
