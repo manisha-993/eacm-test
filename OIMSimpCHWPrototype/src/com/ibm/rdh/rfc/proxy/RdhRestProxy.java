@@ -1224,7 +1224,7 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 				salesBOM.add(depData);
 			}
 
-			return salesBOM;
+			return salesBOM.size()==0? null:salesBOM;
 		} else {
 
 			logger.info("R210ReadSalesBom is null.");
