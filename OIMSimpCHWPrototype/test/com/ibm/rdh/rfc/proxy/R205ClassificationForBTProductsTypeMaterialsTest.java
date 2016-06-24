@@ -2,8 +2,11 @@ package com.ibm.rdh.rfc.proxy;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
@@ -19,12 +22,31 @@ public class R205ClassificationForBTProductsTypeMaterialsTest extends
 			.getPromoteLogger();
 	String activeId = "Z_DM_SAP_CLASSIFICATION_MAINT";
 
+	@Before
+	public void prepareData() {
+		String sql_mara_1 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMNEW')";
+
+		int t1 = SqlHelper.runUpdateSql(sql_mara_1, conn);
+
+		if (t1 >= 0) {
+			System.out.println("insert success");
+		} else {
+			System.out.println("insert failed");
+		}
+	}
+
 	@Test
 	public void r205a() {
 
 		try {
 			TypeModel typeModel = new TypeModel();
 			TypeModelUPGGeo tmupg = new TypeModelUPGGeo();
+			typeModel.setType("EACM");
+			boolean hasRevProfile = true;
+			typeModel.setHasRevProfile(hasRevProfile);
+			RevProfile revProfile = new RevProfile();
+			revProfile.setRevenueProfile("12");
+			typeModel.setRevProfile(revProfile);
 			String pimsIdentity = "C";
 			String fromtotype = "";
 			String typeProfRefresh = "TYPENEW";
@@ -40,8 +62,8 @@ public class R205ClassificationForBTProductsTypeMaterialsTest extends
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 
-			rfcProxy.r205(typeModel, tmupg, newFlag, fromtotype,
-					typeProfRefresh, type, profile, pimsIdentity);
+			rfcProxy.r205(typeModel, null, newFlag, null, null, null, null,
+					pimsIdentity);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
@@ -134,5 +156,18 @@ public class R205ClassificationForBTProductsTypeMaterialsTest extends
 
 		}
 
+	}
+
+	@After
+	public void deleteData() {
+		String del_mara_1 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMNEW'";
+
+		int t1 = SqlHelper.runUpdateSql(del_mara_1, conn);
+		// int t2 = SqlHelper.runUpdateSql(del_mara_2, conn);
+		if (t1 >= 0) {
+			System.out.println("delete success");
+		} else {
+			System.out.println("delete failed");
+		}
 	}
 }

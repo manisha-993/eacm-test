@@ -58,8 +58,8 @@ public class R189createCFIPlantViewForType extends Rfc {
 
 		b0Table.appendRow(b0Row);
 		rfc.setIBmm00(b0Table);
-		rfcInfo.append("IBmm00 \n");
-		rfcInfo.append(Tab + "TCODE" + b0Row.getTcode() 
+		rfcInfo.append("Bmm00 \n");
+		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() 
 				+ ", MATNR>>" + b0Row.getMatnr() 
 				+ ", XEIV4>>" + b0Row.getXeiv4()
 				+ ", WERKS>>" + b0Row.getWerks() + "\n");
