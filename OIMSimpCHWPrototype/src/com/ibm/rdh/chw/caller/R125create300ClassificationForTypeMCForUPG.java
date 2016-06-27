@@ -104,7 +104,7 @@ public class R125create300ClassificationForTypeMCForUPG extends Rfc {
 		rfc.setIApiAusp(r6Table);
 
 		rfcInfo.append("API_AUSP \n");
-		rfcInfo.append(Tab + "VALUE" + r6Row.getValue());
+		rfcInfo.append(Tab + "VALUE>>" + r6Row.getValue());
 		rfcInfo.append(Tab + "CHARACT>> " + r6Row.getCharact() + "\n");
 
 		// ZDM_GEO_TO_CLASS

@@ -128,7 +128,7 @@ public class R163createUpgradeValueForTypeMTCCharacteristic extends Rfc {
 		rfcInfo.append(Tab + "ATNAM>>" + e1Row.getAtnam() 
 				+ ", ATWRT>>" + e1Row.getAtwrt() + "\n");
 
-		// E2CUTXM STRUCTURE
+		// E1CUTXM
 		E1cutxmTable e1CutTable = new E1cutxmTable();
 		E1cutxmTableRow e1CutRow = e1CutTable.createEmptyRow();
 
