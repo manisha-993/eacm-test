@@ -37,11 +37,17 @@ public class R193ReadRevenueProfile extends Rfc {
 	public void execute() throws Exception {
 		logExecution();
 		getRfc().execute();
-		getLog().debug(getErrorInformation());
+		getLog().debug(getErrorInformation());	
 		if (getSeverity() == ERROR) {
-			throw new HWPIMSAbnormalException(getErrorInformation());
+			String errMsg = getErrorInformation();
+			// WebService not found, return errMsg is "Material <material> not found in MAST table."
+			if (errMsg != null
+					&& errMsg.contains("not found in MAST table")) {
+				rfcInfo.append(errMsg);
+			} else {
+				throw new HWPIMSAbnormalException();
+			}
 		}
-
 	}
 
 	@Override
