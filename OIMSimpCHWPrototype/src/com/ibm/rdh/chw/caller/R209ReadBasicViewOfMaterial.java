@@ -29,8 +29,8 @@ public class R209ReadBasicViewOfMaterial extends Rfc {
 		getLog().debug(getErrorInformation());
 		if (getSeverity() == ERROR) {
 			String errMsg = getErrorInformation();
-			// WebService not found, return errMsg is ""
-			if (errMsg.contains("")) {
+			// WebService not found, return errMsg is "Material <material> not found in MARA table"
+			if (errMsg.contains("not found in MARA table")) {
 				rfcInfo.append(errMsg);
 			} else {
 				throw new HWPIMSAbnormalException(errMsg);
