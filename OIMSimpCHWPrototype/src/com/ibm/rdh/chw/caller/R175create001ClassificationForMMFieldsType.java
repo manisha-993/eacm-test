@@ -33,7 +33,7 @@ public class R175create001ClassificationForMMFieldsType extends Rfc {
 
 		reInitialize();
 		Date curDate = new Date();
-
+		rfcName = "Z_DM_SAP_CLASSIFICATION_MAINT";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT();
 
 		// Set up the RFC fields

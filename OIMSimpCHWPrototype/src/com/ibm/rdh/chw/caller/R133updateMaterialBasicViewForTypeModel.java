@@ -1,8 +1,6 @@
 package com.ibm.rdh.chw.caller;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;

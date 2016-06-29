@@ -58,8 +58,8 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 		rfc.setIObjectKey(r0Table);
 
 		rfcInfo.append("OBJECTKEY \n");
-		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() 
-				+ ", KPARAVALU>>" + r0Row.getKparaValu() + "\n");
+		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld() + ", KPARAVALU>>"
+				+ r0Row.getKparaValu() + "\n");
 
 		// KLAH - R2
 		KlahTable r2Table = new KlahTable();
@@ -122,8 +122,11 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 		// API_AUSP - R6
 		Api_auspTable r6Table = new Api_auspTable();
 		Api_auspTableRow r6Row = r6Table.createEmptyRow();
-		// not set
+		
+		// not set in the epims code but we need it.
 		r6Row.setValue("CH");
+		// end
+		
 		if (("MTC").equals(newFlag)) {
 			if (("MTCTOTYPE").equals(FromToType)) {
 				r6Row.setCharact("MK_" + tmUPGObj.getType() + "_MOD");
@@ -139,9 +142,9 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 
 		rfcInfo.append("API_AUSP \n");
 
-		rfcInfo.append(Tab + "CHARACT>> " + r6Row.getCharact()
-				+ ", VALUE>> " + r6Row.getValue() + "\n");
-		
+		rfcInfo.append(Tab + "CHARACT>> " + r6Row.getCharact() + ", VALUE>> "
+				+ r6Row.getValue() + "\n");
+
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();

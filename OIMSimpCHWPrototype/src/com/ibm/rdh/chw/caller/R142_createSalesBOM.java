@@ -115,6 +115,8 @@ public class R142_createSalesBOM extends Rfc {
 				n1Table.appendRow(n1Row);
 
 				rfcInfo.append("STPO_API01  \n");
+				rfcInfo.append(Tab + "COMP_UNIT>>" + n1Row.getCompUnit()
+						+ ", SORTSTRING>>" + n1Row.getSortstring() + "\n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + n1Row.getItemCateg()
 						+ ", ITEM_NO>>" + n1Row.getItemNo() + ", COMPONENT>>"
 						+ n1Row.getComponent() + ", COMP_QTY>>"
@@ -185,6 +187,8 @@ public class R142_createSalesBOM extends Rfc {
 				n1Table.appendRow(n1Row);
 
 				rfcInfo.append("STPO_API01  \n");
+				rfcInfo.append(Tab + "COMP_UNIT>>" + n1Row.getCompUnit()
+						+ ", SORTSTRING>>" + n1Row.getSortstring() + "\n");
 				rfcInfo.append(Tab + "ITEM_CATEG>>" + n1Row.getItemCateg()
 						+ ", ITEM_NO>>" + n1Row.getItemNo() + ", COMPONENT>>"
 						+ n1Row.getComponent() + ", COMP_QTY>>"
@@ -224,7 +228,7 @@ public class R142_createSalesBOM extends Rfc {
 
 		} // end of Else
 
-		// STPO_API01 - N7
+		// SKPO_API01 - N7
 		Stko_api01Structure n7 = new Stko_api01Structure();
 
 		n7.setBaseQuan("1");
