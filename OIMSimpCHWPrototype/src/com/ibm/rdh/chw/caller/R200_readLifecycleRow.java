@@ -84,10 +84,10 @@ public class R200_readLifecycleRow extends Rfc {
 		if (getSeverity() == ERROR) {
 			String errMsg = getErrorInformation();
 			//WebService not found, return errMsg is "No rows were found to match search criteria."
-			if (errMsg != null && errMsg.contains("No rows were found")) {
+			if (errMsg.contains("No rows were found")) {
 				rfcInfo.append(errMsg);
 			} else {
-				throw new HWPIMSAbnormalException();
+				throw new HWPIMSAbnormalException(errMsg);
 			}
 		}
 	}

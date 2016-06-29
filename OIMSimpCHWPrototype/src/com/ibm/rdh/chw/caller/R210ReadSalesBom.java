@@ -39,12 +39,11 @@ public class R210ReadSalesBom extends Rfc {
 
 		if (getSeverity() == ERROR) {
 			String errMsg = getErrorInformation();
-			// WebService not found, return errMsg is
-			// "Material<type+newflag> not found in MAST table."
-			if (errMsg != null && errMsg.contains("not found")) {
+			// WebService not found, return errMsg is "Material<type+newflag> not found in MAST table."
+			if (errMsg.contains("not found")) {
 				rfcInfo.append(errMsg);
 			} else {
-				throw new HWPIMSAbnormalException();
+				throw new HWPIMSAbnormalException(errMsg);
 			}
 
 		}

@@ -22,7 +22,6 @@ public class R204ReadMaterial extends Rfc {
 
 	}
 
-
 	@Override
 	public void execute() throws Exception {
 		logExecution();
@@ -31,11 +30,10 @@ public class R204ReadMaterial extends Rfc {
 		if (getSeverity() == ERROR) {
 			String errMsg = getErrorInformation();
 			// WebService not found, return errMsg is "Material <material> not found in MARA table."
-			if (errMsg != null
-					&& errMsg.contains("not found in MARA table")) {
+			if (errMsg.contains("not found in MARA table")) {
 				rfcInfo.append(errMsg);
 			} else {
-				throw new HWPIMSAbnormalException();
+				throw new HWPIMSAbnormalException(errMsg);
 			}
 		}
 	}

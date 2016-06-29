@@ -95,6 +95,7 @@ public class R194CreateRevenueProfile extends Rfc {
 			n1Table.appendRow(n1Row);
 
 			rfcInfo.append("STPO_API01  \n");
+			rfcInfo.append(Tab + "COMP_UNIT>>" + n1Row.getCompUnit() + "\n");
 			rfcInfo.append(Tab + "ITEM_CATEG>>" + n1Row.getItemCateg()
 					+ ", ITEM_NO>>" + n1Row.getItemNo() + ", COMPONENT>>"
 					+ n1Row.getComponent() + ", COMP_QTY>>"
@@ -105,7 +106,7 @@ public class R194CreateRevenueProfile extends Rfc {
 
 		rfc.setJStpoApi01(n1Table);
 
-		// STPO_API01 - N7
+		// STKO_API01 - N7
 		Stko_api01Structure n7 = new Stko_api01Structure();
 
 		n7.setBaseQuan("1");
@@ -150,7 +151,6 @@ public class R194CreateRevenueProfile extends Rfc {
 		if (getSeverity() == ERROR) {
 			throw new HWPIMSAbnormalException(getErrorInformation());
 		}
-
 	}
 
 	@Override

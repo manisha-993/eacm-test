@@ -8,7 +8,7 @@ public class R193ReadRevenueProfile extends Rfc {
 	public R193ReadRevenueProfile(String type, String newFlag, String _plant)
 			throws Exception {
 		reInitialize();
-		
+
 		rfcName = "CSAP_MAT_BOM_READ";
 		rfc = new com.ibm.rdh.rfc.CSAP_MAT_BOM_READ();
 
@@ -23,13 +23,11 @@ public class R193ReadRevenueProfile extends Rfc {
 		rfc.setPlant(_plant);
 		rfc.setBomUsage("Y");
 
-		System.out.println("***" + Tab
-				+ "MATERIAL>>" + rfc.getMaterial()
-				+ ", PLANT>>" + rfc.getPlant() 
-				+ ", BOM_USAGE>>" + rfc.getBomUsage());
-		rfcInfo.append(Tab + "MATERIAL>>" + rfc.getMaterial() 
-				+ ", PLANT>>" + rfc.getPlant() 
-				+ ", BOM_USAGE>>" + rfc.getBomUsage() + "\n");
+		System.out.println("***" + Tab + "MATERIAL>>" + rfc.getMaterial()
+				+ ", PLANT>>" + rfc.getPlant() + ", BOM_USAGE>>"
+				+ rfc.getBomUsage());
+		rfcInfo.append(Tab + "MATERIAL>>" + rfc.getMaterial() + ", PLANT>>"
+				+ rfc.getPlant() + ", BOM_USAGE>>" + rfc.getBomUsage() + "\n");
 
 	}
 
@@ -37,15 +35,14 @@ public class R193ReadRevenueProfile extends Rfc {
 	public void execute() throws Exception {
 		logExecution();
 		getRfc().execute();
-		getLog().debug(getErrorInformation());	
+		getLog().debug(getErrorInformation());
 		if (getSeverity() == ERROR) {
 			String errMsg = getErrorInformation();
 			// WebService not found, return errMsg is "Material <material> not found in MAST table."
-			if (errMsg != null
-					&& errMsg.contains("not found in MAST table")) {
+			if (errMsg.contains("not found in MAST table")) {
 				rfcInfo.append(errMsg);
 			} else {
-				throw new HWPIMSAbnormalException();
+				throw new HWPIMSAbnormalException(errMsg);
 			}
 		}
 	}
