@@ -142,4 +142,13 @@ public class LifecycleData {
 	public void setPreAnnounceValidFrom(Date preAnnounceValidFrom) {
 		this.preAnnounceValidFrom = preAnnounceValidFrom;
 	}
+
+	@Override
+	public String toString() {
+		return "LifecycleData [varCond=" + varCond + ", preAnnounceValidFrom=" + preAnnounceValidFrom
+				+ ", preAnnounceValidTo=" + preAnnounceValidTo + ", announceValidFrom=" + announceValidFrom
+				+ ", announceValidTo=" + announceValidTo + ", wdfmValidFrom=" + wdfmValidFrom + ", wdfmValidTo="
+				+ wdfmValidTo + "]";
+	}
+	
 }
