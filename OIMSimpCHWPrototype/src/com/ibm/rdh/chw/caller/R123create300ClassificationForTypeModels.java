@@ -124,7 +124,7 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 		Api_auspTableRow r6Row = r6Table.createEmptyRow();
 		
 		// not set in the epims code but we need it.
-		r6Row.setValue(tmUPGObj.getModel());
+		r6Row.setValue("CH");
 		// end
 		
 		if (("MTC").equals(newFlag)) {
