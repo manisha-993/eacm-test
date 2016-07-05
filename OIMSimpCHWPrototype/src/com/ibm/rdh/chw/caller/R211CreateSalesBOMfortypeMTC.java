@@ -96,41 +96,42 @@ public class R211CreateSalesBOMfortypeMTC extends Rfc {
 			rfc.setJStpoApi01(n1Table);
 
 			// CSDEP_DAT - N2 STRUCTURE
-			e = geoV.elements();
-			Csdep_datTable n2Table = new Csdep_datTable();
-
-			while (e.hasMoreElements()) {
-				DepData tmg = (DepData) e.nextElement();
-
-				Csdep_datTableRow n2Row = n2Table.createEmptyRow();
-
-				n2Row.setDepIntern(tmg.getDep_Intern());
-				n2Row.setStatus("1");
-				n2Row.setIdentifier((tmg.getItem_Node()).toString());
-				n2Row.setObjectId("2");
-
-				n2Table.appendRow(n2Row);
-
-				rfcInfo.append("CSDEP_DAT  \n");
-				rfcInfo.append(Tab + "DEP_INTERN>>" + n2Row.getDepIntern()
-						+ ", STATUS>>" + n2Row.getStatus() 
-						+ ", IDENTIFIER>>" + n2Row.getIdentifier() 
-						+ ", OBJECT_ID>>" + n2Row.getObjectId() + "\n");
-			}
-			rfc.setJCsdepDat(n2Table);
+			// wyl this part is not finished in the RFC
+//			e = geoV.elements();
+//			Csdep_datTable n2Table = new Csdep_datTable();
+//
+//			while (e.hasMoreElements()) {
+//				DepData tmg = (DepData) e.nextElement();
+//
+//				Csdep_datTableRow n2Row = n2Table.createEmptyRow();
+//
+//				n2Row.setDepIntern(tmg.getDep_Intern());
+//				n2Row.setStatus("1");
+//				n2Row.setIdentifier((tmg.getItem_Node()).toString());
+//				n2Row.setObjectId("2");
+//
+//				n2Table.appendRow(n2Row);
+//
+//				rfcInfo.append("CSDEP_DAT  \n");
+//				rfcInfo.append(Tab + "DEP_INTERN>>" + n2Row.getDepIntern()
+//						+ ", STATUS>>" + n2Row.getStatus() 
+//						+ ", IDENTIFIER>>" + n2Row.getIdentifier() 
+//						+ ", OBJECT_ID>>" + n2Row.getObjectId() + "\n");
+//			}
+//			rfc.setJCsdepDat(n2Table);
 		}
 
 		// STKO_API01 - N7
-		Stko_api01Structure n7 = new Stko_api01Structure();
-
-		n7.setBaseQuan("1");
-		n7.setBomStatusString("03");
-
-		rfc.setJIStko(n7);
-
-		rfcInfo.append("STPO_API01  \n");
-		rfcInfo.append(Tab + "BASE_QUAN>>" + n7.getBaseQuan()
-				+ ", BOM_STATUS>>" + n7.getBomStatus() + "\n");
+//		Stko_api01Structure n7 = new Stko_api01Structure();
+//
+//		n7.setBaseQuan("1");
+//		n7.setBomStatusString("03");
+//
+//		rfc.setJIStko(n7);
+//
+//		rfcInfo.append("STPO_API01  \n");
+//		rfcInfo.append(Tab + "BASE_QUAN>>" + n7.getBaseQuan()
+//				+ ", BOM_STATUS>>" + n7.getBomStatus() + "\n");
 
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
