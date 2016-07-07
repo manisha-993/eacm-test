@@ -11,13 +11,12 @@ import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.DepData;
 import com.ibm.rdh.rfc.Csap_mbomStructure;
-import com.ibm.rdh.rfc.Csdep_datTable;
 import com.ibm.rdh.rfc.Stko_api01Structure;
 import com.ibm.rdh.rfc.Stpo_api01Table;
 import com.ibm.rdh.rfc.Stpo_api01TableRow;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
-import com.ibm.rdh.rfc.Csdep_datTableRow;
+
 
 public class R211CreateSalesBOMfortypeMTC extends Rfc {
 
@@ -128,7 +127,7 @@ public class R211CreateSalesBOMfortypeMTC extends Rfc {
 
 		rfc.setJIStko(n7);
 
-		rfcInfo.append("STPO_API01  \n");
+		rfcInfo.append("STKO_API01  \n");
 		rfcInfo.append(Tab + "BASE_QUAN>>" + n7.getBaseQuan()
 				+ ", BOM_STATUS>>" + n7.getBomStatus() + "\n");
 

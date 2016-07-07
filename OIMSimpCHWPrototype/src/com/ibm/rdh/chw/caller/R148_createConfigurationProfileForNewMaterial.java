@@ -56,7 +56,7 @@ public class R148_createConfigurationProfileForNewMaterial extends Rfc {
 		p1Table.appendRow(p1Row);
 		rfc.setJConProAttributes(p1Table);
 
-		rfcInfo.append("CPR_ATTR \n");
+		rfcInfo.append("CPRO_ATTR \n");
 		rfcInfo.append(Tab + "C_PROFILE>>" + p1Row.getCProfile()
 				+ ", CLASSTYPE>>" + p1Row.getClasstype() 
 				+ ", STATUS>>" + p1Row.getStatus()
