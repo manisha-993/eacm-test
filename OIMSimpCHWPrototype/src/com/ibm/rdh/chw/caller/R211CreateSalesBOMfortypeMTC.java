@@ -163,7 +163,7 @@ public class R211CreateSalesBOMfortypeMTC extends Rfc {
 			// WebService not found, return errMsg is
 			// " Material <csap_mbom_struct.matnr> is not maintained in plant <csap_mbom_struct.werks>."
 			if (errMsg.contains("is not maintained in plant")
-					& (errMsg.contains("1222") || errMsg.contains("1999"))) {
+					&& (errMsg.contains("1222") || errMsg.contains("1999"))) {
 				rfcInfo.append(errMsg);
 			} else {
 				throw new HWPIMSAbnormalException(errMsg);
