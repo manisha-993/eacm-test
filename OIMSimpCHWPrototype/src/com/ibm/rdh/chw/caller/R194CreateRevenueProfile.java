@@ -113,7 +113,7 @@ public class R194CreateRevenueProfile extends Rfc {
 		n7.setBomStatusString("03");
 
 		rfc.setJIStko(n7);
-		rfcInfo.append("STPO_API01  \n");
+		rfcInfo.append("STKO_API01  \n");
 		rfcInfo.append(Tab + "BASE_QUAN>>" + n7.getBaseQuan()
 				+ ", BOM_STATUS>>" + n7.getBomStatus() + "\n");
 

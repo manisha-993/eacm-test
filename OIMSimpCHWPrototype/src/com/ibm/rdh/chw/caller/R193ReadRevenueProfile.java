@@ -38,8 +38,9 @@ public class R193ReadRevenueProfile extends Rfc {
 		getLog().debug(getErrorInformation());
 		if (getSeverity() == ERROR) {
 			String errMsg = getErrorInformation();
-			// WebService not found, return errMsg is "Material <material> not found in MAST table."
-			if (errMsg.contains("not found in MAST table")) {
+			// WebService not found in MAST, return errMsg is "Material <material> not found in MAST table."
+			// WebService not found in STPO, return errMsg is "Material <material> exists in Mast table but not defined to Stpo table"
+			if (errMsg.contains("not found in MAST table")||errMsg.contains("not defined to Stpo table")) {
 				rfcInfo.append(errMsg);
 			} else {
 				throw new HWPIMSAbnormalException(errMsg);
