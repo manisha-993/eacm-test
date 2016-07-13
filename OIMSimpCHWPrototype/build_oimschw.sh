@@ -28,16 +28,17 @@ PATH=/usr/bin:/etc:/usr/sbin:/usr/ucb:$HOME/bin:/usr/bin/X11:/sbin:.
 export PATH=/usr/java71/bin:$PATH
 cd /home/$USER/abrgenerator/oims/workspace/OIMSimpCHWPrototype
 rm -rf abrsrc
+cd /home/$USER/abrgenerator/oims
 rm OIMSimpCHW.jar
 find . -name "*class" -print -exec rm {} \; 
 rm files.tmp
-find . -name "com.ibm*java" -print|sort >>files.tmp
+find . -name "*java" -print|sort >>files.tmp
 
 
 
-cd /home/$USER/abrgenerator/oims
 
-export CLASSPATH=".:/home/opicmdb2/sqllib/java/db2java.zip:/usr/WebSphere/AppServer/lib/xalan.jar:/usr/WebSphere/AppServer/lib/xerces.jar:/usr/mqm/java/lib/com.ibm.mq.jar:/usr/mqm/java/lib/com.ibm.mq.jmqi.jar:/usr/mqm/java/lib/connector.jar:/usr/mqm/java/lib/base:/home/opicmadm/taskmaster.sg/poi-3.0.1-FINAL-20070705.jar:/home/opicmadm/abrgenerator/script/xercesImpl.jar:/home/opicmadm/abrgenerator/script/xml-apis.jar:/home/opicmadm/abrgenerator/script/dom4j-1.6.1.jar:../lib/cwa.jar:../lib/ibmjndi.jar:../lib/jndi.jar:../lib/jcert.jar:../lib/jnet.jar:../lib/jsse.jar:../lib/OIMJavaClient.jar"
+
+export CLASSPATH=".:/home/opicmdb2/sqllib/java/db2java.zip:/usr/WebSphere/AppServer/lib/xalan.jar:/usr/WebSphere/AppServer/lib/xerces.jar:/usr/mqm/java/lib/com.ibm.mq.jar:/usr/mqm/java/lib/com.ibm.mq.jmqi.jar:/usr/mqm/java/lib/connector.jar:/usr/mqm/java/lib/base:/home/opicmadm/taskmaster.sg/poi-3.0.1-FINAL-20070705.jar:/home/opicmadm/abrgenerator/script/xercesImpl.jar:/home/opicmadm/abrgenerator/script/xml-apis.jar:/home/opicmadm/abrgenerator/script/dom4j-1.6.1.jar:../lib/cwa.jar:../lib/ibmjndi.jar:../lib/jndi.jar:../lib/jcert.jar:../lib/jnet.jar:../lib/jsse.jar:../lib/OIMJavaClient.jar:../lib/junit.jar"
 
 echo compile begins
 echo $CLASSPATH
