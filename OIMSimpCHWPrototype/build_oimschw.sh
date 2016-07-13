@@ -7,6 +7,7 @@
 USER=`whoami`
 
 cd /home/$USER/abrgenerator/oims
+rm OIMSimpCHW.jar
 
 RPTDATE=`date +%Y%m%d%H%M%S`
 RPTNAME="/home/$USER/abrgenerator/oims/rpt/compileoimsimpchw.log."$RPTDATE
@@ -28,7 +29,8 @@ PATH=/usr/bin:/etc:/usr/sbin:/usr/ucb:$HOME/bin:/usr/bin/X11:/sbin:.
 export PATH=/usr/java71/bin:$PATH
 cd /home/$USER/abrgenerator/oims/workspace/OIMSimpCHWPrototype
 rm -rf abrsrc
-cd /home/$USER/abrgenerator/oims
+rm -rf test
+cd /home/$USER/abrgenerator/oims/workspace/OIMSimpCHWPrototype/src
 rm OIMSimpCHW.jar
 find . -name "*class" -print -exec rm {} \; 
 rm files.tmp
@@ -38,7 +40,7 @@ find . -name "*java" -print|sort >>files.tmp
 
 
 
-export CLASSPATH=".:/home/opicmdb2/sqllib/java/db2java.zip:/usr/WebSphere/AppServer/lib/xalan.jar:/usr/WebSphere/AppServer/lib/xerces.jar:/usr/mqm/java/lib/com.ibm.mq.jar:/usr/mqm/java/lib/com.ibm.mq.jmqi.jar:/usr/mqm/java/lib/connector.jar:/usr/mqm/java/lib/base:/home/opicmadm/taskmaster.sg/poi-3.0.1-FINAL-20070705.jar:/home/opicmadm/abrgenerator/script/xercesImpl.jar:/home/opicmadm/abrgenerator/script/xml-apis.jar:/home/opicmadm/abrgenerator/script/dom4j-1.6.1.jar:../lib/cwa.jar:../lib/ibmjndi.jar:../lib/jndi.jar:../lib/jcert.jar:../lib/jnet.jar:../lib/jsse.jar:../lib/OIMJavaClient.jar:../lib/junit.jar"
+export CLASSPATH=".:/home/opicmdb2/sqllib/java/db2java.zip:/usr/WebSphere/AppServer/lib/xalan.jar:/usr/WebSphere/AppServer/lib/xerces.jar:/usr/mqm/java/lib/com.ibm.mq.jar:/usr/mqm/java/lib/com.ibm.mq.jmqi.jar:/usr/mqm/java/lib/connector.jar:/usr/mqm/java/lib/base:/home/opicmadm/taskmaster.sg/poi-3.0.1-FINAL-20070705.jar:/home/opicmadm/abrgenerator/script/xercesImpl.jar:/home/opicmadm/abrgenerator/script/xml-apis.jar:/home/opicmadm/abrgenerator/script/dom4j-1.6.1.jar:/home/opicmadm/abrgenerator/lib/cwa.jar:/home/opicmadm/abrgenerator/lib/ibmjndi.jar:/home/opicmadm/abrgenerator/lib/jndi.jar:/home/opicmadm/abrgenerator/lib/jcert.jar:/home/opicmadm/abrgenerator/lib/jnet.jar:/home/opicmadm/abrgenerator/lib/jsse.jar:/home/opicmadm/abrgenerator/lib/OIMJavaClient.jar:/home/opicmadm/abrgenerator/lib/junit.jar"
 
 echo compile begins
 echo $CLASSPATH
@@ -46,22 +48,21 @@ echo $CLASSPATH
 
 javac -J-Xmx512m -deprecation @files.tmp 2>>$RPTNAME
 #echo javadoc begins
-#javadoc -d doc -version -author COM.ibm.eannounce.abr.ls COM.ibm.eannounce.abr.pcd COM.ibm.eannounce.abr.psg COM.ibm.eannounce.abr.rfa COM.ibm.eannounce.abr.sg COM.ibm.eannounce.abr.util 1>>$RPTNAME 2>>$RPTNAME 
 jar cvf OIMSimpCHW.jar ./*.class >>$RPTNAME
-jar uvf OIMSimpCHW.jar com.ibm.pprds.epimshw/*.class >>$RPTNAME
-jar uvf OIMSimpCHW.jar com.ibm.pprds.epimshw/*.pr* >>$RPTNAME
-jar uvf OIMSimpCHW.jar com.ibm.pprds.epimshw.revenuel/*.class >>$RPTNAME
-jar uvf OIMSimpCHW.jar com.ibm.pprds.epimshw.revenue/*.pr* >>$RPTNAME
-jar uvf OIMSimpCHW.jar com.ibm.pprds.epimshw.util/*.class >>$RPTNAME
-jar uvf OIMSimpCHW.jar com.ibm.pprds.epimshw.util/*.pr* >>$RPTNAME
-jar uvf OIMSimpCHW.jar com.ibm.rdh.chw.entity/*.class >>$RPTNAME
-jar uvf OIMSimpCHW.jar com.ibm.rdh.chw.entity/*.pr* >>$RPTNAME
-jar uvf OIMSimpCHW.jar com.ibm.rdh.chw.caller/*.class >>$RPTNAME
-jar uvf OIMSimpCHW.jar com.ibm.rdh.chw.caller/*.pr* >>$RPTNAME
-jar uvf OIMSimpCHW.jar com.ibm.rdh.rfc.proxy/*.class >>$RPTNAME
-jar uvf OIMSimpCHW.jar com.ibm.rdh.rfc.proxy/*.pr* >>$RPTNAME
+jar uvf OIMSimpCHW.jar com/ibm/pprds/epimshw/*.class >>$RPTNAME
+jar uvf OIMSimpCHW.jar com/ibm/pprds/epimshw/*.pr* >>$RPTNAME
+jar uvf OIMSimpCHW.jar com/ibm/pprds/epimshw/revenuel/*.class >>$RPTNAME
+jar uvf OIMSimpCHW.jar com/ibm/pprds/epimshw/revenue/*.pr* >>$RPTNAME
+jar uvf OIMSimpCHW.jar com/ibm/pprds/epimshw/util/*.class >>$RPTNAME
+jar uvf OIMSimpCHW.jar com/ibm/pprds/epimshw/util/*.pr* >>$RPTNAME
+jar uvf OIMSimpCHW.jar com/ibm/rdh/chw/entity/*.class >>$RPTNAME
+jar uvf OIMSimpCHW.jar com/ibm/rdh/chw/entity/*.pr* >>$RPTNAME
+jar uvf OIMSimpCHW.jar com/ibm/rdh/chw/caller/*.class >>$RPTNAME
+jar uvf OIMSimpCHW.jar com/ibm/rdh/chw/caller/*.pr* >>$RPTNAME
+jar uvf OIMSimpCHW.jar com/ibm/rdh/rfc/proxy/*.class >>$RPTNAME
+jar uvf OIMSimpCHW.jar com/ibm/rdh/rfc/proxy/*.pr* >>$RPTNAME
 
-
+mv OIMSimpCHW.jar /home/$USER/abrgenerator/oims/OIMSimpCHW.jar
 
 date>>$RPTNAME
 
