@@ -56,7 +56,7 @@ public class R200_readLifecycleRow extends Rfc {
 
 		// RFANUMBER
 		if ("wdfm".equals(check)) {
-			rfc.setRfaNum(annDocNo + "_WDFM");
+			rfc.setRfaNum(annDocNo + "_W");
 		} else {
 			rfc.setRfaNum(annDocNo);
 		}

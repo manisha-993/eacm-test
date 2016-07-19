@@ -61,7 +61,7 @@ public class R198updateLifecycleRow extends Rfc {
 				+ ",");
 
 		if ("wdfm".equals(check)) {
-			tRow.setZdmRfanum(annDocNo + "_WDFM");
+			tRow.setZdmRfanum(annDocNo + "_W");
 		} else {
 			tRow.setZdmRfanum(annDocNo);
 		}
@@ -83,7 +83,7 @@ public class R198updateLifecycleRow extends Rfc {
 
 		// RFANUMBER
 		if ("wdfm".equals(check)) {
-			rfc.setRfaNum(annDocNo + "_WDFM");
+			rfc.setRfaNum(annDocNo + "_W");
 		} else {
 			rfc.setRfaNum(annDocNo);
 		}

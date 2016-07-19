@@ -72,7 +72,7 @@ public class R199_deleteLifecycleRow extends Rfc {
 
 		// RFANUMBER
 		if ("wdfm".equals(check)) {
-			rfc.setRfaNum(annDocNo + "_WDFM");
+			rfc.setRfaNum(annDocNo + "_W");
 		} else {
 			rfc.setRfaNum(annDocNo);
 		}
