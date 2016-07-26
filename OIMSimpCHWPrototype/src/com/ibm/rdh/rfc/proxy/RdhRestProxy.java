@@ -129,7 +129,7 @@ import com.sap.rfc.IRfcConnection;
  * 
  * @author waltond
  */
-public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
+public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 
 	private int _sapRetryCount;
 	private long _sapRetrySleepMillis;
@@ -141,6 +141,20 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	public static String PREANNOUNCE = "YA";
 	public static String ANNOUNCE = "Z0";
 	public static String WDFM = "ZJ";
+	
+	private RfcFactory _rfcFactory;
+
+	protected RfcFactory getFactory() {
+		return getRfcFactory();
+	}
+
+	protected RfcFactory getRfcFactory() {
+		return _rfcFactory;
+	}
+
+	protected void setRfcFactory(RfcFactory factory) {
+		_rfcFactory = factory;
+	}
 
 	protected static Logger logger = LogManager.getLogManager()
 			.getPromoteLogger();
@@ -167,11 +181,22 @@ public class RdhRestProxy extends RfcProxy implements RfcReturnSeverityCodes {
 	public void r100(CHWAnnouncement chwA, TypeModel typeModel,
 			CHWGeoAnn chwAg, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String FromToType, String pimsIdentity) throws Exception {
-		R100createTypeMaterialBasicView r = getFactory().getr100(chwA,
-				typeModel, chwAg, newFlag, tmUPGObj, FromToType, pimsIdentity);
-		logPromoteInfoMessage(r);
-		r.evaluate();
-		logPromoteResultMessage(r);
+		Exception exception = null;
+		for (int i = 0; i < 1; i++) {
+			try {
+				R100createTypeMaterialBasicView r = getFactory().getr100(chwA,
+						typeModel, chwAg, newFlag, tmUPGObj, FromToType, pimsIdentity);
+				logPromoteInfoMessage(r);
+				r.evaluate();
+				logPromoteResultMessage(r);
+				return;
+			} catch(Exception e) {
+				exception = e;
+			}
+		}
+		if (exception != null) {
+			throw exception;
+		}
 	}
 
 	@Override

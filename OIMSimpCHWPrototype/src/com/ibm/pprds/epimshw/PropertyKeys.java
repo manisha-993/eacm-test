@@ -147,6 +147,9 @@ public class PropertyKeys
 	public final static String KEY_SAP_LEDGER = "epimshw.enableSapLedger";
 	public final static String KEY_PROFIT_CENTER_PLANT = "epimshw.profitCenterPlant"; 
 	public final static String KEY_CNTRY_TAX_REFRESH_TIME = "epimshw.cntryTaxRefreshTime";
+	
+	public final static String KEY_RFC_MAX_TRY_COUNT = "epimshw.rfcMaxTryCount";
+	public final static String KEY_RFC_RETRY_WAIT_TIME = "epimshw.rfcRetryWaitTime";
 
 }
 

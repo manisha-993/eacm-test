@@ -1,25 +1,5 @@
 package com.ibm.rdh.rfc.proxy;
 
-//import java.util.ArrayList;
-//import java.util.Collection;
-//import java.util.Vector;
-//
-//import com.ibm.pprds.swpims.domain.Announcement;
-//import com.ibm.pprds.swpims.domain.AnnouncementGeo;
-//import com.ibm.pprds.swpims.domain.GeoCountry;
-//import com.ibm.pprds.swpims.domain.PlannedSalesStatus;
-//import com.ibm.pprds.swpims.domain.ProcessOptionFeature;
-//import com.ibm.pprds.swpims.domain.ProductLifecycleStatus;
-//import com.ibm.pprds.swpims.domain.RegistrationFeature;
-//import com.ibm.pprds.swpims.domain.RegularEntitlementFeature;
-//import com.ibm.pprds.swpims.domain.SWO;
-//import com.ibm.pprds.swpims.domain.SupplyFeature;
-//import com.ibm.pprds.swpims.domain.Sw300;
-//import com.ibm.pprds.swpims.domain.Sw300Characteristic;
-//import com.ibm.pprds.swpims.domain.SwFeature;
-//import com.ibm.pprds.swpims.domain.UpgradeEntitlementFeature;
-//import com.ibm.pprds.swpims.rfc.ReturnDataObjectR001;
-//
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
@@ -38,16 +18,8 @@ import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 /**
  * @author Will
  */
-public abstract class RfcProxy {
-	private RfcFactory _rfcFactory;
-
-	protected RfcFactory getFactory() {
-		return getRfcFactory();
-	}
-
-	protected RfcFactory getRfcFactory() {
-		return _rfcFactory;
-	}
+public interface RfcProxy {
+	
 
 	/*
 	 * rjc - this class will instantiate the respective RFC and then NOT execute
@@ -486,9 +458,5 @@ public abstract class RfcProxy {
 	// Exception;
 
 	// public abstract Connection getConnection();
-
-	protected void setRfcFactory(RfcFactory factory) {
-		_rfcFactory = factory;
-	}
 
 }
