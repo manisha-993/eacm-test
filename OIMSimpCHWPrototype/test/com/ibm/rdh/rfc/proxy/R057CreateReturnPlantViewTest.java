@@ -34,7 +34,7 @@ public class R057CreateReturnPlantViewTest extends RdhRestProxyTest {
 			typeModel.setType("EACM");
 			chwAg.setAnnouncementDate(new Date());
 			String pimsIdentity = "C";
-			String sapPlant = "Y";
+			String returnPlant = "Y";
 			String objectId = typeModel.getType();
 
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
@@ -43,7 +43,7 @@ public class R057CreateReturnPlantViewTest extends RdhRestProxyTest {
 			assertEquals(deleteDataResult, 0);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r057(chwA, typeModel, chwAg, sapPlant, pimsIdentity);
+			rfcProxy.r057(chwA, typeModel, chwAg, returnPlant, pimsIdentity);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;

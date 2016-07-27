@@ -18,7 +18,7 @@ public class R057CreateReturnPlantView extends Rfc {
 	private com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE rfc;
 
 	public R057CreateReturnPlantView(CHWAnnouncement chwA, TypeModel typeModel,
-			CHWGeoAnn chwAg, String sapPlant, String pimsIdentity)
+			CHWGeoAnn chwAg, String returnPlant, String pimsIdentity)
 			throws Exception {
 		reInitialize();
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
@@ -34,7 +34,7 @@ public class R057CreateReturnPlantView extends Rfc {
 		b0Row.setMbrsh("M");
 		b0Row.setMtart("ZIMG");
 		b0Row.setXeiv4("X");
-		b0Row.setWerks(sapPlant);
+		b0Row.setWerks(returnPlant);
 		b0Row.setXeib1("X");
 		b0Table.appendRow(b0Row);
 		rfc.setIBmm00(b0Table);

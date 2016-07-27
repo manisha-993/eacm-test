@@ -7,6 +7,11 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import com.ibm.rdh.chw.caller.R005CreatePlantViewForMaterial;
+import com.ibm.rdh.chw.caller.R006CreateSwoMaterialSalesView;
+import com.ibm.rdh.chw.caller.R009Maintain001Classification;
+import com.ibm.rdh.chw.caller.R057CreateReturnPlantView;
+import com.ibm.rdh.chw.caller.R062CreateRevPartMaster;
 import com.ibm.rdh.chw.caller.R100createTypeMaterialBasicView;
 import com.ibm.rdh.chw.caller.R101createGenericPlantViewforMaterial;
 import com.ibm.rdh.chw.caller.R102createSalesViewforMaterial;
@@ -117,6 +122,41 @@ public class RfcFactory extends Object {
 	 * com.ibm.pprds.swpims.AbstractrRfcFactory#getR001(com.ibm.pprds.swpims
 	 * .domain.SWO)
 	 */
+
+	public R005CreatePlantViewForMaterial getr005(CHWAnnouncement chwA,
+			TypeModel typeModel, CHWGeoAnn chwAg, String sapPlant,
+			String pimsIdentity) throws Exception {
+		return new R005CreatePlantViewForMaterial(chwA, typeModel, chwAg,
+				sapPlant, pimsIdentity);
+	}
+
+	public R006CreateSwoMaterialSalesView getr006(CHWAnnouncement chwA,
+			TypeModel typeModel, CHWGeoAnn chwAg, String salesOrg,
+			String currentSapSalesStatus, Date currentEffectiveDate,
+			String productHierarchy, String pimsIdentity) throws Exception {
+		return new R006CreateSwoMaterialSalesView(chwA, typeModel, chwAg,
+				salesOrg, currentSapSalesStatus, currentEffectiveDate,
+				productHierarchy, pimsIdentity);
+	}
+
+	public R009Maintain001Classification getr009(TypeModel typeModel,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		return new R009Maintain001Classification(typeModel, chwA, pimsIdentity);
+	}
+
+	public R057CreateReturnPlantView getr057(CHWAnnouncement chwA,
+			TypeModel typeModel, CHWGeoAnn chwAg, String returnPlant,
+			String pimsIdentity) throws Exception {
+		return new R057CreateReturnPlantView(chwA, typeModel, chwAg, returnPlant,
+				pimsIdentity);
+	}
+
+	public R062CreateRevPartMaster getr062(CHWAnnouncement chwA,
+			TypeModel typeModel, CHWGeoAnn chwAg, String pimsIdentity)
+			throws Exception {
+		return new R062CreateRevPartMaster(chwA, typeModel, chwAg, pimsIdentity);
+	}
+
 	public R100createTypeMaterialBasicView getr100(CHWAnnouncement chwA,
 			TypeModel typeModel, CHWGeoAnn chwAg, String newFlag,
 			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity)

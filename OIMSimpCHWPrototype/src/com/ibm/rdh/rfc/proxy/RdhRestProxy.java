@@ -11,6 +11,11 @@ import org.apache.log4j.Logger;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.pprds.epimshw.util.RfcLogger;
+import com.ibm.rdh.chw.caller.R005CreatePlantViewForMaterial;
+import com.ibm.rdh.chw.caller.R006CreateSwoMaterialSalesView;
+import com.ibm.rdh.chw.caller.R009Maintain001Classification;
+import com.ibm.rdh.chw.caller.R057CreateReturnPlantView;
+import com.ibm.rdh.chw.caller.R062CreateRevPartMaster;
 import com.ibm.rdh.chw.caller.R100createTypeMaterialBasicView;
 import com.ibm.rdh.chw.caller.R101createGenericPlantViewforMaterial;
 import com.ibm.rdh.chw.caller.R102createSalesViewforMaterial;
@@ -141,7 +146,7 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 	public static String PREANNOUNCE = "YA";
 	public static String ANNOUNCE = "Z0";
 	public static String WDFM = "ZJ";
-	
+
 	private RfcFactory _rfcFactory;
 
 	protected RfcFactory getFactory() {
@@ -178,6 +183,65 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 	}
 
 	@Override
+	public void r005(CHWAnnouncement chwA, TypeModel typeModel,
+			CHWGeoAnn chwAg, String sapPlant, String pimsIdentity)
+			throws Exception {
+		R005CreatePlantViewForMaterial r = getFactory().getr005(chwA,
+				typeModel, chwAg, sapPlant, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r006(CHWAnnouncement chwA, TypeModel typeModel,
+			CHWGeoAnn chwAg, String salesOrg, String currentSapSalesStatus,
+			Date currentEffectiveDate, String productHierarchy,
+			String pimsIdentity) throws Exception {
+		R006CreateSwoMaterialSalesView r = getFactory().getr006(chwA,
+				typeModel, chwAg, salesOrg, currentSapSalesStatus,
+				currentEffectiveDate, productHierarchy, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r009(TypeModel typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R009Maintain001Classification r = getFactory().getr009(typeModel, chwA,
+				pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r057(CHWAnnouncement chwA, TypeModel typeModel,
+			CHWGeoAnn chwAg, String returnPlant, String pimsIdentity)
+			throws Exception {
+		R057CreateReturnPlantView r = getFactory().getr057(chwA, typeModel,
+				chwAg, returnPlant, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r062(CHWAnnouncement chwA, TypeModel typeModel,
+			CHWGeoAnn chwAg, String pimsIdentity) throws Exception {
+		R062CreateRevPartMaster r = getFactory().getr062(chwA, typeModel,
+				chwAg, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
 	public void r100(CHWAnnouncement chwA, TypeModel typeModel,
 			CHWGeoAnn chwAg, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String FromToType, String pimsIdentity) throws Exception {
@@ -185,12 +249,13 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 		for (int i = 0; i < 1; i++) {
 			try {
 				R100createTypeMaterialBasicView r = getFactory().getr100(chwA,
-						typeModel, chwAg, newFlag, tmUPGObj, FromToType, pimsIdentity);
+						typeModel, chwAg, newFlag, tmUPGObj, FromToType,
+						pimsIdentity);
 				logPromoteInfoMessage(r);
 				r.evaluate();
 				logPromoteResultMessage(r);
 				return;
-			} catch(Exception e) {
+			} catch (Exception e) {
 				exception = e;
 			}
 		}
@@ -1249,7 +1314,7 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 				salesBOM.add(depData);
 			}
 
-			return salesBOM.size()==0? null:salesBOM;
+			return salesBOM.size() == 0 ? null : salesBOM;
 		} else {
 
 			logger.info("R210ReadSalesBom is null.");

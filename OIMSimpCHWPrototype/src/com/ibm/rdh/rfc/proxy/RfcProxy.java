@@ -19,12 +19,29 @@ import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
  * @author Will
  */
 public interface RfcProxy {
-	
 
 	/*
 	 * rjc - this class will instantiate the respective RFC and then NOT execute
 	 * it. in some cases, bogus data will be created to test the promote.
 	 */
+	public abstract void r005(CHWAnnouncement chwA, TypeModel typeModel,
+			CHWGeoAnn chwAg, String sapPlant, String pimsIdentity)
+			throws Exception;
+
+	public abstract void r006(CHWAnnouncement chwA, TypeModel typeModel,
+			CHWGeoAnn chwAg, String salesOrg, String currentSapSalesStatus,
+			Date currentEffectiveDate, String productHierarchy,
+			String pimsIdentity) throws Exception;
+
+	public abstract void r009(TypeModel typeModel, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+
+	public abstract void r057(CHWAnnouncement chwA, TypeModel typeModel,
+			CHWGeoAnn chwAg, String returnPlant, String pimsIdentity)
+			throws Exception;
+
+	public abstract void r062(CHWAnnouncement chwA, TypeModel typeModel,
+			CHWGeoAnn chwAg, String pimsIdentity) throws Exception;
 
 	public abstract void r100(CHWAnnouncement chwA, TypeModel typeModel,
 			CHWGeoAnn chwAg, String newFlag, TypeModelUPGGeo tmUPGObj,
