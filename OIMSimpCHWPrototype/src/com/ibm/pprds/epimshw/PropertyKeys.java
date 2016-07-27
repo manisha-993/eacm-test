@@ -147,10 +147,11 @@ public class PropertyKeys
 	public final static String KEY_SAP_LEDGER = "epimshw.enableSapLedger";
 	public final static String KEY_PROFIT_CENTER_PLANT = "epimshw.profitCenterPlant"; 
 	public final static String KEY_CNTRY_TAX_REFRESH_TIME = "epimshw.cntryTaxRefreshTime";
-	
+	// RFC proxy try count and retry wait time
 	public final static String KEY_RFC_MAX_TRY_COUNT = "epimshw.rfcMaxTryCount";
 	public final static String KEY_RFC_RETRY_WAIT_TIME = "epimshw.rfcRetryWaitTime";
-
+	// PLNTOFMFR and Loading Group mapping prefix 
+	public final static String KEY_EACM_PLNTOFMFR_LADGR_PREFIX = "eacm.planOfMfr_";
 }
 
 
