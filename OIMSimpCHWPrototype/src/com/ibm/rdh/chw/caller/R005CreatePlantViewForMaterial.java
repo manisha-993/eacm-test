@@ -80,10 +80,21 @@ public class R005CreatePlantViewForMaterial extends Rfc {
 		b1Row.setMaabc("A");
 		b1Row.setDisgr("Z025");
 		b1Row.setPerkz("M");
+		//Prctr need to be confirmed
 		String temp = "0000000000";// temp str for format
 		b1Row.setPrctr(temp.substring(0, 10 - typeModel.getProfitCenter()
 				.length())
 				+ typeModel.getDiv());
+		
+//		if (_productSchedule.getMainProduct().getOwningDivision() != null) {
+//			String prctr = _productSchedule.getMainProduct()
+//					.getOwningDivision().getName();
+//			if (prctr != null) {
+//				String temp = "0000000000";// temp str for format
+//				setPrctr(bmmh1row, temp.substring(0, 10 - prctr.length())
+//						+ prctr);
+//			}
+//		}
 		b1Row.setDwerk("1222");
 		// b1Row.setProdh("");
 		b1Row.setBeskz("X");
