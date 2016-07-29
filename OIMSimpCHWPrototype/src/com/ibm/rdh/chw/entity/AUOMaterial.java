@@ -1,5 +1,7 @@
 package com.ibm.rdh.chw.entity;
 
+import java.util.Vector;
+
 /**
  * To change this generated comment edit the template variable "typecomment":
  * Window>Preferences>Java>Templates. To enable and disable the creation of type
@@ -8,7 +10,32 @@ package com.ibm.rdh.chw.entity;
 public class AUOMaterial implements java.io.Serializable {
 	public String material;
 	public String percentage;
+	public String div;
+	public String CHWProdHierarchy;
+	public String shortName;
+	//ACCTASGNGRP
+	public String acctAsgnGrp;
+	public Vector countryList;
+	//AMRTZTLNSTRT
+	public String amrtztlnstrt;
+	//AMRTZTLNLNGTH
+	public String amrtztlnlngth;
+	//MATERIALGROUP1
+	public String materialGroup1;
+	//EFFECTIVEDATE 
+	public String effectiveDate;
+	
+    public String getEffectiveDate() {
+		return effectiveDate;
+	}
 
+	public void setEffectiveDate(String effectiveDate) {
+		this.effectiveDate = effectiveDate;
+	}
+
+	private static final String CHW_PROD_HIERARCHY = "0900B00002";
+    private static final String SAP_MATERIAL_GRP = "SWC";
+    
 	public AUOMaterial(String material, String percentage) {
 		this.setMaterial(material);
 		this.setPercentage(percentage);
@@ -29,6 +56,69 @@ public class AUOMaterial implements java.io.Serializable {
 	public String getMaterial() {
 		return this.material;
 	}
+	public String getDiv() {
+		return div;
+	}
+
+	public void setDiv(String div) {
+		this.div = div;
+	}
+
+	public String getCHWProdHierarchy() {
+		return CHWProdHierarchy;
+	}
+
+	public void setCHWProdHierarchy(String cHWProdHierarchy) {
+		CHWProdHierarchy = cHWProdHierarchy;
+	}
+
+	public String getShortName() {
+		return shortName;
+	}
+
+	public void setShortName(String shortName) {
+		this.shortName = shortName;
+	}
+
+	public String getAcctAsgnGrp() {
+		return acctAsgnGrp;
+	}
+
+	public void setAcctAsgnGrp(String acctAsgnGrp) {
+		this.acctAsgnGrp = acctAsgnGrp;
+	}
+
+	public Vector getCountryList() {
+		return countryList;
+	}
+
+	public void setCountryList(Vector countryList) {
+		this.countryList = countryList;
+	}
+
+	public String getAmrtztlnstrt() {
+		return amrtztlnstrt;
+	}
+
+	public void setAmrtztlnstrt(String amrtztlnstrt) {
+		this.amrtztlnstrt = amrtztlnstrt;
+	}
+
+	public String getAmrtztlnlngth() {
+		return amrtztlnlngth;
+	}
+
+	public void setAmrtztlnlngth(String amrtztlnlngth) {
+		this.amrtztlnlngth = amrtztlnlngth;
+	}
+
+	public String getMaterialGroup1() {
+		return materialGroup1;
+	}
+
+	public void setMaterialGroup1(String materialGroup1) {
+		this.materialGroup1 = materialGroup1;
+	}
 
 	public boolean equals(AUOMaterial aUOMaterialTmp) {
 		boolean equals = false;
@@ -39,12 +129,14 @@ public class AUOMaterial implements java.io.Serializable {
 
 	}
 
+	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("AUOMaterial [");
-		sb.append("material: " + getMaterial());
-		sb.append(", Percentage: " + getPercentage());
-		sb.append("]");
-		return sb.toString();
+		return "AUOMaterial [material=" + material + ", percentage="
+				+ percentage + ", div=" + div + ", CHWProdHierarchy="
+				+ CHWProdHierarchy + ", shortName=" + shortName
+				+ ", acctAsgnGrp=" + acctAsgnGrp + ", countryList="
+				+ countryList + ", amrtztlnstrt=" + amrtztlnstrt
+				+ ", amrtztlnlngth=" + amrtztlnlngth + ", materialGroup1="
+				+ materialGroup1 + ", effectiveDate=" + effectiveDate + "]";
 	}
 }
