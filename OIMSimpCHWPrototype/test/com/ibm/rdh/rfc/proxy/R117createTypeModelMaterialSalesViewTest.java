@@ -37,7 +37,7 @@ public class R117createTypeModelMaterialSalesViewTest extends RdhRestProxyTest {
 			CHWGeoAnn chwAg = new CHWGeoAnn();
 			chwAg.setAnnouncementDate(new Date());
 			String div = "46";
-			String acctAsgnGrp = "06";
+			String acctAsgnGrp = "";
 			PlannedSalesStatus ps = new PlannedSalesStatus();
 			ps.setCurrentSalesStatus("YA");
 			ps.setCurrentEffectiveDate(new Date());

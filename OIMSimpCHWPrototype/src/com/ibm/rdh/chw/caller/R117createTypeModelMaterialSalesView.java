@@ -29,7 +29,8 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 			String typemod, String div, String acctAsgnGrp,
 			PlannedSalesStatus ps, boolean bumpCtr, String pimsIdentity,
 			String flfil, String salesOrg1, String productHierarchy,
-			Vector VectTaxList, String plantValue,CHWGeoAnn chwAg) throws Exception {
+			Vector VectTaxList, String plantValue, CHWGeoAnn chwAg)
+			throws Exception {
 		reInitialize();
 		Date curDate = new Date();
 		String sDateFormat = ConfigManager.getConfigManager().getString(
@@ -61,15 +62,12 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		rfc.setIBmm00(b0Table);
 
 		rfcInfo.append("B0 \n");
-		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() 
-				+ ", MATNR>>" + b0Row.getMatnr() 
-				+ ", MBRSH>>" + b0Row.getMbrsh()
-				+ ", MTART>>" + b0Row.getMtart() 
-				+ ", XEIB1>>" + b0Row.getXeib1() 
-				+ ", XEIV1>>" + b0Row.getXeiv1()
-				+ ", XEIV2>>" + b0Row.getXeiv2() 
-				+ ", VKORG>>" + b0Row.getVkorg() 
-				+ ", VTWEG>>" + b0Row.getVtweg() + "\n");
+		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
+				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
+				+ ", MTART>>" + b0Row.getMtart() + ", XEIB1>>"
+				+ b0Row.getXeib1() + ", XEIV1>>" + b0Row.getXeiv1()
+				+ ", XEIV2>>" + b0Row.getXeiv2() + ", VKORG>>"
+				+ b0Row.getVkorg() + ", VTWEG>>" + b0Row.getVtweg() + "\n");
 
 		// Bmmh1 - B1
 		Bmmh1Table b1Table = new Bmmh1Table();
@@ -79,7 +77,11 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		b1Row.setDwerk(plantValue);
 		b1Row.setProdh(productHierarchy);
 		b1Row.setMtpos("ZSUP");
-		b1Row.setKtgrm(acctAsgnGrp);
+		if (null == acctAsgnGrp || acctAsgnGrp.equals("")) {
+			b1Row.setKtgrm("01");
+		} else {
+			b1Row.setKtgrm(acctAsgnGrp);
+		}
 		b1Row.setSktof("X");
 		b1Row.setScmng("1");
 		// add 6 set value, In the previous epimshw code
@@ -167,31 +169,23 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
-		rfcInfo.append(Tab + "MATKL>>" + b1Row.getMatkl() 
-				+ ", ZEINR>>" + b1Row.getZeinr() 
-				+ ", AESZN>>" + b1Row.getAeszn()
-				+ ", GEWEI>>" + b1Row.getGewei() 
-				+ ", SPART>>" + b1Row.getSpart() 
-				+ ", ZEIAR>>" + b1Row.getZeiar() + "\n");
+		rfcInfo.append(Tab + "MATKL>>" + b1Row.getMatkl() + ", ZEINR>>"
+				+ b1Row.getZeinr() + ", AESZN>>" + b1Row.getAeszn()
+				+ ", GEWEI>>" + b1Row.getGewei() + ", SPART>>"
+				+ b1Row.getSpart() + ", ZEIAR>>" + b1Row.getZeiar() + "\n");
 
-		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins()
-				+ ", DWERK>>" + b1Row.getDwerk() 
-				+ ", PRODH>>" + b1Row.getProdh()
-				+ ", MTPOS>>" + b1Row.getMtpos() 
-				+ ", KTGRM>>" + b1Row.getKtgrm() 
-				+ ", SKTOF>>" + b1Row.getSktof()
-				+ ", SCMNG>>" + b1Row.getScmng() 
-				+ ", MVGR1>>" + b1Row.getMvgr1() 
-				+ ", MVGR2>>" + b1Row.getMvgr2()
-				+ ", MVGR3>>" + b1Row.getMvgr3() 
-				+ ", VERSG>>" + b1Row.getVersg() 
-				+ ", VMSTA>>" + b1Row.getVmsta()
-				+ ", VMSTD>>" + b1Row.getVmstd() 
-				+ ", AUMNG>>" + b1Row.getAumng() 
-				+ ", VPRSV>>" + b1Row.getVprsv()
-				+ ", PEINH>>" + b1Row.getPeinh() 
-				+ ", STPRS>>" + b1Row.getStprs() 
-				+ ", BKLAS>>" + b1Row.getBklas() + "\n");
+		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins() + ", DWERK>>"
+				+ b1Row.getDwerk() + ", PRODH>>" + b1Row.getProdh()
+				+ ", MTPOS>>" + b1Row.getMtpos() + ", KTGRM>>"
+				+ b1Row.getKtgrm() + ", SKTOF>>" + b1Row.getSktof()
+				+ ", SCMNG>>" + b1Row.getScmng() + ", MVGR1>>"
+				+ b1Row.getMvgr1() + ", MVGR2>>" + b1Row.getMvgr2()
+				+ ", MVGR3>>" + b1Row.getMvgr3() + ", VERSG>>"
+				+ b1Row.getVersg() + ", VMSTA>>" + b1Row.getVmsta()
+				+ ", VMSTD>>" + b1Row.getVmstd() + ", AUMNG>>"
+				+ b1Row.getAumng() + ", VPRSV>>" + b1Row.getVprsv()
+				+ ", PEINH>>" + b1Row.getPeinh() + ", STPRS>>"
+				+ b1Row.getStprs() + ", BKLAS>>" + b1Row.getBklas() + "\n");
 
 		// Bmmh2 - B2 Structure
 		Bmmh2Table b2Table = new Bmmh2Table();
@@ -211,9 +205,9 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 				b2Table.appendRow(b2Row);
 
 				rfcInfo.append("B2 \n");
-				rfcInfo.append(Tab + "ALAND>>" + b2Row.getAland() 
-						+ ", TATY1>>" + b2Row.getTaty1() 
-						+ ", TAXM1>>" + b2Row.getTaxm1() + "\n");
+				rfcInfo.append(Tab + "ALAND>>" + b2Row.getAland() + ", TATY1>>"
+						+ b2Row.getTaty1() + ", TAXM1>>" + b2Row.getTaxm1()
+						+ "\n");
 			}
 		}
 
@@ -228,7 +222,7 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		rfc.setGeoData(zdmTable);
 		rfcInfo.append("ZDM_GEO_TO_CLASS \n");
 		rfcInfo.append(Tab + "GEO>>" + zdmRow.getZGeo() + "\n");
-		
+
 		// PIMS_IDENTITY
 		rfc.setPimsIdentity(pimsIdentity);
 		rfcInfo.append("PIMSIdentity \n");

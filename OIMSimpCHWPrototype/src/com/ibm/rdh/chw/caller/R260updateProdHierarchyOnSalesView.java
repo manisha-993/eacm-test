@@ -19,7 +19,8 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 
 	public R260updateProdHierarchyOnSalesView(CHWAnnouncement chwA,
 			Object material, String pimsIdentity, String salesOrg,
-			String productHierarchy, CHWGeoAnn chwAg) throws Exception {
+			String productHierarchy, CHWGeoAnn chwAg, String acctAsgnGrp)
+			throws Exception {
 		reInitialize();
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
 		rfcName = "Z_DM_SAP_MATM_CREATE";
@@ -63,19 +64,24 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 		rfc.setIBmm00(b0Table);
 
 		rfcInfo.append("BMM00 \n");
-		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() 
-				+ ", MATNR>>" + b0Row.getMatnr() 
-				+ ", XEIV1>>" + b0Row.getXeiv1()
-				+ ", VKORG>>" + b0Row.getVkorg() 
-				+ ", VTWEG>>" + b0Row.getVtweg() + "\n");
-		rfcInfo.append(Tab + "MBRSH>>" + b0Row.getMbrsh() 
-				+ ", MTART>>" + b0Row.getMtart() + "\n");
+		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
+				+ b0Row.getMatnr() + ", XEIV1>>" + b0Row.getXeiv1()
+				+ ", VKORG>>" + b0Row.getVkorg() + ", VTWEG>>"
+				+ b0Row.getVtweg() + "\n");
+		rfcInfo.append(Tab + "MBRSH>>" + b0Row.getMbrsh() + ", MTART>>"
+				+ b0Row.getMtart() + "\n");
 
 		// Bmmh1
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
 		b1Row.setProdh(productHierarchy);
+
+		if (null == acctAsgnGrp || acctAsgnGrp.equals("")) {
+			b1Row.setKtgrm("01");
+		} else {
+			b1Row.setKtgrm(acctAsgnGrp);
+		}
 		// add 20160427
 		b1Row.setMatkl("000");
 		b1Row.setMeins("EA");
@@ -90,13 +96,12 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 
 		rfcInfo.append("BMMH1 \n");
 		rfcInfo.append(Tab + "PRODH>>" + b1Row.getProdh() + "\n");
-		rfcInfo.append(Tab + "MATKL>>" + b1Row.getMatkl() 
-				+ ", MEINS>>" + b1Row.getMeins() 
-				+ ", ZEINR>>" + b1Row.getZeinr() 
-				+ ", ZEIAR>>" + b1Row.getZeiar() 
-				+ ", AESZN>>" + b1Row.getAeszn() 
-				+ ", SPART>>" + b1Row.getSpart() 
-				+ ", GEWEI>>" + b1Row.getGewei() + "\n");
+		rfcInfo.append(Tab + ", KTGRM>>" + b1Row.getKtgrm() + "MATKL>>"
+				+ b1Row.getMatkl() + ", MEINS>>" + b1Row.getMeins()
+				+ ", ZEINR>>" + b1Row.getZeinr() + ", ZEIAR>>"
+				+ b1Row.getZeiar() + ", AESZN>>" + b1Row.getAeszn()
+				+ ", SPART>>" + b1Row.getSpart() + ", GEWEI>>"
+				+ b1Row.getGewei() + "\n");
 
 		// PIMSIdentity
 		rfc.setPimsIdentity(pimsIdentity);
