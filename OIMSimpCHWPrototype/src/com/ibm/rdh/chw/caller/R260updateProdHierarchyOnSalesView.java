@@ -34,7 +34,6 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
 
 		b0Row.setTcode("MM01"); // For NEW
-
 		if (material instanceof TypeModel) {
 			b0Row.setMatnr(((TypeModel) material).getType()
 					+ ((TypeModel) material).getModel());
@@ -76,7 +75,6 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
 		b1Row.setProdh(productHierarchy);
-
 		if (null == acctAsgnGrp || acctAsgnGrp.equals("")) {
 			b1Row.setKtgrm("01");
 		} else {

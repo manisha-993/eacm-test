@@ -60,7 +60,6 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 
 		b0Table.appendRow(b0Row);
 		rfc.setIBmm00(b0Table);
-
 		rfcInfo.append("B0 \n");
 		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
 				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
