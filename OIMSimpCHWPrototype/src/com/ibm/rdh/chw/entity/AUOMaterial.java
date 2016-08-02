@@ -1,5 +1,6 @@
 package com.ibm.rdh.chw.entity;
 
+import java.util.Date;
 import java.util.Vector;
 
 /**
@@ -23,13 +24,13 @@ public class AUOMaterial implements java.io.Serializable {
 	//MATERIALGROUP1
 	public String materialGroup1;
 	//EFFECTIVEDATE 
-	public String effectiveDate;
+	public Date effectiveDate;
 	
-    public String getEffectiveDate() {
+    public Date getEffectiveDate() {
 		return effectiveDate;
 	}
 
-	public void setEffectiveDate(String effectiveDate) {
+	public void setEffectiveDate(Date effectiveDate) {
 		this.effectiveDate = effectiveDate;
 	}
 
