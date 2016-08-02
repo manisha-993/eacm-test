@@ -10,9 +10,7 @@ import org.junit.Test;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
-import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.CHWGeoAnn;
-import com.ibm.rdh.chw.entity.TypeModel;
+import com.ibm.rdh.chw.entity.AUOMaterial;
 
 public class R005CreatePlantViewForMaterialTest extends RdhRestProxyTest {
 
@@ -25,20 +23,12 @@ public class R005CreatePlantViewForMaterialTest extends RdhRestProxyTest {
 	public void r005() {
 		try {
 
-			CHWAnnouncement chwA = new CHWAnnouncement();
-			TypeModel typeModel = new TypeModel();
-			CHWGeoAnn chwAg = new CHWGeoAnn();
-			chwA.setAnnDocNo("123401");
-			chwA.setAnnouncementType("New");
-			typeModel.setDiv("B1");
-			typeModel.setType("EACM");
-			typeModel.setProfitCenter("EC");
-			// typeModel.setProductHierarchy("ph");
-			// typeModel.setDescription("ECCM");
-			chwAg.setAnnouncementDate(new Date());
+			AUOMaterial auoMaterial = new AUOMaterial("EACMCHW", "57");
+			auoMaterial.setDiv("B1");
+			auoMaterial.setEffectiveDate(new Date());
 			String pimsIdentity = "C";
 			String sapPlant = "Y";
-			String objectId = typeModel.getType();
+			String objectId = auoMaterial.getMaterial();
 
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
 					"Z_DM_SAP_MATM_CREATE", objectId);
@@ -46,7 +36,7 @@ public class R005CreatePlantViewForMaterialTest extends RdhRestProxyTest {
 			assertEquals(deleteDataResult, 0);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r005(chwA, typeModel, chwAg, sapPlant, pimsIdentity);
+			rfcProxy.r005(auoMaterial, sapPlant, pimsIdentity);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;

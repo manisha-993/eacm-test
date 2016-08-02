@@ -3,16 +3,14 @@ package com.ibm.rdh.rfc.proxy;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
-import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.CHWGeoAnn;
-import com.ibm.rdh.chw.entity.TypeModel;
+import com.ibm.rdh.chw.entity.AUOMaterial;
+import com.ibm.rdh.chw.entity.CntryTax;
 
 public class R006CreateSwoMaterialSalesViewTest extends RdhRestProxyTest {
 
@@ -25,20 +23,26 @@ public class R006CreateSwoMaterialSalesViewTest extends RdhRestProxyTest {
 	public void r006() {
 		try {
 
-			CHWAnnouncement chwA = new CHWAnnouncement();
-			TypeModel typeModel = new TypeModel();
-			CHWGeoAnn chwAg = new CHWGeoAnn();
-			chwA.setAnnDocNo("123401");
-			chwA.setAnnouncementType("New");
-			typeModel.setDiv("B1");
-			typeModel.setType("EACM");
-			chwAg.setAnnouncementDate(new Date());
+			AUOMaterial auoMaterial = new AUOMaterial("EACMCHW", "57");
+			auoMaterial.setAcctAsgnGrp("EC");
+			auoMaterial.setMaterialGroup1("I");
+			auoMaterial.setCHWProdHierarchy("0900B00002");
+			auoMaterial.setDiv("B1");
+			auoMaterial.setEffectiveDate(new Date());
+			Vector country = new Vector();
+			CntryTax cntryTax = new CntryTax();
+			cntryTax.setCountry("US");
+			// cntryTax.setClassification("H");
+			cntryTax.setTaxCategory("1");
+			country.add(cntryTax);
+			auoMaterial.setCountryList(country);
+
 			String salesOrg = "so1";
 			String currentSapSalesStatus = "Z0";
 			Date currentEffectiveDate = new Date();
-			String productHierarchy = "ph";
+			// String productHierarchy = "ph";
 			String pimsIdentity = "C";
-			String objectId = typeModel.getType();
+			String objectId = auoMaterial.getMaterial();
 
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT,
 					"Z_DM_SAP_MATM_CREATE", objectId);
@@ -46,9 +50,8 @@ public class R006CreateSwoMaterialSalesViewTest extends RdhRestProxyTest {
 			assertEquals(deleteDataResult, 0);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r006(chwA, typeModel, chwAg, salesOrg,
-					currentSapSalesStatus, currentEffectiveDate,
-					productHierarchy, pimsIdentity);
+			rfcProxy.r006(auoMaterial, salesOrg, currentSapSalesStatus,
+					currentEffectiveDate, pimsIdentity);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
@@ -88,5 +91,4 @@ public class R006CreateSwoMaterialSalesViewTest extends RdhRestProxyTest {
 		}
 
 	}
-
 }
