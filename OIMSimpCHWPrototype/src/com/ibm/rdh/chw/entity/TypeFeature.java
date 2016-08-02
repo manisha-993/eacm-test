@@ -58,6 +58,8 @@ public class TypeFeature {
 	private Vector Flfil = new Vector();
 	private Vector typefeatures = new Vector();
 
+	private String featureRange;
+	
 	/*****
 	 * If TypeFeature.FeatureID = 'Q' then Range = 'RPQ' Else if
 	 * TypeFeature.Feature first character is alphabetic (not numeric) then
@@ -218,18 +220,19 @@ public class TypeFeature {
 	 *            com.ibm.pprds.epimshw.TypeFeature
 	 */
 	public String calculateRange100() {
-		String range = "";
-		if ("Q".equals(this.getFeatureID())) {
-			range = "RPQ";
-			return range;
-		} else {		
-			if (ifAlphaNumeric()) {
-				return "A000";
-			} else {
-				range = this.getFeature().substring(0, 1) + "000";
-				return range;
-			}
-		}	
+		return featureRange;
+//		String range = "";
+//		if ("Q".equals(this.getFeatureID())) {
+//			range = "RPQ";
+//			return range;
+//		} else {		
+//			if (ifAlphaNumeric()) {
+//				return "A000";
+//			} else {
+//				range = this.getFeature().substring(0, 1) + "000";
+//				return range;
+//			}
+//		}	
 //		String range;
 //		if (this.getFeatureID().equals("Q")) {
 //			range = "RPQ";
@@ -1134,6 +1137,10 @@ public class TypeFeature {
 		warrantyPer = newWarrantyPer;
 	}
 
+	public void setFeatureRange(String featureRange) {
+		this.featureRange = featureRange;
+	}
+
 	/**
 	 * Returns a String that represents the value of this object.
 	 * 
@@ -1174,6 +1181,8 @@ public class TypeFeature {
 		s.append("AASOrderable >> " + AASOrderable + "\n");
 
 		s.append("warrantyPeriod >> " + warrantyPer + "\n");
+		
+		s.append("featureRange >> " + featureRange + "\n");
 
 		// s.append(tfgCollection.toString());
 
