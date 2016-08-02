@@ -10,6 +10,7 @@ import java.util.Vector;
 import com.ibm.rdh.chw.caller.R005CreatePlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R006CreateSwoMaterialSalesView;
 import com.ibm.rdh.chw.caller.R009Maintain001Classification;
+import com.ibm.rdh.chw.caller.R039Create011ClassificationForMgCommon;
 import com.ibm.rdh.chw.caller.R057CreateReturnPlantView;
 import com.ibm.rdh.chw.caller.R062CreateRevPartMaster;
 import com.ibm.rdh.chw.caller.R100createTypeMaterialBasicView;
@@ -99,6 +100,7 @@ import com.ibm.rdh.chw.caller.R213UpdateSalesBOMItemWithtypeMTC;
 import com.ibm.rdh.chw.caller.R214ReadMCclass;
 import com.ibm.rdh.chw.caller.R260updateProdHierarchyOnSalesView;
 import com.ibm.rdh.chw.caller.R262createPlantViewProfitCenterForMaterial;
+import com.ibm.rdh.chw.entity.AUOMaterial;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.PlannedSalesStatus;
@@ -123,38 +125,39 @@ public class RfcFactory extends Object {
 	 * .domain.SWO)
 	 */
 
-	public R005CreatePlantViewForMaterial getr005(CHWAnnouncement chwA,
-			TypeModel typeModel, CHWGeoAnn chwAg, String sapPlant,
-			String pimsIdentity) throws Exception {
-		return new R005CreatePlantViewForMaterial(chwA, typeModel, chwAg,
-				sapPlant, pimsIdentity);
-	}
-
-	public R006CreateSwoMaterialSalesView getr006(CHWAnnouncement chwA,
-			TypeModel typeModel, CHWGeoAnn chwAg, String salesOrg,
-			String currentSapSalesStatus, Date currentEffectiveDate,
-			String productHierarchy, String pimsIdentity) throws Exception {
-		return new R006CreateSwoMaterialSalesView(chwA, typeModel, chwAg,
-				salesOrg, currentSapSalesStatus, currentEffectiveDate,
-				productHierarchy, pimsIdentity);
-	}
-
-	public R009Maintain001Classification getr009(TypeModel typeModel,
-			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
-		return new R009Maintain001Classification(typeModel, chwA, pimsIdentity);
-	}
-
-	public R057CreateReturnPlantView getr057(CHWAnnouncement chwA,
-			TypeModel typeModel, CHWGeoAnn chwAg, String returnPlant,
-			String pimsIdentity) throws Exception {
-		return new R057CreateReturnPlantView(chwA, typeModel, chwAg, returnPlant,
+	public R005CreatePlantViewForMaterial getr005(AUOMaterial auoMaterial,
+			String sapPlant, String pimsIdentity) throws Exception {
+		return new R005CreatePlantViewForMaterial(auoMaterial, sapPlant,
 				pimsIdentity);
 	}
 
-	public R062CreateRevPartMaster getr062(CHWAnnouncement chwA,
-			TypeModel typeModel, CHWGeoAnn chwAg, String pimsIdentity)
-			throws Exception {
-		return new R062CreateRevPartMaster(chwA, typeModel, chwAg, pimsIdentity);
+	public R006CreateSwoMaterialSalesView getr006(AUOMaterial auoMaterial,
+			String salesOrg, String currentSapSalesStatus,
+			Date currentEffectiveDate, String pimsIdentity) throws Exception {
+		return new R006CreateSwoMaterialSalesView(auoMaterial, salesOrg,
+				currentSapSalesStatus, currentEffectiveDate, pimsIdentity);
+	}
+
+	public R009Maintain001Classification getr009(AUOMaterial auoMaterial,
+			String pimsIdentity) throws Exception {
+		return new R009Maintain001Classification(auoMaterial, pimsIdentity);
+	}
+
+	public R039Create011ClassificationForMgCommon getr039(
+			AUOMaterial auoMaterial, String pimsIdentity) throws Exception {
+		return new R039Create011ClassificationForMgCommon(auoMaterial,
+				pimsIdentity);
+	}
+
+	public R057CreateReturnPlantView getr057(AUOMaterial auoMaterial,
+			String returnPlant, String pimsIdentity) throws Exception {
+		return new R057CreateReturnPlantView(auoMaterial, returnPlant,
+				pimsIdentity);
+	}
+
+	public R062CreateRevPartMaster getr062(AUOMaterial auoMaterial,
+			String pimsIdentity) throws Exception {
+		return new R062CreateRevPartMaster(auoMaterial, pimsIdentity);
 	}
 
 	public R100createTypeMaterialBasicView getr100(CHWAnnouncement chwA,
@@ -765,9 +768,10 @@ public class RfcFactory extends Object {
 
 	public R260updateProdHierarchyOnSalesView getr260(CHWAnnouncement chwA,
 			Object material, String pimsIdentity, String salesOrg,
-			String productHierarchy, CHWGeoAnn chwAg) throws Exception {
+			String productHierarchy, CHWGeoAnn chwAg, String acctAsgnGrp)
+			throws Exception {
 		return new R260updateProdHierarchyOnSalesView(chwA, material,
-				pimsIdentity, salesOrg, productHierarchy, chwAg);
+				pimsIdentity, salesOrg, productHierarchy, chwAg, acctAsgnGrp);
 	}
 
 	// public R261PlantViewMaterial getr261(String material) throws Exception {

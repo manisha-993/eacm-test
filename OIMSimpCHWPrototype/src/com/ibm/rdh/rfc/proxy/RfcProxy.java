@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import com.ibm.rdh.chw.entity.AUOMaterial;
 import com.ibm.rdh.chw.entity.BasicMaterialFromSAP;
 import com.ibm.rdh.chw.entity.BomComponent;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
@@ -24,24 +25,24 @@ public interface RfcProxy {
 	 * rjc - this class will instantiate the respective RFC and then NOT execute
 	 * it. in some cases, bogus data will be created to test the promote.
 	 */
-	public abstract void r005(CHWAnnouncement chwA, TypeModel typeModel,
-			CHWGeoAnn chwAg, String sapPlant, String pimsIdentity)
-			throws Exception;
-
-	public abstract void r006(CHWAnnouncement chwA, TypeModel typeModel,
-			CHWGeoAnn chwAg, String salesOrg, String currentSapSalesStatus,
-			Date currentEffectiveDate, String productHierarchy,
+	public abstract void r005(AUOMaterial auoMaterial, String sapPlant,
 			String pimsIdentity) throws Exception;
 
-	public abstract void r009(TypeModel typeModel, CHWAnnouncement chwA,
+	public abstract void r006(AUOMaterial auoMaterial, String salesOrg,
+			String currentSapSalesStatus, Date currentEffectiveDate,
 			String pimsIdentity) throws Exception;
 
-	public abstract void r057(CHWAnnouncement chwA, TypeModel typeModel,
-			CHWGeoAnn chwAg, String returnPlant, String pimsIdentity)
+	public abstract void r009(AUOMaterial auoMaterial, String pimsIdentity)
 			throws Exception;
 
-	public abstract void r062(CHWAnnouncement chwA, TypeModel typeModel,
-			CHWGeoAnn chwAg, String pimsIdentity) throws Exception;
+	public abstract void r039(AUOMaterial auoMaterial, String pimsIdentity)
+			throws Exception;
+
+	public abstract void r057(AUOMaterial auoMaterial, String returnPlant,
+			String pimsIdentity) throws Exception;
+
+	public abstract void r062(AUOMaterial auoMaterial, String pimsIdentity)
+			throws Exception;
 
 	public abstract void r100(CHWAnnouncement chwA, TypeModel typeModel,
 			CHWGeoAnn chwAg, String newFlag, TypeModelUPGGeo tmUPGObj,
@@ -350,7 +351,7 @@ public interface RfcProxy {
 
 	public abstract void r260(CHWAnnouncement chwA, Object material,
 			String pimsIdentity, String salesOrg, String productHierarchy,
-			CHWGeoAnn chwAg) throws Exception;
+			CHWGeoAnn chwAg, String acctAsgnGrp) throws Exception;
 
 	// public abstract Vector r261(String material) throws Exception;
 

@@ -14,6 +14,7 @@ import com.ibm.pprds.epimshw.util.RfcLogger;
 import com.ibm.rdh.chw.caller.R005CreatePlantViewForMaterial;
 import com.ibm.rdh.chw.caller.R006CreateSwoMaterialSalesView;
 import com.ibm.rdh.chw.caller.R009Maintain001Classification;
+import com.ibm.rdh.chw.caller.R039Create011ClassificationForMgCommon;
 import com.ibm.rdh.chw.caller.R057CreateReturnPlantView;
 import com.ibm.rdh.chw.caller.R062CreateRevPartMaster;
 import com.ibm.rdh.chw.caller.R100createTypeMaterialBasicView;
@@ -105,6 +106,7 @@ import com.ibm.rdh.chw.caller.R260updateProdHierarchyOnSalesView;
 import com.ibm.rdh.chw.caller.R262createPlantViewProfitCenterForMaterial;
 import com.ibm.rdh.chw.caller.Rfc;
 import com.ibm.rdh.chw.caller.RfcReturnSeverityCodes;
+import com.ibm.rdh.chw.entity.AUOMaterial;
 import com.ibm.rdh.chw.entity.BasicMaterialFromSAP;
 import com.ibm.rdh.chw.entity.BomComponent;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
@@ -183,34 +185,32 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 	}
 
 	@Override
-	public void r005(CHWAnnouncement chwA, TypeModel typeModel,
-			CHWGeoAnn chwAg, String sapPlant, String pimsIdentity)
+	public void r005(AUOMaterial auoMaterial, String sapPlant,
+			String pimsIdentity) throws Exception {
+		R005CreatePlantViewForMaterial r = getFactory().getr005(auoMaterial,
+				sapPlant, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r006(AUOMaterial auoMaterial, String salesOrg,
+			String currentSapSalesStatus, Date currentEffectiveDate,
+			String pimsIdentity) throws Exception {
+		R006CreateSwoMaterialSalesView r = getFactory().getr006(auoMaterial,
+				salesOrg, currentSapSalesStatus, currentEffectiveDate,
+				pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+
+	@Override
+	public void r009(AUOMaterial auoMaterial, String pimsIdentity)
 			throws Exception {
-		R005CreatePlantViewForMaterial r = getFactory().getr005(chwA,
-				typeModel, chwAg, sapPlant, pimsIdentity);
-		logPromoteInfoMessage(r);
-		r.evaluate();
-		logPromoteResultMessage(r);
-
-	}
-
-	@Override
-	public void r006(CHWAnnouncement chwA, TypeModel typeModel,
-			CHWGeoAnn chwAg, String salesOrg, String currentSapSalesStatus,
-			Date currentEffectiveDate, String productHierarchy,
-			String pimsIdentity) throws Exception {
-		R006CreateSwoMaterialSalesView r = getFactory().getr006(chwA,
-				typeModel, chwAg, salesOrg, currentSapSalesStatus,
-				currentEffectiveDate, productHierarchy, pimsIdentity);
-		logPromoteInfoMessage(r);
-		r.evaluate();
-		logPromoteResultMessage(r);
-	}
-
-	@Override
-	public void r009(TypeModel typeModel, CHWAnnouncement chwA,
-			String pimsIdentity) throws Exception {
-		R009Maintain001Classification r = getFactory().getr009(typeModel, chwA,
+		R009Maintain001Classification r = getFactory().getr009(auoMaterial,
 				pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
@@ -219,11 +219,11 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 	}
 
 	@Override
-	public void r057(CHWAnnouncement chwA, TypeModel typeModel,
-			CHWGeoAnn chwAg, String returnPlant, String pimsIdentity)
+	public void r039(AUOMaterial auoMaterial, String pimsIdentity)
 			throws Exception {
-		R057CreateReturnPlantView r = getFactory().getr057(chwA, typeModel,
-				chwAg, returnPlant, pimsIdentity);
+
+		R039Create011ClassificationForMgCommon r = getFactory().getr039(
+				auoMaterial, pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
@@ -231,10 +231,21 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 	}
 
 	@Override
-	public void r062(CHWAnnouncement chwA, TypeModel typeModel,
-			CHWGeoAnn chwAg, String pimsIdentity) throws Exception {
-		R062CreateRevPartMaster r = getFactory().getr062(chwA, typeModel,
-				chwAg, pimsIdentity);
+	public void r057(AUOMaterial auoMaterial, String returnPlant,
+			String pimsIdentity) throws Exception {
+		R057CreateReturnPlantView r = getFactory().getr057(auoMaterial,
+				returnPlant, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+	}
+
+	@Override
+	public void r062(AUOMaterial auoMaterial, String pimsIdentity)
+			throws Exception {
+		R062CreateRevPartMaster r = getFactory().getr062(auoMaterial,
+				pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
@@ -1374,9 +1385,10 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 	@Override
 	public void r260(CHWAnnouncement chwA, Object material,
 			String pimsIdentity, String salesOrg, String productHierarchy,
-			CHWGeoAnn chwAg) throws Exception {
+			CHWGeoAnn chwAg, String acctAsgnGrp) throws Exception {
 		R260updateProdHierarchyOnSalesView r = getFactory().getr260(chwA,
-				material, pimsIdentity, salesOrg, productHierarchy, chwAg);
+				material, pimsIdentity, salesOrg, productHierarchy, chwAg,
+				acctAsgnGrp);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
