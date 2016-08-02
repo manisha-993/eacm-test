@@ -1,11 +1,8 @@
 package com.ibm.rdh.chw.caller;
 
 import java.text.SimpleDateFormat;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.CHWGeoAnn;
-import com.ibm.rdh.chw.entity.TypeModel;
+import com.ibm.rdh.chw.entity.AUOMaterial;
 import com.ibm.rdh.rfc.Bmm00Table;
 import com.ibm.rdh.rfc.Bmm00TableRow;
 import com.ibm.rdh.rfc.Bmmh1Table;
@@ -18,8 +15,8 @@ import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 public class R062CreateRevPartMaster extends Rfc {
 	private com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE rfc;
 
-	public R062CreateRevPartMaster(CHWAnnouncement chwA, TypeModel typeModel,
-			CHWGeoAnn chwAg, String pimsIdentity) throws Exception {
+	public R062CreateRevPartMaster(AUOMaterial auoMaterial, String pimsIdentity)
+			throws Exception {
 
 		reInitialize();
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
@@ -31,8 +28,7 @@ public class R062CreateRevPartMaster extends Rfc {
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
 
 		b0Row.setTcode("MM01");
-		// b0Row.setMatnr(typeModel.getRevProfile().getAuoMaterials());
-		b0Row.setMatnr(typeModel.getType());
+		b0Row.setMatnr(auoMaterial.getMaterial());
 		b0Row.setMbrsh("M");
 		b0Row.setMtart("ZIMG");
 		b0Row.setXeik1("X");
@@ -50,17 +46,13 @@ public class R062CreateRevPartMaster extends Rfc {
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
 		b1Row.setMeins("EA");
-		// Add chwA entity
-		b1Row.setZeinr(chwA.getAnnDocNo());
+		b1Row.setZeinr(auoMaterial.getMaterial());
 		b1Row.setMatkl("000");
-		b1Row.setSpart(typeModel.getDiv());
+		b1Row.setSpart(auoMaterial.getDiv());
 		b1Row.setZeiar("RFA");
 		b1Row.setGewei("KG");
-		if ((typeModel.getProductHierarchy()) != null) {
-			b1Row.setPrdha(typeModel.getProductHierarchy());
-		}
-		// Add chwAg entity
-		b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
+		b1Row.setPrdha(auoMaterial.getCHWProdHierarchy());
+		b1Row.setAeszn(sdf.format(auoMaterial.getEffectiveDate()));
 
 		b1Table.appendRow(b1Row);
 		rfc.setIBmmh1(b1Table);
@@ -69,19 +61,14 @@ public class R062CreateRevPartMaster extends Rfc {
 		rfcInfo.append(Tab + ", MEINS>>" + b1Row.getMeins() + ", ZEINR>>"
 				+ b1Row.getZeinr() + ", MATKL>>" + b1Row.getMatkl()
 				+ ", SPART>>" + b1Row.getSpart() + ", ZEIAR>>"
-				+ b1Row.getZeiar() + "GEWEI>>" + b1Row.getGewei() + ", AESZN>>"
-				+ b1Row.getAeszn() + "\n");
-		if (typeModel.getProductHierarchy() != null) {
-			rfcInfo.append(Tab + "PRDHA>>" + b1Row.getPrdha() + "\n");
-		}
+				+ b1Row.getZeiar() + "GEWEI>>" + b1Row.getGewei() + "PRDHA>>"
+				+ b1Row.getPrdha() + ", AESZN>>" + b1Row.getAeszn() + "\n");
 
 		// Bmmh5 - B5 Structure
 		Bmmh5Table b5Table = new Bmmh5Table();
 		Bmmh5TableRow b5Row = b5Table.createEmptyRow();
 		b5Row.setSpras("E");
-		// This has not been completed, so set it as r100 caller.
-		// b5Row.setMaktx(typeModel.getRevProfile().getRevDescription());
-		b5Row.setMaktx(typeModel.getDescription());
+		b5Row.setMaktx(auoMaterial.getShortName());
 
 		b5Table.appendRow(b5Row);
 		rfc.setIBmmh5(b5Table);
@@ -108,9 +95,10 @@ public class R062CreateRevPartMaster extends Rfc {
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
 		// RFANUMBER
-		rfc.setRfaNum(chwA.getAnnDocNo());
+		rfc.setRfaNum(auoMaterial.getMaterial());
 		rfcInfo.append("RFANUM \n");
-		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
+		rfcInfo.append(Tab + "RFANumber>>" + auoMaterial.getMaterial() + "\n");
+
 	}
 
 	@Override

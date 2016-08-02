@@ -1,7 +1,6 @@
 package com.ibm.rdh.chw.caller;
 
 import java.util.Date;
-import java.util.Vector;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.rdh.chw.entity.AUOMaterial;
@@ -20,17 +19,15 @@ import com.ibm.rdh.rfc.RcucoTableRow;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 
-public class R009Maintain001Classification extends Rfc {
+public class R039Create011ClassificationForMgCommon extends Rfc {
 
 	private com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT rfc;
 
-	public R009Maintain001Classification(AUOMaterial auoMaterial,
+	public R039Create011ClassificationForMgCommon(AUOMaterial auoMaterial,
 			String pimsIdentity) throws Exception {
-
 		reInitialize();
 		Date curDate = new Date();
 		rfcName = "Z_DM_SAP_CLASSIFICATION_MAINT";
-
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT();
 		// Set up the RFC fields
 		// OBJECT_KEY - R0
@@ -48,7 +45,7 @@ public class R009Maintain001Classification extends Rfc {
 		KlahTable r2Table = new KlahTable();
 		KlahTableRow r2Row = r2Table.createEmptyRow();
 
-		r2Row.setClass("MM_FIELDS");
+		r2Row.setClass("MG_COMMON");
 
 		r2Table.appendRow(r2Row);
 		rfc.setIKlah(r2Table);
@@ -74,7 +71,6 @@ public class R009Maintain001Classification extends Rfc {
 		rfc.setIRcuco(r4Table);
 		rfcInfo.append("RCUCO \n");
 		rfcInfo.append(Tab + "OBTAB>>" + r4Row.getObtab() + "\n");
-
 		// MARA - R5
 		MaraTable r5Table = new MaraTable();
 		MaraTableRow r5Row = r5Table.createEmptyRow();
@@ -85,25 +81,11 @@ public class R009Maintain001Classification extends Rfc {
 		rfc.setIMara(r5Table);
 		rfcInfo.append("MARA  \n");
 		rfcInfo.append(Tab + "ERSDA>>" + r5Row.getErsdaString() + "\n");
-
 		// API_AUSP - R6
 		Api_auspTable r6Table = new Api_auspTable();
 		Api_auspTableRow r6Row = r6Table.createEmptyRow();
-		Vector r6Vector = new Vector(1, 1);
-		
-		r6Row.setCharact("MM_AMORTSTART");
-		r6Row.setValue(auoMaterial.getAmrtztlnstrt());
-		r6Vector.addElement(r6Row);
-
-		r6Row.setCharact("MM_AMORTLENGTH");
-		r6Row.setValue(auoMaterial.getAmrtztlnlngth());
-		r6Vector.addElement(r6Row);
-		r6Table.appendRow(r6Row);
-		rfc.setIApiAusp(r6Table);
-		rfcInfo.append("API_AUSP \n");
-		rfcInfo.append(Tab + "CHARACT>> " + r6Row.getCharact() + ", VALUE>> "
-				+ r6Row.getValue() + "\n");
-
+		r6Row.setCharact("MG_PRODUCTTYPE");
+		r6Row.setValue("CS");
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
@@ -123,7 +105,6 @@ public class R009Maintain001Classification extends Rfc {
 		rfc.setRfaNum(auoMaterial.getMaterial());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + auoMaterial.getMaterial() + "\n");
-
 	}
 
 	@Override
@@ -167,12 +148,6 @@ public class R009Maintain001Classification extends Rfc {
 	}
 
 	@Override
-	protected String getMaterialName() {
-		// TODO Auto-generated method stub
-		return "Maintain 001 Classification";
-	}
-
-	@Override
 	public String getRfcName() {
 		return ClassUtil.getSimpleClassName(getRfc());
 	}
@@ -181,8 +156,13 @@ public class R009Maintain001Classification extends Rfc {
 		return rfc;
 	}
 
+	@Override
+	protected String getMaterialName() {
+		// TODO Auto-generated method stub
+		return "Create 011 Classification For MgCommon";
+	}
+
 	public void evaluate() throws Exception {
 		execute();
 	}
-
 }

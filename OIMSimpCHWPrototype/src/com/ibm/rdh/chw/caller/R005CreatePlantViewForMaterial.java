@@ -1,11 +1,8 @@
 package com.ibm.rdh.chw.caller;
 
 import java.text.SimpleDateFormat;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.CHWGeoAnn;
-import com.ibm.rdh.chw.entity.TypeModel;
+import com.ibm.rdh.chw.entity.AUOMaterial;
 import com.ibm.rdh.rfc.Bmm00Table;
 import com.ibm.rdh.rfc.Bmm00TableRow;
 import com.ibm.rdh.rfc.Bmmh1Table;
@@ -17,9 +14,8 @@ public class R005CreatePlantViewForMaterial extends Rfc {
 
 	private com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE rfc;
 
-	public R005CreatePlantViewForMaterial(CHWAnnouncement chwA,
-			TypeModel typeModel, CHWGeoAnn chwAg, String sapPlant,
-			String pimsIdentity) throws Exception {
+	public R005CreatePlantViewForMaterial(AUOMaterial auoMaterial,
+			String sapPlant, String pimsIdentity) throws Exception {
 		reInitialize();
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
 		rfcName = "Z_DM_SAP_MATM_CREATE";
@@ -30,11 +26,9 @@ public class R005CreatePlantViewForMaterial extends Rfc {
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
 
 		b0Row.setTcode("MM01");
-		// b0Row.setMatnr(typeModel.getRevProfile().getAuoMaterials());
-		b0Row.setMatnr(typeModel.getType());
+		b0Row.setMatnr(auoMaterial.getMaterial());
 		b0Row.setMbrsh("M");
 		b0Row.setMtart("ZIMG");
-		// b0Row.setXeik1("X");
 		b0Row.setXeiv4("X");
 		if (sapPlant.equals("1999")) {
 			b0Row.setLgort("CHW1");
@@ -80,31 +74,18 @@ public class R005CreatePlantViewForMaterial extends Rfc {
 		b1Row.setMaabc("A");
 		b1Row.setDisgr("Z025");
 		b1Row.setPerkz("M");
-		//Prctr need to be confirmed
+		// Prctr need to be confirmed
+		String prctr = auoMaterial.getDiv();
 		String temp = "0000000000";// temp str for format
-		b1Row.setPrctr(temp.substring(0, 10 - typeModel.getProfitCenter()
-				.length())
-				+ typeModel.getDiv());
-		
-//		if (_productSchedule.getMainProduct().getOwningDivision() != null) {
-//			String prctr = _productSchedule.getMainProduct()
-//					.getOwningDivision().getName();
-//			if (prctr != null) {
-//				String temp = "0000000000";// temp str for format
-//				setPrctr(bmmh1row, temp.substring(0, 10 - prctr.length())
-//						+ prctr);
-//			}
-//		}
-		b1Row.setDwerk("1222");
-		// b1Row.setProdh("");
-		b1Row.setBeskz("X");
+		b1Row.setPrctr(temp.substring(0, 10 - prctr.length()) + prctr);
 
+		b1Row.setBeskz("X");
 		// Add 5 set value not set in the previous epimshw code
-		b1Row.setZeinr(chwA.getAnnDocNo());
+		b1Row.setZeinr(auoMaterial.getMaterial());
 		b1Row.setMatkl("000");
-		b1Row.setSpart(typeModel.getDiv());
-		b1Row.setZeiar(chwA.getAnnouncementType());
-		b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
+		b1Row.setSpart(auoMaterial.getDiv());
+		b1Row.setZeiar("New");
+		b1Row.setAeszn(sdf.format(auoMaterial.getEffectiveDate()));
 		// end
 
 		b1Table.appendRow(b1Row);
@@ -125,8 +106,7 @@ public class R005CreatePlantViewForMaterial extends Rfc {
 				+ ", DISLS>>" + b1Row.getDisls() + ", MAABC>>"
 				+ b1Row.getMaabc() + ", DISGR>>" + b1Row.getDisgr()
 				+ ", PERKZ>>" + b1Row.getPerkz() + ", PRCTR>>"
-				+ b1Row.getPrctr() + ", DWERK>>" + b1Row.getDwerk()
-				+ ", BESKZ>>" + b1Row.getBeskz() + "\n");
+				+ b1Row.getPrctr() + ", BESKZ>>" + b1Row.getBeskz() + "\n");
 
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
@@ -144,9 +124,9 @@ public class R005CreatePlantViewForMaterial extends Rfc {
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
 		// RFANUMBER
-		rfc.setRfaNum(chwA.getAnnDocNo());
+		rfc.setRfaNum(auoMaterial.getMaterial());
 		rfcInfo.append("RFANUM \n");
-		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
+		rfcInfo.append(Tab + "RFANumber>>" + auoMaterial.getMaterial() + "\n");
 
 	}
 

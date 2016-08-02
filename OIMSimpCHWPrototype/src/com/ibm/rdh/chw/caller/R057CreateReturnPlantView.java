@@ -3,9 +3,7 @@ package com.ibm.rdh.chw.caller;
 import java.text.SimpleDateFormat;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.CHWGeoAnn;
-import com.ibm.rdh.chw.entity.TypeModel;
+import com.ibm.rdh.chw.entity.AUOMaterial;
 import com.ibm.rdh.rfc.Bmm00Table;
 import com.ibm.rdh.rfc.Bmm00TableRow;
 import com.ibm.rdh.rfc.Bmmh1Table;
@@ -17,9 +15,8 @@ public class R057CreateReturnPlantView extends Rfc {
 
 	private com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE rfc;
 
-	public R057CreateReturnPlantView(CHWAnnouncement chwA, TypeModel typeModel,
-			CHWGeoAnn chwAg, String returnPlant, String pimsIdentity)
-			throws Exception {
+	public R057CreateReturnPlantView(AUOMaterial auoMaterial,
+			String returnPlant, String pimsIdentity) throws Exception {
 		reInitialize();
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
 		rfcName = "Z_DM_SAP_MATM_CREATE";
@@ -29,8 +26,7 @@ public class R057CreateReturnPlantView extends Rfc {
 		Bmm00Table b0Table = new Bmm00Table();
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
 		b0Row.setTcode("MM01");
-		// b0Row.setMatnr(typeModel.getRevProfile().getAuoMaterials());
-		b0Row.setMatnr(typeModel.getType());
+		b0Row.setMatnr(auoMaterial.getMaterial());
 		b0Row.setMbrsh("M");
 		b0Row.setMtart("ZIMG");
 		b0Row.setXeiv4("X");
@@ -60,12 +56,12 @@ public class R057CreateReturnPlantView extends Rfc {
 		b1Row.setBklas("7920");
 
 		// Add 7 set value not set in the previous epimshw code
-		b1Row.setZeinr(chwA.getAnnDocNo());
+		b1Row.setZeinr(auoMaterial.getMaterial());
 		b1Row.setMatkl("000");
-		b1Row.setSpart(typeModel.getDiv());
-		b1Row.setZeiar(chwA.getAnnouncementType());
+		b1Row.setSpart(auoMaterial.getDiv());
+		b1Row.setZeiar("New");
 		b1Row.setGewei("KG");
-		b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
+		b1Row.setAeszn(sdf.format(auoMaterial.getEffectiveDate()));
 		b1Row.setMeins("EA");
 		// end
 
@@ -101,9 +97,9 @@ public class R057CreateReturnPlantView extends Rfc {
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
 		// RFANUMBER
-		rfc.setRfaNum(chwA.getAnnDocNo());
+		rfc.setRfaNum(auoMaterial.getMaterial());
 		rfcInfo.append("RFANUM \n");
-		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
+		rfcInfo.append(Tab + "RFANumber>>" + auoMaterial.getMaterial() + "\n");
 	}
 
 	@Override

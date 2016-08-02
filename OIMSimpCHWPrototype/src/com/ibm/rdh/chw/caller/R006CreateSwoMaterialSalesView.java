@@ -2,15 +2,17 @@ package com.ibm.rdh.chw.caller;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.rdh.chw.entity.CHWAnnouncement;
-import com.ibm.rdh.chw.entity.CHWGeoAnn;
-import com.ibm.rdh.chw.entity.TypeModel;
+import com.ibm.rdh.chw.entity.AUOMaterial;
+import com.ibm.rdh.chw.entity.CntryTax;
 import com.ibm.rdh.rfc.Bmm00Table;
 import com.ibm.rdh.rfc.Bmm00TableRow;
 import com.ibm.rdh.rfc.Bmmh1Table;
 import com.ibm.rdh.rfc.Bmmh1TableRow;
+import com.ibm.rdh.rfc.Bmmh2Table;
+import com.ibm.rdh.rfc.Bmmh2TableRow;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
 import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 
@@ -18,10 +20,9 @@ public class R006CreateSwoMaterialSalesView extends Rfc {
 
 	private com.ibm.rdh.rfc.Z_DM_SAP_MATM_CREATE rfc;
 
-	public R006CreateSwoMaterialSalesView(CHWAnnouncement chwA,
-			TypeModel typeModel, CHWGeoAnn chwAg, String salesOrg,
-			String currentSapSalesStatus, Date currentEffectiveDate,
-			String productHierarchy, String pimsIdentity) throws Exception {
+	public R006CreateSwoMaterialSalesView(AUOMaterial auoMaterial,
+			String salesOrg, String currentSapSalesStatus,
+			Date currentEffectiveDate, String pimsIdentity) throws Exception {
 		reInitialize();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		SimpleDateFormat sdff = new SimpleDateFormat("ddMMyy");
@@ -33,8 +34,7 @@ public class R006CreateSwoMaterialSalesView extends Rfc {
 		Bmm00TableRow b0Row = b0Table.createEmptyRow();
 
 		b0Row.setTcode("MM01");
-		// b0Row.setMatnr(typeModel.getRevProfile().getAuoMaterials());
-		b0Row.setMatnr(typeModel.getType());
+		b0Row.setMatnr(auoMaterial.getMaterial());
 		b0Row.setMbrsh("M");
 		b0Row.setMtart("ZIMG");
 		b0Row.setXeiv1("X");
@@ -56,83 +56,43 @@ public class R006CreateSwoMaterialSalesView extends Rfc {
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 
 		b1Row.setMeins("EA");
+		b1Row.setDwerk("1222");
 		b1Row.setMtpos("Z002");
-
-		b1Row.setKtgrm("01");
-		// String ktgrm =
-		// _productSchedule.getMainProduct().getSapAccountAssignmentGroup();
-		// if (null == ktgrm || ktgrm.trim().equals(""))
-		// {
-		// // do not set account assignment group (ktgrm) if we can't make the
-		// determination
-		// } else
-		// {
-		// logSetter("ktgrm", ktgrm);
-		// b1Row.setKtgrm(ktgrm);
-		// }
+		String ktgrm = auoMaterial.getAcctAsgnGrp();
+		if (null == ktgrm || ktgrm.trim().equals("")) {
+			b1Row.setKtgrm("01");
+		} else {
+			b1Row.setKtgrm(ktgrm);
+		}
 
 		b1Row.setSktof("X");
-
-		// String pt = _productSchedule.getMainProduct().getSapMaterialGroup1();
-		// if ("I".equals(pt)) {
-		// b1Row.setMvgr1("ICS");
-		//
-		// } else if ("X".equals(pt)) {
-		// b1Row.setMvgr1("VRD");
-		//
-		// } else if ("P".equals(pt)) {
-		// b1Row.setMvgr1("PCS");
-		//
-		// } else {
-		// b1Row.setMvgr1("SWC");
-		//
-		// }
-
-		// The logic of Mvgr2 need to be confirmed.
-		// Set mvgr2 based on enablementProcess. If "EPIMS_AAS", then set to
-		// "ZIP".
-		// If "EPIMS_XSERIES", then set to "XCC". Otherwise error.
+		b1Row.setMvgr1(auoMaterial.getMaterialGroup1());
 		b1Row.setMvgr2("ZIP");
-
 		b1Row.setVersg("1");
-
-		// If the "currentSapSalesStatus" and "currentEffectiveDate" input
-		// parameters are set to values,
-		// then set vmsta to currentSapSalesStatus and set vmstd to
-		// "currentEffectiveDate". (done in setters)
-		if (null == currentSapSalesStatus) {
-			// if null then do not set the field
-			logSetter("vmsta");
-		} else {
-			logSetter("vmsta", currentSapSalesStatus);
+		if (null != currentSapSalesStatus) {
 			b1Row.setVmsta(currentSapSalesStatus);
 		}
 
 		// check the status first. if there is no status, then don't set this
 		// one
-		if (null == currentSapSalesStatus) {
-			// if null then do not set the field
-			logSetter("vmstd");
-		} else {
+		if (null != currentSapSalesStatus) {
 			String vmstd = sdf.format(currentEffectiveDate);
-			if (null == vmstd) {
-				logSetter("vmstd");
-			} else {
-				logSetter("vmstd", vmstd);
+			if (null != vmstd) {
 				b1Row.setVmstd(vmstd);
 			}
 		}
 		b1Row.setAumng("1");
-		b1Row.setProdh(productHierarchy);
-		b1Row.setBeskz("X");
+		b1Row.setProdh(auoMaterial.getCHWProdHierarchy());
+		// b1Row.setProdh("0900B00002");
+		// b1Row.setProdh(softwareProduct.getCswProdHierarchy());
 
 		// Add 6 set value not set in the previous epimshw code
-		b1Row.setZeinr(chwA.getAnnDocNo());
+		b1Row.setZeinr(auoMaterial.getMaterial());
 		b1Row.setMatkl("000");
-		b1Row.setSpart(typeModel.getDiv());
-		b1Row.setZeiar(chwA.getAnnouncementType());
+		b1Row.setSpart(auoMaterial.getDiv());
+		b1Row.setZeiar("New");
 		b1Row.setGewei("KG");
-		b1Row.setAeszn(sdff.format(chwAg.getAnnouncementDate()));
+		b1Row.setAeszn(sdff.format(auoMaterial.getEffectiveDate()));
 		// end
 
 		b1Table.appendRow(b1Row);
@@ -143,42 +103,36 @@ public class R006CreateSwoMaterialSalesView extends Rfc {
 				+ ", ZEIAR>>" + b1Row.getZeiar() + ", GEWEI>>"
 				+ b1Row.getGewei() + ", AESZN>>" + b1Row.getAeszn() + "\n");
 
-		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins() + ", MTPOS"
-				+ b1Row.getMtpos() + ", KTGRM" + b1Row.getKtgrm() + ", SKTOF"
-				+ b1Row.getSktof() + ", MVGR1" + b1Row.getMvgr1() + ", MVGR2"
-				+ b1Row.getMvgr2() + ",VERSG" + b1Row.getVersg() + ",VMSTA"
-				+ b1Row.getVmsta() + ", VMSTD" + b1Row.getVmstd() + ", AUMNG"
-				+ b1Row.getAumng() + ", PRODH" + b1Row.getProdh() + ", BESKZ"
-				+ b1Row.getBeskz() + "\n");
+		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins() + ", DWERK"
+				+ b1Row.getDwerk() + ", MTPOS" + b1Row.getMtpos() + ", KTGRM"
+				+ b1Row.getKtgrm() + ", SKTOF" + b1Row.getSktof() + ", MVGR1"
+				+ b1Row.getMvgr1() + ", MVGR2" + b1Row.getMvgr2() + ",VERSG"
+				+ b1Row.getVersg() + ",VMSTA" + b1Row.getVmsta() + ", VMSTD"
+				+ b1Row.getVmstd() + ", AUMNG" + b1Row.getAumng() + ", PRODH"
+				+ b1Row.getProdh() + "\n");
 
 		// Bmmh2 -B2
-		// List<SapCountry> countries = sapSalesOrg.getSapCountries();
-		// for (SapCountry country : countries) {
-		// Bmmh2TableRow bh2row = getBmh2().createEmptyRow();
-		// setAland(bh2row, country.getIsoCountry());
-		// setTaty1(bh2row, country.getTaxCategory());
-		// setTaxm1(bh2row, country.getTaxClass());
-		// getBmh2().appendRow(bh2row);
-		// }
-		// Bmmh2Table b2Table = new Bmmh2Table();
-		// if (taxCntryList != null) {
-		// Enumeration e = taxCntryList.elements();
-		// while (e.hasMoreElements()) {
-		// Bmmh2TableRow b2Row = b2Table.createEmptyRow();
-		// CntryTax cntry = (CntryTax) e.nextElement();
-		// b2Row.setAland(cntry.getCountry());
-		// b2Row.setTaty1(cntry.getTaxCategory());
-		// b2Row.setTaxm1(cntry.getClassification());
-		//
-		// b2Table.appendRow(b2Row);
-		// rfcInfo.append("BMMH2 \n");
-		// rfcInfo.append(Tab + "ALAND>>" + b2Row.getAland() + ", TATY1>>"
-		// + b2Row.getTaty1() + ", TAXM1>>" + b2Row.getTaxm1()
-		// + "\n");
-		// }
-		// }
-		// rfc.setIBmmh2(b2Table);
 
+		Bmmh2Table b2Table = new Bmmh2Table();
+		Enumeration e = auoMaterial.getCountryList().elements();
+		while (e.hasMoreElements()) {
+			Bmmh2TableRow b2Row = b2Table.createEmptyRow();
+			CntryTax cntry = (CntryTax) e.nextElement();
+			b2Row.setAland(cntry.getCountry());
+			if ("US".equals(cntry.getCountry())) {
+				b2Row.setTaty1("M");
+			} else {
+				b2Row.setTaty1("1");
+			}
+			// b2Row.setTaty1(cntry.getTaxCategory());
+			// b2Row.setTaxm1(cntry.getClassification());
+			b2Table.appendRow(b2Row);
+			rfcInfo.append("BMMH2 \n");
+			rfcInfo.append(Tab + "ALAND>>" + b2Row.getAland() + ", TATY1>>"
+					+ b2Row.getTaty1() + "\n");
+		}
+
+		rfc.setIBmmh2(b2Table);
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
@@ -195,9 +149,9 @@ public class R006CreateSwoMaterialSalesView extends Rfc {
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
 		// RFANUMBER
-		rfc.setRfaNum(chwA.getAnnDocNo());
+		rfc.setRfaNum(auoMaterial.getMaterial());
 		rfcInfo.append("RFANUM \n");
-		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
+		rfcInfo.append(Tab + "RFANumber>>" + auoMaterial.getMaterial() + "\n");
 
 	}
 
