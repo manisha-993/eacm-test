@@ -34,8 +34,10 @@ public class AUOMaterial implements java.io.Serializable {
 		this.effectiveDate = effectiveDate;
 	}
 
-	private static final String CHW_PROD_HIERARCHY = "0900B00002";
-    private static final String SAP_MATERIAL_GRP = "SWC";
+	public static final String CHW_PROD_HIERARCHY = "0900B00002";
+    public static final String SAP_MATERIAL_GRP = "SWC";
+    
+    public AUOMaterial() {}
     
 	public AUOMaterial(String material, String percentage) {
 		this.setMaterial(material);
