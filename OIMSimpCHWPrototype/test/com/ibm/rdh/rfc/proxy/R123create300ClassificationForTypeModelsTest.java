@@ -52,6 +52,7 @@ public class R123create300ClassificationForTypeModelsTest extends
 			CHWAnnouncement chwA = new CHWAnnouncement();
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
 			chwA.setAnnDocNo("123401");
+			tmUPGObj.setModel("EACM");
 			String type = "1234";
 			String newFlag = "NEW";
 			String FromToType = "";
@@ -109,6 +110,7 @@ public class R123create300ClassificationForTypeModelsTest extends
 			CHWAnnouncement chwA = new CHWAnnouncement();
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
 			chwA.setAnnDocNo("123401");
+			tmUPGObj.setModel("EACM");
 			String type = "1234";
 			String newFlag = "UPG";
 			String FromToType = "";
@@ -165,6 +167,7 @@ public class R123create300ClassificationForTypeModelsTest extends
 			CHWAnnouncement chwA = new CHWAnnouncement();
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
 			tmUPGObj.setType("1234");
+			tmUPGObj.setModel("EACM");
 			chwA.setAnnDocNo("123401");
 			String type = "1234";
 			String newFlag = "MTC";
@@ -223,6 +226,7 @@ public class R123create300ClassificationForTypeModelsTest extends
 			CHWAnnouncement chwA = new CHWAnnouncement();
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
 			tmUPGObj.setFromType("1234");
+			tmUPGObj.setModel("EACM");
 			chwA.setAnnDocNo("123401");
 			String type = "1234";
 			String newFlag = "MTC";

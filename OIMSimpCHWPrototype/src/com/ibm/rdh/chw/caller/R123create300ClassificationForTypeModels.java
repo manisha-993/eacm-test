@@ -34,7 +34,6 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 		String sDateFormat = ConfigManager.getConfigManager().getString(
 				PropertyKeys.KEY_DATE_FORMAT, true);
 		SimpleDateFormat sdf = new SimpleDateFormat(sDateFormat);
-
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT();
 		// Set up the RFC fields
 		// OBJECT_KEY - R0
@@ -122,11 +121,12 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 		// API_AUSP - R6
 		Api_auspTable r6Table = new Api_auspTable();
 		Api_auspTableRow r6Row = r6Table.createEmptyRow();
-		
+
 		// not set in the epims code but we need it.
-		r6Row.setValue("CH");
+		// r6Row.setValue("CH");
+		r6Row.setValue(tmUPGObj.getModel());
 		// end
-		
+
 		if (("MTC").equals(newFlag)) {
 			if (("MTCTOTYPE").equals(FromToType)) {
 				r6Row.setCharact("MK_" + tmUPGObj.getType() + "_MOD");
