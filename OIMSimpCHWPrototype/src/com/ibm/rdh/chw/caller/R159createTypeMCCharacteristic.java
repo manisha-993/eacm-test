@@ -23,7 +23,7 @@ public class R159createTypeMCCharacteristic extends Rfc {
 
 		rfcName = "Z_DM_SAP_CHAR_MAINTAIN";
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN();
-		
+
 		// Set up the RFC fields
 		// CHARACTS
 		CharactsTable c0Table = new CharactsTable();
@@ -50,13 +50,13 @@ public class R159createTypeMCCharacteristic extends Rfc {
 		rfc.setICharacts(c0Table);
 
 		rfcInfo.append("CHARACTS \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() 
-				+ ", DATATYPE>>" + c0Row.getDatatype() 
-				+ ", CHARNUMBER>>" + c0Row.getCharnumberString() 
-				+ ", STATUS>>" + c0Row.getStatus() 
-				+ ", VALASSIGNM>>" + c0Row.getValassignm() + "\n");
-		rfcInfo.append(Tab + "NEGVALS>>" + c0Row.getNegVals() 
-				+ ", ADDITVALS>>" + c0Row.getAdditVals() + "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() + ", DATATYPE>>"
+				+ c0Row.getDatatype() + ", CHARNUMBER>>"
+				+ c0Row.getCharnumberString() + ", STATUS>>"
+				+ c0Row.getStatus() + ", VALASSIGNM>>" + c0Row.getValassignm()
+				+ "\n");
+		rfcInfo.append(Tab + "NEGVALS>>" + c0Row.getNegVals() + ", ADDITVALS>>"
+				+ c0Row.getAdditVals() + "\n");
 
 		// CHAR_DESCR - C1
 		Char_descrTable c1Table = new Char_descrTable();
@@ -76,9 +76,9 @@ public class R159createTypeMCCharacteristic extends Rfc {
 		rfc.setICharDescr(c1Table);
 
 		rfcInfo.append("CHAR_DESCR  \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact()
-				+ ", LANGUAGE>>" + c1Row.getLanguage()
-				+ ", CHDESCR>>" + c1Row.getChdescr() + "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact() + ", LANGUAGE>>"
+				+ c1Row.getLanguage() + ", CHDESCR>>" + c1Row.getChdescr()
+				+ "\n");
 
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
@@ -101,6 +101,11 @@ public class R159createTypeMCCharacteristic extends Rfc {
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
+
+		// REFRESH_VALS
+		rfc.setRefreshVals("X");
+		rfcInfo.append("REFRESH_VALS \n");
+		rfcInfo.append(Tab + "REFRESH_VALS>>" + rfc.getRefreshVals() + "\n");
 	}
 
 	@Override

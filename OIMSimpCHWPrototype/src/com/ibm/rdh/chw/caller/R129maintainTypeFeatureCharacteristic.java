@@ -109,6 +109,11 @@ public class R129maintainTypeFeatureCharacteristic extends Rfc {
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
 
+		// REFRESH_VALS
+		rfc.setRefreshVals("X");
+		rfcInfo.append("REFRESH_VALS \n");
+		rfcInfo.append(Tab + "REFRESH_VALS>>" + rfc.getRefreshVals() + "\n");
+
 	}
 
 	@Override

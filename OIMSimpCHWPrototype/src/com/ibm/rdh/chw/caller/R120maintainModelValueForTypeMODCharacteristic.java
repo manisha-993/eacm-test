@@ -49,8 +49,8 @@ public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
 		rfc.setICharacts(c0Table);
 
 		rfcInfo.append("CHARACTS \n");
-		rfcInfo.append(Tab + "ADDITVALS>>" + c0Row.getAdditVals() + ", NEGVALS>>"
-				+ c0Row.getNegVals() + "\n");
+		rfcInfo.append(Tab + "ADDITVALS>>" + c0Row.getAdditVals()
+				+ ", NEGVALS>>" + c0Row.getNegVals() + "\n");
 		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() + ", DATATYPE>>"
 				+ c0Row.getDatatype() + ", CHARNUMBER>>"
 				+ c0Row.getCharnumberString() + ", STATUS>>"
@@ -148,6 +148,11 @@ public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
+
+		// REFRESH_VALS
+		rfc.setRefreshVals("X");
+		rfcInfo.append("REFRESH_VALS \n");
+		rfcInfo.append(Tab + "REFRESH_VALS>>" + rfc.getRefreshVals() + "\n");
 
 	}
 

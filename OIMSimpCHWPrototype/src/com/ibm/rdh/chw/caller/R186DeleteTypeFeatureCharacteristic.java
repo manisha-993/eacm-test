@@ -48,13 +48,13 @@ public class R186DeleteTypeFeatureCharacteristic extends Rfc {
 		rfc.setICharacts(c0Table);
 
 		rfcInfo.append("CHARACTS \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() 
-				+ ", FLDELETE>>" + c0Row.getFldelete()
-				+ ", ADDITVALS>>" + c0Row.getAdditVals() + "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() + ", FLDELETE>>"
+				+ c0Row.getFldelete() + ", ADDITVALS>>" + c0Row.getAdditVals()
+				+ "\n");
 		rfcInfo.append(Tab + "DATATYPE>>" + c0Row.getDatatype()
-				+ ", CHARNUMBER>>" + c0Row.getCharnumberString()
-				+ ", STATUS>>" + c0Row.getStatus() 
-				+ ", VALASSIGNM>>" + c0Row.getValassignm() + "\n");
+				+ ", CHARNUMBER>>" + c0Row.getCharnumberString() + ", STATUS>>"
+				+ c0Row.getStatus() + ", VALASSIGNM>>" + c0Row.getValassignm()
+				+ "\n");
 		rfcInfo.append(Tab + "NEGVALS>>" + c0Row.getNegVals() + "\n");
 
 		// This part will be optional,but now is required.
@@ -70,9 +70,9 @@ public class R186DeleteTypeFeatureCharacteristic extends Rfc {
 		rfc.setICharDescr(c1Table);
 
 		rfcInfo.append("CHAR_DESCR  \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact()
-				+ ", LANGUAGE>>" + c1Row.getLanguage()
-				+ ", CHDESCR>>" + c1Row.getChdescr() + "\n");
+		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact() + ", LANGUAGE>>"
+				+ c1Row.getLanguage() + ", CHDESCR>>" + c1Row.getChdescr()
+				+ "\n");
 		// end
 
 		// ZDM_GEO_TO_CLASS
@@ -96,6 +96,11 @@ public class R186DeleteTypeFeatureCharacteristic extends Rfc {
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
+
+		// REFRESH_VALS
+		rfc.setRefreshVals("X");
+		rfcInfo.append("REFRESH_VALS \n");
+		rfcInfo.append(Tab + "REFRESH_VALS>>" + rfc.getRefreshVals() + "\n");
 	}
 
 	@Override
