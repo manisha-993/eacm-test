@@ -83,8 +83,6 @@ public class R006CreateSwoMaterialSalesView extends Rfc {
 		}
 		b1Row.setAumng("1");
 		b1Row.setProdh(auoMaterial.getCHWProdHierarchy());
-		// b1Row.setProdh("0900B00002");
-		// b1Row.setProdh(softwareProduct.getCswProdHierarchy());
 
 		// Add 6 set value not set in the previous epimshw code
 		b1Row.setZeinr(auoMaterial.getMaterial());
@@ -112,7 +110,6 @@ public class R006CreateSwoMaterialSalesView extends Rfc {
 				+ b1Row.getProdh() + "\n");
 
 		// Bmmh2 -B2
-
 		Bmmh2Table b2Table = new Bmmh2Table();
 		Enumeration e = auoMaterial.getCountryList().elements();
 		while (e.hasMoreElements()) {
@@ -124,8 +121,6 @@ public class R006CreateSwoMaterialSalesView extends Rfc {
 			} else {
 				b2Row.setTaty1("1");
 			}
-			// b2Row.setTaty1(cntry.getTaxCategory());
-			// b2Row.setTaxm1(cntry.getClassification());
 			b2Table.appendRow(b2Row);
 			rfcInfo.append("BMMH2 \n");
 			rfcInfo.append(Tab + "ALAND>>" + b2Row.getAland() + ", TATY1>>"
