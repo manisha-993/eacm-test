@@ -468,10 +468,10 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 	}
 
 	@Override
-	public void r123(String type, TypeModelUPGGeo tmUPGObj, String newFlag,
+	public void r123(TypeModel typeModel, TypeModelUPGGeo tmUPGObj, String newFlag,
 			CHWAnnouncement chwA, String FromToType, String pimsIdentity)
 			throws Exception {
-		R123create300ClassificationForTypeModels r = getFactory().getr123(type,
+		R123create300ClassificationForTypeModels r = getFactory().getr123(typeModel,
 				tmUPGObj, newFlag, chwA, FromToType, pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();

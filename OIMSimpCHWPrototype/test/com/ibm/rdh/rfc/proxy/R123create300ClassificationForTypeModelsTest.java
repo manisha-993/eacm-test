@@ -12,6 +12,7 @@ import org.junit.Test;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.LogManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
+import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 
 public class R123create300ClassificationForTypeModelsTest extends
@@ -48,23 +49,25 @@ public class R123create300ClassificationForTypeModelsTest extends
 	@Test
 	public void r123New() {
 		try {
-
+			TypeModel typeModel = new TypeModel();
 			CHWAnnouncement chwA = new CHWAnnouncement();
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
+			typeModel.setType("1234");
+			typeModel.setModel("EACM");
 			chwA.setAnnDocNo("123401");
 			tmUPGObj.setModel("EACM");
-			String type = "1234";
 			String newFlag = "NEW";
 			String FromToType = "";
 			String pimsIdentity = "C";
-			String objectId = "300" + type + newFlag;
+			String objectId = "300" + typeModel.getType() + newFlag;
 
-			int deleteDataResult = deleteDataClassicationMaint(type + newFlag);
+			int deleteDataResult = deleteDataClassicationMaint(typeModel
+					.getType() + newFlag);
 			assertEquals(deleteDataResult, 0);
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId, objectId);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r123(type, tmUPGObj, newFlag, chwA, FromToType,
+			rfcProxy.r123(typeModel, tmUPGObj, newFlag, chwA, FromToType,
 					pimsIdentity);
 
 			Map<String, String> map = new HashMap<String, String>();
@@ -107,22 +110,24 @@ public class R123create300ClassificationForTypeModelsTest extends
 	@Test
 	public void r123Upg() {
 		try {
+			TypeModel typeModel = new TypeModel();
 			CHWAnnouncement chwA = new CHWAnnouncement();
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
+			typeModel.setType("1234");
 			chwA.setAnnDocNo("123401");
-			tmUPGObj.setModel("EACM");
-			String type = "1234";
+			typeModel.setModel("EACM");
 			String newFlag = "UPG";
 			String FromToType = "";
 			String pimsIdentity = "C";
-			String objectId = "300" + type + newFlag;
+			String objectId = "300" + typeModel.getType() + newFlag;
 
-			int deleteDataResult = deleteDataClassicationMaint(type + newFlag);
+			int deleteDataResult = deleteDataClassicationMaint(typeModel
+					.getType() + newFlag);
 			assertEquals(deleteDataResult, 0);
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId, objectId);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r123(type, tmUPGObj, newFlag, chwA, FromToType,
+			rfcProxy.r123(typeModel, tmUPGObj, newFlag, chwA, FromToType,
 					pimsIdentity);
 
 			Map<String, String> map = new HashMap<String, String>();
@@ -164,12 +169,13 @@ public class R123create300ClassificationForTypeModelsTest extends
 	@Test
 	public void r123MtcToType() {
 		try {
+			TypeModel typeModel = new TypeModel();
 			CHWAnnouncement chwA = new CHWAnnouncement();
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
+			typeModel = null;
 			tmUPGObj.setType("1234");
 			tmUPGObj.setModel("EACM");
 			chwA.setAnnDocNo("123401");
-			String type = "1234";
 			String newFlag = "MTC";
 			String FromToType = "MTCTOTYPE";
 			String pimsIdentity = "C";
@@ -181,7 +187,7 @@ public class R123create300ClassificationForTypeModelsTest extends
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId, objectId);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r123(type, tmUPGObj, newFlag, chwA, FromToType,
+			rfcProxy.r123(typeModel, tmUPGObj, newFlag, chwA, FromToType,
 					pimsIdentity);
 
 			Map<String, String> map = new HashMap<String, String>();
@@ -223,23 +229,25 @@ public class R123create300ClassificationForTypeModelsTest extends
 	@Test
 	public void r123MtcFromType() {
 		try {
+			TypeModel typeModel = new TypeModel();
 			CHWAnnouncement chwA = new CHWAnnouncement();
 			TypeModelUPGGeo tmUPGObj = new TypeModelUPGGeo();
+			typeModel = null;
 			tmUPGObj.setFromType("1234");
 			tmUPGObj.setModel("EACM");
 			chwA.setAnnDocNo("123401");
-			String type = "1234";
 			String newFlag = "MTC";
 			String FromToType = "MTCFROMTYPE";
 			String pimsIdentity = "C";
 			String objectId = "300" + tmUPGObj.getFromType() + newFlag;
 
-			int deleteDataResult = deleteDataClassicationMaint(type + newFlag);
+			int deleteDataResult = deleteDataClassicationMaint(tmUPGObj
+					.getFromType() + newFlag);
 			assertEquals(deleteDataResult, 0);
 			deletezdmLogHdrAndzdmLogDtl(Constants.MANDT, activeId, objectId);
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
-			rfcProxy.r123(type, tmUPGObj, newFlag, chwA, FromToType,
+			rfcProxy.r123(typeModel, tmUPGObj, newFlag, chwA, FromToType,
 					pimsIdentity);
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;

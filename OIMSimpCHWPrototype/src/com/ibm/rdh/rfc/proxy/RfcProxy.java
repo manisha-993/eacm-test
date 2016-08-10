@@ -113,7 +113,7 @@ public interface RfcProxy {
 	public abstract void r121(TypeModel typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
-	public abstract void r123(String type, TypeModelUPGGeo tmUPGObj,
+	public abstract void r123(TypeModel typeModel, TypeModelUPGGeo tmUPGObj,
 			String newFlag, CHWAnnouncement chwA, String FromToType,
 			String pimsIdentity) throws Exception;
 

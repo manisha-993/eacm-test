@@ -7,6 +7,7 @@ import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
+import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.Api_auspTable;
 import com.ibm.rdh.rfc.Api_auspTableRow;
@@ -26,10 +27,12 @@ import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 public class R123create300ClassificationForTypeModels extends Rfc {
 	private com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT rfc;
 
-	public R123create300ClassificationForTypeModels(String type,
+	public R123create300ClassificationForTypeModels(TypeModel typeModel,
 			TypeModelUPGGeo tmUPGObj, String newFlag, CHWAnnouncement chwA,
 			String FromToType, String pimsIdentity) throws Exception {
+
 		reInitialize();
+		String type = typeModel == null ? null : typeModel.getType();
 		Date curDate = new Date();
 		String sDateFormat = ConfigManager.getConfigManager().getString(
 				PropertyKeys.KEY_DATE_FORMAT, true);
@@ -123,10 +126,10 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 		Api_auspTableRow r6Row = r6Table.createEmptyRow();
 
 		// not set in the epims code but we need it.
-		if (type == null) {
+		if (typeModel == null) {
 			r6Row.setValue(tmUPGObj.getModel());
 		} else {
-			r6Row.setValue(type);
+			r6Row.setValue(typeModel.getModel());
 		}
 
 		// end

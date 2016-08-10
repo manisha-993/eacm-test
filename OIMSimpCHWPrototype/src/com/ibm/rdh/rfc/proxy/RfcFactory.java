@@ -289,10 +289,10 @@ public class RfcFactory extends Object {
 				pimsIdentity);
 	}
 
-	public R123create300ClassificationForTypeModels getr123(String type,
+	public R123create300ClassificationForTypeModels getr123(TypeModel typeModel,
 			TypeModelUPGGeo tmUPGObj, String newFlag, CHWAnnouncement chwA,
 			String FromToType, String pimsIdentity) throws Exception {
-		return new R123create300ClassificationForTypeModels(type, tmUPGObj,
+		return new R123create300ClassificationForTypeModels(typeModel, tmUPGObj,
 				newFlag, chwA, FromToType, pimsIdentity);
 	}
 
