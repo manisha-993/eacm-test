@@ -9,8 +9,6 @@ import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
-import com.ibm.rdh.rfc.Api_auspTable;
-import com.ibm.rdh.rfc.Api_auspTableRow;
 import com.ibm.rdh.rfc.KlahTable;
 import com.ibm.rdh.rfc.KlahTableRow;
 import com.ibm.rdh.rfc.KsskTable;
@@ -122,35 +120,35 @@ public class R123create300ClassificationForTypeModels extends Rfc {
 		rfcInfo.append(Tab + "ERSDA>>" + sdf.format(r5Row.getErsda()) + "\n");
 
 		// API_AUSP - R6
-		Api_auspTable r6Table = new Api_auspTable();
-		Api_auspTableRow r6Row = r6Table.createEmptyRow();
-
-		// not set in the epims code but we need it.
-		if (typeModel == null) {
-			r6Row.setValue(tmUPGObj.getModel());
-		} else {
-			r6Row.setValue(typeModel.getModel());
-		}
-
-		// end
-
-		if (("MTC").equals(newFlag)) {
-			if (("MTCTOTYPE").equals(FromToType)) {
-				r6Row.setCharact("MK_" + tmUPGObj.getType() + "_MOD");
-			}
-			if (("MTCFROMTYPE").equals(FromToType)) {
-				r6Row.setCharact("MK_" + tmUPGObj.getFromType() + "_MOD");
-			}
-		} else {
-			r6Row.setCharact("MK_" + type + "_MOD");
-		}
-		r6Table.appendRow(r6Row);
-		rfc.setIApiAusp(r6Table);
-
-		rfcInfo.append("API_AUSP \n");
-
-		rfcInfo.append(Tab + "CHARACT>> " + r6Row.getCharact() + ", VALUE>> "
-				+ r6Row.getValue() + "\n");
+//		Api_auspTable r6Table = new Api_auspTable();
+//		Api_auspTableRow r6Row = r6Table.createEmptyRow();
+//
+//		// not set in the epims code but we need it.
+//		if (typeModel == null) {
+//			r6Row.setValue(tmUPGObj.getModel());
+//		} else {
+//			r6Row.setValue(typeModel.getModel());
+//		}
+//
+//		// end
+//
+//		if (("MTC").equals(newFlag)) {
+//			if (("MTCTOTYPE").equals(FromToType)) {
+//				r6Row.setCharact("MK_" + tmUPGObj.getType() + "_MOD");
+//			}
+//			if (("MTCFROMTYPE").equals(FromToType)) {
+//				r6Row.setCharact("MK_" + tmUPGObj.getFromType() + "_MOD");
+//			}
+//		} else {
+//			r6Row.setCharact("MK_" + type + "_MOD");
+//		}
+//		r6Table.appendRow(r6Row);
+//		rfc.setIApiAusp(r6Table);
+//
+//		rfcInfo.append("API_AUSP \n");
+//
+//		rfcInfo.append(Tab + "CHARACT>> " + r6Row.getCharact() + ", VALUE>> "
+//				+ r6Row.getValue() + "\n");
 
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
