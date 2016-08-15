@@ -66,7 +66,8 @@ public class R006CreateSwoMaterialSalesView extends Rfc {
 		}
 
 		b1Row.setSktof("X");
-		b1Row.setMvgr1(auoMaterial.getMaterialGroup1());
+		//b1Row.setMvgr1(auoMaterial.getMaterialGroup1());
+		b1Row.setMvgr1("SWC");
 		b1Row.setMvgr2("ZIP");
 		b1Row.setVersg("1");
 		if (null != currentSapSalesStatus) {
