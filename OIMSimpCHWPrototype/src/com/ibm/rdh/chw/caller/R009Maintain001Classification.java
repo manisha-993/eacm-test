@@ -1,6 +1,7 @@
 package com.ibm.rdh.chw.caller;
 
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
@@ -88,21 +89,32 @@ public class R009Maintain001Classification extends Rfc {
 
 		// API_AUSP - R6
 		Api_auspTable r6Table = new Api_auspTable();
-		Api_auspTableRow r6Row = r6Table.createEmptyRow();
 		Vector r6Vector = new Vector(1, 1);
-		
+
+		Api_auspTableRow r6Row = r6Table.createEmptyRow();
 		r6Row.setCharact("MM_AMORTSTART");
 		r6Row.setValue(auoMaterial.getAmrtztlnstrt());
 		r6Vector.addElement(r6Row);
 
+		r6Row = r6Table.createEmptyRow();
 		r6Row.setCharact("MM_AMORTLENGTH");
 		r6Row.setValue(auoMaterial.getAmrtztlnlngth());
 		r6Vector.addElement(r6Row);
-		r6Table.appendRow(r6Row);
+
+		// Add the data to rfcInfo
+		Enumeration em6 = r6Vector.elements();
+		int rowCnt = 0;
+		while (em6.hasMoreElements()) {
+			r6Row = (Api_auspTableRow) em6.nextElement();
+			rowCnt++;
+			rfcInfo.append("API_AUSP Row " + rowCnt + "\n");
+			rfcInfo.append(Tab + "CHARACT>>" + r6Row.getCharact()
+					+ ", VALUE>> " + r6Row.getValue() + "\n");
+
+			// Add the row to the table
+			r6Table.appendRow(r6Row);
+		}
 		rfc.setIApiAusp(r6Table);
-		rfcInfo.append("API_AUSP \n");
-		rfcInfo.append(Tab + "CHARACT>> " + r6Row.getCharact() + ", VALUE>> "
-				+ r6Row.getValue() + "\n");
 
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();

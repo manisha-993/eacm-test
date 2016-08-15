@@ -81,11 +81,19 @@ public class R039Create011ClassificationForMgCommon extends Rfc {
 		rfc.setIMara(r5Table);
 		rfcInfo.append("MARA  \n");
 		rfcInfo.append(Tab + "ERSDA>>" + r5Row.getErsdaString() + "\n");
+		
 		// API_AUSP - R6
 		Api_auspTable r6Table = new Api_auspTable();
 		Api_auspTableRow r6Row = r6Table.createEmptyRow();
+		
 		r6Row.setCharact("MG_PRODUCTTYPE");
 		r6Row.setValue("CS");
+		r6Table.appendRow(r6Row);
+		rfc.setIApiAusp(r6Table);
+		rfcInfo.append("API_AUSP \n");
+		rfcInfo.append(Tab + "CHARACT>> " + r6Row.getCharact() + ", VALUE>> "
+				+ r6Row.getValue() + "\n");
+
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();
