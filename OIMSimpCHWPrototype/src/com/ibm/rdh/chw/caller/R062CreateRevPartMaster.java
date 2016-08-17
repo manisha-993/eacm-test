@@ -61,7 +61,7 @@ public class R062CreateRevPartMaster extends Rfc {
 		rfcInfo.append(Tab + ", MEINS>>" + b1Row.getMeins() + ", ZEINR>>"
 				+ b1Row.getZeinr() + ", MATKL>>" + b1Row.getMatkl()
 				+ ", SPART>>" + b1Row.getSpart() + ", ZEIAR>>"
-				+ b1Row.getZeiar() + "GEWEI>>" + b1Row.getGewei() + "PRDHA>>"
+				+ b1Row.getZeiar() + ", GEWEI>>" + b1Row.getGewei() + ", PRDHA>>"
 				+ b1Row.getPrdha() + ", AESZN>>" + b1Row.getAeszn() + "\n");
 
 		// Bmmh5 - B5 Structure
