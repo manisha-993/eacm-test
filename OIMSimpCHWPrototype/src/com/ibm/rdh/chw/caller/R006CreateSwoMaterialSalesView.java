@@ -66,7 +66,7 @@ public class R006CreateSwoMaterialSalesView extends Rfc {
 		}
 
 		b1Row.setSktof("X");
-		//b1Row.setMvgr1(auoMaterial.getMaterialGroup1());
+		// b1Row.setMvgr1(auoMaterial.getMaterialGroup1());
 		b1Row.setMvgr1("SWC");
 		b1Row.setMvgr2("ZIP");
 		b1Row.setVersg("1");
@@ -102,13 +102,14 @@ public class R006CreateSwoMaterialSalesView extends Rfc {
 				+ ", ZEIAR>>" + b1Row.getZeiar() + ", GEWEI>>"
 				+ b1Row.getGewei() + ", AESZN>>" + b1Row.getAeszn() + "\n");
 
-		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins() + ", DWERK"
-				+ b1Row.getDwerk() + ", MTPOS" + b1Row.getMtpos() + ", KTGRM"
-				+ b1Row.getKtgrm() + ", SKTOF" + b1Row.getSktof() + ", MVGR1"
-				+ b1Row.getMvgr1() + ", MVGR2" + b1Row.getMvgr2() + ",VERSG"
-				+ b1Row.getVersg() + ",VMSTA" + b1Row.getVmsta() + ", VMSTD"
-				+ b1Row.getVmstd() + ", AUMNG" + b1Row.getAumng() + ", PRODH"
-				+ b1Row.getProdh() + "\n");
+		rfcInfo.append(Tab + "MEINS>>" + b1Row.getMeins() + ", DWERK>>"
+				+ b1Row.getDwerk() + ", MTPOS>>" + b1Row.getMtpos()
+				+ ", KTGRM>>" + b1Row.getKtgrm() + ", SKTOF>>"
+				+ b1Row.getSktof() + ", MVGR1>>" + b1Row.getMvgr1()
+				+ ", MVGR2>>" + b1Row.getMvgr2() + ", VERSG>>"
+				+ b1Row.getVersg() + ", VMSTA>>" + b1Row.getVmsta()
+				+ ", VMSTD>>" + b1Row.getVmstd() + ", AUMNG>>"
+				+ b1Row.getAumng() + ", PRODH>>" + b1Row.getProdh() + "\n");
 
 		// Bmmh2 -B2
 		Bmmh2Table b2Table = new Bmmh2Table();

@@ -44,8 +44,8 @@ public class R005CreatePlantViewForMaterial extends Rfc {
 		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
 				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
 				+ ", MTART>>" + b0Row.getMtart() + ", XEIV4>>"
-				+ b0Row.getXeiv4() + ", LGORT" + b0Row.getLgort() + ", WERKS"
-				+ b0Row.getWerks() + ", XEID1" + b0Row.getXeid1() + ", XEID2"
+				+ b0Row.getXeiv4() + ", LGORT>>" + b0Row.getLgort() + ", WERKS>>"
+				+ b0Row.getWerks() + ", XEID1>>" + b0Row.getXeid1() + ", XEID2>>"
 				+ b0Row.getXeid2() + "\n");
 
 		// Bmmh1 - B1

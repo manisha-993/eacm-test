@@ -39,8 +39,8 @@ public class R057CreateReturnPlantView extends Rfc {
 		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
 				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
 				+ ", MTART>>" + b0Row.getMtart() + ", XEIV4>>"
-				+ b0Row.getXeiv4() + ", WERKS" + b0Row.getWerks() + ", XEIB1"
-				+ b0Row.getXeib1() + "\n");
+				+ b0Row.getXeiv4() + ", WERKS>>" + b0Row.getWerks()
+				+ ", XEIB1>>" + b0Row.getXeib1() + "\n");
 
 		// Bmmh1 - B1
 		Bmmh1Table b1Table = new Bmmh1Table();
@@ -71,7 +71,7 @@ public class R057CreateReturnPlantView extends Rfc {
 		rfcInfo.append(Tab + "ZEINR>>" + b1Row.getZeinr() + ", MATKL>>"
 				+ b1Row.getMatkl() + ", SPART>>" + b1Row.getSpart()
 				+ ", ZEIAR>>" + b1Row.getZeiar() + ", GEWEI>>"
-				+ b1Row.getGewei() + ", AESZN>>" + b1Row.getAeszn() + ", MEINS"
+				+ b1Row.getGewei() + ", AESZN>>" + b1Row.getAeszn() + ", MEINS>>"
 				+ b1Row.getMeins() + "\n");
 
 		rfcInfo.append(Tab + "TRAGR>>" + b1Row.getTragr() + ", LADGR>>"
