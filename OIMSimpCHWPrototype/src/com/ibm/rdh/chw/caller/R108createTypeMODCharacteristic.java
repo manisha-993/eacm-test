@@ -34,17 +34,10 @@ public class R108createTypeMODCharacteristic extends Rfc {
 		c0Row.setStatus("1");
 		c0Row.setValassignm("S");
 
-		// This will be optional, but we need it now.
-		c0Row.setAdditVals("X");
-		c0Row.setNegVals("X");
-		// end
-
 		c0Table.appendRow(c0Row);
 		rfc.setICharacts(c0Table);
 
 		rfcInfo.append("CHARACTS \n");
-		rfcInfo.append(Tab + "ADDITVALS>>" + c0Row.getAdditVals()
-				+ ", NEGVALS>>" + c0Row.getNegVals() + "\n");
 		rfcInfo.append(Tab + "CHARACT>>" + c0Row.getCharact() + ", DATATYPE>>"
 				+ c0Row.getDatatype() + ", CHARNUMBER>>"
 				+ c0Row.getCharnumberString() + ", STATUS>>"
@@ -67,7 +60,6 @@ public class R108createTypeMODCharacteristic extends Rfc {
 				+ c1Row.getLanguage() + ", CHDESCR>>" + c1Row.getChdescr()
 				+ "\n");
 
-		
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
 		Zdm_geo_to_classTableRow zdmRow = zdmTable.createEmptyRow();

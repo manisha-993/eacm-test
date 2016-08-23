@@ -3,8 +3,6 @@ package com.ibm.rdh.chw.caller;
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
-import com.ibm.rdh.rfc.Char_descrTable;
-import com.ibm.rdh.rfc.Char_descrTableRow;
 import com.ibm.rdh.rfc.Char_valsTable;
 import com.ibm.rdh.rfc.Char_valsTableRow;
 import com.ibm.rdh.rfc.CharactsTable;
@@ -35,11 +33,6 @@ public class R185deleteupgradevaluefromMCcharacteristic extends Rfc {
 		c0Row.setStatus("1");
 		c0Row.setValassignm("S");
 
-		// This will be optional, but we need it now.
-		c0Row.setAdditVals("X");
-		c0Row.setNegVals("X");
-		// end
-
 		c0Table.appendRow(c0Row);
 		rfc.setICharacts(c0Table);
 
@@ -49,26 +42,6 @@ public class R185deleteupgradevaluefromMCcharacteristic extends Rfc {
 				+ c0Row.getCharnumberString() + ", STATUS>>"
 				+ c0Row.getStatus() + ", VALASSIGNM>>" + c0Row.getValassignm()
 				+ "\n");
-		rfcInfo.append(Tab + "ADDITVALS>>" + c0Row.getAdditVals()
-				+ ", NEGVALS>>" + c0Row.getNegVals() + "\n");
-
-		// This part will be optional,but now is required.
-		// CHAR_DESCR - C1
-		Char_descrTable c1Table = new Char_descrTable();
-		Char_descrTableRow c1Row = c1Table.createEmptyRow();
-
-		c1Row.setCharact(charac);
-		c1Row.setLanguage("E");
-		c1Row.setChdescr("Models");
-
-		c1Table.appendRow(c1Row);
-		rfc.setICharDescr(c1Table);
-
-		rfcInfo.append("CHAR_DESCR  \n");
-		rfcInfo.append(Tab + "CHARACT>>" + c1Row.getCharact() + ", LANGUAGE>>"
-				+ c1Row.getLanguage() + ", CHDESCR>>" + c1Row.getChdescr()
-				+ "\n");
-		// end
 
 		// CHAR_VALS - C4
 		Char_valsTable c4Table = new Char_valsTable();

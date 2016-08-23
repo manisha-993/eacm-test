@@ -41,11 +41,6 @@ public class R159createTypeMCCharacteristic extends Rfc {
 		c0Row.setStatus("1");
 		c0Row.setValassignm("S");
 
-		// This will be optional, but we need it now.
-		c0Row.setNegVals("X");
-		c0Row.setAdditVals("X");
-		// end
-
 		c0Table.appendRow(c0Row);
 		rfc.setICharacts(c0Table);
 
@@ -55,8 +50,6 @@ public class R159createTypeMCCharacteristic extends Rfc {
 				+ c0Row.getCharnumberString() + ", STATUS>>"
 				+ c0Row.getStatus() + ", VALASSIGNM>>" + c0Row.getValassignm()
 				+ "\n");
-		rfcInfo.append(Tab + "NEGVALS>>" + c0Row.getNegVals() + ", ADDITVALS>>"
-				+ c0Row.getAdditVals() + "\n");
 
 		// CHAR_DESCR - C1
 		Char_descrTable c1Table = new Char_descrTable();
