@@ -259,8 +259,8 @@ public interface RfcProxy {
 			String pimsIdentity) throws Exception;
 
 	public abstract void r183(String annDocNo, String typemod, String sapPlant,
-			String pimsIdentity, String profitCenter, CHWGeoAnn chwAg)
-			throws Exception;
+			String pimsIdentity, String profitCenter, CHWGeoAnn chwAg,
+			String Div) throws Exception;
 
 	public abstract void r185(TypeModelUPGGeo typeModel, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;

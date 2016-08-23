@@ -289,11 +289,12 @@ public class RfcFactory extends Object {
 				pimsIdentity);
 	}
 
-	public R123create300ClassificationForTypeModels getr123(TypeModel typeModel,
-			TypeModelUPGGeo tmUPGObj, String newFlag, CHWAnnouncement chwA,
-			String FromToType, String pimsIdentity) throws Exception {
-		return new R123create300ClassificationForTypeModels(typeModel, tmUPGObj,
-				newFlag, chwA, FromToType, pimsIdentity);
+	public R123create300ClassificationForTypeModels getr123(
+			TypeModel typeModel, TypeModelUPGGeo tmUPGObj, String newFlag,
+			CHWAnnouncement chwA, String FromToType, String pimsIdentity)
+			throws Exception {
+		return new R123create300ClassificationForTypeModels(typeModel,
+				tmUPGObj, newFlag, chwA, FromToType, pimsIdentity);
 	}
 
 	public R124createUpgradeValueForTypeMCCharacteristic getr124(Vector tmugV,
@@ -596,9 +597,9 @@ public class RfcFactory extends Object {
 
 	public R183createCFIPlantViewForTypeModelMaterial getr183(String annDocNo,
 			String typemod, String sapPlant, String pimsIdentity,
-			String profitCenter, CHWGeoAnn chwAg) throws Exception {
+			String profitCenter, CHWGeoAnn chwAg, String Div) throws Exception {
 		return new R183createCFIPlantViewForTypeModelMaterial(annDocNo,
-				typemod, sapPlant, pimsIdentity, profitCenter, chwAg);
+				typemod, sapPlant, pimsIdentity, profitCenter, chwAg, Div);
 	}
 
 	public R185deleteupgradevaluefromMCcharacteristic getr185(

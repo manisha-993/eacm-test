@@ -468,11 +468,11 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 	}
 
 	@Override
-	public void r123(TypeModel typeModel, TypeModelUPGGeo tmUPGObj, String newFlag,
-			CHWAnnouncement chwA, String FromToType, String pimsIdentity)
-			throws Exception {
-		R123create300ClassificationForTypeModels r = getFactory().getr123(typeModel,
-				tmUPGObj, newFlag, chwA, FromToType, pimsIdentity);
+	public void r123(TypeModel typeModel, TypeModelUPGGeo tmUPGObj,
+			String newFlag, CHWAnnouncement chwA, String FromToType,
+			String pimsIdentity) throws Exception {
+		R123create300ClassificationForTypeModels r = getFactory().getr123(
+				typeModel, tmUPGObj, newFlag, chwA, FromToType, pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
@@ -992,10 +992,11 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 
 	@Override
 	public void r183(String annDocNo, String typemod, String sapPlant,
-			String pimsIdentity, String profitCenter, CHWGeoAnn chwAg)
-			throws Exception {
+			String pimsIdentity, String profitCenter, CHWGeoAnn chwAg,
+			String Div) throws Exception {
 		R183createCFIPlantViewForTypeModelMaterial r = getFactory().getr183(
-				annDocNo, typemod, sapPlant, pimsIdentity, profitCenter, chwAg);
+				annDocNo, typemod, sapPlant, pimsIdentity, profitCenter, chwAg,
+				Div);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
