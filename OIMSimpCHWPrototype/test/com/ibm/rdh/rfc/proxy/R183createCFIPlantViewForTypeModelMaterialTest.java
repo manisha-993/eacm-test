@@ -28,6 +28,7 @@ public class R183createCFIPlantViewForTypeModelMaterialTest extends
 			String sapPlant = "Y";
 			String pimsIdentity = "C";
 			String profitCenter = "";
+			String Div = "B1";
 			CHWGeoAnn chwAg = new CHWGeoAnn();
 			chwAg.setAnnouncementDate(new Date());
 
@@ -38,7 +39,7 @@ public class R183createCFIPlantViewForTypeModelMaterialTest extends
 
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 			rfcProxy.r183(annDocNo, typemod, sapPlant, pimsIdentity,
-					profitCenter, chwAg);
+					profitCenter, chwAg, Div);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;

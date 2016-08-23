@@ -86,7 +86,7 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setZeiar(chwA.getAnnouncementType());
 		b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
-		b1Row.setSpart("B1");
+		b1Row.setSpart((chwA.getDiv()));
 		b1Row.setGewei("KG");
 		// end
 		b1Table.appendRow(b1Row);

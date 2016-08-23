@@ -20,7 +20,7 @@ public class R183createCFIPlantViewForTypeModelMaterial extends Rfc {
 
 	public R183createCFIPlantViewForTypeModelMaterial(String annDocNo,
 			String typemod, String sapPlant, String pimsIdentity,
-			String profitCenter, CHWGeoAnn chwAg) throws Exception {
+			String profitCenter, CHWGeoAnn chwAg, String Div) throws Exception {
 		reInitialize();
 		SimpleDateFormat sdf = new SimpleDateFormat("ddMMyy");
 
@@ -45,12 +45,11 @@ public class R183createCFIPlantViewForTypeModelMaterial extends Rfc {
 		rfc.setIBmm00(b0Table);
 
 		rfcInfo.append("BMM00 \n");
-		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() 
-				+ ", MATNR>>" + b0Row.getMatnr()
-				+ ", XEIV4>>" + b0Row.getXeiv4()
+		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
+				+ b0Row.getMatnr() + ", XEIV4>>" + b0Row.getXeiv4()
 				+ ", WERKS>>" + b0Row.getWerks() + "\n");
-		rfcInfo.append(Tab + "MBRSH>>" + b0Row.getMbrsh() 
-				+ ", MTART>>" + b0Row.getMtart() + "\n");
+		rfcInfo.append(Tab + "MBRSH>>" + b0Row.getMbrsh() + ", MTART>>"
+				+ b0Row.getMtart() + "\n");
 
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
@@ -65,12 +64,12 @@ public class R183createCFIPlantViewForTypeModelMaterial extends Rfc {
 		b1Row.setZeiar("New");
 		b1Row.setAeszn(sdf.format(chwAg.getAnnouncementDate()));
 		b1Row.setGewei("KG");
-		b1Row.setSpart("B1");
+		b1Row.setSpart(Div);
 		// new add data end
 
 		// SAP Ledger
-		if ("Y".equals(ConfigManager.getConfigManager()
-				.getString(PropertyKeys.KEY_SAP_LEDGER))) {
+		if ("Y".equals(ConfigManager.getConfigManager().getString(
+				PropertyKeys.KEY_SAP_LEDGER))) {
 			boolean existsPro = ProfitCenterPlantSelector
 					.checkProfitCenterPlants(sapPlant);
 			if (existsPro) {
@@ -82,16 +81,14 @@ public class R183createCFIPlantViewForTypeModelMaterial extends Rfc {
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
-		rfcInfo.append(Tab + "LADGR>>" + b1Row.getLadgr() 
-				+ ", MTVFP>>" + b1Row.getMtvfp() + "\n");
-		rfcInfo.append(Tab + "ZEINR>>" + b1Row.getZeinr() 
-				+ ", MATKL>>" + b1Row.getMatkl()
-				+ ", MEINS>>" + b1Row.getMeins()
-				+ ", ZEIAR>>" + b1Row.getZeiar() 
-				+ ", AESZN>>" + b1Row.getAeszn()
-				+ ", GEWEI>>" + b1Row.getGewei()
-				+ ", PRCTR>>" + b1Row.getPrctr()
-				+ ", SPART>>" + b1Row.getSpart() + "\n");
+		rfcInfo.append(Tab + "LADGR>>" + b1Row.getLadgr() + ", MTVFP>>"
+				+ b1Row.getMtvfp() + "\n");
+		rfcInfo.append(Tab + "ZEINR>>" + b1Row.getZeinr() + ", MATKL>>"
+				+ b1Row.getMatkl() + ", MEINS>>" + b1Row.getMeins()
+				+ ", ZEIAR>>" + b1Row.getZeiar() + ", AESZN>>"
+				+ b1Row.getAeszn() + ", GEWEI>>" + b1Row.getGewei()
+				+ ", PRCTR>>" + b1Row.getPrctr() + ", SPART>>"
+				+ b1Row.getSpart() + "\n");
 
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();
