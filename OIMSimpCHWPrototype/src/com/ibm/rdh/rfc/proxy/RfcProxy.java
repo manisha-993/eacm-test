@@ -325,7 +325,8 @@ public interface RfcProxy {
 
 	public abstract void r205(TypeModel typeModel, TypeModelUPGGeo tmupg,
 			String newFlag, String fromtotype, String typeProfRefresh,
-			String type, String profile, String pimsIdentity) throws Exception;
+			String type, String profile, String pimsIdentity, String rfaNumber)
+			throws Exception;
 
 	// public abstract boolean r207(String type, String model, String plant)
 	// throws Exception;

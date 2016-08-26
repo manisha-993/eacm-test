@@ -1232,10 +1232,11 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 	@Override
 	public void r205(TypeModel typeModel, TypeModelUPGGeo tmupg,
 			String newFlag, String fromtotype, String typeProfRefresh,
-			String type, String profile, String pimsIdentity) throws Exception {
+			String type, String profile, String pimsIdentity, String rfaNumber)
+			throws Exception {
 		R205ClassificationForBTProductsTypeMaterials r = getFactory().getr205(
 				typeModel, tmupg, newFlag, fromtotype, typeProfRefresh, type,
-				profile, pimsIdentity);
+				profile, pimsIdentity, rfaNumber);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);

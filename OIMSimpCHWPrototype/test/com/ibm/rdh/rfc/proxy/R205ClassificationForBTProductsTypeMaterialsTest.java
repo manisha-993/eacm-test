@@ -54,6 +54,7 @@ public class R205ClassificationForBTProductsTypeMaterialsTest extends
 			String profile = "eacm";
 			String newFlag = "NEW";
 			String objectId = "001" + type + newFlag;
+			String rfaNumber = "123401";
 
 			int deleteDataResult = deleteDataClassicationMaint(typeModel
 					.getType() + newFlag);
@@ -63,7 +64,7 @@ public class R205ClassificationForBTProductsTypeMaterialsTest extends
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 
 			rfcProxy.r205(typeModel, null, newFlag, null, null, null, null,
-					pimsIdentity);
+					pimsIdentity, rfaNumber);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;
@@ -116,6 +117,7 @@ public class R205ClassificationForBTProductsTypeMaterialsTest extends
 			String profile = "eacm";
 			String newFlag = "NEW";
 			String objectId = "001" + typeModel.getType() + newFlag;
+			String rfaNumber = "123401";
 
 			int deleteDataResult = deleteDataClassicationMaint(typeModel
 					.getType() + newFlag);
@@ -125,7 +127,7 @@ public class R205ClassificationForBTProductsTypeMaterialsTest extends
 			RdhRestProxy rfcProxy = new RdhRestProxy();
 
 			rfcProxy.r205(typeModel, tmupg, newFlag, fromtotype,
-					typeProfRefresh, type, profile, pimsIdentity);
+					typeProfRefresh, type, profile, pimsIdentity, rfaNumber);
 
 			Map<String, String> map = new HashMap<String, String>();
 			Map<String, Object> rowDetails;

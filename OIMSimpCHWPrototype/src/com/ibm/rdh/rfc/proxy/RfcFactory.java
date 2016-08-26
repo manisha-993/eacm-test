@@ -721,10 +721,11 @@ public class RfcFactory extends Object {
 	public R205ClassificationForBTProductsTypeMaterials getr205(
 			TypeModel typeModel, TypeModelUPGGeo tmupg, String newFlag,
 			String fromtotype, String typeProfRefresh, String type,
-			String profile, String pimsIdentity) throws Exception {
+			String profile, String pimsIdentity, String rfaNumber)
+			throws Exception {
 		return new R205ClassificationForBTProductsTypeMaterials(typeModel,
 				tmupg, newFlag, fromtotype, typeProfRefresh, type, profile,
-				pimsIdentity);
+				pimsIdentity, rfaNumber);
 	}
 
 	// public R207ReadPlantViewMaterial getr207(String type, String model,

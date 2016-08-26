@@ -30,7 +30,7 @@ public class R205ClassificationForBTProductsTypeMaterials extends Rfc {
 	public R205ClassificationForBTProductsTypeMaterials(TypeModel typeModel,
 			TypeModelUPGGeo tmupg, String newFlag, String fromtotype,
 			String typeProfRefresh, String type, String profile,
-			String pimsIdentity) throws Exception {
+			String pimsIdentity,String rfaNumber) throws Exception {
 
 		reInitialize();
 		Date curDate = new Date();
@@ -212,34 +212,35 @@ public class R205ClassificationForBTProductsTypeMaterials extends Rfc {
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
 		// RFANUMBER
-		if (typeProfRefresh != null) {
-			if (typeProfRefresh.equals("TYPENEW") && (profile != null)) {
-				rfc.setRfaNum(profile + "_REV");
-			} else if (typeProfRefresh.equals("TYPEUPG") && (profile != null)) {
-				rfc.setRfaNum(profile + "_REV");
-			} else if (typeProfRefresh.equals("TYPEMTC") && (profile != null)) {
-				rfc.setRfaNum(profile + "_REV");
-			}
-		} else {
-			if (newFlag.equals("NEW")) {
-				rfc.setRfaNum(typeModel.getRevProfile().getRevenueProfile()
-						+ "_REV");
-			} else if (newFlag.equals("UPG")) {
-				rfc.setRfaNum(typeModel.getRevProfile().getRevenueProfile()
-						+ "_REV");
-			} else if (newFlag.equals("MTC") && fromtotype.equals("FROMTYPE")) {
-				System.out.println("From Type RFA Number ***** "
-						+ tmupg.getFromTMRevProfile().getRevenueProfile());
-
-				rfc.setRfaNum(tmupg.getFromTMRevProfile().getRevenueProfile()
-						+ "_REV");
-			} else if (newFlag.equals("MTC") && fromtotype.equals("TOTYPE")) {
-				System.out.println("To Type RFA Number ***** "
-						+ tmupg.getToTMRevProfile().getRevenueProfile());
-				rfc.setRfaNum(tmupg.getToTMRevProfile().getRevenueProfile()
-						+ "_REV");
-			}
-		}
+//		if (typeProfRefresh != null) {
+//			if (typeProfRefresh.equals("TYPENEW") && (profile != null)) {
+//				rfc.setRfaNum(profile + "_REV");
+//			} else if (typeProfRefresh.equals("TYPEUPG") && (profile != null)) {
+//				rfc.setRfaNum(profile + "_REV");
+//			} else if (typeProfRefresh.equals("TYPEMTC") && (profile != null)) {
+//				rfc.setRfaNum(profile + "_REV");
+//			}
+//		} else {
+//			if (newFlag.equals("NEW")) {
+//				rfc.setRfaNum(typeModel.getRevProfile().getRevenueProfile()
+//						+ "_REV");
+//			} else if (newFlag.equals("UPG")) {
+//				rfc.setRfaNum(typeModel.getRevProfile().getRevenueProfile()
+//						+ "_REV");
+//			} else if (newFlag.equals("MTC") && fromtotype.equals("FROMTYPE")) {
+//				System.out.println("From Type RFA Number ***** "
+//						+ tmupg.getFromTMRevProfile().getRevenueProfile());
+//
+//				rfc.setRfaNum(tmupg.getFromTMRevProfile().getRevenueProfile()
+//						+ "_REV");
+//			} else if (newFlag.equals("MTC") && fromtotype.equals("TOTYPE")) {
+//				System.out.println("To Type RFA Number ***** "
+//						+ tmupg.getToTMRevProfile().getRevenueProfile());
+//				rfc.setRfaNum(tmupg.getToTMRevProfile().getRevenueProfile()
+//						+ "_REV");
+//			}
+//		}
+		rfc.setRfaNum(rfaNumber);
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + rfc.getRfaNum() + "\n");
 
