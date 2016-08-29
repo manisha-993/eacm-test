@@ -25,10 +25,14 @@ public class R205ClassificationForBTProductsTypeMaterialsTest extends
 	@Before
 	public void prepareData() {
 		String sql_mara_1 = "insert into SAPR3.MARA (MANDT,MATNR) values('200','EACMNEW')";
+		String sql_ksml = "insert into sapr3.ksml (mandt, clint, imerk) values ('200', '0101000006', '1100000101')";
+		String sql_cabn = "INSERT INTO SAPR3.CABN (MANDT,ATINN,ADZHL,ATNAM,ATIDN,ATFOR,ANZST,ANZDZ,ATVOR,ATSCH,ATKLE,ATKON,ATEND,ATAEN,ATKLA,ATERF,ATEIN,ATAME,ATWME,MSEHI,ATDIM,ATGLO,ATGLA,ATINT,ATUNS,ATSON,ATTAB,ATFEL,ATTEI,ATPRT,ATPRR,ATPRF,ATWRD,ATFOD,ATHIE,ATDEX,ATFGA,ATVSC,ANAME,ADATU,VNAME,VDATU,ATXAC,ATYAC,ATMST,ATWSO,ATBSO,DATUV,TECHV,AENNR,LKENZ,ATWRI,DOKAR,DOKNR,DOKVR,DOKTL,KNOBJ,ATINP,ATVIE,WERKS,KATALOGART,AUSWAHLMGE,ATHKA,ATHKO,CLINT,ATTOL,ATZUS,ATVPL,SHAD_UPDATE_TS,SHAD_UPDATE_IND,SAP_TS) VALUES ('200','1100000101','0000','MM_BTPRODUCTS',' ','CHAR',2,0,' ',' ',' ',' ',' ',' ',' ','X',' ','X','X',' ',0,' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','0',' ',' ','61823410','20000614','NPARACHURI','20110216',' ',' ','1',' ',' ','00000000',' ',' ',' ',' ',' ',' ',' ',' ','000000000000000000',' ',' ',' ',' ',' ',' ',' ','          ',' ',' ',' ',{ts '2011-02-16 13:59:26.819942'},'U',{ts '2011-02-16 13:21:44'})";
 
 		int t1 = SqlHelper.runUpdateSql(sql_mara_1, conn);
+		int t3 = SqlHelper.runUpdateSql(sql_ksml, conn);
+		int t4 = SqlHelper.runUpdateSql(sql_cabn, conn);
 
-		if (t1 >= 0) {
+		if (t1 >= 0 && t3 >= 0 && t4 >= 0) {
 			System.out.println("insert success");
 		} else {
 			System.out.println("insert failed");
@@ -163,10 +167,15 @@ public class R205ClassificationForBTProductsTypeMaterialsTest extends
 	@After
 	public void deleteData() {
 		String del_mara_1 = "delete from SAPR3.MARA where MANDT='200' and MATNR='EACMNEW'";
+		String del_cabn = "delete from SAPR3.CABN where mandt='200' AND ATNAM='MM_BTPRODUCTS' and ATINN='1100000101'";
+		String del_ksml = "delete from sapr3.ksml where clint='0101000006' and mandt ='200' and imerk='1100000101'";
 
 		int t1 = SqlHelper.runUpdateSql(del_mara_1, conn);
 		// int t2 = SqlHelper.runUpdateSql(del_mara_2, conn);
-		if (t1 >= 0) {
+		int t3 = SqlHelper.runUpdateSql(del_cabn, conn);
+		int t4 = SqlHelper.runUpdateSql(del_ksml, conn);
+
+		if (t1 >= 0 && t3 >= 0 && t4 >= 0) {
 			System.out.println("delete success");
 		} else {
 			System.out.println("delete failed");
