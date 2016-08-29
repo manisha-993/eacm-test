@@ -107,30 +107,27 @@ public class R116createPlantViewForTypeModelMaterial extends Rfc {
 		b1Row.setSpart(typeModel.getDiv());
 		// end
 		// SAP Ledger
-		if (ConfigManager.getConfigManager()
-				.getString(PropertyKeys.KEY_SAP_LEDGER).equals("Y")) {
-			System.out.println("Profit Center Value for R116"
-					+ typeModel.getProfitCenter());
-			System.out.println("Print Vendor ID when Blank"
-					+ typeModel.getVendorID());
-			boolean existsPro = ProfitCenterPlantSelector
-					.checkProfitCenterPlants(sapPlant);
-			if (existsPro) {
-				if (typeModel.getProfitCenter() != null) {
-					b1Row.setPrctr(typeModel.getProfitCenter());
-				}
-			}
-			if (typeModel.getVendorID() != null
-					&& (!"".equals(typeModel.getVendorID()))) {
-				b1Row.setEkgrp("001");
-			}
 
-			if (!"".equals(typeModel.getVendorID())) {
-				b1Row.setMfrnr(typeModel.getVendorID());
-			} else {
-				b1Row.setMfrnr("?");
+		System.out.println("Profit Center Value for R116"
+				+ typeModel.getProfitCenter());
+		System.out.println("Print Vendor ID when Blank"
+				+ typeModel.getVendorID());
+		boolean existsPro = ProfitCenterPlantSelector
+				.checkProfitCenterPlants(sapPlant);
+		if (existsPro) {
+			if (typeModel.getProfitCenter() != null) {
+				b1Row.setPrctr(typeModel.getProfitCenter());
 			}
+		}
+		if (typeModel.getVendorID() != null
+				&& (!"".equals(typeModel.getVendorID()))) {
+			b1Row.setEkgrp("001");
+		}
 
+		if (!"".equals(typeModel.getVendorID())) {
+			b1Row.setMfrnr(typeModel.getVendorID());
+		} else {
+			b1Row.setMfrnr("?");
 		}
 
 		b1Table.appendRow(b1Row);
@@ -158,7 +155,7 @@ public class R116createPlantViewForTypeModelMaterial extends Rfc {
 				+ ", STPRS>>" + b1Row.getStprs() + ", BKLAS>>"
 				+ b1Row.getBklas() + ", PRCTR>>" + b1Row.getPrctr()
 				+ ", EKGRP>>" + b1Row.getEkgrp() + ", MFRNR>>"
-				+ b1Row.getMfrnr() +"\n");
+				+ b1Row.getMfrnr() + "\n");
 
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();

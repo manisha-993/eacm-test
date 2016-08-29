@@ -33,6 +33,7 @@ public class R116createPlantViewForTypeModelMaterialTest extends
 			typeModel.setModel("");
 			typeModel.setDiv("B1");
 			typeModel.setAcctAsgnGrp("");
+			typeModel.setVendorID("11");
 			chwA.setAnnDocNo("123401");
 			chwA.setAnnouncementType("New");
 			chwAg.setAnnouncementDate(new Date());

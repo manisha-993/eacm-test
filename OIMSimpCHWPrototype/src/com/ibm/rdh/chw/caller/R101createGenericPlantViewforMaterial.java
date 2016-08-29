@@ -122,28 +122,26 @@ public class R101createGenericPlantViewforMaterial extends Rfc {
 		b1Row.setPerkz("M");
 		// SAP Ledger
 		// boolean existsPro = false;
-		if (("Y").equals(ConfigManager.getConfigManager().getString(
-				PropertyKeys.KEY_SAP_LEDGER))) {
-			boolean existsPro = ProfitCenterPlantSelector
-					.checkProfitCenterPlants(plantValue);
-			System.out
-					.println("Printing the value of boolean exists in the rfc R101"
-							+ existsPro);
-			if (existsPro) {
-				if (typeModel.getProfitCenter() != null
-						&& (!"".equals(typeModel.getProfitCenter()))) {
-					b1Row.setPrctr(typeModel.getProfitCenter());
-				}
+
+		boolean existsPro = ProfitCenterPlantSelector
+				.checkProfitCenterPlants(plantValue);
+		System.out
+				.println("Printing the value of boolean exists in the rfc R101 "
+						+ existsPro);
+		if (existsPro) {
+			if (typeModel.getProfitCenter() != null
+					&& (!"".equals(typeModel.getProfitCenter()))) {
+				b1Row.setPrctr(typeModel.getProfitCenter());
 			}
-			if (typeModel.getVendorID() != null
-					&& (!"".equals(typeModel.getVendorID()))) {
-				b1Row.setEkgrp("001");
-			}
-			if (!typeModel.getVendorID().equals("")) {
-				b1Row.setMfrnr(typeModel.getVendorID());
-			} else {
-				b1Row.setMfrnr("?");
-			}
+		}
+		if (typeModel.getVendorID() != null
+				&& (!"".equals(typeModel.getVendorID()))) {
+			b1Row.setEkgrp("001");
+		}
+		if (!typeModel.getVendorID().equals("")) {
+			b1Row.setMfrnr(typeModel.getVendorID());
+		} else {
+			b1Row.setMfrnr("?");
 		}
 
 		b1Table.appendRow(b1Row);

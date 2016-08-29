@@ -3,8 +3,6 @@ package com.ibm.rdh.chw.caller;
 import java.text.SimpleDateFormat;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.pprds.epimshw.PropertyKeys;
-import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.pprds.epimshw.util.ProfitCenterPlantSelector;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.rfc.Bmm00Table;
@@ -68,13 +66,11 @@ public class R183createCFIPlantViewForTypeModelMaterial extends Rfc {
 		// new add data end
 
 		// SAP Ledger
-		if ("Y".equals(ConfigManager.getConfigManager().getString(
-				PropertyKeys.KEY_SAP_LEDGER))) {
-			boolean existsPro = ProfitCenterPlantSelector
-					.checkProfitCenterPlants(sapPlant);
-			if (existsPro) {
-				b1Row.setPrctr(profitCenter);
-			}
+
+		boolean existsPro = ProfitCenterPlantSelector
+				.checkProfitCenterPlants(sapPlant);
+		if (existsPro) {
+			b1Row.setPrctr(profitCenter);
 		}
 
 		b1Table.appendRow(b1Row);

@@ -3,8 +3,6 @@ package com.ibm.rdh.chw.caller;
 import java.text.SimpleDateFormat;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.pprds.epimshw.PropertyKeys;
-import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.pprds.epimshw.util.ProfitCenterPlantSelector;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
@@ -59,12 +57,11 @@ public class R189createCFIPlantViewForType extends Rfc {
 		b0Table.appendRow(b0Row);
 		rfc.setIBmm00(b0Table);
 		rfcInfo.append("Bmm00 \n");
-		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() 
-				+ ", MATNR>>" + b0Row.getMatnr() 
-				+ ", XEIV4>>" + b0Row.getXeiv4()
+		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
+				+ b0Row.getMatnr() + ", XEIV4>>" + b0Row.getXeiv4()
 				+ ", WERKS>>" + b0Row.getWerks() + "\n");
-		rfcInfo.append(Tab + "MBRSH>>" + b0Row.getMbrsh() 
-				+ ", MTART>>" + b0Row.getMtart() + "\n");
+		rfcInfo.append(Tab + "MBRSH>>" + b0Row.getMbrsh() + ", MTART>>"
+				+ b0Row.getMtart() + "\n");
 
 		// Bmmh1 - B1
 		Bmmh1Table b1Table = new Bmmh1Table();
@@ -88,15 +85,13 @@ public class R189createCFIPlantViewForType extends Rfc {
 			b1Row.setMtvfp("ZE");
 
 		// SAP Ledger
-		if ("Y".equals(ConfigManager.getConfigManager().getString(
-				PropertyKeys.KEY_SAP_LEDGER))) {
-			boolean existsPro = ProfitCenterPlantSelector
-					.checkProfitCenterPlants(sapPlant);
-			if (existsPro) {
-				if (typeModel.getProfitCenter() != null
-						&& (!"".equals(typeModel.getProfitCenter()))) {
-					b1Row.setPrctr(typeModel.getProfitCenter());
-				}
+
+		boolean existsPro = ProfitCenterPlantSelector
+				.checkProfitCenterPlants(sapPlant);
+		if (existsPro) {
+			if (typeModel.getProfitCenter() != null
+					&& (!"".equals(typeModel.getProfitCenter()))) {
+				b1Row.setPrctr(typeModel.getProfitCenter());
 			}
 		}
 
@@ -104,16 +99,13 @@ public class R189createCFIPlantViewForType extends Rfc {
 		rfc.setIBmmh1(b1Table);
 
 		rfcInfo.append("BMMH1 \n");
-		rfcInfo.append(Tab + "LADGR>>" + b1Row.getLadgr()
-				+ ", MTVFP>>" + b1Row.getMtvfp() 
-				+ ", PRCTR>>" + b1Row.getPrctr() + "\n");
+		rfcInfo.append(Tab + "LADGR>>" + b1Row.getLadgr() + ", MTVFP>>"
+				+ b1Row.getMtvfp() + ", PRCTR>>" + b1Row.getPrctr() + "\n");
 
-		rfcInfo.append(Tab + "GEWEI>>" + b1Row.getGewei() 
-				+ ", SPART>>" + b1Row.getSpart() 
-				+ ", MATKL>>" + b1Row.getMatkl()
-				+ ", MEINS>>" + b1Row.getMeins() 
-				+ ", ZEINR>>" + b1Row.getZeinr() 
-				+ ", ZEIAR>>" + b1Row.getZeiar()
+		rfcInfo.append(Tab + "GEWEI>>" + b1Row.getGewei() + ", SPART>>"
+				+ b1Row.getSpart() + ", MATKL>>" + b1Row.getMatkl()
+				+ ", MEINS>>" + b1Row.getMeins() + ", ZEINR>>"
+				+ b1Row.getZeinr() + ", ZEIAR>>" + b1Row.getZeiar()
 				+ ", AESZN>>" + b1Row.getAeszn() + "\n");
 
 		// ZDM_GEO_TO_CLASS

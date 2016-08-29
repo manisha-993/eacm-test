@@ -36,6 +36,7 @@ public class R101createGenericPlantViewforMaterialTest extends RdhRestProxyTest 
 			typeModel.setType(type);
 			typeModel.setDiv("B1");
 			typeModel.setProductHierarchy("ph");
+			typeModel.setVendorID("11");
 			CHWGeoAnn chwAg = new CHWGeoAnn();
 			chwAg.setAnnouncementDate(new Date());
 			chwAg.setAnnDocNo("123402");
@@ -108,6 +109,7 @@ public class R101createGenericPlantViewforMaterialTest extends RdhRestProxyTest 
 			typeModel.setType(type);
 			typeModel.setDiv("B1");
 			typeModel.setProductHierarchy("ph");
+			typeModel.setVendorID("11");
 			CHWGeoAnn chwAg = new CHWGeoAnn();
 			chwAg.setAnnouncementDate(new Date());
 			chwAg.setAnnDocNo("123402");
@@ -181,6 +183,7 @@ public class R101createGenericPlantViewforMaterialTest extends RdhRestProxyTest 
 			typeModel.setType("EACM");
 			typeModel.setDiv("B1");
 			typeModel.setProductHierarchy("ph");
+			typeModel.setVendorID("11");
 			CHWGeoAnn chwAg = new CHWGeoAnn();
 			chwAg.setAnnouncementDate(new Date());
 			chwAg.setAnnDocNo("123402");
@@ -254,6 +257,7 @@ public class R101createGenericPlantViewforMaterialTest extends RdhRestProxyTest 
 			typeModel.setType("EACM");
 			typeModel.setDiv("B1");
 			typeModel.setProductHierarchy("ph");
+			typeModel.setVendorID("11");
 			CHWGeoAnn chwAg = new CHWGeoAnn();
 			chwAg.setAnnouncementDate(new Date());
 			chwAg.setAnnDocNo("123402");
