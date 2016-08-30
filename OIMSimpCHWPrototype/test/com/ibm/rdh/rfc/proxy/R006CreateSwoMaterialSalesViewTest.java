@@ -25,7 +25,6 @@ public class R006CreateSwoMaterialSalesViewTest extends RdhRestProxyTest {
 
 			AUOMaterial auoMaterial = new AUOMaterial("EACMCHW", "57");
 			auoMaterial.setAcctAsgnGrp("EC");
-			auoMaterial.setMaterialGroup1("I");
 			auoMaterial.setCHWProdHierarchy("0900B00002");
 			auoMaterial.setDiv("B1");
 			auoMaterial.setEffectiveDate(new Date());
@@ -95,7 +94,6 @@ public class R006CreateSwoMaterialSalesViewTest extends RdhRestProxyTest {
 
 			AUOMaterial auoMaterial = new AUOMaterial("EACMCHW", "57");
 			auoMaterial.setAcctAsgnGrp("EC");
-			auoMaterial.setMaterialGroup1("I");
 			auoMaterial.setCHWProdHierarchy("0900B00002");
 			auoMaterial.setDiv("B1");
 			auoMaterial.setEffectiveDate(new Date());
