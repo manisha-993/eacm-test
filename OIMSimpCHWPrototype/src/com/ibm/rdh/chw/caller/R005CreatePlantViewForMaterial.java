@@ -30,9 +30,10 @@ public class R005CreatePlantViewForMaterial extends Rfc {
 		b0Row.setMbrsh("M");
 		b0Row.setMtart("ZIMG");
 		b0Row.setXeiv4("X");
-		if (sapPlant.equals("1999")) {
-			b0Row.setLgort("CHW1");
-		}
+		// if (sapPlant.equals("1999")) {
+		// b0Row.setLgort("CHW1");
+		// }
+		b0Row.setLgort("");
 		b0Row.setWerks(sapPlant);
 		b0Row.setXeid1("X");
 		b0Row.setXeid2("X");
@@ -44,9 +45,9 @@ public class R005CreatePlantViewForMaterial extends Rfc {
 		rfcInfo.append(Tab + "TCODE>>" + b0Row.getTcode() + ", MATNR>>"
 				+ b0Row.getMatnr() + ", MBRSH>>" + b0Row.getMbrsh()
 				+ ", MTART>>" + b0Row.getMtart() + ", XEIV4>>"
-				+ b0Row.getXeiv4() + ", LGORT>>" + b0Row.getLgort() + ", WERKS>>"
-				+ b0Row.getWerks() + ", XEID1>>" + b0Row.getXeid1() + ", XEID2>>"
-				+ b0Row.getXeid2() + "\n");
+				+ b0Row.getXeiv4() + ", LGORT>>" + b0Row.getLgort()
+				+ ", WERKS>>" + b0Row.getWerks() + ", XEID1>>"
+				+ b0Row.getXeid1() + ", XEID2>>" + b0Row.getXeid2() + "\n");
 
 		// Bmmh1 - B1
 		Bmmh1Table b1Table = new Bmmh1Table();
