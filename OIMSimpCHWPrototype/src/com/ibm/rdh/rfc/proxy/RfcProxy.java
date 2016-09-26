@@ -328,8 +328,7 @@ public interface RfcProxy {
 			String type, String profile, String pimsIdentity, String rfaNumber)
 			throws Exception;
 
-	// public abstract boolean r207(String type, String model, String plant)
-	// throws Exception;
+	public abstract boolean r207(String type, String plant) throws Exception;
 
 	public abstract BasicMaterialFromSAP r209(String material) throws Exception;
 

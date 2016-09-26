@@ -92,6 +92,7 @@ import com.ibm.rdh.chw.caller.R201createUpgradeValueForTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R202_createConfigurationProfileForMTCMaterial;
 import com.ibm.rdh.chw.caller.R204ReadMaterial;
 import com.ibm.rdh.chw.caller.R205ClassificationForBTProductsTypeMaterials;
+import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R210ReadSalesBom;
 import com.ibm.rdh.chw.caller.R211CreateSalesBOMfortypeMTC;
@@ -728,10 +729,10 @@ public class RfcFactory extends Object {
 				pimsIdentity, rfaNumber);
 	}
 
-	// public R207ReadPlantViewMaterial getr207(String type, String model,
-	// String plant) throws Exception {
-	// return new R207ReadPlantViewMaterial(type, model, plant);
-	// }
+	public R207ReadPlantViewMaterial getr207(String type, String plant)
+			throws Exception {
+		return new R207ReadPlantViewMaterial(type, plant);
+	}
 
 	public R209ReadBasicViewOfMaterial getr209(String material)
 			throws Exception {

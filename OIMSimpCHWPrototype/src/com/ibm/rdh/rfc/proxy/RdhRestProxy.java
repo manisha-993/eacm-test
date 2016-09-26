@@ -96,6 +96,7 @@ import com.ibm.rdh.chw.caller.R201createUpgradeValueForTypeMCCharacteristic;
 import com.ibm.rdh.chw.caller.R202_createConfigurationProfileForMTCMaterial;
 import com.ibm.rdh.chw.caller.R204ReadMaterial;
 import com.ibm.rdh.chw.caller.R205ClassificationForBTProductsTypeMaterials;
+import com.ibm.rdh.chw.caller.R207ReadPlantViewMaterial;
 import com.ibm.rdh.chw.caller.R209ReadBasicViewOfMaterial;
 import com.ibm.rdh.chw.caller.R210ReadSalesBom;
 import com.ibm.rdh.chw.caller.R211CreateSalesBOMfortypeMTC;
@@ -122,6 +123,7 @@ import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
 import com.ibm.rdh.rfc.BapimatdoaStructure;
 import com.ibm.rdh.rfc.Stpo_api02Table;
 import com.ibm.rdh.rfc.Stpo_api02TableRow;
+import com.ibm.rdh.rfc.Zdm_marc_dataTable;
 import com.ibm.rdh.rfc.Zdm_mat_psales_statusTable;
 import com.ibm.rdh.rfc.Zdm_mat_psales_statusTableRow;
 import com.ibm.rdh.rfc.ZdmchwplcTable;
@@ -1258,31 +1260,30 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 		return exists;
 	}
 
-	// @Override
-	// public boolean r207(String type, String model, String plant)
-	// throws Exception {
-	// R207ReadPlantViewMaterial r = getFactory().getr207(type, model, plant);
-	// logPromoteInfoMessage(r);
-	// r.evaluate();
-	// logPromoteResultMessage(r);
-	//
-	// com.ibm.rdh.rfc.Z_DM_SAP_READ_MARC rfc = r.getRfc();
-	// boolean plantcheck = false;
-	// if (rfc != null) {
-	// logger.info("R207ReadPlantViewMaterial is not null.");
-	// Zdm_marc_dataTable plantvalues = rfc.getZdmMarcData();
-	// int rows = plantvalues.getRowCount();
-	// if (rows > 0) {
-	// plantcheck = true;
-	// } else if (rows == 0) {
-	// plantcheck = false;
-	// }
-	// } else {
-	// logger.info("R207ReadPlantViewMaterial is null.");
-	// }
-	// return plantcheck;
-	//
-	// }
+	@Override
+	public boolean r207(String type, String plant) throws Exception {
+		R207ReadPlantViewMaterial r = getFactory().getr207(type, plant);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+
+		com.ibm.rdh.rfc.Z_DM_SAP_READ_MARC rfc = r.getRfc();
+		boolean plantcheck = false;
+		if (rfc != null) {
+			logger.info("R207ReadPlantViewMaterial is not null.");
+			Zdm_marc_dataTable plantvalues = rfc.getZdmMarcData();
+			int rows = plantvalues.getRowCount();
+			if (rows > 0) {
+				plantcheck = true;
+			} else if (rows == 0) {
+				plantcheck = false;
+			}
+		} else {
+			logger.info("R207ReadPlantViewMaterial is null.");
+		}
+		return plantcheck;
+
+	}
 
 	@Override
 	public BasicMaterialFromSAP r209(String material) throws Exception {
