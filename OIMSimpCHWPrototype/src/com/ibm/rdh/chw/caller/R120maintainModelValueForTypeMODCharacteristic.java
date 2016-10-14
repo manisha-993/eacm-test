@@ -123,11 +123,6 @@ public class R120maintainModelValueForTypeMODCharacteristic extends Rfc {
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
 
-		// REFRESH_VALS
-		rfc.setRefreshVals("X");
-		rfcInfo.append("REFRESH_VALS \n");
-		rfcInfo.append(Tab + "REFRESH_VALS>>" + rfc.getRefreshVals() + "\n");
-
 	}
 
 	// This is an new add function
