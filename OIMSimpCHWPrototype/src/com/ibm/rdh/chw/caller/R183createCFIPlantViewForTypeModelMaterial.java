@@ -36,7 +36,9 @@ public class R183createCFIPlantViewForTypeModelMaterial extends Rfc {
 
 		// new add data start
 		b0Row.setMbrsh("M");
-		b0Row.setMtart("ZMAT");
+//		b0Row.setMtart("ZMAT");
+		b0Row.setMtart("ZPRT");
+		
 		// new add data end
 
 		b0Table.appendRow(b0Row);

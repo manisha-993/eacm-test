@@ -36,7 +36,8 @@ public class R116createPlantViewForTypeModelMaterial extends Rfc {
 		b0Row.setTcode("MM01");
 		b0Row.setMatnr(typeModel.getType() + typeModel.getModel());
 		// this is required by code, but not set in mapping
-		b0Row.setMtart("ZMAT");
+//		b0Row.setMtart("ZMAT");
+		b0Row.setMtart("ZPRT");
 		// end
 		b0Row.setMbrsh("M");
 		b0Row.setXeiv4("X");

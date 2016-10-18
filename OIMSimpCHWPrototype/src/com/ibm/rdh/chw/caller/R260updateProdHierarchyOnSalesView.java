@@ -57,7 +57,8 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 		b0Row.setVtweg("00");
 		// add 20160427
 		b0Row.setMbrsh("M");
-		b0Row.setMtart("ZMAT");
+//		b0Row.setMtart("ZMAT");
+		b0Row.setMtart("ZPRT");
 		// end
 		b0Table.appendRow(b0Row);
 		rfc.setIBmm00(b0Table);
