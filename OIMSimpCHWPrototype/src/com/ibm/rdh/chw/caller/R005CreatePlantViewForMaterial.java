@@ -1,6 +1,7 @@
 package com.ibm.rdh.chw.caller;
 
 import java.text.SimpleDateFormat;
+
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.rdh.chw.entity.AUOMaterial;
 import com.ibm.rdh.rfc.Bmm00Table;
@@ -76,9 +77,9 @@ public class R005CreatePlantViewForMaterial extends Rfc {
 		b1Row.setDisgr("Z025");
 		b1Row.setPerkz("M");
 		// Prctr need to be confirmed
-		String prctr = auoMaterial.getDiv();
-		String temp = "0000000000";// temp str for format
-		b1Row.setPrctr(temp.substring(0, 10 - prctr.length()) + prctr);
+		String prctr = getProfitCenter(auoMaterial.getDiv());
+//		String temp = "0000000000";// temp str for format
+		b1Row.setPrctr(prctr);
 
 		b1Row.setBeskz("X");
 		// Add 5 set value not set in the previous epimshw code
@@ -129,6 +130,27 @@ public class R005CreatePlantViewForMaterial extends Rfc {
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + auoMaterial.getMaterial() + "\n");
 
+	}
+	
+	private String getProfitCenter(String div){
+		String profitCenter;
+		if (isAlphaNumeric(div)){
+			profitCenter= div;
+		}else{
+			profitCenter = "00000000" + div;
+			
+		}
+		return profitCenter;
+	}
+	
+	private boolean isAlphaNumeric(String str){
+		int strLen = str.length();
+		for (int i = 0; i < strLen; i++) {
+			if (Character.isLetter(str.charAt(i))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
