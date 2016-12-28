@@ -93,30 +93,30 @@ public class R213UpdateSalesBOMItemWithtypeMTC extends Rfc {
 
 			rfc.setJStpoApi03(m1Table);
 
-//			// CSDEP_DAT - M2
-//			e = geoV.elements();
-//			Csdep_datTable m2Table = new Csdep_datTable();
-//
-//			while (e.hasMoreElements()) {
-//				DepData tmg = (DepData) e.nextElement();
-//
-//				Csdep_datTableRow m2Row = m2Table.createEmptyRow();
-//
-//				m2Row.setDepIntern(tmg.getDep_Intern());
-//				m2Row.setStatus("1");
-//				m2Row.setIdentifier(tmg.getItem_Node().toString());
-//				m2Row.setObjectId("2");
-//
-//				m2Table.appendRow(m2Row);
-//
-//				rfcInfo.append("CSDEP_DAT Row \n");
-//				rfcInfo.append(Tab + "DEP_INTERN>>" + m2Row.getDepIntern()
-//						+ ", STATUS>>" + m2Row.getStatus()
-//						+ ", IDENTIFIER>>" + m2Row.getIdentifier() 
-//						+ ", OBJECT_ID>>" + m2Row.getObjectId() + "\n");
-//			}
-//
-//			rfc.setJCsdepDat(m2Table);
+			// CSDEP_DAT - M2
+			e = geoV.elements();
+			Csdep_datTable m2Table = new Csdep_datTable();
+
+			while (e.hasMoreElements()) {
+				DepData tmg = (DepData) e.nextElement();
+
+				Csdep_datTableRow m2Row = m2Table.createEmptyRow();
+
+				m2Row.setDepIntern(tmg.getDep_Intern());
+				m2Row.setStatus("1");
+				m2Row.setIdentifier(tmg.getItem_Node().toString());
+				m2Row.setObjectId("2");
+
+				m2Table.appendRow(m2Row);
+
+				rfcInfo.append("CSDEP_DAT Row \n");
+				rfcInfo.append(Tab + "DEP_INTERN>>" + m2Row.getDepIntern()
+						+ ", STATUS>>" + m2Row.getStatus()
+						+ ", IDENTIFIER>>" + m2Row.getIdentifier() 
+						+ ", OBJECT_ID>>" + m2Row.getObjectId() + "\n");
+			}
+
+			rfc.setJCsdepDat(m2Table);
 
 		}
 		CsdataStructure m8 = new CsdataStructure();
