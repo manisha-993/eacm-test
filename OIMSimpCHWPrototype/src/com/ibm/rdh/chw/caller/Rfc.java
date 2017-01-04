@@ -2,6 +2,7 @@ package com.ibm.rdh.chw.caller;
 
 
 import org.apache.log4j.Logger;
+
 import com.ibm.pprds.epimshw.HWPIMSErrorInformation;
 import com.ibm.pprds.epimshw.util.LogManager;
 //import com.ibm.pprds.epimshw.util.ConfigManager;
@@ -123,6 +124,27 @@ public abstract class Rfc implements RfcReturnSeverityCodes
 
 	protected void logThisCall() {
 		getLog().debug( "Created: " + ClassUtil.getSimpleClassName( this ) ) ;  
+	}
+	
+	protected String getProfitCenter(String div){
+		String profitCenter;
+		if (isAlphaNumeric(div)){
+			profitCenter= div;
+		}else{
+			profitCenter = "00000000" + div;
+			
+		}
+		return profitCenter;
+	}
+	
+	protected boolean isAlphaNumeric(String str){
+		int strLen = str.length();
+		for (int i = 0; i < strLen; i++) {
+			if (Character.isLetter(str.charAt(i))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 //	public void setSwo(SWO swo) {

@@ -46,7 +46,7 @@ public class R057CreateReturnPlantView extends Rfc {
 		Bmmh1Table b1Table = new Bmmh1Table();
 		Bmmh1TableRow b1Row = b1Table.createEmptyRow();
 		b1Row.setTragr("STD");
-		b1Row.setLadgr("RETN");
+		b1Row.setLadgr("B001");
 		b1Row.setSernp("ZXXC");
 		b1Row.setSbdkz("1");
 		b1Row.setMtvfp("NC");
@@ -55,6 +55,8 @@ public class R057CreateReturnPlantView extends Rfc {
 		b1Row.setStprs("0");
 		b1Row.setBklas("7920");
 
+		b1Row.setPrctr(getProfitCenter(auoMaterial.getDiv()));
+		
 		// Add 7 set value not set in the previous epimshw code
 		b1Row.setZeinr(auoMaterial.getMaterial());
 		b1Row.setMatkl("000");
@@ -79,7 +81,8 @@ public class R057CreateReturnPlantView extends Rfc {
 				+ ", SBDKZ>>" + b1Row.getSbdkz() + ", MTVFP>>"
 				+ b1Row.getMtvfp() + ", VPRSV>>" + b1Row.getVprsv()
 				+ ", PEINH>>" + b1Row.getPeinh() + ", STPRS>>"
-				+ b1Row.getStprs() + ", BKLAS>>" + b1Row.getBklas() + "\n");
+				+ b1Row.getStprs() + ", BKLAS>>" + b1Row.getBklas() 
+				+ ", PRCTR>>" + b1Row.getPrctr() + "\n");
 
 		// ZDM_GEO_TO_CLASS
 		Zdm_geo_to_classTable zdmTable = new Zdm_geo_to_classTable();

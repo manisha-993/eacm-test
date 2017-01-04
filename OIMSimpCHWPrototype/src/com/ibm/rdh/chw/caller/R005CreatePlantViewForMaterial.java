@@ -131,27 +131,6 @@ public class R005CreatePlantViewForMaterial extends Rfc {
 		rfcInfo.append(Tab + "RFANumber>>" + auoMaterial.getMaterial() + "\n");
 
 	}
-	
-	private String getProfitCenter(String div){
-		String profitCenter;
-		if (isAlphaNumeric(div)){
-			profitCenter= div;
-		}else{
-			profitCenter = "00000000" + div;
-			
-		}
-		return profitCenter;
-	}
-	
-	private boolean isAlphaNumeric(String str){
-		int strLen = str.length();
-		for (int i = 0; i < strLen; i++) {
-			if (Character.isLetter(str.charAt(i))) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	@Override
 	public void execute() throws Exception {
