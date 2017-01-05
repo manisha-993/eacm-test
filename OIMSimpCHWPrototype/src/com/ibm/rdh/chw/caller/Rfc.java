@@ -157,7 +157,7 @@ public abstract class Rfc implements RfcReturnSeverityCodes
 	
 	protected String formatRfcErrorMessage(int returnCode, String errorText)
 	{
-		return errorText + " (rc = " + returnCode + ")";
+		return "[" + getRfcName() + " " + getMaterialName() + "]" + errorText + " (rc = " + returnCode + ")";
 	} 
 	
 	/**
