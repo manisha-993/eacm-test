@@ -1,7 +1,7 @@
 package com.ibm.rdh.chw.caller;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
-import com.ibm.pprds.epimshw.HWPIMSExistMastNotDefinedStkoException;
+import com.ibm.pprds.epimshw.HWPIMSNotFoundInMastException;
 
 public class R193ReadRevenueProfile extends Rfc {
 	private com.ibm.rdh.rfc.CSAP_MAT_BOM_READ rfc;
@@ -39,12 +39,13 @@ public class R193ReadRevenueProfile extends Rfc {
 		getLog().debug(getErrorInformation());
 		if (getSeverity() == ERROR) {
 			String errMsg = getErrorInformation();
+			rfcInfo.append("R193 returned message: " + errMsg);
 			// WebService not found in MAST, return errMsg is "Material <material> not found in MAST table."
 			// WebService not found in STPO, return errMsg is "Material <material> exists in Mast table but not defined to Stpo table"
-			if (errMsg.contains("exists in Mast table but not defined to Stko table")) {
-				throw new HWPIMSExistMastNotDefinedStkoException(errMsg);
-			} else if (errMsg.contains("not found in MAST table")) {
-				rfcInfo.append(errMsg);
+			if (errMsg.contains("not found in MAST table")) {
+				throw new HWPIMSNotFoundInMastException(errMsg);
+			} else if (errMsg.contains("exists in Mast table but not defined to Stko table")) {
+				// ignore
 			} else {
 				throw new HWPIMSAbnormalException(errMsg);
 			}
