@@ -34,7 +34,7 @@ public class R129maintainTypeFeatureCharacteristic extends Rfc {
 				+ typeFeature.getFeature();
 		c0Row.setCharact(charac);
 		c0Row.setDatatype("NUM");
-		c0Row.setCharnumberString("4");
+		c0Row.setCharnumberString("6");
 		c0Row.setStatus("1");
 		c0Row.setValassignm("S");
 		c0Row.setNegVals("X");
