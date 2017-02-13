@@ -90,16 +90,20 @@ public class R009Maintain001Classification extends Rfc {
 		// API_AUSP - R6
 		Api_auspTable r6Table = new Api_auspTable();
 		Vector r6Vector = new Vector(1, 1);
+		Api_auspTableRow r6Row = null;
 
-		Api_auspTableRow r6Row = r6Table.createEmptyRow();
-		r6Row.setCharact("MM_AMORTSTART");
-		r6Row.setValue(auoMaterial.getAmrtztlnstrt());
-		r6Vector.addElement(r6Row);
-
-		r6Row = r6Table.createEmptyRow();
-		r6Row.setCharact("MM_AMORTLENGTH");
-		r6Row.setValue(auoMaterial.getAmrtztlnlngth());
-		r6Vector.addElement(r6Row);
+		if (auoMaterial.getAmrtztlnstrt() != null && !auoMaterial.getAmrtztlnstrt().trim().equals("")) {
+			r6Row = r6Table.createEmptyRow();
+			r6Row.setCharact("MM_AMORTSTART");
+			r6Row.setValue(auoMaterial.getAmrtztlnstrt());
+			r6Vector.addElement(r6Row);
+		}
+		if (auoMaterial.getAmrtztlnlngth() != null && !auoMaterial.getAmrtztlnlngth().trim().equals("")) {
+			r6Row = r6Table.createEmptyRow();
+			r6Row.setCharact("MM_AMORTLENGTH");
+			r6Row.setValue(auoMaterial.getAmrtztlnlngth());
+			r6Vector.addElement(r6Row);
+		}		
 
 		// Add the data to rfcInfo
 		Enumeration em6 = r6Vector.elements();
