@@ -6,6 +6,7 @@ import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.util.ProfitCenterPlantSelector;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
+import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.rfc.Bmm00Table;
 import com.ibm.rdh.rfc.Bmm00TableRow;
 import com.ibm.rdh.rfc.Bmmh1Table;
@@ -35,7 +36,13 @@ public class R262createPlantViewProfitCenterForMaterial extends Rfc {
 
 		// new add data start
 		b0Row.setMbrsh("M");
+		
 		b0Row.setMtart("ZPRT");
+		// [Work Item 1681833] New: HIPO materials (5313 HPO and 5372 IS5)are still set to material type of ZPRT in RDH. Should be ZMAT
+		if (material != null && material.length() == 7 &&isHIPOModel(material.substring(0, 4), material.substring(4, 7))) {
+			b0Row.setMtart("ZMAT");
+		}
+		
 		// new add data end
 
 		b0Row.setWerks(sapPlant);

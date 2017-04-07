@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 
 import com.ibm.pprds.epimshw.HWPIMSErrorInformation;
 import com.ibm.pprds.epimshw.util.LogManager;
+import com.ibm.rdh.chw.entity.TypeModel;
 //import com.ibm.pprds.epimshw.util.ConfigManager;
 
 
@@ -387,4 +388,18 @@ public abstract class Rfc implements RfcReturnSeverityCodes
 		hwpimsErrorInformation.setEvent("RFC");
 
 	}
+	
+	/**
+	 * Check if the TypeModel is a HIPO MODEL
+	 * @param tm
+	 * @return
+	 */
+	protected boolean isHIPOModel(String type, String model) {
+		boolean isHIPO = false;
+		if (("5313".equals(type) && "HPO".equals(model)) || ("5372".equals(type) && "IS5".equals(model))) {
+			isHIPO = true;
+		}
+		return isHIPO;
+	}
+	
 }

@@ -36,8 +36,13 @@ public class R183createCFIPlantViewForTypeModelMaterial extends Rfc {
 
 		// new add data start
 		b0Row.setMbrsh("M");
-//		b0Row.setMtart("ZMAT");
-		b0Row.setMtart("ZPRT");
+		
+		// [Work Item 1681833] New: HIPO materials (5313 HPO and 5372 IS5)are still set to material type of ZPRT in RDH. Should be ZMAT
+		if (typemod != null && typemod.length() == 7 &&isHIPOModel(typemod.substring(0, 4), typemod.substring(4, 7))) {
+			b0Row.setMtart("ZMAT");
+		} else {
+			b0Row.setMtart("ZPRT");
+		}
 		
 		// new add data end
 

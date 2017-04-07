@@ -57,8 +57,16 @@ public class R260updateProdHierarchyOnSalesView extends Rfc {
 		b0Row.setVtweg("00");
 		// add 20160427
 		b0Row.setMbrsh("M");
-//		b0Row.setMtart("ZMAT");
+		
 		b0Row.setMtart("ZPRT");
+		// [Work Item 1681833] New: HIPO materials (5313 HPO and 5372 IS5)are still set to material type of ZPRT in RDH. Should be ZMAT
+		if (material instanceof TypeModel) {
+			TypeModel typeModel = (TypeModel) material;
+			if (isHIPOModel(typeModel.getType(), typeModel.getModel())) { 
+				b0Row.setMtart("ZMAT");
+			}
+		}
+		
 		// end
 		b0Table.appendRow(b0Row);
 		rfc.setIBmm00(b0Table);

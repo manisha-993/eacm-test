@@ -37,7 +37,12 @@ public class R115createTypeModelMaterialBasicView extends Rfc {
 		b0Row.setTcode("MM01");
 		b0Row.setMatnr(typeModel.getType() + typeModel.getModel());
 		b0Row.setMbrsh("M");
-		b0Row.setMtart("ZPRT");
+		// [Work Item 1681833] New: HIPO materials (5313 HPO and 5372 IS5)are still set to material type of ZPRT in RDH. Should be ZMAT
+		if (isHIPOModel(typeModel.getType(), typeModel.getModel())) {
+			b0Row.setMtart("ZMAT");
+		} else {
+			b0Row.setMtart("ZPRT");
+		}
 		b0Row.setXeik1("X");
 		b0Row.setXeib1("X");
 		b0Row.setWerks(plantValue);

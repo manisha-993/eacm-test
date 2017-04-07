@@ -35,7 +35,12 @@ public class R133updateMaterialBasicViewForTypeModel extends Rfc {
 
 		// Two commented out values in the epims code, but we need it.
 		b0Row.setMbrsh("M");
-		b0Row.setMtart("ZPRT");
+		// [Work Item 1681833] New: HIPO materials (5313 HPO and 5372 IS5)are still set to material type of ZPRT in RDH. Should be ZMAT
+		if (isHIPOModel(typeModel.getType(), typeModel.getModel())) {
+			b0Row.setMtart("ZMAT");
+		} else {
+			b0Row.setMtart("ZPRT");
+		}
 		// End
 
 		b0Table.appendRow(b0Row);
