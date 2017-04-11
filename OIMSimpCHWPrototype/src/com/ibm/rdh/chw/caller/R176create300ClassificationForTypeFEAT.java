@@ -23,8 +23,8 @@ import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
 public class R176create300ClassificationForTypeFEAT extends Rfc {
 
 	private com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT rfc;
-
-	public R176create300ClassificationForTypeFEAT(String type, String range,
+	
+	public R176create300ClassificationForTypeFEAT(String type, String model, String range,
 			String newFlag, CHWAnnouncement chwA, String pimsIdentity)
 			throws Exception {
 		reInitialize();
@@ -58,7 +58,8 @@ public class R176create300ClassificationForTypeFEAT extends Rfc {
 		rfcInfo.append(Tab + "KEYFELD>>" + r0Row.getKeyFeld()
 				+ ", KPARAVALU>>" + r0Row.getKparaValu() + "\n");
 
-		String className = "MK_" + type + "_FEAT_" + range;
+		// [Work Item 1681790] New: ESW - unique CLASS (range) and featurenaming support needed for CHW EACM HIPO materials
+		String className = generateClassName(type, model, range);
 		// KLAH - R2
 		KlahTable r2Table = new KlahTable();
 		KlahTableRow r2Row = r2Table.createEmptyRow();
@@ -128,7 +129,12 @@ public class R176create300ClassificationForTypeFEAT extends Rfc {
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
+	}
 
+	public R176create300ClassificationForTypeFEAT(String type, String range,
+			String newFlag, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		this(type, null, range, newFlag, chwA, pimsIdentity);
 	}
 
 	@Override

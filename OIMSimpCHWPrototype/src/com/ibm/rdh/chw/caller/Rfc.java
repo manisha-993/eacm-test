@@ -5,7 +5,6 @@ import org.apache.log4j.Logger;
 
 import com.ibm.pprds.epimshw.HWPIMSErrorInformation;
 import com.ibm.pprds.epimshw.util.LogManager;
-import com.ibm.rdh.chw.entity.TypeModel;
 //import com.ibm.pprds.epimshw.util.ConfigManager;
 
 
@@ -402,4 +401,43 @@ public abstract class Rfc implements RfcReturnSeverityCodes
 		return isHIPO;
 	}
 	
+	/**
+	 * [Work Item 1681790] New: ESW - unique CLASS (range) and feature naming support needed for CHW EACM HIPO materials
+	 * EACM will implement special logic for the 2 HIPO materials - 5313 HPO and 5372 IS5
+	 * The feature classes (ranges) will be of the form MK_5313_HPO_xxxx and MK_5372_IS5_xxxx
+	 * 
+	 * @param type
+	 * @param model
+	 * @param featRanges
+	 * @return
+	 */
+	protected String generateClassName(String type, String model, String featRanges) {
+		String className = "";
+		if (isHIPOModel(type, model)) {
+			className = "MK_" + type + "_" + model + "_" + featRanges;
+		} else {
+			className = "MK_" + type + "_FEAT_" + featRanges;
+		}
+		return className;
+	}
+	
+	/**
+	 * [Work Item 1681790] New: ESW - unique CLASS (range) and feature naming support needed for CHW EACM HIPO materials
+	 * EACM will implement special logic for the 2 HIPO materials - 5313 HPO and 5372 IS5
+	 * The feature classes (ranges) will be of the form MK_5313_HPO_xxxx and MK_5372_IS5_xxxx
+	 * 
+	 * @param type
+	 * @param model
+	 * @param feature
+	 * @return
+	 */
+	protected String generateCharact(String type, String model, String feature) {
+		String charac = "";
+		if (isHIPOModel(type, model)) {
+			charac = "MK_" + type + "_" + model + "_" + feature;
+		} else {
+			charac = "MK_" + type + "_" + feature;
+		}
+		return charac;
+	}
 }

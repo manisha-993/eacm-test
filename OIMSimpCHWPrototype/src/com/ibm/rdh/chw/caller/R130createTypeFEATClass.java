@@ -20,8 +20,8 @@ public class R130createTypeFEATClass extends Rfc {
 	private String sDateFormat = null;
 
 	private com.ibm.rdh.rfc.Z_DM_SAP_CLASS_MAINTAIN rfc;
-
-	public R130createTypeFEATClass(String type, String featRanges,
+	
+	public R130createTypeFEATClass(String type, String model, String featRanges,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 
 		reInitialize();
@@ -37,7 +37,8 @@ public class R130createTypeFEATClass extends Rfc {
 		ClclassesTable l0Table = new ClclassesTable();
 		ClclassesTableRow l0Row = l0Table.createEmptyRow();
 
-		String className = "MK_" + type + "_FEAT_" + featRanges;
+		// [Work Item 1681790] New: ESW - unique CLASS (range) and featurenaming support needed for CHW EACM HIPO materials
+		String className = generateClassName(type, model, featRanges);
 		l0Row.setClass(className);
 		l0Row.setClassType("300");
 		l0Row.setStatus("1");
@@ -88,7 +89,11 @@ public class R130createTypeFEATClass extends Rfc {
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANUM>>" + chwA.getAnnDocNo() + "\n");
+	}
 
+	public R130createTypeFEATClass(String type, String featRanges,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		this(type, null, featRanges, chwA, pimsIdentity);
 	}
 
 	@Override

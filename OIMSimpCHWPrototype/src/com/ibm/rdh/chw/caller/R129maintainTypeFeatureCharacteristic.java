@@ -20,7 +20,7 @@ public class R129maintainTypeFeatureCharacteristic extends Rfc {
 	private com.ibm.rdh.rfc.Z_DM_SAP_CHAR_MAINTAIN rfc;
 
 	public R129maintainTypeFeatureCharacteristic(TypeFeature typeFeature,
-			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+			String model, CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		reInitialize();
 
 		rfcName = "Z_DM_SAP_CHAR_MAINTAIN";
@@ -30,8 +30,9 @@ public class R129maintainTypeFeatureCharacteristic extends Rfc {
 		// CHARACTS
 		CharactsTable c0Table = new CharactsTable();
 		CharactsTableRow c0Row = c0Table.createEmptyRow();
-		String charac = "MK_" + typeFeature.getType() + "_"
-				+ typeFeature.getFeature();
+		// [Work Item 1681790] New: ESW - unique CLASS (range) and featurenaming support needed for CHW EACM HIPO materials
+		String charac = generateCharact(typeFeature.getType(), model, typeFeature.getFeature());
+//		String charac = "MK_" + typeFeature.getType() + "_" + typeFeature.getFeature();
 		c0Row.setCharact(charac);
 		c0Row.setDatatype("NUM");
 		c0Row.setCharnumberString("6");
@@ -108,6 +109,11 @@ public class R129maintainTypeFeatureCharacteristic extends Rfc {
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
+	}
+	
+	public R129maintainTypeFeatureCharacteristic(TypeFeature typeFeature,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		this(typeFeature, null, chwA, pimsIdentity);
 	}
 
 	@Override

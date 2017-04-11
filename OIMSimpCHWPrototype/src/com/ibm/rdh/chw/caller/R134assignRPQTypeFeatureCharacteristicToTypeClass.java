@@ -12,7 +12,7 @@ public class R134assignRPQTypeFeatureCharacteristicToTypeClass extends Rfc {
 	private com.ibm.rdh.rfc.Z_DM_SAP_ASSIGN_CHAR_TO_CLASS rfc;
 
 	public R134assignRPQTypeFeatureCharacteristicToTypeClass(
-			TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
+			TypeFeature typeFeature, String model, CHWAnnouncement chwA, String pimsIdentity)
 			throws Exception {
 		reInitialize();
 		rfcName = "Z_DM_SAP_ASSIGN_CHAR_TO_CLASS";
@@ -24,8 +24,9 @@ public class R134assignRPQTypeFeatureCharacteristicToTypeClass extends Rfc {
 		// C0
 		String className;
 		String range = typeFeature.calculateRange100();
-		className = "MK_" + typeFeature.getType() + "_FEAT"
-				+ formatRange(range);
+		// [Work Item 1681790] New: ESW - unique CLASS (range) and featurenaming support needed for CHW EACM HIPO materials
+		className = generateClassName(typeFeature.getType(), model, range);
+//		className = "MK_" + typeFeature.getType() + "_FEAT" + formatRange(range);
 		rfc.setJClass(className);
 		rfc.setJKlart("300");
 
@@ -37,7 +38,8 @@ public class R134assignRPQTypeFeatureCharacteristicToTypeClass extends Rfc {
 		RmclmTable c1Table = new RmclmTable();
 		RmclmTableRow c1Row = c1Table.createEmptyRow();
 
-		charac = "MK_" + typeFeature.getType() + "_" + typeFeature.getFeature();
+		charac = generateCharact(typeFeature.getType(), model, typeFeature.getFeature());
+//		charac = "MK_" + typeFeature.getType() + "_" + typeFeature.getFeature();
 		c1Row.setMerkma(charac);
 		c1Table.appendRow(c1Row);
 
@@ -64,7 +66,12 @@ public class R134assignRPQTypeFeatureCharacteristicToTypeClass extends Rfc {
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + rfc.getRfaNum() + "\n");
-
+	}
+	
+	public R134assignRPQTypeFeatureCharacteristicToTypeClass(
+			TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		this(typeFeature, null, chwA, pimsIdentity);
 	}
 
 	/**

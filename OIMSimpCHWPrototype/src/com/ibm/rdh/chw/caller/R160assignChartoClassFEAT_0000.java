@@ -19,7 +19,10 @@ public class R160assignChartoClassFEAT_0000 extends Rfc {
 
 		// Set up the RFC fields
 		// C0
-		rfc.setJClass("MK_" + typeModel.getType() + "_FEAT_0000");
+		// [Work Item 1681790] New: ESW - unique CLASS (range) and featurenaming support needed for CHW EACM HIPO materials
+		String className = generateClassName(typeModel.getType(), typeModel.getModel(), "0000");
+//		rfc.setJClass("MK_" + typeModel.getType() + "_FEAT_0000");
+		rfc.setJClass(className);
 		rfc.setJKlart("300");
 
 		rfcInfo.append("Direct fields \n");

@@ -134,8 +134,14 @@ public interface RfcProxy {
 
 	public abstract void r129(TypeFeature typeFeature, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
+	
+	public abstract void r129(TypeFeature typeFeature, String model, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
 
 	public abstract void r130(String type, String featRanges,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
+	
+	public abstract void r130(String type, String model, String featRanges,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
 
 	public abstract void r131(String type, String featRanges,
@@ -145,6 +151,9 @@ public interface RfcProxy {
 			String pimsIdentity, CHWGeoAnn chwAg) throws Exception;
 
 	public abstract void r134(TypeFeature typeFeature, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+	
+	public abstract void r134(TypeFeature typeFeature, String model, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
 	public abstract void r135(TypeFeature typeFeature, CHWAnnouncement chwA,
@@ -192,6 +201,9 @@ public interface RfcProxy {
 			String pimsIdentity) throws Exception;
 
 	public abstract void r153(TypeFeature typeFeature, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception;
+	
+	public abstract void r153(TypeFeature typeFeature, String model, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception;
 
 	public abstract void r156(String typemod, String div, CHWAnnouncement chwA,
@@ -247,6 +259,9 @@ public interface RfcProxy {
 			String pimsIdentity) throws Exception;
 
 	public abstract void r176(String type, String range, String newFlag,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
+	
+	public abstract void r176(String type, String model, String range, String newFlag,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception;
 
 	public abstract void r177(String type, String range, CHWAnnouncement chwA,

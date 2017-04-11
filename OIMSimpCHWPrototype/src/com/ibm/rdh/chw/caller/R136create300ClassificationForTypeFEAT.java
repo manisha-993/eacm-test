@@ -59,10 +59,14 @@ public class R136create300ClassificationForTypeFEAT extends Rfc {
 		KlahTable r2Table = new KlahTable();
 		KlahTableRow r2Row = r2Table.createEmptyRow();
 		if ("MTC".equals(newFlag) && "MTCTOTYPE".equals(FromToType)) {
-			className = "MK_" + tmUPGObj.getType() + "_FEAT_" + range;
+			// [Work Item 1681790] New: ESW - unique CLASS (range) and featurenaming support needed for CHW EACM HIPO materials
+			className = generateClassName(tmUPGObj.getType(), tmUPGObj.getModel(), range);
+//			className = "MK_" + tmUPGObj.getType() + "_FEAT_" + range;
 			r2Row.setClass(className);
 		} else if ("MTC".equals(newFlag) && "MTCFROMTYPE".equals(FromToType)) {
-			className = "MK_" + tmUPGObj.getFromType() + "_FEAT_" + range;
+			// [Work Item 1681790] New: ESW - unique CLASS (range) and featurenaming support needed for CHW EACM HIPO materials
+			className = generateClassName(tmUPGObj.getFromType(), tmUPGObj.getFromModel(), range);
+//			className = "MK_" + tmUPGObj.getFromType() + "_FEAT_" + range;
 			r2Row.setClass(className);
 		}
 

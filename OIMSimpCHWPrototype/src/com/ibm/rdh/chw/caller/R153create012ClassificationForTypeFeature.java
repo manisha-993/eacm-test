@@ -3,6 +3,7 @@ package com.ibm.rdh.chw.caller;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
+
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.TypeFeature;
@@ -26,7 +27,7 @@ public class R153create012ClassificationForTypeFeature extends Rfc {
 	private com.ibm.rdh.rfc.Z_DM_SAP_CLASSIFICATION_MAINT rfc;
 
 	public R153create012ClassificationForTypeFeature(TypeFeature typeFeature,
-			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+			String model, CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		reInitialize();
 		Date curDate = new Date();
 		rfcName = "Z_DM_SAP_CLASSIFICATION_MAINT";
@@ -39,8 +40,10 @@ public class R153create012ClassificationForTypeFeature extends Rfc {
 		Object_keyTableRow r0Row = r0Table.createEmptyRow();
 
 		r0Row.setKeyFeld("ATNAM");
-		r0Row.setKparaValu("MK_" + typeFeature.getType() + "_"
-				+ typeFeature.getFeature());
+		// [Work Item 1681790] New: ESW - unique CLASS (range) and featurenaming support needed for CHW EACM HIPO materials
+		String charac = generateCharact(typeFeature.getType(), model, typeFeature.getFeature());
+		r0Row.setKparaValu(charac);
+//		r0Row.setKparaValu("MK_" + typeFeature.getType() + "_" + typeFeature.getFeature());
 		r0Table.appendRow(r0Row);
 		rfc.setIObjectKey(r0Table);
 		rfcInfo.append("OBJECTKEY \n");
@@ -180,7 +183,11 @@ public class R153create012ClassificationForTypeFeature extends Rfc {
 		rfc.setRfaNum(chwA.getAnnDocNo());
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + chwA.getAnnDocNo() + "\n");
-
+	}
+	
+	public R153create012ClassificationForTypeFeature(TypeFeature typeFeature,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		this(typeFeature, null, chwA, pimsIdentity);
 	}
 
 	@Override

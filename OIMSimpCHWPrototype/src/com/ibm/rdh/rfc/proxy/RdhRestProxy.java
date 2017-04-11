@@ -543,11 +543,32 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 		r.evaluate();
 		logPromoteResultMessage(r);
 	}
+	
+	@Override
+	public void r129(TypeFeature typeFeature, String model, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+
+		R129maintainTypeFeatureCharacteristic r = getFactory().getr129(
+				typeFeature, model, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
 
 	@Override
 	public void r130(String type, String featRanges, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception {
 		R130createTypeFEATClass r = getFactory().getr130(type, featRanges,
+				chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+	
+	@Override
+	public void r130(String type, String model, String featRanges, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R130createTypeFEATClass r = getFactory().getr130(type, model, featRanges,
 				chwA, pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
@@ -585,6 +606,16 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 		logPromoteResultMessage(r);
 	}
 
+	@Override
+	public void r134(TypeFeature typeFeature, String model, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R134assignRPQTypeFeatureCharacteristicToTypeClass r = getFactory()
+				.getr134(typeFeature, model, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+	
 	@Override
 	public void r135(TypeFeature typeFeature, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception {
@@ -727,6 +758,16 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 			String pimsIdentity) throws Exception {
 		R153create012ClassificationForTypeFeature r = getFactory().getr153(
 				typeFeature, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+	
+	@Override
+	public void r153(TypeFeature typeFeature, String model, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		R153create012ClassificationForTypeFeature r = getFactory().getr153(
+				typeFeature, model, chwA, pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);
@@ -928,6 +969,16 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 	public void r176(String type, String range, String newFlag,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		R176create300ClassificationForTypeFEAT r = getFactory().getr176(type,
+				range, newFlag, chwA, pimsIdentity);
+		logPromoteInfoMessage(r);
+		r.evaluate();
+		logPromoteResultMessage(r);
+	}
+	
+	@Override
+	public void r176(String type, String model, String range, String newFlag,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		R176create300ClassificationForTypeFEAT r = getFactory().getr176(type, model,
 				range, newFlag, chwA, pimsIdentity);
 		logPromoteInfoMessage(r);
 		r.evaluate();

@@ -339,10 +339,24 @@ public class RfcFactory extends Object {
 				pimsIdentity);
 
 	}
+	
+	public R129maintainTypeFeatureCharacteristic getr129(
+			TypeFeature typeFeature, String model, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R129maintainTypeFeatureCharacteristic(typeFeature, model, chwA,
+				pimsIdentity);
+
+	}
 
 	public R130createTypeFEATClass getr130(String type, String featRanges,
 			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
 		return new R130createTypeFEATClass(type, featRanges, chwA, pimsIdentity);
+
+	}
+	
+	public R130createTypeFEATClass getr130(String type, String model, String featRanges,
+			CHWAnnouncement chwA, String pimsIdentity) throws Exception {
+		return new R130createTypeFEATClass(type, model, featRanges, chwA, pimsIdentity);
 
 	}
 
@@ -363,6 +377,13 @@ public class RfcFactory extends Object {
 			throws Exception {
 		return new R134assignRPQTypeFeatureCharacteristicToTypeClass(
 				typeFeature, chwA, pimsIdentity);
+	}
+	
+	public R134assignRPQTypeFeatureCharacteristicToTypeClass getr134(
+			TypeFeature typeFeature, String model, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R134assignRPQTypeFeatureCharacteristicToTypeClass(
+				typeFeature, model, chwA, pimsIdentity);
 	}
 
 	public R135assignTypeFeatureCharacteristicToTypeUFClass getr135(
@@ -458,6 +479,13 @@ public class RfcFactory extends Object {
 			TypeFeature typeFeature, CHWAnnouncement chwA, String pimsIdentity)
 			throws Exception {
 		return new R153create012ClassificationForTypeFeature(typeFeature, chwA,
+				pimsIdentity);
+	}
+	
+	public R153create012ClassificationForTypeFeature getr153(
+			TypeFeature typeFeature, String model, CHWAnnouncement chwA, String pimsIdentity)
+			throws Exception {
+		return new R153create012ClassificationForTypeFeature(typeFeature, model, chwA,
 				pimsIdentity);
 	}
 
@@ -573,6 +601,13 @@ public class RfcFactory extends Object {
 			String range, String newFlag, CHWAnnouncement chwA,
 			String pimsIdentity) throws Exception {
 		return new R176create300ClassificationForTypeFEAT(type, range, newFlag,
+				chwA, pimsIdentity);
+	}
+	
+	public R176create300ClassificationForTypeFEAT getr176(String type, String model,
+			String range, String newFlag, CHWAnnouncement chwA,
+			String pimsIdentity) throws Exception {
+		return new R176create300ClassificationForTypeFEAT(type, model, range, newFlag,
 				chwA, pimsIdentity);
 	}
 
