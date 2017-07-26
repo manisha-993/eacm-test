@@ -3,13 +3,12 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/OIMJavaClient"/>
-	<classpathentry kind="lib" path="C:/D/workspace/OIMSimpProtoTypeClientProj/lib/epimssw/ivjsap20.jar"/>
-	<classpathentry kind="lib" path="C:/D/workspace/OIMSimpProtoTypeClientProj/lib/log/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="C:/D/workspace/OIMSimpProtoTypeClientProj/lib/jpa/db2jcc.jar"/>
-	<classpathentry kind="lib" path="C:/D/workspace/OIMSimpProtoTypeClientProj/lib/jpa/db2jcc_license_cu.jar"/>
-	<classpathentry kind="lib" path="C:/D/workspace/OIMSimpProtoTypeClientProj/lib/epimssw/infobus.jar"/>
-	<classpathentry kind="lib" path="C:/D/workspace/OIMSimpProtoTypeClientProj/lib/epimssw/InterfacesEJBClient.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="/myjars/eacm/db2jcc_license_cu.jar"/>
+	<classpathentry kind="lib" path="/myjars/eacm/db2jcc.jar"/>
+	<classpathentry kind="lib" path="/myjars/eacm/infobus.jar"/>
+	<classpathentry kind="lib" path="/myjars/eacm/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="/myjars/eacm/ivjsap20.jar"/>
+	<classpathentry kind="lib" path="/myjars/eacm/OIMJavaClient.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

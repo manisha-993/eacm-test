@@ -44,8 +44,10 @@ public class R193ReadRevenueProfile extends Rfc {
 			// WebService not found in STPO, return errMsg is "Material <material> exists in Mast table but not defined to Stpo table"
 			if (errMsg.contains("not found in MAST table")) {
 				throw new HWPIMSNotFoundInMastException(errMsg);
+			} else if (errMsg.contains("exists in Mast table but not defined to Stpo table")) {
+				// ignore, error already added before
 			} else if (errMsg.contains("exists in Mast table but not defined to Stko table")) {
-				// ignore
+				// ignore, error already added before
 			} else {
 				throw new HWPIMSAbnormalException(errMsg);
 			}
