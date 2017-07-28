@@ -37,17 +37,24 @@ public class R193ReadRevenueProfile extends Rfc {
 		logExecution();
 		getRfc().execute();
 		getLog().debug(getErrorInformation());
+		
 		if (getSeverity() == ERROR) {
 			String errMsg = getErrorInformation();
 			rfcInfo.append("R193 returned message: " + errMsg);
 			// WebService not found in MAST, return errMsg is "Material <material> not found in MAST table."
 			// WebService not found in STPO, return errMsg is "Material <material> exists in Mast table but not defined to Stpo table"
+			// WebService not found in STKO, return errMsg is "Material <material> exists in Mast table but not defined to Stko table"
 			if (errMsg.contains("not found in MAST table")) {
+				// the BOM has not created in RDH
+				// we need to catch this exception and call BOM create
 				throw new HWPIMSNotFoundInMastException(errMsg);
 			} else if (errMsg.contains("exists in Mast table but not defined to Stpo table")) {
-				// ignore, error already added before
+				// ignore, this error means there is no component in RDH
+				// when we ignore this error message, call will return empty component vector
 			} else if (errMsg.contains("exists in Mast table but not defined to Stko table")) {
-				// ignore, error already added before
+				// when we first time call BOM create, it will create the stko record
+				// if we get this error message, this is a data issue in RDH, they need to fix it. 
+				throw new HWPIMSAbnormalException(errMsg);
 			} else {
 				throw new HWPIMSAbnormalException(errMsg);
 			}

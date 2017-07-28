@@ -1,6 +1,7 @@
 package com.ibm.rdh.chw.caller;
 
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
+import com.ibm.pprds.epimshw.HWPIMSNotFoundInMastException;
 
 public class R210ReadSalesBom extends Rfc {
 	private com.ibm.rdh.rfc.CSAP_MAT_BOM_READ rfc;
@@ -39,15 +40,25 @@ public class R210ReadSalesBom extends Rfc {
 
 		if (getSeverity() == ERROR) {
 			String errMsg = getErrorInformation();
-			// WebService not found, return errMsg is "Material<type+newflag> not found in MAST table."
-			if (errMsg.contains("not found")) {
-				rfcInfo.append(errMsg);
+			rfcInfo.append("R210 returned message: " + errMsg);
+			// WebService not found in MAST, return errMsg is "Material <material> not found in MAST table."
+			// WebService not found in STPO, return errMsg is "Material <material> exists in Mast table but not defined to Stpo table"
+			// WebService not found in STKO, return errMsg is "Material <material> exists in Mast table but not defined to Stko table"
+			if (errMsg.contains("not found in MAST table")) {
+				// the BOM has not created in RDH
+				// we need to catch this exception and call BOM create
+				throw new HWPIMSNotFoundInMastException(errMsg);
+			} else if (errMsg.contains("exists in Mast table but not defined to Stpo table")) {
+				// ignore, this error means there is no component in RDH
+				// when we ignore this error message, call will return empty component vector
+			} else if (errMsg.contains("exists in Mast table but not defined to Stko table")) {
+				// when we first time call BOM create, it will create the stko record
+				// if we get this error message, this is a data issue in RDH, they need to fix it. 
+				throw new HWPIMSAbnormalException(errMsg);
 			} else {
 				throw new HWPIMSAbnormalException(errMsg);
 			}
-
 		}
-
 	}
 
 	@Override
