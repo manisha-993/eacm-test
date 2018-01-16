@@ -1,27 +1,14 @@
 package com.ibm.rdh.chw.caller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
 import com.ibm.rdh.chw.entity.TypeModel;
 import com.ibm.rdh.chw.entity.TypeModelUPGGeo;
-import com.ibm.rdh.rfc.Api_auspTable;
-import com.ibm.rdh.rfc.Api_auspTableRow;
-import com.ibm.rdh.rfc.KlahTable;
-import com.ibm.rdh.rfc.KlahTableRow;
-import com.ibm.rdh.rfc.KsskTable;
-import com.ibm.rdh.rfc.KsskTableRow;
-import com.ibm.rdh.rfc.MaraTable;
-import com.ibm.rdh.rfc.MaraTableRow;
-import com.ibm.rdh.rfc.Object_keyTable;
-import com.ibm.rdh.rfc.Object_keyTableRow;
-import com.ibm.rdh.rfc.RcucoTable;
-import com.ibm.rdh.rfc.RcucoTableRow;
-import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
-import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
+import com.ibm.rdh.rfc.*;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class R205ClassificationForBTProductsTypeMaterials extends Rfc {
 
@@ -244,7 +231,10 @@ public class R205ClassificationForBTProductsTypeMaterials extends Rfc {
 		rfcInfo.append("RFANUM \n");
 		rfcInfo.append(Tab + "RFANumber>>" + rfc.getRfaNum() + "\n");
 
-		rfc.setCharvalRefresh("1");
+		// Story 1796482: Question about Z_DM_SAP_CLASSIFICATION_MAINT - do some update for RFCABR of MODEL.
+		// Z_DM_SAP_CLASSIFICATION_MAINT: If the <charval_refresh> input parameter/variable == "1" (TRUE): it will delete all characters first then create as input.
+		// We will call r175 first for MM_FILEDS, the call r205 but we don't want to delete characters where created by r175, so set it to 0
+		rfc.setCharvalRefresh("0");
 		rfcInfo.append("CHARVAL_REFRESH \n");
 		rfcInfo.append(Tab + "CHARVAL_REFRESH>>" + rfc.getCharvalRefresh()
 				+ "\n");
