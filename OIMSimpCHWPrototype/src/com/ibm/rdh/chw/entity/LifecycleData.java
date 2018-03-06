@@ -1,6 +1,8 @@
 package com.ibm.rdh.chw.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class LifecycleData {
 	
@@ -11,7 +13,7 @@ public class LifecycleData {
 	protected Date announceValidTo;
 	protected Date wdfmValidFrom;
 	protected Date wdfmValidTo;
-	
+	private List<LifecycleAnnounceData> announceDataList = new ArrayList<>();
 
 	/**
 	 * Constructor for LifecycleData.
@@ -141,6 +143,10 @@ public class LifecycleData {
 	 */
 	public void setPreAnnounceValidFrom(Date preAnnounceValidFrom) {
 		this.preAnnounceValidFrom = preAnnounceValidFrom;
+	}
+
+	public List<LifecycleAnnounceData> getAnnounceDataList() {
+		return announceDataList;
 	}
 
 	@Override
