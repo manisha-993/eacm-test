@@ -1,10 +1,5 @@
 package com.ibm.rdh.chw.caller;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Vector;
-
 import com.ibm.pprds.epimshw.HWPIMSAbnormalException;
 import com.ibm.pprds.epimshw.PropertyKeys;
 import com.ibm.pprds.epimshw.util.ConfigManager;
@@ -12,14 +7,12 @@ import com.ibm.rdh.chw.entity.CHWAnnouncement;
 import com.ibm.rdh.chw.entity.CHWGeoAnn;
 import com.ibm.rdh.chw.entity.CntryTax;
 import com.ibm.rdh.chw.entity.PlannedSalesStatus;
-import com.ibm.rdh.rfc.Bmm00Table;
-import com.ibm.rdh.rfc.Bmm00TableRow;
-import com.ibm.rdh.rfc.Bmmh1Table;
-import com.ibm.rdh.rfc.Bmmh1TableRow;
-import com.ibm.rdh.rfc.Bmmh2Table;
-import com.ibm.rdh.rfc.Bmmh2TableRow;
-import com.ibm.rdh.rfc.Zdm_geo_to_classTable;
-import com.ibm.rdh.rfc.Zdm_geo_to_classTableRow;
+import com.ibm.rdh.rfc.*;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Vector;
 
 public class R117createTypeModelMaterialSalesView extends Rfc {
 
@@ -125,32 +118,18 @@ public class R117createTypeModelMaterialSalesView extends Rfc {
 		b1Row.setVersg("1");
 
 		if (ps != null) {
-			if ("BTH".equalsIgnoreCase(flfil)) {
+			if ("BTH".equalsIgnoreCase(flfil) || "XCC".equalsIgnoreCase(flfil) || "ZIP".equalsIgnoreCase(flfil)) {
 
 				if (ps.getCurrentSalesStatus() != null) {
 					b1Row.setVmsta(ps.getCurrentSalesStatus());
 				} else {
 					b1Row.setVmsta("Z0");
 				}
-			} else if ("XCC".equalsIgnoreCase(flfil)) {
-				if (ps.getCurrentSalesStatus() != null) {
-					b1Row.setVmsta(ps.getCurrentSalesStatus());
-				} else {
-					b1Row.setVmsta("Z0");
-				}
-			}
-
-			else {
+			} else {
 				b1Row.setVmsta("Z0");
 			}
 
-			if ("BTH".equalsIgnoreCase(flfil)) {
-				if ((ps.getCurrentEffectiveDate()) == null) {
-					b1Row.setVmstd(sdf.format(curDate));
-				} else {
-					b1Row.setVmstd(sdf.format(ps.getCurrentEffectiveDate()));
-				}
-			} else if ("XCC".equalsIgnoreCase(flfil)) {
+			if ("BTH".equalsIgnoreCase(flfil) || "XCC".equalsIgnoreCase(flfil) || "ZIP".equalsIgnoreCase(flfil)) {
 				if ((ps.getCurrentEffectiveDate()) == null) {
 					b1Row.setVmstd(sdf.format(curDate));
 				} else {
