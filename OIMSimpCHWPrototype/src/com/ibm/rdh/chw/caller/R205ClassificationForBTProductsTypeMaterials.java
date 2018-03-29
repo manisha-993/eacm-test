@@ -50,6 +50,11 @@ public class R205ClassificationForBTProductsTypeMaterials extends Rfc {
 			} else if ("MTC".equals(newFlag) && "TOTYPE".equals(fromtotype)) {
 				r0Row.setKparaValu(tmupg.getType() + "MTC");
 			}
+			//add type+model at 20180328
+			else if ("MOD".equals(newFlag)) {
+				r0Row.setKparaValu(typeModel.getType() + typeModel.getModel());
+			}
+			//add end
 		}
 
 		r0Table.appendRow(r0Row);
@@ -174,6 +179,16 @@ public class R205ClassificationForBTProductsTypeMaterials extends Rfc {
 					r6Row.setValue("");
 				}
 			}
+			//add type+model at 20180328
+			else if (newFlag.equals("MOD")) {
+				if (typeModel.isHasRevProfile()) {
+
+					r6Row.setValue("PROCESS4");
+				} else {
+					r6Row.setValue("");
+				}
+			}
+			//add end
 		}
 		r6Table.appendRow(r6Row);
 		rfc.setIApiAusp(r6Table);
