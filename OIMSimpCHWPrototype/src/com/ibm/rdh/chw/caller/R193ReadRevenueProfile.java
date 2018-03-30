@@ -22,7 +22,7 @@ public class R193ReadRevenueProfile extends Rfc {
 		} 
 		//add 20180330
 		else if("MOD".equals(newFlag.substring(0,3))){
-			rfc.setMaterial(type + newFlag.substring(4));
+			rfc.setMaterial(type + newFlag.substring(3));
 		}
 		//add
 		rfc.setPlant(_plant);

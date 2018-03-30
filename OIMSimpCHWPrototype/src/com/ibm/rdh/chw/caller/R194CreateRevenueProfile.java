@@ -64,7 +64,7 @@ public class R194CreateRevenueProfile extends Rfc {
 		}
 		//add 20180330
 		else if("MOD".equals(newFlag.substring(0,3))){
-			n0.setMatnr(type + newFlag.substring(4));
+			n0.setMatnr(type + newFlag.substring(3));
 		}
 		//add
 
