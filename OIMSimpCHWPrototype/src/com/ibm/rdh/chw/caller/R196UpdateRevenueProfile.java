@@ -63,9 +63,7 @@ public class R196UpdateRevenueProfile extends Rfc {
 			m0.setMatnr(type + "UPG");
 		} else if ("MTC".equals(newFlag)) {
 			m0.setMatnr(type + "MTC");
-		} else{
-			m0.setMatnr(type + newFlag);
-		}
+		} 
 		//add 20180330
 		else if("MOD".equals(newFlag.sustring(0,3))){
 			m0.setMatnr(type + newFlag.sustring(4));
