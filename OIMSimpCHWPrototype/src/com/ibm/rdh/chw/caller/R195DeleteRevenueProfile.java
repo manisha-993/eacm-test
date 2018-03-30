@@ -61,8 +61,8 @@ public class R195DeleteRevenueProfile extends Rfc {
 			m0.setMatnr(type + "MTC");
 		}
 		//add 20180330
-		else if("MOD".equals(newFlag.sustring(0,3))){
-			m0.setMatnr(type + newFlag.sustring(4));
+		else if("MOD".equals(newFlag.substring(0,3))){
+			m0.setMatnr(type + newFlag.substring(4));
 		}
 		//add
 
