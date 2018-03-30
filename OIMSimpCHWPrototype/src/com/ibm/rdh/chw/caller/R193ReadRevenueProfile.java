@@ -19,8 +19,12 @@ public class R193ReadRevenueProfile extends Rfc {
 			rfc.setMaterial(type + "UPG");
 		} else if ("MTC".equals(newFlag)) {
 			rfc.setMaterial(type + "MTC");
+		} 
+		//add 20180330
+		else if("MOD".equals(newFlag.sustring(0,3))){
+			rfc.setMaterial(type + newFlag.sustring(4));
 		}
-
+		//add
 		rfc.setPlant(_plant);
 		rfc.setBomUsage("Y");
 
