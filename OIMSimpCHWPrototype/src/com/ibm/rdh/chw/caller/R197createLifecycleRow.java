@@ -58,11 +58,12 @@ public class R197createLifecycleRow extends Rfc {
 		rfcInfo.append(Tab + "ZDM_CREATE_IUSER>>" + tRow.getZdmCreateIuser()
 				+ ",");
 
-		if ("wdfm".equals(check)) {
+		/*if ("wdfm".equals(check)) {
 			tRow.setZdmRfanum(annDocNo + "_W");
 		} else {
 			tRow.setZdmRfanum(annDocNo);
-		}
+		}*/
+		tRow.setZdmRfanum(annDocNo);
 		rfcInfo.append(Tab + "ZDM_RFANUM>>" + tRow.getZdmRfanum() + "\n");
 
 		t.appendRow(tRow);
@@ -79,11 +80,12 @@ public class R197createLifecycleRow extends Rfc {
 		rfcInfo.append(Tab + "PIMS_IDENTITY>>" + rfc.getPimsIdentity() + ",");
 
 		// RFANUMBER
-		if ("wdfm".equals(check)) {
-			rfc.setRfaNum(annDocNo + "_W");
+		/*if ("wdfm".equals(check)) {
+			rfc.setRfaNum(annDocNo );
 		} else {
 			rfc.setRfaNum(annDocNo);
-		}
+		}*/
+		rfc.setRfaNum(annDocNo);
 		rfcInfo.append(Tab + "RFANUM>>" + rfc.getRfaNum() + "\n");
 
 		// ZDM_GEO_TO_CLASS

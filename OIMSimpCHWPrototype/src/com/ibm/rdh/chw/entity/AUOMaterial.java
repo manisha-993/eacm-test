@@ -25,8 +25,17 @@ public class AUOMaterial implements java.io.Serializable {
 	public String materialGroup1;
 	//EFFECTIVEDATE 
 	public Date effectiveDate;
+	public String rfaNum = null;
 	
-    public Date getEffectiveDate() {
+    public String getRfaNum() {
+		return rfaNum;
+	}
+
+	public void setRfaNum(String rfaNum) {
+		this.rfaNum = rfaNum;
+	}
+
+	public Date getEffectiveDate() {
 		return effectiveDate;
 	}
 
@@ -44,6 +53,7 @@ public class AUOMaterial implements java.io.Serializable {
 		this.setPercentage(percentage);
 	}
 
+	
 	public void setPercentage(String value) {
 		this.percentage = value;
 	}
