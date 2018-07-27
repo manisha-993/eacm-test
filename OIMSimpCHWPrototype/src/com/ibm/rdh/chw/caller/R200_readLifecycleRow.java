@@ -17,7 +17,7 @@ public class R200_readLifecycleRow extends Rfc {
 
 		reInitialize();
 		rfcName = "Z_DM_SAP_CHW_PRODUCT_CYCLE";
-
+		
 		rfc = new com.ibm.rdh.rfc.Z_DM_SAP_CHW_PRODUCT_CYCLE();
 		
 		// Set up the RFC fields
@@ -55,12 +55,13 @@ public class R200_readLifecycleRow extends Rfc {
 		rfcInfo.append(Tab + "PIMS_IDENTITY>>" + rfc.getPimsIdentity() + "\n");
 
 		// RFANUMBER
-		/*if ("wdfm".equals(check)) {
+		if ("wdfm".equals(check)) {
 			rfc.setRfaNum(annDocNo + "_W");
 		} else {
+			
 			rfc.setRfaNum(annDocNo);
-		}*/
-		rfc.setRfaNum(annDocNo);
+		}
+		//rfc.setRfaNum(annDocNo);
 		rfcInfo.append(Tab + "RFANUM>>" + rfc.getRfaNum() + "\n");
 
 		// ZDM_GEO_TO_CLASS

@@ -96,9 +96,9 @@ public class R062CreateRevPartMaster extends Rfc {
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
 		// RFANUMBER
-		rfc.setRfaNum(auoMaterial.getRfaNum());
+		rfc.setRfaNum(auoMaterial.getMaterial());
 		rfcInfo.append("RFANUM \n");
-		rfcInfo.append(Tab + "RFANumber>>" + auoMaterial.getRfaNum() + "\n");
+		rfcInfo.append(Tab + "RFANumber>>" + auoMaterial.getMaterial() + "\n");
 
 	}
 

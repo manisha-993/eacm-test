@@ -3,7 +3,6 @@
  */
 package com.ibm.rdh.chw.caller;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -24,7 +23,7 @@ public class ClassUtil {
 	public static String getFullClassName( Object obj ) {
 		return obj.getClass().getName() ; 
 	}
-	public static String removeUniqueId(String value){
+	/*public static String removeUniqueId(String value){
 		String result = value;
 		Matcher matcher = pattern.matcher(value);
 		//Matcher matcher = 
@@ -32,6 +31,6 @@ public class ClassUtil {
 			result = value.substring(0,value.length()-7);
 		
 		return result;
-	}
+	}*/
 
 }
