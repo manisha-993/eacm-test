@@ -25,7 +25,7 @@ public class AUOMaterial implements java.io.Serializable {
 	public String materialGroup1;
 	//EFFECTIVEDATE 
 	public Date effectiveDate;
-	/*public String rfaNum = null;
+	public String rfaNum = null;
 	
     public String getRfaNum() {
 		return rfaNum;
@@ -33,7 +33,7 @@ public class AUOMaterial implements java.io.Serializable {
 
 	public void setRfaNum(String rfaNum) {
 		this.rfaNum = rfaNum;
-	}*/
+	}
 
 	public Date getEffectiveDate() {
 		return effectiveDate;
@@ -150,6 +150,6 @@ public class AUOMaterial implements java.io.Serializable {
 				+ ", acctAsgnGrp=" + acctAsgnGrp + ", countryList="
 				+ countryList + ", amrtztlnstrt=" + amrtztlnstrt
 				+ ", amrtztlnlngth=" + amrtztlnlngth + ", materialGroup1="
-				+ materialGroup1 + ", effectiveDate=" + effectiveDate + "]";
+				+ materialGroup1 + ", effectiveDate=" + effectiveDate + "£¬rfaNum="+rfaNum+"s]";
 	}
 }

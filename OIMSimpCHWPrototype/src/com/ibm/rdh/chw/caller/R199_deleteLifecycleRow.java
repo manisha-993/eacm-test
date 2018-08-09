@@ -71,12 +71,12 @@ public class R199_deleteLifecycleRow extends Rfc {
 		rfcInfo.append(Tab + "PIMS_IDENTITY>>" + rfc.getPimsIdentity() + ",");
 
 		// RFANUMBER
-		if ("wdfm".equals(check)) {
+		/*if ("wdfm".equals(check)) {
 			rfc.setRfaNum(annDocNo + "_W");
 		} else {
 			rfc.setRfaNum(annDocNo);
-		}
-		//rfc.setRfaNum(annDocNo);
+		}*/
+		rfc.setRfaNum(annDocNo);
 		rfcInfo.append(Tab + "RFANUM>>" + rfc.getRfaNum() + "\n");
 
 		// ZDM_GEO_TO_CLASS

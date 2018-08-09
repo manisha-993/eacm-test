@@ -126,9 +126,9 @@ public class R005CreatePlantViewForMaterial extends Rfc {
 		rfcInfo.append(Tab + "PIMSIdentity>>" + pimsIdentity + "\n");
 
 		// RFANUMBER
-		rfc.setRfaNum(auoMaterial.getMaterial());
+		rfc.setRfaNum(auoMaterial.getRfaNum());
 		rfcInfo.append("RFANUM \n");
-		rfcInfo.append(Tab + "RFANumber>>" + auoMaterial.getMaterial() + "\n");
+		rfcInfo.append(Tab + "RFANumber>>" + auoMaterial.getRfaNum() + "\n");
 
 	}
 
