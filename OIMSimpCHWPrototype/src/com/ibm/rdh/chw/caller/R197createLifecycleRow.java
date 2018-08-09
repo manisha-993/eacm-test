@@ -83,8 +83,9 @@ public class R197createLifecycleRow extends Rfc {
 		/*if ("wdfm".equals(check)) {
 			rfc.setRfaNum(annDocNo+"_W");
 		} else {
-			*/rfc.setRfaNum(annDocNo);
+			rfc.setRfaNum(annDocNo);
 		}
+		*/
 		rfc.setRfaNum(annDocNo);
 		rfcInfo.append(Tab + "RFANUM>>" + rfc.getRfaNum() + "\n");
 
