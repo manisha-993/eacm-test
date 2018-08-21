@@ -88,7 +88,7 @@ public class R198updateLifecycleRow extends Rfc {
 		} else {
 			rfc.setRfaNum(annDocNo);
 		}*/
-		rfc.setRfaNum(annDocNo + "_W");
+		rfc.setRfaNum(annDocNo);
 		rfcInfo.append(Tab + "RFANUM>>" + rfc.getRfaNum() + "\n");
 
 		// ZDM_GEO_TO_CLASS
