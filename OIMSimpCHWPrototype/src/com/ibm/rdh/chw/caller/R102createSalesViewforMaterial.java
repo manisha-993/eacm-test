@@ -29,7 +29,7 @@ public class R102createSalesViewforMaterial extends Rfc {
 	public R102createSalesViewforMaterial(CHWAnnouncement chwA,
 			TypeModel typeModel, String sapPlant, String newFlag,
 			TypeModelUPGGeo tmUPGObj, String FromToType, String pimsIdentity,
-			String flfilcd, String salesOrg, Vector taxCntryList,CHWGeoAnn chwAg)
+			String flfilcd, String salesOrg, Vector taxCntryList, CHWGeoAnn chwAg, Date wdfmDate)
 			throws Exception {
 
 		reInitialize();
@@ -111,8 +111,15 @@ public class R102createSalesViewforMaterial extends Rfc {
 
 		b1Row.setMvgr3("ST");
 		b1Row.setVersg("1");
-		b1Row.setVmsta("Z0");
-		b1Row.setVmstd(sdf.format(curDate));
+		
+		if (wdfmDate!=null&&(wdfmDate.before(curDate)||wdfmDate.equals(curDate))){
+			b1Row.setVmsta("ZJ");
+			b1Row.setVmstd(sdf.format(wdfmDate));
+		}else{
+			b1Row.setVmsta("Z0");
+			b1Row.setVmstd(sdf.format(curDate));
+		}
+		
 		b1Row.setAumng("1");
 
 		// add 6 set value, In the previous epimshw code

@@ -180,11 +180,11 @@ public class RdhRestProxy implements RfcProxy, RfcReturnSeverityCodes {
 	public void r102(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String fromToType, String pimsIdentity, String flfilcd,
-			String salesOrg, Vector taxCntryList, CHWGeoAnn chwAg)
+			String salesOrg, Vector taxCntryList, CHWGeoAnn chwAg, Date wdfmDate)
 			throws Exception {
 		R102createSalesViewforMaterial r = getFactory().getr102(chwA,
 				typeModel, sapPlant, newFlag, tmUPGObj, fromToType,
-				pimsIdentity, flfilcd, salesOrg, taxCntryList, chwAg);
+				pimsIdentity, flfilcd, salesOrg, taxCntryList, chwAg, wdfmDate);
 		logPromoteInfoMessage(r);
 		r.evaluate();
 		logPromoteResultMessage(r);

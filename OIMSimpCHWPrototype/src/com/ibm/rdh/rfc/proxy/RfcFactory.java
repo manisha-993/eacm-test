@@ -182,10 +182,10 @@ public class RfcFactory extends Object {
 			TypeModel typeModel, String sapPlant, String newFlag,
 			TypeModelUPGGeo tmUPGObj, String fromToType, String pimsIdentity,
 			String flfilcd, String salesOrg, Vector taxCntryList,
-			CHWGeoAnn chwAg) throws Exception {
+			CHWGeoAnn chwAg, Date wdfmDate) throws Exception {
 		return new R102createSalesViewforMaterial(chwA, typeModel, sapPlant,
 				newFlag, tmUPGObj, fromToType, pimsIdentity, flfilcd, salesOrg,
-				taxCntryList, chwAg);
+				taxCntryList, chwAg, wdfmDate);
 	}
 
 	public R103create001ClassificationForMGCommon getr103(TypeModel typeModel,

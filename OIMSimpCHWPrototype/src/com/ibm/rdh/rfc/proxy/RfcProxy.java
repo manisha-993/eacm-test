@@ -56,7 +56,7 @@ public interface RfcProxy {
 	public abstract void r102(CHWAnnouncement chwA, TypeModel typeModel,
 			String sapPlant, String newFlag, TypeModelUPGGeo tmUPGObj,
 			String FromToType, String pimsIdentity, String flfilcd,
-			String salesOrg, Vector taxCntryList, CHWGeoAnn chwAg)
+			String salesOrg, Vector taxCntryList, CHWGeoAnn chwAg, Date wdfmDate)
 			throws Exception;
 
 	public abstract void r103(TypeModel typeModel, String newFlag,
