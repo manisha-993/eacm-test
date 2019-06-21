@@ -126,7 +126,11 @@ public class R102createSalesViewforMaterial extends Rfc {
 		b1Row.setZeinr(chwA.getAnnDocNo());
 		b1Row.setMatkl("000");
 		b1Row.setSpart(typeModel.getDiv());
-		b1Row.setZeiar(chwA.getAnnouncementType());
+		String anntype=chwA.getAnnouncementType();
+		if("End Of Life - Withdrawal from mktg".equals(anntype)){
+			anntype="WDH";
+		}
+		b1Row.setZeiar(anntype);
 		b1Row.setAeszn(sdff.format(chwAg.getAnnouncementDate()));
 		b1Row.setGewei("KG");
 		// end
