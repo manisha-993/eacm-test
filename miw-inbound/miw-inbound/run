@@ -1,0 +1,1 @@
+java -cp miw.jar:libs/com.ibm.mq5.jar:libs/j2ee.jar:libs/xerces.jar:/usr/java_dev2/jre/lib/rt.jar:/home/$DB2INSTANCE/sqllib/java/sqlj.zip:/home/$DB2INSTANCE/sqllib/function:/home/$DB2INSTANCE/sqllib/java/db2java.zip:/home/$DB2INSTANCE/sqllib/java/runtime.zip:/home/opicmadm/mw.ui/middleware.jar com.ibm.eannounce.miw.Catcher ${1} ${2}
