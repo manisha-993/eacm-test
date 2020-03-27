@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<wwprttxn xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+type="price" id="22222"
+xsi:noNamespaceSchemaLocation="/gsa/pokgsa-p2/01/wwprt-3.0/.aheweb01/projects/w3test2/data/finance/tools/wwprt/ATS/price.xsd">
+
+  <price type="I" xsi:type="referencePriceElementType">
+    <offering>1234567</offering>
+    <startdate>2000-01-02</startdate>
+    <currency>USD</currency>
+    <cabletype>ANN</cabletype>
+    <cableid>123456789012</cableid>
+    <releasets>2007-01-01T13:57:12.456</releasets>
+    <pricevalue>12345678901.12</pricevalue>
+    <country>US</country>
+    <pricetype>PUR</pricetype>
+    <onshore>true</onshore>
+    <enddate>9999-12-31</enddate>
+    <pricevalueusd>123.456</pricevalueusd>
+    <factor>1.0</factor>
+  </price>
+</wwprttxn>

@@ -1,0 +1,53 @@
+<wwprttxn type="price" id="CASE4" xsi:noNamespaceSchemaLocation="price.xsd">
+	<price type="I" xsi:type="referencePriceElementType">
+		<offering>1234</offering>
+		<startdate>2000-02-01</startdate>
+		<enddate>2000-02-14</enddate>
+		<currency>USD</currency>
+		<cabletype>ANN</cabletype>
+		<cableid>123456789012</cableid>
+		<releasets>2007-01-01T13:57:12.456</releasets>
+		<pricevalue>200.00</pricevalue>
+		<pricepointtype>MOD</pricepointtype>
+		<pricepointvalue>123</pricepointvalue>
+		<country>US</country>
+		<pricetype>PUR</pricetype>
+		<onshore>true</onshore>
+		<pricevalueusd>200.00</pricevalueusd>
+		<factor>1.0</factor>
+	</price>
+	<price type="I" xsi:type="referencePriceElementType">
+		<offering>1234</offering>
+		<startdate>2000-02-15</startdate>
+		<enddate>2000-03-14</enddate>
+		<currency>USD</currency>
+		<cabletype>ANN</cabletype>
+		<cableid>123456789012</cableid>
+		<releasets>2007-01-01T13:57:12.456</releasets>
+		<pricevalue>250.00</pricevalue>
+		<pricepointtype>MOD</pricepointtype>
+		<pricepointvalue>123</pricepointvalue>
+		<country>US</country>
+		<pricetype>PUR</pricetype>
+		<onshore>true</onshore>
+		<pricevalueusd>250.00</pricevalueusd>
+		<factor>1.0</factor>
+	</price>
+	<price type="I" xsi:type="referencePriceElementType">
+		<offering>1234</offering>
+		<startdate>2000-03-15</startdate>
+		<enddate>9999-12-31</enddate>
+		<currency>USD</currency>
+		<cabletype>ANN</cabletype>
+		<cableid>123456789012</cableid>
+		<releasets>2007-01-01T13:57:12.456</releasets>
+		<pricevalue>300.00</pricevalue>
+		<pricepointtype>MOD</pricepointtype>
+		<pricepointvalue>123</pricepointvalue>
+		<country>US</country>
+		<pricetype>PUR</pricetype>
+		<onshore>true</onshore>
+		<pricevalueusd>300.00</pricevalueusd>
+		<factor>1.0</factor>
+	</price>
+</wwprttxn>

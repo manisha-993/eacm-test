@@ -1,0 +1,4 @@
+1. Create a local database
+2. Setup a local MQ server
+3. Rename and configure the wwprt-inbound-template.properties to wwprt-inbound.properties
+4. Configure the mq.properties

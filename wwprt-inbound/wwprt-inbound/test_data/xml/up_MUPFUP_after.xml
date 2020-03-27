@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<wwprttxn xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+type="price" id="22656"
+xsi:noNamespaceSchemaLocation="/gsa/pokgsa-p2/01/wwprt-3.0/.aheweb01/projects/w3test2/data/finance/tools/wwprt/ATS/price.xsd">
+
+  <price type="I" xsi:type="referencePriceElementType">
+    <offering>1234</offering>
+    <startdate>2000-01-02</startdate>
+    <currency>USD</currency>
+    <cabletype>ANN</cabletype>
+    <cableid>123456789012</cableid>
+    <releasets>2007-01-01T13:57:12.456</releasets>
+    <pricevalue>12345678901.12</pricevalue>
+    <pricepointtype>FUP</pricepointtype>
+    <pricepointvalue>1234_4567</pricepointvalue>
+    <country>US</country>
+    <pricetype>MES</pricetype>
+    <onshore>true</onshore>
+    <enddate>2011-5-12</enddate>
+    <pricevalueusd>123.456</pricevalueusd>
+    <factor>1.0</factor>
+  </price>
+  <price type="I" xsi:type="referencePriceElementType">
+    <offering>1234</offering>
+    <startdate>2011-05-013</startdate>
+    <currency>USD</currency>
+    <cabletype>BBC</cabletype>
+    <cableid>123456789000</cableid>
+    <releasets>2007-07-07T13:57:12.456</releasets>
+    <pricevalue>12345678321.12</pricevalue>
+    <pricepointtype>FUP</pricepointtype>
+    <pricepointvalue>1234_4567</pricepointvalue>
+    <country>US</country>
+    <pricetype>MES</pricetype>
+    <onshore>true</onshore>
+    <enddate>9999-12-31</enddate>
+    <pricevalueusd>789.456</pricevalueusd>
+    <factor>5.0</factor>
+  </price>  
+  <price type="I" xsi:type="referencePriceElementType">
+    <offering>1234</offering>
+    <startdate>2000-01-02</startdate>
+    <currency>USD</currency>
+    <cabletype>ANN</cabletype>
+    <cableid>123456789012</cableid>
+    <releasets>2007-01-01T13:57:12.456</releasets>
+    <pricevalue>12345678901.12</pricevalue>
+    <pricepointtype>MUP</pricepointtype>
+    <pricepointvalue>123_456</pricepointvalue>
+    <country>US</country>
+    <pricetype>PUR</pricetype>
+    <onshore>false</onshore>
+    <enddate>2011-06-22</enddate>
+    <pricevalueusd>123.456</pricevalueusd>
+    <factor>1.0</factor>
+  </price>
+  <price type="I" xsi:type="referencePriceElementType">
+    <offering>1234</offering>
+    <startdate>2011-06-23</startdate>
+    <currency>USD</currency>
+    <cabletype>ATM</cabletype>
+    <cableid>123456789999</cableid>
+    <releasets>2007-04-04T13:57:12.456</releasets>
+    <pricevalue>12345678999.12</pricevalue>
+    <pricepointtype>MUP</pricepointtype>
+    <pricepointvalue>123_456</pricepointvalue>
+    <country>US</country>
+    <pricetype>PUR</pricetype>
+    <onshore>false</onshore>
+    <enddate>9999-12-31</enddate>
+    <pricevalueusd>321.456</pricevalueusd>
+    <factor>4.0</factor>
+  </price>  
+</wwprttxn>

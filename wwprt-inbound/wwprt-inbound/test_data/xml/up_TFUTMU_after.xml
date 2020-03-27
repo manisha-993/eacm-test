@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<wwprttxn xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+type="price" id="22644"
+xsi:noNamespaceSchemaLocation="/gsa/pokgsa-p2/01/wwprt-3.0/.aheweb01/projects/w3test2/data/finance/tools/wwprt/ATS/price.xsd">
+
+  <price xsi:type="referencePriceElementType" type="I">
+    <offering>9409</offering>
+    <startdate>2010-04-12</startdate>
+    <currency>CHF</currency>
+    <cabletype>ANN</cabletype>
+    <cableid>N2Z10M018634</cableid>
+    <releasets>2010-04-09T10:16:59.064</releasets>
+    <pricevalue>0.00</pricevalue>
+    <pricepointtype>TFU</pricepointtype>
+    <pricepointvalue>1690_8204_0553</pricepointvalue>
+    <country>CH</country>
+    <pricetype>XMT</pricetype>
+    <onshore>true</onshore>
+    <enddate>2011-05-01</enddate>
+    <pricevalueusd>0.00</pricevalueusd>
+    <factor>1.000000</factor>
+  </price>
+  <price xsi:type="referencePriceElementType" type="I">
+    <offering>9409</offering>
+    <startdate>2011-05-02</startdate>
+    <currency>CHF</currency>
+    <cabletype>ACT</cabletype>
+    <cableid>N2Z10M018555</cableid>
+    <releasets>2010-04-10T10:16:59.064</releasets>
+    <pricevalue>1.00</pricevalue>
+    <pricepointtype>TFU</pricepointtype>
+    <pricepointvalue>1690_8204_0553</pricepointvalue>
+    <country>CH</country>
+    <pricetype>XMT</pricetype>
+    <onshore>true</onshore>
+    <enddate>9999-12-31</enddate>
+    <pricevalueusd>1.00</pricevalueusd>
+    <factor>1.023000</factor>
+  </price>
+  <price xsi:type="referencePriceElementType" type="I">
+    <offering>9409</offering>
+    <startdate>2010-04-09</startdate>
+    <currency>USD</currency>
+    <cabletype>ANN</cabletype>
+    <cableid>N2Z10M018561</cableid>
+    <releasets>2010-04-07T23:45:02.784</releasets>
+    <pricevalue>0.00</pricevalue>
+    <pricepointtype>TMU</pricepointtype>
+    <pricepointvalue>M50_8204_E8A</pricepointvalue>
+    <country>AO</country>
+    <pricetype>XMT</pricetype>
+    <onshore>true</onshore>
+    <enddate>2011-06-01</enddate>
+    <pricevalueusd>0.00</pricevalueusd>
+    <factor>1.000000</factor>
+  </price>
+  <price xsi:type="referencePriceElementType" type="I">
+    <offering>9409</offering>
+    <startdate>2011-06-02</startdate>
+    <currency>USD</currency>
+    <cabletype>ABC</cabletype>
+    <cableid>N2Z10M018666</cableid>
+    <releasets>2010-04-08T23:45:02.784</releasets>
+    <pricevalue>2.00</pricevalue>
+    <pricepointtype>TMU</pricepointtype>
+    <pricepointvalue>M50_8204_E8A</pricepointvalue>
+    <country>AO</country>
+    <pricetype>XMT</pricetype>
+    <onshore>true</onshore>
+    <enddate>9999-12-31</enddate>
+    <pricevalueusd>2.00</pricevalueusd>
+    <factor>2.000000</factor>
+  </price>
+</wwprttxn>

@@ -1,0 +1,1 @@
+java -Djava.util.logging.config.file=log.catcher.properties -cp wwprt-inbound.jar;libs/*;mq/* com.ibm.eannounce.wwprt.WWPRTInbound catcher

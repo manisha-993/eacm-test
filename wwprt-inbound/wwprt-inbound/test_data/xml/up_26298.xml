@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<wwprttxn xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+type="price" id="26298"
+xsi:noNamespaceSchemaLocation="/gsa/pokgsa-p2/01/wwprt-3.0/.aheweb01/projects/w3test2/data/finance/tools/wwprt/ATS/price.xsd">
+  
+  <price xsi:type="referencePriceElementType" type="I">
+    <offering>7395</offering>
+    <startdate>2010-10-25</startdate>
+    <currency>USD</currency>
+    <cabletype>ANN</cabletype>
+    <cableid>N2Z10M023569</cableid>
+    <releasets>2010-11-01T13:45:10.077</releasets>
+    <pricevalue>200.00</pricevalue>
+    <pricepointtype>FEA</pricepointtype>
+    <pricepointvalue>11AA</pricepointvalue>
+    <country>AO</country>
+    <pricetype>PUR</pricetype>
+    <onshore>true</onshore>
+    <enddate>9999-12-31</enddate>
+    <pricevalueusd>200.00</pricevalueusd>
+    <factor>1.000000</factor>
+  </price>
+  <price xsi:type="referencePriceElementType" type="I">
+    <offering>7395</offering>
+    <startdate>2010-10-25</startdate>
+    <currency>USD</currency>
+    <cabletype>ANN</cabletype>
+    <cableid>N2Z10M023569</cableid>
+    <releasets>2010-11-01T13:45:10.077</releasets>
+    <pricevalue>200.00</pricevalue>
+    <pricepointtype>MOD</pricepointtype>
+    <pricepointvalue>AAA</pricepointvalue>
+    <country>AO</country>
+    <pricetype>PUR</pricetype>
+    <onshore>true</onshore>
+    <enddate>9999-12-31</enddate>
+    <pricevalueusd>200.00</pricevalueusd>
+    <factor>1.000000</factor>
+  </price>
+  <price xsi:type="referencePriceElementType" type="I">
+    <offering>7395</offering>
+    <startdate>2010-10-25</startdate>
+    <currency>USD</currency>
+    <cabletype>ANN</cabletype>
+    <cableid>N2Z10M023569</cableid>
+    <releasets>2010-11-01T13:45:10.077</releasets>
+    <pricevalue>200.00</pricevalue>
+    <pricepointtype>RPQ</pricepointtype>
+    <pricepointvalue>RPQ111</pricepointvalue>
+    <country>AO</country>
+    <pricetype>PUR</pricetype>
+    <onshore>true</onshore>
+    <enddate>9999-12-31</enddate>
+    <pricevalueusd>200.00</pricevalueusd>
+    <factor>1.000000</factor>
+  </price>
+</wwprttxn>

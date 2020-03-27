@@ -1,0 +1,110 @@
+<wwprttxn type="price" id="INSERTTEST" xsi:noNamespaceSchemaLocation="price.xsd">
+	<!-- Reference Price elements with price point -->
+	<!-- Model -->
+	<price type="I" xsi:type="referencePriceElementType">
+		<offering>1234</offering>
+		<startdate>2000-01-02</startdate>
+		<currency>USD</currency>
+		<cabletype>ANN</cabletype>
+		<cableid>123456789012</cableid>
+		<releasets>2007-01-01T13:57:12.456</releasets>
+		<pricevalue>12345678901.12</pricevalue>
+		<pricepointtype>MOD</pricepointtype>
+		<pricepointvalue>123</pricepointvalue>
+		<country>US</country>
+		<pricetype>PUR</pricetype>
+		<onshore>true</onshore>
+		<enddate>9999-12-31</enddate>
+		<pricevalueusd>123.456</pricevalueusd>
+		<factor>1.0</factor>
+	</price>
+	<price type="I" xsi:type="referencePriceElementType">
+		<offering>1234567</offering>
+		<startdate>2000-01-02</startdate>
+		<currency>USD</currency>
+		<cabletype>ANN</cabletype>
+		<cableid>123456789012</cableid>
+		<releasets>2007-01-01T13:57:12.456</releasets>
+		<pricevalue>12345678901.12</pricevalue>
+		<pricepointtype>WSF</pricepointtype>
+		<pricepointvalue>123456</pricepointvalue>
+		<country>US</country>
+		<pricetype>LIC</pricetype>
+		<onshore>false</onshore>
+		<enddate>2007-12-31</enddate>
+		<pricevalueusd>123.456</pricevalueusd>
+		<factor>1.0</factor>
+	</price>
+	<!-- Feature -->
+	<price type="I" xsi:type="referencePriceElementType">
+		<offering>1234</offering>
+		<startdate>2000-01-02</startdate>
+		<currency>USD</currency>
+		<cabletype>GPA</cabletype>
+		<cableid>123456789012</cableid>
+		<releasets>2007-05-05T08:13:12.456789</releasets>
+		<pricevalue>12345678901.12</pricevalue>
+		<pricepointtype>FEA</pricepointtype>
+		<pricepointvalue>1234</pricepointvalue>
+		<country>US</country>
+		<pricetype>MMO</pricetype>
+		<onshore>false</onshore>
+		<enddate>9999-12-31</enddate>
+		<pricevalueusd>123.456</pricevalueusd>
+		<factor>1.0</factor>
+	</price>
+	<!-- RPQ -->
+	<price type="I" xsi:type="referencePriceElementType">
+		<offering>1234</offering>
+		<startdate>2000-01-02</startdate>
+		<currency>USD</currency>
+		<cabletype>ACT</cabletype>
+		<cableid>123456789012</cableid>
+		<releasets>2008-12-31T09:12:34.456</releasets>
+		<pricevalue>12345678901.12</pricevalue>
+		<pricepointtype>RPQ</pricepointtype>
+		<pricepointvalue>123456</pricepointvalue>
+		<country>US</country>
+		<pricetype>MYR</pricetype>
+		<onshore>true</onshore>
+		<enddate>9999-12-31</enddate>
+		<pricevalueusd>123.456</pricevalueusd>
+		<factor>1.0</factor>
+	</price>
+<!-- Cross Machine Type Feature Upgrade 
+ -->
+	<price type="I" xsi:type="referencePriceElementType">
+		<offering>1234</offering>
+		<startdate>2000-01-02</startdate>
+		<currency>USD</currency>
+		<cabletype>ANN</cabletype>
+		<cableid>123456789012</cableid>
+		<releasets>2007-01-01T13:57:12.456</releasets>
+		<pricevalue>12345678901.12</pricevalue>
+		<pricepointtype>TFU</pricepointtype>
+		<pricepointvalue>1234_4567_8904</pricepointvalue>
+		<country>US</country>
+		<pricetype>PUR</pricetype>
+		<onshore>false</onshore>
+		<enddate>2007-12-31</enddate>
+		<pricevalueusd>123.456</pricevalueusd>
+		<factor>1.0</factor>
+	</price>
+	<!-- Reference Price element w/o price point 
+ -->
+	<price type="I" xsi:type="referencePriceElementType">
+		<offering>1234567</offering>
+		<startdate>2000-01-02</startdate>
+		<currency>USD</currency>
+		<cabletype>ANN</cabletype>
+		<cableid>123456789012</cableid>
+		<releasets>2007-01-01T13:57:12.456</releasets>
+		<pricevalue>12345678901.12</pricevalue>
+		<country>US</country>
+		<pricetype>PUR</pricetype>
+		<onshore>true</onshore>
+		<enddate>2007-12-31</enddate>
+		<pricevalueusd>123.456</pricevalueusd>
+		<factor>1.0</factor>
+	</price>
+</wwprttxn>

@@ -1,0 +1,1 @@
+del .catcher.lock
