@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="createjar" default="createjar" basedir=".">
+	
+	<target name="clean">
+		<delete dir="./miw.jar"/>
+	</target>
+	
+	<target name="compile">
+		<copy file="/eacmsw/build_jdk17/middleware.jar" todir="./libs"/>
+		<path id="classpath">
+			<fileset dir="./libs">
+				<include name="**/*.jar" />
+			</fileset>
+		</path>
+
+		<!--javac fork="true" executable="C:\IBM\InformationServer\jdk\bin\javac.exe" srcdir="./src" destdir="./bin" encoding="UTF8" classpathref="classpath"-->
+		<javac fork="true" executable="/usr/java71/bin/javac" srcdir="./src" destdir="./bin" encoding="UTF8" classpathref="classpath">
+		</javac>
+	</target>
+	
+	<target name ="createjar" description="Create a jar for miw-inbound" depends="compile,clean">
+		<jar jarfile="./miw.jar"  >
+			<fileset dir="./bin" includes="**/*.class" />			
+		</jar>
+		<copy file="./miw.jar" todir="/eacmsw/build_jdk17"/>
+	</target>
+	
+</project>
