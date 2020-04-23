@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/GENERALAREA_UPDATE" elementFormDefault="qualified" xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/GENERALAREA_UPDATE">
+	<xs:complexType name="GENERALAREAELEMENTTYPE">
+		<xs:sequence>
+
+			<xs:element name="ACTIVITY" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+
+			<xs:element name="GENAREACODE" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="GENAREANAME_FC" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="GENAREANAME" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="SLEORG" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="GENAREATYPE" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+            <xs:element name="GENAREAPARENT_FC" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="GENAREAPARENT" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="WWCOACODE" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="RFAGEO" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GENERALAREA_UPDATETYPE">
+		<xs:sequence>
+			<xs:element name="DTSOFMSG" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="GENAREAELEMENT" type="GENERALAREAELEMENTTYPE" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="GENERALAREA_UPDATE" type="GENERALAREA_UPDATETYPE"/>
+</xs:schema>

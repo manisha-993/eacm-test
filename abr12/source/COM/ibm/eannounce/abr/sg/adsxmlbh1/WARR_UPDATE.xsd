@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/WARR_UPDATE" elementFormDefault="qualified" xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/WARR_UPDATE">
+	
+
+	<xs:complexType name="WARR_UPDATETYPE">
+		<xs:sequence>
+			<xs:element name="DTSOFMSG" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="ACTIVITY" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="STATUS" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="WARRENTITYTYPE" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="WARRENTITYID" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="WARRID" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="WARRDATERULEKEY" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="COVRHR" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="RESPPROF" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="WARRPRIOD" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="WARRPRIODUOM" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="WARRTYPE" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+            <xs:element name="WARRCATG" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="BHWARRCATEGORY" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+            <xs:element name="LANGUAGELIST" type="LANGUAGELISTTYPE"
+				minOccurs="1" maxOccurs="1" />
+
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="WARR_UPDATE" type="WARR_UPDATETYPE"/>
+		<xs:complexType name="LANGUAGELISTTYPE">
+		<xs:sequence>
+			<xs:element name="LANGUAGEELEMENT" type="LANGUAGEELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LANGUAGEELEMENTTYPE">
+		<xs:sequence>
+			<xs:element name="NLSID" minOccurs="1" maxOccurs="1">
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:minInclusive value="1" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="INVNAME" type="xs:string" minOccurs="1" maxOccurs="1" />
+			<xs:element name="MKTGNAME" type="xs:string" minOccurs="1" maxOccurs="1"/>			
+			<xs:element name="WARRDESC" type="xs:string" minOccurs="1" maxOccurs="1"/>							
+
+
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

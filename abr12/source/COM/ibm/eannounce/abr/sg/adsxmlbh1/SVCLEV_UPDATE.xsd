@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/SVCLEV_UPDATE" elementFormDefault="qualified" xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/SVCLEV_UPDATE">
+		<xs:complexType name="SVCLEV_UPDATETYPE">
+		<xs:sequence>
+            <xs:element name="DTSOFMSG" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+            <xs:element name="SVCLEVCD" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+            <xs:element name="COVRSHRTDESC" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="EFFECTIVEDATE" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="ENDDATE" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="SVCDELIVMETH" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="FIXTME" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="FIXTMEUOM" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="FIXTMEOBJIVE" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="ONSITERESPTME" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="ONSITERESPTMEUOM" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="ONSITERESPTMEOBJIVE" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="CONTTME" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="CONTTMEUOM" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="CONTTMEOBJIVE" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="TRNARNDTME" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="TRNARNDTMEUOM" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="TRNARNDTMEOBJIVE" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="PARTARRVTME" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="PARTARRVTMEUOM" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="PARTARRVTMEOBJIVE" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="LANGUAGELIST" type="LANGUAGELISTTYPE"
+				minOccurs="1" maxOccurs="1" />
+			<xs:element name="SLCNTRYCONDLIST"
+				type="SLCNTRYCONDLISTTYPE" minOccurs="1" maxOccurs="1" />
+
+		</xs:sequence>
+		</xs:complexType>
+	<xs:element name="SVCLEV_UPDATE" type="SVCLEV_UPDATETYPE"/>
+	<xs:complexType name="LANGUAGELISTTYPE">
+		<xs:sequence>
+			<xs:element name="LANGUAGEELEMENT" type="LANGUAGEELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="LANGUAGEELEMENTTYPE">
+		<xs:sequence>
+			<xs:element name="NLSID" minOccurs="1" maxOccurs="1">
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:minInclusive value="1" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="NCKNME" type="xs:string" minOccurs="1" maxOccurs="1" />          		
+	       		<xs:element name="INVNAME" type="xs:string" minOccurs="1" maxOccurs="1" />
+	       		<xs:element name="MKTGNAME" type="xs:string" minOccurs="1" maxOccurs="1" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SLCNTRYCONDLISTTYPE">
+			<xs:sequence>
+				<xs:element name="SLCNTRYCONDELEMENT" type="SLCNTRYCONDELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+		<xs:complexType name="SLCNTRYCONDELEMENTTYPE">
+			<xs:sequence>
+			<xs:element name="SLCNTRYCONDACTION" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+				<xs:element name="ENTITYTYPE" type="xs:string"
+					minOccurs="1" maxOccurs="1">
+				</xs:element>
+            <xs:element name="ENTITYID" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+            <xs:element name="COUNTRYLIST" type="COUNTRYLISTTYPE"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="COVRLNGDESC" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="MONSTRTTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="MONENDTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="TUESDYSTRTTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="TUESDYENDTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="WEDSTRTTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="WEDENDTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="THURSSTRTTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="THURSENDTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="FRISTRTTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="FRIENDTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="SATSTRTTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="SATENDTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="SUNSTRTTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+				<xs:element name="SUNENDTME" type="xs:string"
+					minOccurs="1" maxOccurs="1" />
+
+			</xs:sequence>
+		</xs:complexType>
+	<xs:complexType name="COUNTRYLISTTYPE">
+	    	<xs:sequence>
+	    		<xs:element name="COUNTRYELEMENT" type="COUNTRYELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xs:element>
+	    	</xs:sequence>
+	    </xs:complexType>
+	
+	    <xs:complexType name="COUNTRYELEMENTTYPE">
+	    	<xs:sequence>
+	    		<xs:element name="COUNTRYACTION" type="xs:string"></xs:element>
+	    		<xs:element name="COUNTRY_FC" type="xs:string"></xs:element>
+	    	</xs:sequence>
+    </xs:complexType>
+</xs:schema>

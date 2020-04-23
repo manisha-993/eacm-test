@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/WWCOMPAT_UPDATE" elementFormDefault="qualified" xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/WWCOMPAT_UPDATE">
+	<xs:complexType name="WWCOMPATELEMENTTYPE">
+		<xs:sequence>
+			<xs:element name="ACTIVITY" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="BRANDCD" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="STATUS" type="xs:string" minOccurs="1"
+				maxOccurs="1">				
+			</xs:element>
+			<xs:element name="SYSTEMENTITYTYPE" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="SYSTEMENTITYID" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="SYSTEMMACHTYPE" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="SYSTEMMODEL" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="SYSTEMSEOID" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="GROUPENTITYTYPE" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="GROUPENTITYID" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="OKTOPUB" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="OPTIONENTITYTYPE" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="OPTIONENTITYID" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+            <xs:element name="OPTIONSEOID" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+            <xs:element name="COMPATPUBFLAG" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="RELTYPE" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="PUBFROM" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="PUBTO" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="WWCOMPAT_UPDATETYPE">
+		<xs:sequence>
+			<xs:element name="DTSOFMSG" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="COMPATELEMENT" type="WWCOMPATELEMENTTYPE" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="WWCOMPAT_UPDATE" type="WWCOMPAT_UPDATETYPE"/>
+</xs:schema>

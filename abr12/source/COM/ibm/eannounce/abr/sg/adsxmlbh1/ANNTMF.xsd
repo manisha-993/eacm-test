@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/ANNTMF" elementFormDefault="qualified" xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/ANNTMF">
+ 
+	<xsd:element name="ANNTMF">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ANNNUMBER" type="xsd:string" minOccurs="1" maxOccurs="1" />
+				<xsd:element name="INVENTORYGROUP" type="xsd:string" minOccurs="1" maxOccurs="1" />
+				<xsd:element name="ANNTYPE" type = "xsd:string" minOccurs="1" maxOccurs="1" />
+				<xsd:element name="AVAILABILITYLIST" type="AVAILABILITYLISTTYPE" minOccurs="1" maxOccurs="1"/>
+				<xsd:element name="MODELLIST" type="MODELLISTTYPE" minOccurs="1" maxOccurs="1"/>
+				<xsd:element name="TMFLIST" type="TMFLISTTYPE" minOccurs="1" maxOccurs="1"/>
+				<xsd:element name="RELATORLIST" type="RELATORLISTTYPE" minOccurs="1" maxOccurs="1"/>
+			</xsd:sequence>
+		</xsd:complexType>	
+	</xsd:element>
+	
+	<xsd:complexType name="AVAILABILITYLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="AVAILABILITYELEMENT" type="AVAILABILITYELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>   	
+	
+	<xsd:complexType name="AVAILABILITYELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="ENTITYID" type="xsd:int" minOccurs="1" maxOccurs="1"/>			
+    		<xsd:element name="AVAILTYPE" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="EFFECTIVEDATE" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="COUNTRYLIST" type="COUNTRYLISTTYPE"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+	<xsd:complexType name="COUNTRYLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="COUNTRY_FC" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>	
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name = "MODELLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name = "MODELELEMENT" type = "MODELELEMENT_TYPE" minOccurs="0" maxOccurs="unbounded"/> 
+		</xsd:sequence>
+	</xsd:complexType> 
+		
+	<xsd:complexType name = "MODELELEMENT_TYPE">
+		<xsd:sequence>
+			<xsd:element name ="ENTITYID" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="MACHTYPEATR" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="MODELATR" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="MKTGNAME" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="INVNAME" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="INSTALL" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="ORDERCODE" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name = "TMFLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name = "TMFELEMENT" type = "TMFELEMENT_TYPE" minOccurs="0" maxOccurs="unbounded"/> 
+		</xsd:sequence>
+	</xsd:complexType> 
+	      
+	<xsd:complexType name = "TMFELEMENT_TYPE">
+		<xsd:sequence>
+			<xsd:element name ="ENTITYID" type = "xsd:string" minOccurs="1" maxOccurs="1"/>		  
+			<xsd:element name ="ORDERCODE" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="INSTALL" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="RETURNEDPARTS" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="SYSTEMMIN" type = "xsd:string" minOccurs="1" maxOccurs="1"/>			
+			<xsd:element name ="SYSTEMMAX" type = "xsd:string" minOccurs="1" maxOccurs="1"/>		
+			<xsd:element name ="INTORDERMAX" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="OSLEVELCOMPLEMENT" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="TMFEDITORNOTE" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="COMMENT" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="PREREQ" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="COREQUISITE" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="LMTATION" type = "xsd:string" minOccurs="1" maxOccurs="1"/>			
+			<xsd:element name ="COMPATIBILITY" type = "xsd:string" minOccurs="1" maxOccurs="1"/>		
+			<xsd:element name ="CBLORD" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="MACHTYPEATR" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="MODELATR" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="FEATURECODE" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="MODELINVNAME" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="INVNAME" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="EDITORNOTE" type = "xsd:string" minOccurs="1" maxOccurs="1"/>			
+			<xsd:element name ="PRICEDFEATURE" type = "xsd:string" minOccurs="1" maxOccurs="1"/>		
+			<xsd:element name ="ZEROPRICE" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="MAINTPRICE" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="HWFCCAT" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="MKTGNAME" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="ATTPROVIDED" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="ATTREQUIRED" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="FCMKTGDESC" type = "xsd:string" minOccurs="1" maxOccurs="1"/>			
+		</xsd:sequence>
+	</xsd:complexType>  
+	
+	<xsd:complexType name="RELATORLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="RELATORELEMENT" type="RELATORELEMENT_TYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>	
+	
+	<xsd:complexType name="RELATORELEMENT_TYPE">
+		<xsd:sequence>
+			<xsd:element name="ENTITY1TYPE" type="xsd:string" minOccurs="1" maxOccurs="1"/>		
+			<xsd:element name="ENTITY1ID" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="ENTITY2TYPE" type="xsd:string" minOccurs="1" maxOccurs="1"/>	
+			<xsd:element name="ENTITY2ID" type="xsd:int" minOccurs="1" maxOccurs="1"/>				
+		</xsd:sequence>
+	</xsd:complexType>	
+</xsd:schema>

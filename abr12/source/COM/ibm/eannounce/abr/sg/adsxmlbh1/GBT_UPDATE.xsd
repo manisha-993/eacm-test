@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/GBT_UPDATE" elementFormDefault="qualified" xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/GBT_UPDATE">
+	
+	<xs:complexType name="GBT_UPDATETYPE">
+		<xs:sequence>
+			<xs:element name="DTSOFMSG" type="xs:string" minOccurs="1"
+				maxOccurs="1" />
+			<xs:element name="ACTIVITY" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="ENTITYTYPE" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="ENTITYID" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="SIEBELPRODLEV" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="SAPPRIMBRANDCD" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="SAPPRODFMLYCD" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="LEVEL17" type="xs:string" minOccurs="0"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="WWOCPARNTS" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="WWOCCODE" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="STATUS" type="xs:string" minOccurs="0"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="GBTDESC" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="RECTYPE" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="PRODTYPE" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="EFFECTIVEDATE" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="DELDATE" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="MAPTOCD" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="OMBRANDCD" type="xs:string" minOccurs="1"
+				maxOccurs="1">
+			</xs:element>
+			<xs:element name="OMPRODFMLYCD" type="xs:string"
+				minOccurs="1" maxOccurs="1">
+			</xs:element>
+			<xs:element name="BPDBBRANDCD" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="MKTGRPTCD" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="IGSSHADOWLOB" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="TPRSSREVDIV" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="INTERNALNOTES" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="GBT_UPDATE" type="GBT_UPDATETYPE"/>
+</xs:schema>

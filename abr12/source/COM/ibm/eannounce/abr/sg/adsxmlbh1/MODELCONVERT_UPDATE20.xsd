@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODELCONVERT_UPDATE" elementFormDefault="qualified" xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODELCONVERT_UPDATE">
+	<xsd:complexType name="SLEORGGRPLISTTYPE">
+			<xsd:sequence>
+				<xsd:element name="SLEORGGRPELEMENT" type="SLEORGGRPELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		<xsd:complexType name="SLEORGGRPELEMENTTYPE">
+			<xsd:sequence>
+				<xsd:element name="SLEOORGGRPACTION" minOccurs="1" maxOccurs="1">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="Update" />
+							<xsd:enumeration value="Delete" />
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="SLEORGGRP" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		<xsd:complexType name="SLEORGNPLNTCODELISTTYPE">
+				<xsd:sequence>
+					<xsd:element name="SLEORGNPLNTCODEELEMENT" type="SLEORGNPLNTCODEELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="SLEORGNPLNTCODEELEMENTTYPE">
+				<xsd:sequence>
+					<xsd:element name="SLEORGNPLNTCODEACTION" minOccurs="1" maxOccurs="1">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="Update" />
+								<xsd:enumeration value="Delete" />
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="SLEORG" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+					<xsd:element name="PLNTCD" type="xsd:string" minOccurs="1" maxOccurs="1"/>					
+				</xsd:sequence>
+		</xsd:complexType>
+	
+	<xsd:complexType name="AVAILABILITYLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="AVAILABILITYELEMENT" type="AVAILABILITYELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AVAILABILITYELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="AVAILABILITYACTION">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="Update" />
+						<xsd:enumeration value="Delete" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="STATUS" type="xsd:string" />
+			<xsd:element name="COUNTRY_FC">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="1000" />
+						<xsd:maxInclusive value="9999" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+
+			<xsd:element name="ANNDATE" type="xsd:string" />
+            <xsd:element name="ANNNUMBER" type="xsd:string"></xsd:element>
+            <xsd:element name="FIRSTORDER" type="xsd:string"></xsd:element>
+			<xsd:element name="PLANNEDAVAILABILITY" type="xsd:string"></xsd:element>
+			<xsd:element name="PUBFROM" type="xsd:string" />
+			<xsd:element name="PUBTO" type="xsd:string" />
+			<xsd:element name="WDANNDATE" type="xsd:string"></xsd:element>
+			<xsd:element name="LASTORDER" type="xsd:string"></xsd:element>
+			<xsd:element name="EOSANNDATE" type="xsd:string"></xsd:element>
+			<xsd:element name="ENDOFSERVICEDATE" type="xsd:string" />
+			<xsd:element name="SLEORGGRPLIST" type="SLEORGGRPLISTTYPE" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="SLEORGNPLNTCODELIST" type="SLEORGNPLNTCODELISTTYPE" minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="MODELCONVERT_UPDATE" type="MODELCONVERT_UPDATETYPE"/>
+
+	<xsd:complexType name="MODELCONVERT_UPDATETYPE">
+		<xsd:sequence>
+			<xsd:element name="PDHDOMAIN" type="xsd:string"
+				maxOccurs="unbounded" />
+			<xsd:element name="DTSOFMSG" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="ACTIVITY" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="MODELUPGRADEENTITYTYPE" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="MODELUPGRADEENTITYID" type="xsd:int" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="FROMMACHTYPE" type="xsd:string"
+				minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="FROMMODEL" type="xsd:string"
+				minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="FROMMODELTYPE" minOccurs="1" maxOccurs="1" type="xsd:string">
+			</xsd:element>
+			<xsd:element name="FROMMODELENTITYID" minOccurs="1" maxOccurs="1" type="xsd:string">
+			</xsd:element>
+
+			<xsd:element name="TOMACHTYPE" type="xsd:string"
+				minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="TOMODEL" type="xsd:string"
+				minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="TOMODELTYPE" type="xsd:string"
+				minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="TOMODELENTITYID" type="xsd:string"
+				minOccurs="1" maxOccurs="1">
+			</xsd:element>
+
+			<xsd:element name="STATUS" type="xsd:string"
+				minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="CUSTOMERSETUP" type="xsd:string" minOccurs="1"
+				maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="RETURNEDPARTSMES" type="xsd:string"
+				minOccurs="1" maxOccurs="1">
+			</xsd:element>
+
+
+			<xsd:element name="UPGRADETYPE" type="xsd:string"
+				minOccurs="1" maxOccurs="1">
+			</xsd:element>
+
+        
+			<xsd:element name="AVAILABILITYLIST"
+				type="AVAILABILITYLISTTYPE" minOccurs="1" maxOccurs="1" />
+
+
+		</xsd:sequence>
+	</xsd:complexType>
+	
+   
+</xsd:schema>
+

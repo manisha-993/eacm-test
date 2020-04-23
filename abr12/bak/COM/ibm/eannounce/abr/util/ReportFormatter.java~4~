@@ -1,0 +1,865 @@
+// (c) Copyright International Business Machines Corporation, 2001
+// All Rights Reserved.
+//
+//  $Log: ReportFormatter.java~4~,v $
+//  Revision 1.1  2006/09/27 23:32:49  dave
+//  <No Comment Entered>
+//
+//  Revision 1.20  2006/08/10 15:42:03  dave
+//  trapping out of bounds
+//
+//  Revision 1.19  2006/08/10 15:24:29  dave
+//  more trace for out of bounds
+//
+//  Revision 1.18  2006/08/10 00:22:15  dave
+//  fixing boundary issue
+//
+//  Revision 1.17  2006/08/09 23:36:30  dave
+//  attempting to trap null pointer
+//
+//  Revision 1.16  2005/05/24 15:47:40  bala
+//  fix
+//
+//  Revision 1.15  2005/05/17 21:58:26  bala
+//  fixes for column wrapping
+//
+//  Revision 1.14  2004/01/12 18:33:25  bala
+//  Adding prettyPrint
+//
+//  Revision 1.13  2003/11/26 20:04:21  bala
+//  revert back to 1.11
+//
+//  Revision 1.12  2003/11/24 19:37:25  bala
+//  further refine sort and break combination by setting the first column for sorting. method  to suppress printing 1st column
+//
+//  Revision 1.11  2003/10/25 22:56:54  bala
+//  fix for breakcontents not being printed for break
+//
+//  Revision 1.10  2003/09/25 01:43:24  bala
+//  add Sorting capability
+//
+//  Revision 1.9  2003/06/11 00:58:02  bala
+//  adjustment to control breaks
+//
+//  Revision 1.8  2003/06/09 23:10:53  bala
+//  Final fix to controlbreak logic
+//
+//  Revision 1.7  2003/06/09 20:49:06  bala
+//  backing out changes
+//
+//  Revision 1.6  2003/06/09 19:35:32  bala
+//  debug
+//
+//  Revision 1.5  2003/06/09 19:25:48  bala
+//  more debugging
+//
+//  Revision 1.4  2003/06/09 18:38:24  bala
+//  more debugs
+//
+//  Revision 1.3  2003/06/09 18:19:49  bala
+//  debugging break line
+//
+//  Revision 1.2  2003/06/09 17:17:54  bala
+//  change to incorporate control breaks in reports
+//
+//  Revision 1.1.1.1  2003/06/03 19:02:25  dave
+//  new 1.1.1 abr
+//
+//  Revision 1.11  2002/12/14 00:58:33  bala
+//  print the "-" after the header
+//
+//  Revision 1.10  2002/12/12 00:53:21  bala
+//  print instances of multivalue flags in new row...also not to
+//  wrap a word in the middle if possible
+//
+//  Revision 1.9  2002/12/05 03:03:46  bala
+//  logic to suppress duplicate lines
+//
+//  Revision 1.8  2002/11/26 22:41:08  bala
+//  fixes
+//
+//  Revision 1.7  2002/11/16 01:50:30  bala
+//  offset to work at header level too
+//
+//  Revision 1.6  2002/11/14 00:47:12  bala
+//  Added setOffset to offset printing by offset spaces
+//
+//  Revision 1.5  2002/10/31 00:25:44  bala
+//  more fixes
+//
+//  Revision 1.4  2002/10/18 22:39:08  bala
+//  more fine tuning....ability to print rows without heading etc
+//
+//  Revision 1.3  2002/10/15 20:46:33  bala
+//  further cleaning up
+//
+//  Revision 1.2  2002/10/11 00:01:51  bala
+//  plug into the printwriter, format header, pretty print etc
+//
+
+
+
+
+
+package COM.ibm.eannounce.abr.util;
+import java.lang.String;
+import java.io.StringWriter;
+import java.io.PrintWriter;
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Vector;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+import COM.ibm.opicmpdh.transactions.OPICMABRItem;
+/**
+ *  Description of the Class
+ *
+ *@author     Bala
+ *@created    October 4, 2002
+ */
+public class ReportFormatter {
+    String[] m_strHeader = null;
+    String[][] m_strDetail = null;
+    String[] m_strPadSpaces = null;
+    String m_strSpaces = "                                                                              ";
+    String m_strColSeparator = " ";
+    boolean m_bPrintHeader = true;
+    boolean m_bNoDupeLines = true;
+    Hashtable m_hNoDupeLines = new Hashtable();
+    int m_iSeparatorWidth = 0;
+    int m_iWidth = 0;
+    int m_iColWidths[] = null;
+    int m_iWrapColumn[] = null;
+    int iREPORTWIDTH = 72;
+    int m_iAvgWidth = 0;
+
+    int m_iCurrHdrColumn = 0;
+    int m_iCurrDtlColumn = 0;
+    int m_iCurrHdrRow = 0;
+    int m_iCurrDtlRow = 0;
+    int m_iTotDetRows = 0;
+    int m_iOffsetLen = 0;
+    String m_strOffsetSpace = "";
+    StringTokenizer m_st = null;
+    OPICMABRItem m_abrItem = null;
+    final String BREAK_INDICATOR = "$$BREAKHERE$$";
+    /**
+     *  Description of the Field
+     */
+    protected boolean m_bSortOutput = false;
+    /**
+     *  Description of the Field
+     */
+    protected int[] m_iSortColumns = null;
+
+
+    /**
+     *  Description of the Method
+     */
+    public void ReportFormatter() {
+    }
+
+
+    /**
+     *  Sets the aBRItem attribute of the ReportFormatter object
+     *
+     *@param  _strSeparator  The new columnSeparator value
+     */
+      public void setABRItem(OPICMABRItem _abrI) {
+        m_abrItem = _abrI;
+      }
+
+
+    /**
+     *  Sets the aBRItem attribute of the ReportFormatter object
+     *
+     *@param  _strSeparator  The new columnSeparator value
+     */
+
+    /**
+     *  Sets the columnSeparator attribute of the ReportFormatter object
+     *
+     *@param  _strSeparator  The new columnSeparator value
+     */
+    public void setColumnSeparator(String _strSeparator) {
+        m_strColSeparator = _strSeparator;
+    }
+
+
+    /**
+     *  Sets the reportWidth attribute of the ReportFormatter object
+     *
+     *@param  _iWidth  The new reportWidth value
+     */
+    public void setReportWidth(int _iWidth) {
+        m_iWidth = _iWidth;
+    }
+
+
+    /**
+     *  calculateColumnWidths
+     */
+    private void calculateColumnWidths() {
+        int iWidth = 0;
+        int i = 0;
+        m_iAvgWidth = iREPORTWIDTH / m_iColWidths.length;//get the width of each column
+
+        m_iWrapColumn = (int[]) Array.newInstance(int.class, m_iColWidths.length);// This will be used hold flag whether column has to be wrapped
+        m_strPadSpaces = (String[]) Array.newInstance(String.class, m_iColWidths.length);//Holds spaces to pad after each column
+        m_iSeparatorWidth = m_strColSeparator.length();
+
+    }
+
+
+    /**
+     *  Gets the rowCount attribute of the ReportFormatter object
+     *
+     *@return    The rowCount value
+     */
+    private int getRowCount() {
+        //println("Report has " + m_strDetail.length + " rows");
+        return m_strDetail.length;
+    }
+
+
+    /**
+     *  Gets the colCount attribute of the ReportFormatter object
+     *
+     *@return    The colCount value
+     */
+    private int getColCount() {
+        //println("Report has "+m_iColWidths.length+" columns");
+        return m_iColWidths.length;
+    }
+
+
+    /**
+     *  Description of the Method
+     */
+    public void writeReport() {
+    }
+
+
+    /**
+     *  Adds a feature to the HeaderColumn attribute of the ReportFormatter object
+     *
+     *@param  _strColHeader  The feature to be added to the HeaderColumn attribute
+     */
+    public void addHeaderColumn(String _strColHeader) {
+        m_strHeader[m_iCurrHdrColumn] = _strColHeader;
+        m_iCurrHdrColumn++;
+    }
+
+
+    /**
+     *  Adds a feature to the DetailColumn attribute of the ReportFormatter object
+     *
+     *@param  _strColDetail  The feature to be added to the DetailColumn attribute
+     */
+    public void addDetailColumn(String _strColDetail) {
+        if (m_strDetail == null) {
+            growDetailArray();
+        }
+        m_strDetail[m_iCurrDtlRow][m_iCurrDtlColumn] = _strColDetail;
+        m_iCurrDtlColumn++;
+        if (m_iCurrDtlColumn > getColCount() - 1) {
+            m_iCurrDtlColumn = 0;
+        }
+    }
+
+
+    /**
+     *  Adds a feature to the DetailRow attribute of the ReportFormatter object
+     *
+     *@param  _strColDetail  The feature to be added to the DetailRow attribute
+     */
+    public void addDetailRow(String _strColDetail) {
+        m_iCurrDtlRow++;
+        m_iCurrDtlColumn = 0;
+        m_iTotDetRows++;
+    }
+
+
+    /**
+     *  Description of the Method
+     */
+    private void growDetailArray() {
+        int iRowIncrement = 0;
+        iRowIncrement = (m_iTotDetRows == 0 ? 100 : iRowIncrement);
+        String[][] strGrowDetail = (String[][]) Array.newInstance(String.class, new int[]{iRowIncrement * 2, m_iColWidths.length});//Initialize the Detail array
+        if (m_strDetail != null) {
+            System.arraycopy(m_strDetail, 0, strGrowDetail, 0, m_strDetail.length);
+        }
+        m_strDetail = strGrowDetail;
+        //println("Detail array has " + m_strDetail.length + " rows");
+    }
+
+
+    /**
+     *  Sets the colWidth attribute of the ReportFormatter object
+     *
+     *@param  _iColWidth  The new colWidth value
+     */
+    public void setColWidth(int[] _iColWidth) {
+        m_iColWidths = _iColWidth;
+    }
+
+
+    /**
+     *  Sets the header attribute of the ReportFormatter object
+     *
+     *@param  _strArrHeader  The new header value
+     */
+    public void setHeader(String[] _strArrHeader) {
+        m_strHeader = _strArrHeader;
+    }
+
+
+    /**
+     *  Description of the Method
+     *
+     *@param  _bPrint  Description of the Parameter
+     */
+    public void printHeaders(boolean _bPrint) {
+        m_bPrintHeader = _bPrint;
+    }
+
+
+    /**
+     *  Sets the detail attribute of the ReportFormatter object
+     *
+     *@param  _strArrDetail  The new detail value
+     */
+    public void setDetail(String[][] _strArrDetail) {
+        m_strDetail = _strArrDetail;
+
+        //
+        // DWB -- looking for a null pointer
+        //
+        if (_strArrDetail != null) {
+	        m_iTotDetRows = m_strDetail.length;
+	    } else {
+            println("setDetail Simple.. someone passed a null parm.. no total rows...");
+            m_iTotDetRows = 0;
+		}
+    }
+
+
+       /**
+        *  Sets the detail attribute of the ReportFormatter object
+        *
+        *@param  _vDetail  The new detail value
+        */
+       public void setDetail(Vector _vDetail) {
+           int i = 0;
+           int iCol = 0;
+           m_iTotDetRows = 0;
+           /*
+        *  We know the number of columns needed from the header
+        *  So calculate the number of rows given by dividing
+        *  vector size with number of columns in Header
+        */
+           if (_vDetail != null &&  _vDetail.size() > 0 &&  m_iColWidths != null && m_iColWidths.length > 0) {
+
+ //              System.out.println("Detail is not null..size is "+_vDetail.size()+ " Creating an array of "+_vDetail.size() / m_iColWidths.length+","+ m_iColWidths.length);
+
+               String[][] strGrowDetail = (String[][]) Array.newInstance(String.class, new int[]{_vDetail.size() / m_iColWidths.length, m_iColWidths.length});//Initialize the Detail array
+               m_strDetail = strGrowDetail;
+
+               /*
+          *  Now fill the Array with the contents of the vector
+          */
+               for (i = 0; i < _vDetail.size(); i++) {
+//                 System.out.println("DAVE:" + m_strDetail[0].length + ";" + m_strDetail.length + " wid:" + iCol + ":len:" + m_iTotDetRows);
+                   m_strDetail[m_iTotDetRows][iCol++] = (String) _vDetail.elementAt(i);
+                   if (iCol == m_iColWidths.length) {//Reset the column and row when next column position = the length of the array
+                       iCol = 0;
+                       m_iTotDetRows++;
+                   }
+     			    if (m_iTotDetRows == m_strDetail.length) {
+  //               		System.out.println("We reached the end of the rows.. and we are done.. even though more data exists than it should");
+               		    break;
+   				   }
+     			}
+
+           } else if (_vDetail == null) {
+
+             m_strDetail = null;
+
+                        System.out.println("vDetail is null cannot perform a set Detail properly...");
+
+           } else if (_vDetail.size() == 0) {
+
+
+             m_strDetail = null;
+
+                        System.out.println("vDetail has no elements.. cannot perform a set Detail properly...");
+
+           } else if (m_iColWidths == null) {
+
+             m_strDetail = null;
+
+      			System.out.println("m_iColWidths seems to be not set.. cannot perform a set Detail properly...");
+
+           } else if (m_iColWidths.length == 0) {
+
+             m_strDetail = null;
+
+      			System.out.println("m_iColWidths has no length.. cannot perform a set Detail properly...");
+
+            } else {
+
+               m_strDetail = null;
+
+           }
+
+           if (m_bSortOutput) {
+               ColumnSorter sortCol1 = new ColumnSorter(m_iSortColumns);
+               Arrays.sort(m_strDetail, sortCol1);
+           }
+       }
+
+
+    /**
+     *  Description of the Method
+     */
+    public void printReport() {
+        int i = 0;
+        int j = 0;
+        m_hNoDupeLines = new Hashtable();
+        if (m_strDetail != null) {
+            calculateColumnWidths();
+
+            /*
+       *  print Header
+       */
+            if (m_bPrintHeader) {
+                for (i = 0; i < m_strHeader.length; i++) {
+                    if (i == 0) {
+                        print(m_strOffsetSpace);
+                    }//Offset spaces from left border
+                    if (i < m_strHeader.length - 1) {
+                        print(m_strHeader[i]);
+                        if (m_strHeader[i].length() < m_iColWidths[i]) {
+                            print(m_strSpaces.substring(0, (m_iColWidths[i] - m_strHeader[i].length())));
+                            //print(m_strPadSpaces[i]);
+                        }
+                        print(m_strColSeparator);
+                    } else {
+                        println(m_strHeader[i]);
+                    }
+                }
+
+                /*
+         *  Print pretty lines
+         */
+                for (i = 0; i < m_strHeader.length; i++) {
+                    for (j = 0; j < m_iColWidths[i]; j++) {
+                        if (j == 0) {
+                            print(m_strOffsetSpace);
+                        }//Offset spaces from left border
+                        print("-");
+                    }
+                    print(m_strColSeparator);
+                }
+                println("");
+            }
+
+            /*
+       *  print Datail
+       */
+            for (i = 0; i < m_iTotDetRows; i++) {
+                if (!m_bNoDupeLines) {
+                    printRow(m_strDetail[i]);
+                } else if (!foundInPrint(m_strDetail[i])) {
+                    printRow(m_strDetail[i]);
+                }
+            }
+        }
+        //println("print complete!");
+    }
+
+
+    /**
+     *  Description of the Method
+     *
+     *@param  _strDetail  the RowString
+     *@return             boolean value
+     */
+    private boolean foundInPrint(String[] _strDetail) {
+        boolean bRetVal = true;
+        String strFind = "";
+        int k = 0;
+        for (k = 0; k < _strDetail.length; k++) {
+            if (k == 0) {
+                strFind = _strDetail[k];
+            } else {
+                strFind += "|" + _strDetail[k];
+            }
+        }
+        if (!m_hNoDupeLines.containsKey(strFind)) {
+            bRetVal = false;
+            m_hNoDupeLines.put(strFind, " ");//If not found, then add to the Hashtable
+        }
+        return bRetVal;
+    }
+
+
+    /**
+     *  Description of the Method
+     *
+     *@param  _strRow  Description of the Parameter
+     */
+
+    private void printRow(String[] _strRow) {
+        boolean bWrapRow = false;
+        boolean bBreakNow = false;
+        boolean bMFSeparator = false;
+        int i = 0;
+        int iTotWrapCol = 0;
+        int iStringWidth = 0;
+        String DELIM = " * ";
+        String strPrintString = null;
+
+        /*
+     *  First check whether the column has to be wrapped
+     */
+        for (i = 0; i < _strRow.length; i++) {
+            _strRow[i] = _strRow[i].trim();//remove all the pesky trailing and leading spaces bala
+
+            m_iWrapColumn[i] = 0;
+
+            if (bBreakNow) {//Stuff the rest of the columns with spaces
+                _strRow[i] = m_strSpaces.substring(0, m_iColWidths[i]);
+            } else {
+            }
+
+            //Check whether this row has a break tag
+            if (_strRow[i].indexOf(BREAK_INDICATOR) > -1) {
+                bWrapRow = false;
+                bBreakNow = true;
+                _strRow[i] = _strRow[i].substring(_strRow[i].indexOf(BREAK_INDICATOR) + BREAK_INDICATOR.length());
+//        _strRow[i] = _strRow[i].substring(BREAK_INDICATOR.length());          //Take the indicator out
+            } else if (_strRow[i].length() > m_iColWidths[i] - m_iSeparatorWidth + 1) {
+                bWrapRow = true;
+                m_iWrapColumn[i] = 1;
+            }
+        }
+        if (bWrapRow) {
+            while (bWrapRow) {
+                for (i = 0; i < getColCount(); i++) {
+                    if (i == 0) {
+                        print(m_strOffsetSpace);
+//print("Printing offset space :"+m_strOffsetSpace+":");
+                    }//Offset spaces from left border
+
+                    if (m_iWrapColumn[i] == 1) {//This column has to be wrapped
+                        iStringWidth = _strRow[i].indexOf(DELIM);//Check for multivalue flag separators
+                        if (iStringWidth == 0) {
+                            iStringWidth = _strRow[i].indexOf(DELIM, DELIM.length() - 1);
+                        }//Check for the next one
+//            println("Next separator found at "+iStringWidth);
+                        bMFSeparator = iStringWidth == -1 ? false : true;
+                        //if (bMFSeparator) println("Multivalueflag separator found");
+                        if (iStringWidth < m_iColWidths[i] && !(iStringWidth <= 0)) {
+                            //Delimiter found in middle, print to delimiter
+                            strPrintString = _strRow[i].substring(0, iStringWidth);
+                        } else {//next delimiter could exceed width
+                            //Check whether value is > col width for column
+                            //Print to the word upto where the next word exceeds width., then print the next word on the next line
+                            //if multivalue separator found, start each instance of the mv in a new row
+                            m_st = new StringTokenizer(_strRow[i]);
+                            strPrintString = "";
+                            while ((strPrintString.length() < m_iColWidths[i] - m_iSeparatorWidth + 1) && m_st.hasMoreElements()) {
+                                strPrintString += (strPrintString.length()>0 ? " ":"") + m_st.nextToken();      //bala
+//println("String is now |" + strPrintString + "|");
+
+                            }
+                            //strPrintString = _strRow[i].substring(0, m_iColWidths[i] - m_iSeparatorWidth + 1);
+                            //strPrintString = strPrintString.trim();  bala
+                            if (strPrintString.length() > m_iColWidths[i]) {
+//            println("1. strPrintString.length() > m_iColWidths[i])");
+                                if (strPrintString.lastIndexOf(" ") > 0) {
+                                    //strPrintString = strPrintString.substring(0, strPrintString.lastIndexOf(" ")+1);//move to the last word
+                                    strPrintString = strPrintString.substring(0, strPrintString.lastIndexOf(" "));//move to the last word
+//println("After moving to last word " +strPrintString);
+                                }
+                            }
+                        }
+//println("Recalc String is now |"+strPrintString+"|");
+                        if (strPrintString.length() > m_iColWidths[i]) {
+                            strPrintString = _strRow[i].substring(0, m_iColWidths[i] - m_iSeparatorWidth + 1);
+                        }
+//println("Recalc String 1 is now |"+strPrintString+"|");
+
+                        print(strPrintString);
+                        print(m_strSpaces.substring(0, m_iColWidths[i] - (m_iSeparatorWidth + strPrintString.length() - 1)) + m_strColSeparator);
+
+                        if (strPrintString.length() < m_iColWidths[i]) {
+//println("strPrintString.length() < m_iColWidths[i])");
+//println("row is :"+_strRow[i]+":");
+//println("strPrintString is:"+strPrintString+":");
+//              _strRow[i] = _strRow[i].substring(strPrintString.trim().length() + 1);  bala
+                            _strRow[i] = _strRow[i].substring(strPrintString.length()+1);
+                        } else {
+// println("strPrintString.length() > m_iColWidths[i])");
+                            _strRow[i] = _strRow[i].substring(strPrintString.length());
+                        }
+//println("row is now|"+_strRow[i]);
+                        if (_strRow[i].length() < m_iColWidths[i]) {
+                            m_iWrapColumn[i] = 0;// Dont have to wrap this column again
+                        }
+                    } else {
+                        //Now you have to print and pad spaces if needed
+                        print(_strRow[i]);
+                        print(m_strSpaces.substring(0, (m_iColWidths[i] - _strRow[i].length() - m_iSeparatorWidth + 1)) + m_strColSeparator);
+                        _strRow[i] = m_strSpaces.substring(0, m_iColWidths[i] - m_iSeparatorWidth + 1);//Set the column to spaces so that it prints spaces in the next iteration
+                    }
+                    if (i == getColCount() - 1) {
+                        println("");
+                    }
+                }
+
+                /*
+         *  Check if any columns need wrapping
+         */
+                iTotWrapCol = 0;
+                for (i = 0; i < _strRow.length; i++) {
+                    iTotWrapCol += m_iWrapColumn[i];
+                }
+                if (iTotWrapCol == 0) {//means no column need to be wrapped
+                    bWrapRow = false;
+                }
+            }
+            /*
+       *  print the last row for wrap
+       */
+            for (i = 0; i < getColCount(); i++) {
+                if (i < getColCount() - 1) {
+                    if (i == 0) {
+                        print(m_strOffsetSpace);
+                    }//Offset spaces from left border
+
+                    if (_strRow[i].length() <= m_iColWidths[i]) {
+                        print(_strRow[i]);
+                        print(m_strSpaces.substring(0, (m_iColWidths[i] - _strRow[i].length() - m_iSeparatorWidth + 1)) + m_strColSeparator);
+                    }
+                } else {
+                    println(_strRow[i]);
+                }
+            }
+        } else {
+            for (i = 0; i < getColCount(); i++) {
+                if (i < getColCount() - 1) {//is this the last column?
+
+                    if (i == 0) {
+                        print(m_strOffsetSpace);
+                    }//Offset spaces from left border
+
+                    if (_strRow[i].length() <= m_iColWidths[i]) {
+
+                        if (!bBreakNow) {
+                            print(_strRow[i]);
+                            print(m_strSpaces.substring(0, (m_iColWidths[i] - _strRow[i].length() - m_iSeparatorWidth + 1)) + m_strColSeparator);
+                        } else {
+                            //print(_strRow[i]);
+                            prettyPrint(_strRow[i], 69);
+                        }
+                    } else if (_strRow[i].length() > m_iColWidths[i]) {//Now we have to wrap
+                        if (bBreakNow) {
+                            //print(_strRow[i].substring(BREAK_INDICATOR.length()));
+                            //print(_strRow[i].substring(_strRow[i].indexOf(BREAK_INDICATOR)+BREAK_INDICATOR.length()));
+                            print(_strRow[i]);
+                        } else {
+                            println("WE SHOULDNT BE HERE!!");
+                        }
+                    }
+                } else {
+                    println(_strRow[i]);
+                }
+
+            }
+        }
+
+    }
+
+    /**
+     *  Sets the offset attribute of the ReportFormatter object
+     *
+     *@param  _iOffset  The new offset value
+     */
+    public void setOffset(int _iOffset) {
+        m_iOffsetLen = _iOffset;
+        m_strOffsetSpace = "";
+        for (int i = 0; i < _iOffset; i++) {
+            m_strOffsetSpace += " ";
+        }
+    }
+
+
+    /**
+     *  Sets the printDupeLines attribute of the ReportFormatter object
+     *
+     *@param  _b  The new printDupeLines value
+     */
+    public void setPrintDupeLines(boolean _b) {
+        m_bNoDupeLines = _b;
+    }
+
+
+    /**
+     *  Gets the version attribute of the ReportFormatter class
+     *
+     *@return    The version value
+     */
+    public static String getVersion() {
+        return new String("$Id: ReportFormatter.java~4~,v 1.1 2006/09/27 23:32:49 dave Exp $");
+    }
+
+
+    /**
+     *  Description of the Method
+     *
+     *@param  _str  Description of the Parameter
+     */
+    private void print(String _str) {
+        m_abrItem.print(_str);
+    }
+
+
+    /**
+     *  Description of the Method
+     *
+     *@param  _str  Description of the Parameter
+     */
+    private void println(String _str) {
+        m_abrItem.println(_str);
+        //System.out.println(_str);
+    }
+
+
+
+    /**
+     *  Description of the Class
+     *
+     *@author     Administrator
+     *@created    October 25, 2003
+     */
+    static class ColumnSorter implements Comparator {
+        int[] m_columnIndex;
+
+
+        /**
+         *  Constructor for the ColumnSorter object
+         *
+         *@param  _icolumnIndex  Description of the Parameter
+         */
+        public ColumnSorter(int[] _icolumnIndex) {
+            this.m_columnIndex = _icolumnIndex;
+        }
+
+
+        /**
+         *  Description of the Method
+         *
+         *@param  o1  Description of the Parameter
+         *@param  o2  Description of the Parameter
+         *@return     Description of the Return Value
+         */
+        public int compare(Object o1, Object o2) {
+            int iresult = 0;
+            int i = 0;
+            String[] arr1 = (String[]) o1;
+            String[] arr2 = (String[]) o2;
+            try {
+                for (i = 0; i < m_columnIndex.length && iresult == 0; i++) {
+                    iresult = arr1[m_columnIndex[i]].compareTo(arr2[m_columnIndex[i]]);
+                }
+            } catch (ArrayIndexOutOfBoundsException aie) {
+                System.out.println("Error in ReportFormatter compare parameters: ArrayLength is " + arr1.length + " column parameter is " + m_columnIndex[i] + " " + aie.getMessage());
+                aie.printStackTrace();
+            }
+            return iresult;
+        }
+    }
+
+
+    /**
+     *  Sets the sortable attribute of the ReportFormatter object
+     *
+     *@param  _b  The new sortable value
+     */
+    public void setSortable(boolean _b) {
+        m_bSortOutput = _b;
+    }
+
+
+    /**
+     *  Sets the sortColumns attribute of the ReportFormatter object
+     *
+     *@param  _i  The new sortColumns value
+     */
+    public void setSortColumns(int[] _i) {
+        m_iSortColumns = _i;
+    }
+
+
+    /**
+     *  This will format a string to print it within the specified width
+     *
+     *@param  _strPrint   Description of the Parameter
+     *@param  _iColWidth  Description of the Parameter
+     */
+    public void prettyPrint(String _strPrint, int _iColWidth) {
+        /*
+     *  things to check
+     *  * Length of the line
+     *  Splitting line in the middle of a word - split at previous word
+     *  next char after splitting line is a line feed -
+     */
+        int iTotalLen = 0;
+        String strToPrint = null;
+        String strFromToken = null;
+        boolean bPrintNewLine = false;
+        int iReadNext = 0;
+        int i = 0;
+
+        StringTokenizer stString = new StringTokenizer(_strPrint, "\n", false);
+        while (stString.hasMoreElements()) {
+            strFromToken = stString.nextToken();
+            if (strFromToken.length() > _iColWidth) {
+                iTotalLen = strFromToken.length();
+
+                //System.out.println("Length of this token is "+iTotalLen);
+
+                while (strFromToken.length() > _iColWidth) {
+                    iReadNext = (strFromToken.length() >= _iColWidth) ? _iColWidth : strFromToken.length();
+                    strToPrint = strFromToken.substring(0, iReadNext);
+                    if (!strToPrint.substring(iReadNext - 1).equals(" ")) {// no space found, Is this middle of a word?
+
+                        if (strToPrint.lastIndexOf(" ") <= 0) {//previous word not found or 1st char is space
+                        } else {
+                            strToPrint = strToPrint.substring(0, strToPrint.lastIndexOf(" "));//move to the last word
+                        }
+                    }
+                    strFromToken = strFromToken.substring(strToPrint.length());//Initialize the String to process
+                    println(strToPrint.trim());
+                }
+                if (strFromToken.trim().length() > 0) {
+                    println(strFromToken.trim());//Print the remaining stuff
+                }
+            } else {
+                println(strFromToken.trim());
+            }
+        }
+    }
+
+
+
+
+}
+
+
+
+

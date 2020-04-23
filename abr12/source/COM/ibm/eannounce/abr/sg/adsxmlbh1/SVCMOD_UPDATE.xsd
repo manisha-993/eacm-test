@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/SVCMOD_UPDATE" elementFormDefault="qualified" xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/SVCMOD_UPDATE">
+
+	<xsd:element name="SVCMOD_UPDATE" type="SVCMOD_UPDATETYPE"/>
+
+	<xsd:complexType name="SVCMOD_UPDATETYPE">
+		<xsd:sequence>
+			<xsd:element name="PDHDOMAIN" type="xsd:string"
+						 maxOccurs="unbounded" />
+			<xsd:element name="DTSOFMSG" type="xsd:string" minOccurs="1"
+						 maxOccurs="1" />
+			<xsd:element name="ACTIVITY" type="xsd:string" minOccurs="1"
+						 maxOccurs="1" />
+			<xsd:element name="MODELENTITYTYPE" type="xsd:string"
+						 minOccurs="1" maxOccurs="1" />
+			<xsd:element name="MODELENTITYID" type="xsd:string"
+						 minOccurs="1" maxOccurs="1" />
+			<xsd:element name="MACHTYPE" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="4" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="MODEL" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="3" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="STATUS" type="xsd:string" minOccurs="1"
+						 maxOccurs="1" />
+			<xsd:element name="CATEGORY" type="xsd:string" minOccurs="1"
+						 maxOccurs="1" />
+			<xsd:element name="SUBCATEGORY" type="xsd:string"
+						 minOccurs="1" maxOccurs="1" />
+			<xsd:element name="GROUP" type="xsd:string" minOccurs="1"
+						 maxOccurs="1" />
+			<xsd:element name="SUBGROUP" type="xsd:string" minOccurs="1"
+						 maxOccurs="1" />
+			<xsd:element name="PROJECT" type="xsd:string" minOccurs="1"
+						 maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="DIVISION" type="xsd:string" minOccurs="1"
+						 maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="PRFTCTR" type="xsd:string" minOccurs="1"
+						 maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="PRODHIERCD" type="xsd:string"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="ACCTASGNGRP" type="xsd:string"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="NEC" type="xsd:string" minOccurs="1"
+						 maxOccurs="1" />
+			<xsd:element name="TOS" type="xsd:string" minOccurs="1"
+						 maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="SVCFFTYPE" type="xsd:string"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="OFERCONFIGTYPE" type="xsd:string"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="ENDCUSTIDREQ" type="xsd:string"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="FIXTERMPRIOD" type="xsd:string"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="PRORATEDOTCALLOW" type="xsd:string"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="SNGLLNEITEM" type="xsd:string"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="SVCCHRGOPT" minOccurs="1" maxOccurs="1"
+						 type="xsd:string" />
+			<xsd:element name="TYPEOFWRK" minOccurs="1" maxOccurs="1"
+						 type="xsd:string" />
+			<xsd:element name="UOMSI" type="xsd:string" minOccurs="1"
+						 maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="UPGRADEYN" type="xsd:string"
+						 minOccurs="1" maxOccurs="1" />
+			<xsd:element name="WWOCCODE" type="xsd:string" minOccurs="1"
+						 maxOccurs="1" />
+			<xsd:element name="UNSPSC" type="xsd:string" minOccurs="1"
+						 maxOccurs="1" />
+			<xsd:element name="UNUOM" type="xsd:string" minOccurs="1"
+						 maxOccurs="1" />
+			<xsd:element name="PCTOFCMPLTINDC" type="xsd:string"
+						 minOccurs="1" maxOccurs="1" />
+			<xsd:element name="SOPRELEVANT" type="xsd:string"
+						 minOccurs="1" maxOccurs="1" />
+			<xsd:element name="SOPTASKTYPE" type="xsd:string"
+						 minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ALTID" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="LANGUAGELIST" type="LANGUAGELISTTYPE"
+						 minOccurs="1" maxOccurs="1" />
+			<xsd:element name="AVAILABILITYLIST"
+						 type="AVAILABILITYLISTTYPE" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="TAXCATEGORYLIST"
+						 type="TAXCATEGORYLISTTYPE" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="TAXCODELIST" type="TAXCODELISTTYPE"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="CATATTRIBUTELIST"
+						 type="CATATTRIBUTELISTTYPE" minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="UNBUNDCOMPLIST" type="UNBUNDCOMPLISTTYPE"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="CHRGCOMPLIST" type="CHRGCOMPLISTTYPE"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="SVCEXECTMELIST" type="SVCEXECTMELISTTYPE"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="SVCSEOREFLIST" type="SVCSEOREFLISTTYPE"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="SVCMODREFLIST" type="SVCMODREFLISTTYPE"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="SVCSEOLIST" type="SVCSEOLISTTYPE"
+						 minOccurs="1" maxOccurs="1">
+			</xsd:element>
+			<xsd:element name="PRODSTRUCTLIST" type="PRODSTRUCTLISTTYPE" minOccurs="0" maxOccurs="1">
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="LANGUAGELISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="LANGUAGEELEMENT" type="LANGUAGEELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="LANGUAGEELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="NLSID" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="1" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="INVNAME" type="xsd:string"></xsd:element>
+			<xsd:element name="MKTGNAME" type="xsd:string" minOccurs="1"
+						 maxOccurs="1" />
+
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AVAILABILITYLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="AVAILABILITYELEMENT" type="AVAILABILITYELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AVAILABILITYELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="AVAILABILITYACTION">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="Update" />
+						<xsd:enumeration value="Delete" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="STATUS" type="xsd:string" />
+			<xsd:element name="COUNTRY_FC">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="1000" />
+						<xsd:maxInclusive value="9999" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+
+			<xsd:element name="ANNDATE" type="xsd:string" />
+			<xsd:element name="ANNNUMBER" type="xsd:string"></xsd:element>
+			<xsd:element name="FIRSTORDER" type="xsd:string"></xsd:element>
+			<xsd:element name="PLANNEDAVAILABILITY" type="xsd:string"></xsd:element>
+			<xsd:element name="PUBFROM" type="xsd:string" />
+			<xsd:element name="PUBTO" type="xsd:string" />
+			<xsd:element name="WDANNDATE" type="xsd:string"></xsd:element>
+			<xsd:element name="ENDOFMARKETANNNUMBER" type="xsd:string"/>
+			<xsd:element name="LASTORDER" type="xsd:string"></xsd:element>
+			<xsd:element name="EOSANNDATE" type="xsd:string"></xsd:element>
+			
+			<xsd:element name="ENDOFSERVICEDATE" type="xsd:string" />
+			<xsd:element name="SLEORGGRPLIST" type="SLEORGGRPLISTTYPE" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="SLEORGNPLNTCODELIST" type="SLEORGNPLNTCODELISTTYPE" minOccurs="1" maxOccurs="1" />
+
+		</xsd:sequence>
+	</xsd:complexType>
+		<xsd:complexType name="SEOAVAILABILITYLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="AVAILABILITYELEMENT" type="SEOAVAILABILITYELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SEOAVAILABILITYELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="AVAILABILITYACTION">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="Update" />
+						<xsd:enumeration value="Delete" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="STATUS" type="xsd:string" />
+			<xsd:element name="COUNTRY_FC">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="1000" />
+						<xsd:maxInclusive value="9999" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+
+			<xsd:element name="ANNDATE" type="xsd:string" />
+			<xsd:element name="ANNNUMBER" type="xsd:string"></xsd:element>
+			<xsd:element name="FIRSTORDER" type="xsd:string"></xsd:element>
+			<xsd:element name="PLANNEDAVAILABILITY" type="xsd:string"></xsd:element>
+			<xsd:element name="PUBFROM" type="xsd:string" />
+			<xsd:element name="PUBTO" type="xsd:string" />
+			<xsd:element name="WDANNDATE" type="xsd:string"></xsd:element>
+			<xsd:element name="LASTORDER" type="xsd:string"></xsd:element>
+			<xsd:element name="EOSANNDATE" type="xsd:string"></xsd:element>			
+			<xsd:element name="ENDOFSERVICEDATE" type="xsd:string" />
+			<xsd:element name="SLEORGGRPLIST" type="SLEORGGRPLISTTYPE" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="SLEORGNPLNTCODELIST" type="SLEORGNPLNTCODELISTTYPE" minOccurs="1" maxOccurs="1" />
+
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TAXCATEGORYELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="TAXCATEGORYACTION">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="Update"/>
+						<xsd:enumeration value="Delete"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="COUNTRYLIST" type="COUNTRYLISTTYPE">
+			</xsd:element>
+			<xsd:element name="TAXCATEGORYVALUE">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:length value="4"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="TAXCLASSIFICATION" type="xsd:string"/>
+			<xsd:element name="SLEORGGRPLIST" type="SLEORGGRPLISTTYPE" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="SLEORGNPLNTCODELIST" type="SLEORGNPLNTCODELISTTYPE" minOccurs="1" maxOccurs="1" />
+
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TAXCATEGORYLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="TAXCATEGORYELEMENT" type="TAXCATEGORYELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TAXCODELISTTYPE" >
+		<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+			<xsd:element name="TAXCODEELEMENT" type="TAXCODELEMENTTYPE"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TAXCODELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="TAXCODEACTION" type="xsd:string"></xsd:element>
+			<xsd:element name="TAXCODEDESCRIPTION" type="xsd:string"></xsd:element>
+			<xsd:element name="COUNTRYLIST" type="COUNTRYLISTTYPE" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="TAXCODE" type="xsd:string"></xsd:element>
+			<xsd:element name="SLEORGGRPLIST" type="SLEORGGRPLISTTYPE" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="SLEORGNPLNTCODELIST" type="SLEORGNPLNTCODELISTTYPE" minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="COUNTRYLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="COUNTRYELEMENT" type="COUNTRYELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CATATTRIBUTELISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="CATATTRIBUTEELEMENT" type="CATATTRIBUTEELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CATATTRIBUTEELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="CATATTRIBUTEACTION" type="xsd:string"></xsd:element>
+			<xsd:element name="CATATTRIBUTE" type="xsd:string"></xsd:element>
+			<xsd:element name="NLSID" type="xsd:string"></xsd:element>
+			<xsd:element name="CATATTRIUBTEVALUE" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="UNBUNDCOMPELEMENTTYPE">
+		<xsd:sequence minOccurs="1" maxOccurs="1">
+			<xsd:element name="UNBUNDCOMPACTION" type="xsd:string"></xsd:element>
+			<xsd:element name="ENTITYTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="ENTITYID" type="xsd:string"></xsd:element>
+			<xsd:element name="UNBUNDCOMPID" type="xsd:string"></xsd:element>
+			<xsd:element name="EFFECTIVEDATE" type="xsd:string"></xsd:element>
+			<xsd:element name="ENDDATE" type="xsd:string"></xsd:element>
+			<xsd:element name="UNBUNDTYPE" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="UNBUNDCOMPLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="UNBUNDCOMPELEMENT" type="UNBUNDCOMPELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CHRGCOMPLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="CHRGCOMPELEMENT" type="CHRGCOMPELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CHRGCOMPELEMENTTYPE">
+		<xsd:sequence minOccurs="1" maxOccurs="1">
+			<xsd:element name="ENTITYTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="ENTITYID" type="xsd:string"></xsd:element>
+			<xsd:element name="CHRGCOMPID" type="xsd:string"></xsd:element>
+			<xsd:element name="BHACCTASGNGRP" type="xsd:string"></xsd:element>
+			<xsd:element name="REFSELCONDTN" type="xsd:string"></xsd:element>
+			<xsd:element name="SVCCHRGOPT" type="xsd:string"></xsd:element>
+			<xsd:element name="EFFECTIVEDATE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ENDDATE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="LANGUAGELIST" type="LANGUAGELISTTYPE" minOccurs="1" maxOccurs="1"  ></xsd:element>
+			<xsd:element name="PRICEPOINTLIST" type="PRICEPOINTLISTTYPE" minOccurs="1" maxOccurs="1"  ></xsd:element>
+			<xsd:element name="CHARVALUEMETRICLIST" type="CHARVALUEMETRICLISTTYPE" minOccurs="1" maxOccurs="1" ></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PRICEPOINTELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="ENTITYTYPE" type="xsd:string" minOccurs="1" maxOccurs="1"  ></xsd:element>
+			<xsd:element name="ENTITYID" type="xsd:string" minOccurs="1" maxOccurs="1" ></xsd:element>
+			<xsd:element name="PRCPTID" type="xsd:string" minOccurs="1" maxOccurs="1" ></xsd:element>
+			<xsd:element name="PRCMETH" type="xsd:string" minOccurs="1" maxOccurs="1" ></xsd:element>
+			<xsd:element name="LANGUAGELIST" type="LANGUAGELISTTYPE" minOccurs="1" maxOccurs="1" ></xsd:element>
+			<xsd:element name="CNTRYEFFLIST" type="CNTRYEFFLISTTYPE" minOccurs="1" maxOccurs="1" ></xsd:element>
+			<xsd:element name="REFCVMSPECLIST" type="REFCVMSPECLISTTYPE" minOccurs="1" maxOccurs="1" ></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="PRICEPOINTLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="PRICEPOINTELEMENT" type="PRICEPOINTELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="LANGUAGELISTSHRTTYPE">
+		<xsd:sequence>
+			<xsd:element name="LANGUAGEELEMENT" type="LANGUAGEELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="LANGUAGESHRTELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="NLSID" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="1" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="SHRTNAM" type="xsd:string"></xsd:element>
+			<xsd:element name="INVAME" type="xsd:string"></xsd:element>
+			<xsd:element name="MKTGNAME" type="xsd:string" minOccurs="1"
+						 maxOccurs="1" />
+
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CNTRYEFFLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="CNTRYEFFELEMENT" type="CNTRYEFFELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CNTRYEFFELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="EFFECTIVEDATE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ENDDATE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ENTITYTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="ENTITYID" type="xsd:string"></xsd:element>
+			<xsd:element name="COUNTRYLISTLIST" type="COUNTRYLISTLISTTYPE"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="COUNTRYLISTLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="COUNTRYLISTELEMENT" type="COUNTRYELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="COUNTRYELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="COUNTRYACTION" type="xsd:string"></xsd:element>
+			<xsd:element name="COUNTRY_FC" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CHARVALUEMETRICELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="ENTITYTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="ENTITYID" type="xsd:string"></xsd:element>
+			<xsd:element name="CVMTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="VMID" type="xsd:string"></xsd:element>
+			<xsd:element name="CHARACID" type="xsd:string"></xsd:element>
+			<xsd:element name="EFFECTIVEDATE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ENDDATE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="LANGUAGELIST" type="LANGUAGELISTSHRTONLYTYPE"></xsd:element>
+			<xsd:element name="CVMDATATYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="CVMSELTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="CVMSPECLIST" type="CVMSPECLISTTYPE"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CHARVALUEMETRICLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="CHARVALUEMETRICELEMENT" type="CHARVALUEMETRICELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="LANGUAGELISTSHRTONLYTYPE">
+		<xsd:sequence>
+			<xsd:element name="LANGUAGEELEMENT" type="LANGUAGESHRTONLYELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="LANGUAGESHRTONLYELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="NLSID" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="1" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="SHRTNAM" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CVMSPECELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="ENTITYTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="ENTITYID" type="xsd:string"></xsd:element>
+			<xsd:element name="CVMSPECID" type="xsd:string"></xsd:element>
+			<xsd:element name="EFFECTIVEDATE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ENDDATE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="LANGUAGELIST" type="LANGUAGELISTSHRTONLYTYPE"></xsd:element>
+			<xsd:element name="LOWLIMT" type="xsd:string"></xsd:element>
+			<xsd:element name="HIGHLIMT" type="xsd:string"></xsd:element>
+			<xsd:element name="SPECTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="RNGETBLOPT" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CVMSPECLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="CVMSPECELEMENT" type="CVMSPECELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="REFCVMSPECELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="EFFECTIVEDATE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ENDDATE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="REFCVMSPECENTITYTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="REFCVMSPECENTITYID" type="xsd:string"></xsd:element>
+			<xsd:element name="REFCVMSPECTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="REFCVMSPECID" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="REFCVMSPECLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="REFCVMSPECELEMENT" type="REFCVMSPECELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SVCEXECTMEELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="COMPETENCECD" type="xsd:string"></xsd:element>
+			<xsd:element name="HR" type="xsd:string"></xsd:element>
+			<xsd:element name="IMPLEMENTRBN" type="xsd:string"></xsd:element>
+			<xsd:element name="MACHTYPEATR" type="xsd:string"></xsd:element>
+			<xsd:element name="MODELATR" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="SVCEXECTMELISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="SVCEXECTMEELEMENT" type="SVCEXECTMEELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SVCSEOREFELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="SVCSEOENTITYTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="SVCSEOENTITYID" type="xsd:string"></xsd:element>
+			<xsd:element name="SEOID" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="SVCSEOREFLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="SVCSEOREFELEMENT" type="SVCSEOREFELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="SVCMODREFELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="SVCMODEENTITYTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="SVCMODENTITYID" type="xsd:string"></xsd:element>
+			<xsd:element name="MACHTYPEATR" type="xsd:string"></xsd:element>
+			<xsd:element name="MODELATR" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="SVCMODREFLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="SVCMODREFELEMENT" type="SVCMODREFELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="PRCPTREFELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="ACTIVITY" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="EFFECTIVEDATE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ENDDATE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ENTITYTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="ENTITYID" type="xsd:string"></xsd:element>
+			<xsd:element name="PRCPTID" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="PRCPTREFLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="PRCPTELEMENT" type="PRCPTREFELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="SVCSEOELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="ACTIVITY" type="xsd:string"></xsd:element>
+			<xsd:element name="ENTITYTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="ENTITYID" type="xsd:string"></xsd:element>
+			<xsd:element name="STATUS" type="xsd:string"></xsd:element>
+			<xsd:element name="SEOID" type="xsd:string"></xsd:element>
+			<xsd:element name="BHPRDHIERCD" type="xsd:string"></xsd:element>
+			<xsd:element name="PRFTCTR" type="xsd:string"></xsd:element>
+			<xsd:element name="ACCTASGNGRP" type="xsd:string"></xsd:element>
+			<xsd:element name="LANGUAGELIST" type="LANGUAGELISTTYPE"></xsd:element>
+			<xsd:element name="AVAILABILITYLIST" type="SEOAVAILABILITYLISTTYPE"></xsd:element>
+			<xsd:element name="PRCPTLIST" type="PRCPTREFLISTTYPE"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="SVCSEOLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="SVCSEOELEMENT" type="SVCSEOELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="PRODSTRUCTLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="PRODSTRUCTELEMENT" type="PRODSTRUCTELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PRODSTRUCTELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="ACTIVITY" type="xsd:string"></xsd:element>
+			<xsd:element name="ENTITYTYPE" type="xsd:string"></xsd:element>
+			<xsd:element name="ENTITYID" type="xsd:string"></xsd:element>
+			<xsd:element name="STATUS" type="xsd:string"></xsd:element>
+			<xsd:element name="MKTGNAME" type="xsd:string"></xsd:element>
+			<xsd:element name="MNATORYOPT" type="xsd:string"></xsd:element>
+			<xsd:element name="OWNERID" type="xsd:string"></xsd:element>
+			
+			<xsd:element name="WITHDRAWDATE" type="xsd:string"></xsd:element>
+			<xsd:element name="WTHDRWEFFCTVDATE" type="xsd:string"></xsd:element>
+			
+			<xsd:element name="FEATURECODE" type="xsd:string"></xsd:element>
+			<xsd:element name="FCMKTGSHRTDESC" type="xsd:string"></xsd:element>
+			<xsd:element name="SVCCAT" type="xsd:string"></xsd:element>
+			<xsd:element name="SVCFCSUBCAT" type="xsd:string"></xsd:element>
+			<xsd:element name="EFFECTIVEDATE" type="xsd:string"></xsd:element>
+			<xsd:element name="ENDDATE" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+	<xsd:complexType name="SLEORGGRPLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="SLEORGGRPELEMENT" type="SLEORGGRPELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SLEORGGRPELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="SLEOORGGRPACTION" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="Update" />
+						<xsd:enumeration value="Delete" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="SLEORGGRP" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SLEORGNPLNTCODELISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="SLEORGNPLNTCODEELEMENT" type="SLEORGNPLNTCODEELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="SLEORGNPLNTCODEELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="SLEORGNPLNTCODEACTION" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="Update" />
+						<xsd:enumeration value="Delete" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="SLEORG" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="PLNTCD" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+</xsd:schema>
+

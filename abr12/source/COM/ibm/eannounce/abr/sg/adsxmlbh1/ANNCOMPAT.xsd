@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/ANNCOMPAT" elementFormDefault="qualified" xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/ANNCOMPAT">
+
+	<xsd:element name="ANNCOMPAT">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ANNNUMBER" type="xsd:string" minOccurs="1" maxOccurs="1"  />
+				<xsd:element name="INVENTORYGROUP" type="xsd:string" minOccurs="1" maxOccurs="1" />
+				<xsd:element name="ANNTYPE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+				
+				<xsd:element name="AVAILABILITYLIST" type="AVAILABILITYLISTTYPE" minOccurs="1" maxOccurs="1" />
+				<xsd:element name="COMPATLIST" type="COMPATLISTTYPE" minOccurs="1" maxOccurs="1" />
+				<xsd:element name="RELATORLIST" type="RELATORLISTTYPE" minOccurs="1" maxOccurs="1"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:complexType name="AVAILABILITYLISTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="AVAILABILITYELEMENT" type="AVAILABILITYELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="AVAILABILITYELEMENTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="ENTITYID" type="xsd:int" minOccurs="1" maxOccurs="1"></xsd:element>			
+    		<xsd:element name="AVAILTYPE" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="EFFECTIVEDATE" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="COUNTRYLIST" type="COUNTRYLISTTYPE"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+	
+	<xsd:complexType name="COUNTRYLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="COUNTRY_FC" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	
+    <xsd:complexType name="COMPATLISTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="COMPATELEMENT" type="COMPATELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="COMPATELEMENTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="FROMENTITYID" type="xsd:int" minOccurs="1" maxOccurs="1"></xsd:element>
+    		<xsd:element name="FROMMACHTYPE" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+    		<xsd:element name="FROMMODEL" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="OKTOPUB" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="TOENTITYID" type="xsd:int" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="TOMACHTYPE" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="TOMODEL" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="MKTGNAME" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="COMPATDVCCAT" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+			<xsd:element name="COMPATDVCSUBCAT" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+		</xsd:sequence>
+    </xsd:complexType>
+	
+	<xsd:complexType name="RELATORLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="RELATORELEMENT" type="RELATORELEMENT_TYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>	
+	
+	<xsd:complexType name="RELATORELEMENT_TYPE">
+		<xsd:sequence>
+			<xsd:element name="ENTITY1TYPE" type="xsd:string" minOccurs="1" maxOccurs="1"/>		
+			<xsd:element name="ENTITY1ID" type="xsd:int" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name="ENTITY2TYPE" type="xsd:string" minOccurs="1" maxOccurs="1"/>	
+			<xsd:element name="ENTITY2ID" type="xsd:int" minOccurs="1" maxOccurs="1"/>				
+		</xsd:sequence>
+	</xsd:complexType>	
+</xsd:schema>

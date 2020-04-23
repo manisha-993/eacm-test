@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<!-- definition of simple elements -->
+	<xs:element name="country">
+		<xs:annotation>
+			<xs:documentation>
+			Should only contain valid country codes. The schema only checks that the country code is 2 upper case alpha characters
+		</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:pattern value="[A-Z][A-Z]"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="pricetype" type="xs:string"/>
+	<xs:element name="onshore" type="xs:boolean"/>
+	<xs:element name="offering" type="xs:string"/>
+	<xs:element name="startdate" type="xs:date"/>
+	<xs:element name="enddate" type="xs:date"/>
+	<xs:element name="pricevalueusd" type="xs:decimal"/>
+	<xs:element name="factor" type="xs:decimal"/>
+	<xs:element name="cabletype">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="ANN">
+					<xs:annotation>
+						<xs:documentation>Announcement Cable</xs:documentation>
+					</xs:annotation>
+				</xs:enumeration>
+				<xs:enumeration value="GPA">
+					<xs:annotation>
+						<xs:documentation>General Price Action</xs:documentation>
+					</xs:annotation>
+				</xs:enumeration>
+				<xs:enumeration value="ACT">
+					<xs:annotation>
+						<xs:documentation>Price Action</xs:documentation>
+					</xs:annotation>
+				</xs:enumeration>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:element name="cableid" type="xs:string"/>
+	<xs:element name="releasets" type="xs:dateTime"/>
+	<xs:element name="currency">
+		<xs:annotation>
+			<xs:documentation>
+			Should only contain valid currency codes. The schema only test that the currency code is 3 upper case alpha characters
+		</xs:documentation>
+		</xs:annotation>
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:pattern value="[A-Z]{3}"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:element>
+	<xs:group name="variantgroup">
+		<xs:sequence>
+			<xs:element name="pricepointtype">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="MOD">
+							<xs:annotation>
+								<xs:documentation>Model</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="FEA">
+							<xs:annotation>
+								<xs:documentation>Feature</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="RPQ">
+							<xs:annotation>
+								<xs:documentation>Request for Price Quote</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="SWF">
+							<xs:annotation>
+								<xs:documentation>Software Feature</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="FUP">
+							<xs:annotation>
+								<xs:documentation>Feature Upgrade</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="MUP">
+							<xs:annotation>
+								<xs:documentation>Model Upgrade</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="TMU">
+							<xs:annotation>
+								<xs:documentation>Cross-Type Model Upgrade</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="TFU">
+							<xs:annotation>
+								<xs:documentation>Cross-Type Feature Upgrade</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="VAR">
+							<xs:annotation>
+								<xs:documentation>ESW Variant Condition</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="SBB">
+							<xs:annotation>
+								<xs:documentation>CTO Sales Building Block</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="WSF">
+							<xs:annotation>
+								<xs:documentation>Worldwide Software Feature Code</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="GRD">
+							<xs:annotation>
+								<xs:documentation>Step Tier</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="QTY">
+							<xs:annotation>
+								<xs:documentation>Granular Tier</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="VAL">
+							<xs:annotation>
+								<xs:documentation>Block Tier</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="GRO">
+							<xs:annotation>
+								<xs:documentation>Step Tier Overage</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="QTO">
+							<xs:annotation>
+								<xs:documentation>Granular Tier Overage</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="VAO">
+							<xs:annotation>
+								<xs:documentation>Block Tier Overage</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="pricepointvalue" type="xs:string"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:element name="pricevalue" type="xs:decimal"/>
+	<!-- definition of complex elements -->
+	<!-- definition for the wrapping wwprttxn -->
+	<xs:element name="wwprttxn">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="price" type="priceElementType" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="type" type="xs:string" fixed="price"/>
+			<xs:attribute name="id" use="required">
+				<xs:simpleType>
+					<xs:restriction base="xs:positiveInteger">
+						<xs:maxInclusive value="99999999"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- definition for the price elements -->
+	<xs:complexType name="priceElementType" abstract="true">
+		<xs:sequence>
+			<xs:element ref="offering"/>
+			<xs:element ref="startdate"/>
+			<xs:element ref="currency"/>
+			<xs:element ref="cabletype"/>
+			<xs:element ref="cableid"/>
+			<xs:element ref="releasets"/>
+			<xs:element ref="pricevalue"/>
+		</xs:sequence>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="I">
+						<xs:annotation>
+							<xs:documentation>
+							"I" in general means a newly created price - It may be an update or an insert pending 
+							the target system's implementation
+						</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="D">
+						<xs:annotation>
+							<xs:documentation>
+							"D" in general means a removed price. Target systems may choose to soft or hard delete removed prices
+						</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<!-- The reference price element Type is derived from the price element Type -->
+	<xs:complexType name="referencePriceElementType">
+		<xs:complexContent>
+			<xs:extension base="priceElementType">
+				<xs:sequence>
+					<xs:group ref="variantgroup" minOccurs="0"/>
+					<xs:element ref="country"/>
+					<xs:element ref="pricetype"/>
+					<xs:element ref="onshore"/>
+					<xs:element ref="enddate"/>
+					<xs:element ref="pricevalueusd"/>
+					<xs:element ref="factor"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+</xs:schema>

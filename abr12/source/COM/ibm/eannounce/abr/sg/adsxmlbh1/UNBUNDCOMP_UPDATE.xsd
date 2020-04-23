@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/UNBUNDCOMP_UPDATE" elementFormDefault="qualified" xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/UNBUNDCOMP_UPDATE">
+	
+
+	<xs:complexType name="UNBUNDCOMP_UPDATETYPE">
+		<xs:sequence>
+			<xs:element name="DTSOFMSG" type="xs:string"></xs:element>
+			<xs:element name="ACTIVITY" type="xs:string"></xs:element>
+			<xs:element name="STATUS" type="xs:string"></xs:element>
+			<xs:element name="UNBUNDCOMPENTITYTYPE" type="xs:string"></xs:element>
+			<xs:element name="UNBUNDCOMPENTITYID" type="xs:string"></xs:element>
+			<xs:element name="UNBUNDCOMPID" type="xs:string"></xs:element>
+			<xs:element name="SHRTNAM" type="xs:string"></xs:element>
+			<xs:element name="BHPRODHIERCD" type="xs:string"></xs:element>
+			<xs:element name="BHACCTASGNGRP" type="xs:string"></xs:element>
+			<xs:element name="AMRTZTNLNGTH" type="xs:string"></xs:element>
+			<xs:element name="AMRTZTNSTRT" type="xs:string"></xs:element>
+			<xs:element name="PRFTCTR" type="xs:string"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="UNBUNDCOMP_UPDATE" type="UNBUNDCOMP_UPDATETYPE"/>
+</xs:schema>

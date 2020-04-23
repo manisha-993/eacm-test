@@ -1,0 +1,354 @@
+<!--
+//*********************************************************************
+//* COPYRIGHT:                                                        *
+//*    xxxx-yyy (C) COPYRIGHT IBM CORPORATION 2002.                   *
+//*    OCO SOURCE MATERIALS - IBM CONFIDENTIAL                        *
+//*    THE SOURCE CODE FOR THIS PROGRAM IS NOT PUBLISHED OR           *
+//*    OTHERWISE DIVESTED OF ITS TRADE SECRETS, IRRESPECTIVE OF       *
+//*    WHAT HAS BEEN DEPOSITED WITH THE U.S. COPYRIGHT OFFICE.        *
+//*********************************************************************
+-->
+
+<!-- This is the DTD for eAnnounce text taken from the spinTextBlock.dtd -->
+
+<!--================ Character mnemonic entities =========================-->
+
+<!ENTITY % HTMLlat1 PUBLIC
+   "-//W3C//ENTITIES Latin 1 for XHTML//EN"
+   "xhtml-lat1.ent">
+%HTMLlat1;
+
+<!ENTITY % HTMLsymbol PUBLIC
+   "-//W3C//ENTITIES Symbols for XHTML//EN"
+   "xhtml-symbol.ent">
+%HTMLsymbol;
+
+<!ENTITY % HTMLspecial SYSTEM
+   "xhtml-special.ent">
+%HTMLspecial;
+
+<!--=================== Text Elements ====================================-->
+
+<!ENTITY % special "br">
+
+<!ENTITY % fontstyle "i | b">
+
+<!ENTITY % phrase "u">
+
+<!ENTITY % inline "%special; | %fontstyle; | %phrase; | subvar | put | 
+                   format | replace">
+
+<!-- %Inline; covers inline or "text-level" elements -->
+<!ENTITY % Inline "(#PCDATA | %inline;)*">
+
+<!--================== Block level elements ==============================-->
+
+<!ENTITY % lists "ul | ol | dl">
+<!ENTITY % blocktext "pre">
+
+<!ENTITY % block
+     "p | %lists; | %blocktext; | table | geo">
+     
+<!-- %Flow; mixes Block and Inline and is used for list items etc. -->
+<!ENTITY % Flow "(#PCDATA | %block; | %inline; | varelement)*">
+
+<!--================== Content models for exclusions =====================-->
+
+<!-- pre uses %Inline excluding img, object, big, small, sup or sup -->
+<!ENTITY % pre.content
+   "(#PCDATA | br | i | b | %phrase; | subvar | varelement | put)*">
+
+<!--================ Document Structure ==================================-->
+
+<!--
+  The div tag denotes text block boundaries.  The ID attribute will be
+  displayed in SPIN interfaces and can be used for reference.  The div tag
+  will not show in the SPIN UI or the RFA feed file, but will be used by
+  SPIN and the reports for text block delineation.
+-->
+<!ELEMENT div 
+     (#PCDATA | %block; | %inline; | section | im | div | repeatvar | 
+      announcementRef | contentText | message | forEach| if)*>
+<!ATTLIST div
+  id             CDATA       #REQUIRED
+  language       CDATA       "ENU"
+  isOverridden   (true | false) "false"
+  approvalStatus (draft | completed | approved | locked) "draft"
+  isApplicable   (true | false) "false"
+  description    CDATA       #IMPLIED
+  isStandardText (true | false) "false"
+  isVisible      (true | false) "false"
+  isRequired     (true | false) "false"
+  >
+
+<!--=================== Paragraphs =======================================-->
+
+<!ELEMENT p (#PCDATA | %inline; | geo | varelement| annRef)*>
+
+<!--=================== Sections =========================================-->
+
+<!--
+  Generic Header, nesting determines heading level.  You can also skip levels
+  with a modifier on the starting tag, like <section level="+2">.  This would
+  cause a skip on one level.  The default is "+1".  The end tag stays the same
+  (i.e. </section>).  We will add IDs as well, here is a sample: 
+  <section id="acadcert" level="+2">
+-->
+
+<!ELEMENT section (secstitle?, sectitle?, (%block; | %inline; | section |
+                   repeatvar | im | div | announcementRef | contentText| if |
+                   forEach)*)>
+<!ATTLIST section
+  id          CDATA          #IMPLIED
+  level       CDATA          "+1"
+  >
+
+<!-- section title -->
+<!ELEMENT sectitle (#PCDATA | subvar | put | format)*>
+
+<!-- short title for the section -->
+<!ELEMENT secstitle (#PCDATA | subvar | put | format)*>
+
+<!--=================== Lists ============================================-->
+
+<!-- Unordered list -->
+<!ELEMENT ul (li | listvar | listForEach)+>
+<!ATTLIST ul
+  simple      (n | y) "n"
+  compact     (n | y) "n"
+  >
+
+<!-- Ordered (numbered) list -->
+<!ELEMENT ol (li | listvar | listForEach)+>
+<!ATTLIST ol
+  compact     (n | y) "n"
+  >
+
+<!-- list item -->
+<!ELEMENT li (#PCDATA | %block; | %inline; | varelement)*>
+
+<!-- definition lists - dt for term, dd for its definition -->
+<!ELEMENT dl (dt , dd)+>
+
+<!ELEMENT dt (#PCDATA | %inline;)*>
+
+<!ELEMENT dd %Flow;>
+
+<!--=================== Preformatted Text ================================-->
+
+<!-- content is %Inline; excluding "img|object|big|small|sub|sup" -->
+<!ELEMENT pre %pre.content;>
+<!ATTLIST pre
+  xml:space (preserve) #FIXED 'preserve'
+  >
+
+<!--===================== Inline Elements ================================-->
+
+<!ELEMENT br EMPTY>   <!-- forced line break -->
+
+<!ELEMENT i (#PCDATA | %inline; | varelement)*>   <!-- italic font -->
+
+<!ELEMENT b (#PCDATA | %inline; | varelement)*>   <!-- bold font -->
+
+<!-- Applies underline. Deprecated in HTML 4 spec -->
+<!ELEMENT u (#PCDATA | %inline; | varelement)*>
+
+<!--======================= Tables =======================================-->
+
+<!ELEMENT table (tr | tablevar | tableForEach)+>
+
+<!ELEMENT tr     (th | td)+>
+<!ATTLIST tr
+  id          CDATA          #IMPLIED
+  >
+
+<!ELEMENT th       %Flow;>
+  
+<!ELEMENT td       %Flow;>
+
+<!--================== SPIN Geographical Applicability ===================-->
+
+<!--
+  The geo tag indicates the IBM geographies where this text block applies.
+  Example: <geo locs="us can"> text for US and Canada only. </geo>
+  Possible values for the locs attribute are: ap, can, emea, la, us.
+-->
+<!ELEMENT geo (#PCDATA | %block; | %inline; | section | im | div | 
+               announcementRef | contentText | forEach| if)*>
+<!ATTLIST geo
+  ap          (n | y) "n"
+  can         (n | y) "n"
+  emea        (n | y) "n"
+  la          (n | y) "n"
+  us          (n | y) "n"
+  >
+  
+<!--===================== SPIN Substitution Variable =====================-->
+
+<!--
+  The substitution variable references a string value retrieved from the
+  SPIN data store.  The id attribute identifies the routine that will be
+  used to retrieve the value that will be substituted.  The valid set of
+  IDs is predefined.
+-->
+<!ELEMENT subvar (#PCDATA)>
+<!ATTLIST subvar
+  id          CDATA          #REQUIRED
+  element     CDATA          #IMPLIED
+  isVisible      (true | false) "false"
+  >
+
+<!--======================== SPIN Table Variable =========================-->
+
+<!--
+  The table variable references string values retrieved from the
+  SPIN data store.  The <tablevar> tag can only be present to within <table>
+  tags.  The id attribute identifies the routine that will be
+  used to retrieve the value that will be substituted.  The valid set of
+  IDs is predefined.
+-->
+<!ELEMENT tablevar (tr+)>
+<!ATTLIST tablevar
+  id          CDATA          #REQUIRED
+  isVisible      (true | false) "false"
+  >
+  
+<!--========================= SPIN List Variable =========================-->
+
+<!--
+  The list variable references string values retrieved from the
+  SPIN data store.  The <listvar> tag can only be present within <ul> and <ol>
+  tags.  The id attribute identifies the routine that will be
+  used to retrieve the value that will be substituted.  The valid set of
+  IDs is predefined.
+-->
+<!ELEMENT listvar (li+)>
+<!ATTLIST listvar
+  id          CDATA          #REQUIRED
+  isVisible      (true | false) "false"
+  >
+  
+<!--========================= SPIN Repeat Variable =========================-->
+
+<!--
+  The repeat variable references string values retrieved from the
+  SPIN data store.  The <repeatvar> tag is to work similar to the <listvar> and
+  <tablevar> tags.  It can only contain specific tags such as the 
+  <announcementRef> tag.  The id attribute identifies the routine that will be
+  used to retrieve the value that will be substituted.  The valid set of
+  IDs is predefined.
+-->
+<!ELEMENT repeatvar (announcementRef | contentText | stitleitem)*>
+<!ATTLIST repeatvar
+  id          CDATA          #REQUIRED
+  isVisible      (true | false) "false"
+  >
+  
+
+<!--========================= SPIN varelement ============================-->
+
+<!--
+  The varelement tag is enclosed within subvar tags.  The ID
+  attribute identifies a set of enumerated values which have been retrieved
+  by the routine defined by the subvar tags.
+-->
+<!ELEMENT varelement (#PCDATA)>
+<!ATTLIST varelement
+  id          CDATA          #REQUIRED
+  isVisible      (true | false) "false"
+  >
+  
+<!--============================= SPIN imbed =============================-->
+
+<!--
+  The im tag describes a text block to be imbedded in the text.  The
+  text block to imbed is identified with the "id" attribute.  The valid set
+  of IDs is defined in the SPIN standard text database.
+-->
+<!ELEMENT im (message?)>
+<!ATTLIST im
+  id             CDATA       #REQUIRED
+  language       CDATA       "ENU"
+  isOverridden   (true | false) "false"
+  approvalStatus (draft | completed | approved | locked) "draft"
+  isApplicable   (true | false) "false"
+  description    CDATA       #IMPLIED
+  isStandardText (true | false) "false"
+  isVisible      (true | false) "false"
+  isRequired     (true | false) "false"
+  >
+  
+<!--=============== SPIN announcementRef - to be phased out=================-->
+
+<!ELEMENT announcementRef (rfaNumber, announceLetterNumber, announceDate, announceType)>
+<!ELEMENT rfaNumber (#PCDATA | varelement | subvar | put)*>
+<!ELEMENT announceLetterNumber (#PCDATA | varelement | subvar | put)*>
+<!ELEMENT announceDate (#PCDATA | varelement | subvar | put)*>
+<!ELEMENT announceType (#PCDATA | varelement | subvar | put)*>
+<!ELEMENT contentText (#PCDATA | br | i | b | %phrase; | subvar | varelement | p)*>
+
+<!--================= SPIN annRef - new, less filling =======================-->
+<!ELEMENT annRef (#PCDATA | rfaNum | put)*>
+<!ELEMENT rfaNum (#PCDATA | put)*>
+
+
+<!--== SPIN Tags to support STITLE1, STITLE2, etc. RFA Legacy Requirement ==-->
+
+<!ELEMENT stitlelist (repeatvar)>
+<!ELEMENT stitleitem (#PCDATA | varelement)*>
+
+<!--================================== if ==================================-->
+<!ELEMENT if 
+     (#PCDATA | %block; | %inline; | section | im | div | repeatvar | 
+      announcementRef | contentText | message | forEach| if)*>
+<!ATTLIST if
+  expr             CDATA       #REQUIRED
+  >
+
+<!--=============================== forEach ================================-->
+<!ELEMENT forEach 
+     (#PCDATA | p | %lists; | %blocktext; | table | section | %inline; |
+      announcementRef | if | forEach | message)*>
+<!ATTLIST forEach
+  var              CDATA       #REQUIRED
+  items            CDATA       #REQUIRED
+  sort             CDATA       #IMPLIED
+  >
+
+<!--=========================== tableForEach ==============================-->
+<!ELEMENT tableForEach (tr | message | tableForEach)+>
+<!ATTLIST tableForEach
+  var              CDATA       #REQUIRED
+  items            CDATA       #REQUIRED
+  sort             CDATA       #IMPLIED
+  >
+
+<!--============================ listForEach ===============================-->
+<!ELEMENT listForEach (li | message | listForEach)+>
+<!ATTLIST listForEach
+  var              CDATA       #REQUIRED
+  items            CDATA       #REQUIRED
+  sort             CDATA       #IMPLIED
+  >
+
+<!--================================= put ==================================-->
+<!ELEMENT put (#PCDATA | message)*>
+<!ATTLIST put
+  expr             CDATA       #REQUIRED
+  sp               (n | y) "y"
+  >
+
+<!--=============================== replace ================================-->
+<!ELEMENT replace (#PCDATA)>
+
+<!--=============================== format =================================-->
+<!ELEMENT format (put)>
+<!ATTLIST format
+  type             (date | boolean)  "date"
+  dateStyle        (full | long | medium | short)  "full"
+  booleanStyle     (1 | yes | y | true | t) "yes"
+  datePattern      (mdy | dmy) "mdy"
+  >
+  
+<!--=============================== message ================================-->
+<!ELEMENT message (#PCDATA)>

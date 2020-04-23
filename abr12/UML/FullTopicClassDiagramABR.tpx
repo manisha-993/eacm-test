@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--xtools2_universal_type_manager-->
+<?com.ibm.xtools.emf.core.signature <signature id="com.ibm.xtools.mmi.ui.signatures.topic" version="7.0.0"><feature description="" name="Rational Modeling Platform (com.ibm.xtools.rmp)" url="" version="7.0.0"/></signature>?>
+<topic:TopicQuery xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:topic="http://www.ibm.com/xtools/6.0.0/Topic" xmlns:uml="http://www.eclipse.org/uml2/2.0.0/UML" xmi:id="_DHEGgP6KEd-tPZmoP6x_CA" topicId="com.ibm.xtools.mmi.ui.RelatedVisualizerElements:J2SE.Presets.Generalization" name="topicdiagramPokBaseABR">
+  <eAnnotations xmi:id="_DHEGgf6KEd-tPZmoP6x_CA" source="com.ibm.xtools.topic.query_attributes">
+    <details xmi:id="_DHEGgv6KEd-tPZmoP6x_CA" key="consumerToSelection" value="true"/>
+    <details xmi:id="_DHEGg_6KEd-tPZmoP6x_CA" key="selectionToSupplier" value="false"/>
+    <details xmi:id="_DHEGhP6KEd-tPZmoP6x_CA" key="expandIndefinitely" value="true"/>
+    <details xmi:id="_DHEGhf6KEd-tPZmoP6x_CA" key="expandLevels" value="1"/>
+    <details xmi:id="_DHEGhv6KEd-tPZmoP6x_CA" key="layoutType" value="DEFAULT"/>
+    <details xmi:id="_DHEGh_6KEd-tPZmoP6x_CA" key="selections" value="~Java~Extends (Generalization)~Uses (Dependency)~Implements (Realization)~References (Association)~Collection Type References (Association)~Declares (Owned Element)~Trace (Abstraction)"/>
+  </eAnnotations>
+  <context xmi:type="uml:Interface" href="mmi:///#jsrctype%5Ename=PokLSExtRef%5Bjcu%5Ename=PokLSExtRef.java%5Bjpack%5Ename=COM.ibm.eannounce.abr.util%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=abr12%5D%5D%5D%5D$uml.Interface"/>
+</topic:TopicQuery>

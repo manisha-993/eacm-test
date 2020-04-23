@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/CATNAV_UPDATE" elementFormDefault="qualified" xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/CATNAV_UPDATE">
+	<xsd:complexType name="LANGUAGELISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="LANGUAGEELEMENT" type="LANGUAGEELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="LANGUAGEELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="NLSID" minOccurs="1" maxOccurs="1">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="1" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="CATFMLY" type="xsd:string" minOccurs="1" maxOccurs="1" />          		
+            		<xsd:element name="CATSER" type="xsd:string" minOccurs="1" maxOccurs="1" />
+            		<xsd:element name="CATOPTGRPNAM" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="CATNAME" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="CATNAVL1" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="CATNAVL2" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="CATNAVL3" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="CATNAVL4" type="xsd:string" minOccurs="1" maxOccurs="1" />          	
+			<xsd:element name="PRICEDISCLAIMER" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="IMAGEDISCLAIMER" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FEATUREBENEFIT" type="XMLTYPE" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FAMILYDESCOVERRIDE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="SERIESDESCOVERRIDE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="SERIESHEADING" type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="LONGMKTGMSG" type="xsd:string" minOccurs="1" maxOccurs="1" />
+
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="CATNAV_UPDATE" type="CATNAV_UPDATETYPE"/>
+
+	<xsd:complexType name="CATNAV_UPDATETYPE">
+		<xsd:sequence>
+			<xsd:element name="PDHDOMAIN" type="xsd:string"
+				maxOccurs="unbounded" />
+			<xsd:element name="DTSOFMSG" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="ACTIVITY" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="ENTITYTYPE" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ENTITYID" type="xsd:int"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="TYPE" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="STATUS" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="PUBLISH" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="CATBR" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="CATNAME" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="PROJECTLIST" type="PROJECTLISTTYPE"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="COUNTRYLIST" type="COUNTRYLISTTYPE"
+				minOccurs="1" maxOccurs="1" />
+            		<xsd:element name="LANGUAGELIST" type="LANGUAGELISTTYPE"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="CATAUDIENCELIST" type="CATAUDIENCELISTTYPE" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="CATDETAILSLIST" type="CATDETAILSLISTTYPE" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="CATVAMLIST" type="CATVAMLISTTYPE" minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+	
+
+	<xsd:complexType name="CATAUDIENCEELEMENTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="ACTIVITY" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="CATAUDIENCE" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    	</xsd:sequence>
+    	</xsd:complexType>
+    	
+	<xsd:complexType name="CATAUDIENCELISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="CATAUDIENCEELEMENT" type="CATAUDIENCEELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+	<xsd:complexType name="PROJECTLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="PROJECTELEMENT" type="PROJECTELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="PROJECTELEMENTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="PROJECTACTIVITY" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="PROJECT" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    	</xsd:sequence>
+    	</xsd:complexType>
+
+	<xsd:complexType name="CATDETAILSLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="CATDETAILSELEMENT" type="CATGROUPELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CATGROUPELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="ACTIVITY" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+            <xsd:element name="ENTITYID" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+            <xsd:element name="CATSEQ" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="CATDESCLIST" type="CATDESCLISTTYPE"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="CATATTRLIST" type="CATATTRLISTTYPE"
+				minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+		
+	</xsd:complexType>
+	<xsd:complexType name="CATDESCLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="CATDESCELEMENT" type="CATDESCELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CATDESCELEMENTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="ACTIVITY" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="NLSID" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="GROUPDESCRIPTION" type="XMLTYPE" minOccurs="1" maxOccurs="1" />
+    	</xsd:sequence>
+    	</xsd:complexType>
+	<xsd:complexType name="CATATTRLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="CATATTRELEMENT" type="CATATTRELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CATATTRELEMENTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="ACTIVITY" type="xsd:string" minOccurs="1"
+    			maxOccurs="1" />
+    		<xsd:element name="CATENTITYTYPE" type="xsd:string"
+    			minOccurs="1" maxOccurs="1" />
+            <xsd:element name="CATATTRIBUTECODE" type="xsd:string"
+    			minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="CATSEQ" type="xsd:string" minOccurs="1"
+    			maxOccurs="1" />
+    		<xsd:element name="CATDESCLIST" type="CATATTRDESCLISTTYPE"
+    			minOccurs="1" maxOccurs="1" />
+    	</xsd:sequence>
+	</xsd:complexType>    	
+	<xsd:complexType name="CATATTRDESCLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="CATDESCELEMENT" type="CATATTRDESCELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CATATTRDESCELEMENTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="ACTIVITY" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="NLSID" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="ATTRIBUTEDESCRIPTION" type="XMLTYPE" minOccurs="1" maxOccurs="1" />   		
+    	</xsd:sequence>
+    	</xsd:complexType>    	
+    	    	
+	<xsd:complexType name="CATVAMLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="CATVAMATTRELEMENT" type="CATVAMATTRELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="CATVAMATTRELEMENTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="ACTIVITY" type="xsd:string" minOccurs="1"
+    			maxOccurs="1" />
+    		<xsd:element name="CATENTITYTYPE" type="xsd:string"
+    			minOccurs="1" maxOccurs="1" />
+            <xsd:element name="CATATTRIBUTECODE" type="xsd:string"
+    			minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="CATCOLUMN" type="xsd:string"
+    			minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="CATSEQ" type="xsd:string" minOccurs="1"
+    			maxOccurs="1" />
+    		<xsd:element name="CATDESCLIST" type="CATATTRDESCLISTTYPE"
+    			minOccurs="1" maxOccurs="1" />
+    	</xsd:sequence>
+	</xsd:complexType>
+
+
+    <xsd:complexType name="COUNTRYLISTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="COUNTRYELEMENT" type="COUNTRYELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="COUNTRYELEMENTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="COUNTRYACTION" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="COUNTRY_FC" type="xsd:string" minOccurs="1" maxOccurs="1" />
+    		<xsd:element name="IMAGELIST" type="IMAGELISTTYPE" minOccurs="1" maxOccurs="1" />
+    	</xsd:sequence>
+    </xsd:complexType>
+    
+        <xsd:complexType name="IMAGELISTTYPE">
+        	<xsd:sequence>
+        		<xsd:element name="IMAGEELEMENT" type="IMAGEELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+        	</xsd:sequence>
+        </xsd:complexType>
+        
+        <xsd:complexType name="IMAGEELEMENTTYPE">
+        	<xsd:sequence>
+            <xsd:element name="IMAGEENTITYTYPE" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+            <xsd:element name="IMAGEENTITYID" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+        		<xsd:element name="ACTIVITY" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+        		<xsd:element name="PUBFROM" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+        		<xsd:element name="PUBTO" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+        		<xsd:element name="STATUS" type="xsd:string"
+        			minOccurs="1" maxOccurs="1" />
+        		<xsd:element name="IMAGEDESCRIPTION"
+        			type="xsd:string" minOccurs="1" maxOccurs="1">
+        		</xsd:element>
+        		<xsd:element name="MARKETINGIMAGEFILENAME"
+        			type="xsd:string" minOccurs="1" maxOccurs="1">
+        		</xsd:element>
+
+        	</xsd:sequence>
+        </xsd:complexType>
+
+
+
+     <xsd:complexType name="CATATTRIBUTELISTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="CATATTRIBUTEELEMENT" type="CATATTRIBUTEELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="CATATTRIBUTEELEMENTTYPE">
+    	<xsd:sequence>
+    		<xsd:element name="CATATTRIBUTEACTION" type="xsd:string"></xsd:element>
+    		<xsd:element name="CATATTRIBUTE" type="xsd:string"></xsd:element>
+    		<xsd:element name="NLSID" type="xsd:string"></xsd:element>
+    		<xsd:element name="CATATTRIBUTEVALUE" type="xsd:string"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+    
+     <xsd:complexType name="XMLTYPE" mixed="true">	
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+        	<xsd:element name="p" type="xsd:string"></xsd:element>
+        	<xsd:element name="ul" type="ULTYPE"></xsd:element>
+        	<xsd:element name="sup" type="SUPTYPE"></xsd:element>
+        </xsd:choice>
+        
+    </xsd:complexType>
+    
+    <xsd:complexType name="ULTYPE" mixed="true">
+    	<xsd:sequence>
+    		<xsd:element name="li" type="xsd:string" minOccurs="1" maxOccurs="unbounded"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+    
+
+    
+    <xsd:complexType name="SUPTYPE" mixed="true">
+    	<xsd:sequence>
+    		<xsd:element name="a" type="ATYPE" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+    	</xsd:sequence>
+    </xsd:complexType>
+
+	<xsd:complexType name="ATYPE" mixed="true">
+    	<xsd:attribute name="href" type="xsd:string" ></xsd:attribute>
+    </xsd:complexType>
+
+</xsd:schema>
+

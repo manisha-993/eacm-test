@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/SLEORGNPLNTCODE_UPDATE" elementFormDefault="qualified" xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/SLEORGNPLNTCODE_UPDATE">
+	
+
+	<xs:complexType name="SLEORGNPLNTCODE_UPDATETYPE">
+		<xs:sequence>
+			<xs:element name="DTSOFMSG" type="xs:string"></xs:element>
+			<xs:element name="ACTIVITY" type="xs:string"></xs:element>
+			<xs:element name="STATUS" type="xs:string"></xs:element>
+			<xs:element name="ENTITYTYPE" type="xs:string"></xs:element>
+			<xs:element name="ENTITYID" type="xs:string"></xs:element>
+			<xs:element name="COUNTRY_FC" type="xs:string"></xs:element>
+			<xs:element name="MODCATG" type="xs:string"></xs:element>
+			<xs:element name="PLNTCD" type="xs:string"></xs:element>
+			<xs:element name="SLEORG" type="xs:string"></xs:element>
+			<xs:element name="SLEORGGRP" type="xs:string"></xs:element>
+			<xs:element name="BHRELNO" type="xs:string"></xs:element>
+			<xs:element name="LEGACYSLEORG" type="xs:string"></xs:element>
+			<xs:element name="LEGACYPLNTCD" type="xs:string"></xs:element>
+		</xs:sequence>
+
+	</xs:complexType>
+	<xs:element name="SLEORGNPLNTCODE_UPDATE" type="SLEORGNPLNTCODE_UPDATETYPE"/>
+</xs:schema>

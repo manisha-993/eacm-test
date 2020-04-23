@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/PRODUCT_PRICE_UPDATE" elementFormDefault="qualified" xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/PRODUCT_PRICE_UPDATE">
+      <xsd:complexType name="PRODUCTLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="PRODUCTELEMENT" type="PRODUCTELEMENTTYPE" minOccurs="1" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PRODUCTELEMENTTYPE">
+		<xsd:sequence>
+            <xsd:element name="PRODUCTENTITYTYPE" type="xsd:string" maxOccurs="1" minOccurs="1">
+			</xsd:element>
+            <xsd:element name="PRODUCTENTITYID" type="xsd:string" maxOccurs="1" minOccurs="1">
+			</xsd:element>
+            <xsd:element name="PRICEPOINTENTITYTYPE" type="xsd:string" maxOccurs="1" minOccurs="1">
+			</xsd:element>
+            <xsd:element name="PRICEPOINTENTITYID" type="xsd:string" maxOccurs="1" minOccurs="1"></xsd:element>
+            <xsd:element name="MACHTYPE" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="MODEL" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="FEATURECODE" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FROMMACHTYPE" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FROMMODEL" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FROMFEATURECODE" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="SEOID" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="MKTGNAME" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="INVNAME" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="PRICELIST" type="PRICELISTTYPE"
+				minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+      <xsd:complexType name="PRICELISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="price" type="price_type" minOccurs="1" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="price_type">
+		<xsd:sequence>
+            <xsd:element name="offering" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+           <xsd:element name="startdate" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+           <xsd:element name="currency" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+           <xsd:element name="cabletype" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+           <xsd:element name="cableid" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+           <xsd:element name="releasets" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+           <xsd:element name="pricevalue" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+           <xsd:element name="pricepointtype" type="xsd:string" minOccurs="0"
+				maxOccurs="1" />
+           <xsd:element name="pricepointvalue" type="xsd:string" minOccurs="0"
+				maxOccurs="1" />
+           <xsd:element name="country" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+           <xsd:element name="pricetype" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />				
+           <xsd:element name="onshore" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+           <xsd:element name="enddate" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+           <xsd:element name="pricevalueusd" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+           <xsd:element name="factor" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />				
+		</xsd:sequence>
+		
+	</xsd:complexType>
+
+	<xsd:element name="PRODUCT_PRICE_UPDATE" type="PRODUCT_PRICE_UPDATETYPE"/>
+
+	<xsd:complexType name="PRODUCT_PRICE_UPDATETYPE">
+		<xsd:sequence>
+
+            <xsd:element name="DTSOFMSG" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
+            <xsd:element name="ACTIVITY" type="xsd:string" minOccurs="1"
+				maxOccurs="1" />
+            <xsd:element name="PDHDOMAIN" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="PRODUCTCATEGORY" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="PRODUCTOFFERINGTYPE" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="PRODUCTLIST" type="PRODUCTLISTTYPE"
+				minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
+
