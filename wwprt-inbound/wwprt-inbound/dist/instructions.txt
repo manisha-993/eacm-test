@@ -1,0 +1,53 @@
+Copy all files from ea6:
+/home/opicmadm/lucas/wwprt-inbound
+
+Configure the following files:
+
+log.properties:
+com.ibm.eannounce.wwprt.level = FINE <- Change to INFO for less logging data
+
+mq.eacm.properties:
+Defines the client properties for MQ
+
+wwprt-inbound.properties
+Defines database access, and the tables names/schemas
+
+subscriptions.txt
+List of e-mails separated by lines that will receive notifications
+
+Optionally, copy the above files from bh1 and adapt to the new environment:
+/home/opicmadm/wwprt-inbound
+
+
+Directory structure:
+libs/ - required java libraries
+log.properties - defines logging behavior
+
+mq.eacm.properties - defines MQ client properties
+mq.test.out.properties - optional (used for local testing)
+
+PRICE.sql - used to create a temporary table used to merge data
+report.htm - HTML template used to build the notification e-mail
+subscriptions.txt - list of e-mails to be notified
+wwprt-inbound.jar - main jar file
+wwprt-inbound.properties - defines database access, table names and smtp for notifications
+
+
+Start in background script: ./start
+nohup /usr/java6_64/bin/java -Djava.util.logging.config.file=log.properties -cp wwprt-inbound.jar:libs/*:/home/opicmdb2/sqllib/java/*:/usr/mqm/java/lib/* com.ibm.eannounce.wwprt.WWPRTInbound &
+
+In bold are the environment dependent requirements.
+
+Stop script: ./stop
+rm .lock
+
+Test using a local file:
+./test local-file.xml
+
+
+Regards,
+Lucas Ribeiro Goraieb
+IT Specialist	Application Services Brazil
+Phone: +55 44 3031 2045
+Mobile: +55 44 8801 8885
+E-mail: lucasrg@br.ibm.com	E-Announce Team

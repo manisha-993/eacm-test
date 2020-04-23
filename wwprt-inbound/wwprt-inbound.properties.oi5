@@ -1,0 +1,44 @@
+#DATABASE SERVER
+server = b01cxnt12080.gho.pok.ibm.com:60001
+database = bhods 
+username = opicmadm
+password = one9help 
+
+#TABLE NAMES
+table.WWPRTXML = PRICE.WWPRTXML
+table.PRICE = PRICE.PRICE
+table.TEMPPRICE = PRICE.TEMP_PRICE
+
+#NOTIFICATION
+mail.smtp.host=9.56.224.216
+mail.sender=opicmadm@b01cxnt12080.gho.pok.ibm.com
+
+#INTERVAL
+#interval=120000
+ 
+#LOG 0 - INFO, 1 - FINE, 2 - DEBUG  
+log.Level = 2
+/home/opicmadm/wwprt-inbound =>vi wwprt-inbound.properties
+"wwprt-inbound.properties" 20 lines, 401 characters 
+#DATABASE SERVER
+server = b01cxnt12080.gho.pok.ibm.com:60001
+database = bhods
+username = opicmadm
+password = one9help
+
+#TABLE NAMES
+table.WWPRTXML = PRICE.WWPRTXML
+table.PRICE = PRICE.PRICE
+table.TEMPPRICE = PRICE.TEMP_PRICE
+
+#NOTIFICATION
+mail.smtp.host=9.56.224.216
+mail.sender=opicmadm@b01cxnt12080.gho.pok.ibm.com
+
+#INTERVAL
+#interval=120000
+#add MLP,CON,SWS to support DSW price
+price.offeringtypes=PID,EEE,OSP,MLP,CON,SWS
+
+#LOG 0 - INFO, 1 - FINE, 2 - DEBUG
+log.Level = 0

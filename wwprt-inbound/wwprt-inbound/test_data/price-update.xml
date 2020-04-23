@@ -1,0 +1,75 @@
+<wwprttxn type="price" id="UPDATETEST" xsi:noNamespaceSchemaLocation="price.xsd">
+	<!-- Reference Price elements with price point -->
+	<!-- Old Model -->
+	<price type="I" xsi:type="referencePriceElementType">
+		<offering>1234</offering>
+		<startdate>2011-01-02</startdate>
+		<currency>USD</currency>
+		<cabletype>ANN</cabletype>
+		<cableid>123456789012</cableid>
+		<releasets>2011-01-01T13:57:12.456</releasets>
+		<pricevalue>12345678901.12</pricevalue>
+		<pricepointtype>MOD</pricepointtype>
+		<pricepointvalue>123</pricepointvalue>
+		<country>US</country>
+		<pricetype>PUR</pricetype>
+		<onshore>true</onshore>
+		<enddate>2011-05-16</enddate>
+		<pricevalueusd>123.456</pricevalueusd>
+		<factor>1.0</factor>
+	</price>
+	<!-- New Model -->
+	<price type="I" xsi:type="referencePriceElementType">
+		<offering>1234</offering>
+		<startdate>2011-05-17</startdate>
+		<currency>USD</currency>
+		<cabletype>ANN</cabletype>
+		<cableid>123456789012</cableid>
+		<releasets>2011-01-01T13:57:12.456</releasets>
+		<pricevalue>12345678901.12</pricevalue>
+		<pricepointtype>MOD</pricepointtype>
+		<pricepointvalue>123</pricepointvalue>
+		<country>US</country>
+		<pricetype>PUR</pricetype>
+		<onshore>true</onshore>
+		<enddate>9999-12-31</enddate>
+		<pricevalueusd>234.567</pricevalueusd>
+		<factor>1.0</factor>
+	</price>
+	<!-- Old Feature -->
+	<price type="I" xsi:type="referencePriceElementType">
+		<offering>1234</offering>
+		<startdate>2011-01-02</startdate>
+		<currency>USD</currency>
+		<cabletype>GPA</cabletype>
+		<cableid>123456789012</cableid>
+		<releasets>2011-05-05T08:13:12.456789</releasets>
+		<pricevalue>12345678901.12</pricevalue>
+		<pricepointtype>FEA</pricepointtype>
+		<pricepointvalue>1234</pricepointvalue>
+		<country>US</country>
+		<pricetype>MMO</pricetype>
+		<onshore>false</onshore>
+		<enddate>2011-05-16</enddate>
+		<pricevalueusd>123.456</pricevalueusd>
+		<factor>1.0</factor>
+	</price>
+	<!-- New Feature -->
+	<price type="I" xsi:type="referencePriceElementType">
+		<offering>1234</offering>
+		<startdate>2011-05-17</startdate>
+		<currency>USD</currency>
+		<cabletype>GPA</cabletype>
+		<cableid>123456789012</cableid>
+		<releasets>2011-05-05T08:13:12.456789</releasets>
+		<pricevalue>12345678901.12</pricevalue>
+		<pricepointtype>FEA</pricepointtype>
+		<pricepointvalue>1234</pricepointvalue>
+		<country>US</country>
+		<pricetype>MMO</pricetype>
+		<onshore>false</onshore>
+		<enddate>9999-12-31</enddate>
+		<pricevalueusd>345.678</pricevalueusd>
+		<factor>1.0</factor>
+	</price>
+</wwprttxn>

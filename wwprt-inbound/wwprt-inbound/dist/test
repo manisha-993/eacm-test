@@ -1,0 +1,1 @@
+/usr/java6/bin/java -Djava.util.logging.config.file=log.test.properties -cp wwprt-inbound.jar:libs/*:/home/opicmdb2/sqllib/java/*:/usr/mqm/java/lib/* com.ibm.eannounce.wwprt.WWPRTInbound test ${1}

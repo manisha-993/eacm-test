@@ -1,0 +1,1 @@
+del .processor.lock
