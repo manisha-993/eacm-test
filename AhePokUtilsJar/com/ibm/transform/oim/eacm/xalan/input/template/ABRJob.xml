@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	(C) Copyright IBM Corp. 2005, 2007  All Rights Reserved.
+	
+	$Log: ABRJob.xml,v $
+	Revision 1.2  2008/08/26 21:09:40  wendy
+	Added outputting a message for the user
+	
+	Revision 1.1  2007/03/07 00:15:01  chris
+	XML input documents for ABRJob and the generalized ExcelReport abr
+	
+	
+-->
+<ABRJob jobNumber="(1)" timestamp="2007-03-05-08.45.00.000000">
+	<ABRCode className="com.ibm.FUBAR" revision="$Revision 1.2 $" />
+
+	<EntityDescription entityType="FUBAR" entityID="123">
+		<AttributeDescription code="FUBAR">meta long description of attribute code</AttributeDescription>
+		Meta entity long description
+	</EntityDescription>
+
+
+	<UserProfile userToken="fubar@us.ibm.com">
+		<ProfileEnterprise code="L2">
+		enterprise description
+		</ProfileEnterprise>
+		<Workgroup wid="123">
+		workgroup Name
+		</Workgroup>
+		<ReadLanguage nlsID="1">
+		selected read language description
+		</ReadLanguage>
+		<WriteLanguage nlsID="1">
+		selected write language description
+		</WriteLanguage>
+		<Role code="roleCode">roleDescription</Role>
+	</UserProfile>
+
+	<DGSubmit>dgSubmitString</DGSubmit>
+	<Message>msg</Message>
+</ABRJob>

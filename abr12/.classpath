@@ -6,5 +6,14 @@
 	<classpathentry kind="var" path="WAS_50_PLUGINDIR/mqjms/Java/lib/com.ibm.mq.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/AhePokUtilsJar"/>
 	<classpathentry kind="lib" path="source/poi-2.5.1-final-20040804.jar"/>
+	<classpathentry kind="lib" path="C:/WangLan/ProjectCode/Jar/abr_lib/com.ibm.mq.jar"/>
+	<classpathentry kind="lib" path="C:/WangLan/ProjectCode/Jar/abr_lib/com.ibm.mq.jmqi.jar"/>
+	<classpathentry kind="lib" path="C:/WangLan/ProjectCode/Jar/abr_lib/connector.jar"/>
+	<classpathentry kind="lib" path="C:/WangLan/ProjectCode/Jar/abr_lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/WangLan/ProjectCode/Jar/abr_lib/middleware95.jar"/>
+	<classpathentry kind="lib" path="C:/WangLan/ProjectCode/Jar/abr_lib/OIMJavaClient_fix.jar"/>
+	<classpathentry kind="lib" path="C:/WangLan/ProjectCode/Jar/abr_lib/OIMSimpCHW.jar"/>
+	<classpathentry kind="lib" path="C:/WangLan/ProjectCode/Jar/abr_lib/poi-3.0.1-FINAL-20070705.jar"/>
+	<classpathentry kind="lib" path="C:/WangLan/ProjectCode/Jar/abr_lib/PokUtils.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

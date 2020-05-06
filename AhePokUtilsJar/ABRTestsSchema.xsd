@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/eacm/ABRTests" xmlns="http://w3.ibm.com/eacm/ABRTests">
+	<xsd:simpleType name="acName">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[A-Z]+[A-Z0-9_]*" />
+			<xsd:minLength value="1"></xsd:minLength>
+			<xsd:maxLength value="32"></xsd:maxLength>
+			<xsd:whiteSpace value="collapse"></xsd:whiteSpace>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="eName">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[_A-Z0-9]+" />
+			<xsd:minLength value="1"></xsd:minLength>
+			<xsd:maxLength value="32"></xsd:maxLength>
+			<xsd:whiteSpace value="collapse"></xsd:whiteSpace>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="mName">
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="[a-zA-Z0-9_-]+" />
+			<xsd:minLength value="1"></xsd:minLength>
+			<xsd:maxLength value="32"></xsd:maxLength>
+			<xsd:whiteSpace value="collapse"></xsd:whiteSpace>
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="functionType">
+		<xsd:attribute name="method" use="required" type="mName"></xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="acType">
+		<xsd:attribute name="attributecode" use="required" type="acName"></xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:element name="text" nillable="true" type="functionType">
+		<xsd:annotation>The string result of the method call will be put in a CDATA child of this element.</xsd:annotation>
+	</xsd:element>
+
+	<xsd:element name="xml" type="functionType" nillable="true">
+		<xsd:annotation>This will parse the String returned by the method and append the root node to the xml node so you can manipulate it in a report.</xsd:annotation>
+	</xsd:element>
+
+	<xsd:element name="test" nillable="true">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="functionType">
+					<xsd:attribute name="result" type="xsd:boolean" use="required" />
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="filter" type="xsd:string">
+		<xsd:annotation>This is not implemented at this time. It's type needs to be defined. I think it could be useful to filter on flag or date value(s). Also may wan't to handle filtering based on a relation</xsd:annotation>
+	</xsd:element>
+
+	<xsd:element name="group" nillable="true">
+		<xsd:complexType>
+			<xsd:sequence minOccurs="0" maxOccurs="1">
+				<xsd:element ref="attributesubset"></xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="entityType" use="required" type="eName"></xsd:attribute>
+			<xsd:attribute name="rootEntityType" type="xsd:boolean" use="optional" default="true" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="data">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="unbounded" minOccurs="1" ref="group" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="abrtests">
+		<xsd:complexType>
+			<xsd:choice maxOccurs="unbounded">
+				<xsd:element ref="text" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+				<xsd:element ref="xml" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+				<xsd:element ref="test" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+				<xsd:element ref="data" minOccurs="0" maxOccurs="1" />
+			</xsd:choice>
+			<xsd:attribute name="abrclass" type="xsd:string" use="optional">
+				<xsd:annotation>This is more for documentation purposes at this time. The xml is calling functions on the class so it is tightly coupled. May at some point use this to create the instance of the class.</xsd:annotation>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="include" type="acType">
+		<xsd:annotation>Only the included attributes will be pulled (if attribute is populated).</xsd:annotation>
+	</xsd:element>
+
+	<xsd:element name="exclude" type="acType">
+		<xsd:annotation>This is not implemented at the moment. Used if it is more convenient to exclude a few attributes than to include most but not all attributes.</xsd:annotation>
+	</xsd:element>
+
+	<xsd:element name="attributesubset">
+		<xsd:complexType>
+			<xsd:annotation>Used when not all attributes are needed</xsd:annotation>
+			<xsd:choice>
+				<xsd:annotation>You cannot have both excludes and includes</xsd:annotation>
+				<xsd:element maxOccurs="unbounded" minOccurs="1" ref="include"></xsd:element>
+				<xsd:element maxOccurs="unbounded" minOccurs="1" ref="exclude"></xsd:element>
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

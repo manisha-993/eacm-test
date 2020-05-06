@@ -1,0 +1,4369 @@
+<!--
+    (C) Copyright IBM Corp. 2007,2008  All Rights Reserved.
+    
+    $Log: Configuration.xml,v $
+    Revision 1.40  2018/04/10 07:50:41  dlwlan
+    Story 1818093 - Warranty Report update schema to opicm
+
+    Revision 1.39  2018/04/09 06:46:14  dlwlan
+    Story 1818093 - Warranty Report
+
+    Revision 1.38  2017/08/01 12:23:51  wangyul
+    Work Item 1660374 Monthly Query to Support Data EnablementMetrics /Reporting
+
+    Revision 1.37  2017/07/05 09:22:48  wangyul
+    Work Item 1660374 Monthly Query to Support Data EnablementMetrics /Reporting
+
+    Revision 1.36  2017/06/12 09:24:58  wangyul
+    SWPRELOADABR change CSV to EXCEL report
+
+    Revision 1.35  2017/02/15 06:45:06  wangyul
+    Story 1629925?CSU flags report
+
+    Revision 1.34  2016/12/28 08:52:50  wangyul
+    Story 1562723 EACM - Add new attribute to Model to indicate pre-load SW support and generate the ODS report update
+
+    Revision 1.33  2016/06/07 18:15:12  stimpsow
+    point to opicmods instead of bhods
+
+    Revision 1.32  2016/06/06 13:37:37  stimpsow
+    Story 1527844 Update to existing Storage ABR - add view to STORAGEMTABR
+    
+    Revision 1.31  2015/12/04 09:14:09  wangyul
+    Task1430425 - Storage Extract report needs to be able to run under the announcement and model entities - development
+
+    Revision 1.30  2015/09/22 13:05:16  wangyul
+    Task 1386798 - Storage SS report for a given Machine Type
+
+    Revision 1.29  2015/06/01 13:57:54  wangyul
+    RCQ00276438-WI /RCQ00188990-RQ Storage SS
+
+    Revision 1.29  2015/06/01 21:46:15  luis
+ 	RCQ00276438-WI /RCQ00188990-RQ Storage SS - Add STORAGEABR for EXTSTORAGE
+    
+    Revision 1.28  2015/01/29 12:54:07  stimpsow
+    RCQ00337768-RQ Report for Price Calc limits to 65K
+
+    Revision 1.27  2014/07/20 02:43:52  wendy
+    copy SG enterprise to LN enterprise
+
+    Revision 1.26  2013/12/11 09:01:06  liuweimi
+    TMFAVAIL Report
+
+    Revision 1.25  2013/03/19 13:06:10  liuweimi
+    New RCQ number: RCQ243134 for change - RCQ00185731-RQ EACM feature code report to  support Blue Harmony deployment in China and Germany
+
+    Revision 1.24  2012/07/06 02:30:31  liuweimi
+    RCQ00185731-RQ EACM feature code report to  support Blue Harmony deployment in China and Germany
+
+    Revision 1.23  2011/02/02 19:06:25  mmiotto
+    Added UNSPSCCD reports for LSEO and MODEL
+
+    Revision 1.22  2009/01/12 21:58:27  wendy
+    spec updates SG FS RPT DRR SS 20090112.doc
+
+    Revision 1.21  2008/11/06 15:32:57  wendy
+    Removed / from tab names
+
+    Revision 1.20  2008/11/05 13:53:29  wendy
+    Change DRR rpt mapping
+
+    Revision 1.19  2008/11/04 16:18:53  wendy
+    CQ00009172-RQ  MN34942323:  DRR report not working
+
+    Revision 1.18  2008/10/10 17:40:47  wendy
+    Added more EXTPRCCALCRPT ABRs for LA CTO MTP
+
+    Revision 1.17  2008/10/09 20:51:43  yang
+    quick password set for beta2 testing
+
+    Revision 1.16  2008/09/22 15:55:25  wendy
+    CQ00006066-WI updates
+
+    Revision 1.15  2008/09/03 18:19:51  wendy
+    split hw/sw fc wu rpts into 6
+
+    Revision 1.14  2008/08/26 21:59:17  wendy
+    Remove bad character
+
+    Revision 1.13  2008/08/26 21:49:01  wendy
+    Add support for RQ0611073018 - XCC GX SR - Feature Code Where Used Report
+
+    Revision 1.12  2008/01/24 22:15:48  yang
+    adding AUDIENCE back to LSEO detailed pricing
+    
+    Revision 1.11  2008/01/23 21:15:38  yang
+    removing audience from assortmodrpt
+    
+    Revision 1.10  2008/01/21 22:21:34  yang
+    removed attribute: audience from LSEO Detail Pricing Report
+    
+    Revision 1.9  2008/01/11 01:25:27  yang
+    Change the chemaname back to PRICE
+    
+    Revision 1.8  2008/01/08 01:37:27  yang
+    Change the view schema name from PRICE to 
+    
+    Revision 1.7  2007/12/26 13:26:37  chris
+    Delayed Queue Report
+    
+    Revision 1.6  2007/10/29 15:06:07  chris
+    Incomplete Work
+    
+    Revision 1.5  2007/07/16 17:37:41  chris
+    Fixes for unit test
+    
+    Revision 1.4  2007/07/13 15:57:19  chris
+    Added view and column information
+    
+    Revision 1.3  2007/07/03 16:45:27  chris
+    some more tweaks
+    
+    Revision 1.2  2007/07/03 13:08:46  chris
+    changes for pricing reports
+    
+    Revision 1.1  2007/03/07 00:21:17  chris
+    new
+    
+    
+-->
+<Config xmlns="http://w3.ibm.com/eacm/XSLReportABRConfiguration"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://w3.ibm.com/eacm/XSLReportABRConfiguration XSLReportABRConfiguration ">
+	<Enterprise code="L2">
+		<Entity type="CCTO">
+			<Attribute code="UNLOCKABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/UnlockReport.xsl">
+					<XSLParam name="unlockCode">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.Unlock" />
+					</XSLParam>
+					<XSLParam name="unlockAction">CCTOABR002UNLOCK</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="CCTOABR002">
+				<Style
+					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/CCTOABR002.xsl">
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.lenovo.abr.CCTOABR002">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="setVEName">
+												<Obj>EXCCTOABR002</Obj>
+											</Invoke>
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="CTO">
+			<Attribute code="UNLOCKABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/UnlockReport.xsl">
+					<XSLParam name="unlockCode">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.Unlock" />
+					</XSLParam>
+					<XSLParam name="unlockAction">CTOABR003UNLOCK</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="CTOABR003">
+				<Style
+					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/CTOABR003.xsl">
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.lenovo.abr.CTOABR003">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="setVEName">
+												<Obj>EXCTOABR003</Obj>
+											</Invoke>
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="CVAR">
+			<Attribute code="UNLOCKABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/UnlockReport.xsl">
+					<XSLParam name="unlockCode">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.Unlock" />
+					</XSLParam>
+					<XSLParam name="unlockAction">CVARABR002UNLOCK</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="CVARABR002">
+				<Style
+					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/CVARABR002.xsl">
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.lenovo.abr.CVARABR002">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="setVEName">
+												<Obj>EXCVARABR002</Obj>
+											</Invoke>
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="VAR">
+			<Attribute code="UNLOCKABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/UnlockReport.xsl">
+					<XSLParam name="unlockCode">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.Unlock" />
+					</XSLParam>
+					<XSLParam name="unlockAction">VARABR004UNLOCK</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="VARABR003">
+				<Style
+					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/VARABR003.xsl">
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.lenovo.abr.VARABR003">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="setVEName">
+												<Obj>EXVARABR003</Obj>
+											</Invoke>
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="VARABR004">
+				<Style
+					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/VARABR004.xsl">
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.lenovo.abr.VARABR004">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="setVEName">
+												<Obj>EXVARABR004</Obj>
+											</Invoke>
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="VARDDABR001">
+				<Style xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/DDABR.xsl">
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.lenovo.abr.DDABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="setVEName">
+												<Obj>EXVARDDABR</Obj>
+											</Invoke>
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="VARDDWWMIABR002">
+				<Style xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/WWMIABR.xsl">
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.lenovo.abr.WWMIABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="setVEName">
+												<Obj>EXVARWWMIABR</Obj>
+											</Invoke>
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="OF">
+			<Attribute code="OFABR001">
+				<Style xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/OFABR001.xsl">
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.lenovo.abr.OFABR001">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="setVEName">
+												<Obj>EXOFABR001</Obj>
+											</Invoke>
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="OFABR002">
+				<Style xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/OFABR002.xsl">
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.lenovo.abr.OFABR002">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="setVEName">
+												<Obj>EXOFABR001</Obj>
+											</Invoke>
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="OFDDABR001">
+				<Style xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/DDABR.xsl">
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.lenovo.abr.DDABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="setVEName">
+												<Obj>EXOFDDABR</Obj>
+											</Invoke>
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+
+								</Obj>
+							</Invoke>
+						</Obj>
+
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="OFDDWWMIABR002">
+				<Style xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/WWMIABR.xsl">
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.lenovo.abr.WWMIABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="setVEName">
+												<Obj>EXOFWWMIABR</Obj>
+											</Invoke>
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="CSOL">
+			<Attribute code="CSOLABR002">
+				<Style
+					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/CSOLABR002.xsl">
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.lenovo.abr.CSOLABR002">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="setVEName">
+												<Obj>EXCSOLABR002</Obj>
+											</Invoke>
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="SBB">
+			<Attribute code="SBBABR001">
+				<Style
+					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/SBBABR001.xsl">
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.lenovo.abr.SBBABR001">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="setVEName">
+												<Obj>EXSBBABR001</Obj>
+											</Invoke>
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+	</Enterprise>
+	<Enterprise code="SG">
+		<Connection id="PDH">
+			<UserID>opicmadm</UserID>
+			<Password>mice8chs</Password>
+			<Database>opicmpdh</Database>
+			<!-- jdbc4 format required -->
+			<!-- DatabaseURL>jdbc:db2:pdhalias</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
+			<DatabaseURL>jdbc:db2://127.0.0.1:50001/PDHALIAS</DatabaseURL>
+			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
+		</Connection>
+		<Connection id="ODS">
+			<UserID>opicmadm</UserID>
+			<Password>one2help</Password>
+			<Database>bldods</Database>
+			<!-- jdbc4 format required -->
+			<!-- DatabaseURL>jdbc:db2:bldods</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
+			<DatabaseURL>jdbc:db2://b01cxnp11082.gho.pok.ibm.com:3702/OPICMODS</DatabaseURL>
+			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
+		</Connection>
+		<Entity type="EXTSTORAGE">
+			<Attribute code="VOLUMECOUNTABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl" zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>VOLUMECOUNTABR report extract</DGTitle>
+					<XSLParam name="dgTitle">VOLUMECOUNTABR report extract</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>RPQFEATURECOUNT</Obj>
+										<Obj>SELECT * FROM price.VRPQFEATURECOUNT WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>ANNCOUNT</Obj>
+										<Obj>SELECT * FROM price.VANNCOUNT WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">	                                                              
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="WARRABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl" zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>WARRABR report extract</DGTitle>
+					<XSLParam name="dgTitle">Warranty report extract</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">							
+									<Invoke method="addTabForSQL">
+										<Obj>WARRANTYRPT</Obj>
+										<Obj>SELECT * FROM OPICM.VWARRANTYRPT WITH UR</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">	                                                              
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="STORAGEABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>Announcement extract</DGTitle>
+					<XSLParam name="dgTitle">Announcement extract</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>ANNOUNCEMENT</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTANNOUNCEMENT</BaseSQL>
+												<InsertAttribute code="ANNNUMBER" isList="true"
+													isNumber="true"> annnumber IN (?)</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>MODEL</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTMODEL</BaseSQL>
+												<InsertAttribute code="ANNNUMBER" isList="true"
+													isNumber="true"> annnumber IN (?)</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>FEATURE</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTFEATURE</BaseSQL>
+												<InsertAttribute code="ANNNUMBER" isList="true"
+													isNumber="true"> annnumber IN (?)</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>PRODSTRUCT</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTPRODSTRUCT</BaseSQL>
+												<InsertAttribute code="ANNNUMBER" isList="true"
+													isNumber="true"> annnumber IN (?)</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="STORAGEMTABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>Machine Type extract</DGTitle>
+					<XSLParam name="dgTitle">Machine Type extract</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>ANNOUNCEMENT</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTMTANNOUNCEMENT</BaseSQL>
+												<InsertAttribute code="MACHTYPEATR"> machtypeatr = '?'
+												</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>MODEL</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTMTMODEL</BaseSQL>
+												<InsertAttribute code="MACHTYPEATR"> machtypeatr = '?'
+												</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>FEATURE</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTMTFEATURE</BaseSQL>
+												<InsertAttribute code="MACHTYPEATR"> machtypeatr = '?'
+												</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>PRODSTRUCT</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTMTPRODSTRUCT</BaseSQL>
+												<InsertAttribute code="MACHTYPEATR"> machtypeatr = '?'
+												</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>GEODATES</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTMTGEODATES</BaseSQL>
+												<InsertAttribute code="MACHTYPEATR"> machtypeatr = '?'
+												</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="MODEL">
+			<Attribute code="STORAGEMTABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>Machine Type extract</DGTitle>
+					<XSLParam name="dgTitle">Machine Type extract</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>ANNOUNCEMENT</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTMTANNOUNCEMENT</BaseSQL>
+												<InsertAttribute code="MACHTYPEATR"> machtypeatr = '?'
+												</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>MODEL</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTMTMODEL</BaseSQL>
+												<InsertAttribute code="MACHTYPEATR"> machtypeatr = '?'
+												</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>FEATURE</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTMTFEATURE</BaseSQL>
+												<InsertAttribute code="MACHTYPEATR"> machtypeatr = '?'
+												</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>PRODSTRUCT</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTMTPRODSTRUCT</BaseSQL>
+												<InsertAttribute code="MACHTYPEATR"> machtypeatr = '?'
+												</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>GEODATES</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTMTGEODATES</BaseSQL>
+												<InsertAttribute code="MACHTYPEATR"> machtypeatr = '?'
+												</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>									
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="SWPRELOADABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl" zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>SWPRELOADABR report-PRELOADSWINDC extract</DGTitle>
+					<XSLParam name="dgTitle">SWPRELOADABR report-PRELOADSWINDC extract</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>MODEL</Obj>
+										<Obj>SELECT * FROM price.VPRELOADEDSW WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">	                                                              
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="CSWREPORT">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>CSWREPORT report extract</DGTitle>
+					<XSLParam name="dgTitle">CSWREPORT report extract
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">
+									<Invoke method="addTabForSQL">
+										<Obj>MODEL</Obj>
+										<Obj>SELECT * FROM price.CSWREPORT</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="ANNOUNCEMENT">
+			<Attribute code="STORAGEABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>Announcement extract</DGTitle>
+					<XSLParam name="dgTitle">Announcement extract</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>ANNOUNCEMENT</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTANNOUNCEMENT</BaseSQL>
+												<InsertAttribute code="ANNNUMBER" isList="true"
+													isNumber="true"> annnumber IN (?)</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>MODEL</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTMODEL</BaseSQL>
+												<InsertAttribute code="ANNNUMBER" isList="true"
+													isNumber="true"> annnumber IN (?)</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>FEATURE</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTFEATURE</BaseSQL>
+												<InsertAttribute code="ANNNUMBER" isList="true"
+													isNumber="true"> annnumber IN (?)</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="addTabForSQL">
+										<Obj>PRODSTRUCT</Obj>
+										<Obj>
+											<DynamicSQL>
+												<BaseSQL>SELECT * FROM price.VSTEXTPRODSTRUCT</BaseSQL>
+												<InsertAttribute code="ANNNUMBER" isList="true"
+													isNumber="true"> annnumber IN (?)</InsertAttribute>
+											</DynamicSQL>
+										</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="EXTPRCCALCRPT">
+			<Attribute code="SEOBUNDLERPTABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>PriceCalc - Bundle LSEO Detail Pricing Report</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Bundle LSEO Detail Pricing
+						Report
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>SEOBUNDLERPT</Obj>
+										<Obj>SELECT * FROM OPICM.SEOBUNDLERPT WITH UR</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRCCALCSEORPT_USCAABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>PriceCalc - Custom Option SEO Report for US only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Custom Option SEO Report for US
+						only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>PRCCALCSEORPT_USCA</Obj>
+										<Obj>SELECT * FROM OPICM.PRCCALCSEORPT_USCA WHERE
+											COUNTRYLIST='US' WITH UR
+										</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRCCALCSEORPT_USCA1ABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>PriceCalc - Custom Option SEO Report for CA only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Custom Option SEO Report for CA
+						only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>PRCCALCSEORPT_USCA</Obj>
+										<Obj>SELECT * FROM OPICM.PRCCALCSEORPT_USCA WHERE
+											COUNTRYLIST='CA' WITH UR
+										</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRICECALCCOSTABLESABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>PriceCalc - Features Report for US only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Features Report for US only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>PRICECALCCOSTABLES</Obj>
+										<Obj>SELECT * FROM OPICM.PRICECALCCOSTABLES WHERE COUNTRYLIST
+											= 'US' WITH UR
+										</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRICECALCCOSTABLES1ABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>PriceCalc - Features Report for CA only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Features Report for CA only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>PRICECALCCOSTABLES</Obj>
+										<Obj>SELECT * FROM OPICM.PRICECALCCOSTABLES WHERE COUNTRYLIST
+											= 'CA' WITH UR
+										</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="UNIQUEMTMPRICECALCABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>PriceCalc - MT and Model Report for US only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - MT and Model Report for US only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>UNIQUEMTMPRICECALC</Obj>
+										<Obj>SELECT * FROM OPICM.UNIQUEMTMPRICECALC WITH UR</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<!-- Previous attributes use ODS and opicm tables. The following use PDH 
+				and price tables -->
+			<Attribute code="PRCMTMABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>PriceCalc - MT and Model Report - xSeries</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - MT and Model Report - xSeries
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">
+									<Invoke method="addTabForSQL">
+										<Obj>MTM</Obj>
+										<Obj>SELECT * FROM price.PRCMTM WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRCBUNDLEABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>PriceCalc - Bundle LSEO Detail Pricing Report</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Bundle LSEO Detail Pricing
+						Report
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">
+									<Invoke method="addTabForSQL">
+										<Obj>BUNDLE</Obj>
+										<Obj>SELECT * FROM price.PRCBUNDLE WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRCFEATUREABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>PriceCalc - Features Report - US and CA</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Features Report - US and CA
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">
+									<Invoke method="addTabForSQL">
+										<Obj>FEATURE</Obj>
+										<Obj>SELECT * FROM price.PRCFEATURE WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<!-- added for new feature report - only for CH and only for GR -->
+			<Attribute code="PRCFEATUREAPABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>PriceCalc - Features Report for China only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Features Report for China only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">
+									<Invoke method="addTabForSQL">
+										<Obj>FEATURE</Obj>
+										<Obj>SELECT * FROM PRICE.PRCFEATUREAP WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRCFEATUREEMEAABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>PriceCalc - Features Report for Germany only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Features Report for Germany
+						only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">
+									<Invoke method="addTabForSQL">
+										<Obj>FEATURE</Obj>
+										<Obj>SELECT * FROM PRICE.PRCFEATUREEMEA WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="TMFAVAILREQSETUP">
+			<Attribute code="TMFAVAILRPTSTATUS">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>TMF AVAIL Report</DGTitle>
+					<XSLParam name="dgTitle">TMF AVAIL Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>TMFAVAIL</Obj>
+										<Obj>SELECT * FROM PRICE.TMFAVAIL WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="TMFAVAILLORPTSTATUS">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>TMF AVAIL Report</DGTitle>
+					<XSLParam name="dgTitle">TMF AVAIL LAST ORDER Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>TMFLASTORDER</Obj>
+										<Obj>SELECT * FROM PRICE.TMFLASTORDER WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="PRCRPTREQ">
+			<Attribute code="PRICEREPORTABR">
+				<SelectionAttribute code="PRRTYPE">
+					<Option code="PRR01">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>TM to SEO Cross Reference</DGTitle>
+							<DGClass>PRR01</DGClass>
+							<XSLParam name="dgTitle">TM to SEO Cross Reference</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Report</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT
+															MACHINETYPE,MODEL,MODELPRICEFILENAME,WWSEOSEOID,WWSEOPRICEFILENAME,WWMASTERINDEX,SPECIALBID,LSEOSEOID,AUDIENCE,PLANNINGRELEVANT,PRICEDINDICATOR,ZEROPRICEDINDICATOR,SAPASSORTMENTMODULE,OFFERINGCOUNTRY,LSEOUNPUBLISHDATETARGET
+															FROM PRICE.TMSEOCROSSREFRPT
+														</BaseSQL>
+														<InsertAttribute code="PRRMACHTYPE"> MACHINETYPE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRRMODEL"> MODEL = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRRPUBTO">
+															LSEOUNPUBLISHDATETARGET = '?'
+														</InsertAttribute>
+														<InsertAttribute code="SPECBID"> SPECIALBID = '?'
+														</InsertAttribute>
+														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="COUNTRYLIST"
+															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="PRR02">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>SEO Pre-PRG Reference</DGTitle>
+							<DGClass>PRR02</DGClass>
+							<XSLParam name="dgTitle">SEO Pre-PRG Reference</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Report</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT
+															SEOID,TYPE,AUDIENCE,PRICEFILENAME,DIVISION,WWMASTERINDEX,SPECIALBID,PLANNINGRELEVANT,PRICEDINDICATOR,ZEROPRICEDINDICATOR,SAPASSORTMENTMODULE,OFFERINGCOUNTRY,PUBLISHDATETARGET,UNPUBLISHDATETARGET
+															FROM PRICE.PREPRG
+														</BaseSQL>
+														<InsertAttribute code="PRRPUBTO"> PUBLISHDATETARGET =
+															'?'
+														</InsertAttribute>
+														<InsertAttribute code="SPECBID"> SPECIALBID = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRCINDC"> PRICEDINDICATOR =
+															'?'
+														</InsertAttribute>
+														<InsertAttribute code="ZEROPRICE"> ZEROPRICEDINDICATOR
+															= '?'
+														</InsertAttribute>
+														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="COUNTRYLIST"
+															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="PRR03">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>LSEO Detail Pricing Report</DGTitle>
+							<DGClass>PRR03</DGClass>
+							<XSLParam name="dgTitle">LSEO Detail Pricing Report</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Report</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT
+															LSEOLISTPRICE,SEOID,FEATURECODE,ZEROPRICEDINDICATOR,FEATURELISTPRICE,CATEGORY,PRICEFILENAME,QUANTITY
+															FROM PRICE.LSEODETPRCRPT
+														</BaseSQL>
+														<InsertAttribute code="PRRMACHTYPE"> MACHINETYPE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRRMODEL"> MODEL = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRRPUBTO"> UNPUBLISHDATETARGET
+															= '?'
+														</InsertAttribute>
+														<InsertAttribute code="SPECBID"> SPECIALBID = '?'
+														</InsertAttribute>
+														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="COUNTRYLIST"
+															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="PRR04">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>LSEOBUNDLE Detail Pricing Report</DGTitle>
+							<DGClass>PRR04</DGClass>
+							<XSLParam name="dgTitle">LSEOBUNDLE Detail Pricing Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Report</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT
+															LSEOBUNDLELISTPRICE,LSEOBUNDLESEOID,LSEOSEOID,PRICEDINDICATOR,LSEOLISTPRICE,PRICEFILENAME,QUANTITY
+															FROM PRICE.LSEOBDETPRCRPT
+														</BaseSQL>
+														<InsertAttribute code="PRRSEOID"><![CDATA[ LSEOBUNDLESEOID like '?%' ]]></InsertAttribute>
+														<InsertAttribute code="PRRPUBTO"> UNPUBLISHDATETARGET
+															= '?'
+														</InsertAttribute>
+														<InsertAttribute code="SPECBID"> SPECIALBID = '?'
+														</InsertAttribute>
+														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="COUNTRYLIST"
+															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="PRR05">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>Assortment Module Report</DGTitle>
+							<DGClass>PRR05</DGClass>
+							<XSLParam name="dgTitle">Assortment Module Report</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Report</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT
+															TYPE,PARTNUMBER,PRICEFILENAME,SPECIALBID,ASSORTMODULE,PRIORASSORTMODULE,PUBLISHFROM,PUBLISHTO
+															FROM PRICE.ASSORTMODRPT
+														</BaseSQL>
+														<InsertAttribute code="PRRPUBTO"> PUBLISHTO = '?'
+														</InsertAttribute>
+														<InsertAttribute code="COUNTRYLIST"
+															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="PRR06">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>TM to Feature Cross Reference</DGTitle>
+							<DGClass>PRR06</DGClass>
+							<XSLParam name="dgTitle">TM to Feature Cross Reference</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Report</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT
+															MACHINETYPE,MODEL,FEATURECODE,HWFEATURECATEGORY,HWFEATURESUBCATEGORY,FEATURETYPE,MARKETINGNAME,PRICEFILENAME,FIRSTANNOUNCEMENTDATE,GLOBALWITHDRAWALANNOUNCEDATE,COUNTRY,PLANNINGRELEVANT,HARDWARECOST,PRICEDFEATUREINDICATOR,ZEROPRICEDINDICATOR,BOMQUANTITY,BOMNUMBER,BOMTYPE
+															FROM PRICE.TMFCCROSSREFRPT
+														</BaseSQL>
+														<InsertAttribute code="PRRMACHTYPE"> MACHINETYPE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRRMODEL"> MODEL = '?'
+														</InsertAttribute>
+														<InsertAttribute code="FCTYPE"> FEATURETYPE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRRPUBTO">
+															GLOBALWITHDRAWALANNOUNCEDATE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="COUNTRYLIST"
+															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+				</SelectionAttribute>
+			</Attribute>
+		</Entity>
+		<Entity type="ABRDELAYEDQUEUE">
+			<Attribute code="DELAYABRSTATUS">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/QueueReport.xsl"
+					zip="false">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>ABR Delayed Queue Report</DGTitle>
+					<XSLParam name="dgTitle">ABR Delayed Queue Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.QueueABR">
+									<Invoke method="setQuery">
+										<DynamicSQL>
+											<BaseSQL>
+												SELECT ENTITYTYPE, ENTITYID, ATTRIBUTECODE
+												FROM
+												OPICM.FLAG AS F
+												WHERE
+												F.ENTERPRISE='SG'
+												AND CURRENT TIMESTAMP
+												BETWEEN F.VALFROM AND F.VALTO
+												AND CURRENT TIMESTAMP BETWEEN
+												F.EFFFROM AND F.EFFTO
+												AND EXISTS (
+												SELECT 1
+												FROM
+												OPICM.METADESCRIPTION AS MD
+												WHERE
+												F.ENTERPRISE = MD.ENTERPRISE
+												AND F.ATTRIBUTECODE = MD.DESCRIPTIONTYPE
+												AND
+												MD.DESCRIPTIONCLASS = 'A'
+												AND CURRENT TIMESTAMP BETWEEN
+												VALFROM AND VALTO
+												AND CURRENT TIMESTAMP BETWEEN EFFFROM AND
+												EFFTO
+												)
+
+											</BaseSQL>
+											<InsertAttribute code="ABRVALUE"> AND
+												F.ATTRIBUTEVALUE='?'
+											</InsertAttribute>
+										</DynamicSQL>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="EPMODEL">
+			<Attribute code="EPMODELABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>ABR Inbound Queue Report</DGTitle>
+					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.InboundQueueABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="EPFEATURE">
+			<Attribute code="EPFEATUREABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>ABR Inbound Queue Report</DGTitle>
+					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.InboundQueueABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="EPSWFEATURE">
+			<Attribute code="EPFSWEATUREABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>ABR Inbound Queue Report</DGTitle>
+					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.InboundQueueABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="EPLSEO">
+			<Attribute code="EPLSEOABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>ABR Inbound Queue Report</DGTitle>
+					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.InboundQueueABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="EPLSEOBUNDLE">
+			<Attribute code="EPLSEOBUNDLEABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>ABR Inbound Queue Report</DGTitle>
+					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.InboundQueueABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="FCWURPT">
+			<Attribute code="FCWURPTABRSTATUS">
+				<SelectionAttribute code="FCWURPTTYPE">
+					<Option code="FCWU1">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>HW Feature MODEL Where Used Report</DGTitle>
+							<DGClass>FCWU1</DGClass>
+							<XSLParam name="dgTitle">HW Feature MODEL Where Used Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>MODEL</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT * FROM PRICE.VHWFCWUMODEL</BaseSQL>
+														<InsertAttribute code="FCWUFCLIST" isList="true"
+															maxList="36"> FEATURECODE in (?) </InsertAttribute>
+														<InsertAttribute code="INVENTORYGROUP"> INVENTORYGROUP =
+															'?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="FCWU3">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>HW Feature LSEO Where Used Report</DGTitle>
+							<DGClass>FCWU3</DGClass>
+							<XSLParam name="dgTitle">HW Feature LSEO Where Used Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>LSEO</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT * FROM PRICE.VHWFCWULSEO</BaseSQL>
+														<InsertAttribute code="FCWUFCLIST" isList="true"
+															maxList="36"> FEATURECODE in (?) </InsertAttribute>
+														<InsertAttribute code="INVENTORYGROUP"> INVENTORYGROUP =
+															'?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="FCWU6">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>HW Feature LSEOBUNDLE Where Used Report</DGTitle>
+							<DGClass>FCWU6</DGClass>
+							<XSLParam name="dgTitle">HW Feature LSEOBUNDLE Where Used Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>LSEOBUNDLE</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT * FROM PRICE.VHWFCWUBDL</BaseSQL>
+														<InsertAttribute code="FCWUFCLIST" isList="true"
+															maxList="36"> FEATURECODE in (?) </InsertAttribute>
+														<InsertAttribute code="INVENTORYGROUP"> INVENTORYGROUP =
+															'?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="FCWU2">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>SW Feature MODEL Where Used Report</DGTitle>
+							<DGClass>FCWU2</DGClass>
+							<XSLParam name="dgTitle">SW Feature MODEL Where Used Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>MODEL</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT * FROM PRICE.VSWFCWUMODEL</BaseSQL>
+														<InsertAttribute code="PDHDOMAIN"> DOMAIN = '?'
+														</InsertAttribute>
+														<InsertAttribute code="FCWUFCLIST" isList="true"
+															maxList="28"> FEATURECODE in (?) </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="FCWU4">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>SW Feature LSEO Where Used Report</DGTitle>
+							<DGClass>FCWU4</DGClass>
+							<XSLParam name="dgTitle">SW Feature LSEO Where Used Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>LSEO</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT * FROM PRICE.VSWFCWULSEO</BaseSQL>
+														<InsertAttribute code="PDHDOMAIN"> DOMAIN = '?'
+														</InsertAttribute>
+														<InsertAttribute code="FCWUFCLIST" isList="true"
+															maxList="28"> FEATURECODE in (?) </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="FCWU5">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>SW Feature LSEOBUNDLE Where Used Report</DGTitle>
+							<DGClass>FCWU5</DGClass>
+							<XSLParam name="dgTitle">SW Feature LSEOBUNDLE Where Used Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>LSEOBUNDLE</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT * FROM PRICE.VSWFCWUBDL</BaseSQL>
+														<InsertAttribute code="PDHDOMAIN"> DOMAIN = '?'
+														</InsertAttribute>
+														<InsertAttribute code="FCWUFCLIST" isList="true"
+															maxList="28"> FEATURECODE in (?) </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+				</SelectionAttribute>
+			</Attribute>
+		</Entity>
+		<Entity type="GFSQSMRPT">
+			<Attribute code="GFSQSMABRSTATUS">
+				<SelectionAttribute code="GFSQSMRPTTYPE">
+					<Option code="QSMRPT1">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>Announcements - Summary - New</DGTitle>
+							<DGClass>QSMRPT1</DGClass>
+							<XSLParam name="dgTitle">Announcements - Summary - New</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>SummaryAnnNew</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.QSMRPTNEWANN</BaseSQL>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="QSMRPT2">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>Announcements - Summary - Withdrawal</DGTitle>
+							<DGClass>QSMRPT2</DGClass>
+							<XSLParam name="dgTitle">Announcements - Summary - Withdrawal
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>SummaryAnnWD</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.QSMRPTWDANN</BaseSQL>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="QSMRPT3">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>Special Bid - Summary</DGTitle>
+							<DGClass>QSMRPT3</DGClass>
+							<XSLParam name="dgTitle">Special Bid - Summary</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>SummarySpecBid</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.QSMRPTSPECBID</BaseSQL>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+				</SelectionAttribute>
+			</Attribute>
+		</Entity>
+		<Entity type="DRRSSRPT">
+			<Attribute code="DRRSSABRSTATUS">
+				<SelectionAttribute code="DRRSSRPTTYPE">
+					<Option code="WWPR">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>Project DRR Report for WWSEOs</DGTitle>
+							<DGClass>DRRSSRPT</DGClass>
+							<XSLParam name="dgTitle">Project DRR Report for WWSEOs</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Project</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRPROJ</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>WWSEO</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRPROJSEO</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Bays Avail</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEOBA</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Derived Data</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEODD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Slots Avail</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEOSA</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>WARR</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEOWA</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>WWSEO Wgt Dim</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEOWD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>SW Feature</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEOSWF</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>HW Feature</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEOHWF</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Audio</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFAUD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Cable</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFCAB</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Country Pack</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFCTP</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Environmental Info</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFENV</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Expansion Unit</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFEXP</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Fax Modem</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFFXM</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Graphics Adapter</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFGAD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>HD Controller</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFHDC</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Hard Disk Drive</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFHDD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>MouseInput Device</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFIDV</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Keyboard</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFKBD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Language Pack</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFLPK</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Mechanical Package</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFMPG</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Mechanical - Rack Cabinet</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFMRK</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Memory</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFMEM</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>DisplayMonitor</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFMON</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Network Card</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFNIC</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Optical Device</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFOPD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Planar</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFPLN</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Port</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFPRT</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Printer</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFPRN</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Processor</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFPRC</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Power Supply</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFPWR</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Removable Storage</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFRST</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Security</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFSEC</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Speaker</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFSPL</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>System Management Adapter</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFSMA</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Tape Drive</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFTPE</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Tech Info</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFTEC</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Tech Info Features</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFTIF</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>FeatureWgtDim</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFWGT</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Wireless Networking Component</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFWLN</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Memory Card</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFMCD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Expansion Unit Slot</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRREXPUSLT</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Mechpkg Bay</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRMPKGBAY</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Memory Card Slot</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRMCRDSLT</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Planar Slot</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRPLNRSLT</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+				</SelectionAttribute>
+			</Attribute>
+		</Entity>
+		<Entity type="EXTUNSPSCCDRPT">
+			<Attribute code="UNSPSCCDLSEO">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>UNSPSC Report - UNSPSCCDLSEO</DGTitle>
+					<XSLParam name="dgTitle">UNSPSC Report - UNSPSCCDLSEO</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>UNSPSCCDLSEO</Obj>
+										<Obj>SELECT * FROM OPICM.UNSPSCCD WITH UR</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="UNSPSCCDMODEL">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>UNSPSC Report - UNSPSCCDMODEL</DGTitle>
+					<XSLParam name="dgTitle">UNSPSC Report - UNSPSCCDMODEL</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>UNSPSCCDMODEL</Obj>
+										<Obj>SELECT * FROM OPICM.UNSPSCCDMODEL WITH UR</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+	</Enterprise>
+	<Enterprise code="LN">
+		<Connection id="PDH">
+			<UserID>opicmadm</UserID>
+			<Password>mice8chs</Password>
+			<Database>opicmpdh</Database>
+			<!-- jdbc4 format required -->
+			<!-- DatabaseURL>jdbc:db2:pdhalias</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
+			<DatabaseURL>jdbc:db2://127.0.0.1:50001/PDHALIAS</DatabaseURL>
+			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
+		</Connection>
+		<Connection id="ODS">
+			<UserID>opicmadm</UserID>
+			<Password>one2help</Password>
+			<Database>bldods</Database>
+			<!-- jdbc4 format required -->
+			<!-- DatabaseURL>jdbc:db2:bldods</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
+			<DatabaseURL>jdbc:db2://b01cxnp11082.gho.pok.ibm.com:3702/OPICMODS</DatabaseURL>
+			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
+		</Connection>
+		<Entity type="EXTPRCCALCRPT">
+			<Attribute code="SEOBUNDLERPTABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>PriceCalc - Bundle LSEO Detail Pricing Report</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Bundle LSEO Detail Pricing
+						Report
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>SEOBUNDLERPT</Obj>
+										<Obj>SELECT * FROM OPICM.SEOBUNDLERPT WITH UR</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRCCALCSEORPT_USCAABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>PriceCalc - Custom Option SEO Report for US only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Custom Option SEO Report for US
+						only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>PRCCALCSEORPT_USCA</Obj>
+										<Obj>SELECT * FROM OPICM.PRCCALCSEORPT_USCA WHERE
+											COUNTRYLIST='US' WITH UR
+										</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRCCALCSEORPT_USCA1ABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>PriceCalc - Custom Option SEO Report for CA only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Custom Option SEO Report for CA
+						only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>PRCCALCSEORPT_USCA</Obj>
+										<Obj>SELECT * FROM OPICM.PRCCALCSEORPT_USCA WHERE
+											COUNTRYLIST='CA' WITH UR
+										</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRICECALCCOSTABLESABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>PriceCalc - Features Report for US only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Features Report for US only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>PRICECALCCOSTABLES</Obj>
+										<Obj>SELECT * FROM OPICM.PRICECALCCOSTABLES WHERE COUNTRYLIST
+											= 'US' WITH UR
+										</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRICECALCCOSTABLES1ABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>PriceCalc - Features Report for CA only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Features Report for CA only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>PRICECALCCOSTABLES</Obj>
+										<Obj>SELECT * FROM OPICM.PRICECALCCOSTABLES WHERE COUNTRYLIST
+											= 'CA' WITH UR
+										</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="UNIQUEMTMPRICECALCABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>PriceCalc - MT and Model Report for US only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - MT and Model Report for US only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>UNIQUEMTMPRICECALC</Obj>
+										<Obj>SELECT * FROM OPICM.UNIQUEMTMPRICECALC WITH UR</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<!-- Previous attributes use ODS and opicm tables. The following use PDH 
+				and price tables -->
+			<Attribute code="PRCMTMABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>PriceCalc - MT and Model Report - xSeries</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - MT and Model Report - xSeries
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">
+									<Invoke method="addTabForSQL">
+										<Obj>MTM</Obj>
+										<Obj>SELECT * FROM price.PRCMTM WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRCBUNDLEABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>PriceCalc - Bundle LSEO Detail Pricing Report</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Bundle LSEO Detail Pricing
+						Report
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">
+									<Invoke method="addTabForSQL">
+										<Obj>BUNDLE</Obj>
+										<Obj>SELECT * FROM price.PRCBUNDLE WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRCFEATUREABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>PriceCalc - Features Report - US and CA</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Features Report - US and CA
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">
+									<Invoke method="addTabForSQL">
+										<Obj>FEATURE</Obj>
+										<Obj>SELECT * FROM price.PRCFEATURE WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<!-- Invoke method="setDelimiter"> <Obj>,</Obj> </Invoke -->
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<!-- added for new feature report - only for CH and only for GR -->
+			<Attribute code="PRCFEATUREAPABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>PriceCalc - Features Report for China only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Features Report for China only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">
+									<Invoke method="addTabForSQL">
+										<Obj>FEATURE</Obj>
+										<Obj>SELECT * FROM PRICE.PRCFEATUREAP WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="PRCFEATUREEMEAABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>PriceCalc - Features Report for Germany only</DGTitle>
+					<XSLParam name="dgTitle">PriceCalc - Features Report for Germany
+						only
+					</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<!-- Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport" -->
+								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">
+									<Invoke method="addTabForSQL">
+										<Obj>FEATURE</Obj>
+										<Obj>SELECT * FROM PRICE.PRCFEATUREEMEA WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="TMFAVAILREQSETUP">
+			<Attribute code="TMFAVAILRPTSTATUS">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>TMF AVAIL Report</DGTitle>
+					<XSLParam name="dgTitle">TMF AVAIL Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>TMFAVAIL</Obj>
+										<Obj>SELECT * FROM PRICE.TMFAVAIL WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="TMFAVAILLORPTSTATUS">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>TMF AVAIL Report</DGTitle>
+					<XSLParam name="dgTitle">TMF AVAIL LAST ORDER Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>TMFLASTORDER</Obj>
+										<Obj>SELECT * FROM PRICE.TMFLASTORDER WITH UR</Obj>
+										<Obj>PDH</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="PRCRPTREQ">
+			<Attribute code="PRICEREPORTABR">
+				<SelectionAttribute code="PRRTYPE">
+					<Option code="PRR01">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>TM to SEO Cross Reference</DGTitle>
+							<DGClass>PRR01</DGClass>
+							<XSLParam name="dgTitle">TM to SEO Cross Reference</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Report</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT
+															MACHINETYPE,MODEL,MODELPRICEFILENAME,WWSEOSEOID,WWSEOPRICEFILENAME,WWMASTERINDEX,SPECIALBID,LSEOSEOID,AUDIENCE,PLANNINGRELEVANT,PRICEDINDICATOR,ZEROPRICEDINDICATOR,SAPASSORTMENTMODULE,OFFERINGCOUNTRY,LSEOUNPUBLISHDATETARGET
+															FROM PRICE.TMSEOCROSSREFRPT
+														</BaseSQL>
+														<InsertAttribute code="PRRMACHTYPE"> MACHINETYPE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRRMODEL"> MODEL = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRRPUBTO">
+															LSEOUNPUBLISHDATETARGET = '?'
+														</InsertAttribute>
+														<InsertAttribute code="SPECBID"> SPECIALBID = '?'
+														</InsertAttribute>
+														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="COUNTRYLIST"
+															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="PRR02">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>SEO Pre-PRG Reference</DGTitle>
+							<DGClass>PRR02</DGClass>
+							<XSLParam name="dgTitle">SEO Pre-PRG Reference</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Report</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT
+															SEOID,TYPE,AUDIENCE,PRICEFILENAME,DIVISION,WWMASTERINDEX,SPECIALBID,PLANNINGRELEVANT,PRICEDINDICATOR,ZEROPRICEDINDICATOR,SAPASSORTMENTMODULE,OFFERINGCOUNTRY,PUBLISHDATETARGET,UNPUBLISHDATETARGET
+															FROM PRICE.PREPRG
+														</BaseSQL>
+														<InsertAttribute code="PRRPUBTO"> PUBLISHDATETARGET =
+															'?'
+														</InsertAttribute>
+														<InsertAttribute code="SPECBID"> SPECIALBID = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRCINDC"> PRICEDINDICATOR =
+															'?'
+														</InsertAttribute>
+														<InsertAttribute code="ZEROPRICE"> ZEROPRICEDINDICATOR
+															= '?'
+														</InsertAttribute>
+														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="COUNTRYLIST"
+															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="PRR03">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>LSEO Detail Pricing Report</DGTitle>
+							<DGClass>PRR03</DGClass>
+							<XSLParam name="dgTitle">LSEO Detail Pricing Report</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Report</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT
+															LSEOLISTPRICE,SEOID,FEATURECODE,ZEROPRICEDINDICATOR,FEATURELISTPRICE,CATEGORY,PRICEFILENAME,QUANTITY
+															FROM PRICE.LSEODETPRCRPT
+														</BaseSQL>
+														<InsertAttribute code="PRRMACHTYPE"> MACHINETYPE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRRMODEL"> MODEL = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRRPUBTO"> UNPUBLISHDATETARGET
+															= '?'
+														</InsertAttribute>
+														<InsertAttribute code="SPECBID"> SPECIALBID = '?'
+														</InsertAttribute>
+														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="COUNTRYLIST"
+															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="PRR04">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>LSEOBUNDLE Detail Pricing Report</DGTitle>
+							<DGClass>PRR04</DGClass>
+							<XSLParam name="dgTitle">LSEOBUNDLE Detail Pricing Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Report</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT
+															LSEOBUNDLELISTPRICE,LSEOBUNDLESEOID,LSEOSEOID,PRICEDINDICATOR,LSEOLISTPRICE,PRICEFILENAME,QUANTITY
+															FROM PRICE.LSEOBDETPRCRPT
+														</BaseSQL>
+														<InsertAttribute code="PRRSEOID"><![CDATA[ LSEOBUNDLESEOID like '?%' ]]></InsertAttribute>
+														<InsertAttribute code="PRRPUBTO"> UNPUBLISHDATETARGET
+															= '?'
+														</InsertAttribute>
+														<InsertAttribute code="SPECBID"> SPECIALBID = '?'
+														</InsertAttribute>
+														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="COUNTRYLIST"
+															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="PRR05">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>Assortment Module Report</DGTitle>
+							<DGClass>PRR05</DGClass>
+							<XSLParam name="dgTitle">Assortment Module Report</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Report</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT
+															TYPE,PARTNUMBER,PRICEFILENAME,SPECIALBID,ASSORTMODULE,PRIORASSORTMODULE,PUBLISHFROM,PUBLISHTO
+															FROM PRICE.ASSORTMODRPT
+														</BaseSQL>
+														<InsertAttribute code="PRRPUBTO"> PUBLISHTO = '?'
+														</InsertAttribute>
+														<InsertAttribute code="COUNTRYLIST"
+															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="PRR06">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>TM to Feature Cross Reference</DGTitle>
+							<DGClass>PRR06</DGClass>
+							<XSLParam name="dgTitle">TM to Feature Cross Reference</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Report</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT
+															MACHINETYPE,MODEL,FEATURECODE,HWFEATURECATEGORY,HWFEATURESUBCATEGORY,FEATURETYPE,MARKETINGNAME,PRICEFILENAME,FIRSTANNOUNCEMENTDATE,GLOBALWITHDRAWALANNOUNCEDATE,COUNTRY,PLANNINGRELEVANT,HARDWARECOST,PRICEDFEATUREINDICATOR,ZEROPRICEDINDICATOR,BOMQUANTITY,BOMNUMBER,BOMTYPE
+															FROM PRICE.TMFCCROSSREFRPT
+														</BaseSQL>
+														<InsertAttribute code="PRRMACHTYPE"> MACHINETYPE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRRMODEL"> MODEL = '?'
+														</InsertAttribute>
+														<InsertAttribute code="FCTYPE"> FEATURETYPE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="PRRPUBTO">
+															GLOBALWITHDRAWALANNOUNCEDATE = '?'
+														</InsertAttribute>
+														<InsertAttribute code="COUNTRYLIST"
+															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+				</SelectionAttribute>
+			</Attribute>
+		</Entity>
+		<Entity type="ABRDELAYEDQUEUE">
+			<Attribute code="DELAYABRSTATUS">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/QueueReport.xsl"
+					zip="false">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>ABR Delayed Queue Report</DGTitle>
+					<XSLParam name="dgTitle">ABR Delayed Queue Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.QueueABR">
+									<Invoke method="setQuery">
+										<DynamicSQL>
+											<BaseSQL>
+												SELECT ENTITYTYPE, ENTITYID, ATTRIBUTECODE
+												FROM
+												OPICM.FLAG AS F
+												WHERE
+												F.ENTERPRISE='SG'
+												AND CURRENT TIMESTAMP
+												BETWEEN F.VALFROM AND F.VALTO
+												AND CURRENT TIMESTAMP BETWEEN
+												F.EFFFROM AND F.EFFTO
+												AND EXISTS (
+												SELECT 1
+												FROM
+												OPICM.METADESCRIPTION AS MD
+												WHERE
+												F.ENTERPRISE = MD.ENTERPRISE
+												AND F.ATTRIBUTECODE = MD.DESCRIPTIONTYPE
+												AND
+												MD.DESCRIPTIONCLASS = 'A'
+												AND CURRENT TIMESTAMP BETWEEN
+												VALFROM AND VALTO
+												AND CURRENT TIMESTAMP BETWEEN EFFFROM AND
+												EFFTO
+												)
+
+											</BaseSQL>
+											<InsertAttribute code="ABRVALUE"> AND
+												F.ATTRIBUTEVALUE='?'
+											</InsertAttribute>
+										</DynamicSQL>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="EPMODEL">
+			<Attribute code="EPMODELABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>ABR Inbound Queue Report</DGTitle>
+					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.InboundQueueABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="EPFEATURE">
+			<Attribute code="EPFEATUREABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>ABR Inbound Queue Report</DGTitle>
+					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.InboundQueueABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="EPSWFEATURE">
+			<Attribute code="EPFSWEATUREABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>ABR Inbound Queue Report</DGTitle>
+					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.InboundQueueABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="EPLSEO">
+			<Attribute code="EPLSEOABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>ABR Inbound Queue Report</DGTitle>
+					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.InboundQueueABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="EPLSEOBUNDLE">
+			<Attribute code="EPLSEOBUNDLEABR">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
+					zip="true">
+					<UsesConnection>PDH</UsesConnection>
+					<DGTitle>ABR Inbound Queue Report</DGTitle>
+					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.InboundQueueABR">
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+		<Entity type="FCWURPT">
+			<Attribute code="FCWURPTABRSTATUS">
+				<SelectionAttribute code="FCWURPTTYPE">
+					<Option code="FCWU1">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>HW Feature MODEL Where Used Report</DGTitle>
+							<DGClass>FCWU1</DGClass>
+							<XSLParam name="dgTitle">HW Feature MODEL Where Used Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>MODEL</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT * FROM PRICE.VHWFCWUMODEL</BaseSQL>
+														<InsertAttribute code="FCWUFCLIST" isList="true"
+															maxList="36"> FEATURECODE in (?) </InsertAttribute>
+														<InsertAttribute code="INVENTORYGROUP"> INVENTORYGROUP =
+															'?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="FCWU3">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>HW Feature LSEO Where Used Report</DGTitle>
+							<DGClass>FCWU3</DGClass>
+							<XSLParam name="dgTitle">HW Feature LSEO Where Used Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>LSEO</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT * FROM PRICE.VHWFCWULSEO</BaseSQL>
+														<InsertAttribute code="FCWUFCLIST" isList="true"
+															maxList="36"> FEATURECODE in (?) </InsertAttribute>
+														<InsertAttribute code="INVENTORYGROUP"> INVENTORYGROUP =
+															'?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="FCWU6">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>HW Feature LSEOBUNDLE Where Used Report</DGTitle>
+							<DGClass>FCWU6</DGClass>
+							<XSLParam name="dgTitle">HW Feature LSEOBUNDLE Where Used Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>LSEOBUNDLE</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT * FROM PRICE.VHWFCWUBDL</BaseSQL>
+														<InsertAttribute code="FCWUFCLIST" isList="true"
+															maxList="36"> FEATURECODE in (?) </InsertAttribute>
+														<InsertAttribute code="INVENTORYGROUP"> INVENTORYGROUP =
+															'?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="FCWU2">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>SW Feature MODEL Where Used Report</DGTitle>
+							<DGClass>FCWU2</DGClass>
+							<XSLParam name="dgTitle">SW Feature MODEL Where Used Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>MODEL</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT * FROM PRICE.VSWFCWUMODEL</BaseSQL>
+														<InsertAttribute code="PDHDOMAIN"> DOMAIN = '?'
+														</InsertAttribute>
+														<InsertAttribute code="FCWUFCLIST" isList="true"
+															maxList="28"> FEATURECODE in (?) </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="FCWU4">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>SW Feature LSEO Where Used Report</DGTitle>
+							<DGClass>FCWU4</DGClass>
+							<XSLParam name="dgTitle">SW Feature LSEO Where Used Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>LSEO</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT * FROM PRICE.VSWFCWULSEO</BaseSQL>
+														<InsertAttribute code="PDHDOMAIN"> DOMAIN = '?'
+														</InsertAttribute>
+														<InsertAttribute code="FCWUFCLIST" isList="true"
+															maxList="28"> FEATURECODE in (?) </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="FCWU5">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>SW Feature LSEOBUNDLE Where Used Report</DGTitle>
+							<DGClass>FCWU5</DGClass>
+							<XSLParam name="dgTitle">SW Feature LSEOBUNDLE Where Used Report
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>LSEOBUNDLE</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>SELECT * FROM PRICE.VSWFCWUBDL</BaseSQL>
+														<InsertAttribute code="PDHDOMAIN"> DOMAIN = '?'
+														</InsertAttribute>
+														<InsertAttribute code="FCWUFCLIST" isList="true"
+															maxList="28"> FEATURECODE in (?) </InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+				</SelectionAttribute>
+			</Attribute>
+		</Entity>
+		<Entity type="GFSQSMRPT">
+			<Attribute code="GFSQSMABRSTATUS">
+				<SelectionAttribute code="GFSQSMRPTTYPE">
+					<Option code="QSMRPT1">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>Announcements - Summary - New</DGTitle>
+							<DGClass>QSMRPT1</DGClass>
+							<XSLParam name="dgTitle">Announcements - Summary - New</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>SummaryAnnNew</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.QSMRPTNEWANN</BaseSQL>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="QSMRPT2">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>Announcements - Summary - Withdrawal</DGTitle>
+							<DGClass>QSMRPT2</DGClass>
+							<XSLParam name="dgTitle">Announcements - Summary - Withdrawal
+							</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>SummaryAnnWD</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.QSMRPTWDANN</BaseSQL>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+					<Option code="QSMRPT3">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>Special Bid - Summary</DGTitle>
+							<DGClass>QSMRPT3</DGClass>
+							<XSLParam name="dgTitle">Special Bid - Summary</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>SummarySpecBid</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.QSMRPTSPECBID</BaseSQL>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+				</SelectionAttribute>
+			</Attribute>
+		</Entity>
+		<Entity type="DRRSSRPT">
+			<Attribute code="DRRSSABRSTATUS">
+				<SelectionAttribute code="DRRSSRPTTYPE">
+					<Option code="WWPR">
+						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+							zip="true">
+							<UsesConnection>PDH</UsesConnection>
+							<DGTitle>Project DRR Report for WWSEOs</DGTitle>
+							<DGClass>DRRSSRPT</DGClass>
+							<XSLParam name="dgTitle">Project DRR Report for WWSEOs</XSLParam>
+							<XSLParam name="xmlabr">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+									<Invoke method="setABRCode">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+											<Invoke method="addTabForSQL">
+												<Obj>Project</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRPROJ</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>WWSEO</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRPROJSEO</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Bays Avail</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEOBA</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Derived Data</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEODD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Slots Avail</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEOSA</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>WARR</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEOWA</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>WWSEO Wgt Dim</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEOWD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>SW Feature</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEOSWF</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>HW Feature</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRSEOHWF</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Audio</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFAUD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Cable</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFCAB</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Country Pack</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFCTP</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Environmental Info</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFENV</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Expansion Unit</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFEXP</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Fax Modem</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFFXM</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Graphics Adapter</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFGAD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>HD Controller</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFHDC</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Hard Disk Drive</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFHDD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>MouseInput Device</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFIDV</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Keyboard</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFKBD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Language Pack</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFLPK</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Mechanical Package</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFMPG</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Mechanical - Rack Cabinet</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFMRK</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Memory</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFMEM</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>DisplayMonitor</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFMON</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Network Card</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFNIC</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Optical Device</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFOPD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Planar</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFPLN</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Port</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFPRT</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Printer</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFPRN</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Processor</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFPRC</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Power Supply</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFPWR</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Removable Storage</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFRST</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Security</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFSEC</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Speaker</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFSPL</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>System Management Adapter</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFSMA</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Tape Drive</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFTPE</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Tech Info</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFTEC</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Tech Info Features</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFTIF</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>FeatureWgtDim</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFWGT</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Wireless Networking Component</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFWLN</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Memory Card</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRHWFMCD</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Expansion Unit Slot</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRREXPUSLT</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Mechpkg Bay</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRMPKGBAY</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Memory Card Slot</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRMCRDSLT</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="addTabForSQL">
+												<Obj>Planar Slot</Obj>
+												<Obj>
+													<DynamicSQL>
+														<BaseSQL>select * from PRICE.DRRPLNRSLT</BaseSQL>
+														<InsertAttribute code="PROJCDNAM"> PROJNAME = '?'
+														</InsertAttribute>
+													</DynamicSQL>
+												</Obj>
+												<Obj>PDH</Obj>
+											</Invoke>
+											<Invoke method="setDataView">
+												<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+													<Invoke method="initialize" />
+												</Obj>
+											</Invoke>
+										</Obj>
+									</Invoke>
+								</Obj>
+							</XSLParam>
+						</Style>
+					</Option>
+				</SelectionAttribute>
+			</Attribute>
+		</Entity>
+		<Entity type="EXTUNSPSCCDRPT">
+			<Attribute code="UNSPSCCDLSEO">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>UNSPSC Report - UNSPSCCDLSEO</DGTitle>
+					<XSLParam name="dgTitle">UNSPSC Report - UNSPSCCDLSEO</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>UNSPSCCDLSEO</Obj>
+										<Obj>SELECT * FROM OPICM.UNSPSCCD WITH UR</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+			<Attribute code="UNSPSCCDMODEL">
+				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
+					zip="true">
+					<UsesConnection>ODS</UsesConnection>
+					<DGTitle>UNSPSC Report - UNSPSCCDMODEL</DGTitle>
+					<XSLParam name="dgTitle">UNSPSC Report - UNSPSCCDMODEL</XSLParam>
+					<XSLParam name="xmlabr">
+						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
+							<Invoke method="setABRCode">
+								<Obj type="com.ibm.transform.oim.eacm.xalan.ExcelReport">
+									<Invoke method="addTabForSQL">
+										<Obj>UNSPSCCDMODEL</Obj>
+										<Obj>SELECT * FROM OPICM.UNSPSCCDMODEL WITH UR</Obj>
+										<Obj>ODS</Obj>
+									</Invoke>
+									<Invoke method="setDataView">
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
+											<Invoke method="initialize" />
+										</Obj>
+									</Invoke>
+								</Obj>
+							</Invoke>
+						</Obj>
+					</XSLParam>
+				</Style>
+			</Attribute>
+		</Entity>
+	</Enterprise>
+</Config>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	(C) Copyright IBM Corp. 2007  All Rights Reserved.
+	
+	$Log: InboundABR.xml,v $
+	Revision 1.1  2007/10/29 14:46:39  chris
+	Incomplete Work
+	
+	
+	This is a template for the results of the Inbound ABR
+-->
+<abrtests xmlns="http://w3.ibm.com/eacm/ABRTests" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://w3.ibm.com/eacm/ABRTests ABRTestsSchema ">
+	<text method="getDisplayName" />
+	<test result="false" method="hasPassed" />
+	<data>
+		<group entityType="ROOT" rootEntityType="true"></group>
+	</data>
+</abrtests>

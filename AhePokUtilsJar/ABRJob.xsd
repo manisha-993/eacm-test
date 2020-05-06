@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <xsd:element name="ABRCode">
+        <xsd:complexType>
+            <xsd:attribute name="className" type="xsd:string" use="required"/>
+            <xsd:attribute name="revision" type="xsd:string" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="ABRJob">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="ABRCode"/>
+                <xsd:element ref="EntityDescription"/>
+                <xsd:element ref="UserProfile"/>
+                <xsd:element ref="DGSubmit"/>
+            </xsd:sequence>
+            <xsd:attribute name="jobNumber" type="xsd:string" use="required"/>
+            <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="AttributeDescription">
+        <xsd:complexType>
+            <xsd:simpleContent>
+                <xsd:extension base="xsd:string">
+                    <xsd:attribute name="code" type="xsd:string" use="required"/>
+                </xsd:extension>
+            </xsd:simpleContent>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="DGSubmit" type="xsd:string"/>
+    <xsd:element name="ProfileEnterprise">
+        <xsd:complexType>
+            <xsd:simpleContent>
+                <xsd:extension base="xsd:string">
+                    <xsd:attribute name="code" type="xsd:string" use="required"/>
+                </xsd:extension>
+            </xsd:simpleContent>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="EntityDescription">
+        <xsd:complexType mixed="true">
+            <xsd:choice maxOccurs="1" minOccurs="1">
+                <xsd:element ref="AttributeDescription"/>
+            </xsd:choice>
+            <xsd:attribute name="entityID" type="xsd:int" use="required"/>
+            <xsd:attribute name="entityType" type="xsd:string" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="ReadLanguage">
+        <xsd:complexType>
+            <xsd:simpleContent>
+                <xsd:extension base="xsd:string">
+                    <xsd:attribute name="nlsID" type="xsd:int" use="required"/>
+                </xsd:extension>
+            </xsd:simpleContent>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="Role">
+        <xsd:complexType>
+            <xsd:simpleContent>
+                <xsd:extension base="xsd:string">
+                    <xsd:attribute name="code" type="xsd:string" use="required"/>
+                </xsd:extension>
+            </xsd:simpleContent>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="UserProfile">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="ProfileEnterprise"/>
+                <xsd:element ref="Workgroup"/>
+                <xsd:element ref="ReadLanguage"/>
+                <xsd:element ref="WriteLanguage"/>
+                <xsd:element ref="Role"/>
+            </xsd:sequence>
+            <xsd:attribute name="userToken" type="xsd:string" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="Workgroup">
+        <xsd:complexType>
+            <xsd:simpleContent>
+                <xsd:extension base="xsd:string">
+                    <xsd:attribute name="wid" type="xsd:int" use="required"/>
+                </xsd:extension>
+            </xsd:simpleContent>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="WriteLanguage">
+        <xsd:complexType>
+            <xsd:simpleContent>
+                <xsd:extension base="xsd:string">
+                    <xsd:attribute name="nlsID" type="xsd:int" use="required"/>
+                </xsd:extension>
+            </xsd:simpleContent>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

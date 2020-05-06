@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="PokUtilsJar.makeJar" default="jar" basedir=".">
+	
+	<!-- set global properties for this build -->
+	
+    <property name="pokutils.location" value="../AhePokUtilsJar"/>
+	<property name="abr12.location" value="../abr12"/>
+	
+	<target name="init">
+		<tstamp>
+			<!-- Use Eastern Standard Time in jar Manifest -->
+			<format property="jar.date" pattern="EEE MM/dd/yyyy" timezone="America/New_York"/>
+		</tstamp>
+		<tstamp>
+			<format property="jar.time" pattern="hh:mm:ss.SS" timezone="America/New_York"/>
+		</tstamp>
+
+		<tstamp>
+			<!-- Use local System time in message -->
+			<format property="start.ts" pattern="EEE MM/dd/yyyy hh:mm:ss.SS"/>
+		</tstamp>
+		<echo message="Init: ${start.ts}" />   
+		<echo message="Ant JVM version: ${ant.java.version}"/>
+	</target>
+	
+	<target name="clean" description="Cleans the destination file" depends="init">
+		<delete file="bin/jar/PokUtils.jar"/>
+	</target>
+
+    <target name="build" depends="init,clean">
+        <!-- Build is done by the IDE -->
+        <echo message="Build previously done by the IDE"/>
+<!--        <javac srcdir="${src}" destdir="${build}"/>    -->
+    </target>
+   
+	<target name="jar" depends="build,clean,init">
+        <mkdir dir="bin/jar"/>
+        <jar destfile="bin/jar/PokUtils.jar">
+            <fileset dir="${pokutils.location}/bin">
+              <include name="com/**/*.class"/>
+              <include name="com/**/*.properties"/>
+              <include name="com/**/*.xml"/>
+              <include name="com/**/*.xsl"/>
+            </fileset>
+            <fileset dir="${abr12.location}/bin">
+              <include name="COM/ibm/eannounce/abr/sg/CHGGRPRptGen.class"/>
+            </fileset>
+        	<manifest>
+        		<section name="Build Information">
+					<attribute name="Built-By" value="${user.name}"/>
+					<attribute name="Build-Version" value="Built on ${jar.date} at ${jar.time}"/> 
+					<attribute name="Build-Date" value="${jar.date}${jar.time}"/>
+        			<attribute name="Version-Timezone" value="Eastern Standard Time: America/New_York"/>
+				</section>
+			</manifest>
+        </jar>
+        <tstamp>
+        	<!-- Use local System time in message -->
+            <format property="finish.timestamp" pattern="EEE MM/dd/yyyy HH:mm:ss.SS"/>
+        </tstamp>
+        <echo message="Finished: ${finish.timestamp}"/>
+    </target>		
+</project>

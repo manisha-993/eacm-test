@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<com.rational.xtools.umlvisualizer.emfnotation:Pack xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:com.rational.xtools.umlvisualizer.emfnotation="http:///com/rational/xtools/umlvisualizer/emfnotation.ecore" Id="e191b9b-0111-edb0-5d0c-0943d923aa77" version="8">
+  <Diagram DiagramId="e191ba5-0111-ff1e-7602-0943d923aa77">
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:PositionalGeneralView" LineColor="4009615" FillColor="13565951" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e197d5d-0111-f240-36ba-0943d923aa77" sourceConnectors="e1d1945-0111-eb27-6595-0943d923aa77 e1d64a1-0111-ee67-3534-0943d923aa77 e1e73d7-0111-fd46-579c-0943d923aa77 e1f2179-0111-fb17-5bbd-0943d923aa77 e2ada5a-0111-f335-23c1-0943d923aa77" PositionX="16550" PositionY="200" ExtentX="150" ExtentY="150" Autosize="true" VisibilityStyle="2" ShowCompartmentTitle="false" CompartmentStereotypeStyle="2" ShowParentName="false">
+      <SemanticReference Id="emfsemantic:(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})" Name="XSLReportABR" Kind="29"/>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e197d71-0111-e7be-43ac-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})" Name="XSLReportABR" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e197d7b-0111-ee30-119e-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})" Name="XSLReportABR" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Attribute" ShapeStereotypeStyle="2" Id="e197d7c-0111-f390-2318-0943d923aa77" Ratio="-1.0" Collapsed="true">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})" Name="XSLReportABR" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Operation" ShapeStereotypeStyle="2" Id="e197d85-0111-ec85-3996-0943d923aa77" Ratio="-1.0" Collapsed="true">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})" Name="XSLReportABR" Kind="29"/>
+      </children>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:PositionalGeneralView" LineColor="4009615" FillColor="13565951" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1b397b-0111-e83f-5642-0943d923aa77" targetConnectors="e2d0901-0111-ff3d-6663-0943d923aa77" PositionX="35275" PositionY="5250" ExtentX="150" ExtentY="150" Autosize="true" VisibilityStyle="2" ShowCompartmentTitle="false" CompartmentStereotypeStyle="2" ShowParentName="false">
+      <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.BinaryReport})" Name="BinaryReport" Kind="29"/>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1b398f-0111-ed07-69f7-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.BinaryReport})" Name="BinaryReport" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1b3990-0111-f003-7310-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.BinaryReport})" Name="BinaryReport" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Attribute" ShapeStereotypeStyle="2" Id="e1b3991-0111-f116-7ac6-0943d923aa77" Ratio="-1.0" Collapsed="true">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.BinaryReport})" Name="BinaryReport" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Operation" ShapeStereotypeStyle="2" Id="e1b3992-0111-eddd-0493-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.BinaryReport})" Name="BinaryReport" Kind="29"/>
+      </children>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:PositionalGeneralView" LineColor="4009615" FillColor="13565951" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1bd161-0111-fbc7-1ac1-0943d923aa77" sourceConnectors="e1d1952-0111-f270-7215-0943d923aa77" targetConnectors="e2bdea5-0111-ea36-3ef7-0943d923aa77 e2d08fc-0111-ea94-0d34-0943d923aa77" PositionX="23450" PositionY="5250" ExtentX="150" ExtentY="150" Autosize="true" VisibilityStyle="2" ShowCompartmentTitle="false" CompartmentStereotypeStyle="2" ShowParentName="false">
+      <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data})" Name="Data" Kind="29"/>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1bd16b-0111-e239-2e72-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data})" Name="Data" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1bd16c-0111-e799-3776-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data})" Name="Data" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Attribute" ShapeStereotypeStyle="2" Id="e1bd16d-0111-e8ac-3f2c-0943d923aa77" Ratio="-1.0" Collapsed="true">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data})" Name="Data" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Operation" ShapeStereotypeStyle="2" Id="e1bd16e-0111-e573-48db-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data})" Name="Data" Kind="29"/>
+      </children>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:PositionalGeneralView" LineColor="4009615" FillColor="13565951" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1c790a-0111-ea9e-16ac-0943d923aa77" sourceConnectors="e1d64a7-0111-f08e-6e96-0943d923aa77 e1e73e0-0111-eda2-1431-0943d923aa77 e2ada5e-0111-f781-0425-0943d923aa77" targetConnectors="e1d1945-0111-eb27-6595-0943d923aa77 e1d1952-0111-f270-7215-0943d923aa77 e2bdeb1-0111-f4b8-074a-0943d923aa77" PositionX="19850" PositionY="14175" ExtentX="150" ExtentY="150" Autosize="true" VisibilityStyle="2" ShowCompartmentTitle="false" CompartmentStereotypeStyle="2" ShowParentName="false">
+      <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})" Name="DataView" Kind="29"/>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1c7914-0111-f746-2a58-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})" Name="DataView" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1c7915-0111-f859-3367-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})" Name="DataView" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Attribute" ShapeStereotypeStyle="2" Id="e1c7916-0111-f520-3b57-0943d923aa77" Ratio="-1.0" Collapsed="true">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})" Name="DataView" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Operation" ShapeStereotypeStyle="2" Id="e1c7917-0111-f633-4502-0943d923aa77" Ratio="-1.0" Collapsed="true">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})" Name="DataView" Kind="29"/>
+      </children>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1d1945-0111-eb27-6595-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e197d5d-0111-f240-36ba-0943d923aa77" target="e1c790a-0111-ea9e-16ac-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView}))" Name="" Kind="49"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1d194f-0111-f19a-0b1c-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView}))" Name="" Kind="49"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1d1950-0111-f496-26b4-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView}))" Name="" Kind="49"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1d1951-0111-f5a9-304a-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView}))" Name="" Kind="49"/>
+        </children>
+      </Labels>
+      <BendPoints x="16" y="33"/>
+      <BendPoints x="-51" y="-520"/>
+      <BendPoints x="67" y="131"/>
+      <BendPoints x="0" y="-422"/>
+      <BendPoints x="67" y="520"/>
+      <BendPoints x="0" y="-33"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1d1952-0111-f270-7215-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e1bd161-0111-fbc7-1ac1-0943d923aa77" target="e1c790a-0111-ea9e-16ac-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView}))" Name="" Kind="49"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1d1959-0111-fe42-7d2e-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView}))" Name="" Kind="49"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1d195a-0111-fb09-0781-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView}))" Name="" Kind="49"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1d195b-0111-fc1c-112a-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView}))" Name="" Kind="49"/>
+        </children>
+      </Labels>
+      <BendPoints x="4" y="59"/>
+      <BendPoints x="-352" y="-65"/>
+      <BendPoints x="360" y="91"/>
+      <BendPoints x="4" y="-33"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:PositionalGeneralView" LineColor="4009615" FillColor="13565951" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1d6493-0111-f8ac-017b-0943d923aa77" targetConnectors="e1d64a1-0111-ee67-3534-0943d923aa77 e1d64a7-0111-f08e-6e96-0943d923aa77" PositionX="8900" PositionY="5275" ExtentX="150" ExtentY="150" Autosize="true" VisibilityStyle="2" ShowCompartmentTitle="false" CompartmentStereotypeStyle="2" ShowParentName="false">
+      <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam})" Name="EntityParam" Kind="29"/>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1d649d-0111-e7b8-1568-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam})" Name="EntityParam" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1d649e-0111-e47f-1e7b-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam})" Name="EntityParam" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Attribute" ShapeStereotypeStyle="2" Id="e1d649f-0111-e592-2637-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam})" Name="EntityParam" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Operation" ShapeStereotypeStyle="2" Id="e1d64a0-0111-ed54-2fe0-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam})" Name="EntityParam" Kind="29"/>
+      </children>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1d64a1-0111-ee67-3534-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e197d5d-0111-f240-36ba-0943d923aa77" target="e1d6493-0111-f8ac-017b-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam}))" Name="" Kind="49"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1d64a2-0111-eb2e-4061-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam}))" Name="" Kind="49"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1d64a3-0111-ec41-4ab2-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam}))" Name="" Kind="49"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1d64a4-0111-f1a1-5454-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam}))" Name="" Kind="49"/>
+        </children>
+      </Labels>
+      <BendPoints x="-57" y="0"/>
+      <BendPoints x="241" y="-220"/>
+      <BendPoints x="-298" y="0"/>
+      <BendPoints x="0" y="-220"/>
+      <BendPoints x="-298" y="169"/>
+      <BendPoints x="0" y="-51"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1d64a7-0111-f08e-6e96-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e1c790a-0111-ea9e-16ac-0943d923aa77" target="e1d6493-0111-f8ac-017b-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam}))" Name="" Kind="125"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1d64a8-0111-f5ed-7a3e-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam}))" Name="" Kind="125"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1d64a9-0111-f700-04ac-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam}))" Name="" Kind="125"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1d64aa-0111-f3c7-0e6b-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam}))" Name="" Kind="125"/>
+        </children>
+      </Labels>
+      <Labels Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1d64ab-0111-f4da-19d3-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.EntityParam}))" Name="" Kind="125"/>
+      </Labels>
+      <BendPoints x="-57" y="-30"/>
+      <BendPoints x="372" y="309"/>
+      <BendPoints x="-429" y="-229"/>
+      <BendPoints x="0" y="110"/>
+      <BendPoints x="-429" y="-288"/>
+      <BendPoints x="0" y="51"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:PositionalGeneralView" LineColor="4009615" FillColor="13565951" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1e73c9-0111-f4eb-2623-0943d923aa77" targetConnectors="e1e73d7-0111-fd46-579c-0943d923aa77 e1e73e0-0111-eda2-1431-0943d923aa77 e2bdeb5-0111-f905-5114-0943d923aa77" PositionX="12700" PositionY="5275" ExtentX="150" ExtentY="150" Autosize="true" VisibilityStyle="2" ShowCompartmentTitle="false" CompartmentStereotypeStyle="2" ShowParentName="false">
+      <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init})" Name="Init" Kind="29"/>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1e73d3-0111-f8fa-38f2-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init})" Name="Init" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1e73d4-0111-fe59-422e-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init})" Name="Init" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Attribute" ShapeStereotypeStyle="2" Id="e1e73d5-0111-ff6d-49e8-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init})" Name="Init" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Operation" ShapeStereotypeStyle="2" Id="e1e73d6-0111-fc33-53cc-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init})" Name="Init" Kind="29"/>
+      </children>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1e73d7-0111-fd46-579c-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e197d5d-0111-f240-36ba-0943d923aa77" target="e1e73c9-0111-f4eb-2623-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init}))" Name="" Kind="49"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1e73dd-0111-e805-6300-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init}))" Name="" Kind="49"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1e73de-0111-e4cc-6d77-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init}))" Name="" Kind="49"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1e73df-0111-e5df-770c-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init}))" Name="" Kind="49"/>
+        </children>
+      </Labels>
+      <BendPoints x="-57" y="16"/>
+      <BendPoints x="98" y="-195"/>
+      <BendPoints x="-155" y="45"/>
+      <BendPoints x="0" y="-166"/>
+      <BendPoints x="-155" y="169"/>
+      <BendPoints x="0" y="-42"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1e73e0-0111-eda2-1431-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e1c790a-0111-ea9e-16ac-0943d923aa77" target="e1e73c9-0111-f4eb-2623-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init}))" Name="" Kind="125"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1e73e1-0111-eeb5-1f7f-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init}))" Name="" Kind="125"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1e73e2-0111-eb7c-2a5b-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init}))" Name="" Kind="125"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1e73e3-0111-ec8f-3410-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init}))" Name="" Kind="125"/>
+        </children>
+      </Labels>
+      <Labels Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1e73e4-0111-f1ee-3fb3-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init}))" Name="" Kind="125"/>
+      </Labels>
+      <BendPoints x="-44" y="-33"/>
+      <BendPoints x="242" y="315"/>
+      <BendPoints x="-286" y="-216"/>
+      <BendPoints x="0" y="132"/>
+      <BendPoints x="-286" y="-307"/>
+      <BendPoints x="0" y="41"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:PositionalGeneralView" LineColor="4009615" FillColor="13565951" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1ecf02-0111-fca9-1e6c-0943d923aa77" PositionX="2625" PositionY="1575" ExtentX="150" ExtentY="150" Autosize="true" VisibilityStyle="2" ShowCompartmentTitle="false" CompartmentStereotypeStyle="2" ShowParentName="false">
+      <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JarURIResolver})" Name="JarURIResolver" Kind="29"/>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1ecf0d-0111-ecc7-3145-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JarURIResolver})" Name="JarURIResolver" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1ecf0e-0111-e98e-3a7a-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JarURIResolver})" Name="JarURIResolver" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Attribute" ShapeStereotypeStyle="2" Id="e1ecf17-0111-f0d7-63e9-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JarURIResolver})" Name="JarURIResolver" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Operation" ShapeStereotypeStyle="2" Id="e1ecf18-0111-f636-6dcd-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JarURIResolver})" Name="JarURIResolver" Kind="29"/>
+      </children>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:PositionalGeneralView" LineColor="4009615" FillColor="13565951" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1f2129-0111-e782-7273-0943d923aa77" targetConnectors="e1f2179-0111-fb17-5bbd-0943d923aa77 e2d0906-0111-e051-40ba-0943d923aa77" PositionX="26925" PositionY="5250" ExtentX="150" ExtentY="150" Autosize="true" VisibilityStyle="2" ShowCompartmentTitle="false" CompartmentStereotypeStyle="2" ShowParentName="false">
+      <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection})" Name="ODSConnection" Kind="29"/>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1f2133-0111-eb92-0546-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection})" Name="ODSConnection" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1f2134-0111-f0f1-0ecc-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection})" Name="ODSConnection" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Attribute" ShapeStereotypeStyle="2" Id="e1f2135-0111-f204-1687-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection})" Name="ODSConnection" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Operation" ShapeStereotypeStyle="2" Id="e1f2136-0111-eecb-206b-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection})" Name="ODSConnection" Kind="29"/>
+      </children>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e1f2179-0111-fb17-5bbd-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e197d5d-0111-f240-36ba-0943d923aa77" target="e1f2129-0111-e782-7273-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection}))" Name="" Kind="49"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1f217a-0111-f7de-6710-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection}))" Name="" Kind="49"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e1f217b-0111-f8f1-715a-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection}))" Name="" Kind="49"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e1f217c-0111-fe51-7b73-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection}))" Name="" Kind="49"/>
+        </children>
+      </Labels>
+      <BendPoints x="57" y="15"/>
+      <BendPoints x="-380" y="-195"/>
+      <BendPoints x="307" y="85"/>
+      <BendPoints x="-130" y="-125"/>
+      <BendPoints x="394" y="168"/>
+      <BendPoints x="-43" y="-42"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:PositionalGeneralView" LineColor="4009615" FillColor="13565951" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e291c15-0111-f9f3-773b-0943d923aa77" targetConnectors="e2d090b-0111-e5b0-1d02-0943d923aa77" PositionX="31100" PositionY="5250" ExtentX="150" ExtentY="150" Autosize="true" VisibilityStyle="2" ShowCompartmentTitle="false" CompartmentStereotypeStyle="2" ShowParentName="false">
+      <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JDBCConnection})" Name="JDBCConnection" Kind="29"/>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e291c1f-0111-e066-6b05-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JDBCConnection})" Name="JDBCConnection" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e291c3d-0111-e4ef-039b-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JDBCConnection})" Name="JDBCConnection" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Attribute" ShapeStereotypeStyle="2" Id="e291c3e-0111-e1b6-0b5f-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JDBCConnection})" Name="JDBCConnection" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Operation" ShapeStereotypeStyle="2" Id="e291c3f-0111-e2c9-1521-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JDBCConnection})" Name="JDBCConnection" Kind="29"/>
+      </children>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:PositionalGeneralView" LineColor="4009615" FillColor="13565951" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2ada45-0111-e353-4234-0943d923aa77" targetConnectors="e2ada5a-0111-f335-23c1-0943d923aa77 e2ada5e-0111-f781-0425-0943d923aa77 e2bdeb9-0111-fd51-1bc2-0943d923aa77 e2d08f7-0111-e0e8-3457-0943d923aa77" PositionX="16550" PositionY="5275" ExtentX="150" ExtentY="150" Autosize="true" VisibilityStyle="2" ShowCompartmentTitle="false" CompartmentStereotypeStyle="2" ShowParentName="false">
+      <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode})" Name="ReturnCode" Kind="29"/>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2ada46-0111-e01a-5683-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode})" Name="ReturnCode" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2ada47-0111-e12d-5f8e-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode})" Name="ReturnCode" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Attribute" ShapeStereotypeStyle="2" Id="e2ada48-0111-e68c-674e-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode})" Name="ReturnCode" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Operation" ShapeStereotypeStyle="2" Id="e2ada49-0111-e79f-70ec-0943d923aa77" Ratio="-1.0" Collapsed="false">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode})" Name="ReturnCode" Kind="29"/>
+      </children>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2ada5a-0111-f335-23c1-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e197d5d-0111-f240-36ba-0943d923aa77" target="e2ada45-0111-e353-4234-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="49"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2ada5b-0111-f448-2f2f-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="49"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2ada5c-0111-f9a7-3d9f-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="49"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2ada5d-0111-faba-473b-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%abr12}{%COM.ibm.eannounce.abr.XSLReportABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="49"/>
+        </children>
+      </Labels>
+      <BendPoints x="-20" y="33"/>
+      <BendPoints x="208" y="-363"/>
+      <BendPoints x="-205" y="355"/>
+      <BendPoints x="23" y="-41"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2ada5e-0111-f781-0425-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e1c790a-0111-ea9e-16ac-0943d923aa77" target="e2ada45-0111-e353-4234-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="49"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2ada5f-0111-f894-0f94-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="49"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2ada60-0111-e057-19fa-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="49"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2ada61-0111-e16a-242e-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="49"/>
+        </children>
+      </Labels>
+      <BendPoints x="4" y="41"/>
+      <BendPoints x="4" y="-73"/>
+      <BendPoints x="4" y="73"/>
+      <BendPoints x="4" y="-41"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:PositionalGeneralView" LineColor="4009615" FillColor="13565951" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2b454d-0111-e30f-7936-0943d923aa77" sourceConnectors="e2bdea5-0111-ea36-3ef7-0943d923aa77 e2bdeb1-0111-f4b8-074a-0943d923aa77 e2bdeb5-0111-f905-5114-0943d923aa77 e2bdeb9-0111-fd51-1bc2-0943d923aa77" PositionX="23625" PositionY="200" ExtentX="150" ExtentY="150" Autosize="true" VisibilityStyle="2" ShowCompartmentTitle="false" CompartmentStereotypeStyle="2" ShowParentName="false">
+      <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})" Name="XMLABR" Kind="29"/>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2b4557-0111-e71e-0d66-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})" Name="XMLABR" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2b4558-0111-ec7e-1675-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})" Name="XMLABR" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Attribute" ShapeStereotypeStyle="2" Id="e2b4559-0111-ed91-1e28-0943d923aa77" Ratio="-1.0" Collapsed="true">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})" Name="XMLABR" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Operation" ShapeStereotypeStyle="2" Id="e2b455a-0111-ea57-27bb-0943d923aa77" Ratio="-1.0" Collapsed="true">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})" Name="XMLABR" Kind="29"/>
+      </children>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2bdea5-0111-ea36-3ef7-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e2b454d-0111-e30f-7936-0943d923aa77" target="e1bd161-0111-fbc7-1ac1-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data}))" Name="" Kind="49"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2bdea6-0111-e6fd-4a52-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data}))" Name="" Kind="49"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2bdeaf-0111-f0a9-54b2-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data}))" Name="" Kind="49"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2bdeb0-0111-f3a5-5eec-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data}))" Name="" Kind="49"/>
+        </children>
+      </Labels>
+      <BendPoints x="4" y="76"/>
+      <BendPoints x="268" y="-82"/>
+      <BendPoints x="-260" y="108"/>
+      <BendPoints x="4" y="-50"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2bdeb1-0111-f4b8-074a-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e2b454d-0111-e30f-7936-0943d923aa77" target="e1c790a-0111-ea9e-16ac-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView}))" Name="" Kind="49"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2bdeb2-0111-f17f-12c3-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView}))" Name="" Kind="49"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2bdeb3-0111-f292-1d30-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView}))" Name="" Kind="49"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2bdeb4-0111-f7f2-276c-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.DataView}))" Name="" Kind="49"/>
+        </children>
+      </Labels>
+      <BendPoints x="-11" y="33"/>
+      <BendPoints x="56" y="-519"/>
+      <BendPoints x="-44" y="132"/>
+      <BendPoints x="23" y="-420"/>
+      <BendPoints x="-66" y="519"/>
+      <BendPoints x="1" y="-33"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2bdeb5-0111-f905-5114-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e2b454d-0111-e30f-7936-0943d923aa77" target="e1e73c9-0111-f4eb-2623-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init}))" Name="" Kind="49"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2bdeb6-0111-f5cb-5c82-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init}))" Name="" Kind="49"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2bdeb7-0111-f6df-66ec-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init}))" Name="" Kind="49"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2bdeb8-0111-fc3e-709c-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Init}))" Name="" Kind="49"/>
+        </children>
+      </Labels>
+      <BendPoints x="4" y="76"/>
+      <BendPoints x="-88" y="-73"/>
+      <BendPoints x="96" y="108"/>
+      <BendPoints x="4" y="-41"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2bdeb9-0111-fd51-1bc2-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e2b454d-0111-e30f-7936-0943d923aa77" target="e2ada45-0111-e353-4234-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="49"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2bdeba-0111-fa18-2731-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="49"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2bdebb-0111-fb2b-318d-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="49"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2bdebc-0111-e08a-3b6c-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLDependency}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.XMLABR})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="49"/>
+        </children>
+      </Labels>
+      <BendPoints x="56" y="-1"/>
+      <BendPoints x="-560" y="1"/>
+      <BendPoints x="558" y="-2"/>
+      <BendPoints x="-58" y="0"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:PositionalGeneralView" LineColor="4009615" FillColor="13565951" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2d05a4-0111-e080-3f9b-0943d923aa77" sourceConnectors="e2d08f7-0111-e0e8-3457-0943d923aa77 e2d08fc-0111-ea94-0d34-0943d923aa77 e2d0901-0111-ff3d-6663-0943d923aa77 e2d0906-0111-e051-40ba-0943d923aa77 e2d090b-0111-e5b0-1d02-0943d923aa77" PositionX="26575" PositionY="14000" ExtentX="150" ExtentY="150" Autosize="true" VisibilityStyle="2" ShowCompartmentTitle="false" CompartmentStereotypeStyle="2" ShowParentName="false">
+      <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})" Name="ExcelReport" Kind="29"/>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2d05ae-0111-e6f3-53b2-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})" Name="ExcelReport" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2d05af-0111-e806-5cc4-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})" Name="ExcelReport" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Attribute" ShapeStereotypeStyle="2" Id="e2d05b0-0111-eb02-647e-0943d923aa77" Ratio="-1.0" Collapsed="true">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})" Name="ExcelReport" Kind="29"/>
+      </children>
+      <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ListCompartmentView" Visible="true" FactoryHint="Operation" ShapeStereotypeStyle="2" Id="e2d05b1-0111-ec15-6e35-0943d923aa77" Ratio="-1.0" Collapsed="true">
+        <SemanticReference Id="emfsemantic:(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})" Name="ExcelReport" Kind="29"/>
+      </children>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2d08f7-0111-e0e8-3457-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e2d05a4-0111-e080-3f9b-0943d923aa77" target="e2ada45-0111-e353-4234-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="125"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2d08f8-0111-e648-3feb-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="125"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2d08f9-0111-e75b-4ae0-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="125"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2d08fa-0111-e422-54a4-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="125"/>
+        </children>
+      </Labels>
+      <Labels Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2d08fb-0111-e535-6029-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ReturnCode}))" Name="" Kind="125"/>
+      </Labels>
+      <BendPoints x="4" y="-33"/>
+      <BendPoints x="-203" y="81"/>
+      <BendPoints x="211" y="-65"/>
+      <BendPoints x="4" y="49"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2d08fc-0111-ea94-0d34-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e2d05a4-0111-e080-3f9b-0943d923aa77" target="e1bd161-0111-fbc7-1ac1-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data}))" Name="" Kind="125"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2d08fd-0111-eba7-18b5-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data}))" Name="" Kind="125"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2d08fe-0111-e86e-2317-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data}))" Name="" Kind="125"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2d08ff-0111-e981-2ce8-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data}))" Name="" Kind="125"/>
+        </children>
+      </Labels>
+      <Labels Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2d0900-0111-fe2a-3829-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.Data}))" Name="" Kind="125"/>
+      </Labels>
+      <BendPoints x="-7" y="-33"/>
+      <BendPoints x="34" y="178"/>
+      <BendPoints x="-32" y="-160"/>
+      <BendPoints x="9" y="51"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2d0901-0111-ff3d-6663-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e2d05a4-0111-e080-3f9b-0943d923aa77" target="e1b397b-0111-e83f-5642-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.BinaryReport}))" Name="" Kind="125"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2d0902-0111-fc04-71e9-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.BinaryReport}))" Name="" Kind="125"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2d0903-0111-fd17-7c54-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.BinaryReport}))" Name="" Kind="125"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2d0904-0111-e277-064f-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.BinaryReport}))" Name="" Kind="125"/>
+        </children>
+      </Labels>
+      <Labels Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2d0905-0111-e38a-1197-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.BinaryReport}))" Name="" Kind="125"/>
+      </Labels>
+      <BendPoints x="4" y="-33"/>
+      <BendPoints x="259" y="89"/>
+      <BendPoints x="-251" y="-65"/>
+      <BendPoints x="4" y="57"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2d0906-0111-e051-40ba-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e2d05a4-0111-e080-3f9b-0943d923aa77" target="e1f2129-0111-e782-7273-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection}))" Name="" Kind="125"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2d0907-0111-e164-4ca1-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection}))" Name="" Kind="125"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2d0908-0111-e6c3-571d-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection}))" Name="" Kind="125"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2d0909-0111-e7d6-60f5-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection}))" Name="" Kind="125"/>
+        </children>
+      </Labels>
+      <Labels Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2d090a-0111-e49d-6c5b-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.ODSConnection}))" Name="" Kind="125"/>
+      </Labels>
+      <BendPoints x="8" y="-34"/>
+      <BendPoints x="-75" y="306"/>
+      <BendPoints x="72" y="-299"/>
+      <BendPoints x="-11" y="41"/>
+    </children>
+    <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:ConnectorView" LineColor="4009615" Font="Tahoma|10|0|" Visible="true" FactoryHint="" ShapeStereotypeStyle="2" Id="e2d090b-0111-e5b0-1d02-0943d923aa77" Routing="0" Smoothness="0" AvoidObstructions="false" ClosestDistance="false" SourceAnchor="anchor" TargetAnchor="anchor" JumpLinksStatus="0" JumpLinksType="1" JumpLinksReverse="false" ShowCompartmentTitle="false" source="e2d05a4-0111-e080-3f9b-0943d923aa77" target="e291c15-0111-f9f3-773b-0943d923aa77">
+      <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JDBCConnection}))" Name="" Kind="125"/>
+      <Labels Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2d090c-0111-eb10-28a1-0943d923aa77" FromLine="-18" FromEnd="50" IsPercentage="true">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JDBCConnection}))" Name="" Kind="125"/>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2d090d-0111-ec23-331d-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JDBCConnection}))" Name="" Kind="125"/>
+        </children>
+        <children xsi:type="com.rational.xtools.umlvisualizer.emfnotation:NameCompartmentView" Visible="true" FactoryHint="Name" ShapeStereotypeStyle="2" Id="e2d090e-0111-e8e9-3cf5-0943d923aa77">
+          <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JDBCConnection}))" Name="" Kind="125"/>
+        </children>
+      </Labels>
+      <Labels Visible="true" FactoryHint="Stereotype" ShapeStereotypeStyle="2" Id="e2d090f-0111-e9fc-485b-0943d923aa77">
+        <SemanticReference Id="emfsemantic:(~sc{%UMLRealization}(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.sg.abr.ExcelReport})(~jclass{!pid%AhePokUtilsJar}{%com.ibm.transform.oim.eacm.xalan.JDBCConnection}))" Name="" Kind="125"/>
+      </Labels>
+      <BendPoints x="4" y="-33"/>
+      <BendPoints x="102" y="81"/>
+      <BendPoints x="-94" y="-65"/>
+      <BendPoints x="4" y="49"/>
+    </children>
+  </Diagram>
+</com.rational.xtools.umlvisualizer.emfnotation:Pack>

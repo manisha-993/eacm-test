@@ -1,0 +1,221 @@
+<!-- 
+$Log: build.xml,v $
+Revision 1.15  2014/12/16 18:43:26  stimpsow
+pick up jars from middleware directory
+
+Revision 1.14  2014/12/16 18:17:50  stimpsow
+change to eacmbhdev
+
+Revision 1.13  2012/07/10 14:11:03  wendy
+restore cn.ibm.com address
+
+Revision 1.11  2012/07/10 14:01:33  wendy
+change from address to bin guo
+
+Revision 1.10  2012/07/10 13:59:27  wendy
+update mailing list
+
+Revision 1.9  2010/01/08 13:01:37  wendy
+remove yang from mailing list
+
+Revision 1.8  2008/11/05 14:25:31  wendy
+Changed mailing list
+
+Revision 1.7  2008/08/26 22:08:07  wendy
+upgrade poi jar
+
+Revision 1.6  2008/07/24 20:56:20  wendy
+update email addresses
+
+Revision 1.5  2007/03/07 00:33:50  chris
+added xsdbeans.jar
+
+Revision 1.4  2006/12/19 17:25:54  chris
+fix path to jar
+
+Revision 1.3  2006/12/19 17:23:24  chris
+adding jar for compile
+
+Revision 1.2  2006/06/07 19:19:15  wendy
+Updated distribution list
+
+Revision 1.1  2005/09/09 15:49:05  wendy
+Init AHE build for PokUtils.jar
+
+-->
+<project name="mktInfo" default="compile" basedir=".">
+  <property file="cvsid" />
+  <property name="mw12.jar" value="/home/opicmadm/middleware/middleware.jar" />
+  <property name="bui.classes" value="/home/opicmadm/buiadm/bui/current/generator/build/bui.jar" />
+  <property name="servlet.jar" value="" />
+  <property name="websphere.jar" value="" />
+  <property name="xalan.jar" value="/home/opicmadm/middleware/xalan.jar" />
+  <target name="update" >
+    <cvs command="update -d" 
+         cvsRoot=":pserver:${cvs.id}@eacmbhdev.lexington.ibm.com:/home/software/development" 
+         failonerror="true">
+    </cvs>
+  </target>
+  <target name="export" >
+    <delete dir="abr12"/>
+    <cvs command="export -r HEAD " 
+         cvsRoot=":pserver:${cvs.id}@eacmbhdev.lexington.ibm.com:/home/software/development" 
+         package="abr12/source/COM/ibm/eannounce/abr/sg/CHGGRPRptGen.java"
+         failonerror="true">
+    </cvs>
+  </target>
+  <target name="compile" depends="update,export">
+    <record name="compile.log" action="start" append="no" />
+    <javac srcdir="com" includes="**/*.java" debug="on" debuglevel="lines,vars,source"><!--  debug="on" debuglevel="lines,vars,source" -->
+      <classpath>
+        <pathelement location="${mw12.jar}"/>
+        <pathelement location="${bui.classes}"/>
+        <pathelement location="${servlet.jar}"/>
+        <pathelement location="${xalan.jar}"/>
+        <pathelement location="../../lib/poi-3.0.1-FINAL-20070705.jar"/>
+        <pathelement location="../../lib/xsdbeans.jar"/>
+      </classpath>
+    </javac>
+    <javac srcdir="abr12/source/COM" includes="**/*.java" debug="on" debuglevel="lines,vars,source"><!--  debug="on" debuglevel="lines,vars,source" -->
+      <classpath>
+        <pathelement location="${mw12.jar}"/>
+        <pathelement location="${bui.classes}"/>
+        <pathelement location="${servlet.jar}"/>
+      </classpath>
+    </javac>
+  </target>
+  <target name="tag">
+    <!-- get and format the date -->
+    <tstamp><format property="DSTAMP" pattern="yyyy-MM-dd"/></tstamp>
+    <propertyfile file="EA.builds">
+      <entry  key="PokUtils.build.number" type="int" operation="+" default="0"/>
+      <entry  key="PokUtils.build.date" value="${DSTAMP}"/>
+    </propertyfile>
+    <loadproperties srcfile="EA.builds"/>
+    <property name="tag1" value="PokUtils13-build-${PokUtils.build.date}-${PokUtils.build.number}" />
+    <cvs command="tag -b -c ${tag1}" 
+         cvsRoot=":pserver:${cvs.id}@eacmbhdev.lexington.ibm.com:/home/software/development"
+         dest="."
+         failonerror="true" />
+    <cvs command="rtag -b ${tag1}" 
+         cvsRoot=":pserver:${cvs.id}@eacmbhdev.lexington.ibm.com:/home/software/development"
+         package="abr12/source/COM/ibm/eannounce/abr/sg/CHGGRPRptGen.java"
+         failonerror="true" />
+  </target>
+  <target name="jar" depends="compile">
+    <delete file="../bui/source/web/WEB-INF/lib/PokUtils.jar" />
+    <jar destfile="../bui/source/web/WEB-INF/lib/PokUtils.jar">
+      <fileset dir=".">
+        <include name="com/**/*.class"/>
+        <include name="com/**/*.properties"/>
+        <include name="com/**/*.xml"/>
+        <include name="com/**/*.xsl"/>
+      </fileset>
+      <fileset dir="abr12/source">
+        <include name="COM/**/*.class"/>
+        <include name="COM/**/*.properties"/>
+      </fileset>
+    </jar>
+  </target>
+  <target name="commit" depends="jar,tag">
+    <filelist id="msgid" dir="." files="msg.txt" />
+    <pathconvert pathsep=" " property="messageFile" refid="msgid" />
+    <echo file="${messageFile}">built ${tag1}</echo>
+    <cvs command="commit -F ${messageFile}" 
+         cvsRoot=":pserver:${cvs.id}@eacmbhdev.lexington.ibm.com:/home/software/development" 
+         package="PokUtils.jar" 
+         dest="../bui/source/web/WEB-INF/lib"
+         failonerror="true" />
+  </target>
+  <target name="clean">
+    <delete>
+      <fileset dir="com" includes="**/*.class"/>
+    </delete>
+  </target>
+  <target name="e-mail" depends="clean,commit,strip">
+      <echo file="MailBody.txt">All,
+
+A new version of PokUtils.jar for AHE OIM3.0 based on sources tagged ${tag1} has been built.
+It has been checked into the bui CVS module on eacmbhdev.
+It will be distributed with the next West Coast build. 
+If you wish to be removed or add someone to this automated notification e-mail stimpsow@us.ibm.com.
+
+Changes on/since ${lastBuildDate} (NOTE: Changes show as revisions):
+</echo>
+    <!--<concat destfile="MailBody.txt" append="true">
+      <filelist dir="." files="change.log"/>
+    </concat>-->
+    <mail 
+      mailhost="relay.us.ibm.com" 
+      subject="PokUtils.jar built"
+      messagefile="MailBody.txt"
+      files="change.log"
+    >
+      <from address="guobin@cn.ibm.com"/>
+      <to address="stimpsow@us.ibm.com"/>
+      <to address="bedore@us.ibm.com"/>
+      <to address="ptatinen@us.ibm.com"/>
+      <to address="guobin@cn.ibm.com"/>
+    </mail>
+    <propertyfile file="EA.builds">
+      <entry  key="lastBuildDate" value="${DSTAMP}"/>
+    </propertyfile>
+  </target>
+  <target name="change">
+    <cvs command="log -N -d ${lastBuildDate}&lt;" 
+         cvsRoot=":pserver:${cvs.id}@eacmbhdev.lexington.ibm.com:/home/software/development"
+         dest="."
+         output="change.log"
+         failonerror="true" />
+  </target>
+  <target name="strip" depends="change">
+    <replaceregexp file="change.log" byline="false" flags="g">
+      <regexp pattern="\?.*\n"/>
+      <substitution expression=""/>
+    </replaceregexp>
+    <replaceregexp file="change.log" byline="false" flags="g">
+      <regexp pattern="RCS file:.*\n"/>
+      <substitution expression=""/>
+    </replaceregexp>
+    <replaceregexp file="change.log" byline="false" flags="g">
+      <regexp pattern="Working file:"/>
+      <substitution expression="File:"/>
+    </replaceregexp>
+    <replaceregexp file="change.log" byline="false" flags="g">
+      <regexp pattern="branch:.*\n"/>
+      <substitution expression=""/>
+    </replaceregexp>
+    <replaceregexp file="change.log" byline="false" flags="g">
+      <regexp pattern="locks:.*\n"/>
+      <substitution expression=""/>
+    </replaceregexp>
+    <replaceregexp file="change.log" byline="false" flags="g">
+      <regexp pattern="access list:.*\n"/>
+      <substitution expression=""/>
+    </replaceregexp>
+    <replaceregexp file="change.log" byline="false" flags="g">
+      <regexp pattern="keyword substitution:.*\n"/>
+      <substitution expression=""/>
+    </replaceregexp>
+    <replaceregexp file="change.log" byline="false" flags="g">
+      <regexp pattern="total revisions:.*\n"/>
+      <substitution expression=""/>
+    </replaceregexp>
+    <replaceregexp file="change.log" byline="false" flags="g">
+      <regexp pattern="description:"/>
+      <substitution expression=""/>
+    </replaceregexp>
+    <replaceregexp file="change.log" byline="true">
+      <regexp pattern=";  state:.*"/>
+      <substitution expression=""/>
+    </replaceregexp>
+    <replaceregexp file="change.log" byline="false" flags="g">
+      <regexp pattern="=============================================================================.*\n"/>
+      <substitution expression=""/>
+    </replaceregexp>
+    <replaceregexp file="change.log" byline="false" flags="gm">
+      <regexp pattern="^$"/>
+      <substitution expression=""/>
+    </replaceregexp>
+  </target>
+</project>

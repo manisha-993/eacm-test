@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://w3.ibm.com/eacm/XSLReportABRConfiguration" xmlns="http://w3.ibm.com/eacm/XSLReportABRConfiguration">
+	<xsd:element name="Option">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Style" />
+			</xsd:sequence>
+			<xsd:attribute name="code" type="xsd:string" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SelectionAttribute">
+		<xsd:complexType mixed="true">
+			<xsd:choice maxOccurs="unbounded" minOccurs="0">
+				<xsd:element ref="Option" />
+			</xsd:choice>
+			<xsd:attribute name="code" type="xsd:string" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Attribute">
+		<xsd:complexType>
+			<xsd:choice minOccurs="1" maxOccurs="1">
+				<xsd:element ref="Style" />
+				<xsd:element ref="SelectionAttribute" maxOccurs="1" />
+			</xsd:choice>
+			<xsd:attribute name="code" type="xsd:string" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Config">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="unbounded" minOccurs="1" ref="Enterprise" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Connection">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="UserID" />
+				<xsd:element ref="Password" />
+				<xsd:element ref="Database" />
+				<xsd:element ref="DatabaseURL" />
+				<xsd:element ref="DatabaseDriver" />
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:string" use="optional" />
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="DGTitle" type="xsd:string" />
+	<xsd:element name="DGClass" type="xsd:string" />
+	<xsd:element name="Database" type="xsd:string" />
+	<xsd:element name="DatabaseDriver" type="xsd:string" />
+	<xsd:element name="DatabaseURL" type="xsd:string" />
+	<xsd:element name="Enterprise">
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:sequence>
+					<xsd:element maxOccurs="unbounded" minOccurs="0" ref="Connection" />
+					<xsd:element maxOccurs="unbounded" minOccurs="1" ref="Entity" />
+				</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element maxOccurs="unbounded" minOccurs="1" ref="Connection" />
+					<xsd:element ref="Entity" />
+				</xsd:sequence>
+			</xsd:choice>
+			<xsd:attribute name="code" type="xsd:string" use="optional" />
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Entity">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="unbounded" minOccurs="1" ref="Attribute" />
+			</xsd:sequence>
+			<xsd:attribute name="type" type="xsd:string" use="optional" />
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Invoke">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element maxOccurs="unbounded" minOccurs="0" ref="Obj" />
+			</xsd:sequence>
+			<xsd:attribute name="method" type="xsd:string" use="optional" />
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Obj">
+		<xsd:complexType mixed="true">
+			<xsd:choice>
+				<xsd:element ref="DynamicSQL" maxOccurs="1" minOccurs="1"></xsd:element>
+				<xsd:element ref="Invoke" minOccurs="0" maxOccurs="unbounded" />
+			</xsd:choice>
+			<xsd:attribute name="excludeReturnCode" type="xsd:boolean" use="optional" />
+			<xsd:attribute name="type" type="xsd:string" use="optional" default="java.lang.String" />
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Password" type="xsd:string" />
+	<xsd:element name="Style">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:sequence maxOccurs="1" minOccurs="0">
+					<xsd:element ref="UsesConnection" maxOccurs="unbounded" minOccurs="1"  />
+					<xsd:element ref="DGTitle" />
+					<xsd:element ref="DGClass" minOccurs="0" maxOccurs="1" />
+				</xsd:sequence>
+				<xsd:element maxOccurs="unbounded" minOccurs="1" ref="XSLParam" />
+			</xsd:sequence>
+			<xsd:attribute name="xsl" type="xsd:string" use="optional" />
+			<xsd:attribute name="zip" type="xsd:boolean" use="optional" default="false" />
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="UserID" type="xsd:string" />
+	<xsd:element name="UsesConnection" type="xsd:string" />
+	<xsd:element name="XSLParam">
+		<xsd:complexType mixed="true">
+			<xsd:choice maxOccurs="unbounded" minOccurs="0">
+				<xsd:element ref="Obj" />
+			</xsd:choice>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="InsertAttribute">
+		<xsd:complexType>
+			<xsd:simpleContent>
+				<xsd:extension base="xsd:string">
+					<xsd:attribute name="code" type="xsd:string" /><xsd:attribute name="useFlagCode" type="xsd:boolean" use="optional" default="false"></xsd:attribute>
+				</xsd:extension>
+			</xsd:simpleContent>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="BaseSQL" type="xsd:string"></xsd:element>
+
+	<xsd:element name="DynamicSQL">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="BaseSQL" minOccurs="1" maxOccurs="1" />
+				<xsd:element ref="InsertAttribute" minOccurs="1" maxOccurs="unbounded" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

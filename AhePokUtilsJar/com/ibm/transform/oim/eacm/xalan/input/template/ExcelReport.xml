@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	(C) Copyright IBM Corp. 2006  All Rights Reserved.
+	
+	$Log: ExcelReport.xml,v $
+	Revision 1.2  2007/07/03 13:08:47  chris
+	changes for pricing reports
+	
+	Revision 1.1  2007/03/07 00:15:01  chris
+	XML input documents for ABRJob and the generalized ExcelReport abr
+	
+	
+	This is a template for the results of the Advance Status ABR
+-->
+<abrtests xmlns="http://w3.ibm.com/eacm/ABRTests" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://w3.ibm.com/eacm/ABRTests ABRTestsSchema ">
+	<text method="getDisplayName" />
+	<text method="getDependentProcessName" />
+	<text method="getDependentProcessStartTime" />
+	<test result="false" method="hasPassed" />
+	<test result="false" method="isDependentProcessRunning" />
+	<data>
+		<group entityType="ROOT" rootEntityType="true"></group>
+	</data>
+</abrtests>
