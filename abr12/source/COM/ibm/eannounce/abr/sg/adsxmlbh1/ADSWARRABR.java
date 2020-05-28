@@ -12,8 +12,11 @@ import COM.ibm.eannounce.abr.util.*;
 
 */
 // $Log: ADSWARRABR.java,v $
-// Revision 1.12  2020/04/03 08:17:20  xujianbo
-// Rollback code for stroy EACM 2494
+// Revision 1.13  2020/04/28 07:00:25  xujianbo
+// Recover code for EACM-2949 Development - Additional warranty attributes to support oem in iERP
+//
+// Revision 1.11  2020/03/31 10:18:08  xujianbo
+//     EACM-2949 Development - Additional warranty attributes to support oem in iERP
 //
 // Revision 1.10  2013/11/05 13:35:54  guobin
 // New RTC item 105978 - Add BHWARRCATEGORY to WARR_UPDATE
@@ -78,7 +81,8 @@ public class ADSWARRABR extends XMLMQRoot
         XMLMAP.addChild(new XMLElem("WARRCATG","WARRCATG"));
        //Add    BHALM00221724  WARR	BHWARRCATEGORY		
         XMLMAP.addChild(new XMLElem("BHWARRCATEGORY","BHWARRCATEGORY",XMLElem.SHORTDESC));
-        
+        XMLMAP.addChild(new XMLElem("OEMESAPRTSLBR","OEMESAPRTSLBR"));
+        XMLMAP.addChild(new XMLElem("OEMESAPRTSONY","OEMESAPRTSONY"));
         
         XMLElem list = new XMLElem("LANGUAGELIST");
         XMLMAP.addChild(list);
