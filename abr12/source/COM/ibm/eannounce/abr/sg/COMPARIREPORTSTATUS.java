@@ -21,17 +21,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.swing.CellEditor;
-
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
-import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.util.SystemOutLogger;
 
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
@@ -676,7 +672,7 @@ public class COMPARIREPORTSTATUS extends PokBaseABR {
 							report.append("All Match");
 						} else {
 							if (sheets[i].equals(MODEL)) {
-								addDebug("Mis Match：" + mismatchStr);
+								addDebug("Mis Matchï¼š" + mismatchStr);
 
 							}
 							cell = row.createCell((short) col++);
@@ -885,7 +881,7 @@ public class COMPARIREPORTSTATUS extends PokBaseABR {
 		// Set<String> set = new HashSet<String>();
 		/*
 		 * int firstRowIndex = sheet.getFirstRowNum() + 1; //
-		 * ç¬¬ä¸€è¡Œæ˜¯åˆ—å��ï¼Œæ‰€ä»¥ä¸�è¯» int lastRowIndex =
+		 * Ã§Â¬Â¬Ã¤Â¸â‚¬Ã¨Â¡Å’Ã¦ËœÂ¯Ã¥Ë†â€”Ã¥ï¿½ï¿½Ã¯Â¼Å’Ã¦â€°â‚¬Ã¤Â»Â¥Ã¤Â¸ï¿½Ã¨Â¯Â» int lastRowIndex =
 		 * sheet.getLastRowNum(); System.out.println("firstRowIndex: " +
 		 * firstRowIndex); System.out.println("lastRowIndex: " + lastRowIndex);
 		 * 
@@ -893,7 +889,7 @@ public class COMPARIREPORTSTATUS extends PokBaseABR {
 		 * BufferedWriter(new FileWriter(txt));
 		 * 
 		 * for (int rIndex = firstRowIndex; rIndex <= lastRowIndex; rIndex++) {
-		 * // é��åŽ†è¡Œ System.out.println("rIndex: " + rIndex); Row row =
+		 * // Ã©ï¿½ï¿½Ã¥Å½â€ Ã¨Â¡Å’ System.out.println("rIndex: " + rIndex); Row row =
 		 * sheet.getRow(rIndex); if (row != null) { int firstCellIndex =
 		 * row.getFirstCellNum();
 		 * 
@@ -929,8 +925,8 @@ public class COMPARIREPORTSTATUS extends PokBaseABR {
 		if (cell == null)
 			return "";
 		String value = "";
-		DecimalFormat df = new DecimalFormat("0");// 格式化number String字符串
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");// 日期格式化
+		DecimalFormat df = new DecimalFormat("0");// æ ¼å¼�åŒ–number Stringå­—ç¬¦ä¸²
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");// æ—¥æœŸæ ¼å¼�åŒ–
 		switch (cell.getCellType()) {
 		case HSSFCell.CELL_TYPE_STRING:
 			value = cell.getRichStringCellValue().getString();
