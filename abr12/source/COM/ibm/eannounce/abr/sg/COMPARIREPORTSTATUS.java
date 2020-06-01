@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -526,7 +527,7 @@ public class COMPARIREPORTSTATUS extends PokBaseABR {
 			// find the mapping between sheetdata and dbdata
 			for (int l = 0; l < sheetData[0].length; l++) {
 				String sheetCol = sheetData[0][l];
-				if (sheetCol == null || sheetCol.trim().equals("") || sheetCol.contains("Action"))
+				if (sheetCol == null || sheetCol.trim().equals("") || sheetCol.indexOf("Action")!=0)
 					continue;
 				report.append(sheetCol);
 				// row = sheet.createRow(rows++);
@@ -672,7 +673,7 @@ public class COMPARIREPORTSTATUS extends PokBaseABR {
 							report.append("All Match");
 						} else {
 							if (sheets[i].equals(MODEL)) {
-								addDebug("Mis Matchï¼š" + mismatchStr);
+								addDebug("Mis Match：" + mismatchStr);
 
 							}
 							cell = row.createCell((short) col++);
@@ -729,13 +730,13 @@ public class COMPARIREPORTSTATUS extends PokBaseABR {
 
 						String sheetName = wb.getSheetName(i);
 						addDebug("sheetName:" + sheetName);
-						if (sheetName != null && sheetName.contains("Announcement Info")) {
+						if (sheetName != null && sheetName.indexOf("Announcement Info")!=-1) {
 
 							HSSFSheet hssfSheet = wb.getSheetAt(i);
 							String title = hssfSheet.getRow(0).getCell((short) 0).getStringCellValue();
 
 							int col = 0;
-							if (title != null && title.contains("Withdrawal")) {
+							if (title != null && title.indexOf("Withdrawal")!=-1) {
 								col = 2;
 
 							} else {
@@ -881,7 +882,7 @@ public class COMPARIREPORTSTATUS extends PokBaseABR {
 		// Set<String> set = new HashSet<String>();
 		/*
 		 * int firstRowIndex = sheet.getFirstRowNum() + 1; //
-		 * Ã§Â¬Â¬Ã¤Â¸â‚¬Ã¨Â¡Å’Ã¦ËœÂ¯Ã¥Ë†â€”Ã¥ï¿½ï¿½Ã¯Â¼Å’Ã¦â€°â‚¬Ã¤Â»Â¥Ã¤Â¸ï¿½Ã¨Â¯Â» int lastRowIndex =
+		 * ç¬¬ä¸€è¡Œæ˜¯åˆ—å��ï¼Œæ‰€ä»¥ä¸�è¯» int lastRowIndex =
 		 * sheet.getLastRowNum(); System.out.println("firstRowIndex: " +
 		 * firstRowIndex); System.out.println("lastRowIndex: " + lastRowIndex);
 		 * 
@@ -889,7 +890,7 @@ public class COMPARIREPORTSTATUS extends PokBaseABR {
 		 * BufferedWriter(new FileWriter(txt));
 		 * 
 		 * for (int rIndex = firstRowIndex; rIndex <= lastRowIndex; rIndex++) {
-		 * // Ã©ï¿½ï¿½Ã¥Å½â€ Ã¨Â¡Å’ System.out.println("rIndex: " + rIndex); Row row =
+		 * // é��åŽ†è¡Œ System.out.println("rIndex: " + rIndex); Row row =
 		 * sheet.getRow(rIndex); if (row != null) { int firstCellIndex =
 		 * row.getFirstCellNum();
 		 * 
@@ -925,11 +926,12 @@ public class COMPARIREPORTSTATUS extends PokBaseABR {
 		if (cell == null)
 			return "";
 		String value = "";
-		DecimalFormat df = new DecimalFormat("0");// æ ¼å¼�åŒ–number Stringå­—ç¬¦ä¸²
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");// æ—¥æœŸæ ¼å¼�åŒ–
+		DecimalFormat df = new DecimalFormat("0");// 格式化number String字符串
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");// 日期格式化
 		switch (cell.getCellType()) {
 		case HSSFCell.CELL_TYPE_STRING:
-			value = cell.getRichStringCellValue().getString();
+			//value = cell.getRichStringCellValue().getString();
+			value = cell.getStringCellValue();
 			break;
 		case HSSFCell.CELL_TYPE_NUMERIC:
 			short style = cell.getCellStyle().getDataFormat();
