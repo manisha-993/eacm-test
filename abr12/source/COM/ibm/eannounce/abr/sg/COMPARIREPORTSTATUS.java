@@ -527,7 +527,7 @@ public class COMPARIREPORTSTATUS extends PokBaseABR {
 			// find the mapping between sheetdata and dbdata
 			for (int l = 0; l < sheetData[0].length; l++) {
 				String sheetCol = sheetData[0][l];
-				if (sheetCol == null || sheetCol.trim().equals("") || sheetCol.indexOf("Action")!=0)
+				if (sheetCol == null || sheetCol.trim().equals("") || sheetCol.indexOf("Action")!=-1)
 					continue;
 				report.append(sheetCol);
 				// row = sheet.createRow(rows++);
