@@ -2572,8 +2572,10 @@ private static Pattern pattern = Pattern.compile(reg);
 				for (int i = 0; i < taxcat.size(); i++) {
 					EntityItem tItem = (EntityItem) taxcat.get(i);
 					String tax = PokUtils.getAttributeFlagValue(tItem, "TAXCNTRY");
-					addDebug("tax：" + tax);
-					if ("1652".equals(tax)) {
+					String grp = PokUtils.getAttributeFlagValue(tItem, "SLEORGGRP");
+					addDebug("tax" + tax);
+					addDebug("grp" + grp);
+					if ("1652".equals(tax)&&"SGSUS".equals(grp)) {
 						EntityItem entityItem = (EntityItem) tItem.getUpLink().get(0);
 
 						String v2 = PokUtils.getAttributeValue(entityItem, "TAXCLS", "", "");
