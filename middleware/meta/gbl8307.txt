@@ -1,0 +1,66 @@
+@name=GBL8307
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=true
+@narrative
+
+(was 3007)
+
+$Log: gbl8307.txt,v $
+Revision 1.7  2010/06/21 15:42:59  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2004/10/20 21:01:49  dave
+changes to gen parm
+
+Revision 1.5  2004/02/20 20:21:57  roger
+Must be @t_schema
+
+Revision 1.4  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.3  2003/09/08 16:31:21  roger
+Enterprise was changed to 16 char length
+
+Revision 1.2  2002/08/05 23:15:35  joan
+get ValFrom value
+
+Revision 1.1  2002/05/03 18:17:59  gregg
+moved from gbl3007
+
+Revision 1.1  2001/11/19 23:52:10  dave
+newSP's for SerialHistoryObject 
+
+
+@desc=Return Blob Extention about a serial history for the UI Tree
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8307.txt,v 1.7 2010/06/21 15:42:59 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  B.BlobExtension, B.ValFrom
+FROM @t_schema.Blob B
+WHERE
+    B.Enterprise =  :Enterprise 
+AND B.EntityType = 'OPWG'
+AND B.EntityID =  :OPENID
+AND B.NLSID IN (1) 
+AND B.AttributeCode = :AttributeCode
+AND B.ValFrom <= :now AND :now < B.ValTo AND B.EffFrom <= :now AND :now < B.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in AttributeCode varchar(32)
+@end
+
+

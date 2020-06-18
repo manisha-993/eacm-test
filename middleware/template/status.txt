@@ -1,0 +1,26 @@
+//
+// TEMPLATE: STATUS.TXT (@date)
+//
+// Copyright (c) 2001, International Business Machines Corp., Ltd.
+// All Rights Reserved.
+// Licensed for use in connection with IBM business only.
+//
+// the status header file for C stored procedures
+//
+// $Log: status.txt,v $
+// Revision 1.5  2001/08/23 20:27:55  roger
+// Removed dead entries
+//
+// Revision 1.4  2001/03/16 03:18:49  roger
+// Added Log keyword
+//
+
+// Stored procedure exited normally
+#define SP_OK                              0
+
+// Password comparison
+#define SP_PASSWORD_OK                     1
+#define SP_PASSWORD_MISMATCH               2
+
+// Stored procedure abended
+#define SP_EXITED_PREMATURELY             -1

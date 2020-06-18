@@ -1,0 +1,40 @@
+#!/bin/sh
+
+#
+# This batch file is used to test LDAP functionality
+#
+
+JDK_CLASSES="/usr/java_dev2/jre/lib/rt.jar"
+OTHER_CLASSES="./cwa.jar:./ibmjndi.jar:./jndi.jar"
+JAVA_COMMAND="java"
+GOOD_USER = "rmccart1@us.ibm.com"
+BAD_USER = "bogus"
+GOOD_PASSWORD = "rnp63ix"
+BAD_PASSWORD = "bogus"
+GOOD_SERVER = "bluepages.ibm.com"
+BAD_SERVER = "swat.blue.ibm.com"
+TEST_SERVER = "swat.bluepages.ibm.com"
+
+echo bad user, bad password on Test server
+$JAVA_COMMAND $1 $2 $3 $4 $5 -classpath .:$JDK_CLASSES:$OTHER_CLASSES:middleware.jar -D\"java.naming.factory.initial=com.ibm.jndi.LDAPCtxFactory\" COM.ibm.opicmpdh.middleware.TestLDAP $TEST_SERVER $BAD_USER $BAD_PASSWORD
+sleep 2
+
+echo bad user, good password on Test server
+$JAVA_COMMAND $1 $2 $3 $4 $5 -classpath .:$JDK_CLASSES:$OTHER_CLASSES:middleware.jar -D\"java.naming.factory.initial=com.ibm.jndi.LDAPCtxFactory\" COM.ibm.opicmpdh.middleware.TestLDAP $TEST_SERVER $BAD_USER $GOOD_PASSWORD
+sleep 2
+
+echo good user, good password on bad server
+$JAVA_COMMAND $1 $2 $3 $4 $5 -classpath .:$JDK_CLASSES:$OTHER_CLASSES:middleware.jar -D\"java.naming.factory.initial=com.ibm.jndi.LDAPCtxFactory\" COM.ibm.opicmpdh.middleware.TestLDAP $BAD_SERVER $GOOD_USER $GOOD_PASSWORD
+sleep 2
+
+echo good user, good password on Test server
+$JAVA_COMMAND $1 $2 $3 $4 $5 -classpath .:$JDK_CLASSES:$OTHER_CLASSES:middleware.jar -D\"java.naming.factory.initial=com.ibm.jndi.LDAPCtxFactory\" COM.ibm.opicmpdh.middleware.TestLDAP $TEST_SERVER $GOOD_USER $GOOD_PASSWORD
+sleep 2
+
+echo good user, good password, production server
+$JAVA_COMMAND $1 $2 $3 $4 $5 -classpath .:$JDK_CLASSES:$OTHER_CLASSES:middleware.jar -D\"java.naming.factory.initial=com.ibm.jndi.LDAPCtxFactory\" COM.ibm.opicmpdh.middleware.TestLDAP $GOOD_SERVER $GOOD_USER $GOOD_PASSWORD
+sleep 2
+
+#
+# end of script
+#

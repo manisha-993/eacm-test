@@ -1,0 +1,54 @@
+@name=GBL4050
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------
+-- Pulling out WorldWideComponent info (This is a relator WWPRODUCT to COMPONENTGROUP)
+----------------------------------------------------------------------
+$Log: gbl4050.txt,v $
+Revision 1.2  2010/06/21 15:43:21  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.1  2005/05/25 18:55:48  bala
+check in
+
+
+
+
+@desc=Pulling out WorldWideComponent info
+@fenced=true
+@parmstyle=GENERAL
+@sql
+@results=1
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl4050.txt,v 1.2 2010/06/21 15:43:21 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE Cur CURSOR FOR
+
+SELECT 
+  VALFROM        
+ ,VALTO          
+ ,ISACTIVE       
+FROM GBLI.WWCOMPONENTS
+ WHERE 
+ENTERPRISE = :Enterprise 
+AND WWENTITYTYPE = :WWEntityType
+AND WWENTITYID = :WWEntityID
+AND COMPENTITYTYPE = :CompEntityType
+AND COMPENTITYID = :CompEntityID
+;
+                                         
+
+@execute
+
+EXEC SQL OPEN Cur;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(8)
+in WWEntityType varchar(32)
+in WWEntityID int
+in CompEntityType varchar(32)
+in CompEntityID int
+@end

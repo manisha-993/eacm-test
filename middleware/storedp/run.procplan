@@ -1,0 +1,22 @@
+#!/bin/ksh 
+
+. ~/storedp/vars
+
+date
+
+rm *planout
+
+db2 connect to $DBASE user $USER using $PASSWD
+db2 "select pkgname from syscat.packages \
+where (pkgname LIKE 'WHY%' or pkgname LIKE '%PSG%' or pkgname LIKE 'GBL%') order by pkgname" |
+awk 'NR > 3 && NF == 1 {print $1}' |
+while read PACKAGE
+  do
+    db2 connect to $DBASE user $USER using $PASSWD
+    db2expln -c $USER -s 0 -d $DBASE -u $USER $PASSWD -p $PACKAGE -o $SPSOURCE/$PACKAGE.planout
+    db2 terminate
+  done
+db2 terminate 
+
+date
+

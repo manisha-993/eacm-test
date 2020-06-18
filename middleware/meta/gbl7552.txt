@@ -1,0 +1,117 @@
+@name=GBL7552
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@results=1
+@narrative
+
+// $Log: gbl7552.txt,v $
+// Revision 1.14  2010/06/21 15:43:24  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.13  2004/10/20 21:01:46  dave
+// changes to gen parm
+//
+// Revision 1.12  2004/09/21 16:49:24  dave
+// fixes for Wendy on Change Group API
+//
+// Revision 1.11  2004/09/21 16:27:57  dave
+// trapping sp gen issue
+//
+//
+@desc=retreive Operator info for an OPWG
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7552.txt,v 1.14 2010/06/21 15:43:24 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL BEGIN DECLARE SECTION;
+
+char cUserToken[254];
+char cRoleCode[254];
+char cRoleDesc[254];
+char cChgDesc[254];
+
+EXEC SQL END DECLARE SECTION;
+
+strcpy(cUserToken,"No User Token  Found");
+strcpy(cRoleCode,"No Role Code Found");
+strcpy(cRoleDesc,"No Role Description Found");
+
+EXEC SQL 
+SELECT
+ RTRIM(T.AttributeValue),
+ RTRIM(T1.AttributeValue),
+ RTRIM(MD.LongDescription)
+ 
+ into :cUserToken, :cRoleCode, :cRoleDesc
+
+ FROM opicm.Relator REL
+ LEFT JOIN opicm.Text T ON
+     T.Enterprise = :Enterprise
+ AND T.Entitytype = 'OP' 
+ AND T.EntityID =  CASE WHEN REL.entity1type = 'OP' then REL.entity1id ELSE REL.Entity2ID END
+ AND T.AttributeCode = 'USERTOKEN' 
+ AND T.NLSID = 1
+ AND T.Valto = :forever
+
+ LEFT JOIN opicm.Text T1 ON
+     T1.Enterprise = :Enterprise
+ AND T1.Entitytype = 'OPWG' 
+ AND T1.EntityID =  :OPWGID
+ AND T1.AttributeCode = 'ROLECODE' 
+ AND T1.NLSID = 1
+ AND T1.Valto = :forever
+
+ LEFT JOIN opicm.metaDescription MD ON
+     MD.enterprise =  :Enterprise
+ AND MD.descriptiontype = T1.attributevalue
+ AND MD.nlsid IN (1,:NLSID)
+ AND MD.valto = :forever
+ WHERE
+     REL.Enterprise = :Enterprise
+ AND REL.entitytype = 'OPWG'
+ AND REL.entityid = :OPWGID
+ AND REL.valto = :forever
+;
+
+strcpy(cChgDesc,"None Found");
+
+EXEC SQL 
+SELECT
+ RTRIM(T.AttributeValue)
+ 
+ into :cChgDesc
+ 
+ FROM opicm.Text T 
+ WHERE
+     T.Enterprise = :Enterprise
+ AND T.Entitytype = 'CHANGEGROUP' 
+ AND T.EntityID =  :CHGID
+ AND T.AttributeCode = 'CHGGRPNAME' 
+ AND T.Valto = :forever
+;
+
+
+// just select our local variables from a dummy table - nextid will do...wanna ensure one and only 1 row is returned...
+EXEC SQL DECLARE FinalCur CURSOR FOR
+SELECT 
+  :cUserToken
+ ,:cRoleDesc
+ ,:cChgDesc
+from @t_schema.nextid where enterprise = :Enterprise and entitytype = 'OPWG' FOR READ ONLY;
+;
+
+@execute
+EXEC SQL OPEN FinalCur;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPWGID int
+in CHGID int
+in NLSID int
+@end
+
+

@@ -1,0 +1,441 @@
+okecho Starting $0 `date`
+
+#
+# $Id: run.clonesegct,v 1.11 2003/10/30 21:04:55 roger Exp $
+#
+
+#
+# settings
+#
+DATABASE="idlpdh"
+ENTERPRISE="L2"
+FOREVER="9999-12-31-00.00.00.000000"
+JOB="/tmp/jobfile"
+MAGIC_TRANID=12345
+NOW=`date +"%Y-%m-%d-%H.%M.%S.000000"`
+OUTPUT="out.clonesegct."`date +"%Y%m%d%H%M%S"`
+RUNDATETIME=$NOW
+
+echo Output to $OUTPUT
+
+cat > $JOB << EOF
+--#COMMENT
+--#COMMENT $Id: run.clonesegct,v 1.11 2003/10/30 21:04:55 roger Exp $
+--#COMMENT
+
+--#COMMENT
+--#COMMENT phase 1/3 - LSCC to LSSEG
+--#COMMENT
+
+--#COMMENT
+--#COMMENT step 1/8 - remove cloned rows from prior run
+--#COMMENT
+--#COMMENT
+--#COMMENTdelete
+--#COMMENTfrom opicm.flag
+--#COMMENTwhere
+--#COMMENTtranid = $MAGIC_TRANID
+--#COMMENT;
+--#COMMENT
+--#COMMENTMAGIC_TRANID=0100
+
+--#COMMENT
+--#COMMENT step 2/8 - provide count of associations for segment in LSCC (sb = 0)
+--#COMMENT
+
+select 
+count(*) as count
+from opicm.flag f
+where
+    f.enterprise = '$ENTERPRISE'
+and f.entitytype = 'LSCC'
+and f.attributecode = 'LSCCSEGMENT'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+;
+
+--#COMMENT
+--#COMMENT step 3/8 - provide count of associations in segment (sb > 0)
+--#COMMENT
+
+select 
+count(*) as count
+from opicm.flag f
+where
+    f.enterprise = '$ENTERPRISE'
+and f.entitytype = 'LSSEG'
+and f.attributecode = 'LSSEGSEGMENT'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+;
+
+--#COMMENT
+--#COMMENT step 4/8 - count the number of relators (should match count from final step)
+--#COMMENT
+
+select 
+count(*) as count
+from opicm.relator 
+where 
+    enterprise = '$ENTERPRISE'
+and entitytype='LSCCSEG' 
+and entity1type='LSCC' 
+and entity2type='LSSEG'
+and valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < valto and efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < effto
+;
+
+--#COMMENT
+--#COMMENT step 5/8 - count the number of entities (entity1) where more than 1 (entity2)
+--#COMMENT
+
+select 
+  entity1type
+, entity1id
+, count(*) as count
+from opicm.relator 
+where 
+    enterprise = '$ENTERPRISE'
+and entitytype='LSCCSEG' 
+and entity1type='LSCC' 
+and entity2type='LSSEG'
+and valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < valto and efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < effto
+group by entity1type, entity1id
+having count(*) > 1
+;
+
+--#COMMENT
+--#COMMENT step 6/8 - clone the segment associations to LSCC
+--#COMMENT
+
+insert into opicm.flag
+select
+  f.enterprise
+ ,r.entity1type
+ ,r.entity1id
+ ,'LSCCSEGMENT'
+ ,min(f.attributevalue)
+ ,'$NOW'
+ ,'$FOREVER'
+ ,'$NOW'
+ ,'$FOREVER'
+ ,min(r.openid)
+ ,$MAGIC_TRANID
+from opicm.flag f
+inner join opicm.relator r on
+    r.enterprise = f.enterprise
+and r.entitytype = 'LSCCSEG'    
+and r.entity1type = 'LSCC'
+and r.entity2type = f.entitytype
+and r.entity2id = f.entityid
+and r.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < r.valto and r.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < r.effto
+where
+    f.enterprise = '$ENTERPRISE'
+and f.entitytype = 'LSSEG'
+and f.attributecode = 'LSSEGSEGMENT'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+group by f.enterprise, r.entity1type, r.entity1id
+;
+
+--#COMMENT
+--#COMMENT step 7/8 - provide count of associations for segment in LSCC (sb > 0)
+--#COMMENT
+
+select 
+count(*) as count
+from opicm.flag f
+where
+    f.enterprise = '$ENTERPRISE'
+and f.entitytype = 'LSCC'
+and f.attributecode = 'LSCCSEGMENT'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+;
+
+--#COMMENT
+--#COMMENT step 8/8 - deactivate existing relators
+--#COMMENT
+--#COMMENT
+--#COMMENTupdate opicm.relator
+--#COMMENTset effto = '$NOW'
+--#COMMENTwhere
+--#COMMENT    enterprise = '$ENTERPRISE'
+--#COMMENTand entitytype = 'LSCCSEG'
+--#COMMENTand entity1type = 'LSCC'
+--#COMMENTand entity2type = 'LSSEG'
+--#COMMENTand valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < valto and efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < effto
+--#COMMENT;
+
+--#COMMENT
+--#COMMENT phase 2/3 - LSWWCC to LSSEG
+--#COMMENT
+
+--#COMMENT
+--#COMMENT step 1/8 - remove cloned rows from prior run
+--#COMMENT
+--#COMMENT
+--#COMMENTdelete
+--#COMMENTfrom opicm.flag
+--#COMMENTwhere
+--#COMMENTtranid = $MAGIC_TRANID
+--#COMMENT;
+--#COMMENT
+--#COMMENTMAGIC_TRANID=0200
+
+--#COMMENT
+--#COMMENT step 2/8 - provide count of associations for segment in LSWWCC (sb = 0)
+--#COMMENT
+
+select 
+count(*) as count
+from opicm.flag f
+where
+    f.enterprise = '$ENTERPRISE'
+and f.entitytype = 'LSWWCC'
+and f.attributecode = 'LSWWCCSEGMENT'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+;
+
+--#COMMENT
+--#COMMENT step 3/8 - provide count of associations in segment (sb > 0)
+--#COMMENT
+
+select 
+count(*) as count
+from opicm.flag f
+where
+    f.enterprise = '$ENTERPRISE'
+and f.entitytype = 'LSSEG'
+and f.attributecode = 'LSSEGSEGMENT'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+;
+
+--#COMMENT
+--#COMMENT step 4/8 - count the number of relators (should match count from final step)
+--#COMMENT
+
+select 
+count(*) as count
+from opicm.relator 
+where entitytype='LSWWCCSEG' 
+and entity1type='LSWWCC' 
+and entity2type='LSSEG'
+and valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < valto and efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < effto
+;
+
+--#COMMENT
+--#COMMENT step 5/8 - count the number of entities (entity1) where more than 1 (entity2)
+--#COMMENT
+
+select 
+  entity1type
+, entity1id
+, count(*) as count
+from opicm.relator 
+where entitytype='LSWWCCSEG' 
+and entity1type='LSWWCC' 
+and entity2type='LSSEG'
+and valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < valto and efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < effto
+group by entity1type, entity1id
+having count(*) > 1
+;
+
+--#COMMENT
+--#COMMENT step 6/8 - clone the segment associations to LSWWCC
+--#COMMENT
+
+insert into opicm.flag
+select
+  f.enterprise
+ ,r.entity1type
+ ,r.entity1id
+ ,'LSWWCCSEGMENT'
+ ,min(f.attributevalue)
+ ,'$NOW'
+ ,'$FOREVER'
+ ,'$NOW'
+ ,'$FOREVER'
+ ,min(r.openid)
+ ,$MAGIC_TRANID
+from opicm.flag f
+inner join opicm.relator r on
+    r.enterprise = f.enterprise
+and r.entitytype = 'LSWWCCSEG'    
+and r.entity1type = 'LSWWCC'
+and r.entity2type = f.entitytype
+and r.entity2id = f.entityid
+and r.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < r.valto and r.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < r.effto
+where
+    f.enterprise = '$ENTERPRISE'
+and f.entitytype = 'LSSEG'
+and f.attributecode = 'LSSEGSEGMENT'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+group by f.enterprise, r.entity1type, r.entity1id
+;
+
+--#COMMENT
+--#COMMENT step 7/8 - provide count of associations for segment in LSWWCC (sb > 0)
+--#COMMENT
+
+select 
+count(*) as count
+from opicm.flag f
+where
+    f.enterprise = '$ENTERPRISE'
+and f.entitytype = 'LSWWCC'
+and f.attributecode = 'LSWWCCSEGMENT'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+;
+
+--#COMMENT
+--#COMMENT step 8/8 - deactivate existing relators
+--#COMMENT
+--#COMMENT
+--#COMMENTupdate opicm.relator
+--#COMMENTset effto = '$NOW'
+--#COMMENTwhere
+--#COMMENT    enterprise = '$ENTERPRISE'
+--#COMMENTand entitytype = 'LSWWCCSEG'
+--#COMMENTand entity1type = 'LSWWCC'
+--#COMMENTand entity2type = 'LSSEG'
+--#COMMENTand valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < valto and efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < effto
+--#COMMENT;
+
+--#COMMENT
+--#COMMENT phase 3/3 - LSWWCCCT to LSCT
+--#COMMENT
+
+--#COMMENT
+--#COMMENT step 1/8 - remove cloned rows from prior run
+--#COMMENT
+--#COMMENT
+--#COMMENTdelete
+--#COMMENTfrom opicm.flag
+--#COMMENTwhere
+--#COMMENTtranid = $MAGIC_TRANID
+--#COMMENT;
+--#COMMENT
+--#COMMENTMAGIC_TRANID=0300
+
+--#COMMENT
+--#COMMENT step 2/8 - provide count of associations for segment in LSWWCC (sb = 0)
+--#COMMENT
+
+select 
+count(*) as count
+from opicm.flag f
+where
+    f.enterprise = '$ENTERPRISE'
+and f.entitytype = 'LSWWCC'
+and f.attributecode = 'LSWWCCCOUNTRY'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+;
+
+--#COMMENT
+--#COMMENT step 3/8 - provide count of associations in county (sb > 0)
+--#COMMENT
+
+select 
+count(*) as count
+from opicm.flag f
+where
+    f.enterprise = '$ENTERPRISE'
+and f.entitytype = 'LSCT'
+and f.attributecode = 'LSCTCOUNTRY'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+;
+
+--#COMMENT
+--#COMMENT step 4/8 - count the number of relators (should match count from final step)
+--#COMMENT
+
+select 
+count(*) as count
+from opicm.relator 
+where entitytype='LSWWCCCT' 
+and entity1type='LSWWCC' 
+and entity2type='LSCT'
+and valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < valto and efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < effto
+;
+
+--#COMMENT
+--#COMMENT step 5/8 - count the number of entities (entity1) where more than 1 (entity2)
+--#COMMENT
+
+select 
+  entity1type
+, entity1id
+, count(*) as count
+from opicm.relator 
+where entitytype='LSWWCCCT' 
+and entity1type='LSWWCC' 
+and entity2type='LSCT'
+and valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < valto and efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < effto
+group by entity1type, entity1id
+having count(*) > 1
+;
+
+--#COMMENT
+--#COMMENT step 6/8 - clone the country associations to LSWWCC
+--#COMMENT
+
+insert into opicm.flag
+select
+  f.enterprise
+ ,r.entity1type
+ ,r.entity1id
+ ,'LSWWCCCOUNTRY'
+ ,min(f.attributevalue)
+ ,'$NOW'
+ ,'$FOREVER'
+ ,'$NOW'
+ ,'$FOREVER'
+ ,min(r.openid)
+ ,$MAGIC_TRANID
+from opicm.flag f
+inner join opicm.relator r on
+    r.enterprise = f.enterprise
+and r.entitytype = 'LSWWCCCT'    
+and r.entity1type = 'LSWWCC'
+and r.entity2type = f.entitytype
+and r.entity2id = f.entityid
+and r.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < r.valto and r.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < r.effto
+where
+    f.enterprise = '$ENTERPRISE'
+and f.entitytype = 'LSCT'
+and f.attributecode = 'LSCTCOUNTRY'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+group by f.enterprise, r.entity1type, r.entity1id
+;
+
+--#COMMENT
+--#COMMENT step 7/8 - provide count of associations for segment in LSWWCC (sb > 0)
+--#COMMENT
+
+select 
+count(*) as count
+from opicm.flag f
+where
+    f.enterprise = '$ENTERPRISE'
+and f.entitytype = 'LSWWCC'
+and f.attributecode = 'LSWWCCCOUNTRY'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+;
+
+--#COMMENT
+--#COMMENT step 8/8 - deactivate existing relators
+--#COMMENT
+--#COMMENT
+--#COMMENTupdate opicm.relator
+--#COMMENTset effto = '$NOW'
+--#COMMENTwhere
+--#COMMENT    enterprise = '$ENTERPRISE'
+--#COMMENTand entitytype = 'LSWWCCCT'
+--#COMMENTand entity1type = 'LSWWCC'
+--#COMMENTand entity2type = 'LSCT'
+--#COMMENTand valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < valto and efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < effto
+--#COMMENT;
+
+EOF
+
+db2batch -d $DATABASE -f $JOB -r $OUTPUT
+rm $JOB
+
+echo Ending $0 `date`
+

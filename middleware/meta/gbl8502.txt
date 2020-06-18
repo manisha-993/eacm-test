@@ -1,0 +1,201 @@
+@name=GBL8502
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Manages the update of an Feature Record
+
+// $Log: gbl8502.txt,v $
+// Revision 1.10  2010/06/21 15:42:37  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.9  2009/10/20 00:22:01  rick
+// update to change long datatype to sqlint32
+//
+// Revision 1.8  2007/01/30 21:02:22  rick
+// Updated to make os_fc part of primary key.
+//
+// Revision 1.7  2006/02/22 00:33:02  gregg
+// nlsid in count query
+//
+// Revision 1.6  2005/09/30 21:38:12  joan
+// fixes
+//
+// Revision 1.5  2005/09/29 16:39:30  joan
+// adjusting os_fc length
+//
+// Revision 1.4  2005/09/28 15:05:57  joan
+// fixes
+//
+// Revision 1.3  2005/09/27 18:09:49  joan
+// fixes
+//
+// Revision 1.2  2005/09/26 18:07:09  joan
+// fix compile
+//
+// Revision 1.1  2005/09/26 16:21:49  joan
+// initial load
+//
+//
+
+@desc= Manages the update of an WWProduct Reocrd
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8502.txt,v 1.10 2010/06/21 15:42:37 wendy Exp $";
+sqlint32 count = 0;
+EXEC SQL END DECLARE SECTION;
+@execute
+
+FILE *t;
+mode_t Mode2;
+Mode2 = 0777;
+chmod("/tmp/8502.log",Mode2);
+t=fopen("/tmp/8502.log","a");
+t=fopen("/tmp/8502.log","w");
+fprintf(t,"-->start of stored procedure GBL8502\n"); 
+
+fprintf(t,"isactive:%d\n",isactive);
+
+EXEC SQL 
+
+Select count(*) into :count 
+from gbli.wwprodcompat
+where 
+enterprise = :enterprise and 
+wwprodentitytypefrom = :wwprodentitytypefrom and 
+wwprodentityidfrom = :wwprodentityidfrom and
+wwprodentitytypeto = :wwprodentitytypeto and 
+wwprodentityidto = :wwprodentityidto and
+os_fc = :os_fc and 
+countrylist = :countrylist and
+nlsid = :nlsid
+;
+
+if (count == 0 && isactive == 0) {
+// do nothing
+fprintf(t,"count == 0 && isactive == 0\n");
+} else if (count == 0 && isactive == 1) {
+// insert this guy
+fprintf(t,"count == 0 && isactive == 1\n");
+EXEC SQL
+insert into gbli.wwprodcompat 
+(  
+  enterprise
+, countrycode
+, languagecode
+, nlsid
+, countrylist
+, compattype 
+, os 
+, os_fc 
+, wwprodentitytypefrom 
+, wwprodentityidfrom 
+, wwpartnumberfrom 
+, wwprodentitytypeto 
+, wwprodentityidto
+, wwpartnumberto 
+, pubfrom 
+, pubto
+, valfrom
+, valto
+, isactive
+)
+values (
+  :enterprise
+, :countrycode
+, :languagecode
+, :nlsid
+, :countrylist
+, :compattype
+, :os 
+, :os_fc 
+, :wwprodentitytypefrom 
+, :wwprodentityidfrom 
+, :wwpartnumberfrom 
+, :wwprodentitytypeto 
+, :wwprodentityidto
+, :wwpartnumberto 
+, :pubfrom 
+, :pubto
+, current timestamp
+, '9999-12-31-00.00.00.000000'
+, 1
+)
+;
+} else if (count != 0 && isactive == 1) {
+// update this guy
+fprintf(t,"count != 0 && isactive == 1\n");
+EXEC SQL
+update gbli.wwprodcompat 
+set  
+  compattype  =  :compattype
+, os = :os
+, wwpartnumberfrom = :wwpartnumberfrom
+, wwpartnumberto = :wwpartnumberto 
+, pubfrom  = :pubfrom 
+, pubto = :pubto 
+, valfrom = current timestamp
+, valto = '9999-12-31-00.00.00.000000'
+, isactive = 1
+where 
+enterprise = :enterprise and 
+wwprodentitytypefrom = :wwprodentitytypefrom and 
+wwprodentityidfrom = :wwprodentityidfrom and
+wwprodentitytypeto = :wwprodentitytypeto and 
+wwprodentityidto = :wwprodentityidto and
+os_fc = :os_fc and 
+countrylist = :countrylist
+;
+
+} else {
+// turn it off
+fprintf(t,"else...\n");
+EXEC SQL
+update gbli.wwprodcompat
+set  
+valfrom = current timestamp, 
+valto  =  current timestamp, 
+isactive = 0 
+where 
+enterprise = :enterprise and 
+wwprodentitytypefrom = :wwprodentitytypefrom and 
+wwprodentityidfrom = :wwprodentityidfrom and
+wwprodentitytypeto = :wwprodentitytypeto and 
+wwprodentityidto = :wwprodentityidto and
+os_fc = :os_fc and 
+countrylist = :countrylist
+;
+
+}
+
+ fprintf(t,"end of GBL8502\n");
+fclose(t);
+
+//EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in enterprise varchar(8) 
+in countrycode varchar(2) 
+in languagecode varchar(2) 
+in nlsid int
+in countrylist varchar(8)
+in compattype varchar(6) 
+in os varchar(128) 
+in os_fc varchar(16) 
+in wwprodentitytypefrom varchar(32) 
+in wwprodentityidfrom int
+in wwpartnumberfrom varchar(12) 
+in wwprodentitytypeto varchar(32) 
+in wwprodentityidto int
+in wwpartnumberto varchar(12) 
+in pubfrom varchar(10)
+in pubto varchar(10) 
+in isactive int
+@end
+

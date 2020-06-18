@@ -1,0 +1,146 @@
+@name=GBL2911
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+$Log: gbl2911.txt,v $
+Revision 1.32  2010/06/21 15:43:02  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.31  2004/11/05 20:05:53  dave
+fix
+
+Revision 1.30  2004/11/05 16:57:57  dave
+small change
+
+Revision 1.29  2004/11/04 18:57:36  dave
+OK Billingcode is now an attribute on the translation entity
+itself and is now part of the PackageID constructor
+
+Revision 1.28  2004/10/21 17:57:23  roger
+Remove duplicate @fenced
+
+Revision 1.27  2004/10/20 21:01:39  dave
+changes to gen parm
+
+Revision 1.26  2004/02/20 20:21:49  roger
+Must be @t_schema
+
+Revision 1.25  2004/02/20 18:09:30  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.24  2003/09/03 17:03:54  dave
+minor changes based upon Hans comments
+
+Revision 1.23  2003/08/14 17:49:56  dave
+Fine tuning putBlobNow
+
+Revision 1.22  2003/07/08 18:32:57  dave
+First attempt at getting Package ID's and Info
+from the outbound queues
+
+Revision 1.21  2001/09/21 17:27:47  dave
+fixed up some NE stuff
+
+Revision 1.20  2001/06/08 05:40:14  dave
+removed perms from GBL2911
+
+Revision 1.19  2001/06/07 22:58:23  dave
+backing out fix
+
+Revision 1.18  2001/06/07 22:34:16  vlasta
+*** empty log message ***
+
+Revision 1.17  2001/06/07 22:01:49  dave
+fixes
+
+Revision 1.16  2001/06/07 17:40:37  vlasta
+*** empty log message ***
+
+Revision 1.15  2001/06/01 20:16:43  dave
+review of 2911
+
+Revision 1.14  2001/06/01 15:59:37  dave
+fix to 2911 added T6 NLS check back in
+
+Revision 1.13  2001/05/31 15:25:51  dave
+Attempted fix to reduce the rows (doubling)
+
+Revision 1.12  2001/05/30 16:56:59  vlasta
+added MD4
+
+Revision 1.11  2001/05/29 21:37:59  vlasta
+changed MD2.Enterprise to MD3.Enterprise
+
+Revision 1.10  2001/05/15 21:26:22  vlasta
+*** empty log message ***
+
+Revision 1.9  2001/05/15 21:25:03  vlasta
+changed gbl2911.txt, added
+INNER JOIN @t_schema.MetaDescription MD3 ON
+MD3.Enterprise = R2.Enterprise
+AND MD3.DescriptionType = F2.AttributeCode
+AND MD3.DescriptionClass in ('F', 'U')
+AND MD3.NLSID = 1
+AND MD3.ValFrom <= :ValOn AND :ValOn < MD3.ValTo AND MD3.EffFrom <= :EffOn AND :EffOn < MD3.EffTo
+
+Revision 1.8  2001/03/22 01:04:15  roger
+Misc clean up
+
+Revision 1.7  2001/03/21 19:57:18  roger
+Adjusted column names for MetaDescription table
+
+Revision 1.6  2001/03/19 19:21:47  roger
+MetaFlagValue rows moved to MetaDescription table
+
+Revision 1.5  2001/03/19 17:56:55  roger
+Id rows now in Text table
+
+Revision 1.4  2001/03/16 18:27:52  roger
+Added branding feature to stored procedures
+
+Revision 1.3  2001/03/16 03:38:57  roger
+Added Log keyword
+
+@desc=Supports getPackageList method for Translation
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2911.txt,v 1.32 2010/06/21 15:43:02 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT 
+ Q.EntityType
+,Q.EntityID
+,MAX(Q.PushDate)
+,MIN(CASE WHEN F.AttributeValue IS Null OR F.AttributeValue = 'PCD' THEN '' ELSE F.AttributeValue END)
+FROM @t_schema.Queue Q
+INNER JOIN @t_schema.Entity E  ON
+    E.Enterprise = :Enterprise
+AND E.EntityType = Q.EntityType
+AND E.EntityID = Q.EntityID
+AND E.ValTo > Current TimeStamp
+AND E.EffTo > Current TimeStamp
+LEFT JOIN @t_schema.FLAG F ON
+    F.EntityType = E.EntityType 
+AND F.EntityID = E.EntityID
+AND F.AttributeCode = 'BILLINGCODE'
+AND F.ValTo > Current TimeStamp
+AND F.EffTo > Current TimeStamp
+WHERE
+    Q.Enterprise = :Enterprise
+AND Q.Queue = :Queue
+AND Q.Status = 0
+GROUP BY Q.EntityType, Q.EntityID;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in Queue varchar(33)
+@end
+
+

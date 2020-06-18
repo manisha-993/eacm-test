@@ -1,0 +1,194 @@
+@name=GBL7004
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Returns all EntityTypes that can be returned for a given Navigate Action
+
+$Log: gbl7004.txt,v $
+Revision 1.16  2010/06/21 15:42:41  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.15  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.14  2004/07/20 16:39:16  dave
+Attempting to do the trickey T think to pick up both ends of
+the relator on a Nav.. or extract
+
+Revision 1.13  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.12  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.11  2003/09/08 16:31:15  roger
+Enterprise was changed to 16 char length
+
+Revision 1.10  2003/08/21 20:03:14  dave
+syntax fixes on GBL7004
+
+Revision 1.9  2003/08/21 19:53:11  dave
+sort ordering the 7004 so entity groups come
+back based upon their english description
+
+Revision 1.8  2003/04/08 03:37:52  dave
+syntax
+
+Revision 1.7  2002/03/13 16:53:09  dave
+fix to 7004 to fish out action item stuff
+
+Revision 1.6  2002/03/05 23:53:45  dave
+Rounding out the SearchActionItem
+
+Revision 1.5  2002/02/11 06:41:26  dave
+fix to include the WG EntityItem in the EntityGroup
+
+Revision 1.4  2002/02/11 06:11:20  dave
+more sp fixes
+
+Revision 1.3  2002/01/21 21:41:59  dave
+removed role from 7004 no need
+
+Revision 1.2  2002/01/21 18:12:40  dave
+added MetaLink to support new NavigateObject
+so we can de-couple Navigation from Linking
+
+Revision 1.1  2002/01/18 23:24:13  dave
+new sp to get all entitytypes that can come back from a NavAction
+
+
+@desc= Returns all EntityTypes that can be returned for a given Navigate Action
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7004.txt,v 1.16 2010/06/21 15:42:41 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT
+  RTRIM(MLA1.LinkType1)
+ ,(select
+   RTRIM(md.LongDescription)
+   from @t_schema.MetaDescription md
+   where
+       md.enterprise = :Enterprise
+   and md.descriptionType = mla1.LinkType1
+   and md.nlsid = 1
+   and md.valto = :forever
+   and :EffOn between md.efffrom and md.effto)
+FROM  @t_schema.MetaLinkAttr MLA
+INNER JOIN @t_schema.MetaLinkAttr MLA1 ON
+    MLA1.Enterprise = :Enterprise
+AND MLA1.LinkType = MLA.LinkType2
+AND MLA1.LinkCode IN ('Relator','Assoc')
+AND MLA1.ValFrom <= :ValOn AND :ValOn < MLA1.ValTo AND MLA1.EffFrom <= :EffOn AND :EffOn < MLA1.EffTo
+WHERE
+    MLA.Enterprise = :Enterprise
+AND MLA.LinkType = 'Action/Entity'
+AND MLA.LinkType1 = :ActionType
+AND MLA.LinkCode in ('D','U')
+AND MLA.ValFrom <= :ValOn AND :ValOn < MLA.ValTo AND MLA.EffFrom <= :EffOn AND :EffOn < MLA.EffTo
+UNION
+SELECT
+  RTRIM(MLA1.LinkType2)
+ ,(select
+   RTRIM(md.LongDescription)
+   from @t_schema.MetaDescription md
+   where
+       md.enterprise = :Enterprise
+   and md.descriptionType = mla1.LinkType2
+   and md.nlsid = 1
+   and md.valto = :forever
+   and :EffOn between md.efffrom and md.effto)
+FROM @t_schema.MetaLinkAttr MLA
+INNER JOIN @t_schema.MetaLinkAttr MLA1 ON
+    MLA1.Enterprise = :Enterprise
+AND MLA1.LinkType = MLA.LinkType2
+AND MLA1.LinkCode IN ('Relator','Assoc')
+AND MLA1.ValFrom <= :ValOn AND :ValOn < MLA1.ValTo AND MLA1.EffFrom <= :EffOn AND :EffOn < MLA1.EffTo
+WHERE
+    MLA.Enterprise = :Enterprise
+AND MLA.LinkType = 'Action/Entity'
+AND MLA.LinkType1 = :ActionType
+AND MLA.linkCode in ('D','U')
+AND MLA.ValFrom <= :ValOn AND :ValOn < MLA.ValTo AND MLA.EffFrom <= :EffOn AND :EffOn < MLA.EffTo
+UNION
+SELECT
+  RTRIM(MLA.LinkType2)
+ ,(select
+   RTRIM(md.LongDescription)
+   from @t_schema.MetaDescription md
+   where
+       md.enterprise = :Enterprise
+   and md.descriptionType = mla.LinkType2
+   and md.nlsid = 1
+   and md.valto = :forever
+   and :EffOn between md.efffrom and md.effto)
+FROM @t_schema.MetaLinkAttr MLA
+WHERE
+    MLA.Enterprise =  :Enterprise
+AND MLA.LinkType = 'Action/Entity'
+AND MLA.LinkType1 = :ActionType
+AND MLA.LinkCode in ('D','U')
+AND MLA.ValFrom <= :ValOn AND :ValOn < MLA.ValTo AND MLA.EffFrom <= :EffOn AND :EffOn < MLA.EffTo
+--
+-- Get the EntryPoint Case
+UNION
+SELECT
+ RTRIM(MLA.LinkType2)
+ ,(select
+   RTRIM(md.LongDescription)
+   from @t_schema.MetaDescription md
+   where
+       md.enterprise = :Enterprise
+   and md.descriptionType = mla.LinkType2
+   and md.nlsid = 1
+   and md.valto = :forever
+   and :EffOn between md.efffrom and md.effto)
+FROM @t_schema.MetaLinkAttr MLA
+WHERE
+    MLA.Enterprise =  :Enterprise
+AND MLA.LinkType = 'Action/Entity'
+AND MLA.LinkType1 = :ActionType
+AND MLA.LinkCode = 'D'
+AND MLA.ValFrom <= :ValOn AND :ValOn < MLA.ValTo AND MLA.EffFrom <= :EffOn AND :EffOn < MLA.EffTo
+--
+-- Get the Search Case
+UNION
+SELECT
+ RTRIM(MLA.LinkType2)
+ ,(select
+   RTRIM(md.LongDescription)
+   from @t_schema.MetaDescription md
+   where
+       md.enterprise = :Enterprise
+   and md.descriptionType = mla.LinkType2
+   and md.nlsid = 1
+   and md.valto = :forever
+   and :EffOn between md.efffrom and md.effto)
+FROM @t_schema.MetaLinkAttr MLA
+WHERE
+    MLA.Enterprise =  :Enterprise
+AND MLA.LinkType = 'Action/Entity'
+AND MLA.LinkType1 = :ActionType
+AND MLA.LinkValue = 'Target'
+AND MLA.ValFrom <= :ValOn AND :ValOn < MLA.ValTo AND MLA.EffFrom <= :EffOn AND :EffOn < MLA.EffTo
+order by 2
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in RoleCode varchar(32)
+in ActionType varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

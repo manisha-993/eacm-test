@@ -1,0 +1,100 @@
+@name=GBL5017
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------
+-- Answers the question:
+--   What is locked for a given OPENID and Enterprise
+----------------------------------------------------------------
+$Log: gbl5017.txt,v $
+Revision 1.6  2010/06/21 15:42:53  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.5  2004/10/20 21:01:42  dave
+changes to gen parm
+
+Revision 1.4  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.3  2004/02/20 18:09:32  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.2  2003/09/08 16:31:14  roger
+Enterprise was changed to 16 char length
+
+Revision 1.1  2003/05/14 23:34:02  joan
+initial load
+
+
+
+@desc=What is locked for a given OPENID and Entperprise
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl5017.txt,v 1.6 2010/06/21 15:42:53 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+ S.EntityType AS EntityType
+,S.EntityID AS EntityID
+,MD.LongDescription As EntityDescription
+,COALESCE(RTRIM(T.AttributeValue), 'Unknown') AS AgentName
+,COALESCE(RTRIM(T1.AttributeValue), 'Unknown') AS RoleCode
+,S.LockedOn
+,S.OPWGID
+,S.LockLevel
+,S.LockEntityType
+,S.LockEntityID
+,S.OPWGID
+,S.LockOwner
+,COALESCE(RTRIM(MD2.LongDescription), 'N/A') AS LockOwnerDesc
+FROM @t_schema.Softlock S
+INNER JOIN @t_schema.Relator R ON
+    R.Enterprise =  :Enterprise
+AND R.EntityType = 'OPWG'
+AND R.EntityID = S.OPWGID
+AND R.Entity1Type = 'WG'
+and R.Entity1ID = :WGID
+AND R.ValFrom <= :now AND :now < R.ValTo AND R.EffFrom <= :now AND :now < R.EffTo
+INNER JOIN @t_schema.MetaDescription MD ON
+    MD.Enterprise = :Enterprise
+AND MD.DescriptionType = S.EntityType
+AND MD.DescriptionClass in ('Entity', 'Relator')
+AND MD.NLSID = 1
+AND MD.ValFrom <= :now AND :now < MD.ValTo AND MD.EffFrom <= :now AND :now < MD.EffTo
+LEFT JOIN @t_schema.Text T ON
+    T.Enterprise = R.Enterprise
+AND T.EntityType = R.Entity2Type
+AND T.EntityID = R.Entity2ID
+AND T.AttributeCode = 'USERNAME'
+AND T.NLSID = 1
+AND T.ValFrom <= :now AND :now < T.ValTo AND T.EffFrom <= :now AND :now < T.EffTo
+LEFT JOIN @t_schema.Text T1 ON
+    T1.Enterprise = R.Enterprise
+AND T1.EntityType = R.EntityType
+AND T1.EntityID = R.EntityID
+AND T1.AttributeCode = 'ROLECODE'
+AND T1.NLSID = 1
+AND T1.ValFrom <= :now AND :now < T1.ValTo AND T1.EffFrom <= :now AND :now < T1.EffTo
+LEFT JOIN @t_schema.MetaDescription MD2 ON
+    MD2.Enterprise = :Enterprise
+AND MD2.DescriptionType = S.LOCKOWNER
+AND MD2.ValFrom <= :now AND :now < MD2.ValTo AND MD2.EffFrom <= :now AND :now < MD2.EffTo
+
+WHERE
+    S.Enterprise = :Enterprise
+
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in WGID int
+@end
+
+

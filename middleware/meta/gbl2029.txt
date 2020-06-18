@@ -1,0 +1,46 @@
+@name=GBL2029
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------
+--  This returns a timestamp offset
+----------------------------------------------------------------------
+$Log: gbl2029.txt,v $
+Revision 1.5  2010/06/21 15:43:21  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.4  2004/10/20 21:01:38  dave
+changes to gen parm
+
+Revision 1.3  2004/02/20 20:21:47  roger
+Must be @t_schema
+
+Revision 1.2  2004/02/20 18:09:28  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.1  2002/08/21 21:26:10  dave
+first pass at refresh DG queue method for the database object
+
+@desc=This returns a timestamp offset
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2029.txt,v 1.5 2010/06/21 15:43:21 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  DISTINCT current timestamp + :Days DAYS
+FROM SYSCAT.SCHEMAAUTH
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Days int
+@end
+
+

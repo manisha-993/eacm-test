@@ -1,0 +1,1018 @@
+@name=GBL9200
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@results=1
+@narrative
+
+This guy inserts a new record into the trsNavigateTable based
+upon information in the DynaSearch Table
+
+$Log: gbl9200.txt,v $
+Revision 1.62  2013/11/13 18:35:33  praveen
+Remove duplicate with ur clause
+
+Revision 1.61  2013/08/26 15:27:12  praveen
+Added "with ur" clauses to all queries
+
+Revision 1.60  2012/05/21 02:34:06  praveen
+Fix flag count performance issue
+
+Revision 1.59  2010/06/21 15:43:27  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.58  2009/10/20 00:22:02  rick
+update to change long datatype to sqlint32
+
+Revision 1.57  2009/02/27 00:01:01  rick
+fix to check efffrom/effto as well as valfrom/valto
+
+Revision 1.56  2009/02/26 08:59:32  yang
+add by gubin
+
+Revision 1.53  2008/04/11 18:50:05  yang
+fixing compile
+
+Revision 1.52  2008/04/07 16:13:46  yang
+removing logging
+
+Revision 1.51  2008/02/06 18:22:17  rick
+fix to initialize aStepRowNumber array.
+
+Revision 1.50  2008/02/04 17:00:49  yang
+adding additional comment
+
+Revision 1.49  2008/01/25 21:11:18  yang
+changing debug from /tmp to /splog
+
+Revision 1.48  2008/01/23 19:04:16  yang
+fixing compile
+
+Revision 1.47  2008/01/23 18:03:14  yang
+adding logs
+
+Revision 1.46  2007/11/28 17:55:26  chris
+latest update
+
+Revision 1.45  2007/11/26 16:04:24  chris
+fix hopefully
+
+Revision 1.44  2007/11/26 14:59:41  chris
+discrepancy
+
+Revision 1.43  2007/11/16 19:53:12  chris
+fix OR case
+
+Revision 1.42  2007/09/14 12:29:34  chris
+fix compile error
+
+Revision 1.41  2007/09/13 18:35:59  chris
+Rewrite
+
+Revision 1.40 2007/03/26 13:58:28 chris
+cannot use host variable in a fetch first clause
+
+Revision 1.39 2007/03/22 20:44:22 chris
+pass limit of rows to retreive
+
+Revision 1.38 2006/06/15 20:59:46 dave
+tracing
+
+Revision 1.37 2006/03/21 20:32:04 joan
+increase array to 100
+
+Revision 1.36 2006/02/15 16:26:58 joan
+add checking
+
+Revision 1.35 2006/02/02 22:04:00 dave
+Cleanup
+
+Revision 1.34 2006/02/02 18:15:01 joan
+fix compile
+
+Revision 1.33 2006/02/02 17:27:00 joan
+fix compile
+
+Revision 1.32 2006/02/02 16:47:30 joan
+fix compile
+
+Revision 1.31 2006/02/02 16:32:37 joan
+fix compile
+
+Revision 1.30 2006/02/02 16:19:02 joan
+use separate variables for second loop
+
+Revision 1.29 2006/02/01 03:12:27 dave
+cleanning up
+
+Revision 1.28 2006/02/01 02:54:49 dave
+closing in on it
+
+Revision 1.27 2006/02/01 02:47:21 dave
+noew GBL9200
+
+Revision 1.26 2006/02/01 01:52:34 dave
+needed var def
+
+Revision 1.25 2006/02/01 01:14:35 dave
+moving smallest to top
+
+Revision 1.24 2006/02/01 01:06:53 dave
+more trace
+
+Revision 1.23 2006/02/01 01:01:45 dave
+more formatting
+
+Revision 1.22 2006/02/01 00:26:29 dave
+minor fix
+
+Revision 1.21 2006/02/01 00:24:53 dave
+another version
+
+Revision 1.20 2006/02/01 00:14:57 dave
+more cleanup
+
+Revision 1.19 2006/01/31 23:57:43 dave
+fix for file open
+
+Revision 1.18 2006/01/31 23:55:54 dave
+more cleanup
+
+Revision 1.17 2006/01/31 23:15:04 dave
+<No Comment Entered>
+
+Revision 1.16 2006/01/31 19:05:25 dave
+9200 cleanup
+
+Revision 1.15 2004/10/20 21:01:50 dave
+changes to gen parm
+
+Revision 1.14 2004/02/20 20:21:58 roger
+Must be @t_schema
+
+Revision 1.13 2004/02/20 18:09:38 roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.12 2003/11/26 17:55:40 joan
+add SELECT DISTINCT for flag table
+
+Revision 1.11 2003/10/30 19:17:14 dave
+added valon effon to dynasearch
+
+Revision 1.10 2003/10/30 18:44:47 joan
+try to make it run faster
+
+Revision 1.9 2003/10/09 20:11:48 gregg
+SELECT DISTINCT on insert to trsEntities table to prevent dup's for mult. nlsid's
+
+Revision 1.8 2003/09/23 23:53:26 joan
+work on dynamic search
+
+Revision 1.7 2003/09/18 19:39:14 joan
+fix error
+
+Revision 1.6 2003/09/18 17:44:13 joan
+fix var
+
+Revision 1.5 2003/09/18 17:37:33 joan
+declare variable
+
+Revision 1.4 2003/09/18 17:36:31 joan
+fix error
+
+Revision 1.3 2003/09/18 16:28:38 joan
+fix error
+
+Revision 1.2 2003/09/18 16:10:18 joan
+put more work
+
+Revision 1.1 2003/09/17 23:24:14 joan
+load
+
+
+@desc=insert a record into the trsnavigateTable from DynaSearch
+@parmstyle=GENERAL
+@sql
+
+// File logging stuff
+//FILE *t;
+//mode_t Mode2;
+//Mode2 = 0777;
+//chmod("/splog/omiglog9200",Mode2);
+
+//t=fopen("/splog/omiglog9200","a");
+//fprintf(t,"-->start of stored procedure GBL9200\n");
+//fprintf(t,"GBL9200bSessionID:%ld \n", SessionID);
+//fprintf(t,"GBL9200bActionType:%ld \n", ActionType);
+
+EXEC SQL WHENEVER SQLERROR GOTO error_exit;
+EXEC SQL WHENEVER SQLWARNING CONTINUE;
+
+// begin sql tag
+// Host variables
+EXEC SQL BEGIN DECLARE SECTION;
+    char brand[80] = "$Id: gbl9200.txt,v 1.62 2013/11/13 18:35:33 praveen Exp $";
+    sqlint32 iMaxRowNumber;
+    sqlint32 iMaxStepNumber;
+    sqlint32 iLastStepNumber;
+    sqlint32 iStepCount;
+    sqlint32 iRowNumber;
+    sqlint32 iStepNumber;
+    sqlint32 iEID;
+    char tmpEntityType[33];
+    char tmpAttCode[33];
+    char tmpAttType[1];
+    char tmpAttValue[255];
+EXEC SQL END DECLARE SECTION;
+
+// This is the return cursor
+EXEC SQL
+    DECLARE NavCur CURSOR FOR
+    SELECT
+          Entity2Type
+        , Entity2ID
+    FROM @t_schema.trsNavigate
+    WHERE
+            Level = 0
+        AND SessionID = :SessionID
+with ur;
+// This is the cursor for the steps
+//add by china
+EXEC SQL
+    DECLARE curDynaSearch CURSOR FOR
+    SELECT
+          Step
+        , RTRIM(EntityType)
+        , RTRIM(AttributeCode)
+        , RTRIM(AttributeType)
+        , RTRIM(AttributeValue)
+,case when step <0 then step*-1
+                  else step end as rn
+    FROM @t_schema.DynaSearch
+    WHERE
+            SessionID = :SessionID
+        AND Enterprise = :Enterprise
+    ORDER BY rn
+with ur;
+
+@execute
+// Local variables (not visible to SQL)
+sqlint32 iStop;
+sqlint32 lCount;
+sqlint32 iMinStep;
+char aStepEntityType[100][33];
+char aStepAttCode[100][33];
+char aStepAttType[100][1];
+char aStepAttValue[100][255];
+sqlint32 aStepCount[100];
+sqlint32 aStepNumber[100];
+sqlint32 aStepRowNumber[100];
+// Initialize aStepRowNumber to 0
+for (int i = 0; i<100; i++) aStepRowNumber[i] = 0;
+// Get the number of rows in the dyna search
+iMaxRowNumber = 0;
+EXEC SQL
+    SELECT COUNT(*) INTO :iMaxRowNumber
+    FROM @t_schema.DynaSearch
+    WHERE
+            Enterprise = :Enterprise
+        AND SessionID = :SessionID
+with ur;
+EXEC SQL COMMIT WORK;
+iMaxStepNumber = 0;
+EXEC SQL
+    SELECT MAX(step) INTO :iMaxStepNumber
+    FROM @t_schema.DynaSearch
+    WHERE
+            Enterprise = :Enterprise
+        AND SessionID = :SessionID
+with ur;
+EXEC SQL COMMIT WORK;
+// Flag the OR steps by making the step number negative
+// They will still be performed in order
+EXEC SQL
+    UPDATE @t_schema.DYNASEARCH
+    SET STEP = STEP * -1
+    WHERE SESSIONID = :SessionID
+    AND STEP IN (
+        SELECT STEP FROM (
+            SELECT STEP, COUNT(*) AS NSUBSTEPS
+            FROM @t_schema.DYNASEARCH
+            WHERE SESSIONID = :SessionID
+            GROUP BY STEP
+        ) AS ORSTEP
+        WHERE ORSTEP.NSUBSTEPS > 1
+    )
+with ur;
+EXEC SQL COMMIT WORK;
+// Load the steps into the arrays
+iRowNumber = 0;
+EXEC SQL OPEN curDynaSearch;
+do {
+    EXEC SQL
+        FETCH curDynaSearch
+        INTO
+              :iStepNumber
+            , :tmpEntityType
+            , :tmpAttCode
+            , :tmpAttType
+            , :tmpAttValue
+    ;
+    if (SQLCODE != 0) break;
+    aStepNumber[iRowNumber] = iStepNumber;
+    if (iStepNumber < 0) {
+        iStepNumber *= -1;
+    }
+    strcpy(aStepEntityType[iRowNumber],tmpEntityType);
+    strcpy(aStepAttCode[iRowNumber],tmpAttCode);
+    strcpy(aStepAttType[iRowNumber],tmpAttType);
+    strcpy(aStepAttValue[iRowNumber],tmpAttValue);
+    if (aStepRowNumber[iStepNumber] == 0 && iStepNumber > 1) {
+        aStepRowNumber[iStepNumber] = iRowNumber;
+    }
+    iRowNumber++;
+} while (iRowNumber < iMaxRowNumber);
+EXEC SQL CLOSE curDynaSearch WITH RELEASE;
+EXEC SQL COMMIT WORK;
+// Get the count for each step a step may have more than one row. In that case the count is the sum of counts
+// The intersect of the steps could still be zero
+iStop = 0; // Stop at the first step that contains 0 results
+iMinStep = 1; // keep track of the step with the lowest count
+lCount = 0;
+for (iRowNumber = 0; iRowNumber < iMaxRowNumber && iStop == 0; iRowNumber++) {
+    iStepNumber = aStepNumber[iRowNumber];
+    strcpy(tmpEntityType, aStepEntityType[iRowNumber]);
+    strcpy(tmpAttCode, aStepAttCode[iRowNumber]);
+    strcpy(tmpAttType, aStepAttType[iRowNumber]);
+    strcpy(tmpAttValue, aStepAttValue[iRowNumber]);
+    // Get the count for this step
+    if (tmpAttType[0] == 'F') {
+        EXEC SQL
+            INSERT INTO @t_schema.FLGCOUNT
+            SELECT :SessionID, F.EntityID
+             FROM @t_schema.Flag F
+             WHERE
+                     F.Enterprise = :Enterprise
+                 AND F.AttributeCode = :tmpAttCode
+                 AND F.AttributeValue = :tmpAttValue
+                 AND F.EntityType = :tmpEntityType
+                 AND :ValOn BETWEEN F.ValFrom and F.ValTo
+                 AND :EffOn BETWEEN F.EffFrom and F.EffTo
+                 fetch first 2500 rows only
+        with ur;
+        EXEC SQL
+            SELECT count(entityid) INTO :iStepCount
+             FROM @t_schema.FLGCOUNT
+             WHERE sessionid=:SessionID
+        with ur;
+        EXEC SQL
+             DELETE
+             FROM @t_schema.FLGCOUNT
+             WHERE sessionid=:SessionID
+        with ur;
+    }
+    else {
+        if (iLike == 1) {
+            EXEC SQL
+                SELECT COUNT(EntityID) INTO :iStepCount
+                FROM @t_schema.Text T
+                WHERE
+                        T.Enterprise = :Enterprise
+                    AND T.AttributeCode = :tmpAttCode
+                    AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+                    AND T.EntityType = :tmpEntityType
+                    AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                    AND :EffOn BETWEEN T.EffFrom and T.EffTo
+            with ur;
+        }
+        else {
+            EXEC SQL
+                SELECT COUNT(EntityID) INTO :iStepCount
+                FROM @t_schema.Text T
+                WHERE
+                        T.Enterprise = :Enterprise
+                    AND T.AttributeCode = :tmpAttCode
+                    AND T.AttributeValue = :tmpAttValue
+                    AND T.EntityType = :tmpEntityType
+                    AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                    AND :EffOn BETWEEN T.EffFrom and T.EffTo
+            with ur;
+        }
+    }
+    // Update the DynaSearch row with the count
+    //fprintf(t,"GBL9200b:%s:%ld \n", tmpAttCode, iStepNumber);
+    EXEC SQL
+        UPDATE @t_schema.DynaSearch SET SEARCHCOUNT = :iStepCount
+        WHERE
+                Step = :iStepNumber
+            AND SessionID = :SessionID
+            AND RTRIM(Enterprise) = :Enterprise
+            AND RTRIM(AttributeCode) = :tmpAttCode
+            AND RTRIM(AttributeValue) = :tmpAttValue
+            AND RTRIM(EntityType) = :tmpEntityType
+    with ur;
+    EXEC SQL COMMIT WORK;
+    // Do we stop?, Do we have a new min?, Do we SUM the OR steps
+    if (iStepNumber < 0) {
+        lCount += iStepCount; // SUM of counts for OR step
+        // Stop case for OR term
+        if (iRowNumber == iMaxRowNumber - 1 || aStepNumber[iRowNumber + 1] != aStepNumber[iRowNumber]) {
+            // last row of OR term
+            iStepNumber *= -1;
+            aStepCount[iStepNumber] = lCount;
+            // Keep track of the lowest step
+            if (aStepCount[iMinStep] > aStepCount[iStepNumber]) {
+                iMinStep = iStepNumber;
+            }
+            if (lCount == 0) {
+                iStop = 1; // Stop
+            }
+            // Reset in case there are other OR terms
+            lCount = 0;
+        }
+    }
+    else {
+        aStepCount[iStepNumber] = iStepCount;
+        // Keep track of the lowest step
+        if (aStepCount[iMinStep] > iStepCount) {
+            iMinStep = iStepNumber;
+        }
+        if (iStepCount == 0) {
+            // Stop case for normal terms
+            iStop = 1; // Stop
+        }
+    }
+}
+// at this point we have the counts for all steps and we know which step has the least
+// how to do both union as well as intersect
+        //fprintf(t,"GBL9200iStop:%ld \n", iStop);
+if (iStop == 0) {
+    // Find the row number that corresponds to the min step number.
+    iRowNumber = aStepRowNumber[iMinStep];
+        //fprintf(t,"GBL9200iRowNumber:%ld \n", iRowNumber);
+        //fprintf(t,"GBL9200iMaxRowNumber:%ld \n", iMaxRowNumber);
+    // Insert the ID's from the step with the lowest count first
+    while (iRowNumber < iMaxRowNumber) {
+        iStepNumber = aStepNumber[iRowNumber];
+        strcpy(tmpEntityType, aStepEntityType[iRowNumber]);
+        strcpy(tmpAttCode, aStepAttCode[iRowNumber]);
+        strcpy(tmpAttType, aStepAttType[iRowNumber]);
+        strcpy(tmpAttValue, aStepAttValue[iRowNumber]);
+        //fprintf(t,"GBL9200a:%s:%ld \n", tmpAttCode, iStepNumber);
+        EXEC SQL
+            UPDATE @t_schema.DynaSearch SET Step = Step * -1
+            WHERE
+                    Step = :iStepNumber
+                AND SessionID = :SessionID
+                AND RTRIM(Enterprise) = :Enterprise
+                AND RTRIM(AttributeCode) = :tmpAttCode
+                AND RTRIM(AttributeValue) = :tmpAttValue
+                AND RTRIM(EntityType) = :tmpEntityType
+        with ur;
+        if (iStepNumber < 0) {
+            iStepNumber *= -1;
+            // Doing a union of the iMinStep rows
+            if (tmpAttType[0] == 'F') {
+                EXEC SQL
+                    INSERT INTO @t_schema.trsEntities
+                    SELECT
+                         :Enterprise
+                        ,:iStepNumber
+                        ,:SessionID
+                        , F.ENTITYID
+                        , F.EntityType
+                    FROM @t_schema.Flag F
+                    WHERE
+                            F.Enterprise = :Enterprise
+                        AND F.AttributeCode = :tmpAttCode
+                        AND F.AttributeValue = :tmpAttValue
+                        AND F.EntityType = :tmpEntityType
+                        AND :ValOn BETWEEN F.ValFrom and F.ValTo
+                        AND :EffOn BETWEEN F.EffFrom and F.EffTo
+                    EXCEPT
+                    SELECT
+                         :Enterprise
+                        ,:iStepNumber
+                        ,:SessionID
+                        , ENTITYID
+                        , EntityType
+                    FROM @t_schema.trsEntities
+                    WHERE
+                            Enterprise = :Enterprise
+                        AND Level = :iStepNumber
+                        AND SessionID = :SessionID
+                with ur;
+            }
+            else {
+                if (iLike == 1) {
+                    EXEC SQL
+                        INSERT INTO @t_schema.trsEntities
+                        SELECT DISTINCT
+                             :Enterprise
+                            ,:iStepNumber
+                            ,:SessionID
+                            , T.ENTITYID
+                            , T.EntityType
+                        FROM @t_schema.Text T
+                        WHERE
+                                T.Enterprise = :Enterprise
+                            AND T.AttributeCode = :tmpAttCode
+                            AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+                            AND T.EntityType = :tmpEntityType
+                            AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                            AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                        EXCEPT
+                        SELECT
+                             :Enterprise
+                            ,:iStepNumber
+                            ,:SessionID
+                            , ENTITYID
+                            , EntityType
+                        FROM @t_schema.trsEntities
+                        WHERE
+                                Enterprise = :Enterprise
+                            AND Level = :iStepNumber
+                            AND SessionID = :SessionID
+                    with ur;
+                }
+                else {
+                    EXEC SQL
+                        INSERT INTO @t_schema.trsEntities
+                        SELECT DISTINCT
+                             :Enterprise
+                            ,:iStepNumber
+                            ,:SessionID
+                            , T.ENTITYID
+                            , T.EntityType
+                        FROM @t_schema.Text T
+                        WHERE
+                                T.Enterprise = :Enterprise
+                            AND T.AttributeCode = :tmpAttCode
+                            AND T.AttributeValue = :tmpAttValue
+                            AND T.EntityType = :tmpEntityType
+                            AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                            AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                        EXCEPT
+                        SELECT
+                             :Enterprise
+                            ,:iStepNumber
+                            ,:SessionID
+                            , ENTITYID
+                            , EntityType
+                        FROM @t_schema.trsEntities
+                        WHERE
+                                Enterprise = :Enterprise
+                            AND Level = :iStepNumber
+                            AND SessionID = :SessionID
+                    with ur;
+                }
+            }
+        }
+        else {
+            // Doing an insert of the iMinStep row
+            if (tmpAttType[0] == 'F') {
+                EXEC SQL
+                    INSERT INTO @t_schema.trsEntities
+                    SELECT
+                         :Enterprise
+                        ,:iStepNumber
+                        ,:SessionID
+                        , ENTITYID
+                        , EntityType
+                    FROM @t_schema.Flag F
+                    WHERE
+                            F.Enterprise = :Enterprise
+                        AND F.AttributeCode = :tmpAttCode
+                        AND F.AttributeValue = :tmpAttValue
+                        AND F.EntityType = :tmpEntityType
+                        AND :ValOn BETWEEN F.ValFrom and F.ValTo
+                        AND :EffOn BETWEEN F.EffFrom and F.EffTo
+                with ur;
+            }
+            else {
+                if (iLike == 1) {
+                    EXEC SQL
+                        INSERT INTO @t_schema.trsEntities
+                        SELECT DISTINCT
+                             :Enterprise
+                            ,:iStepNumber
+                            ,:SessionID
+                            , T.ENTITYID
+                            , T.EntityType
+                        FROM @t_schema.Text T
+                        WHERE
+                                T.Enterprise = :Enterprise
+                            AND T.AttributeCode = :tmpAttCode
+                            AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+                            AND T.EntityType = :tmpEntityType
+                            AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                            AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                    with ur;
+                }
+                else {
+                    EXEC SQL
+                        INSERT INTO @t_schema.trsEntities
+                        SELECT DISTINCT
+                             :Enterprise
+                            ,:iStepNumber
+                            ,:SessionID
+                            , T.ENTITYID
+                            , T.EntityType
+                        FROM @t_schema.Text T
+                        WHERE
+                                T.Enterprise = :Enterprise
+                            AND T.AttributeCode = :tmpAttCode
+                            AND T.AttributeValue = :tmpAttValue
+                            AND T.EntityType = :tmpEntityType
+                            AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                                                        AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                    with ur;
+                }
+            }
+            iRowNumber = iMaxRowNumber;
+        }
+        iRowNumber++;
+        // check that we are still on the same step
+        iStepNumber = aStepNumber[iRowNumber];
+        if (iStepNumber < 0) {
+            iStepNumber *=-1;
+        }
+        if (iStepNumber != iMinStep) {
+            iRowNumber = iMaxRowNumber;
+        }
+    }
+    // For all other steps (if any)
+    // Only insert the INTERSECT of all preceeding steps (excluding iMinStep)
+    if (iMaxStepNumber != 1) {
+        // Whatever the min step, Start at 1 or 2 if 1 is the min step
+        iStepNumber = (iMinStep == 1) ? 2 : 1;
+        iRowNumber = aStepRowNumber[iStepNumber];
+    }
+    else {
+        // a one step search means we have already gone through the rows
+        iRowNumber = iMaxRowNumber;
+    }
+    iLastStepNumber = iMinStep;
+    // So if only one step it will be the min step and we are done
+    while (iRowNumber < iMaxRowNumber) {
+        iStepNumber = aStepNumber[iRowNumber];
+        strcpy(tmpEntityType, aStepEntityType[iRowNumber]);
+        strcpy(tmpAttCode, aStepAttCode[iRowNumber]);
+        strcpy(tmpAttType, aStepAttType[iRowNumber]);
+        strcpy(tmpAttValue, aStepAttValue[iRowNumber]);
+        //fprintf(t,"GBL9200:%s:%s:%s:%ld \n", tmpAttCode,tmpAttValue,tmpEntityType,iStepNumber);
+        EXEC SQL
+            UPDATE @t_schema.DynaSearch SET Step = Step * -1
+            WHERE
+                    Step = :iStepNumber
+                AND SessionID = :SessionID
+                AND RTRIM(Enterprise) = :Enterprise
+                AND RTRIM(AttributeCode) = :tmpAttCode
+                AND RTRIM(AttributeValue) = :tmpAttValue
+                AND RTRIM(EntityType) = :tmpEntityType
+        with ur;
+        if (iStepNumber < 0) {
+            iStepNumber *= -1;
+            if (tmpAttType[0] == 'F') {
+                EXEC SQL
+                    INSERT INTO @t_schema.trsEntities
+                    SELECT
+                         :Enterprise
+                        ,:iStepNumber
+                        ,:SessionID
+                        , EntityID
+                        , EntityType
+                    FROM (
+                        SELECT
+                              EntityType
+                            , EntityID
+                        FROM @t_schema.trsEntities
+                        WHERE
+                                Enterprise = :Enterprise
+                            AND SessionID = :SessionID
+                            AND Level = :iLastStepNumber
+                        INTERSECT
+                        SELECT
+                              F.EntityType
+                            , F.entityID
+                        FROM @t_schema.Flag F
+                        WHERE
+                                F.Enterprise = :Enterprise
+                            AND F.AttributeCode = :tmpAttCode
+                            AND F.AttributeValue = :tmpAttValue
+                            AND F.EntityType = :tmpEntityType
+                            AND :ValOn BETWEEN F.ValFrom and F.ValTo
+                            AND :EffOn BETWEEN F.EffFrom and F.EffTo
+                    ) AS FOO
+                    EXCEPT
+                    SELECT
+                         :Enterprise
+                        ,:iStepNumber
+                        ,:SessionID
+                        , ENTITYID
+                        , EntityType
+                    FROM @t_schema.trsEntities
+                    WHERE
+                            Enterprise = :Enterprise
+                        AND Level = :iStepNumber
+                        AND SessionID = :SessionID
+                with ur;
+            }
+            else {
+                if (iLike == 1) {
+                    EXEC SQL
+                        INSERT INTO @t_schema.trsEntities
+                        SELECT DISTINCT
+                             :Enterprise
+                            ,:iStepNumber
+                            ,:SessionID
+                            , EntityID
+                            , EntityType
+                        FROM (
+                            SELECT
+                                  EntityType
+                                , EntityID
+                            FROM @t_schema.trsEntities
+                            WHERE
+                                    Enterprise = :Enterprise
+                                AND SessionID = :SessionID
+                                AND Level = :iLastStepNumber
+                            INTERSECT
+                            SELECT
+                                  T.EntityType
+                                , T.EntityID
+                            FROM @t_schema.Text T
+                            WHERE
+                                    T.Enterprise = :Enterprise
+                                AND T.AttributeCode = :tmpAttCode
+                                AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+                                AND T.EntityType = :tmpEntityType
+                                AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                                AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                        ) AS FOO
+                        EXCEPT
+                        SELECT
+                             :Enterprise
+                            ,:iStepNumber
+                            ,:SessionID
+                            , ENTITYID
+                            , EntityType
+                        FROM @t_schema.trsEntities
+                        WHERE
+                                Enterprise = :Enterprise
+                            AND Level = :iStepNumber
+                            AND SessionID = :SessionID
+                    with ur;
+                }
+                else {
+                    EXEC SQL
+                        INSERT INTO @t_schema.trsEntities
+                        SELECT
+                             :Enterprise
+                            ,:iStepNumber
+                            ,:SessionID
+                            , EntityID
+                            , EntityType
+                        FROM (
+                            SELECT
+                                  EntityType
+                                , EntityID
+                            FROM @t_schema.trsEntities
+                            WHERE
+                                    Enterprise = :Enterprise
+                                AND SessionID = :SessionID
+                                AND Level = :iLastStepNumber
+                            INTERSECT
+                            SELECT
+                                  T.EntityType
+                                , T.EntityID
+                            FROM @t_schema.Text T
+                            WHERE
+                                    T.Enterprise = :Enterprise
+                                AND T.AttributeCode = :tmpAttCode
+                                AND T.AttributeValue = :tmpAttValue
+                                AND T.EntityType = :tmpEntityType
+                                AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                                AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                        ) AS FOO
+                        EXCEPT
+                        SELECT
+                             :Enterprise
+                            ,:iStepNumber
+                            ,:SessionID
+                            , ENTITYID
+                            , EntityType
+                        FROM @t_schema.trsEntities
+                        WHERE
+                                Enterprise = :Enterprise
+                            AND Level = :iStepNumber
+                            AND SessionID = :SessionID
+                    with ur;
+                }
+            }
+        }
+        else {
+            // for steps with one row we only need to intersect with the prior step
+            if (tmpAttType[0] == 'F') {
+                EXEC SQL
+                    INSERT INTO @t_schema.trsEntities
+                    SELECT
+                         :Enterprise
+                        ,:iStepNumber
+                        ,:SessionID
+                        , EntityID
+                        , EntityType
+                    FROM (
+                        SELECT
+                              EntityType
+                            , EntityID
+                        FROM @t_schema.trsEntities
+                        WHERE
+                                Enterprise = :Enterprise
+                            AND SessionID = :SessionID
+                            AND Level = :iLastStepNumber
+                        INTERSECT
+                        SELECT
+                              F.EntityType
+                            , F.entityID
+                        FROM @t_schema.Flag F
+                        WHERE
+                                F.Enterprise = :Enterprise
+                            AND F.AttributeCode = :tmpAttCode
+                            AND F.AttributeValue = :tmpAttValue
+                            AND F.EntityType = :tmpEntityType
+                            AND :ValOn BETWEEN F.ValFrom and F.ValTo
+                            AND :EffOn BETWEEN F.EffFrom and F.EffTo
+                    ) AS FOO
+                with ur;
+            }
+            else {
+                if (iLike == 1) {
+                    EXEC SQL
+                        INSERT INTO @t_schema.trsEntities
+                        SELECT DISTINCT
+                             :Enterprise
+                            ,:iStepNumber
+                            ,:SessionID
+                            , EntityID
+                            , EntityType
+                        FROM (
+                            SELECT
+                                  EntityType
+                                , EntityID
+                            FROM @t_schema.trsEntities
+                            WHERE
+                                    Enterprise = :Enterprise
+                                AND SessionID = :SessionID
+                                AND Level = :iLastStepNumber
+                            INTERSECT
+                            SELECT
+                                  T.EntityType
+                                , T.EntityID
+                            FROM @t_schema.Text T
+                            WHERE
+                                    T.Enterprise = :Enterprise
+                                AND T.AttributeCode = :tmpAttCode
+                                AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+                                AND T.EntityType = :tmpEntityType
+                                AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                                AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                        ) AS FOO
+                    with ur;
+                }
+                else {
+                    EXEC SQL
+                        INSERT INTO @t_schema.trsEntities
+                        SELECT
+                             :Enterprise
+                            ,:iStepNumber
+                            ,:SessionID
+                            , EntityID
+                            , EntityType
+                        FROM (
+                            SELECT
+                                  EntityType
+                                , EntityID
+                            FROM @t_schema.trsEntities
+                            WHERE
+                                    Enterprise = :Enterprise
+                                AND SessionID = :SessionID
+                                AND Level = :iLastStepNumber
+                            INTERSECT
+                            SELECT
+                                  T.EntityType
+                                , T.EntityID
+                            FROM @t_schema.Text T
+                            WHERE
+                                    T.Enterprise = :Enterprise
+                                AND T.AttributeCode = :tmpAttCode
+                                AND T.AttributeValue = :tmpAttValue
+                                AND T.EntityType = :tmpEntityType
+                                AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                                AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                        ) AS FOO
+                   with ur;
+                }
+            }
+        }
+
+
+        //add by china
+        if(iRowNumber>0&&(aStepNumber[iRowNumber]==aStepNumber[iRowNumber+1])&& iRowNumber < iMaxRowNumber){
+        }
+        else{
+        iLastStepNumber = iStepNumber;
+        }
+        if(iRowNumber+1==iMaxRowNumber){
+            iLastStepNumber = iStepNumber;
+        }
+        iRowNumber++;
+        // Skip the min step
+        iStepNumber = aStepNumber[iRowNumber];
+        while ((iStepNumber == iMinStep || iStepNumber * -1 == iMinStep) && iRowNumber < iMaxRowNumber) {
+            iStepNumber = aStepNumber[++iRowNumber];
+        }
+    }
+    // At this point iLastStepNumber will have the intersect of all search terms
+    EXEC SQL COMMIT WORK;
+
+    // O.K.. lets insert the final answer into the trsNavigate Table
+    EXEC SQL
+        DECLARE limitResult CURSOR for
+        SELECT
+              t.EntityType
+            , t.EntityID
+        FROM @t_schema.trsEntities T
+        WHERE
+                T.Enterprise = :Enterprise
+            AND T.SessionID = :SessionID
+            AND T.Level = :iLastStepNumber
+    with ur;
+    EXEC SQL OPEN limitResult;
+    lCount = 0;
+    do {
+        EXEC SQL
+            FETCH limitResult INTO
+                  :tmpEntityType
+                , :iEID
+        ;
+        if (SQLCODE != 0) break;
+        EXEC SQL
+            INSERT INTO @t_schema.trsNavigate
+            values (
+                  :Enterprise
+                , :SessionID
+                , :ActionType
+                , 'Search'
+                , 0
+                , 0
+                , 'X'
+                , 'X'
+                , 'NOOP'
+                , 0
+                , 'NOOP'
+                , 0
+                , :tmpEntityType
+                , :iEID
+                , :now
+                , :now
+            )
+        ;
+        lCount++;
+    } while (lCount <= Limit);
+    EXEC SQL CLOSE limitResult WITH RELEASE;
+    EXEC SQL COMMIT WORK;
+
+    EXEC SQL
+        DELETE
+        FROM @t_schema.trsEntities as t
+        WHERE
+                sessionid = :SessionID
+            AND enterprise = :Enterprise
+    with ur;
+    EXEC SQL COMMIT WORK;
+}
+
+error_exit:
+
+EXEC SQL OPEN NavCur;
+
+// File Closing
+//
+//fprintf(t,"<--end of stored procedure GBL9200\n");
+//fclose(t);
+
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in ActionType varchar(32)
+in iLike int
+in ValOn varchar(27)
+in EffOn varchar(27)
+in Limit int
+@end
+

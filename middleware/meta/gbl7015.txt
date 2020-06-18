@@ -1,0 +1,125 @@
+@name=GBL7015
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Returns all Relator information from a given entitytype, the capabilities for both directions
+
+$Log: gbl7015.txt,v $
+Revision 1.19  2010/06/21 15:42:38  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.18  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.17  2004/09/04 00:20:30  joan
+fixes
+
+Revision 1.16  2004/09/04 00:14:02  joan
+fix
+
+Revision 1.15  2004/09/04 00:10:27  joan
+fixes
+
+Revision 1.14  2004/09/04 00:03:56  joan
+debug
+
+Revision 1.13  2004/09/03 23:46:12  joan
+fixes
+
+Revision 1.12  2004/09/03 23:40:35  joan
+get entity1 and entity2 descriptions
+
+Revision 1.11  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.10  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.9  2003/09/08 16:31:16  roger
+Enterprise was changed to 16 char length
+
+Revision 1.8  2003/04/28 20:34:31  dave
+making the Role/Entity a left join
+
+Revision 1.7  2003/04/14 15:39:37  dave
+more updates to MetaLink area
+
+Revision 1.6  2003/04/07 17:44:38  dave
+make it run faster?
+
+Revision 1.5  2003/01/07 00:48:52  dave
+syntax on quote
+
+Revision 1.4  2003/01/07 00:14:52  dave
+adding generic orphan checking
+
+Revision 1.3  2002/07/17 17:33:19  roger
+Ensured Log was in @narrative
+
+
+@desc=All relators for a given entitytype, and role and NLSID.
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7015.txt,v 1.19 2010/06/21 15:42:38 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT
+ COALESCE(RTRIM(MLR.LinkValue),'R')
+,MD.NLSID
+,RTRIM(MD.ShortDescription)
+,RTRIM(MD.LongDescription)
+,RTRIM(MLG.LinkType1)
+,RTRIM(MLG.LinkType2)
+,CASE WHEN MLG.LinkValue = 'L' THEN 'NO' ELSE 'YES' END
+,COALESCE(RTRIM(MD1.LongDescription),'NONE')
+,COALESCE(RTRIM(MD2.LongDescription),'NONE')
+
+FROM @t_schema.metalinkattr MLG
+INNER JOIN @t_schema.metadescription MD ON
+    MD.Enterprise = :Enterprise
+AND MD.DescriptionType =  MLG.LinkType
+AND MD.NLSID in (:NLSID,1)
+AND MD.ValFrom <= :ValOn and :ValOn < MD.ValTo AND MD.EffFrom <= :EffOn and :EffOn < MD.EffTo
+LEFT JOIN @t_schema.metalinkattr MLR ON
+    MLR.Enterprise = :Enterprise
+AND MLR.LinkType = 'Role/Entity'
+AND MLR.LinkType1 = :RoleCode
+AND MLR.LinkType2 = MLG.LinkType
+AND MLR.ValFrom <= :ValOn and :ValOn < MLR.ValTo AND MLR.EffFrom <= :EffOn and :EffOn < MLR.EffTo
+LEFT JOIN @t_schema.metadescription MD1 ON
+    MD1.Enterprise = :Enterprise
+AND MD1.DescriptionType =  MLG.LinkType1
+AND MD1.NLSID in (:NLSID,1)
+AND MD1.ValFrom <= :ValOn and :ValOn < MD1.ValTo AND MD1.EffFrom <= :EffOn and :EffOn < MD1.EffTo
+LEFT JOIN @t_schema.metadescription MD2 ON
+    MD2.Enterprise = :Enterprise
+AND MD2.DescriptionType =  MLG.LinkType2
+AND MD2.NLSID in (:NLSID,1)
+AND MD2.ValFrom <= :ValOn and :ValOn < MD2.ValTo AND MD2.EffFrom <= :EffOn and :EffOn < MD2.EffTo
+
+WHERE
+    MLG.Enterprise = :Enterprise
+AND MLG.LinkType = :EntityType
+AND MLG.LinkCode = 'Relator'
+AND MLG.ValFrom <= :ValOn and :ValOn < MLG.ValTo AND MLG.EffFrom <= :EffOn and :EffOn < MLG.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in RoleCode varchar(32)
+in EntityType varchar(32)
+in NLSID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

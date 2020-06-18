@@ -1,0 +1,103 @@
+@name=GBL7521
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7521.txt,v $
+Revision 1.11  2010/06/21 15:43:04  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.10  2004/10/20 21:01:44  dave
+changes to gen parm
+
+Revision 1.9  2004/02/20 20:21:54  roger
+Must be @t_schema
+
+Revision 1.8  2004/02/20 18:09:34  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.7  2004/01/28 19:32:16  gregg
+add entitytype to result set
+
+Revision 1.6  2004/01/28 18:31:59  gregg
+adding switch on empty entitytype to grab ALL entitytypes.
+
+Revision 1.5  2003/09/08 16:31:18  roger
+Enterprise was changed to 16 char length
+
+Revision 1.4  2002/07/25 17:17:29  gregg
+correct blobExtension
+
+Revision 1.3  2002/07/24 23:11:45  gregg
+INT(NLSID)
+
+Revision 1.2  2002/07/24 23:10:07  gregg
+added nlsid to rs
+
+Revision 1.1  2002/07/24 22:59:10  gregg
+initial load
+
+Revision 1.4  2002/07/17 17:33:21  roger
+Ensured Log was in @narrative
+
+@desc=all attribute codes for a given entitytype/enterprise/entityid/blobextension - e.g. used for grabbing all meta cache keys for an entity
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7521.txt,v 1.11 2010/06/21 15:43:04 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT DISTINCT
+ ATTRIBUTECODE
+,INT(NLSID)
+,ENTITYTYPE
+from @t_schema.BLOB
+where
+    Enterprise = :Enterprise   
+AND EntityID = :EntityID 
+AND BlobExtension = :BlobExtension
+AND valfrom <= current timestamp
+AND valto > current timestamp
+AND efffrom <= current timestamp
+AND effto > current timestamp  
+;
+
+EXEC SQL DECLARE sp_cursor2 CURSOR FOR
+SELECT DISTINCT
+ ATTRIBUTECODE
+,INT(NLSID)
+,ENTITYTYPE
+from @t_schema.BLOB
+where
+    Enterprise = :Enterprise   
+AND EntityType = :EntityType
+AND EntityID = :EntityID 
+AND BlobExtension = :BlobExtension
+AND valfrom <= current timestamp
+AND valto > current timestamp
+AND efffrom <= current timestamp
+AND effto > current timestamp  
+;
+
+if(strncmp(EntityType," ",1) == 0) {
+    EXEC SQL OPEN sp_cursor1;
+} else {
+    EXEC SQL OPEN sp_cursor2;
+}
+    
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in BlobExtension varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

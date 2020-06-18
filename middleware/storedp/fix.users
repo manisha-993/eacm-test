@@ -1,0 +1,17 @@
+for user in opicmadm 
+do
+  mkuser groups=staff home=/home/$user $user 
+  passwd $user
+  lsuser $user
+done
+
+chuser pgrp=opicusrg groups=staff,proddb2g aixdba
+chuser pgrp=proddb2g groups=staff opicmadm
+
+chown -R opicmadm.proddb2g /home/opicmadm
+chown -R opicmdb2.proddb2g /home/opicmdb2
+chown -R aixdba.proddb2g /home/aixdba
+
+echo " " >> /home/opicmadm/.profile
+echo ". /home/opicmdb2/sqllib/db2profile" >> /home/opicmadm/.profile
+

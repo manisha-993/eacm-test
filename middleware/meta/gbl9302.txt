@@ -1,0 +1,71 @@
+@name=GBL9302
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------
+-- Pulling out FEATURE info
+----------------------------------------------------------------------
+$Log: gbl9302.txt,v $
+Revision 1.6  2010/06/21 15:43:20  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.5  2005/05/24 19:39:52  joan
+fixes
+
+Revision 1.4  2005/05/20 21:15:54  joan
+fixes
+
+Revision 1.3  2005/05/20 19:45:38  joan
+fixes
+
+Revision 1.2  2005/05/16 21:42:32  joan
+change table
+
+Revision 1.1  2005/05/13 16:04:49  joan
+initial load
+
+
+@desc=Pulling out FEATURE info 
+@fenced=true
+@parmstyle=GENERAL
+@sql
+@results=1
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9302.txt,v 1.6 2010/06/21 15:43:20 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE Cur CURSOR FOR
+
+SELECT F.FEATENTITYTYPE
+, F.FEATENTITYID
+, F.ITEMENTITYTYPE
+, F.ITEMENTITYID
+
+ FROM GBLI.PRODSTRUCT P
+
+INNER JOIN GBLI.FEATURE F
+ON 
+    F.ENTERPRISE = :Enterprise 
+AND F.NLSID = :NLSID
+AND F.FEATENTITYTYPE = P.FEATENTITYTYPE
+AND F.FEATENTITYID = P.FEATENTITYID
+    
+ WHERE 
+P.ENTERPRISE = :Enterprise 
+AND P.NLSID = :NLSID
+AND P.PRODENTITYTYPE = :ProdEntityType
+AND P.PRODENTITYID = :ProdEntityID
+;
+                                         
+    
+@execute
+
+EXEC SQL OPEN Cur;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(8)
+in NLSID int
+in ProdEntityType varchar(32)
+in ProdEntityID int
+@end

@@ -1,0 +1,49 @@
+#!/bin/ksh
+
+DBASE=pdh12
+USER=opica12
+PASSWD=cat9tail
+
+WHERE="WHERE 1=1"
+DIR="/db2/opicmpdh/fs0/export/"
+NAME="ALL"
+
+set DB2CODEPAGE 1208
+export DB2CODEPAGE=1208
+
+# we don't want these tables (normally)
+ln -s /dev/null $DIR$NAME.OPICM.BLOB.IXF
+ln -s /dev/null $DIR$NAME.OPICM.BLOBX.IXF
+ln -s /dev/null $DIR$NAME.OPICM.ENTITYX.IXF
+ln -s /dev/null $DIR$NAME.OPICM.FLAGX.IXF
+ln -s /dev/null $DIR$NAME.OPICM.LONGTEXTX.IXF
+ln -s /dev/null $DIR$NAME.OPICM.RELATORX.IXF
+ln -s /dev/null $DIR$NAME.OPICM.SOFTLOCK.IXF
+ln -s /dev/null $DIR$NAME.OPICM.TEXTX.IXF
+ln -s /dev/null $DIR$NAME.OPICM.TRSENTITIES.IXF
+ln -s /dev/null $DIR$NAME.OPICM.TRSNAVIGATE.IXF
+ln -s /dev/null $DIR$NAME.OPICM.TRSWATCHDOG.IXF
+
+db2 connect to $DBASE user $USER using $PASSWD
+echo "Export Name         : $NAME">$DIR$NAME.EXPORT.OUT
+echo "Export directory    : $DIR">>$DIR$NAME.EXPORT.OUT
+echo "Export WHERE clause : $WHERE">>$DIR$NAME.EXPORT.OUT
+echo " ">>$DIR$NAME.EXPORT.OUT
+db2 "select creator,name from sysibm.systables \
+where creator = 'OPICM' order by creator,name" |
+awk 'NR > 3 && NF == 2 {print $1"."$2}' |
+while read TABLE
+  do
+    db2 connect to $DBASE user $USER using $PASSWD
+    echo Exporting $TABLE to $DIR$NAME.$TABLE.IXF
+    db2 "EXPORT TO $DIR$NAME.$TABLE.IXF OF IXF SELECT * FROM $TABLE $WHERE" >>$DIR$NAME.EXPORT.OUT
+    echo " "
+    echo GZIP the file $DIR$NAME.$TABLE.IXF
+    gzip $DIR$NAME.$TABLE.IXF
+    db2 terminate
+  done
+db2 terminate
+cp export $DIR$NAME.export
+cp import $DIR$NAME.import
+echo " "
+echo Now, CD to $DIR and do tar cf $NAME.tar $NAME*

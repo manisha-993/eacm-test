@@ -1,0 +1,10 @@
+/**
+ * Exposes stored procedure @spname (@desc) through RMI
+ * @author generated code
+ * @return ReturnDataResultSetGroup or void
+ * @exception RemoteException, MiddlewareException
+ */
+  public @vectorornot remote@spname
+  (
+@callremotemethodparms
+  ) throws RemoteException, MiddlewareException;

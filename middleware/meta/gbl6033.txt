@@ -1,0 +1,59 @@
+@name=GBL6033
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+@addperm=true
+--------------------------------------------------------------------------------------------------
+-- This guy will return the max valfrom from all tables for entitytype, entityid
+--
+--------------------------------------------------------------------------------------------------
+$Log: gbl6033.txt,v $
+Revision 1.3  2006/07/31 00:29:59  joan
+fixes
+
+Revision 1.2  2006/07/30 23:46:21  joan
+add relator table
+
+Revision 1.1  2006/07/25 19:25:04  joan
+add new sp
+
+
+
+@desc=Get the max valfrom from all tables for entitytype, entityid
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl6033.txt,v 1.3 2006/07/31 00:29:59 joan Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+with mymax
+  (maxvalfrom, enterprise)
+  AS
+(select max(valfrom), enterprise from opicm.entity where enterprise=:Enterprise and entitytype=:EntityType and entityid=:EntityID  and valto > current timestamp and effto > current timestamp group by enterprise
+union
+select max(valfrom), enterprise from opicm.flag where enterprise=:Enterprise and entitytype=:EntityType and entityid=:EntityID  and valto > current timestamp and effto > current timestamp group by enterprise
+union
+select max(valfrom), enterprise from opicm.text where enterprise=:Enterprise and entitytype=:EntityType and entityid=:EntityID  and valto > current timestamp and effto > current timestamp group by enterprise
+union
+select max(valfrom), enterprise from opicm.blob where enterprise=:Enterprise and entitytype=:EntityType and entityid=:EntityID  and valto > current timestamp and effto > current timestamp group by enterprise
+union
+select max(valfrom), enterprise from opicm.longtext where enterprise=:Enterprise and entitytype=:EntityType and entityid=:EntityID  and valto > current timestamp and effto > current timestamp group by enterprise
+union
+select max(valfrom), enterprise from opicm.relator where enterprise=:Enterprise and entitytype=:EntityType and entityid=:EntityID  and valto > current timestamp and effto > current timestamp group by enterprise
+)
+select max(maxvalfrom), enterprise from mymax where length(rtrim(enterprise)) > 0 group by enterprise
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+@end
+
+

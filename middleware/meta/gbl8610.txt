@@ -1,0 +1,98 @@
+@name=GBL8610
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+  This retrieves basic information about a simple MetaAttribute (was 6010)
+  
+$Log: gbl8610.txt,v $
+Revision 1.8  2010/06/21 15:43:04  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2004/10/20 21:01:49  dave
+changes to gen parm
+
+Revision 1.6  2004/02/20 20:21:57  roger
+Must be @t_schema
+
+Revision 1.5  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.4  2003/09/08 16:31:21  roger
+Enterprise was changed to 16 char length
+
+Revision 1.3  2003/04/14 16:43:09  dave
+speed and cleanup
+
+Revision 1.2  2003/04/02 21:01:01  dave
+removing setperm in GBL7502
+
+Revision 1.1  2002/05/03 18:17:04  gregg
+moved from gbl6010
+
+Revision 1.5  2002/04/02 22:11:20  gregg
+removed RTRIM from ValFrom, ValTo
+
+Revision 1.4  2002/04/02 20:53:03  gregg
+include MD.ValFrom, MD.ValTo in the resultSet.
+
+Revision 1.3  2001/10/04 23:14:40  dave
+fix to GBL8610
+
+Revision 1.2  2001/10/04 22:21:13  dave
+fixes
+
+Revision 1.1  2001/10/04 22:09:28  dave
+more constructor cool stuff
+
+@desc=Get basic information about an attribute
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8610.txt,v 1.8 2010/06/21 15:43:04 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  RTRIM(ME.EntityClass) 
+, RTRIM(COALESCE(MA.LinkValue,'R'))  
+, MD.NLSID
+, RTRIM(MD.ShortDescription)
+, RTRIM(MD.LongDescription)
+, MD.ValFrom
+, MD.ValTo
+FROM @t_schema.MetaEntity ME
+INNER JOIN @t_schema.MetaLinkAttr MA ON
+    MA.Enterprise = ME.Enterprise
+AND MA.LinkType  = 'Role/Attribute'
+AND MA.LinkType1 = :RoleCode
+AND MA.LinkType2 = :AttributeCode
+AND MA.LinkCode = 'Capability'
+AND MA.ValFrom <= :ValOn AND :ValOn < MA.ValTo AND MA.EffFrom <= :EffOn AND :EffOn < MA.EffTo
+INNER JOIN @t_schema.MetaDescription MD ON
+    MD.Enterprise = :Enterprise
+AND MD.DescriptionType = ME.EntityType
+AND MD.DescriptionClass = ME.EntityClass
+AND MD.NLSID in (1,:NLSID)
+AND MD.ValFrom <= :ValOn AND :ValOn < MD.ValTo AND MD.EffFrom <= :EffOn AND :EffOn < MD.EffTo
+WHERE
+    ME.Enterprise = :Enterprise
+AND ME.EntityType = :AttributeCode
+AND ME.ValFrom <= :ValOn AND :ValOn < ME.ValTo AND ME.EffFrom <= :EffOn AND :EffOn < ME.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in RoleCode varchar(32)
+in AttributeCode varchar(32)
+in NLSID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

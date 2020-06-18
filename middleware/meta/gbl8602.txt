@@ -1,0 +1,123 @@
+@name=GBL8602
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+$Log: gbl8602.txt,v $
+Revision 1.14  2010/06/21 15:42:53  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.13  2004/10/20 21:01:49  dave
+changes to gen parm
+
+Revision 1.12  2004/05/06 19:50:13  dave
+sp speed updates
+
+Revision 1.11  2004/02/20 20:21:57  roger
+Must be @t_schema
+
+Revision 1.10  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.9  2003/09/08 16:31:21  roger
+Enterprise was changed to 16 char length
+
+Revision 1.8  2003/05/14 21:05:20  dave
+fixing : in iAny
+
+Revision 1.7  2003/05/14 20:30:59  dave
+need a quick fix for release that allows you to create
+a profile from an OPWGID that existed but is not current
+
+Revision 1.6  2003/05/14 19:34:00  dave
+left join  in case relator Name not made
+
+Revision 1.5  2002/11/11 20:48:00  dave
+misc fixes
+
+Revision 1.4  2002/11/08 20:25:22  dave
+more reversing stuff on opwg
+
+Revision 1.3  2002/11/01 18:14:33  roger
+NAME is now USERNAME
+
+Revision 1.2  2002/11/01 18:03:20  roger
+OPWG changed to WGOP
+
+Revision 1.1  2002/08/28 22:58:14  roger
+New SP for Profile variation
+
+@desc=Get OP+OPWG+WG for Profile object by OPWGID
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8602.txt,v 1.14 2010/06/21 15:42:53 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  RTRIM(R.Enterprise)
+, RTRIM(T0.EntityType)
+, T0.EntityID
+, RTRIM(T0.AttributeValue)
+, RTRIM(R.EntityType)
+, R.EntityID
+, COALESCE(RTRIM(T1.AttributeValue), 'No OPWG Name Defined')
+, RTRIM(T2.EntityType)
+, T2.EntityID
+, RTRIM(T2.AttributeValue)
+, RTRIM(T3.AttributeValue)
+, RTRIM(MD.LongDescription)
+FROM @t_schema.Relator R
+INNER JOIN @t_schema.Text T0 ON
+    T0.Enterprise = R.Enterprise
+AND T0.EntityType = :OPType
+AND T0.EntityID = R.Entity2ID
+AND T0.AttributeCode = 'USERTOKEN'
+AND T0.Valto = :forever
+LEFT JOIN @t_schema.Text T1 ON
+    T1.Enterprise = R.Enterprise
+AND T1.EntityType = R.EntityType
+AND T1.EntityID = R.EntityID
+AND T1.AttributeCode = 'NAME'
+AND T1.Valto = :forever
+INNER JOIN @t_schema.Text T2 ON
+    T2.Enterprise = R.Enterprise
+AND T2.EntityType = R.Entity1Type
+AND T2.EntityID = R.Entity1ID
+AND T2.AttributeCode = 'NAME'
+AND T2.Valto = :forever
+INNER JOIN @t_schema.Text T3 ON
+    T3.Enterprise = R.Enterprise
+AND T3.EntityType = R.EntityType
+AND T3.EntityID = R.EntityID
+AND T3.AttributeCode = 'ROLECODE'
+AND T3.Valto = :forever
+INNER JOIN @t_schema.MetaDescription MD ON
+    MD.Enterprise = R.Enterprise
+AND MD.DescriptionType = T3.AttributeValue
+AND MD.DescriptionClass = 'Role'
+AND MD.ValFrom <= :ValOn AND :ValOn < MD.ValTo AND MD.EffFrom <= :EffOn AND :EffOn < MD.EffTo
+WHERE
+    R.Enterprise = :Enterprise
+AND R.EntityType = :OPWGType
+AND R.EntityID = :OPWGID
+AND ((R.ValTo = :forever AND :iAny = 1) OR
+(R.ValFrom <= :ValOn AND :ValOn < R.ValTo AND R.EffFrom <= :EffOn AND :EffOn < R.EffTo))
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPType varchar(32)
+in OPWGType varchar(32)
+in OPWGID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+in iAny int
+@end
+
+

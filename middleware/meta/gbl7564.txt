@@ -1,0 +1,65 @@
+@name=GBL7564
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+Check if a valid Enterprise + EntityType + EntityID exists.
+
+$Log: gbl7564.txt,v $
+Revision 1.5  2010/06/21 15:42:42  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.4  2004/10/20 21:01:46  dave
+changes to gen parm
+
+Revision 1.3  2004/07/16 17:17:50  gregg
+lets also check relator table
+
+Revision 1.2  2004/07/02 21:34:42  gregg
+ficks
+
+Revision 1.1  2004/07/02 20:56:58  gregg
+initial load
+
+
+
+
+
+@desc=Check if a valid Enterprise + EntityType + EntityID exists
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7564.txt,v 1.5 2010/06/21 15:42:42 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+select entityid from 
+  opicm.entity where
+enterprise = :Enterprise and
+valto > current timestamp and
+effto > current timestamp and
+entitytype = :EntityType and
+entityid = :EntityID
+UNION
+select entityid from 
+  opicm.relator where
+enterprise = :Enterprise and
+valto > current timestamp and
+effto > current timestamp and
+entitytype = :EntityType and
+entityid = :EntityID
+;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(8)
+in EntityType varchar(32)
+in EntityID int
+@end
+
+

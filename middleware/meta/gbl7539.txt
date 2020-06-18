@@ -1,0 +1,82 @@
+@name=GBL7539
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+Get Change history information for an Entity Item
+
+//
+// $Log: gbl7539.txt,v $
+// Revision 1.26  2010/06/21 15:42:47  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.25  2004/10/20 21:01:45  dave
+// changes to gen parm
+//
+// Revision 1.24  2004/09/28 21:16:35  dave
+// more change history stuff
+//
+// Revision 1.23  2004/09/21 16:27:57  dave
+// trapping sp gen issue
+//
+//
+
+@desc=Get Change history information for an Entity Item
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+
+char brand[80] = "$Id: gbl7539.txt,v 1.26 2010/06/21 15:42:47 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR 
+
+SELECT 
+ ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OPENID
+,TRANID
+,CASE WHEN (ValTo > current timestamp AND EffTo > current timestamp) THEN 'CURRENT' ELSE 'EXPIRED' END AS STATUS
+,CASE WHEN (EffTo <= Valfrom) THEN 'INACTIVE' ELSE 'ACTIVE' END
+FROM @t_schema.Entity where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND EntityID = :EntityID
+UNION ALL
+SELECT 
+ ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,INT(OPENID)
+,INT(TRANID)
+,CASE WHEN (ValTo > current timestamp AND EffTo > current timestamp) THEN 'CURRENT' ELSE 'EXPIRED' END AS STATUS
+,CASE WHEN (EffTo <= Valfrom) THEN 'INACTIVE' ELSE 'ACTIVE' END
+FROM @t_schema.Relator where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND EntityID = :EntityID
+order by valfrom
+;
+
+@execute
+
+//
+// Insert the records here...
+//
+
+EXEC SQL OPEN sp_cursor1;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in NLSID int
+@end

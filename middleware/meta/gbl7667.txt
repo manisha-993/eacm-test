@@ -1,0 +1,41 @@
+@name=GBL7667
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+For PDH research Flag Value(Admin UI)
+
+@desc=For Navigate Action Item Flag Research
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+
+
+// flag Table w/ Attribute
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT COUNT(*) 
+FROM @schema.Flag 
+where
+    Enterprise = :Enterprise 
+AND AttributeCode  LIKE rtrim(:AttributeCode)
+AND ValFrom <= :ValOn AND ValTo > :ValOn
+AND EffFrom <= :EffOn AND EffTo  > :EffOn
+;
+
+
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in AttributeCode varchar(32)
+in AttributeValue varchar(32)
+in NLSID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+
+

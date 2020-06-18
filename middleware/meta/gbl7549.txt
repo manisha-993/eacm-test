@@ -1,0 +1,63 @@
+@name=GBL7549
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+Delete MetaColOrder info for Enterprise + OPWGID + EntityType
+
+$Log: gbl7549.txt,v $
+Revision 1.7  2004/10/20 21:01:46  dave
+changes to gen parm
+
+Revision 1.6  2004/02/20 20:21:55  roger
+Must be @t_schema
+
+Revision 1.5  2004/02/20 18:09:35  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.4  2003/04/02 21:47:52  gregg
+remove cursor for delete
+
+Revision 1.3  2003/04/02 18:15:54  gregg
+fix
+
+Revision 1.2  2003/04/02 17:52:12  gregg
+results = 0
+
+Revision 1.1  2003/04/02 17:49:50  gregg
+initial load
+
+
+
+@desc=delete MetaColOrder info
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+
+char brand[80] = "$Id: gbl7549.txt,v 1.7 2004/10/20 21:01:46 dave Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL
+DELETE from @t_schema.METACOLORDER 
+WHERE
+    Enterprise = :Enterprise
+AND OPWGID = :OPWGID
+AND EntityType = :EntityType
+;
+@execute
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPWGID int
+in EntityType varchar(32)
+@end
+
+
+
+
+

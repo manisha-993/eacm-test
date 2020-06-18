@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ ! -f runmw-aix ]; then
+  echo You do not appear to be in a middleware instance directory - can't update - bye!
+  exit
+fi
+
+if [ ! -f ~/storedp/middleware.jar.new ]; then
+  echo No new middleware.jar file in ~/storedp - can't update - bye!
+  exit
+fi
+
+cp ~/storedp/middleware.jar.new .
+touch mwcycle
+

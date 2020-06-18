@@ -1,0 +1,73 @@
+@name=GBL2931
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative  checks for combo uniqueness - optional attribute (CR 061604565)
+$Log: gbl2931.txt,v $
+Revision 1.7  2010/06/21 15:43:25  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2004/10/20 21:01:40  dave
+changes to gen parm
+
+Revision 1.5  2004/08/03 22:46:07  gregg
+compile fix
+
+Revision 1.4  2004/08/03 21:43:47  gregg
+add EntityType to ResultSet
+
+Revision 1.3  2004/08/03 21:42:28  gregg
+update
+
+Revision 1.2  2004/08/02 23:34:39  gregg
+left join on flag
+
+Revision 1.1  2004/08/02 20:49:38  gregg
+initial load (copied from gbl2930)
+
+
+@desc=checks for combo uniqueness - optional attribute (CR 061604565)
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2931.txt,v 1.7 2010/06/21 15:43:25 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT 
+ T_REQ.EntityType
+,T_REQ.EntityID
+,COALESCE(T_OPT.attributevalue, '')
+FROM @t_schema.Text T_REQ
+LEFT JOIN @t_schema.TEXT T_OPT ON
+    T_OPT.Enterprise = :Enterprise
+AND T_OPT.EntityType = T_REQ.EntityType
+AND T_OPT.EntityID = T_REQ.EntityID
+AND rtrim(T_OPT.AttributeCode)  = :AttributeCodeOpt
+AND T_OPT.NLSID = 1
+AND T_OPT.ValFrom <= :now AND :now < T_OPT.ValTo AND T_OPT.EffFrom <= :now AND :now < T_OPT.EffTo
+INNER JOIN @t_schema.Entity E ON
+    E.Enterprise = :Enterprise
+AND E.EntityType = T_REQ.EntityType
+AND E.EntityID = T_REQ.EntityID
+AND E.ValFrom <=  :now AND :now < E.ValTo AND E.EffFrom <= :now AND :now < E.EffTo
+WHERE
+    T_REQ.Enterprise =  :Enterprise
+AND T_REQ.AttributeCode = :AttributeCodeReq
+AND T_REQ.AttributeValue = :AttributeValueReq
+AND T_REQ.NLSID = 1
+AND T_REQ.ValFrom <= :now  AND :now < T_REQ.ValTo AND T_REQ.EffFrom <= :now AND :now < T_REQ.EffTo
+;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in AttributeCodeReq varchar(33)
+in AttributeValueReq varchar(33)
+in AttributeCodeOpt varchar(33)
+@end
+
+

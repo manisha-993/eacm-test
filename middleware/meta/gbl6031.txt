@@ -1,0 +1,97 @@
+@name=GBL6031
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+@addperm=true
+------------------------------------------------------------------------
+-- Returns the change history for a given attributecode,entityid,entitytype,timestamps from and to
+--      in the FLAG table
+-- Parameters are:
+-- OPENID
+-- Enterprise
+-- EntityType
+-- EntityID
+-- AttributeCode
+-- ValFrom
+-- Valto
+-- ValOn
+-- EffOn
+-----------------------------------------------------------------------
+$Log: gbl6031.txt,v $
+Revision 1.10  2010/06/21 15:43:21  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.9  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.8  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.7  2004/02/20 18:09:32  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.6  2003/09/08 16:31:14  roger
+Enterprise was changed to 16 char length
+
+Revision 1.5  2001/10/26 17:15:25  bala
+changed sort order
+
+Revision 1.4  2001/10/25 22:41:22  bala
+changed valfrom to fromdate and valto to Todate
+
+Revision 1.3  2001/10/25 22:31:19  bala
+lowercase execute
+
+Revision 1.2  2001/10/25 22:22:24  bala
+added OPENID
+
+-----------------------------------------------------------------------
+@desc=Get Flag change history for a given entitytype,entityid,attributecode,timestamps from and to
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+char brand[80] = "$Id: gbl6031.txt,v 1.10 2010/06/21 15:43:21 wendy Exp $";
+EXEC SQL BEGIN DECLARE SECTION;
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT 
+  F.Valfrom,
+  F.Attributevalue,
+  F.Valto,
+  F.Efffrom,
+  F.Effto,
+  F.Openid 
+FROM @t_schema.FLAG F
+INNER JOIN @t_schema.MetaLinkAttr MLA ON
+    MLA.Enterprise = :Enterprise
+AND MLA.LinkType = 'Role/Attribute'
+AND MLA.LinkType1 = :RoleCode
+AND MLA.LinkType2 = F.AttributeCode
+AND MLA.LinkCode = 'Capability'
+AND MLA.ValFrom <= :ValOn AND :ValOn < MLA.ValTo AND MLA.EffFrom <= :EffOn AND :EffOn < MLA.EffTo
+WHERE F.ENTERPRISE=:Enterprise
+  AND F.Entitytype= :EntityType
+  AND F.Entityid= :EntityID
+  AND F.Attributecode=:AttributeCode
+  AND F.Valfrom Between :FromDate And :ToDate
+ORDER BY F.Attributevalue,F.Valfrom
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in AttributeCode varchar(32)
+in FromDate varchar(26)
+in ToDate varchar(26)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

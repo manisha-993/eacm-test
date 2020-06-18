@@ -1,0 +1,75 @@
+@name=GBL7566
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+Get MetaColOrder info for Enterprise + OPWGID + ActionItemKey. No defaults.
+
+$Log: gbl7566.txt,v $
+Revision 1.7  2010/06/21 15:43:03  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2004/11/22 17:33:12  gregg
+opwgid always zero
+
+Revision 1.5  2004/11/15 19:32:26  gregg
+COALESCE 'C' as fallback RelTag
+
+Revision 1.4  2004/11/15 19:24:29  gregg
+add RELTAG column
+
+Revision 1.3  2004/11/02 23:58:08  gregg
+add entitytype into result set
+
+Revision 1.2  2004/11/02 23:44:51  gregg
+rem entitytype
+
+Revision 1.1  2004/11/02 21:37:35  gregg
+initial load
+
+
+
+@desc=Get MetaColOrder info based on ActionItemKey
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+
+char brand[80] = "$Id: gbl7566.txt,v 1.7 2010/06/21 15:43:03 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+
+EXEC SQL DECLARE sp_curNoDefaults CURSOR FOR 
+SELECT DISTINCT
+ MCO.entitytype
+,MCO.ATTRIBUTECODE
+,INT(MCO.ORDER)
+,INT(MCO.VISIBLE)
+,'THISONEFOUND'
+,COALESCE(MCO.RELTAG,'C')
+from @t_schema.METACOLORDER MCO
+WHERE
+    MCO.Enterprise = :Enterprise
+AND MCO.OPWGID = 0
+AND MCO.ActionItemKey = :ActionItemKey
+;
+
+// end sql tag
+
+// begin execute tag
+
+    EXEC SQL OPEN sp_curNoDefaults;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPWGID int
+in ActionItemKey varchar(32)
+@end
+
+
+
+

@@ -1,0 +1,110 @@
+@name=GBL3034
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=true
+@narrative
+$Log: gbl3034.txt,v $
+Revision 1.13  2010/06/21 15:43:23  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.12  2004/10/20 21:01:42  dave
+changes to gen parm
+
+Revision 1.11  2004/02/20 20:21:52  roger
+Must be @t_schema
+
+Revision 1.10  2004/02/20 18:09:32  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.9  2003/09/08 16:31:13  roger
+Enterprise was changed to 16 char length
+
+Revision 1.8  2001/10/10 17:57:24  dave
+added 'X' to the mix
+
+Revision 1.7  2001/07/27 00:36:11  roger
+Add Log keyword and/or branding as needed
+
+@desc=build a list of Attributes from MetaLinkAttr based upon enterprise, linktype=ODSLength,linktype1  and linkcode = Length
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+EXEC SQL END DECLARE SECTION;
+EXEC SQL BEGIN DECLARE SECTION;
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+ MRA.ENTERPRISE
+,MRA.LINKTYPE
+,MRA2.LINKTYPE1
+,MRA.LINKTYPE2
+,MRA.LINKCODE
+,COALESCE(MRA.LINKVALUE, ' ') as LinkValue
+,COALESCE(MA.LONGDESCRIPTION, ' ') as linktype1_desc
+,COALESCE(MA1.LONGDESCRIPTION, ' ') as linktype2_desc
+,COALESCE(MA.SHORTDESCRIPTION, ' ') as linktype1_stdesc
+,COALESCE(MA1.SHORTDESCRIPTION, ' ') as linktype2_stdesc
+,MA.Descriptionclass                 as entity_class
+,COALESCE(MA1.DescriptionClass, ' ') as attribute_type
+,COALESCE(MA2.LONGDESCRIPTION, ' ')  as attribute_type_desc
+
+FROM @t_schema.MetaLinkAttr MRA
+INNER JOIN @t_schema.MetaLinkAttr MRA2 ON
+MRA2.Enterprise = MRA.Enterprise AND
+MRA2.linktype1 = :LinkType1 and
+MRA2.Linktype  = 'Entity/Attribute'  AND
+MRA2.Linktype2 = MRA.linktype2  AND
+MRA2.Linkcode  = 'EntityAttribute'  AND
+MRA2.ValFrom <= :ValOn AND :ValOn < MRA2.ValTo AND MRA2.EffFrom <= :EffOn AND :EffOn < MRA2.EffTo
+
+INNER JOIN @t_schema.MetaDescription MA ON
+MA.Enterprise      = MRA.Enterprise AND
+MA.DescriptionType = MRA2.LinkType1 AND
+MA.Descriptionclass in ('Entity', 'Relator') AND
+MA.NLSID in (1, :NLSID)  AND
+MA.ValFrom <= :ValOn AND :ValOn < MA.ValTo AND
+MA.EffFrom <= :EffOn AND :EffOn < MA.EffTo
+
+INNER JOIN @t_schema.MetaDescription MA1 ON
+MA1.Enterprise = MRA.Enterprise AND
+MA1.DescriptionClass in ('B','D','F','I','L','X','P','S','T','U','A') AND
+MA1.DescriptionType = MRA.LinkType2 AND
+MA1.NLSID in (1, :NLSID) AND
+MA1.ValFrom <= :ValOn AND :ValOn < MA1.ValTo AND
+MA1.EffFrom <= :EffOn AND :EffOn < MA1.EffTo
+
+LEFT JOIN @t_schema.MetaDescription MA2 ON
+MA2.Enterprise = 'NE' AND
+MA2.DescriptionType = MA1.DescriptionClass AND
+MA2.DescriptionClass = 'AttType'  AND
+MA2.NLSID in (1, :NLSID) AND
+MA2.ValFrom <= :ValOn AND :ValOn < MA2.ValTo AND
+MA2.EffFrom <= :EffOn AND :EffOn < MA2.EffTo
+
+WHERE
+    MRA.Enterprise = :Enterprise
+AND MRA.LinkType   = :LinkType
+AND MRA.LinkCode   = :LinkCode
+AND MRA.Valfrom <= :ValOn AND :ValOn < MRA.ValTo AND MRA.EffFrom <= :EffOn AND :EffOn < MRA.EffTo
+ORDER BY
+ MA.LONGDESCRIPTION
+,MA1.LONGDESCRIPTION
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in LinkType varchar(32)
+in LinkType1 varchar(32)
+in LinkCode varchar(32)
+in OPENID int
+in NLSID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

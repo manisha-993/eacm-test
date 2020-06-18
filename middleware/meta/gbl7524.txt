@@ -1,0 +1,130 @@
+@name=GBL7524
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7524.txt,v $
+Revision 1.12  2010/06/21 15:42:51  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.11  2004/10/20 21:01:44  dave
+changes to gen parm
+
+Revision 1.10  2004/02/20 20:21:54  roger
+Must be @t_schema
+
+Revision 1.9  2004/02/20 18:09:34  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.8  2003/09/08 16:31:18  roger
+Enterprise was changed to 16 char length
+
+Revision 1.7  2002/10/17 18:20:06  gregg
+adding in category + descrips
+
+Revision 1.6  2002/09/19 23:08:47  gregg
+sp
+
+Revision 1.5  2002/09/19 22:59:55  gregg
+grab all nlsids
+
+Revision 1.4  2002/09/19 22:28:35  gregg
+add nlsid
+
+Revision 1.3  2002/08/08 16:20:55  gregg
+coalesce on descriptions
+
+Revision 1.2  2002/08/08 15:55:36  gregg
+make sure description selects only get back one row
+
+Revision 1.1  2002/08/07 23:57:42  gregg
+initial load
+
+
+@desc=get a list of ALL actions+actionclass+descriptions for an Enterprise (non-role sensitive)
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7524.txt,v 1.12 2010/06/21 15:42:51 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+
+SELECT DISTINCT
+  ME.ENTITYTYPE as ActionType 
+, ME.ENTITYCLASS as ActionClass
+, MD.SHORTDESCRIPTION as ShortDescription    
+, MD.LONGDESCRIPTION as LongDescription  
+, INT(MD.NLSID) as NLSID
+, MLACAT.LINKTYPE2 as CategoryCode 
+, COALESCE(MDCAT.SHORTDESCRIPTION,MDCATFALLBACK.SHORTDESCRIPTION)
+, COALESCE(MDCAT.LONGDESCRIPTION,MDCATFALLBACK.LONGDESCRIPTION)
+
+FROM @t_schema.metaentity ME
+INNER JOIN @t_schema.metaentity AC ON
+    AC.ENTERPRISE = 'NE' 
+AND AC.ENTITYCLASS = 'Action' 
+AND AC.VALFROM < current timestamp 
+AND AC.EFFFROM < current timestamp
+AND AC.VALTO > current timestamp 
+AND AC.EFFTO > current timestamp
+INNER JOIN @t_schema.metadescription MD ON
+    MD.ENTERPRISE = :Enterprise
+AND MD.DESCRIPTIONTYPE = ME.ENTITYTYPE
+AND MD.DESCRIPTIONCLASS = ME.ENTITYCLASS
+AND MD.VALFROM < current timestamp 
+AND MD.EFFFROM < current timestamp
+AND MD.VALTO > current timestamp 
+AND MD.EFFTO > current timestamp
+
+LEFT JOIN @t_schema.metalinkattr MLACAT ON
+    MLACAT.ENTERPRISE = :Enterprise
+AND MLACAT.LINKTYPE = 'Action/Category' 
+AND MLACAT.LINKTYPE1 = ME.ENTITYTYPE
+AND MLACAT.LINKCODE = 'Link'
+AND MLACAT.VALFROM < current timestamp 
+AND MLACAT.EFFFROM < current timestamp
+AND MLACAT.VALTO > current timestamp 
+AND MLACAT.EFFTO > current timestamp
+
+LEFT JOIN @t_schema.metadescription MDCAT ON
+    MDCAT.ENTERPRISE = :Enterprise
+AND MDCAT.DESCRIPTIONTYPE = MLACAT.LINKTYPE2
+AND MDCAT.DESCRIPTIONCLASS = 'Category'
+AND MDCAT.NLSID = MD.NLSID
+AND MDCAT.VALFROM < current timestamp 
+AND MDCAT.EFFFROM < current timestamp
+AND MDCAT.VALTO > current timestamp 
+AND MDCAT.EFFTO > current timestamp
+
+LEFT JOIN @t_schema.metadescription MDCATFALLBACK ON
+    MDCATFALLBACK.ENTERPRISE = :Enterprise
+AND MDCATFALLBACK.DESCRIPTIONTYPE = MLACAT.LINKTYPE2
+AND MDCATFALLBACK.DESCRIPTIONCLASS = 'Category'
+AND MDCATFALLBACK.NLSID = 1
+AND MDCATFALLBACK.VALFROM < current timestamp 
+AND MDCATFALLBACK.EFFFROM < current timestamp
+AND MDCATFALLBACK.VALTO > current timestamp 
+AND MDCATFALLBACK.EFFTO > current timestamp
+
+WHERE
+    ME.ENTERPRISE = :Enterprise
+AND ME.ENTITYCLASS = AC.ENTITYTYPE
+AND ME.VALFROM < current timestamp 
+AND ME.EFFFROM < current timestamp
+AND ME.VALTO > current timestamp 
+AND ME.EFFTO > current timestamp
+order by ActionClass, ActionType, ShortDescription, LongDescription, NLSID 
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+@end
+
+
+

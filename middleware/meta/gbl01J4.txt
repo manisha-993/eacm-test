@@ -1,0 +1,263 @@
+@name=GBL01J4
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+Stand Alone VE based net changes calculator
+
+$Log: gbl01J4.txt,v $
+Revision 1.1  2009/01/22 23:35:09  yang
+initial load
+
+
+@results=1
+@parmstyle=GENERAL
+@sql
+//==================================================================
+// This Guy Returns the entire Nav structure to the caller.
+//==================================================================
+EXEC SQL DECLARE NavCur1 CURSOR FOR
+SELECT DISTINCT
+  RTRIM(COALESCE(GAF.ATTRIBUTEVALUE,'DEPRECATED'))
+ ,RTRIM(N.RootType)
+ ,N.RootID
+ ,RTRIM(N.RootTran)
+ ,RTRIM(N.ChildType)
+ ,N.ChildID
+ ,RTRIM(N.ChildTran)
+ ,N.ChildLevel
+ ,RTRIM(N.ChildClass)
+ ,RTRIM(N.ChildPath)
+ ,RTRIM(COALESCE(R.Entity2Type,N.Entity2Type))
+ ,COALESCE(R.Entity2ID,N.Entity2ID)
+ ,RTRIM(COALESCE(R.Entity1Type,N.Entity1Type))
+ ,COALESCE(R.Entity1ID,N.Entity1ID)
+ , 'DEPRECATED'
+FROM bigcatj.trsNetterFinal N
+--
+-- Needed for Legacy General Area Name Pulling
+--
+LEFT JOIN @t_schema.FLAG GAF ON
+    GAF.Enterprise = :Enterprise
+AND GAF.EntityType = N.RootType
+AND GAF.EntityID = N.RootID
+AND GAF.ATTRIBUTECODE = 'GENAREANAME'
+AND GAF.Valto = :forever AND CURRENT TIMESTAMP BETWEEN GAF.EffFrom AND GAF.EffTo
+LEFT JOIN @t_schema.Relator R ON
+    R.Enterprise = :Enterprise
+AND R.EntityType = N.ChildType
+AND R.EntityID = N.ChildID
+AND R.Valto = :forever
+WHERE
+    N.SessionID = :SessionID
+AND N.Enterprise = :Enterprise
+ORDER BY
+   2,3,4,5,6,7,8
+;
+
+@execute
+
+if (iPass == 1) {
+ goto genfullimage;
+}
+
+// Adds and Changes for the VE into trsNetterPass1
+EXEC SQL delete from bigcatj.trsNetterPass1 where sessionid = :SessionID and Enterprise = :Enterprise;
+EXEC SQL delete from bigcatj.trsNetterPass2 where sessionid = :SessionID and Enterprise = :Enterprise;
+EXEC SQL delete from bigcatj.trsNetterFinal where sessionid = :SessionID and Enterprise = :Enterprise;
+EXEC SQL delete from bigcatj.trsNetterAtts where sessionid = :SessionID and Enterprise = :Enterprise;
+
+EXEC SQL COMMIT WORK;
+
+EXEC SQL
+INSERT INTO bigcatj.trsNetterPass1
+Select
+DISTINCT
+1,
+:Enterprise,
+:SessionID,
+CASE WHEN E.EffTo > :EndDate  AND E.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END,
+0,
+E.EntityType,
+E.EntityID,
+E.EntityType,
+E.EntityID,
+E.EntityType,
+E.EntityID,
+'S',
+E.EntityType,
+E.EntityID,
+0,
+CASE WHEN E.EffTo > :EndDate  AND E.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END,
+'S',
+'S',
+E.ValFrom,
+E.EntityType
+FROM @t_schema.ENTITYX E
+WHERE
+    E.Enterprise = :Enterprise
+AND E.EntityType = :TargetEntityType
+AND E.ValFrom Between :StartDate AND :EndDate
+AND E.EntityID IN
+   (SELECT DISTINCT
+      T.ENTITYID FROM @t_schema.TEXTX T
+      INNER JOIN @t_schema.metalinkattr MLA ON
+          MLA.Enterprise  = :Enterprise
+      AND RTRIM(MLA.LinkType) = 'Role/Attribute'
+      AND RTRIM(MLA.LinkType1) = :RoleCode
+      AND MLA.LinkType2 = T.AttributeCode
+      AND MLA.ValTo > current timestamp
+      AND MLA.EffTo > Current TimeStamp
+      WHERE
+          T.Enterprise = :Enterprise
+      AND T.EntityType = :TargetEntityType
+      AND T.ValFrom Between :StartDate AND :EndDate
+    UNION
+    SELECT  DISTINCT
+      T.EntityID
+      FROM @t_schema.Flagx T
+      INNER JOIN @t_schema.metalinkattr MLA ON
+      MLA.Enterprise  = :Enterprise
+      AND RTRIM(MLA.LinkType) = 'Role/Attribute'
+      AND RTRIM(MLA.LinkType1) = :RoleCode
+      AND MLA.LinkType2 = T.AttributeCode
+      AND MLA.ValTo > current timestamp
+      AND MLA.EffTo > Current TimeStamp
+      WHERE
+          T.Enterprise = :Enterprise
+      AND T.EntityType = :TargetEntityType
+      AND T.ValFrom Between :StartDate AND :EndDate
+    UNION
+    SELECT DISTINCT
+      T.EntityID
+      FROM @t_schema.LongTextx T
+      INNER JOIN @t_schema.metalinkattr MLA ON
+      MLA.Enterprise  = :Enterprise
+      AND RTRIM(MLA.LinkType) = 'Role/Attribute'
+      AND RTRIM(MLA.LinkType1) = :RoleCode
+      AND MLA.LinkType2 = T.AttributeCode
+      AND MLA.ValTo > current timestamp
+      AND MLA.EffTo > Current TimeStamp
+      WHERE
+          T.Enterprise = :Enterprise
+      AND T.EntityType = :TargetEntityType
+      AND T.ValFrom Between :StartDate AND :EndDate
+    UNION
+    SELECT DISTINCT
+      T.EntityID
+      FROM @t_schema.Blobx T
+      INNER JOIN @t_schema.metalinkattr MLA ON
+          MLA.Enterprise  = :Enterprise
+      AND RTRIM(MLA.LinkType) = 'Role/Attribute'
+      AND RTRIM(MLA.LinkType1) = :RoleCode
+      AND MLA.LinkType2 = T.AttributeCode
+      AND MLA.ValTo > current timestamp
+      AND MLA.EffTo > Current TimeStamp
+      WHERE
+          T.Enterprise = :Enterprise
+      AND T.EntityType = :TargetEntityType
+      AND T.ValFrom Between :StartDate AND :EndDate
+   )
+;
+
+EXEC SQL COMMIT WORK;
+
+EXEC SQL
+delete from bigcatj.trsNetterPass1 N
+where
+    N.sessionid = :SessionID
+and N.enterprise = :Enterprise
+and N.tran = 'OFF'
+and N.marker = 1
+and N.valfrom <
+  (select max(n1.valfrom) from bigcatj.trsNetterPass1 n1
+   where
+       n1.entitytype = n.entitytype
+   and n1.entityid = n.entityid
+   and n1.corelevel = n.corelevel and
+   n1.sessionid = :SessionID
+and n1.enterprise = :Enterprise
+and n1.tran = 'ON'
+and n1.marker = 1
+)
+;
+
+EXEC SQL COMMIT WORK;
+
+// IF we have multile offs.. which you will get
+// lets only keep the one with the Max Valfrom
+// !! DWB This area need more performance work!
+//
+//
+EXEC SQL
+delete from bigcatj.trsNetterPass1 N
+where
+    N.sessionid = :SessionID
+and N.enterprise = :Enterprise
+and N.tran = 'OFF'
+and N.marker = 1
+and N.valfrom <
+  (select max(n1.valfrom) from bigcatj.trsNetterPass1 n1
+   where
+       n1.entitytype = n.entitytype
+   and n1.entityid = n.entityid
+   and n1.corelevel = n.corelevel and
+   n1.sessionid = :SessionID
+and n1.enterprise = :Enterprise
+and n1.tran = 'OFF'
+and n1.marker = 1
+)
+;
+EXEC SQL
+delete from bigcatj.trsNetterPass1 N
+where
+    N.sessionid = :SessionID
+and N.enterprise = :Enterprise
+and N.tran = 'ON'
+and N.marker = 1
+and N.valfrom <
+  (select max(n1.valfrom) from bigcatj.trsNetterPass1 n1
+   where
+       n1.entitytype = n.entitytype
+   and n1.entityid = n.entityid
+   and n1.corelevel = n.corelevel and
+   n1.sessionid = :SessionID
+and n1.enterprise = :Enterprise
+and n1.tran = 'ON'
+and n1.marker = 1
+)
+;
+
+EXEC SQL COMMIT WORK;
+
+//
+// here.. we are going to leave.. because all we did was set up trsNetterPass1
+//
+if (iPass == 9) {
+  goto bailsp;
+}
+
+genfullimage:
+
+//
+// Lets open it back up
+//
+EXEC SQL OPEN NavCur1;
+
+bailsp:
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in FilterKey varchar(32)
+in TargetEntityType varchar(32)
+in ActionType varchar(32)
+in RoleCode varchar(32)
+in StartDate varchar(26)
+in EndDate varchar(26)
+in iPass int
+@end
+

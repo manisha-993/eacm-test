@@ -1,0 +1,58 @@
+for group in roger was fixdist
+do
+  mkgroup $group
+done
+
+for user in dave roger ching bala dana gregg joan minhthy naomi steve tony vlasta muiadm prevadm was fixdist
+do
+  mkuser groups=staff home=/home/$user $user 
+  passwd $user
+done
+
+chuser pgrp=was groups=staff,was dana
+chuser pgrp=was groups=staff,was gregg
+chuser pgrp=was groups=staff,was minhthy
+chuser pgrp=was groups=staff,was naomi
+chuser pgrp=was groups=staff,was steve
+chuser pgrp=was groups=staff,was vlasta
+chuser pgrp=was groups=staff,was was
+
+chuser pgrp=roger groups=staff,roger roger
+chuser pgrp=fixdist groups=fixdist fixdist
+
+exit
+
+for group in opicusrg proddb2g db2asgrp
+do
+  rmgroup $group
+  mkgroup $group
+  lsgroup $group
+done
+
+for user in aixdba opicmdb2 db2as opicmadm 
+do
+  rmuser -p $user
+  rm -Rf /home/$user
+  mkuser groups=staff home=/home/$user $user 
+  passwd $user
+  lsuser $user
+done
+
+chuser pgrp=opicusrg aixdba
+chuser pgrp=proddb2g aixdba
+chuser pgrp=proddb2g opicmadm
+chuser pgrp=db2asgrp opicmdb2
+chuser pgrp=db2asgrp db2as 
+
+chown -R aixdba.opicusrg /home/aixdba
+chown -R db2as.db2asgrp /home/db2as
+chown -R opicmadm.staff /home/opicmadm
+chown -R opicmdb2.proddb2g /home/opicmdb2
+
+#touch /etc/rc.local
+#chown root.sys /etc/rc.local
+#chmod 744 /etc/rc.local
+#mkitab "rclocal:2:wait:/etc/rc.local > /dev/console 2>&1"
+
+#db2 update dbm cfg using DFTDBPATH /db2
+

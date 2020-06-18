@@ -1,0 +1,208 @@
+@name=GBL7555
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+For PDH research Value(Admin UI)
+
+@desc=For PDH research Value(Admin UI)
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7555.txt,v 1.21 2010/06/21 15:43:07 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+
+// LongText Table w/ Attribute
+EXEC SQL DECLARE curLongText CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,NLSID
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM opicm.LongText where
+    Enterprise = :Enterprise 
+AND AttributeCode LIKE rtrim(:AttributeCode) || '%'
+AND AttributeValue LIKE rtrim(:AttributeValue) || '%'
+AND NLSID IN (1,:NLSID)
+order by valfrom
+FETCH FIRST 2000 ROWS ONLY
+;
+
+// longtext Table w/ NO Attribute
+EXEC SQL DECLARE curLongTextNoValue CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,NLSID
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM opicm.LongText where
+    Enterprise = :Enterprise 
+AND AttributeCode LIKE rtrim(:AttributeCode) || '%'
+AND NLSID IN (1,:NLSID)
+order by valfrom
+FETCH FIRST 2000 ROWS ONLY
+;
+
+
+// flag Table w/ Attribute
+EXEC SQL DECLARE curFlag CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM opicm.Flag where
+    Enterprise = :Enterprise 
+AND AttributeCode  LIKE rtrim(:AttributeCode) || '%'
+AND AttributeValue LIKE rtrim(:AttributeValue) || '%'
+order by valfrom
+FETCH FIRST 2000 ROWS ONLY
+;
+
+// flag Table w/ NO Attribute
+EXEC SQL DECLARE curFlagNoValue CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM opicm.Flag where
+    Enterprise = :Enterprise 
+AND AttributeCode  LIKE rtrim(:AttributeCode) || '%'
+order by valfrom
+FETCH FIRST 2000 ROWS ONLY
+;
+
+
+
+// Text Table w/ Attribute
+EXEC SQL DECLARE curText CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,NLSID
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM opicm.Text where
+    Enterprise = :Enterprise 
+AND AttributeCode  LIKE rtrim(:AttributeCode) || '%'
+AND AttributeValue LIKE rtrim(:AttributeValue) || '%'
+AND NLSID IN (1,:NLSID)
+order by valfrom
+FETCH FIRST 2000 ROWS ONLY
+;
+
+// Text Table w/ NO Attribute
+EXEC SQL DECLARE curTextNoValue CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,NLSID
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM opicm.Text where
+    Enterprise = :Enterprise 
+AND AttributeCode LIKE rtrim(:AttributeCode) || '%'
+AND NLSID IN (1,:NLSID)
+order by valfrom
+FETCH FIRST 2000 ROWS ONLY
+;
+
+// Now Execute the Corresponding Table's SQL. 
+if (strncmp(Table,"text",4) == 0) {
+    // No Attribute Case
+    if(strncmp(AttributeCode," ",1) == 0) {
+        //fprintf(f,"executing curTextNoValue\n");
+        EXEC SQL OPEN curTextNoValue;
+    } else {
+        //fprintf(f,"executing curText\n");
+        EXEC SQL OPEN curText;
+    }
+
+} else if(strncmp(Table,"flag",4) == 0) {
+    // No Attribute Case
+    if(strncmp(AttributeCode," ",1) == 0) {
+        //fprin tf(f,"executing curFlagNoValue\n");
+        EXEC SQL OPEN curFlagNoValue;
+    } else {
+        //fprintf(f,"executing curFlag\n");
+        EXEC SQL OPEN curFlag;
+    }
+
+} else if(strncmp(Table,"longtext",4) == 0) {
+    // No Attribute Case
+    if(strncmp(AttributeCode," ",1) == 0) {
+        //fprintf(f,"executing curLongTextNoValue\n");
+        EXEC SQL OPEN curLongTextNoValue;
+    } else {
+        //fprintf(f,"executing curLongText\n");
+        EXEC SQL OPEN curLongText;
+    }
+
+
+} else {
+  //fprintf(f,"executing NONE\n");
+  // do nothing
+}
+
+
+@parameters
+inout ReturnStatus int
+in Table varchar(9)
+in Enterprise varchar(16)
+in AttributeCode varchar(32)
+in AttributeValue varchar(32)
+in NLSID int
+@end
+
+
+

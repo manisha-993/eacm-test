@@ -1,0 +1,87 @@
+@name=GBL0009
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+-- Store latest interval based upon a Class Name
+--------------------------------------------------------------------------------------------
+$Log: gbl0009.txt,v $
+Revision 1.5  2010/07/21 19:55:00  praveen
+Change Long data type to Sqlint32 in support for db2 9.5
+
+Revision 1.4  2010/06/21 15:42:52  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.3  2009/01/23 00:05:54  praveen
+Supporting dual catdb schema
+
+Revision 1.2  2006/05/11 22:43:05  gregg
+let's actually change the scema this time.
+
+Revision 1.1  2006/05/11 22:30:34  gregg
+spawning clone from bigcat
+
+Revision 1.2  2005/06/07 14:00:16  dave
+fixing an sp
+
+Revision 1.1  2005/06/07 13:21:24  dave
+closing the loop and posting time back to the
+timetable
+
+
+
+@desc=Store latest interval based upon a Class Name
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0009.txt,v 1.5 2010/07/21 19:55:00 praveen Exp $";
+sqlint32 count = 0;
+EXEC SQL END DECLARE SECTION;
+@execute
+
+if (strcmp(schema,"BIGCAT") == 0) {
+
+    EXEC SQL 
+    INSERT INTO 
+    bigcat.RUNTIME
+    (
+    enterprise,
+    object_key,
+    runtime
+    )
+    values
+    (:enterprise,
+    :classname,
+    :runtime
+    )
+    ;
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+    EXEC SQL 
+    INSERT INTO 
+    ibmcat.RUNTIME
+    (
+    enterprise,
+    object_key,
+    runtime
+    )
+    values
+    (:enterprise,
+    :classname,
+    :runtime
+    )
+    ;
+}
+
+@execute
+EXEC SQL COMMIT WORK;
+@parameters
+inout ReturnStatus int
+in enterprise varchar(16)
+in classname varchar(128)
+in runtime varchar(26)
+in schema varchar(8)
+@end

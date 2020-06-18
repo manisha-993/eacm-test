@@ -1,0 +1,37 @@
+
+db2 connect to opicmpdh
+
+db2 "import from /dev/null of del replace into opicm.trsnavigate"
+
+db2 runstats on table OPICM.BLOB with distribution and detailed indexes all
+db2 runstats on table OPICM.BLOBX with distribution and detailed indexes all
+db2 runstats on table OPICM.BOOKMARK with distribution and detailed indexes all
+db2 runstats on table OPICM.DYNASEARCH with distribution and detailed indexes all
+db2 runstats on table OPICM.ENTITY with distribution and detailed indexes all
+db2 runstats on table OPICM.ENTITYX with distribution and detailed indexes all
+db2 runstats on table OPICM.FLAG with distribution and detailed indexes all
+db2 runstats on table OPICM.FLAGX with distribution and detailed indexes all
+db2 runstats on table OPICM.LONGTEXT with distribution and detailed indexes all
+db2 runstats on table OPICM.LONGTEXTX with distribution and detailed indexes all
+db2 runstats on table OPICM.METACOLORDER with distribution and detailed indexes all
+db2 runstats on table OPICM.METADESCRIPTION with distribution and detailed indexes all
+db2 runstats on table OPICM.METAENTITY with distribution and detailed indexes all
+db2 runstats on table OPICM.METAHELP with distribution and detailed indexes all
+db2 runstats on table OPICM.METALINKATTR with distribution and detailed indexes all
+db2 runstats on table OPICM.METATRANSITION with distribution and detailed indexes all
+db2 runstats on table OPICM.NEXTID with distribution and detailed indexes all
+db2 runstats on table OPICM.QUEUE with distribution and detailed indexes all
+db2 runstats on table OPICM.RELATOR with distribution and detailed indexes all
+db2 runstats on table OPICM.RELATORX with distribution and detailed indexes all
+db2 runstats on table OPICM.SESSIONTAGS with distribution and detailed indexes all
+db2 runstats on table OPICM.SOFTLOCK with distribution and detailed indexes all
+db2 runstats on table OPICM.TEXT with distribution and detailed indexes all
+db2 runstats on table OPICM.TEXTX with distribution and detailed indexes all
+db2 runstats on table OPICM.TRSENTITIES with distribution and detailed indexes all
+db2 runstats on table OPICM.TRSENTITY with distribution and detailed indexes all
+db2 runstats on table OPICM.TRSNAVIGATE and detailed indexes all
+db2 runstats on table OPICM.TRSWATCHDOG with distribution and detailed indexes all
+
+./rebind opicmpdh
+
+db2 terminate

@@ -1,0 +1,61 @@
+@name=GBL9977
+@noremote=true
+@type=basic
+@dbase=opicmods
+@narrative
+
+Inserts a record into prodDetailRel
+
+//
+// $Log: gbl9977.txt,v $
+// Revision 1.2  2010/06/21 15:42:43  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.1  2004/12/02 19:19:13  gregg
+// initial load
+//
+//
+//
+
+@desc=Inserts a record into prodDetailRel
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9977.txt,v 1.2 2010/06/21 15:42:43 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+@execute
+
+EXEC SQL 
+INSERT INTO GBLI.PRODDETAILREL
+(
+ENTERPRISE,
+HEADERID,
+DETAILID,
+PUBLISHFLAG,
+VALFROM
+) 
+
+VALUES 
+(
+:ENTERPRISE,
+:HEADERID,
+:DETAILID,
+:PUBLISHFLAG,
+:VALFROM
+) 
+
+;
+@parameters
+inout ReturnStatus int
+in ENTERPRISE varchar(16)
+in HEADERID int
+in DETAILID int
+in PUBLISHFLAG varchar(2)
+in VALFROM varchar(27)
+@end
+
+                                                              
+                                                              

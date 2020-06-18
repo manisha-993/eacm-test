@@ -1,0 +1,338 @@
+@name=GBL0978
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@t_schema=BIGCAT
+@narrative
+
+Manages the update of an Market info record
+
+// $Log: gbl0978.txt,v $
+// Revision 1.9  2010/07/21 19:56:53  praveen
+// Change Long data type to Sqlint32 in support for db2 9.5
+//
+// Revision 1.8  2008/11/17 17:05:35  praveen
+// minor changes
+//
+// Revision 1.7  2008/11/15 04:13:13  praveen
+// Supporting dual catdb schema
+//
+// Revision 1.6  2007/07/11 03:04:51  praveen
+// nlsid check in update stmts
+//
+// Revision 1.5  2007/01/24 21:44:41  bala
+// <No Comment Entered>
+//
+// Revision 1.4  2006/04/13 17:22:27  bala
+// fix to substitute db2 'NULL' when the value is 'null' in the publish dates
+//
+// Revision 1.3  2006/04/13 00:13:38  bala
+// add logging
+//
+// Revision 1.2  2006/04/11 18:39:22  bala
+// add noremote to stop remotedatabase stub
+//
+// Revision 1.1  2006/04/11 17:44:58  bala
+// convert for lenovo
+//
+
+
+@desc= Manages the update of a basic Market Info Record
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0978.txt,v 1.9 2010/07/21 19:56:53 praveen Exp $";
+sqlint32 count = 0;
+char tstamp[27];
+EXEC SQL END DECLARE SECTION;
+@execute
+
+//
+// BEGIN ERROR CHECK DECLARE SECTION
+//
+const int SQLERROR = -1;
+const int SQLCOMPLETE = 1;
+//set this to SQLCOMPLETE when finished!
+int m_iSQLState = SQLERROR;
+EXEC SQL WHENEVER SQLERROR GOTO error_exit;
+EXEC SQL WHENEVER SQLWARNING CONTINUE;
+//
+// END ERROR CHECK DECLARE SECTION
+//
+
+EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+
+//FILE *t;
+//mode_t Mode2;
+//Mode2 = 0777;
+//chmod("/tmp/0978.log",Mode2);
+// append...
+//t=fopen("/tmp/0978.log","a+");
+//t=fopen("/tmp/0978.log","w");
+//fprintf(t,"%s: -->start of stored procedure GBL0978\n",tstamp);
+
+
+if (strcmp(schema,"BIGCAT") == 0) {
+
+	EXEC SQL
+
+	Select count(*) into :count
+	from bigcat.marketinfo
+	where
+	enterprise = :enterprise and
+	collEntityType = :collentitytype and
+	collEntityID = :collentityid and
+	countrycode = :countrycode and
+	languagecode = :languagecode and
+	nlsid = :nlsid
+	;
+
+	if (count == 0 && isactive == 0) {
+	// do nothing
+	} else if (count == 0 && isactive == 1) {
+	// insert this guy
+	EXEC SQL
+	insert into bigcat.marketinfo
+	(
+	  enterprise
+	, countrycode
+	, languagecode
+	, nlsid
+	, countrylist
+	, collentitytype
+	, collentityid
+	, publishfrom
+	, publishto
+	, status
+	, status_fc
+	, valfrom
+	, valto
+	, isactive
+	)
+	values (
+	  :enterprise
+	, :countrycode
+	, :languagecode
+	, :nlsid
+	, :countrylist
+	, :collentitytype
+	, :collentityid
+	, case :publishfrom when 'null' then NULL else :publishfrom end
+	, case :publishto when 'null' then NULL else :publishto end
+	, :status
+	, :status_fc
+	, current timestamp
+	, :forever
+	, 1
+	)
+	;
+	} else if (count != 0 && isactive == 1) {
+	// update this guy
+	EXEC SQL
+	update bigcat.marketinfo
+	set
+	  publishfrom = case :publishfrom when 'null' then NULL else :publishfrom end
+	, publishto = case :publishto when 'null' then NULL else :publishto end
+	, status = :status
+	, status_fc = :status_fc
+	, valfrom = current timestamp
+	, valto = :forever
+	, isactive = 1
+	where
+	enterprise = :enterprise and
+	collEntityType = :collentitytype and
+	collEntityID = :collentityid and
+	nlsid = :nlsid and
+	countrylist = :countrylist
+	;
+
+	} else {
+	// turn it off
+	EXEC SQL
+	update bigcat.marketinfo
+	set
+	valfrom = current timestamp,
+	valto  =  current timestamp,
+	isactive = 0
+	where
+	enterprise = :enterprise and
+	collEntityType = :collentitytype and
+	collEntityID = :collentityid and
+	nlsid = :nlsid and
+	countrylist = :countrylist
+	;
+
+	}
+} else if (strcmp(schema,"IBMCAT") == 0) {
+
+	EXEC SQL
+
+	Select count(*) into :count
+	from ibmcat.marketinfo
+	where
+	enterprise = :enterprise and
+	collEntityType = :collentitytype and
+	collEntityID = :collentityid and
+	countrycode = :countrycode and
+	languagecode = :languagecode and
+	nlsid = :nlsid
+	;
+
+	if (count == 0 && isactive == 0) {
+	// do nothing
+	} else if (count == 0 && isactive == 1) {
+	// insert this guy
+	EXEC SQL
+	insert into ibmcat.marketinfo
+	(
+	  enterprise
+	, countrycode
+	, languagecode
+	, nlsid
+	, countrylist
+	, collentitytype
+	, collentityid
+	, publishfrom
+	, publishto
+	, status
+	, status_fc
+	, valfrom
+	, valto
+	, isactive
+	)
+	values (
+	  :enterprise
+	, :countrycode
+	, :languagecode
+	, :nlsid
+	, :countrylist
+	, :collentitytype
+	, :collentityid
+	, case :publishfrom when 'null' then NULL else :publishfrom end
+	, case :publishto when 'null' then NULL else :publishto end
+	, :status
+	, :status_fc
+	, current timestamp
+	, :forever
+	, 1
+	)
+	;
+	} else if (count != 0 && isactive == 1) {
+	// update this guy
+	EXEC SQL
+	update ibmcat.marketinfo
+	set
+	  publishfrom = case :publishfrom when 'null' then NULL else :publishfrom end
+	, publishto = case :publishto when 'null' then NULL else :publishto end
+	, status = :status
+	, status_fc = :status_fc
+	, valfrom = current timestamp
+	, valto = :forever
+	, isactive = 1
+	where
+	enterprise = :enterprise and
+	collEntityType = :collentitytype and
+	collEntityID = :collentityid and
+	nlsid = :nlsid and
+	countrylist = :countrylist
+	;
+
+	} else {
+	// turn it off
+	EXEC SQL
+	update ibmcat.marketinfo
+	set
+	valfrom = current timestamp,
+	valto  =  current timestamp,
+	isactive = 0
+	where
+	enterprise = :enterprise and
+	collEntityType = :collentitytype and
+	collEntityID = :collentityid and
+	nlsid = :nlsid and
+	countrylist = :countrylist
+	;
+
+	}
+}
+
+//
+// BEGIN ERROR CHECK SECTION
+//
+
+// this won't get executed if sql error occurs
+m_iSQLState = SQLCOMPLETE;
+
+error_exit:
+
+if(m_iSQLState == SQLERROR) {
+
+    // ensure no infinite loops in the case that a failed SQL connection is used past this point...
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+
+
+    //     fprintf(t,"********************  GBL0978 SQLCA DUMP  ********************\n");
+    //     char msg[1025];
+    //     sqlaintp(msg, 1024, 0, &sqlca);
+    //     fprintf(t,"msg:%s\n",msg);
+//    fprintf(t,"SQLCAID: %s\n", sqlca.sqlcaid);
+//    fprintf(t,"SQLCABC: %d\n", sqlca.sqlcabc);
+//    fprintf(t,"SQLCODE: %d\n", sqlca.sqlcode);
+//    fprintf(t,"SQLERRML: %d\n", sqlca.sqlerrml);
+//    fprintf(t,"SQLERRMC: %s\n", sqlca.sqlerrmc);
+//    fprintf(t,"SQLERRP: %s\n", sqlca.sqlerrp);
+//    fprintf(t,"SQLERRD[0]: %d\n", sqlca.sqlerrd[0]);
+//    fprintf(t,"SQLERRD[1]: %d\n", sqlca.sqlerrd[1]);
+//    fprintf(t,"SQLERRD[2]: %d\n", sqlca.sqlerrd[2]);
+//    fprintf(t,"SQLERRD[3]: %d\n", sqlca.sqlerrd[3]);
+//    fprintf(t,"SQLERRD[4]: %d\n", sqlca.sqlerrd[4]);
+//    fprintf(t,"SQLERRD[5]: %d\n", sqlca.sqlerrd[5]);
+//    fprintf(t,"SQLWARN: %s\n", sqlca.sqlwarn);
+//    fprintf(t,"SQLSTATE: %s\n", sqlca.sqlstate);
+    //
+    // Dumping Input params:
+//    fprintf(t,"enterprise:\"%s\"\n",enterprise);
+//    fprintf(t,"countrycode:\"%s\"\n",countrycode);
+//    fprintf(t,"languagecode:\"%s\"\n",languagecode);
+//    fprintf(t,"nlsid:\"%d\"\n",nlsid);
+//    fprintf(t,"countrylist:\"%s\"\n",countrylist);
+//    fprintf(t,"collentitytype:\"%s\"\n",collentitytype);
+//    fprintf(t,"collentityid:\"%s\"\n",collentityid);
+//
+//    fprintf(t,"publishfrom:\"%d\"\n",publishfrom);
+//    fprintf(t,"publishto:\"%d\"\n",publishto);
+//    fprintf(t,"status:\"%d\"\n",status);
+//    fprintf(t,"status_fc:\"%d\"\n",status_fc);
+//    fprintf(t,"isactive:\"%d\"\n",isactive);
+    // End dump params
+//    fprintf(t,"******************  END OF GBL0978 SQLCA DUMP  *******************\n");
+}
+//
+// END ERROR CHECK SECTION
+//
+
+//fprintf(t,"%s:end of GBL0978\n",tstamp);
+//fclose(t);
+
+
+//EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in enterprise varchar(8)
+in countrycode varchar(2)
+in languagecode varchar(2)
+in nlsid int
+in countrylist varchar(8)
+in collentitytype varchar(32)
+in collentityid int
+in publishfrom varchar(12)
+in publishto varchar(12)
+in status varchar(25)
+in status_fc varchar(8)
+in isactive int
+in schema varchar(8)
+@end

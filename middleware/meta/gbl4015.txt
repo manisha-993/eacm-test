@@ -1,0 +1,54 @@
+@name=GBL4015
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+-- Retrieve WW Product Records from the CatDB based upon an part number match
+--------------------------------------------------------------------------------------------
+$Log: gbl4015.txt,v $
+Revision 1.3  2010/06/21 15:42:50  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.2  2005/05/23 01:00:45  dave
+small syntax error
+
+Revision 1.1  2005/05/23 00:36:44  dave
+new SP to get WW product records based upon
+a WWPartNumber
+
+Revision 1.3  2005/05/17 23:56:31  dave
+fixing syntax
+
+Revision 1.2  2005/05/17 23:01:18  dave
+fixing source tag
+
+Revision 1.1  2005/05/17 22:50:41  dave
+new SP to deal with getting a World Wide Part Number
+from the CatalogDB
+@desc=Retrieve WW Product Records from the CatDB based upon an part number match
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl4015.txt,v 1.3 2010/06/21 15:42:50 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+WWEntityType,
+WWEntityID
+FROM gbli.WWPRODUCT 
+WHERE
+    Enterprise = :Enterprise
+AND WWPartNumber like :WWPartNumber
+AND NLSID = :NLSID
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in NLSID int
+in WWPartNumber varchar(16)
+@end

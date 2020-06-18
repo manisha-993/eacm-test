@@ -1,0 +1,101 @@
+@name=GBL4010
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+-- Retrieve a WW Product Record from the CatDB
+-- We do not get related data here
+-- but we always get the stubs to get collections
+-- of other data
+--------------------------------------------------------------------------------------------
+$Log: gbl4010.txt,v $
+Revision 1.9  2015/02/24 21:44:04  ptatinen
+Add PRCFILENAM as per Lenovo CQ
+
+Revision 1.8  2011/05/10 07:12:10  guobin
+add two columns: dualpipe,dualpipe_fc
+
+Revision 1.7  2010/06/21 15:42:42  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2007/04/03 16:47:54  bala
+one more fix
+
+Revision 1.5  2007/04/03 16:47:23  bala
+fix for compile errors PROJCDNAM,PROJCDNAM_FC and PUBLISHFLAG
+
+Revision 1.4  2005/09/13 04:14:31  dave
+ok.. lets add the PROJCDNAM, and lets take a hard look at
+WWSEO and how to get prod structures
+
+Revision 1.3  2005/05/17 23:56:31  dave
+fixing syntax
+
+Revision 1.2  2005/05/17 23:01:18  dave
+fixing source tag
+
+Revision 1.1  2005/05/17 22:50:41  dave
+new SP to deal with getting a World Wide Part Number
+from the CatalogDB
+
+
+@desc=Retrieve a WW Part Number Record from the CatDB table
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl4010.txt,v 1.9 2015/02/24 21:44:04 ptatinen Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+PROJCDNAM
+,PROJCDNAM_FC
+,WWPARTNUMBER
+,MACHTYPE
+,MODEL
+,SPECIALBID
+,SPECIALBID_FC
+,CATEGORY
+,CATEGORY_FC
+,SUBCATEGORY
+,SUBCATEGORY_FC
+,GROUP
+,GROUP_FC
+,SUBGROUP
+,SUBGROUP_FC
+,ORDERCODE
+,ORDERCODE_FC
+,SARINDC
+,SARINDC_FC
+,SERVICEINDICATOR
+,DIVISION
+,DIVISION_FC
+,RATECARDCODE
+,RATECARDCODE_FC
+,DUALPIPE
+,DUALPIPE_FC
+,STATUS
+,STATUS_FC
+--,PUBLISHFLAG
+,VALFROM
+,VALTO
+,ISACTIVE
+,PRCFILENAM
+FROM gbli.WWPRODUCT
+WHERE
+    Enterprise = :Enterprise
+AND WWEntityType = :EntityType
+AND WWEntityID = :EntityID
+AND NLSID = :NLSID
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in NLSID int
+@end

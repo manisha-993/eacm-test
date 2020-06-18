@@ -1,0 +1,68 @@
+@name=GBL8201
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+$Log: gbl8201.txt,v $
+Revision 1.9  2010/06/21 15:43:07  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.8  2004/10/20 21:01:48  dave
+changes to gen parm
+
+Revision 1.7  2004/02/20 20:21:57  roger
+Must be @t_schema
+
+Revision 1.6  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.5  2003/09/08 16:31:21  roger
+Enterprise was changed to 16 char length
+
+Revision 1.4  2003/01/04 01:02:45  joan
+fix bugs
+
+Revision 1.3  2003/01/03 23:23:26  joan
+fix sp
+
+Revision 1.2  2003/01/03 21:54:25  joan
+fix error
+
+Revision 1.1  2003/01/03 21:35:19  joan
+initial load
+
+
+@desc=Get Parent/Child Group info, giving group name
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8201.txt,v 1.9 2010/06/21 15:43:07 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  Linktype2
+, Linkvalue 
+FROM @t_schema.metalinkattr mla
+WHERE
+    mla.Enterprise = :Enterprise
+AND mla.linktype = 'Group/Attribute'
+AND mla.linktype1 = :Group
+AND mla.ValFrom <= :ValOn AND :ValOn < mla.ValTo AND mla.EffFrom <= :EffOn AND :EffOn < mla.EffTo
+;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in Group varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+in OPWGID int
+@end
+
+

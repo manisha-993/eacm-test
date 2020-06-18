@@ -1,0 +1,70 @@
+@name=GBL2926
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+This checks for an existing EntityType/Attributecode/AttributeValue in the flag table
+It always checks for current currently active.. since it is used exlusively for
+a uniqueness check
+
+$Log: gbl2926.txt,v $
+Revision 1.12  2010/06/21 15:42:58  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.11  2004/10/20 21:01:39  dave
+changes to gen parm
+
+Revision 1.10  2004/02/20 20:21:49  roger
+Must be @t_schema
+
+Revision 1.9  2004/02/20 18:09:30  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.8  2003/09/08 16:31:11  roger
+Enterprise was changed to 16 char length
+
+Revision 1.7  2003/05/02 18:12:42  dave
+syntax fixes
+
+Revision 1.6  2003/05/02 17:24:56  dave
+unique EntiyType/AttributeCode/AttributeValue chcck
+
+@desc=Flag Code EACHECK
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2926.txt,v 1.12 2010/06/21 15:42:58 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT COUNT(*) FROM
+@t_schema.Flag F
+INNER JOIN @t_schema.Entity E ON
+E.Enterprise = :Enterprise
+AND E.EntityType = F.EntityType
+AND E.EntityID = F.EntityID
+AND E.ValFrom <= :now AND :now < E.ValTo AND E.EffFrom <= :now AND :now < E.EffTo
+WHERE
+    F.Enterprise =  :Enterprise
+AND F.AttributeCode = :AttributeCode
+AND F.EntityType = :EntityType
+AND F.AttributeValue = :AttributeValue
+AND F.EntityID <>  :EntityID
+AND F.Valto = :forever
+AND CURRENT TIMESTAMP BETWEEN F.EffFrom AND F.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in AttributeCode varchar(32)
+in AttributeValue varchar(32)
+@end
+
+

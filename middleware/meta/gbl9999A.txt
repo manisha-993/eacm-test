@@ -1,0 +1,44 @@
+@name=GBL9999A
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+Table MetaTransition. give a Enterprise, Attributecode,fromcode, ruturn all tocode()
+use this SP to get World wide countries. 
+--------------------------------------------------------------------------------------------
+$Log: gbl9999A.txt,v $
+Revision 1.2  2010/06/21 15:42:49  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.1  2010/03/02 05:27:07  yang
+get world wide countries from table MetaTransition where flag1 = 1999
+
+
+
+
+
+@desc=Unique one-off sibling check part 1
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9999A.txt,v 1.2 2010/06/21 15:42:49 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+select Flag2 from opicm.metatransition where Enterprise = :Enterprise
+                                    AND AttributeCode1 = :AttributeCode1
+                                    AND Flag1 = :Flag1
+                                    AND AttributeCode2 = :AttributeCode2
+                                    AND ValFrom <= :now AND :now < ValTo AND EffFrom <= :now AND :now < EffTo;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in AttributeCode1 varchar(32)
+in Flag1 varchar(32) 
+in AttributeCode2 varchar(32)
+@end

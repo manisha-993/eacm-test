@@ -1,0 +1,16 @@
+#!/bin/sh
+
+#
+# $Logx$
+#
+
+#
+# This script pings TaskMaster and (4) Idlers under Linux or AIX
+#
+
+for object in TaskMaster IdlerA IdlerB IdlerC IdlerD
+do
+  java -classpath middleware.jar COM.ibm.opicmpdh.middleware.taskmaster.PingObject $object
+  echo " "
+done
+

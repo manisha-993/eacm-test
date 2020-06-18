@@ -1,0 +1,33 @@
+db2 connect to $1
+db2 list tablespaces show detail|egrep "ID|Name|Used pages|Free pages|High water mark|Total" > tablespaces
+db2 terminate
+
+X=`wc -l tablespaces|awk '{print $1}'`
+COUNTER=1
+
+echo "\nID\tNAME\t\tTOTAL PAGES\tUSED PAGES\tHIGH WATER\tFREE PAGES\t% FREE"
+echo "----------------------------------------------------------------------------------------------"
+while [ X -ge COUNTER ]
+do
+cat tablespaces|head -$COUNTER|tail -1|cut -f2 -d"="|read TS_ID
+((COUNTER += 1))
+cat tablespaces|head -$COUNTER|tail -1|cut -f2 -d"="|read TSNAME
+((COUNTER += 1))
+cat tablespaces|head -$COUNTER|tail -1|cut -f2 -d"="|read TOTALP
+((COUNTER += 1))
+cat tablespaces|head -$COUNTER|tail -1|cut -f2 -d"="|read USEDP
+((COUNTER += 1))
+cat tablespaces|head -$COUNTER|tail -1|cut -f2 -d"="|read FREEP
+((COUNTER += 1))
+cat tablespaces|head -$COUNTER|tail -1|cut -f2 -d"="|read HIGHW
+((COUNTER += 1))
+
+if [ -z "`echo $FREEP|grep 'Not'`" ];
+then
+((PCTFREE = (FREEP * 100) / TOTALP))
+echo "$TS_ID\t$TSNAME       \t$TOTALP\t\t$USEDP\t\t$HIGHW\t\t$FREEP\t\t$PCTFREE"
+fi
+
+done 
+echo
+rm tablespaces

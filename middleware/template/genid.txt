@@ -1,0 +1,61 @@
+//
+// TEMPLATE: GENID.TXT (@date)
+//
+// $Log: genid.txt,v $
+// Revision 1.12  2003/03/17 20:08:17  dave
+// almost there for Tagging in Entity Table
+//
+// Revision 1.11  2003/03/13 00:46:13  dave
+// trying to get GENID back
+//
+// Revision 1.10  2003/03/12 18:24:18  dave
+// simplifying and preparing for the Tagging requirement
+//
+// Revision 1.9  2002/09/26 00:13:19  dave
+// template  fix to include == 0
+//
+// Revision 1.8  2002/08/07 23:16:29  roger
+// Fix it
+//
+// Revision 1.7  2002/08/07 22:03:17  roger
+// Gen IDs for Entity/Relator only
+//
+// Revision 1.6  2001/07/27 00:03:40  roger
+// Changed opicm to @schema
+//
+// Revision 1.5  2001/03/17 03:11:50  roger
+// brand was defined multiple times - renamed to x_brand
+//
+// Revision 1.4  2001/03/16 19:10:40  roger
+// More branding code
+//
+// Revision 1.3  2001/03/16 03:18:48  roger
+// Added Log keyword
+//
+
+EXEC SQL BEGIN DECLARE SECTION;
+char b_brand[80] = "$Id: genid.txt,v 1.12 2003/03/17 20:08:17 dave Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL BEGIN DECLARE SECTION;
+long NewEntityID = 0;
+EXEC SQL END DECLARE SECTION;
+
+// We only Gen a new ID for This Entity Table
+if (EntityID <= 0 && (strcmp("opicm.Entity","@table") == 0) ||strcmp("opicm.Relator","@table") )  {
+	EXEC SQL DECLARE C1 CURSOR FOR
+	SELECT NextID FROM opicm.NextID WHERE Enterprise = :Enterprise and EntityType = :EntityType FOR UPDATE OF NEXTID;
+	EXEC SQL OPEN C1;
+	EXEC SQL FETCH C1 INTO :NewEntityID ;
+	if (NewEntityID > 0) {
+		EXEC SQL UPDATE opicm.NextID SET NextID = :NewEntityID + 1 WHERE CURRENT OF C1;
+		EXEC SQL CLOSE C1 WITH RELEASE;
+		EntityID = NewEntityID;
+	}else {
+		// If no value exists, "prime the pump" with ID = 1
+		EXEC SQL CLOSE C1 WITH RELEASE;
+		EntityID = 1;
+		EXEC SQL INSERT INTO opicm.NEXTID (Enterprise, EntityType, NextID) Values (:Enterprise, :EntityType, 2);	
+	}
+	EXEC SQL COMMIT WORK;
+}

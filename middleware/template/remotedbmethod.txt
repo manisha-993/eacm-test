@@ -1,0 +1,171 @@
+//
+// TEMPLATE: REMOTEDBMETHOD.TXT (@date)
+//
+// Copyright (c) 2001, International Business Machines Corp., Ltd.
+// All Rights Reserved.
+// Licensed for use in connection with IBM business only.
+//
+// $Log: remotedbmethod.txt,v $
+// Revision 1.13  2009/03/11 18:15:55  wendy
+// Fix jre1.4 compiler warnings
+//
+// Revision 1.12  2007/05/23 14:35:52  wendy
+// Use dbcurrent for debug msgs when possible to get connectid
+//
+// Revision 1.11  2007/04/23 13:34:36  wendy
+// Null dbcurrent causing JUI hangs, hiding other exceptions
+//
+// Revision 1.10  2005/02/03 17:06:10  roger
+// Change javadoc directives
+//
+// Revision 1.9  2001/06/27 18:10:01  roger
+// Remove displayMemory calls
+//
+// Revision 1.8  2001/06/16 01:59:08  roger
+// More changes to support connectionID in all log output
+//
+// Revision 1.7  2001/06/15 22:14:13  roger
+// D.ebug and T.est for Remote
+//
+// Revision 1.6  2001/03/16 04:26:16  roger
+// Removed dead code
+//
+// Revision 1.5  2001/03/16 03:18:49  roger
+// Added Log keyword
+//
+
+/**
+ * Exposes stored procedure @spname (@desc) through RMI
+ * @author generated code
+ * @return the stored procedure output as a <code>ReturnDataResultSetGroup</code>
+ * @exception RemoteException, MiddlewareException
+ */
+  public @vectorornot remote@spname
+  (
+@callremotemethodparms
+  ) throws RemoteException, MiddlewareException {
+    // The ResultSet
+    ResultSet rs = null;
+    // ReturnData containing result sets for the current operation
+    ReturnDataResultSetGroup rdrsgReturn = new ReturnDataResultSetGroup(5, 1);
+    String strReturnData = null;
+    // Return value (for insert/update)
+    ReturnID returnID = new ReturnID(0);
+    // ReturnStatus from call to Stored Proc
+    ReturnStatus returnStatus = new ReturnStatus(-1);
+    // Information about exception location
+    String strMethod = "remote@spname";
+    String strSP = "@spname";
+    Database dbCurrent = null;
+    MiddlewareException mx = null;
+
+    try {
+      // Connection to use for this call
+      dbCurrent = c_dbpOPICM.getConnection(strMethod);
+      dbCurrent.test(dbCurrent != null, "remote@spname:Unable to acquire a connection");
+      dbCurrent.debug(D.EBUG_DETAIL, "CALL @spname from remote@spname");
+@parmlength
+      // If this is a UI instance only, tell caller to go elsewhere (not welcome here)
+      if (c_strInstancePurpose.equals("U")) {
+        throw new MiddlewareRequestException("Please use the WebSphere middleware instance for reports");
+      }
+try {
+c_Connections.recordCall(RemoteServer.getClientHost(), "remote@spname");
+}
+catch (Exception x) { debug("error getting host info"); }
+      dbCurrent.setAutoCommit(false);
+      dbCurrent.isPending();
+      // Call the Stored Procedure
+      @callreturndbCurrent.call@spname
+        (
+@parmnames
+        );
+      // If there is a resultset, return it
+      if (rs != null) {
+        // Place the ReturnDataResultSet into a ReturnDataResultSetGroup
+        rdrsgReturn.addElement(new ReturnDataResultSet(rs, strSP));
+      }
+      dbCurrent.commit();
+    }
+    catch (RuntimeException rx) {
+      mx = new MiddlewareException("(remote@spname) RuntimeException: " + rx);
+      StringWriter writer = new StringWriter();
+      rx.printStackTrace(new PrintWriter(writer));
+      String x = writer.toString();
+      if (dbCurrent != null){
+          dbCurrent.debug(D.EBUG_ERR, "RuntimeException trapped at: " + strMethod + "." + strSP + " " + rx);
+          dbCurrent.debug(D.EBUG_ERR, "" + x);
+          try {
+            dbCurrent.rollback();
+          }
+          catch (SQLException sx) {
+            dbCurrent.debug(D.EBUG_ERR, "rollback failed " + sx);
+          }
+      }else{
+        D.ebug(D.EBUG_ERR, "RuntimeException trapped at: " + strMethod + "." + strSP + " " + rx);
+        D.ebug(D.EBUG_ERR, "" + x);
+      }
+      D.ebug(D.EBUG_DETAIL, "@spname complete - error");
+      throw mx;
+    }
+    catch (MiddlewareException x) {
+      mx = x;
+      if (dbCurrent != null){
+          dbCurrent.debug(D.EBUG_ERR, "MiddlewareException trapped at: " + strMethod + "." + strSP + " " + x);
+          try {
+            dbCurrent.rollback();
+          }
+          catch (SQLException sx) {
+            dbCurrent.debug(D.EBUG_ERR, "rollback failed " + sx);
+          }
+      }else{
+        D.ebug(D.EBUG_ERR, "MiddlewareException trapped at: " + strMethod + "." + strSP + " " + x);
+      }
+      D.ebug(D.EBUG_DETAIL, "@spname complete - error");
+      throw mx;      
+    }
+    catch (Exception x) {
+      mx = new MiddlewareException("(remote@spname) Exception: " + x);
+      if (dbCurrent != null){
+          dbCurrent.debug(D.EBUG_ERR, "Exception trapped at: " + strMethod + "." + strSP + " " + x);
+          try {
+            dbCurrent.rollback();
+          }
+          catch (SQLException sx) {
+            dbCurrent.debug(D.EBUG_ERR, "rollback failed " + sx);
+          }
+      }else{
+        D.ebug(D.EBUG_ERR, "Exception trapped at: " + strMethod + "." + strSP + " " + x);
+      }
+      D.ebug(D.EBUG_DETAIL, "@spname complete - error");
+      throw mx;      
+    }
+    finally {
+      // All ResultSets are processed, dispose of the SQL statement
+      if (rs != null) {
+        try {
+          rs.close();
+        }
+        catch (SQLException x) {
+          D.ebug(D.EBUG_ERR, "rs close failure in remote@spname");
+        }
+        rs = null;
+      }
+      if (dbCurrent != null) {
+        dbCurrent.freeStatement();
+        c_dbpOPICM.freeConnection(dbCurrent);
+      }
+      /*if (mx != null) {
+        D.ebug(D.EBUG_DETAIL, "@spname complete - error");
+        throw mx;
+      } else {
+        D.ebug(D.EBUG_DETAIL, "@spname complete");
+        // return the result vector (or void)
+        return@vctretornot;
+      }*/
+    }
+    D.ebug(D.EBUG_DETAIL, "@spname complete");
+    // return the result vector (or void)
+    return@vctretornot;
+  }
+

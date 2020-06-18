@@ -1,0 +1,72 @@
+@name=GBL7544
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+Delete a record from the bookmark table
+
+$Log: gbl7544.txt,v $
+Revision 1.9  2010/06/21 15:43:09  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.8  2004/10/20 21:01:45  dave
+changes to gen parm
+
+Revision 1.7  2004/02/20 20:21:55  roger
+Must be @t_schema
+
+Revision 1.6  2004/02/20 18:09:35  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.5  2003/09/08 16:31:19  roger
+Enterprise was changed to 16 char length
+
+Revision 1.4  2003/03/29 00:46:28  gregg
+add enterprise column to bookmark
+
+Revision 1.3  2003/03/19 20:32:55  gregg
+compile ficks
+
+Revision 1.2  2003/03/19 17:58:37  gregg
+no results for 7544
+
+Revision 1.1  2003/03/19 17:50:36  gregg
+initial load
+
+
+@desc=Delete a record from the bookmark table
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+
+char brand[80] = "$Id: gbl7544.txt,v 1.9 2010/06/21 15:43:09 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL 
+DELETE 
+from @t_schema.BOOKMARK B where
+    B.OPID = :OPID
+AND B.Enterprise = :Enterprise
+AND B.ActionItemKey = :ActionItemKey
+AND B.UserDescription = :UserDescription
+;
+@execute
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPID int
+in ActionItemKey varchar(32)
+in UserDescription varchar(254)
+@end
+
+
+
+
+
+

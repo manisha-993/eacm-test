@@ -1,0 +1,428 @@
+@name=GBL8167
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Takes two exract images in the trsNavigate table and finds all kinda role info on them
+$Log: gbl8167.txt,v $
+Revision 1.10  2010/06/21 15:43:24  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.9  2006/03/16 19:44:59  joan
+changes to left join on relator table
+
+Revision 1.8  2005/03/21 20:21:06  dave
+more specific
+
+Revision 1.7  2004/10/20 21:01:48  dave
+changes to gen parm
+
+Revision 1.6  2004/02/20 20:21:57  roger
+Must be @t_schema
+
+Revision 1.5  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.4  2003/08/12 18:14:34  joan
+need to look at attribute type I and X also
+
+Revision 1.3  2003/07/17 18:18:18  dave
+syncing EANNetChanges Up
+
+
+
+@desc=Reuse Extract Info for this stuff
+@results=1
+@parmstyle=GENERAL
+@sql
+
+// begin sql tag
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+With Entities(EntityType, EntityID) AS
+(SELECT DISTINCT Entity1Type,Entity1ID from @t_schema.trsNavigate WHERE SESSIONID = :SessionIDFinish 
+UNION 
+SELECT DISTINCT Entity2Type,Entity2ID from @t_schema.trsNavigate WHERE SESSIONID = :SessionIDFinish 
+UNION
+SELECT DISTINCT EntityType,EntityID from @t_schema.trsNavigate WHERE SESSIONID = :SessionIDFinish 
+)
+SELECT
+ CASE
+     WHEN T.ValFrom > :StartDate AND T.EffTo < :EndDate THEN 'D'
+     WHEN T.ValFrom > :StartDate THEN 'C'
+     ELSE 'N'
+ END
+,'A'
+,T.ValFrom
+,T.EntityType
+,T.EntityID
+,T.AttributeCode
+,'NA'
+,T.NLSID
+,COALESCE(T1.AttributeValue,'Unknown')
+,COALESCE(T2.AttributeValue,'Unknown')
+FROM Entities N
+INNER JOIN @t_schema.Text T ON
+    T.Enterprise = :Enterprise
+AND T.EntityType = N.EntityType
+AND T.EntityID = N.EntityID
+AND T.NLSID IN(1,1)
+AND T.Valto  = :forever
+--INNER JOIN @t_schema.MetaEntity ME ON
+--    ME.Enterprise = :Enterprise
+--AND ME.EntityType = T.AttributeCode
+--AND ME.EntityClass in ('T', 'I')
+--AND ME.ValTo = :forever
+--AND ME.Effto > :now
+LEFT JOIN @t_schema.relator R1 ON
+        R1.Enterprise = :Enterprise
+AND R1.EntityType = 'OPWG'
+AND R1.EntityID =T.OPENID
+AND R1.ValTo = :forever
+LEFT JOIN @t_schema.Text T1 ON
+        T1.Enterprise = :Enterprise
+AND T1.EntityType = 'OPWG'
+AND T1.EntityID = R1.EntityID
+AND T1.AttributeCode = 'NAME'
+AND T1.NLSID = 1
+AND T1.valto = :forever
+LEFT JOIN @t_schema.Text T2 ON
+        T2.Enterprise = :Enterprise
+AND T2.EntityTYPE = 'OP'
+AND T2.EntityID = R1.Entity2ID
+AND T2.AttributeCode = 'USERTOKEN'
+AND T2.NLSID = 1
+AND T2.valto = :forever
+UNION ALL
+SELECT
+ CASE
+     WHEN T.ValFrom > :StartDate AND T.EffTo < :EndDate THEN 'D'
+     WHEN T.ValFrom > :StartDate THEN 'C'
+     ELSE 'N'
+ END
+,'A'
+,T.ValFrom
+,T.EntityType
+,T.EntityID
+,T.AttributeCode
+,'NA'
+,T.NLSID
+,COALESCE(T1.AttributeValue,'Unknown')
+,COALESCE(T2.AttributeValue,'Unknown')
+FROM Entities N
+INNER JOIN @t_schema.LongText T ON
+    T.Enterprise = :Enterprise
+AND T.EntityType = N.EntityType
+AND T.EntityID = N.EntityID
+AND T.NLSID IN(1,1)
+AND T.Valto  = :forever
+--INNER JOIN @t_schema.MetaEntity ME ON
+--    ME.Enterprise = :Enterprise
+--AND ME.EntityType = T.AttributeCode
+--AND ME.EntityClass in ('L','X')
+--AND ME.ValTo = :forever
+--AND ME.Effto > :now
+LEFT JOIN @t_schema.relator R1 ON
+        R1.Enterprise = :Enterprise
+AND R1.EntityType = 'OPWG'
+AND R1.EntityID = T.OPENID
+AND R1.ValTo = :forever
+LEFT JOIN @t_schema.Text T1 ON
+        T1.Enterprise = :Enterprise
+AND T1.EntityType = 'OPWG'
+AND T1.EntityID = R1.EntityID
+AND T1.AttributeCode = 'NAME'
+AND T1.NLSID = 1
+AND T1.valto = :forever
+LEFT JOIN @t_schema.Text T2 ON
+        T2.Enterprise = :Enterprise
+AND T2.EntityTYPE = 'OP'
+AND T2.EntityID = R1.Entity2ID
+AND T2.AttributeCode = 'USERTOKEN'
+AND T2.NLSID = 1
+AND T2.valto = :forever
+UNION ALL
+SELECT
+ CASE
+     WHEN F.ValFrom > :StartDate AND F.EffTo < :EndDate THEN 'D'
+     WHEN F.ValFrom > :StartDate THEN 'C'
+     ELSE 'N'
+ END
+,'A'
+,F.ValFrom
+,F.EntityType
+,F.EntityID
+,F.AttributeCode
+,F.AttributeValue
+,1
+,COALESCE(T1.AttributeValue,'Unknown')
+,COALESCE(T2.AttributeValue,'Unknown')
+FROM Entities N
+INNER JOIN @t_schema.Flag F ON
+    F.Enterprise = :Enterprise
+AND F.EntityType = N.EntityType
+AND F.EntityID = N.EntityID
+AND F.Valto  = :forever
+--INNER JOIN @t_schema.MetaEntity ME ON
+--    ME.Enterprise = :Enterprise
+--AND ME.EntityType = F.AttributeCode
+--AND ME.EntityClass IN ('F','U','A','S')
+--AND ME.ValTo = :forever
+--AND ME.Effto > :now
+LEFT JOIN @t_schema.relator R1 ON
+        R1.Enterprise = :Enterprise
+AND R1.EntityType = 'OPWG'
+AND R1.EntityID =F.OPENID
+AND R1.ValTo = :forever
+LEFT JOIN @t_schema.Text T1 ON
+        T1.Enterprise = :Enterprise
+AND T1.EntityType = 'OPWG'
+AND T1.EntityID = R1.EntityID
+AND T1.AttributeCode = 'NAME'
+AND T1.NLSID = 1
+AND T1.valto = :forever
+LEFT JOIN @t_schema.Text T2 ON
+        T2.Enterprise = :Enterprise
+AND T2.EntityTYPE = 'OP'
+AND T2.EntityID = R1.Entity2ID
+AND T2.AttributeCode = 'USERTOKEN'
+AND T2.NLSID = 1
+AND T2.valto = :forever
+UNION ALL
+SELECT
+ CASE
+     WHEN B.ValFrom > :StartDate AND B.EffTo < :EndDate THEN 'D'
+     WHEN B.ValFrom > :StartDate THEN 'C'
+     ELSE 'N'
+ END
+,'A'
+,B.ValFrom
+,B.EntityType
+,B.EntityID
+,B.AttributeCode
+,'NA'
+,B.NLSID
+,COALESCE(T1.AttributeValue,'Unknown')
+,COALESCE(T2.AttributeValue,'Unknown')
+FROM Entities N
+INNER JOIN @t_schema.Blob B ON
+    B.Enterprise = :Enterprise
+AND B.EntityType = N.EntityType
+AND B.EntityID = N.EntityID
+AND B.NLSID IN(1,1)
+AND B.Valto  = :forever
+LEFT JOIN @t_schema.relator R1 ON
+        R1.Enterprise = :Enterprise
+AND R1.EntityType = 'OPWG'
+AND R1.EntityID =B.OPENID
+AND R1.ValTo = :forever
+LEFT JOIN @t_schema.Text T1 ON
+        T1.Enterprise = :Enterprise
+AND T1.EntityType = 'OPWG'
+AND T1.EntityID = R1.EntityID
+AND T1.AttributeCode = 'NAME'
+AND T1.NLSID = 1
+AND T1.valto = :forever
+LEFT JOIN @t_schema.Text T2 ON
+        T2.Enterprise = :Enterprise
+AND T2.EntityTYPE = 'OP'
+AND T2.EntityID = R1.Entity2ID
+AND T2.AttributeCode = 'USERTOKEN'
+AND T2.NLSID = 1
+AND T2.valto = :forever
+UNION ALL
+SELECT
+DISTINCT
+ CASE WHEN N1.SESSIONID IS NULL THEN 'A' ELSE 'N' END
+,'R'
+,R.ValFrom
+,R.EntityType
+,R.EntityID
+,'NA'
+,'NA'
+,1
+,COALESCE(T1.AttributeValue,'Unknown')
+,COALESCE(T2.AttributeValue,'Unknown')
+FROM @t_schema.trsNavigate N2
+INNER JOIN @t_schema.Relator R ON
+    R.Enterprise =  :Enterprise
+AND R.EntityType = N2.EntityType
+AND R.Entityid = N2.EntityID
+AND R.Valto  = :forever
+LEFT JOIN @t_schema.relator R1 ON
+    R1.Enterprise = :Enterprise
+AND RTRIM(R1.EntityType || ' ') = 'OPWG'    
+AND R1.EntityID =R.OPENID
+AND R1.ValTo = :forever
+LEFT JOIN @t_schema.Text T1 ON
+    T1.Enterprise = :Enterprise
+AND T1.EntityType = 'OPWG'
+AND T1.EntityID = R1.EntityID
+AND T1.AttributeCode = 'NAME'
+AND T1.NLSID = 1
+AND T1.valto = :forever
+LEFT JOIN @t_schema.Text T2 ON
+    T2.Enterprise = :Enterprise
+AND T2.EntityTYPE = 'OP'
+AND T2.EntityID = R1.Entity2ID
+AND T2.AttributeCode = 'USERTOKEN'
+AND T2.NLSID = 1
+AND T2.valto = :forever
+LEFT JOIN @t_schema.trsNavigate N1 ON
+    N1.SessionID = :SessionIDStart
+AND N1.EntityType = N2.EntityType
+AND N1.EntityID = N2.EntityID
+AND N1.Level = N2.Level
+WHERE
+    N2.SessionID = :SessionIDFinish
+UNION ALL
+SELECT
+DISTINCT
+'D'
+,'R'
+,R.ValFrom
+,R.EntityType
+,R.EntityID
+,'NA'
+,'NA'
+,1
+,COALESCE(T1.AttributeValue,'Unknown')
+,COALESCE(T2.AttributeValue,'Unknown')
+FROM @t_schema.trsNavigate N1
+INNER JOIN @t_schema.Relator R ON
+    R.Enterprise = :Enterprise
+AND R.EntityType = N1.EntityType
+AND R.Entityid = N1.EntityID
+AND R.Valto  = :forever
+LEFT JOIN @t_schema.relator R1 ON
+    R1.Enterprise = :Enterprise
+AND RTRIM(R1.EntityType || ' ') = 'OPWG'    
+AND R1.EntityID =R.OPENID
+AND R1.ValTo = :forever
+LEFT JOIN @t_schema.Text T1 ON
+    T1.Enterprise = :Enterprise
+AND T1.EntityType = 'OPWG'
+AND T1.EntityID = R1.EntityID
+AND T1.AttributeCode = 'NAME'
+AND T1.NLSID = 1
+AND T1.valto = :forever
+LEFT JOIN @t_schema.Text T2 ON
+    T2.Enterprise = :Enterprise
+AND T2.EntityTYPE = 'OP'
+AND T2.EntityID = R1.Entity2ID
+AND T2.AttributeCode = 'USERTOKEN'
+AND T2.NLSID = 1
+AND T2.valto = :forever
+LEFT JOIN @t_schema.trsNavigate N2 ON
+    N2.SessionID = :SessionIDFinish
+AND N2.EntityType = N1.EntityType
+AND N2.EntityID = N1.EntityID
+AND N2.Level = N1.Level
+WHERE
+    N1.SessionID = :SessionIDStart
+AND N2.SessionID IS NULL
+UNION ALL
+SELECT
+ DISTINCT
+ 'N'
+,'E'
+,E.ValFrom
+,E.EntityType
+,E.EntityID
+,'NA'
+,'NA'
+,1
+,COALESCE(T1.AttributeValue,'Unknown')
+,COALESCE(T2.AttributeValue,'Unknown')
+FROM @t_schema.trsNavigate N2
+ LEFT JOIN @t_schema.trsNavigate N1 ON
+        N1.sessionid = :SessionIDFinish
+AND N1.entity1Type = N2.Entity2Type
+AND N1.Entity1ID = N2.EntitY2ID
+INNER JOIN @t_schema.Entity  E ON
+    E.Enterprise = :Enterprise
+AND E.EntityType = N2.Entity2Type
+AND E.Entityid = N2.Entity2ID
+AND E.Valto  = :forever
+LEFT JOIN @t_schema.relator R1 ON
+    R1.Enterprise = :Enterprise
+AND R1.EntityType = 'OPWG'
+AND R1.EntityID =E.OPENID
+AND R1.ValTo = :forever
+LEFT JOIN @t_schema.Text T1 ON
+    T1.Enterprise = :Enterprise
+AND T1.EntityType = 'OPWG'
+AND T1.EntityID = R1.EntityID
+AND T1.AttributeCode = 'NAME'
+AND T1.NLSID = 1
+AND T1.valto = :forever
+LEFT JOIN @t_schema.Text T2 ON
+    T2.Enterprise = :Enterprise
+AND T2.EntityTYPE = 'OP'
+AND T2.EntityID = R1.Entity2ID
+AND T2.AttributeCode = 'USERTOKEN'
+AND T2.NLSID = 1
+AND T2.valto = :forever
+WHERE
+    N2.SessionID = :SessionIDFinish
+AND N1.SESSIONID IS NULL
+UNION ALL
+ SELECT
+ DISTINCT
+  'N'
+ ,'E'
+ ,E.ValFrom
+ ,E.EntityType
+ ,E.EntityID
+ ,'NA'
+ ,'NA'
+ ,1
+ ,COALESCE(T1.AttributeValue,'Unknown')
+ ,COALESCE(T2.AttributeValue,'Unknown')
+ FROM @t_schema.trsNavigate N2
+ LEFT JOIN @t_schema.trsNavigate N1 ON
+        N1.sessionid = :SessionIDFinish
+AND N1.entity2Type = N2.Entity1Type
+AND N1.Entity2ID = N2.EntitY1ID
+INNER JOIN @t_schema.Entity  E ON
+     E.Enterprise = :Enterprise
+ AND E.EntityType = N2.Entity1Type
+ AND E.Entityid = N2.Entity1ID
+ AND E.Valto  = :forever
+ LEFT JOIN @t_schema.relator R1 ON
+     R1.Enterprise = :Enterprise
+ AND R1.EntityType = 'OPWG'
+ AND R1.EntityID =E.OPENID
+ AND R1.ValTo = :forever
+ LEFT JOIN @t_schema.Text T1 ON
+     T1.Enterprise = :Enterprise
+ AND T1.EntityType = 'OPWG'
+ AND T1.EntityID = R1.EntityID
+ AND T1.AttributeCode = 'NAME'
+ AND T1.NLSID = 1
+ AND T1.valto = :forever
+ LEFT JOIN @t_schema.Text T2 ON
+     T2.Enterprise = :Enterprise
+ AND T2.EntityTYPE = 'OP'
+ AND T2.EntityID = R1.Entity2ID
+ AND T2.AttributeCode = 'USERTOKEN'
+ AND T2.NLSID = 1
+ AND T2.valto = :forever
+ WHERE
+     N2.SessionID = :SessionIDFinish
+ AND N1.SESSIONID IS NULL
+;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(17)
+in SessionIDStart int
+in SessionIDFinish int
+in StartDate varchar(27)
+in EndDate varchar(27)
+@end
+
+

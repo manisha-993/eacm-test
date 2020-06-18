@@ -1,0 +1,17 @@
+#!/bin/sh
+
+#
+# This batch file tests Middleware and reports errors
+#
+
+JDK_CLASSES="/usr/java_dev2/jre/lib/rt.jar"
+#JDK_CLASSES="/usr/jdk_base/lib/classes.zip"
+DB2_JAVA_CLASSES="/home/opicmdb2/sqllib/java/db2java.zip"
+OTHER_CLASSES="./jnet.jar:./jcert.jar:./jsse.jar:./mail.jar:./middleware.jar:./activate.jar"
+JAVA_COMMAND="java"
+
+$JAVA_COMMAND $1 $2 $3 $4 $5 -classpath .:$DB2_JAVA_CLASSES:$JDK_CLASSES:$OTHER_CLASSES:middleware.jar COM.ibm.opicmpdh.middleware.TestMiddleware
+
+#
+# end of script
+#

@@ -1,0 +1,51 @@
+@name=GBL9679
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+@desc=Duplicates in Data
+@results=0
+@sql
+
+
+
+EXEC SQL BEGIN DECLARE SECTION;
+EXEC SQL END DECLARE SECTION;
+
+//***************
+//* DUPLICATES *
+//***************
+
+EXEC SQL DECLARE curSTA CURSOR FOR
+
+select linktype1, linktype2 from opicm.metalinkattr
+where enterprise = :Enterprise and
+linktype = 'Role/Attribute' and
+valto>current timestamp and
+effto>current timestamp
+group by linktype1, linktype2
+having count(*) >1;
+
+//EXEC SQL DECLARE curSTAONE CURSOR FOR
+//select linktype1, linktype2, linkcode, linkvalue from opicm.metalinkattr
+//where enterprise = :Enterprise and
+//linktype = 'Role/Action/Entity/Group' and
+//valto>current timestamp and
+//effto>current timestamp
+//group by linktype1, linktype2, linkcode, linkvalue
+//having count(*) >1;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+@end
+
+
+
+
+
+
+

@@ -1,0 +1,166 @@
+@name=GBL8975
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Manages the update of an WWAttributes
+
+// $Log: gbl8975.txt,v $
+// Revision 1.6  2010/06/21 15:42:41  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.5  2009/10/20 00:22:01  rick
+// update to change long datatype to sqlint32
+//
+// Revision 1.4  2006/08/01 19:41:40  gregg
+// nore nlsid:where clause of select
+//
+// Revision 1.3  2006/07/18 20:18:03  gregg
+// add nlsid into the where clause
+//
+// Revision 1.2  2005/06/23 02:26:05  dave
+// s[ foxes
+//
+// Revision 1.1  2005/06/23 02:12:52  dave
+// new sp
+//
+
+@desc= Manages the update of an WWProduct Record
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8975.txt,v 1.6 2010/06/21 15:42:41 wendy Exp $";
+sqlint32 count = 0;
+EXEC SQL END DECLARE SECTION;
+@execute
+
+EXEC SQL 
+
+Select count(*) into :count 
+from gbli.wwattributes
+where 
+enterprise = :enterprise and 
+wwentitytype = :wwentitytype and 
+wwentityid = :wwentityid and 
+attentitytype = :attentitytype and 
+attentityid = :attentityid and 
+countrylist = :countrylist and
+attributecode = :attributecode and
+flagcode = :flagcode and
+nlsid = :nlsid
+;
+
+if (count == 0 && isactive == 0) {
+// do nothing
+} else if (count == 0 && isactive == 1) {
+// insert this guy
+EXEC SQL
+insert into gbli.wwattributes
+(  
+  enterprise
+, countrycode
+, languagecode
+, nlsid
+, countrylist
+, wwentitytype
+, wwentityid
+, attentitytype
+, attentityid
+, attributecode
+, attributetype
+, flagcode
+, attributevalue
+, attrunitofmeasure
+, valfrom
+, valto
+, isactive
+)
+values (
+  :enterprise
+, :countrycode
+, :languagecode
+, :nlsid
+, :countrylist
+, :wwentitytype
+, :wwentityid
+, :attentitytype
+, :attentityid
+, :attributecode
+, :attributetype
+, :flagcode
+, :attributevalue
+, :attrunitofmeasure
+, current timestamp
+, :forever
+, 1
+)
+;
+} else if (count != 0 && isactive == 1) {
+// update this guy
+EXEC SQL
+update gbli.wwattributes
+set  
+  attributevalue = :attributevalue
+, attrunitofmeasure = :attrunitofmeasure
+, valfrom = current timestamp
+, valto = :forever
+, isactive = 1
+where 
+enterprise = :enterprise and 
+wwentitytype = :wwentitytype and 
+wwentityid = :wwentityid and 
+attentitytype = :attentitytype and 
+attentityid = :attentityid and 
+countrylist = :countrylist and
+attributecode = :attributecode and
+flagcode = :flagcode and
+nlsid = :nlsid
+;
+
+} else {
+// turn it off
+EXEC SQL
+update gbli.wwattributes
+set  
+valfrom = current timestamp, 
+valto  =  current timestamp, 
+isactive = 0 
+where 
+enterprise = :enterprise and 
+wwentitytype = :wwentitytype and 
+wwentityid = :wwentityid and 
+attentitytype = :attentitytype and 
+attentityid = :attentityid and 
+countrylist = :countrylist and
+attributecode = :attributecode and
+flagcode = :flagcode and
+nlsid = :nlsid
+;
+
+}
+
+//EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in enterprise varchar(8) 
+in countrycode varchar(2) 
+in languagecode varchar(2) 
+in nlsid int
+in countrylist varchar(8)
+in wwentitytype varchar(32) 
+in wwentityid int
+in attentitytype varchar(32) 
+in attentityid int
+in attributecode varchar(32) 
+in attributetype varchar(1) 
+in flagcode varchar(16) 
+in attributevalue varchar(254) 
+in attrunitofmeasure varchar(25)
+in isactive int
+@end
+

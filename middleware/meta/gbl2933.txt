@@ -1,0 +1,78 @@
+@name=GBL2933
+@noremote=true
+@type=basic
+@addperm=true
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------
+--  This replaces WHY2933
+----------------------------------------------------------------------
+$Log: gbl2933.txt,v $
+Revision 1.6  2010/06/21 15:42:56  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.5  2004/10/20 21:01:40  dave
+changes to gen parm
+
+Revision 1.4  2004/02/20 20:21:49  roger
+Must be @t_schema
+
+Revision 1.3  2004/02/20 18:09:30  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.2  2003/09/08 16:31:11  roger
+Enterprise was changed to 16 char length
+
+Revision 1.1  2001/03/21 21:33:50  roger
+Changed GBL####A to GBL####
+
+Revision 1.5  2001/03/17 04:47:10  roger
+Misc clean up
+
+Revision 1.4  2001/03/16 18:27:52  roger
+Added branding feature to stored procedures
+
+Revision 1.3  2001/03/16 03:38:58  roger
+Added Log keyword
+
+@desc=Return all relators with EntityType and EntityID
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2933.txt,v 1.6 2010/06/21 15:42:56 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  EntityType
+, EntityID
+, Entity1Type
+, Entity1ID
+, Entity2Type
+, Entity2ID
+, ValFrom
+, ValTo
+, EffFrom
+, EffTo
+FROM @t_schema.Relator R
+WHERE
+R.Enterprise = :Enterprise AND
+R.EntityType = :RelatorType AND
+R.EntityID = :RelatorID AND
+R.ValFrom <= :ValOn AND :ValOn < R.ValTo AND R.EffFrom <= :EffOn AND :EffOn < R.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in RelatorType varchar(32)
+in RelatorID int
+in OPENID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

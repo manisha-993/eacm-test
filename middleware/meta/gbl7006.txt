@@ -1,0 +1,194 @@
+@name=GBL7006
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------------
+-- This guy will be soley responsible for returning all the Navigation Attributes for
+-- a given entitytype,id column in the trsNavigate table
+--------------------------------------------------------------------------------------------------
+$Log: gbl7006.txt,v $
+Revision 1.35  2010/06/21 15:43:03  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.34  2007/03/23 19:29:12  joan
+update change
+
+Revision 1.33  2006/04/28 18:18:55  tony
+changed to NonNavigate
+
+Revision 1.32  2006/04/28 18:10:59  tony
+added force
+
+Revision 1.31  2006/04/28 18:04:48  tony
+*** empty log message ***
+
+Revision 1.30  2004/11/15 23:40:30  dave
+perf on 7006
+
+Revision 1.29  2004/11/12 17:22:21  dave
+more fprintf removals
+
+Revision 1.28  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.27  2004/10/20 20:26:13  dave
+more parmstyle
+
+Revision 1.26  2004/10/20 18:38:57  dave
+putting parm style in right spot
+
+Revision 1.25  2004/10/20 18:30:32  dave
+trying new parm style
+
+Revision 1.24  2004/10/14 23:56:25  dave
+more trace
+
+Revision 1.23  2004/10/14 23:08:10  dave
+more syntax
+
+Revision 1.22  2004/10/13 18:28:39  dave
+adding a reset feature to ABREntityGroup
+
+Revision 1.21  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.20  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.19  2002/10/15 16:50:58  dave
+made GBL7006 more optimizer  friendly
+
+Revision 1.18  2002/07/10 23:35:32  dave
+fixed syntax
+
+Revision 1.17  2002/07/10 22:56:48  gregg
+replace 'myEntties' w/ 'myEntities' (type-O)
+
+Revision 1.16  2002/07/10 15:32:24  dave
+missed the patch.. reapplying
+
+Revision 1.15  2002/07/10 15:28:11  dave
+Fix to remove using trsEntites on 7006
+
+Revision 1.14  2002/03/20 23:19:30  dave
+Fixing SP7006 and other to use trsEntity Table
+
+Revision 1.13  2002/03/08 18:09:46  dave
+added an exra inner join to 7006 to ensure flag values are valid
+
+Revision 1.12  2002/03/01 20:57:57  dave
+more fixes to SP's and tweeking to how assocs are
+handled in entitygroups
+
+Revision 1.11  2002/02/28 22:04:06  dave
+minor fix to GBL7006
+
+Revision 1.10  2002/02/28 21:06:52  dave
+changed the definition of 7006 to be more 1030 like
+
+Revision 1.9  2002/02/28 19:50:42  dave
+fixes to syntax
+
+Revision 1.8  2002/02/28 19:30:14  dave
+simpified the Pulling of data for Attributes
+
+Revision 1.7  2002/02/19 22:55:50  dave
+SP Fix for 7006 to return only the data that is needed
+
+Revision 1.6  2002/02/11 05:39:06  dave
+fix to GBL7006
+
+Revision 1.5  2002/02/10 01:23:32  dave
+more typo's
+
+Revision 1.4  2002/02/10 01:13:03  dave
+more fixes
+
+Revision 1.3  2002/02/10 01:03:28  dave
+mass sp fixes for compile
+
+Revision 1.2  2002/02/05 16:39:13  dave
+more expansion of abstract model
+
+Revision 1.1  2002/01/30 02:07:52  dave
+file name fixes and WHERE block fix for 7005 (Up case not working)
+
+Revision 1.1  2002/01/30 00:48:04  dave
+added new SP and moded gbl8000 to avoid loopbacks
+
+
+@desc=Get Navigation Attributes for a given trsNavigateColumn
+@fenced=true
+@results=1
+@parmstyle=general
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+
+char brand[80] = "$Id: gbl7006.txt,v 1.35 2010/06/21 15:43:03 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+WITH myEntities (EntityID, EntityType) AS
+(SELECT Entity1ID, Entity1Type from opicm.trsNavigate WHERE SESSIONID = :SessionID
+UNION
+SELECT Entity2ID, Entity2Type from opicm.trsNavigate WHERE SESSIONID = :SessionID
+UNION
+SELECT EntityID, EntityType from opicm.trsNavigate WHERE SESSIONID = :SessionID
+)
+SELECT
+ RTRIM(T.EntityType)  as EntityType
+,T.EntityID  as EntityID
+,RTRIM(T.AttributeCode) as AttributeCode
+,T.NLSID as NLSID
+,RTRIM(T.AttributeValue) as AttributeValue
+,T.EffFrom as EffFrom
+,T.EffTo as EffTo
+FROM myEntities N
+INNER JOIN opicm.Text T ON
+    T.Enterprise = :Enterprise
+AND T.EntityType = N.EntityType
+AND T.EntityID = N.EntityID
+AND T.NLSID in (1,:NLSID)
+AND T.ValFrom <= :ValOn AND :ValOn <= T.ValTo AND T.EffFrom <= :EffOn AND :EffOn <= T.EffTo
+JOIN opicm.navigate ma on
+    ma.entitytype = T.EntityType
+and ma.enterprise = :Enterprise
+and ma.attributecode = T.Attributecode
+UNION ALL
+SELECT
+ RTRIM(F.EntityType)
+,F.EntityID
+,RTRIM(F.AttributeCode)
+,1
+,RTRIM(F.AttributeValue)
+,F.EffFrom
+,F.EffTo
+FROM myEntities N
+INNER JOIN opicm.Flag F ON
+    F.Enterprise = :Enterprise
+AND F.EntityType = N.EntityType
+AND F.EntityID = N.EntityID
+AND F.ValFrom <= :ValOn AND :ValOn <= F.ValTo AND F.EffFrom <= :EffOn AND :EffOn <= F.EffTo
+JOIN opicm.navigate ma on
+    ma.entitytype = F.EntityType
+and ma.enterprise = :Enterprise
+and ma.attributecode = F.attributecode
+;
+
+@execute
+
+EXEC SQL OPEN sp_cursor1;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in SessionID int
+in NLSID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

@@ -1,0 +1,6 @@
+#!/bin/ksh
+
+. ~/storedp/vars
+
+db2batch -d $DBASE -a $USER/$PASSWD -f $SPSOURCE/i.txt
+

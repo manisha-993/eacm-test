@@ -1,0 +1,116 @@
+@name=GBL8701
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+$Log: gbl8701.txt,v $
+Revision 1.14  2010/06/21 15:43:00  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.13  2004/10/20 21:01:49  dave
+changes to gen parm
+
+Revision 1.12  2004/02/20 20:21:58  roger
+Must be @t_schema
+
+Revision 1.11  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.10  2003/09/08 16:31:22  roger
+Enterprise was changed to 16 char length
+
+Revision 1.9  2002/10/02 20:23:20  joan
+fix sp
+
+Revision 1.8  2002/09/20 23:30:35  joan
+fix error
+
+
+@desc=Get All COMMERCIALOFs that have matching MachType, Model, OptionalFeatureID
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8701.txt,v 1.14 2010/06/21 15:43:00 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT T1.entitytype, T1.entityid 
+from @t_schema.text T1
+
+inner join @t_schema.text T2 on
+T2.enterprise = :Enterprise and
+T2.entitytype = T1.entitytype and
+T2.entityid = T1.entityid and
+T2.attributecode = 'MODEL' and
+T2.attributevalue = :Model and
+T2.ValFrom <= :ValOn AND :ValOn < T2.ValTo AND T2.EffFrom <= :EffOn AND :EffOn < T2.EffTo
+
+inner join @t_schema.flag F1 on
+F1.enterprise = :Enterprise and
+F1.entitytype = T1.entitytype and
+F1.entityid = T1.entityid and
+F1.attributecode = 'OPTFEATUREID' and
+F1.attributevalue = :OptFeatureID and
+F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+inner join @t_schema.flag F2 on
+F2.enterprise = :Enterprise and
+F2.entitytype = T1.entitytype and
+F2.entityid = T1.entityid and
+F2.attributecode = 'COMMERCIALOFCAT' and
+F2.attributevalue = :Cat and
+F2.ValFrom <= :ValOn AND :ValOn < F2.ValTo AND F2.EffFrom <= :EffOn AND :EffOn < F2.EffTo
+
+inner join @t_schema.flag F3 on
+F3.enterprise = :Enterprise and
+F3.entitytype = T1.entitytype and
+F3.entityid = T1.entityid and
+F3.attributecode = 'COMMERCIALOFSUBCAT' and
+F3.attributevalue = :SubCat and
+F3.ValFrom <= :ValOn AND :ValOn < F3.ValTo AND F3.EffFrom <= :EffOn AND :EffOn < F3.EffTo
+
+inner join @t_schema.flag F4 on
+F4.enterprise = :Enterprise and
+F4.entitytype = T1.entitytype and
+F4.entityid = T1.entityid and
+F4.attributecode = 'COMMERCIALOFGRP' and
+F4.attributevalue = :Group and
+F4.ValFrom <= :ValOn AND :ValOn < F4.ValTo AND F4.EffFrom <= :EffOn AND :EffOn < F4.EffTo
+
+inner join @t_schema.flag F5 on
+F5.enterprise = :Enterprise and
+F5.entitytype = T1.entitytype and
+F5.entityid = T1.entityid and
+F5.attributecode = 'COMMERCIALOFSUBGRP' and
+F5.attributevalue = :SubGroup and
+F5.ValFrom <= :ValOn AND :ValOn < F5.ValTo AND F5.EffFrom <= :EffOn AND :EffOn < F5.EffTo
+
+where T1.enterprise = :Enterprise and
+T1.entitytype = 'COMMERCIALOF' and
+T1.attributecode = 'MACHTYPE' and
+T1.attributevalue = :MachType and
+T1.ValFrom <= :ValOn AND :ValOn < T1.ValTo AND T1.EffFrom <= :EffOn AND :EffOn < T1.EffTo
+;
+
+@execute
+  EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in Cat varchar(32)
+in SubCat varchar(32)
+in Group varchar(32)
+in SubGroup varchar(32)
+in MachType varchar(254)
+in Model varchar(254)
+in OptFeatureID varchar(32)
+in OPENID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

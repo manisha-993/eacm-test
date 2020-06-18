@@ -1,0 +1,71 @@
+@name=GBL7938
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+    This Guy Returns a set of Relator information... based upon parent entitytype/id and relator type
+    It provides a list of relators that you can actually change
+    
+$Log: gbl7938.txt,v $
+Revision 1.7  2010/06/21 15:42:59  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2004/10/20 21:01:47  dave
+changes to gen parm
+
+Revision 1.5  2004/02/20 20:21:56  roger
+Must be @t_schema
+
+Revision 1.4  2004/02/20 18:09:35  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.3  2003/04/28 22:49:36  dave
+adding toClassificationString on entityitem
+
+Revision 1.2  2002/02/22 18:44:06  dave
+sp fix is in place bad parm name
+
+Revision 1.1  2002/02/22 17:35:11  dave
+added EANObject as in interface
+
+@desc=Return all relators with Entity1Type, Entity1ID, and Relator Type
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7938.txt,v 1.7 2010/06/21 15:42:59 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  EntityType
+, EntityID
+FROM @t_schema.Relator R
+INNER JOIN @t_schema.MetaLinkAttr MLA2 ON
+    MLA2.Enterprise = :Enterprise
+AND MLA2.LinkType  = R.EntityType
+AND MLA2.LinkType1 = R.Entity1Type
+AND MLA2.LinkType2 = R.Entity2Type
+AND MLA2.ValFrom <= :ValOn AND :ValOn < MLA2.ValTo AND MLA2.EffFrom <= :EffOn AND :EffOn < MLA2.EffTo
+WHERE
+        R.Enterprise = :Enterprise
+AND R.EntityType = :EntityType
+AND R.Entity1Type = :Entity1Type
+AND R.Entity1ID = :Entity1ID
+AND R.ValFrom <= :ValOn AND :ValOn < R.ValTo AND R.EffFrom <= :EffOn AND :EffOn < R.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in RoleCode varchar(32)
+in EntityType varchar(32)
+in Entity1Type varchar(32)
+in Entity1ID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

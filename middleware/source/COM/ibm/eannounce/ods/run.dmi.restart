@@ -1,0 +1,16 @@
+#
+# $Log: run.dmi.restart,v $
+# Revision 1.2  2004/01/16 19:32:59  dave
+# added CODEPAGE for pre-prod clean up
+#
+# Revision 1.1  2003/12/10 21:00:43  dave
+# added script files and tagging to eccmods
+#
+#
+#
+# this tells the DB2 client that we want NO codepage conversion from database (1208 = UTF8)
+#
+export DB2CODEPAGE=1208
+
+java -ms128M -mx2028M -ss4M -oss4M -classpath /usr/java131/jre/lib/rt.jar:/home/opicmdb2/sqllib/java/sqlj.zip:/home/opicmdb2/sqllib/function:/home/opicmdb2/sqllib/java/db2java.zip:/home/opicmdb2/sqllib/java/runtime.zip:./middleware.jar:. COM.ibm.eannounce.ods.ODSInit -r -i ALL 
+

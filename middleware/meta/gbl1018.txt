@@ -1,0 +1,121 @@
+@name=GBL1018
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+ This guy inserts a new record into the trsNavigateTable
+
+ It inserts the entitis in their proper place
+ It is tracked by the Session ID, ObjectType, and Object Class for the request in this
+ 
+ - simplified for Grab By EntityID logic.
+
+ This is primarily used to build a list a of Entities to do other things with
+$Log: gbl1018.txt,v $
+Revision 1.9  2010/06/21 15:42:52  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.8  2009/10/20 00:21:59  rick
+update to change long datatype to sqlint32
+
+Revision 1.7  2004/10/20 21:01:38  dave
+changes to gen parm
+
+Revision 1.6  2004/04/03 00:25:39  gregg
+var name fix
+
+Revision 1.5  2004/04/03 00:18:33  gregg
+ok results = 1 for real
+
+Revision 1.4  2004/04/03 00:13:47  gregg
+results = 1
+
+Revision 1.3  2004/04/03 00:05:48  gregg
+let's return entitytype just fer kicks
+
+Revision 1.2  2004/04/03 00:03:19  gregg
+return EID if inserted...
+
+Revision 1.1  2004/04/02 23:36:02  gregg
+initial load
+
+
+
+@desc=insert a record into the trsnavigateTable for the given session ID (GrabByEntityID flavor)
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl1018.txt,v 1.9 2010/06/21 15:42:52 wendy Exp $";
+sqlint32 lCount;
+EXEC SQL END DECLARE SECTION;
+@execute
+
+lCount = 0;
+
+// this is our return cursor
+EXEC SQL DECLARE curReturn CURSOR FOR
+SELECT 
+  EntityType
+ ,EntityID
+FROM @t_schema.Entity
+WHERE
+    Enterprise = :Enterprise
+AND EntityType = :EntityType
+AND EntityID = :EntityID
+AND Valfrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+;
+
+// count for insert
+EXEC SQL SELECT COUNT(*) INTO :lCount
+FROM @t_schema.Entity
+WHERE
+    Enterprise = :Enterprise
+AND EntityType = :EntityType
+AND EntityID = :EntityID
+AND Valfrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+;
+
+// if Entity is real (found + grabbed), then insert into trsNav for later retrieval....
+if(lCount > 0) {
+  EXEC SQL INSERT INTO @t_schema.trsNavigate 
+  VALUES
+  (
+   :Enterprise
+  ,:SessionID
+  ,'Entity'
+  ,'List'
+  ,-1
+  ,0
+  ,'X'
+  ,'X'
+  ,'X'
+  ,-1
+  ,:EntityType
+  ,:EntityID
+  ,'X'
+  ,-1
+  ,:now
+  ,:now
+  )
+  ;
+}
+
+EXEC SQL COMMIT WORK;
+
+EXEC SQL OPEN curReturn;
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+
+

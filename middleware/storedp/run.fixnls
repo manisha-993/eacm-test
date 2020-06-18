@@ -1,0 +1,175 @@
+echo Starting $0 `date`
+
+#
+# $Id: run.fixnls,v 1.6 2003/10/30 17:17:03 roger Exp $
+#
+
+#
+# settings
+#
+DATABASE="idlpdh"
+ENTERPRISE="L2"
+JOB="/tmp/jobfile"
+OUTPUT="out.fixnls."`date +"%Y%m%d%H%M%S"`
+RUNDATETIME=`date +"%Y-%m-%d-%H.%M.%S.000000"`
+
+echo Output to $OUTPUT
+
+cat > $JOB << EOF
+--#COMMENT
+--#COMMENT $Id: run.fixnls,v 1.6 2003/10/30 17:17:03 roger Exp $
+--#COMMENT
+
+--#COMMENT
+--#COMMENT provide count of text rows which have a nlsid <> 1
+--#COMMENT
+
+select
+count(*) as count
+from opicm.text t
+where
+    t.enterprise = '$ENTERPRISE'
+and t.entitytype in ('LSCC','LSWWCC')
+and t.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.valto and t.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.effto
+and t.nlsid <> 1;
+
+--#COMMENT
+--#COMMENT provide count of longtext rows which have a nlsid <> 1
+--#COMMENT
+
+select
+count(*) as count
+from opicm.longtext lt
+where
+    lt.enterprise = '$ENTERPRISE'
+and lt.attributecode in ('LSCRSKEYWORD','LSCRSABSTRACT','LSCRSAUDIENCEDESC','LSCRSCATSKILLVDES','LSCRSCERTPGMDESC','LSCRSCOURSEMAT','LSCRSCOURSEOVERVIEW','LSCRSDELFORMATDESC','LSCRSOBJECTIVES','LSCRSORD','LSCRSPREREQDESC','LSCRSREMARKS','LSCRSSTUDENTMACHREQTS','LSCRSTOPICS')and lt.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.valto and lt.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.effto
+and lt.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.valto and lt.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.effto
+and lt.nlsid <> 1;
+
+--#COMMENT
+--#COMMENT restate text rows to nlsid = 1
+--#COMMENT
+
+update opicm.text t
+set t.nlsid = 1
+where 
+    t.enterprise = '$ENTERPRISE'
+and t.attributecode in ('LSCRSDURATIONTEXT','LSCRSTITLE')
+and t.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.valto and t.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.effto
+and t.nlsid <> 1;
+
+--#COMMENT
+--#COMMENT restate longtext rows to nlsid = 1
+--#COMMENT
+
+update opicm.longtext lt
+set lt.nlsid = 1
+where 
+    lt.enterprise = '$ENTERPRISE'
+and lt.attributecode in ('LSCRSKEYWORD','LSCRSABSTRACT','LSCRSAUDIENCEDESC','LSCRSCATSKILLVDES','LSCRSCERTPGMDESC','LSCRSCOURSEMAT','LSCRSCOURSEOVERVIEW','LSCRSDELFORMATDESC','LSCRSOBJECTIVES','LSCRSORD','LSCRSPREREQDESC','LSCRSREMARKS','LSCRSSTUDENTMACHREQTS','LSCRSTOPICS')
+and lt.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.valto and lt.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.effto
+and lt.nlsid <> 1;
+
+--#COMMENT
+--#COMMENT provide count of text rows which have nlsid <> 1 (s/b 0)
+--#COMMENT
+
+select
+count(*) as count
+from opicm.text t
+where
+    t.enterprise = '$ENTERPRISE'
+and t.entitytype in ('LSCC','LSWWCC')
+and t.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.valto and t.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.effto
+and t.nlsid <> 1;
+
+--#COMMENT
+--#COMMENT provide count of longtext rows which have nlsid <> 1 (s/b 0)
+--#COMMENT
+
+select
+count(*) as count
+from opicm.longtext lt
+where
+    lt.enterprise = '$ENTERPRISE'
+and lt.attributecode in ('LSCRSKEYWORD','LSCRSABSTRACT','LSCRSAUDIENCEDESC','LSCRSCATSKILLVDES','LSCRSCERTPGMDESC','LSCRSCOURSEMAT','LSCRSCOURSEOVERVIEW','LSCRSDELFORMATDESC','LSCRSOBJECTIVES','LSCRSORD','LSCRSPREREQDESC','LSCRSREMARKS','LSCRSSTUDENTMACHREQTS','LSCRSTOPICS')and lt.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.valto and lt.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.effto
+and lt.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.valto and lt.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.effto
+and lt.nlsid <> 1;
+
+--#COMMENT
+--#COMMENT restate text rows with new nlsid value
+--#COMMENT
+
+update opicm.text t
+set t.nlsid = 
+coalesce((select case f.attributevalue when '0010' then 1 when '0020' then 6 when '0030' then 5 when '0040' then 14 when '0050' then 2 when '0060' then 3 when '0070' then 20 when '0080' then 18 when '0090' then 15 when '0100' then 17 when '0110' then 19 else 1 end from opicm.flag f where
+    f.enterprise = t.enterprise
+and f.entitytype = t.entitytype
+and f.entityid = t.entityid
+and f.attributecode = 'LSLANGINDICATOR'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+),1)
+where 
+    t.enterprise = '$ENTERPRISE'
+and t.entitytype in ('LSCC','LSWWCC')
+and t.attributecode in ('LSCRSDURATIONTEXT','LSCRSTITLE')
+and t.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.valto and t.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.effto
+and t.nlsid = 1;
+
+--#COMMENT
+--#COMMENT restate longtext rows with new nlsid value
+--#COMMENT
+
+update opicm.longtext lt
+set lt.nlsid = 
+coalesce((select case f.attributevalue when '0010' then 1 when '0020' then 6 when '0030' then 5 when '0040' then 14 when '0050' then 2 when '0060' then 3 when '0070' then 20 when '0080' then 18 when '0090' then 15 when '0100' then 17 when '0110' then 19 else 1 end from opicm.flag f where
+    f.enterprise = lt.enterprise
+and f.entitytype = lt.entitytype
+and f.entityid = lt.entityid
+and f.attributecode = 'LSLANGINDICATOR'
+and f.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.valto and f.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < f.effto
+),1)
+where 
+    lt.enterprise = '$ENTERPRISE'
+and lt.entitytype in ('LSCC','LSWWCC')
+and lt.attributecode in ('LSCRSKEYWORD','LSCRSABSTRACT','LSCRSAUDIENCEDESC','LSCRSCATSKILLVDES','LSCRSCERTPGMDESC','LSCRSCOURSEMAT','LSCRSCOURSEOVERVIEW','LSCRSDELFORMATDESC','LSCRSOBJECTIVES','LSCRSORD','LSCRSPREREQDESC','LSCRSREMARKS','LSCRSSTUDENTMACHREQTS','LSCRSTOPICS')and lt.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.valto and lt.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.effto
+and lt.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.valto and lt.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.effto
+and lt.nlsid = 1;
+
+--#COMMENT
+--#COMMENT provide count of text rows which have nlsid <> 1 (s/b > 0)
+--#COMMENT
+
+select
+  t.attributecode
+, count(*) as count
+from opicm.text t
+where
+    t.enterprise = '$ENTERPRISE'
+and t.entitytype in ('LSCC','LSWWCC')
+and t.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.valto and t.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.effto
+and t.nlsid <> 1
+group by t.attributecode;
+
+--#COMMENT
+--#COMMENT provide count of longtext rows which have nlsid <> 1 (s/b > 0)
+--#COMMENT
+
+select
+  lt.attributecode
+, count(*) as count
+from opicm.longtext lt
+where
+    lt.enterprise = '$ENTERPRISE'
+and lt.attributecode in ('LSCRSKEYWORD','LSCRSABSTRACT','LSCRSAUDIENCEDESC','LSCRSCATSKILLVDES','LSCRSCERTPGMDESC','LSCRSCOURSEMAT','LSCRSCOURSEOVERVIEW','LSCRSDELFORMATDESC','LSCRSOBJECTIVES','LSCRSORD','LSCRSPREREQDESC','LSCRSREMARKS','LSCRSSTUDENTMACHREQTS','LSCRSTOPICS')and lt.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.valto and lt.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.effto
+and lt.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.valto and lt.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < lt.effto
+and lt.nlsid <> 1
+group by lt.attributecode;
+
+EOF
+
+db2batch -d $DATABASE -f $JOB -r $OUTPUT
+rm $JOB
+
+echo Ending $0 `date`
+

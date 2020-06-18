@@ -1,0 +1,1527 @@
+@name=GBL8121
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+Synronizes ECCM Feed Flags for the PSGCVOF
+
+$Log: gbl8121.txt,v $
+Revision 1.10  2010/06/21 15:43:08  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.9  2009/10/20 00:22:00  rick
+update to change long datatype to sqlint32
+
+Revision 1.8  2004/10/20 21:01:48  dave
+changes to gen parm
+
+Revision 1.7  2004/02/20 20:21:57  roger
+Must be @t_schema
+
+Revision 1.6  2004/02/20 18:09:36  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.5  2003/09/08 16:31:20  roger
+Enterprise was changed to 16 char length
+
+Revision 1.4  2003/03/26 18:45:09  dave
+add churn logic everywhere
+
+Revision 1.3  2003/01/06 21:16:12  dave
+adding rolling now timestamp for looping
+so each set of entityid transactions
+gets updated with a new now
+
+Revision 1.2  2002/11/06 00:39:32  dave
+working w/ refreshrestrictions in more places
+
+Revision 1.1  2002/10/24 16:17:11  dave
+this is for the Configurable stuff
+
+
+@desc= Synronizes ECCM Feed Flags from PSGCVOF
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8121.txt,v 1.10 2010/06/21 15:43:08 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL BEGIN DECLARE SECTION;
+sqlint32 EntityID;
+EXEC SQL END DECLARE SECTION;
+
+//
+//  This is the CVOF Cursor
+//
+EXEC SQL DECLARE curPSGCVOF CURSOR FOR
+SELECT
+DISTINCT
+E1.ENTITYID
+FROM OPICM.ENTITY E1
+LEFT JOIN OPICM.FLAG F2 ON
+    F2.ENTERPRISE = :Enterprise
+AND F2.ENTITYTYPE = E1.ENTITYTYPE
+AND F2.ENTITYID = E1.ENTITYID
+AND F2.ATTRIBUTECODE = 'ECCMREADYBASE'
+AND F2.ATTRIBUTEVALUE = 'ECMBR'
+AND F2.VALTO = :forever
+AND CURRENT TIMESTAMP BETWEEN F2.EFFFROM AND F2.EFFTO
+INNER JOIN OPICM.TEXT T1 ON
+    T1.ENTERPRISE = :Enterprise
+AND T1.ENTITYTYPE = E1.ENTITYTYPE
+AND T1.ENTITYID = E1.ENTITYID
+AND T1.ATTRIBUTECODE = 'PSGCOFANNOUNCETGT'
+AND RTRIM(T1.ATTRIBUTEVALUE) <> ''
+AND DATE(T1.ATTRIBUTEVALUE) < DATE(CURRENT TIMESTAMP) + 60 DAYS
+AND T1.VALTO = :forever
+AND CURRENT TIMESTAMP BETWEEN T1.EFFFROM AND T1.EFFTO
+WHERE
+    E1.ENTERPRISE = :Enterprise
+AND E1.ENTITYTYPE = 'PSGCVOF'
+AND E1.VALTO = :forever
+AND CURRENT TIMESTAMP BETWEEN E1.EFFFROM AND E1.EFFTO
+AND F2.ENTERPRISE IS NULL
+;
+
+//
+//  HERE IS THE ONE FOR THE PSGCVSL
+//
+EXEC SQL DECLARE curPSGCVSL CURSOR FOR
+  SELECT
+  DISTINCT
+  E1.ENTITYID
+  FROM OPICM.ENTITY E1
+  LEFT JOIN OPICM.FLAG F1 ON
+      F1.ENTERPRISE = :Enterprise
+  AND F1.ENTITYTYPE = E1.ENTITYTYPE
+  AND F1.ENTITYID = E1.ENTITYID
+  AND F1.ATTRIBUTECODE = 'ECCMREADYBASE'
+  AND F1.ATTRIBUTEVALUE = 'ECMBR'
+  AND F1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN F1.EFFFROM AND F1.EFFTO
+  INNER JOIN OPICM.RELATOR R1 ON
+      R1.Enterprise = :Enterprise
+  AND R1.EntityType = 'PSGCVSLCVOF'
+  AND R1.Entity1Type  = E1.EntityType
+  AND R1.Entity1ID = E1.EntityID
+  AND R1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN R1.EFFFROM AND R1.EFFTO
+  INNER JOIN OPICM.FLAG F2 ON
+      F2.ENTERPRISE = :Enterprise
+  AND F2.ENTITYTYPE = R1.ENTITY2TYPE
+  AND F2.ENTITYID = R1.ENTITY2ID
+  AND F2.ATTRIBUTECODE = 'ECCMREADYBASE'
+  AND F2.ATTRIBUTEVALUE = 'ECMBR'
+  AND F2.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN F2.EFFFROM AND F2.EFFTO
+  WHERE
+      E1.ENTERPRISE = :Enterprise
+  AND E1.ENTITYTYPE = 'PSGCVSL'
+  AND E1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN E1.EFFFROM AND E1.EFFTO
+  AND F1.Enterprise IS NULL;
+;
+
+//
+//  HERE IS THE ONE FOR THE PSGPCSL
+//
+EXEC SQL DECLARE curPSGPCSL CURSOR FOR
+  SELECT
+  DISTINCT
+  E1.ENTITYID
+  FROM OPICM.ENTITY E1
+  LEFT JOIN OPICM.FLAG F1 ON
+      F1.ENTERPRISE = :Enterprise
+  AND F1.ENTITYTYPE = E1.ENTITYTYPE
+  AND F1.ENTITYID = E1.ENTITYID
+  AND F1.ATTRIBUTECODE = 'ECCMREADYBASE'
+  AND F1.ATTRIBUTEVALUE = 'ECMBR'
+  AND F1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN F1.EFFFROM AND F1.EFFTO
+  INNER JOIN OPICM.RELATOR R1 ON
+      R1.Enterprise = :Enterprise
+  AND R1.EntityType = 'PSGPCSLCVSL'
+  AND R1.Entity1Type  = E1.EntityType
+  AND R1.Entity1ID = E1.EntityID
+  AND R1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN R1.EFFFROM AND R1.EFFTO
+  INNER JOIN OPICM.FLAG F2 ON
+      F2.ENTERPRISE = :Enterprise
+  AND F2.ENTITYTYPE = R1.ENTITY2TYPE
+  AND F2.ENTITYID = R1.ENTITY2ID
+  AND F2.ATTRIBUTECODE = 'ECCMREADYBASE'
+  AND F2.ATTRIBUTEVALUE = 'ECMBR'
+  AND F2.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN F2.EFFFROM AND F2.EFFTO
+  WHERE
+      E1.ENTERPRISE = :Enterprise
+  AND E1.ENTITYTYPE = 'PSGPCSL'
+  AND E1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN E1.EFFFROM AND E1.EFFTO
+  AND F1.Enterprise IS NULL;
+;
+
+//
+//  HERE IS THE ONE FOR THE PSGCCSL
+//
+EXEC SQL DECLARE curPSGCCSL CURSOR FOR
+  SELECT
+  DISTINCT
+  E1.ENTITYID
+  FROM OPICM.ENTITY E1
+  LEFT JOIN OPICM.FLAG F1 ON
+      F1.ENTERPRISE = :Enterprise
+  AND F1.ENTITYTYPE = E1.ENTITYTYPE
+  AND F1.ENTITYID = E1.ENTITYID
+  AND F1.ATTRIBUTECODE = 'ECCMREADY'
+  AND F1.ATTRIBUTEVALUE = '0020'
+  AND F1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN F1.EFFFROM AND F1.EFFTO
+  INNER JOIN OPICM.RELATOR R1 ON
+      R1.Enterprise = :Enterprise
+  AND R1.EntityType = 'PSGCCSLCVSL'
+  AND R1.Entity1Type  = E1.EntityType
+  AND R1.Entity1ID = E1.EntityID
+  AND R1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN R1.EFFFROM AND R1.EFFTO
+  INNER JOIN OPICM.FLAG F2 ON
+      F2.ENTERPRISE = :Enterprise
+  AND F2.ENTITYTYPE = R1.ENTITY2TYPE
+  AND F2.ENTITYID = R1.ENTITY2ID
+  AND F2.ATTRIBUTECODE = 'ECCMREADYBASE'
+  AND F2.ATTRIBUTEVALUE = 'ECMBR'
+  AND F2.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN F2.EFFFROM AND F2.EFFTO
+  WHERE
+      E1.ENTERPRISE = :Enterprise
+  AND E1.ENTITYTYPE = 'PSGCCSL'
+  AND E1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN E1.EFFFROM AND E1.EFFTO
+  AND F1.Enterprise IS NULL
+;
+
+//
+//  HERE IS THE ONE FOR THE PSGCPSL
+//
+EXEC SQL DECLARE curPSGCPSL CURSOR FOR
+  SELECT
+  DISTINCT
+  E1.ENTITYID
+  FROM OPICM.ENTITY E1
+  LEFT JOIN OPICM.FLAG F1 ON
+      F1.ENTERPRISE = :Enterprise
+  AND F1.ENTITYTYPE = E1.ENTITYTYPE
+  AND F1.ENTITYID = E1.ENTITYID
+  AND F1.ATTRIBUTECODE = 'ECCMREADY'
+  AND F1.ATTRIBUTEVALUE = '0020'
+  AND F1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN F1.EFFFROM AND F1.EFFTO
+  INNER JOIN OPICM.RELATOR R1 ON
+      R1.Enterprise = :Enterprise
+  AND R1.EntityType = 'PSGCPSLPCSL'
+  AND R1.Entity1Type  = E1.EntityType
+  AND R1.Entity1ID = E1.EntityID
+  AND R1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN R1.EFFFROM AND R1.EFFTO
+  INNER JOIN OPICM.FLAG F2 ON
+      F2.ENTERPRISE = :Enterprise
+  AND F2.ENTITYTYPE = R1.ENTITY2TYPE
+  AND F2.ENTITYID = R1.ENTITY2ID
+  AND F2.ATTRIBUTECODE = 'ECCMREADYBASE'
+  AND F2.ATTRIBUTEVALUE = 'ECMBR'
+  AND F2.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN F2.EFFFROM AND F2.EFFTO
+  WHERE
+      E1.ENTERPRISE = :Enterprise
+  AND E1.ENTITYTYPE = 'PSGCPSL'
+  AND E1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN E1.EFFFROM AND E1.EFFTO
+  AND F1.Enterprise IS NULL
+;
+
+//
+//  HERE IS THE ONE FOR THE PSGCB
+//
+EXEC SQL DECLARE curPSGCB CURSOR FOR
+  SELECT
+  DISTINCT
+  E1.ENTITYID
+  FROM OPICM.ENTITY E1
+  LEFT JOIN OPICM.FLAG F1 ON
+      F1.ENTERPRISE = :Enterprise
+  AND F1.ENTITYTYPE = E1.ENTITYTYPE
+  AND F1.ENTITYID = E1.ENTITYID
+  AND F1.ATTRIBUTECODE = 'ECCMREADY'
+  AND F1.ATTRIBUTEVALUE = '0020'
+  AND F1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN F1.EFFFROM AND F1.EFFTO
+  INNER JOIN OPICM.RELATOR R1 ON
+      R1.Enterprise = :Enterprise
+  AND R1.EntityType = 'PSGCBCPSL'
+  AND R1.Entity1Type  = E1.EntityType
+  AND R1.Entity1ID = E1.EntityID
+  AND R1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN R1.EFFFROM AND R1.EFFTO
+  INNER JOIN OPICM.FLAG F2 ON
+      F2.ENTERPRISE = :Enterprise
+  AND F2.ENTITYTYPE = R1.ENTITY2TYPE
+  AND F2.ENTITYID = R1.ENTITY2ID
+  AND F2.ATTRIBUTECODE = 'ECCMREADY'
+  AND F2.ATTRIBUTEVALUE = '0020'
+  AND F2.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN F2.EFFFROM AND F2.EFFTO
+  WHERE
+      E1.ENTERPRISE = :Enterprise
+  AND E1.ENTITYTYPE = 'PSGCB'
+  AND E1.VALTO = :forever
+  AND CURRENT TIMESTAMP BETWEEN E1.EFFFROM AND E1.EFFTO
+  AND F1.Enterprise IS NULL
+;
+
+@execute
+
+//
+//  PSGOF SECTION .... We currently always to the IDL section
+//
+//
+sqlint32 alEntityID[250000];
+sqlint32 lLevel = 0;
+sqlint32 i=0;
+
+EXEC SQL OPEN curPSGCVOF;
+
+do {
+  EXEC SQL FETCH curPSGCVOF INTO :EntityID;
+  if (SQLCODE != 0) break;
+  alEntityID[lLevel] =  EntityID;
+  lLevel++;
+} while (1);
+
+// Close and release resources
+EXEC SQL CLOSE curPSGCVOF WITH RELEASE;
+
+for (i=0;i<lLevel;i++) {
+
+  EntityID = alEntityID[i];
+  EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :now;
+
+  // Here is where we turn off
+  EXEC SQL
+    UPDATE @t_schema.Flag
+    SET
+    ValTo = :now
+    WHERE
+        Enterprise = :Enterprise
+    AND EntityType = 'PSGCVOF'
+    AND EntityID = :EntityID
+    AND AttributeCode = 'ECCMREADYBASE'
+    AND ValTo = :forever
+  ;
+
+  // Here is where we turn off X
+  EXEC SQL
+    UPDATE @t_schema.Flagx
+    SET
+    ValTo = :now
+    WHERE
+        Enterprise = :Enterprise
+    AND EntityType = 'PSGCVOF'
+    AND EntityID = :EntityID
+    AND AttributeCode = 'ECCMREADYBASE'
+    AND ValTo = :forever
+  ;
+
+  // Here is where we insert new records
+  // We must do it for the FlagX recoreds also
+
+  EXEC SQL
+    INSERT
+    INTO @t_schema.Flag
+    (
+    Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,TranID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    )
+    VALUES
+    (
+    :Enterprise
+    ,'PSGCVOF'
+    ,:EntityID
+    ,'ECCMREADYBASE'
+    ,'ECMBR'
+    ,2
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    )
+  ;
+
+  // Flag X Table is here
+  EXEC SQL
+    INSERT
+    INTO @t_schema.FlagX
+    (
+    Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,TranID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    )
+    VALUES
+    (
+    :Enterprise
+    ,'PSGCVOF'
+    ,:EntityID
+    ,'ECCMREADYBASE'
+    ,'ECMBR'
+    ,2
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    )
+  ;
+
+
+   // Lets check for churnflag
+    if (iChurn == 1) {
+
+      EXEC SQL
+        UPDATE @t_schema.Entity
+        SET
+        ValTo = :now
+        WHERE
+            Enterprise = :Enterprise
+        AND EntityType = 'PSGCVOF'
+        AND EntityID = :EntityID
+        AND ValTo = :forever
+      ;
+
+      EXEC SQL
+        UPDATE @t_schema.EntityX
+        SET
+        ValTo = :now
+        WHERE
+            Enterprise = :Enterprise
+        AND EntityType = 'PSGCVOF'
+        AND EntityID = :EntityID
+        AND ValTo = :forever
+      ;
+
+      // Now insert the new entity rec
+      EXEC SQL
+        INSERT
+        INTO @t_schema.Entity
+        (
+         Enterprise
+        ,EntityType
+        ,EntityID
+        ,TranID
+        ,ValFrom
+        ,ValTo
+        ,EffFrom
+        ,EffTo
+        ,OPENID
+        )
+        VALUES
+        (
+         :Enterprise
+        ,'PSGCVOF'
+        ,:EntityID
+        ,2
+        ,:now
+        ,:forever
+        ,:now
+        ,:forever
+        ,:OPENID
+        )
+      ;
+
+      // Now insert the new entity rec
+      EXEC SQL
+        INSERT
+        INTO @t_schema.EntityX
+        (
+         Enterprise
+        ,EntityType
+        ,EntityID
+        ,TranID
+        ,ValFrom
+        ,ValTo
+        ,EffFrom
+        ,EffTo
+        ,OPENID
+        )
+        VALUES
+        (
+         :Enterprise
+        ,'PSGCVOF'
+        ,:EntityID
+        ,2
+        ,:now
+        ,:forever
+        ,:now
+        ,:forever
+        ,:OPENID
+        )
+      ;
+    }
+
+  EXEC SQL COMMIT WORK;
+
+}
+
+//
+//  PSGCVSL SECTION ....
+//
+
+lLevel = 0;
+i=0;
+
+EXEC SQL OPEN curPSGCVSL;
+do {
+  EXEC SQL FETCH curPSGCVSL INTO :EntityID;
+  if (SQLCODE != 0) break;
+  alEntityID[lLevel] =  EntityID;
+  lLevel++;
+} while (1);
+
+// Close and release resources
+EXEC SQL CLOSE curPSGCVSL WITH RELEASE;
+
+for (i=0;i<lLevel;i++) {
+  EntityID = alEntityID[i];
+  EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :now;
+
+  // Here is where we turn off
+  EXEC SQL
+    UPDATE @t_schema.Flag
+    SET
+    ValTo = :now
+    WHERE
+        Enterprise = :Enterprise
+    AND EntityType = 'PSGCVSL'
+    AND EntityID = :EntityID
+    AND AttributeCode = 'ECCMREADYBASE'
+    AND ValTo = :forever
+  ;
+
+  // Here is where we turn off X
+  EXEC SQL
+    UPDATE @t_schema.Flagx
+    SET
+    ValTo = :now
+    WHERE
+        Enterprise = :Enterprise
+    AND EntityType = 'PSGCVSL'
+    AND EntityID = :EntityID
+    AND AttributeCode = 'ECCMREADYBASE'
+    AND ValTo = :forever
+  ;
+
+  // Here is where we insert new records
+  // We must do it for the FlagX recoreds also
+
+  EXEC SQL
+    INSERT
+    INTO @t_schema.Flag
+    (
+    Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,TranID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    )
+    VALUES
+    (
+    :Enterprise
+    ,'PSGCVSL'
+    ,:EntityID
+    ,'ECCMREADYBASE'
+    ,'ECMBR'
+    ,2
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    )
+  ;
+
+  // Flag X Table is here
+  EXEC SQL
+    INSERT
+    INTO @t_schema.FlagX
+    (
+    Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,TranID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    )
+    VALUES
+    (
+    :Enterprise
+    ,'PSGCVSL'
+    ,:EntityID
+    ,'ECCMREADYBASE'
+    ,'ECMBR'
+    ,2
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    )
+  ;
+
+ // Lets check for churnflag
+    if (iChurn == 1) {
+
+      EXEC SQL
+        UPDATE @t_schema.Entity
+        SET
+        ValTo = :now
+        WHERE
+            Enterprise = :Enterprise
+        AND EntityType = 'PSGCVSL'
+        AND EntityID = :EntityID
+        AND ValTo = :forever
+      ;
+
+      EXEC SQL
+        UPDATE @t_schema.EntityX
+        SET
+        ValTo = :now
+        WHERE
+            Enterprise = :Enterprise
+        AND EntityType = 'PSGCVSL'
+        AND EntityID = :EntityID
+        AND ValTo = :forever
+      ;
+
+      // Now insert the new entity rec
+      EXEC SQL
+        INSERT
+        INTO @t_schema.Entity
+        (
+         Enterprise
+        ,EntityType
+        ,EntityID
+        ,TranID
+        ,ValFrom
+        ,ValTo
+        ,EffFrom
+        ,EffTo
+        ,OPENID
+        )
+        VALUES
+        (
+         :Enterprise
+        ,'PSGCVSL'
+        ,:EntityID
+        ,2
+        ,:now
+        ,:forever
+        ,:now
+        ,:forever
+        ,:OPENID
+        )
+      ;
+
+      // Now insert the new entity rec
+      EXEC SQL
+        INSERT
+        INTO @t_schema.EntityX
+        (
+         Enterprise
+        ,EntityType
+        ,EntityID
+        ,TranID
+        ,ValFrom
+        ,ValTo
+        ,EffFrom
+        ,EffTo
+        ,OPENID
+        )
+        VALUES
+        (
+         :Enterprise
+        ,'PSGCVSL'
+        ,:EntityID
+        ,2
+        ,:now
+        ,:forever
+        ,:now
+        ,:forever
+        ,:OPENID
+        )
+      ;
+    }
+
+  EXEC SQL COMMIT WORK;
+
+}
+
+//
+//  PSGPCSL SECTION ....
+//
+
+lLevel = 0;
+i=0;
+
+EXEC SQL OPEN curPSGPCSL;
+do {
+  EXEC SQL FETCH curPSGPCSL INTO :EntityID;
+  if (SQLCODE != 0) break;
+  alEntityID[lLevel] =  EntityID;
+  lLevel++;
+} while (1);
+
+// Close and release resources
+EXEC SQL CLOSE curPSGPCSL WITH RELEASE;
+
+for (i=0;i<lLevel;i++) {
+
+  EntityID = alEntityID[i];
+  EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :now;
+
+  // Here is where we turn off
+  EXEC SQL
+    UPDATE @t_schema.Flag
+    SET
+    ValTo = :now
+    WHERE
+        Enterprise = :Enterprise
+    AND EntityType = 'PSGPCSL'
+    AND EntityID = :EntityID
+    AND AttributeCode = 'ECCMREADYBASE'
+    AND ValTo = :forever
+  ;
+
+  // Here is where we turn off X
+  EXEC SQL
+    UPDATE @t_schema.Flagx
+    SET
+    ValTo = :now
+    WHERE
+        Enterprise = :Enterprise
+    AND EntityType = 'PSGPCSL'
+    AND EntityID = :EntityID
+    AND AttributeCode = 'ECCMREADYBASE'
+    AND ValTo = :forever
+  ;
+
+  // Here is where we insert new records
+  // We must do it for the FlagX recoreds also
+
+  EXEC SQL
+    INSERT
+    INTO @t_schema.Flag
+    (
+    Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,TranID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    )
+    VALUES
+    (
+    :Enterprise
+    ,'PSGPCSL'
+    ,:EntityID
+    ,'ECCMREADYBASE'
+    ,'ECMBR'
+    ,2
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    )
+  ;
+
+  // Flag X Table is here
+  EXEC SQL
+    INSERT
+    INTO @t_schema.FlagX
+    (
+    Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,TranID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    )
+    VALUES
+    (
+    :Enterprise
+    ,'PSGPCSL'
+    ,:EntityID
+    ,'ECCMREADYBASE'
+    ,'ECMBR'
+    ,2
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    )
+  ;
+
+   // Lets check for churnflag
+    if (iChurn == 1) {
+
+      EXEC SQL
+        UPDATE @t_schema.Entity
+        SET
+        ValTo = :now
+        WHERE
+            Enterprise = :Enterprise
+        AND EntityType = 'PSGPCSL'
+        AND EntityID = :EntityID
+        AND ValTo = :forever
+      ;
+
+      EXEC SQL
+        UPDATE @t_schema.EntityX
+        SET
+        ValTo = :now
+        WHERE
+            Enterprise = :Enterprise
+        AND EntityType = 'PSGPCSL'
+        AND EntityID = :EntityID
+        AND ValTo = :forever
+      ;
+
+      // Now insert the new entity rec
+      EXEC SQL
+        INSERT
+        INTO @t_schema.Entity
+        (
+         Enterprise
+        ,EntityType
+        ,EntityID
+        ,TranID
+        ,ValFrom
+        ,ValTo
+        ,EffFrom
+        ,EffTo
+        ,OPENID
+        )
+        VALUES
+        (
+         :Enterprise
+        ,'PSGPCSL'
+        ,:EntityID
+        ,2
+        ,:now
+        ,:forever
+        ,:now
+        ,:forever
+        ,:OPENID
+        )
+      ;
+
+      // Now insert the new entity rec
+      EXEC SQL
+        INSERT
+        INTO @t_schema.EntityX
+        (
+         Enterprise
+        ,EntityType
+        ,EntityID
+        ,TranID
+        ,ValFrom
+        ,ValTo
+        ,EffFrom
+        ,EffTo
+        ,OPENID
+        )
+        VALUES
+        (
+         :Enterprise
+        ,'PSGPCSL'
+        ,:EntityID
+        ,2
+        ,:now
+        ,:forever
+        ,:now
+        ,:forever
+        ,:OPENID
+        )
+      ;
+    }
+
+  EXEC SQL COMMIT WORK;
+
+}
+
+//
+//  PSGCCSL SECTION ....
+//
+
+lLevel = 0;
+i=0;
+
+EXEC SQL OPEN curPSGCCSL;
+
+do {
+  EXEC SQL FETCH curPSGCCSL INTO :EntityID;
+  if (SQLCODE != 0) break;
+  alEntityID[lLevel] =  EntityID;
+  lLevel++;
+} while (1);
+
+// Close and release resources
+EXEC SQL CLOSE curPSGCCSL WITH RELEASE;
+
+for (i=0;i<lLevel;i++) {
+
+  EntityID = alEntityID[i];
+  EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :now;
+
+  // Here is where we turn off
+  EXEC SQL
+    UPDATE @t_schema.Flag
+    SET
+    ValTo = :now
+    WHERE
+        Enterprise = :Enterprise
+    AND EntityType = 'PSGCCSL'
+    AND EntityID = :EntityID
+    AND AttributeCode = 'ECCMREADY'
+    AND ValTo = :forever
+  ;
+
+  // Here is where we turn off X
+  EXEC SQL
+    UPDATE @t_schema.Flagx
+    SET
+    ValTo = :now
+    WHERE
+        Enterprise = :Enterprise
+    AND EntityType = 'PSGCCSL'
+    AND EntityID = :EntityID
+    AND AttributeCode = 'ECCMREADY'
+    AND ValTo = :forever
+  ;
+
+  // Here is where we insert new records
+  // We must do it for the FlagX recoreds also
+
+  EXEC SQL
+    INSERT
+    INTO @t_schema.Flag
+    (
+    Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,TranID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    )
+    VALUES
+    (
+    :Enterprise
+    ,'PSGCCSL'
+    ,:EntityID
+    ,'ECCMREADY'
+    ,'0020'
+    ,2
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    )
+  ;
+
+  // Flag X Table is here
+  EXEC SQL
+    INSERT
+    INTO @t_schema.FlagX
+    (
+    Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,TranID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    )
+    VALUES
+    (
+    :Enterprise
+    ,'PSGCCSL'
+    ,:EntityID
+    ,'ECCMREADY'
+    ,'0020'
+    ,2
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    )
+  ;
+
+  // Lets check for churnflag
+  if (iChurn == 1) {
+
+    EXEC SQL
+      UPDATE @t_schema.Entity
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = 'PSGCCSL'
+      AND EntityID = :EntityID
+      AND ValTo = :forever
+    ;
+
+    EXEC SQL
+      UPDATE @t_schema.EntityX
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = 'PSGCCSL'
+      AND EntityID = :EntityID
+      AND ValTo = :forever
+    ;
+
+    // Now insert the new entity rec
+    EXEC SQL
+      INSERT
+      INTO @t_schema.Entity
+      (
+       Enterprise
+      ,EntityType
+      ,EntityID
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+       :Enterprise
+      ,'PSGCCSL'
+      ,:EntityID
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+
+    // Now insert the new entity rec
+    EXEC SQL
+      INSERT
+      INTO @t_schema.EntityX
+      (
+       Enterprise
+      ,EntityType
+      ,EntityID
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+       :Enterprise
+      ,'PSGCCSL'
+      ,:EntityID
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+  }
+
+  EXEC SQL COMMIT WORK;
+}
+
+//
+//  PSGCPSL SECTION ....
+//
+
+lLevel = 0;
+i=0;
+
+EXEC SQL OPEN curPSGCPSL;
+
+do {
+  EXEC SQL FETCH curPSGCPSL INTO :EntityID;
+  if (SQLCODE != 0) break;
+  alEntityID[lLevel] =  EntityID;
+  lLevel++;
+} while (1);
+
+// Close and release resources
+EXEC SQL CLOSE curPSGCPSL WITH RELEASE;
+
+for (i=0;i<lLevel;i++) {
+
+  EntityID = alEntityID[i];
+  EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :now;
+
+  // Here is where we turn off
+  EXEC SQL
+    UPDATE @t_schema.Flag
+    SET
+    ValTo = :now
+    WHERE
+        Enterprise = :Enterprise
+    AND EntityType = 'PSGCPSL'
+    AND EntityID = :EntityID
+    AND AttributeCode = 'ECCMREADY'
+    AND ValTo = :forever
+  ;
+
+  // Here is where we turn off X
+  EXEC SQL
+    UPDATE @t_schema.Flagx
+    SET
+    ValTo = :now
+    WHERE
+        Enterprise = :Enterprise
+    AND EntityType = 'PSGCPSL'
+    AND EntityID = :EntityID
+    AND AttributeCode = 'ECCMREADY'
+    AND ValTo = :forever
+  ;
+
+  // Here is where we insert new records
+  // We must do it for the FlagX recoreds also
+
+  EXEC SQL
+    INSERT
+    INTO @t_schema.Flag
+    (
+    Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,TranID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    )
+    VALUES
+    (
+    :Enterprise
+    ,'PSGCPSL'
+    ,:EntityID
+    ,'ECCMREADY'
+    ,'0020'
+    ,2
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    )
+  ;
+
+  // Flag X Table is here
+  EXEC SQL
+    INSERT
+    INTO @t_schema.FlagX
+    (
+    Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,TranID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    )
+    VALUES
+    (
+    :Enterprise
+    ,'PSGCPSL'
+    ,:EntityID
+    ,'ECCMREADY'
+    ,'0020'
+    ,2
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    )
+  ;
+
+  // Lets check for churnflag
+  if (iChurn == 1) {
+
+    EXEC SQL
+      UPDATE @t_schema.Entity
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = 'PSGCPSL'
+      AND EntityID = :EntityID
+      AND ValTo = :forever
+    ;
+
+    EXEC SQL
+      UPDATE @t_schema.EntityX
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = 'PSGCPSL'
+      AND EntityID = :EntityID
+      AND ValTo = :forever
+    ;
+
+    // Now insert the new entity rec
+    EXEC SQL
+      INSERT
+      INTO @t_schema.Entity
+      (
+       Enterprise
+      ,EntityType
+      ,EntityID
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+       :Enterprise
+      ,'PSGCPSL'
+      ,:EntityID
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+
+    // Now insert the new entity rec
+    EXEC SQL
+      INSERT
+      INTO @t_schema.EntityX
+      (
+       Enterprise
+      ,EntityType
+      ,EntityID
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+       :Enterprise
+      ,'PSGCPSL'
+      ,:EntityID
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+  }
+
+  EXEC SQL COMMIT WORK;
+}
+
+//
+//  PSGCB SECTION ....
+//
+lLevel = 0;
+i=0;
+
+EXEC SQL OPEN curPSGCB;
+
+do {
+  EXEC SQL FETCH curPSGCB INTO :EntityID;
+  if (SQLCODE != 0) break;
+  alEntityID[lLevel] =  EntityID;
+  lLevel++;
+} while (1);
+
+// Close and release resources
+EXEC SQL CLOSE curPSGCB WITH RELEASE;
+
+for (i=0;i<lLevel;i++) {
+
+  EntityID = alEntityID[i];
+  EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :now;
+
+  // Here is where we turn off
+  EXEC SQL
+    UPDATE @t_schema.Flag
+    SET
+    ValTo = :now
+    WHERE
+        Enterprise = :Enterprise
+    AND EntityType = 'PSGCB'
+    AND EntityID = :EntityID
+    AND AttributeCode = 'ECCMREADY'
+    AND ValTo = :forever
+  ;
+
+  // Here is where we turn off X
+  EXEC SQL
+    UPDATE @t_schema.Flagx
+    SET
+    ValTo = :now
+    WHERE
+        Enterprise = :Enterprise
+    AND EntityType = 'PSGCB'
+    AND EntityID = :EntityID
+    AND AttributeCode = 'ECCMREADY'
+    AND ValTo = :forever
+  ;
+
+  // Here is where we insert new records
+  // We must do it for the FlagX recoreds also
+
+  EXEC SQL
+    INSERT
+    INTO @t_schema.Flag
+    (
+    Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,TranID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    )
+    VALUES
+    (
+    :Enterprise
+    ,'PSGCB'
+    ,:EntityID
+    ,'ECCMREADY'
+    ,'0020'
+    ,2
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    )
+  ;
+
+  // Flag X Table is here
+  EXEC SQL
+    INSERT
+    INTO @t_schema.FlagX
+    (
+    Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,TranID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    )
+    VALUES
+    (
+    :Enterprise
+    ,'PSGCB'
+    ,:EntityID
+    ,'ECCMREADY'
+    ,'0020'
+    ,2
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    )
+  ;
+
+  // Lets check for churnflag
+  if (iChurn == 1) {
+
+    EXEC SQL
+      UPDATE @t_schema.Entity
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = 'PSGCB'
+      AND EntityID = :EntityID
+      AND ValTo = :forever
+    ;
+
+    EXEC SQL
+      UPDATE @t_schema.EntityX
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = 'PSGCB'
+      AND EntityID = :EntityID
+      AND ValTo = :forever
+    ;
+
+    // Now insert the new entity rec
+    EXEC SQL
+      INSERT
+      INTO @t_schema.Entity
+      (
+       Enterprise
+      ,EntityType
+      ,EntityID
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+       :Enterprise
+      ,'PSGCB'
+      ,:EntityID
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+
+    // Now insert the new entity rec
+    EXEC SQL
+      INSERT
+      INTO @t_schema.EntityX
+      (
+       Enterprise
+      ,EntityType
+      ,EntityID
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+       :Enterprise
+      ,'PSGCB'
+      ,:EntityID
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+  }
+
+  EXEC SQL COMMIT WORK;
+
+}
+
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in iChurn int
+@end
+
+
+

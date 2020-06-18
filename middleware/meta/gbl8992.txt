@@ -1,0 +1,61 @@
+@name=GBL8992
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+@nulls_ok=true
+-----------------------------------------------------------------------------------------------------------------------
+Returns entityid, entitytype, attributecode and valfrom for all entities with an ABR attribute with a specified value
+-----------------------------------------------------------------------------------------------------------------------
+$Log: gbl8992.txt,v $
+Revision 1.6  2010/06/21 20:10:42  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.5  2010/06/10 16:53:03  rick
+changing SP to generate results.
+
+Revision 1.4  2010/05/19 17:15:48  rick
+fixing some more probs
+
+Revision 1.3  2010/05/19 15:39:04  rick
+fixing some compile problems
+
+Revision 1.2  2010/05/19 15:09:06  rick
+fixing logging
+
+
+
+@desc= returns entityid,entitytype,attributecode,valfrom for entities with an ABR attribute with a specified value
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8992.txt,v 1.6 2010/06/21 20:10:42 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+select distinct flag.entityid, flag.entitytype, flag.AttributeCode, flag.valfrom from opicm.flag flag
+    inner join opicm.MetaDescription MD ON
+    MD.Enterprise = :Enterprise 
+    AND MD.DescriptionType = flag.AttributeCode 
+    AND MD.DescriptionClass ='A'
+    AND MD.NLSID =1
+    AND MD.ValFrom <= :ValOn AND :ValOn < MD.ValTo 
+    AND MD.EffFrom <= :EffOn AND :EffOn < MD.EffTo 
+    where flag.enterprise = :Enterprise 
+    AND flag.AttributeValue = :AttributeValue
+    AND flag.valfrom <= :ValOn AND :ValOn < flag.valto
+    AND flag.efffrom <= :EffOn AND :EffOn < flag.effto 
+    with ur;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in AttributeValue varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+

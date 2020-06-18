@@ -1,0 +1,281 @@
+@name=GBL3000
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+--------------------------------------------------------------------------
+--  This guy Returns all ABR Records from the Flag Table
+--  That are in a queud state
+--  EntityClass 'A' and AttributeValue = 0020
+--------------------------------------------------------------------------
+$Log: gbl3000.txt,v $
+Revision 1.44  2013/08/26 15:30:58  praveen
+Added Order by valfrom clause
+
+Revision 1.43  2010/06/21 15:43:20  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.42  2005/03/25 18:33:27  roger
+fix it
+
+Revision 1.41  2005/03/25 18:29:01  roger
+Reinstate RefNLSID
+
+Revision 1.40  2005/03/16 17:23:24  dave
+another column fix
+
+Revision 1.39  2005/03/16 17:20:21  dave
+ordering fix
+
+Revision 1.38  2005/03/14 17:01:14  dave
+backing out multiple nls flag changes
+
+Revision 1.37  2005/03/11 21:01:48  roger
+Fix up
+
+Revision 1.36  2005/03/11 20:26:34  roger
+New col
+
+Revision 1.35  2004/10/20 21:01:41  dave
+changes to gen parm
+
+Revision 1.34  2004/10/12 22:35:26  dave
+minor fixes and taking a nap .. if all idlers are busy
+
+Revision 1.33  2004/10/12 22:18:53  dave
+better columns
+
+Revision 1.32  2004/10/12 22:06:09  dave
+Remove Hardcoded Enterprise
+
+Revision 1.31  2004/10/12 21:59:25  dave
+new SP3000 to handle multi enterprise clashes and on taskmaster
+wiping out the calculation of another taskmaster
+when multiple GBL3000 are running
+
+Revision 1.30  2004/09/14 20:38:17  roger
+Can't rely on PK to filter dupes, there should be NO PK on TRSQ table!
+
+Revision 1.29  2004/09/14 17:22:59  roger
+I see nothing wrong, restore code for interleaved
+
+Revision 1.28  2004/08/17 19:27:16  roger
+Interleaved is "sick" at the moment ...
+
+Revision 1.27  2004/08/17 16:44:47  roger
+Turbo clean up
+
+Revision 1.26  2004/08/17 16:42:59  roger
+Clean up
+
+Revision 1.25  2004/08/17 16:03:46  roger
+Fixes
+
+Revision 1.24  2004/08/17 15:55:23  roger
+Clear the Q
+
+Revision 1.23  2004/08/17 15:39:34  roger
+Support interleaved execution of ABRs by OPENID
+
+Revision 1.22  2004/07/20 20:18:42  dave
+changed to try to improve perf based upon existing
+flagx indexes as opposed to making simplified indexes
+
+Revision 1.21  2004/07/07 19:34:31  gregg
+Flagx -> Flag
+
+Revision 1.20  2004/02/20 20:21:51  roger
+Must be @t_schema
+
+Revision 1.19  2004/02/20 18:09:31  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.18  2004/01/15 18:07:19  dave
+gbl3000 fix
+
+Revision 1.17  2004/01/09 22:26:06  dave
+perf changes I
+
+Revision 1.16  2003/08/13 23:53:34  dave
+introduced a 60 second time delay into the abr queue request
+
+Revision 1.15  2003/06/05 18:54:33  dave
+fixing GBL7520fixing 7520 <= shoud be < on valto
+
+Revision 1.14  2002/11/07 18:29:46  roger
+Need feature to select In Process ABRs
+
+Revision 1.13  2002/08/20 22:03:32  dave
+changed from x table back to non x table
+
+Revision 1.12  2002/01/28 20:53:21  dave
+merging 1.0 maint into 1.1
+
+Revision 1.11  2001/07/27 06:34:33  roger
+Fix line termination characters
+
+@desc=Return All ABR Records in a Queued State
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl3000.txt,v 1.44 2013/08/26 15:30:58 praveen Exp $";
+EXEC SQL END DECLARE SECTION;
+
+if (Interleaved[0] == 'N' && AttributeValue[2] == '2') {
+EXEC SQL DECLARE sp_cursor0020 CURSOR FOR
+SELECT
+  F.EntityType
+ ,F.EntityID
+ ,(select LongDescription from @t_schema.metadescription where enterprise =  :Enterprise and descriptiontype = F.AttributeCode and
+ descriptionclass = 'A' and valto = '9999-12-31-00.00.00.000000' and current timestamp between efffrom and effto)
+ ,F.AttributeCode
+ ,F.AttributeValue
+ ,F.ValFrom
+ ,F.OPENID
+ ,F.Ref_NLSID
+FROM @t_schema.MetaEntity ME
+INNER JOIN @t_schema.Flagx F ON
+    F.Enterprise = :Enterprise
+AND F.AttributeCode = ME.EntityType
+AND F.AttributeValue = '0020'
+AND F.Valfrom > current timestamp - 4 days
+AND rtrim(char(F.ValTo))  = '9999-12-31-00.00.00.000000'
+AND rtrim(char(F.effto)) > :now
+WHERE
+    ME.Enterprise = :Enterprise
+AND ME.EntityClass = 'A'
+AND ME.ValTo  = '9999-12-31-00.00.00.000000'
+AND CURRENT TIMESTAMP BETWEEN ME.EffFrom and ME.EffTo
+order by 6 with ur;
+EXEC SQL OPEN sp_cursor0020
+;
+}
+
+if (Interleaved[0] == 'N' && AttributeValue[2] == '5') {
+EXEC SQL DECLARE sp_cursor0050 CURSOR FOR
+SELECT
+  F.EntityType
+ ,F.EntityID
+ ,(select LongDescription from @t_schema.metadescription where enterprise =  :Enterprise and descriptiontype = F.AttributeCode and
+ descriptionclass = 'A' and valto = '9999-12-31-00.00.00.000000' and current timestamp between efffrom and effto)
+ ,F.AttributeCode
+ ,F.AttributeValue
+ ,F.ValFrom
+ ,F.OPENID
+ ,F.Ref_NLSID
+FROM @t_schema.MetaEntity ME
+INNER JOIN @t_schema.Flagx F ON
+    F.Enterprise = :Enterprise
+AND F.AttributeCode = ME.EntityType
+AND F.AttributeValue = '0050'
+AND F.Valfrom > current timestamp - 4 days
+AND rtrim(char(F.ValTo))  = '9999-12-31-00.00.00.000000'
+AND rtrim(char(F.effto)) > :now
+WHERE
+    ME.Enterprise = :Enterprise
+AND ME.EntityClass = 'A'
+AND ME.ValTo  = '9999-12-31-00.00.00.000000'
+AND CURRENT TIMESTAMP BETWEEN ME.EffFrom and ME.EffTo
+order by 6 with ur;
+EXEC SQL OPEN sp_cursor0050
+;
+}
+
+if (Interleaved[0] == 'Y' && AttributeValue[2] == '2') {
+
+EXEC SQL DECLARE sp_cursor_int0020 CURSOR FOR
+with myabrs (entitytype, entityid, description, code, value, valfrom, openid, ref_nlsid) as (
+SELECT
+  F.EntityType
+ ,F.EntityID
+ ,(select LongDescription from opicm.metadescription where enterprise =  :Enterprise and descriptiontype = F.AttributeCode and
+ descriptionclass = 'A' and valto = '9999-12-31-00.00.00.000000' and current timestamp between efffrom and effto)
+ ,F.AttributeCode
+ ,F.AttributeValue
+ ,F.ValFrom
+ ,F.OPENID
+ ,F.Ref_NLSID
+FROM @t_schema.MetaEntity ME
+INNER JOIN @t_schema.Flagx F ON
+    F.Enterprise = :Enterprise
+AND F.AttributeCode = ME.EntityType
+AND F.AttributeValue = '0020'
+AND F.Valfrom > current timestamp - 4 days
+AND rtrim(char(F.ValTo))  = '9999-12-31-00.00.00.000000'
+AND rtrim(char(F.effto)) > :now
+
+WHERE
+    ME.Enterprise = :Enterprise
+AND ME.EntityClass = 'A'
+AND ME.ValTo  = '9999-12-31-00.00.00.000000'
+AND CURRENT TIMESTAMP BETWEEN ME.EffFrom and ME.EffTo
+)
+SELECT
+t.entitytype,
+t.entityid,
+t.description,
+t.code,
+t.value,
+t.valfrom,
+t.openid,
+t.ref_nlsid,
+(select count(*) from myabrs where openid =t.openid and valfrom < t.valfrom)
+FROM myabrs T order by 9,7,6
+with ur;
+
+EXEC SQL OPEN sp_cursor_int0020
+;
+}
+
+if (Interleaved[0] == 'Y' && AttributeValue[2] == '5') {
+EXEC SQL DECLARE sp_cursor_int0050 CURSOR FOR
+with myabrs (entitytype, entityid, description, code, value, valfrom, openid, ref_nlsid) as (
+SELECT
+  F.EntityType
+ ,F.EntityID
+ ,(select LongDescription from opicm.metadescription where enterprise =  :Enterprise and descriptiontype = F.AttributeCode and
+ descriptionclass = 'A' and valto = '9999-12-31-00.00.00.000000' and current timestamp between efffrom and effto)
+ ,F.AttributeCode
+ ,F.AttributeValue
+ ,F.ValFrom
+ ,F.OPENID
+ ,F.Ref_NLSID
+FROM @t_schema.MetaEntity ME
+INNER JOIN @t_schema.Flagx F ON
+    F.Enterprise = :Enterprise
+AND F.AttributeCode = ME.EntityType
+AND F.AttributeValue = '0050'
+AND F.Valfrom > current timestamp - 4 days
+AND rtrim(char(F.ValTo))  = '9999-12-31-00.00.00.000000'
+AND rtrim(char(F.effto)) > :now
+
+WHERE
+    ME.Enterprise = :Enterprise
+AND ME.EntityClass = 'A'
+AND ME.ValTo  = '9999-12-31-00.00.00.000000'
+AND CURRENT TIMESTAMP BETWEEN ME.EffFrom and ME.EffTo
+)
+SELECT
+t.entitytype,
+t.entityid,
+t.description,
+t.code,
+t.value,
+t.valfrom,
+t.openid,
+t.ref_nlsid,
+(select count(*) from myabrs where openid =t.openid and valfrom < t.valfrom)
+FROM myabrs T order by 9,7,6
+with ur;
+EXEC SQL OPEN sp_cursor_int0050
+;
+}
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in AttributeValue varchar(8)
+in Interleaved varchar(1)
+@end

@@ -1,0 +1,102 @@
+@name=GBL1019
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+This guy inserts a new record into the trsNavigateTable - generic; allows us to 'pre-load' the table.
+Used in navigates where the Root is itself a relator.
+
+
+$Log: gbl1019.txt,v $
+Revision 1.7  2010/06/21 15:43:05  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2009/10/20 00:21:59  rick
+update to change long datatype to sqlint32
+
+Revision 1.5  2005/06/07 18:42:09  gregg
+more var fix
+
+Revision 1.4  2005/06/07 18:35:48  gregg
+nother fix
+
+Revision 1.3  2005/06/07 18:31:05  gregg
+fix
+
+Revision 1.2  2005/06/07 18:25:55  gregg
+obtain e1/e2 within
+
+Revision 1.1  2005/06/06 21:32:34  gregg
+initial load
+
+
+@desc=This guy inserts a new record into the trsNavigateTable - generic; allows us to 'pre-load' the table. Used in navigates where the Root is itself a relator.
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl1019.txt,v 1.7 2010/06/21 15:43:05 wendy Exp $";
+char cEntity1Type[32];
+char cEntity2Type[32];
+sqlint32 iEntity1ID;
+sqlint32 iEntity2ID;
+EXEC SQL END DECLARE SECTION;
+@execute
+
+
+if (EntityID > 0) {
+
+EXEC SQL
+SELECT Entity1Type, Entity1ID, Entity2Type, Entity2ID INTO :cEntity1Type, :iEntity1ID, :cEntity2Type, :iEntity2ID 
+FROM @t_schema.Relator
+WHERE
+    Enterprise = :Enterprise
+AND EntityType = :EntityType
+AND EntityID = :EntityID
+AND Valfrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+;
+
+
+
+}
+
+
+
+EXEC SQL INSERT INTO @t_schema.trsNavigate 
+VALUES
+(
+ :Enterprise
+,:SessionID
+,:ObjectType
+,'Navigate'
+,0
+,1
+,'D'
+,'U'
+,:cEntity1Type
+,:iEntity1ID
+,:EntityType
+,:EntityID
+,:cEntity2Type
+,:iEntity2ID
+,:now
+,:now
+)
+;
+
+EXEC SQL COMMIT WORK;
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in ObjectType varchar(32)
+in EntityType varchar(32)
+in EntityID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+
+

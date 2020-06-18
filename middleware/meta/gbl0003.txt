@@ -1,0 +1,51 @@
+@name=GBL0003
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+Rule51:
+fetch an attribute value
+--------------------------------------------------------------------------------------------
+$Log: gbl0003.txt,v $
+Revision 1.2  2005/01/20 22:20:24  gregg
+phix
+
+Revision 1.1  2005/01/20 21:08:50  gregg
+more rule51
+
+
+
+
+@desc=Rule51:fetch an attribute value
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0003.txt,v 1.2 2005/01/20 22:20:24 gregg Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+
+SELECT T.attributevalue,T.NLSID FROM
+@schema.Text T
+
+WHERE
+T.Enterprise =  :Enterprise
+AND T.EntityType = :EntityType
+AND T.EntityID = :EntityID
+AND T.AttributeCode = :AttributeCode
+AND T.NLSID in (1,:NLSID)
+AND T.ValFrom <= :now AND :now < T.ValTo AND T.EffFrom <= :now AND :now < T.EffTo
+order by nlsid
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in AttributeCode varchar(32)
+in NLSID int
+@end

@@ -1,0 +1,53 @@
+@name=GBL7668
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Returns all EntityType from a given attributeCode
+$Log: gbl7668.txt,v $
+Revision 1.4  2010/06/21 15:42:56  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.3  2004/10/20 21:01:46  dave
+changes to gen parm
+
+Revision 1.2  2004/04/14 22:35:03  joan
+fix error
+
+Revision 1.1  2004/04/14 21:53:14  joan
+initial load
+
+
+@desc=All relators for a given entitytype
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7668.txt,v 1.4 2010/06/21 15:42:56 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT
+RTRIM(MLG.LinkType1)
+,RTRIM(MLG.LinkType2)
+
+FROM @t_schema.metalinkattr MLG
+WHERE
+    MLG.Enterprise = :Enterprise
+AND MLG.LinkType2 = :AttributeCode
+AND MLG.LinkCode = 'EntityAttribute'
+AND MLG.ValFrom <= :ValOn and :ValOn < MLG.ValTo AND MLG.EffFrom <= :EffOn and :EffOn < MLG.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in AttributeCode varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

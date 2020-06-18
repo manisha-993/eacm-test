@@ -1,0 +1,56 @@
+@name=GBL9305
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------
+-- Pulling out info from sales_status based on given countrycode
+----------------------------------------------------------------------
+$Log: gbl9305.txt,v $
+Revision 1.3  2010/06/21 15:43:03  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.2  2005/10/31 22:25:59  joan
+fixes
+
+Revision 1.1  2005/10/31 22:04:19  joan
+fixes
+
+
+
+@desc=Pulling out info from sales_status based on given countrycode
+@fenced=true
+@parmstyle=GENERAL
+@sql
+@results=1
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9305.txt,v 1.3 2010/06/21 15:43:03 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE Cur CURSOR FOR
+
+SELECT SS.MATNR
+, SS.VARCOND
+, SS.VARCONDTYPE
+, SS.SALESORG
+, SS.MATERIALSTATUS
+, SS.MATERIALSTATUSDATE
+, SS.LASTUPDATED
+, SS.MARKEDFORDELETION
+
+FROM EACM.SALESORG_COUNTRY SC
+
+INNER JOIN EACM.SALES_STATUS SS ON
+    SS.SALESORG = SC.SALESORG
+
+WHERE SC.COUNTRYCODE = :countrycode
+;
+
+@execute
+
+EXEC SQL OPEN Cur;
+
+@parameters
+inout ReturnStatus int
+in countrycode varchar(8)
+@end
+

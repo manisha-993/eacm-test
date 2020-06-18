@@ -1,0 +1,46 @@
+@name=GBL9204
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+ This guy removes any Queue records for the given SessionID
+
+$Log: gbl9204.txt,v $
+Revision 1.4  2010/06/21 15:43:27  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.3  2004/10/22 17:12:09  dave
+removing inouts and tmp fix for update
+
+Revision 1.2  2004/10/20 21:01:50  dave
+changes to gen parm
+
+Revision 1.1  2004/08/18 22:23:52  joan
+add file
+
+
+@results=0
+@desc=Clears out the trsNavigateTable for a Given SessionID
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9204.txt,v 1.4 2010/06/21 15:43:27 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+@execute
+// =================================================================
+// Now Remove any possible records for this guy for the given SessionID
+// ==================================================================
+EXEC SQL
+DELETE FROM @t_schema.Queue
+WHERE
+    SESSIONID  = :SessionID
+;
+EXEC SQL COMMIT WORK;
+@parameters
+inout ReturnStatus int
+in SessionID int
+@end
+
+

@@ -1,0 +1,19 @@
+#!/bin/sh
+
+#
+# Export variables for opicmadm scripts
+#
+
+DBASE=opicmpdh
+USER=`whoami`
+PASSWD=mice8chs
+SPSOURCE="/home/"$USER"/storedp/"
+SQLLIB="/home/"$DB2INSTANCE"/sqllib/"
+
+export DBASE
+export USER
+export PASSWD
+export SPSOURCE
+export SQLLIB
+
+. $SQLLIB/db2profile32bit

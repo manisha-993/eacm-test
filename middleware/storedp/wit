@@ -1,0 +1,1035 @@
+#!/bin/ksh
+#@(#) WIT Version 7.05.28  28-May-97  (c) IBM Corp.  All Rights Reserved.
+#   
+# Date:           Wednesday;  May 28, 1997
+#
+# Copyright:      (c) Copyright 1996
+#                 IBM Corporation
+#                 All Rights Reserved
+#
+#  Disclaimers:   I do not guarantee anything about this shell script;
+#                 you are officially "yoyo" (You'reOnYourOwn).  This
+#                 has NOT BEEN THOROUGHLY TESTED.  I do encourage/welcome
+#                 your thoughts, feedback and contributions.
+#
+#  Program Name:  WIT  ( as in ... WhatIsThis )
+#
+#  Author:        D. R. Ranz, Marketing Rep
+#                 IBM Corporation
+#                 P.O. Box 5050
+#                 18000 West Nine Mile Road
+#                 Southfield, Michigan  48086-5050
+#
+#  e-mail:        Internet:       dranz@vnet.ibm.com
+#                 IBM internal:   DETVMIC1(DRANZ)
+#                 IBM cust net:   IBMMAIL(USIB2QXH)
+#                 CompuServe:     104356,2220
+#
+#  Inspiration:   This shell script was inspired by Glen Chalemin's
+#                 posting in the RISC6000 FORUM.
+#
+#  Purpose:       To provide a salient summary of the system configuration
+#                 and performance specs.
+#
+#  Best PDA:      HP-200LX
+#
+#  28-May-97:     WIT Version 7.05.28
+#
+#                      Added support for the F50, J50 and R50
+#
+#  25-Feb-97:     WIT Version 7.02.25
+#		
+#                      Altered WIT to cope with the following nonsense:
+#
+#                           - AIX v4.2: lscfg & lsattr have moved to /etc 
+#                           - AIX v4.1: lscfg & lsattr have moved to /usr/sbin
+#                           - AIX v3.2: lscfg & lsattr have moved to /etc
+#
+#  08-Feb-97:     WIT Version 7.02.08
+#
+#                      - Added support for SP Thin/120, Wide/135 & SMP/High node
+#
+#  03-Dec-96:     WIT Version 6.12.03
+#
+#                      - Split out reporting of SSA disks & SCSI disks
+#                      - Correctly reports the amount of attached SSA disks
+#                      - Reports the PPsize for each VG
+#
+#  24-Nov-96:     WIT Version 6.11.24
+#
+#                      - Added support for 595, F40, H10,
+#                                          43P-140, 43P-240, TP-860
+#
+#                      - Updated disk size parsing to cope with yet another
+#                        reporting format.
+#
+#  09-Sep-96:     WIT Version 6.9.9
+#
+#                      - Added paging space(s) support
+#
+#                      - Added rmss support (if installed)
+#
+#                      - Changed the order of reporting so that
+#                        all related items are grouped together
+#
+#                      - Altered the SMP-awk code for readability
+#
+#                      - Altered machine/model string to be trademark compliant
+#
+#  29-Jul-96:     WIT Version 6.7.5
+#
+#                      - Tested/fixed for G40
+#
+#  23-Jul-96:     WIT Version 6.7.4
+#
+#                      - Columnized the performance data for readability
+#                      - Improved decoding for SMP config
+#                      - Improved decoding of F30 slot utilization
+#                      - Adding support for 591, G40, J40, R40
+#                      - Tested on AIX v4.2 (Model J30)
+#
+#  10-Jun-96:     WIT Version 6.6.3
+#
+#                 Bug-fixes:
+#
+#                      - I just learned that 'df' has changed in AIX v4.1.
+#                        WIT now correctly reports filesystem utilization for
+#                        AIX v4.1 systems.  Thanx to Mike McDermott for pointing
+#		         this oversight.
+#
+#                      - Non-root users would sometimes see 0 MBytes of RAM ... 
+#                        workaround implemented to overcome the schizo
+#                        behaviours of the various & differing implementations
+#                        of 'lscfg'
+#
+#  07-Jun-96:     WIT Version 6.6.2
+#
+#                 Added support for E30 and F30
+#                 Added support for slot utilization
+#                 Fixed a bug wrt ksh expansion:  echo "$VERBOSE"
+#                 
+#  03-Jun-96:     WIT Version 6.6
+#
+#                 Long overdue additions/enhancements for:
+#                 C20, 41T/W, 42T/W, 43P, E20
+#
+#  16-Mar-95:     WIT Version 5.7
+#                 Updated to include 390H, 3CT and SP/2 Thin2 (Huron) engine
+#
+#  14-Mar-95:     WIT Version 5.6
+#                 Updated 40P info to include memory bus width & speed
+#
+#  06-Mar-95:     WIT Version 5.5  ( 'beta edition )
+#                 Added (incomplete) support for:  40P
+#
+#  20-Feb-95:     WIT Version 5.4
+#                 Added support for:  G30, J30 & R30
+#
+#  31-Aug-94:     WIT Version 5.3
+#                 Updated memory bus details for models:  N40, 41T/41W, C10,
+#                                                         380/3AT, 390/3BT, 59H,
+#                                                         R10, R20, R24
+#
+#  30-Aug-94:     WIT Version 5.2
+#                 Fixed the EOL problem with v5.1 (changed EOL from CRLF to LF)
+#
+#  26-Aug-94:     WIT Version 5.1
+#                 Added support for the Model 250-Turbo
+#                 Updated tech details for models:  N40, 41T/41W, C10, 380/3AT,
+#                                                   390/3BT, 59H, R10, R20, R24
+#
+#  03-Jun-94:     WIT Version 5.0
+#                 Added support for the Models:  N40, 41T/41W, C10, 380/3AT,
+#                                                390/3BT, 59H, R10, R20, R24
+#
+#  24-Sep-93:     WIT Version 4.1
+#                 Corrected a problem when totalling GB drives.
+#
+#  09-Sep-93:     WIT Version 4.0
+#                 Converted SPECmark89 to both SPECint92 and SPECfp92
+#                 Added Support for PowerPC/Model 250
+#                 Added support for Model 580H
+#                 Added support for Model 590
+#                 Added support for Model 990
+#                 Added support for Model 340H
+#                 Corrected Model 580 detail wrt integrated SCSI-1
+#                 Update M230 specs
+#
+#  06-Jun-93:     WIT Version 3.22
+#                 Added support for the Models 36T, 37T and 230
+#                 Corrected the spelling Tex's name.
+#
+#  18-May-93:     Corrected a bug (missing ") on line 263
+#                 WIT Version 3.2
+#
+#  05-Feb-93:     Corrected a mistake on the 570 speeds'n feeds
+#
+#                 Cannot trust the AIX 3.2.x version guessing stuff;
+#                 I give up - it has been deleted.
+#
+#  04-Feb-93:     It's 1993 so it must be time for WIT 3.0
+#                 Distributed to all prior requestors & I posted
+#                 a "come & get it" note to AIX6000 FORUM.
+#
+#  03-Feb-93:     Added support for the: M20, 355, 360, 365, 370,
+#                                        375, 520H, 570, 970b, 980b
+#
+#                 Updated some of the Linpack DP's and SPECmarks
+#
+#                 Dave Jaffe provided details to guess the AIX 3.2.x level
+#
+#                 Andrew Yoemans and Marc Pawliger made a compelling argument
+#                 to alter the TPUT CLEAR.  Done.
+#
+#                 Appropriated Marc Pawliger's idea to total the amount of
+#                 installed memory & disk.
+#
+#                 Victor Au suggested that the Installed Disk listing would be
+#                 more informative if it included the PV too.  Done.
+#
+#                 Jim Dunn found a bug when trying to distinguish between
+#                 a the 8-bit and 24-bit GTO's.  Fixed?
+#
+#  24-Sep-92:     WIT VERSION 1.26 sent to all prior requestors.
+#
+#                 Old bug crept back in.  550 MFLOPS & SPECS were in error;
+#                 corrected - again.
+#
+#  23-Sep-92:     WIT VERSION 1.25 sent to all prior requestors.
+#
+#                 Added support for the Models 580 and 980.
+#
+#                 Pete Fiorese's LSVG suggestion improves upon my DF'ing
+#
+#  09-Jul-92:     WIT VERSION 1.23 sent to all prior requestors.
+#
+#                 Support for Gt3/Lega added & tested.
+#
+#                 Discovered an AIX 3.2 "lscfg -l hd*" bug.
+#                 Priviledged users get the DESCRIPTION,
+#                 non-priviledged users get nuthin.  PMR:  4x101
+#
+#                 Workaround?  Must run WIT as the root user.
+#
+#  07-Jul-92:     WIT VERSION 1.22 sent to all prior requestors.
+#
+#                 Doesn't cope with long filesystem names well,
+#                 pushed the formatting out a bit more.
+#
+#                 Fixed a bug with zero-byte filesystems.
+#
+#                 Doesn't handle AFS correctly;  AWK dies 'cause $2 and $3
+#                 are run together (computational error).  Know what's wrong;
+#                 still thinking about the "best" fix.
+#
+#                 Improved the formatting of the disk and RAM sizings
+#
+#  26-Jun-92:     WIT VERSION 1.21 sent to all prior requestors
+#
+#  24-Jun-92:     A. Yeomans recommended a change to rmt's.  Done.
+#
+#  23-Jun-92:     V. Briones reports an awk problem when df'ing /dev/.  Fixed?
+#
+#  22-Jun-92:     WIT VERSION 1.2 AVAILABLE
+#
+#  21-Jun-92:     Altered/fixed the LVM and FileSystem formatting
+#
+#  17-Jun-92:     L. Albani contributed/inspired the LVM and FileSystem stuff;
+#                 but I'm unhappy with the formatting - heavily modified it.
+#
+#  15-Jun-92:     
+#
+#                       Gemini:   8-bit code added
+#                                24-bit code added and tested
+#
+#                       GTO:      8-bit code added
+#                                24-bit code added and tested
+#
+#                       Gt1:      8-bit code added and tested
+#                                 But what happens with the 1-bit
+#                                 and 4-bit Gt1's?
+#
+#  04-Jun-92:     V. Briones pointed out a bug with parsing CD-ROM's
+#
+#                 K. Schultz provided the necessary details to begin adding
+#                 support for graphics adapters.
+#
+#                        Sabine:   8-bit Sabine code added
+#                                 24-bit Sabine code added
+#                                 24-bit Z-buffer code added and tested
+#
+#                        Skyway:  Added and tested
+#
+#  01-Jun-92:     Consolidated case statement for TYPE 11 and 14 (Model 540)
+#
+#  28-May-92:     Jason Behm provided a tip to distinguish between the
+#                 530 and 730.
+#
+#                 Corrected the 970 Machine type;  it should be "63"
+#
+#                 Added memory bus performance information for the 530H
+#
+#                 Altered the default case to echo the machine type
+#                 that was unknown.
+#
+# find lscfg
+if [ -x /etc/lscfg ] 
+then {
+        export LSCFG=/etc/lscfg
+        export LSATTR=/etc/lsattr
+}
+fi
+
+if [ -x /usr/sbin/lscfg ]
+then {
+	export LSCFG=/usr/sbin/lscfg
+        export LSATTR=/usr/sbin/lsattr
+}
+fi
+
+case "$TERM" in
+	"dumb" | "dumb0" | "emacs")
+		;;
+
+	*)
+		tput clear
+		;;
+esac
+#
+UNIQ=`uname -m | cut -c3-10`
+TYPE=`echo $UNIQ | cut -c7-8`
+UNIQ=`echo $UNIQ | cut -c1-6`
+STRING="RS/6000 Model "
+
+#  Req'd because of how 'df -k' works for AIX v4.1.x
+KFLAG=""
+if [ `uname -v` = 4 ]
+	then KFLAG='-k'
+fi
+
+case $TYPE in
+
+  "10") MODEL="530 or 730"
+
+	if test `$LSCFG -v 2>/dev/null | grep GEMINI | wc -l` -eq 0
+	then
+		MODEL="530"
+	else
+		MODEL="730"
+		if test `$LSCFG -l hispdfbb* -v 2>/dev/null | grep ID | grep 6 | wc -l` -eq 0
+		then
+			MODEL="Model 730\n24-bit, double-buffered w/shading processor (Gemini)"
+		else
+			MODEL="Model 730\n8-bit, double-buffered w/shading processor (Gemini)"
+		fi
+	fi
+
+	VERBOSE="25 MHz clock\n64 KByte data cache\n8 KByte instr cache\n15.4 DP-MFLOPS\n46.1 SPECmarks\n1 Microchannel bus @ 40 MBytes/sec\n128-bit memory bus @ 400 MBytes/sec\n"
+        ;;
+
+  "11"|"14") MODEL="540"
+	VERBOSE="30 MHz clock\n64 KByte data cache\n8 KByte instr cache\n16.5 DP-MFLOPS\n38.7 SPECmarks\n1 Microchannel bus @ 40 MBytes/sec\n128-bit memory bus @ 480 MBytes/sec\n"
+        ;;
+
+  "18") MODEL="530H"
+	VERBOSE="33 MHz clock\n64 KByte data cache\n8 KByte instr cache\n20.5 DP-MFLOPS\n62.2 SPECmarks\n1 Microchannel bus @ 40 MBytes/sec\n128-bit memory bus @ 528 MBytes/sec\n"
+        ;;
+
+  "1C") MODEL="550"
+	VERBOSE="42 MHz clock\n64 KByte data cache\n8 KByte instr cache\n25.8 DP-MFLOPS\n78.9 SPECmarks\n1 Microchannel bus @ 40 MBytes/sec\n128-bit memory bus @ 667 MBytes/sec\n"
+        ;;
+
+  "02"|"20") MODEL="930"
+	VERBOSE="25 MHz clock\n64 KByte data cache\n8 KByte instr cache\n15.4 DP-MFLOPS\n46.1 SPECmarks\n1 Microchannel bus @ 40 MBytes/sec\n128-bit memory bus @ 400 MBytes/sec\n"
+        ;;
+
+  "2E") MODEL="950 or 950E"
+	VERBOSE="42 MHz clock\n64 KByte data cache\n8 KByte instr cache\n25.9 DP-MFLOPS\n79.4 SPECmarks\n1 Microchannel bus @ 40 MBytes/sec\n128-bit memory bus @ 667 MBytes/sec\n"
+        ;;
+
+  "30") MODEL="520, 740 or 741"
+	VERBOSE="20 MHz clock\n32 KByte data cache\n8 KByte instr cache\n9.2 DP-MFLOPS\n32.8 SPECmarks\n1 Microchannel bus @ 40 MBytes/sec\n64-bit memory bus @ 160 MBytes/sec\n"
+        ;;
+
+  "31") MODEL="320"
+	VERBOSE="20 MHz clock\n32 KByte data cache\n8 KByte instr cache\n9.2 DP-MFLOPS\n32.8 SPECmarks\n1 Microchannel bus @ 40 MBytes/sec\n64-bit memory bus @ 160 MBytes/sec\n"
+        ;;
+
+  "34") MODEL="520H"
+	VERBOSE="25 MHz clock\n32 KByte data cache\n8 KByte instr cache\n11.9 DP-MFLOPS\n45.1 SPECmarks\n1 Microchannel bus @ 40 MBytes/sec\n64-bit memory bus @ 160 MBytes/sec\n"
+        ;;
+
+  "35") MODEL="320H"
+	VERBOSE="25 MHz clock\n32 KByte data cache\n8 KByte instr cache\n11.8 DP-MFLOPS\n44.9 SPECmarks\n1 Microchannel bus @ 40 MBytes/sec\n64-bit memory bus @ 160 MBytes/sec\n"
+        ;;
+
+  "37") MODEL="340"
+	VERBOSE="33 MHz clock\n32 KByte data cache\n8 KByte instr cache\n15 DP-MFLOPS\n58.5 SPECmarks\n1 Microchannel bus @ 40 MBytes/sec\n64-bit memory bus @ 264 MBytes/sec\nIntegrated ethernet\nIntegrated SCSI\n"
+        ;;
+
+  "38") MODEL="350"
+	VERBOSE="42 MHz clock\n32 KByte data cache\n8 KByte instr cache\n18.8 DP-MFLOPS\n73.7 SPECmarks\n1 Microchannel bus @ 40 MBytes/sec\n64-bit memory bus @ 333 MBytes/sec\nIntegrated ethernet\nIntegrated SCSI\n"
+        ;;
+
+  "41") MODEL="220"
+	VERBOSE="33.3 MHz RSC\n8 KByte data cache\n0 KByte instr cache\n6.6 DP-MFLOPS\n20.4 SPECint92\n29.1 SPECfp92\n13.9 TPP-MFLOPS\n1 Microchannel bus @ 40 MBytes/sec\n32-bit memory bus @ 89 MBytes/sec\nIntegrated ethernet\nIntegrated SCSI\n"
+        ;;
+
+  "42") MODEL="41W or 41T"
+	VERBOSE="80 MHz 601\n32 KByte instr & data cache\n0/512 KBytes L2-cache\n78.8/88.1 SPECint92\n90.4/98.7 SPECfp92\n\n2.03/x.xx SPECint_base95\n2.58/x.xx SPECfp_base95\n\n21.8/24.9 SP-MFLOPS\n15.1/20.1 DP-MFLOPS\n40.5/41.9 TPP-MFLOPS\n\n1 Microchannel bus @ 80 MBytes/sec\n64-bit memory bus @ 610 MBytes/sec\nIntegrated: ethernet/SCSI-2SE\n"
+        ;;
+
+  "43") MODEL="M20"
+	VERBOSE="33.3 MHz RSC\n8 KByte data cache\n0 KByte instr cache\n6.6 DP-MFLOPS\n20.4 SPECint92\n29.1 SPECfp92\n13.9 TPP-MFLOPS\n1 Microchannel bus @ 40 MBytes/sec\n32-bit memory bus @ 89 MBytes/sec\nIntegrated ethernet\nIntegrated SCSI\n"
+        ;;
+
+  "46") MODEL="250"
+	VERBOSE="67 MHz 601\n32 KByte instr/data cache\n12.7 DP-MFLOPS\n62.6 SPECint92\n72.2 SPECfp92\n33.9 TPP-MFLOPS\n1 Microchannel bus @ 80 MBytes/sec\n64-bit memory bus @ 610 MBytes/sec\nIntegrated ethernet\nIntegrated SCSI-2\n"
+        ;;
+
+  "48") MODEL="C10"
+	VERBOSE="80 MHz 601\n32 KByte instr & data cache\n0/1 MByte L2-cache\n\n90.5 SPECint92\n100.8 SPECfp92\n\n 20.3 DP-MFLOPS\nxxx.x TPP-MFLOPS\n\nxxx/486 tpcC\n\n1 Microchannel bus @ 80 MBytes/sec\n64-bit memory bus @ 610 MBytes/sec\nIntegrated SCSI2\n"
+        ;;
+
+  "49") MODEL="250-Turbo"
+	VERBOSE="80 MHz 601\n32 KByte instr/data cache\n12.7 DP-MFLOPS\n62.6 SPECint92\n72.2 SPECfp92\n33.9 TPP-MFLOPS\n1 Microchannel bus @ 80 MBytes/sec\n64-bit memory bus @ 610 MBytes/sec\nIntegrated ethernet\nIntegrated SCSI-2\n"
+        ;;
+
+  "4D") MODEL="40P PowerPC"
+	VERBOSE="67 MHz 601\n32 KByte instr/data cache\n0/256 KByte L2-cache\n64.2/76.0 SPECint92\n52.4/62.1 SPECbase_int92\n68.3/77.2 SPECfp92\n62.4/71.6 SPECbase_fp92\n16.9/20.0 SP-MFLOPS\n9.5/13.7 Linpack DP MFLOPS\n46.7/49.2 TPP-MFLOPS\n1-PCI bus @ 66 MBytes/sec\n1 ISA bus @ 8.3 MBytes/sec\n64-bit memory bus @ 509 MBytes/sec\nIntegrated: ethernet/SCSI-SE2/audio\n"
+        ;;
+
+  "5C") MODEL="560"
+	VERBOSE="50 MHz clock\n64 KByte data cache\n8 KByte instr cache\n31.3 DP-MFLOPS\n92.3 SPECmarks\n1 Microchannel bus @ 40 MBytes/sec\n128-bit memory bus @ 800 MBytes/sec\n"
+        ;;
+
+  "57") MODEL="390, 3BT"
+	VERBOSE="67 MHz RS2\n64 KByte data cache\n32 KByte instr cache\n0/1 MByte L20cache\n\nxxx.x/114.3 SPECint92\nxxx.x/205.3 SPECfp92\n\n3.14/3.25 SPECint95\n7.50/7.71 SPECfp95\n\n3.00/3.12 SPECint_base95\n7.20/7.35 SPECfp_base95\n\n 73.0/ 73.0 SP-MFLOPS\n 52.9/ 55.1 DP-MFLOPS\n180.6/182.8 TPP-MFLOPS\n\n1 Microchannel bus @ 80 MBytes/sec\n64-bit memory bus @ 509 MBytes/sec\nIntegrated ethernet\nIntegrated SCSI2\n"
+        ;;
+
+  "58") MODEL="380, 3AT"
+	VERBOSE="59 MHz RS2\n64 KByte data cache\n32 KByte instr cache\n\n 99.3 SPECint92\n187.2 SPECfp92\n\n2.84 SPECint95\n7.20 SPECfp95\n\n2.71 SPECint_base95\n6.81 SPECfp_base95\n\n 64.7 SP-MFLOPS\n 49.7 DP-MFLOPS\n166.8 TPP-MFLOPS\n\n1 Microchannel bus @ 80 MBytes/sec\n64-bit memory bus @ 450 MBytes/sec\nIntegrated ethernet\nIntegrated SCSI2\n"
+        ;;
+
+  "59") MODEL="390H or 3CT"
+	VERBOSE="67 MHz RS2\n128 KByte data cache\n32 KByte instr cache\n0/2MB L2-cache\n\nxxx.x/130.2 SPECint92\nxxx.x/266.6 SPECfp92\n\nxxx.x/103.5 SPECbase_int92\nxxx.x/225.0 SPECbase_fp92\n\n x.xx/ 3.42 SPECint95\nxx.x/10.2 SPECfp95\n\nx.xx/3.29 SPECint_base95\nx.xx/9.61 SPECfp_base95\n\n 72.3/ 72.3 SP-MFLOPS\n132.8/133.6 DP-MFLOPS\n224.7/231.3 TPP-MFLOPS\n\n1 Microchannel bus @ 80 MBytes/sec\n128-bit memory bus @ 1 GBytes/sec\nIntegrated ethernet\nIntegrated Dual SCSI-2SE/FW\n"
+        ;;
+
+  "63") MODEL="970 or 970B"
+	VERBOSE="50 MHz RS1\n64 KByte data cache\n32 KByte instr cache\n31 DP-MFLOPS\n58.8 SPECint92\n108.9 SPECfp92\n83.6 TPP-MFLOPS\n1 (or 2) Microchannel busses @ 80 MBytes/sec each\n128-bit memory bus @ 800 MBytes/sec\n"
+        ;;
+
+  "64") MODEL="980 or 980B"
+	VERBOSE="63 MHz RS1\n64 KByte data cache\n32 KByte instr cache\n38.1 DP-MFLOPS\n73.3 SPECint92\n134.6 SPECfp92\n103.8 TPP-MFLOPS\n1 (or 2) Microchannel busses @ 80 MBytes/sec each\n128-bit memory bus @ 1 GByte/sec\n"
+        ;;
+
+  "66") MODEL="580"
+	VERBOSE="63 MHz RS1\n64 KByte data cache\n32 KByte instr cache\n38.1 DP-MFLOPS\n73.3 SPECint92\n134.6 SPECfp92\n103.8 TPP-MFLOPS\n1 Microchannel bus @ 80 MBytes/sec each\n128-bit memory bus @ 1 GByte/sec\nIntegrated SCSI-1\n"
+        ;;
+
+  "67") MODEL="570, R10"
+	VERBOSE="50 MHz RS1\n32 KByte data cache\n32 KByte instr cache\n22.2 DP-MFLOPS\n57.5 SPECint92\n99.2 SPECfp92\n73 TPP-MFLOPS\n1 Microchannel bus @ 80 MBytes/sec\n64-bit memory bus @ 400 MBytes/sec\n"
+        ;;
+
+  "47") MODEL="230"
+	VERBOSE="45.5 RSC\n32 KByte instr/data cache\n128KByte level 2 cache\n8.8 DP-MFLOPS\n28.5 SPECint92\n39.9 SPECfp92\n19.2 TPP-MFLOPS\n1 Microchannel bus @ 40 MBytes/sec\n32-bit memory bus @ 121.2 MBytes/sec\nIntegrated ethernet\nIntegrated SCSI-1\n"
+        ;;
+
+  "70") MODEL="590"
+	VERBOSE="66 MHz RS2\n256 KByte data cache\n32 KByte instr cache\n130.4 DP-MFLOPS\n117 SPECint92\n242.2 SPECfp92\n236.6 TPP-MFLOPS\n1 Microchannel bus @ 160 MBytes/sec\n256-bit memory bus @ 2.1 GBytes/sec\nIntegrated SCSI-1\nSCSI-2 controller\n"
+        ;;
+
+  "71") MODEL="580H"
+	VERBOSE="55 MHz RS2\n256 KByte data cache\n32 KByte instr cache\n101.1 DP-MFLOPS\n97.6 SPECint92\n203.9 SPECfp92\n197.2 TPP-MFLOPS\n1 Microchannel bus @ 80 MBytes/sec\n256-bit memory bus @ 1.8 GBytes/sec\nIntegrated SCSI-1\nSCSI-2 controller\n"
+        ;;
+
+  "72") MODEL="590H, R20"
+	VERBOSE="67 MHz RS2\n128 KByte data cache\n32 KByte instr cache\n1 MByte L2 cache\n132.0 DP-MFLOPS\n122.4 SPECint92\n250.7 SPECfp92\nx TPP-MFLOPS\n1 Microchannel bus @ 160 MBytes/sec\n128-bit memory bus @ 1 GByte/sec\nIntegrated SCSI2\n"
+        ;;
+
+  "75") MODEL="370, 37T or 375"
+	VERBOSE="63 MHz RS1\n32 KByte data cache\n32 KByte instr cache\n25.9 DP-MFLOPS\n70.3 SPECint92\n121.1 SPECfp92\n89.6 TPP-MFLOPS\n1 Microchannel bus @ 80 MBytes/sec\n64-bit memory bus @ 500 MBytes/sec\nIntegrated ethernet\nIntegrated SCSI-1\n"
+        ;;
+
+  "76") MODEL="360, 36T or 365"
+	VERBOSE="50 MHz RS1\n32 KByte data cache\n32 KByte instr cache\n22.2 DP-MFLOPS\n57.5 SPECint92\n99.2 SPECfp92\n73 TPP-MFLOPS\n1 Microchannel bus @ 80 MBytes/sec\n64-bit memory bus @ 400 MBytes/sec\nIntegrated ethernet\nIntegrated SCSI-1\n"
+        ;;
+
+  "77") MODEL="340H, 350, 355 or 550L"
+	VERBOSE="42 MHz RS1\n32 KByte data cache\n32 KByte instr cache\n18.8 DP-MFLOPS\n48.1 SPECint92\n83.3 SPECfp92\n61.3 TPP-MFLOPS\n1 Microchannel bus @ 80 MBytes/sec\n64-bit memory bus @ 333 MBytes/sec\nIntegrated ethernet\nIntegrated SCSI-1\n"
+        ;;
+
+  "79") MODEL="591"
+	VERBOSE="77 MHz RS2\nxxx KByte data cache\nxx KByte instr cache\nxxx.x DP-MFLOPS\nxxx SPECint92\nxxx.x SPECfp92\nxxx.x TPP-MFLOPS\n1 Microchannel busses @ 160 MBytes/sec\n256-bit memory bus @ 2.6 GBytes/sec\n"
+        ;;
+
+  "80") MODEL="990"
+	VERBOSE="67 MHz RS2\n256 KByte data cache\n32 KByte instr cache\n140.3 DP-MFLOPS\n126 SPECint92\n260.4 SPECfp92\n254.1 TPP-MFLOPS\n2 Microchannel busses @ 80 MBytes/sec\n256-bit memory bus @ 2.3 GBytes/sec\nIntegrated SCSI-1\nSCSI-2 controller\n"
+        ;;
+
+  "81"|"82") MODEL="R24 or (SP) Thin/120 node"
+	VERBOSE=""
+#	VERBOSE="72 MHz RS2\n128 KByte data cache\n32 KByte instr cache\n2 MByte L2 cache\n141.0 DP-MFLOPS\n134.1 SPECint92\n273.8 SPECfp92\nx TPP-MFLOPS\n\n 1470 tpcC\n\n2 Microchannel bus @ 160 MBytes/sec\n256-bit memory bus @ 2.4 GBytes/sec\nIntegrated SCSI2\n"
+        ;;
+
+  "89") MODEL="595 or (SP) Wide/135 node"
+	VERBOSE="135 MHz Power2\n128 KByte data cache\n 32 KByte instr cache\n0/0 MByte L2 cache\n\n 6.2 SPECint95\n17.6 SPECfp95\n\n 6.2 SPECint_base95\n17.6SPECfp_base95\n\nxxx.x SP-MFLOPS\nxxx.x DP-MFLOPS\n443.2 TPP-MFLOPS\nxxx tpm (est)\n2 Microchannel bus @ 160 MBytes/sec\n256-bit memory bus @ 2.2 MBytes/sec\nIntegrated SCSI-2SE\n"
+        ;;
+
+  "90") MODEL="C20"
+	VERBOSE="120 MHz 604\n16 KByte data cache\n16 KByte instr cache\n0/1 MByte L2 cache\n118.2/155.0 SPECint92\n116.5/150.2 SPECfp92\n95.2/124.3 SPECbase_int92\n106.4/137.2 SPECbase_fp92\n3.9 SPECint_base95\n3.5 SPECint_base95\n\n26.9/40.7 SP-MFLOPS\nx/22.7 DP-MFLOPS\n42.3/62.7 TPP-MFLOPS\n620 tpm (est)\n1 Microchannel bus @ x MBytes/sec\n64-bit memory bus @ x MBytes/sec\nIntegrated SCSI-2SE\n"
+        ;;
+
+  "A0"|"A1") MODEL=""
+	STRING=""
+	# MODEL="J30, J40 or J50"
+	# STRING="IBM RISC System/6000"
+#
+	MODEL=`$LSCFG -v | awk '/FRU.*C1D/ { C1D += 2 };
+                               /FRU.*C4D/ { C4D += 2 };
+                               /FRU.*X4D/ { X4D += 2 };
+                               END {;
+                                       if (C1D > 0) {;
+                                               MODEL = "J30 w/";
+                                               MODEL = MODEL C1D;
+                                               MODEL = MODEL "-601 @ 75 MHz";
+                                       }
+                                       if (C4D > 0) {;
+                                               MODEL = "J40 w/";
+                                               MODEL = MODEL C4D;
+                                               MODEL = MODEL "-604 @ 112 MHz";
+                                       }
+                                       if (X4D > 0) {;
+                                               MODEL = "J50 w/";
+                                               MODEL = MODEL X4D;
+                                               MODEL = MODEL "-604e @ 200 MHz";
+                                       }
+                                       printf("%s", MODEL) }'`
+#
+	case $MODEL in
+
+		"J30 w/2-601 @ 75 MHz" )
+			VERBOSE="\n 64 KByte instr cache\n 64 KByte data cache\n  1 MByte L2-cache\n\n 4282 SPECrate_int92\n 4492 SPECrate_fp92\n\n 1200 tpm (est)\n"
+			;;
+
+		"J30 w/4-601 @ 75 MHz" )
+			VERBOSE="\n128 KByte instr cache\n128 KByte data cache\n  2 MByte L2-cache\n\n 8430 SPECrate_int92\n 8689 SPECrate_fp92\n\n 2000 tpm (est)\n"
+			;;
+
+		"J30 w/6-601 @ 75 MHz" )
+			VERBOSE="\n192 KByte instr cache\n192 KByte data cache\n  3 MByte L2-cache\n\n12008 SPECrate_int92\n12644 SPECrate_fp92\n\n 2750 tpm (est)\n"
+			;;
+
+		"J30 w/8-601 @ 75 MHz" )
+			VERBOSE="\n256 KByte instr cache\n256 KByte data cache\n  4 MByte L2-cache\n\n16200 SPECrate_int92\n16324 SPECrate_fp92\n\n 3120 tpm (est)\n"
+			;;
+
+		"J40 w/2-604 @ 112 MHz" )
+			VERBOSE="\n 16 KByte instr cache\n 16 KByte data cache\n  1 MByte L2-cache\n\n 71.9 SPECint_rate95\n 57.3 SPECfp_rate95\n\n 64.9 SPECint_base_rate95\n 53.4 SPECfp_base_rate95\n\n 6.8 Rel OLTP\n"
+			;;
+
+		"J40 w/4-604 @ 112 MHz" )
+			VERBOSE="\n 16 KByte instr cache\n 16 KByte data cache\n  1 MByte L2-cache\n\n138.0 SPECint_rate95\n107.0 SPECfp_rate95\n\n129.0 SPECint_base_rate95\n102.0 SPECfp_base_rate95\n\n 10.0 Rel OLTP\n"
+			;;
+
+		"J40 w/6-604 @ 112 MHz" )
+			VERBOSE="\n 16 KByte instr cache\n 16 KByte data cache\n  1 MByte L2-cache\n\n205.0 SPECint_rate95\n159.0 SPECfp_rate95\n\n195.0 SPECint_base_rate95\n154.0 SPECfp_base_rate95\n\n 14.6 Rel OLTP\n"
+			;;
+
+		"J40 w/8-604 @ 112 MHz" )
+			VERBOSE="\n 16 KByte instr cache\n 16 KByte data cache\n  1 MByte L2-cache\n\n258.0 SPECint_rate95\n200.0 SPECfp_rate95\n\n244.0 SPECint_base_rate95\n189.0 SPECfp_base_rate95\n\n 19.2 Rel OLTP\n"
+			;;
+
+		"J50 w/2-604e @ 200 MHz" )
+			VERBOSE="\n 32 KByte instr cache\n 32 KByte data cache\n  2 MByte L2-cache\n\n137.0 SPECint_rate95\n92.6 SPECfp_rate95\n\n121.0 SPECint_base_rate95\n90.3 SPECfp_base_rate95\n\n 9.3 Rel OLTP\n"
+			;;
+
+		"J50 w/4-604e @ 200 MHz" )
+			VERBOSE="\n 32 KByte instr cache\n 32 KByte data cache\n  2 MByte L2-cache\n\n268.0 SPECint_rate95\n183.0 SPECfp_rate95\n\n244.0 SPECint_base_rate95\n176.0 SPECfp_base_rate95\n\n 17.0 Rel OLTP\n"
+			;;
+
+		"J50 w/6-604e @ 200 MHz" )
+			VERBOSE="\n 32 KByte instr cache\n 32 KByte data cache\n  2 MByte L2-cache\n\n396.0 SPECint_rate95\n261.0 SPECfp_rate95\n\n343.0 SPECint_base_rate95\n248.0 SPECfp_base_rate95\n\n 23.8 Rel OLTP\n"
+			;;
+
+		"J50 w/8-604e @ 200 MHz" )
+			VERBOSE="\n 32 KByte instr cache\n 32 KByte data cache\n  2 MByte L2-cache\n\n609.0 SPECint_rate95\n332.0 SPECfp_rate95\n\n445.0 SPECint_base_rate95\n320.0 SPECfp_base_rate95\n\n  30.6  Rel OLTP\n9166.13 tpmC\n    \$98/tmpC\n"
+			;;
+
+		*) VERBOSE="\nPerformance details are not yet available.\n"
+			;;
+	esac
+        ;;
+
+  "A3"|"A4") MODEL=""
+	STRING=""
+	# MODEL="R30, R40 or R50"
+	# STRING="IBM RISC System/6000"
+#
+	MODEL=`$LSCFG -v | awk '/FRU.*C1D/ { C1D += 2 };
+                                /FRU.*C4D/ { C4D += 2 };
+                                /FRU.*X4D/ { X4D += 2 };
+                               END {;
+                                       if (C1D > 0) {;
+                                               MODEL = "R30 w/";
+					       MODEL = MODEL C1D;
+					       MODEL = MODEL "-601 @ 75 MHz";
+				        };
+					if (C4D > 0) {;
+						MODEL = "R40 or SP High-node w/";
+						MODEL = MODEL C4D;
+						MODEL = MODEL "-604 @ 112 MHz";
+					};
+					if (X4D > 0) {;
+						MODEL = "R50 or SP High-node w/";
+						MODEL = MODEL X4D;
+						MODEL = MODEL "-604e @ 200 MHz";
+					};
+					printf("%s", MODEL) }'`
+#
+	case $MODEL in
+
+		"R30 w/2-601 @ 75 MHz" )
+			VERBOSE="\n 64 KByte instr cache\n 64 KByte data cache\n  1 MByte L2-cache\n\n 4282 SPECrate_int92\n 4492 SPECrate_fp92\n\n 1200 tpm (est)\n"
+			;;
+
+		"R30 w/4-601 @ 75 MHz" )
+			VERBOSE="\n128 KByte instr cache\n128 KByte data cache\n  2 MByte L2-cache\n\n 8430 SPECrate_int92\n 8689 SPECrate_fp92\n\n 2000 tpm (est)\n"
+			;;
+
+		"R30 w/6-601 @ 75 MHz" )
+			VERBOSE="\n192 KByte instr cache\n192 KByte data cache\n  3 MByte L2-cache\n\n12008 SPECrate_int92\n12644 SPECrate_fp92\n\n 2750 tpm (est)\n"
+			;;
+
+		"R30 w/8-601 @ 75 MHz" )
+			VERBOSE="\n256 KByte instr cache\n256 KByte data cache\n  4 MByte L2-cache\n\n16200 SPECrate_int92\n16324 SPECrate_fp92\n\n 3120 tpm (est)\n"
+			;;
+
+		"R40 or SP High-node w/2-604 @ 112 MHz" )
+			VERBOSE="\n 16 KByte instr cache\n 16 KByte data cache\n  1 MByte L2-cache\n\n 71.9 SPECint_rate95\n 57.3 SPECfp_rate95\n\n 64.9 SPECint_base_rate95\n 53.4 SPECfp_base_rate95\n\n xxxx tpm (est)\n"
+			;;
+
+		"R40 or SP High-node w/4-604 @ 112 MHz" )
+			VERBOSE="\n 16 KByte instr cache\n 16 KByte data cache\n  1 MByte L2-cache\n\n138.0 SPECint_rate95\n107.0 SPECfp_rate95\n\n129.0 SPECint_base_rate95\n102.0 SPECfp_base_rate95\n\n xxxx tpm (est)\n"
+			;;
+
+		"R40 or SP High-node w/6-604 @ 112 MHz" )
+			VERBOSE="\n 16 KByte instr cache\n 16 KByte data cache\n  1 MByte L2-cache\n\n205.0 SPECint_rate95\n159.0 SPECfp_rate95\n\n195.0 SPECint_base_rate95\n154.0 SPECfp_base_rate95\n\n xxxx tpm (est)\n"
+			;;
+
+		"R40 or SP High-node w/8-604 @ 112 MHz" )
+			VERBOSE="\n 16 KByte instr cache\n 16 KByte data cache\n  1 MByte L2-cache\n\n258.0 SPECint_rate95\n200.0 SPECfp_rate95\n\n244.0 SPECint_base_rate95\n189.0 SPECfp_base_rate95\n\n 5774 tpm (est)\n"
+			;;
+
+		"R50 or SP High-node w/2-604e @ 200 MHz" )
+			VERBOSE="\n 32 KByte instr cache\n 32 KByte data cache\n  2 MByte L2-cache\n\n137.0 SPECint_rate95\n92.6 SPECfp_rate95\n\n121.0 SPECint_base_rate95\n90.3 SPECfp_base_rate95\n\n 9.3 Rel OLTP\n"
+			;;
+
+		"R50 or SP High-node w/4-604e @ 200 MHz" )
+			VERBOSE="\n 32 KByte instr cache\n 32 KByte data cache\n  2 MByte L2-cache\n\n268.0 SPECint_rate95\n183.0 SPECfp_rate95\n\n244.0 SPECint_base_rate95\n176.0 SPECfp_base_rate95\n\n 17.0 Rel OLTP\n"
+			;;
+
+		"R50 or SP High-node w/6-604e @ 200 MHz" )
+			VERBOSE="\n 32 KByte instr cache\n 32 KByte data cache\n  2 MByte L2-cache\n\n396.0 SPECint_rate95\n261.0 SPECfp_rate95\n\n343.0 SPECint_base_rate95\n248.0 SPECfp_base_rate95\n\n 23.8 Rel OLTP\n"
+			;;
+
+		"R50 or SP High-node w/8-604e @ 200 MHz" )
+			VERBOSE="\n 32 KByte instr cache\n 32 KByte data cache\n  2 MByte L2-cache\n\n609.0 SPECint_rate95\n332.0 SPECfp_rate95\n\n445.0 SPECint_base_rate95\n320.0 SPECfp_base_rate95\n\n  30.6  Rel OLTP\n9166.13 tpmC\n    \$98/tmpC\n"
+			;;
+
+		*) VERBOSE="\nPerformance details are not yet available.\n"
+			;;
+	esac
+        ;;
+
+#  "A6") MODEL="G30"
+#	VERBOSE="75 MHz 601\n32 KByte instr & data cache\n512 KByte L2 cache std\n2-way SPECrate_int92: 3900\ntpm (est): 850\n4-way SPECrate_int92: 7500\ntpm (est): 1100\n"
+#        ;;
+
+  "A6" | "A7") MODEL=""
+	STRING=""
+	# MODEL="G30 or G40"
+	# STRING="IBM RISC System/6000"
+#
+	MODEL=`$LSCFG -v | awk '/FRU.*E1D/ { E1D += 2 };
+			       /FRU.*E4D/ { E4D += 2 };
+			       /FRU.*E4M/ { E4M += 1 };
+			       END {;
+				       if (E1D > 0) {;
+			                       MODEL = "G30 w/";
+					       MODEL = MODEL E1D;
+					       MODEL = MODEL "-601 @ 75 MHz";
+				       };
+				       if (E4D > 0) {;
+				               MODEL="G40 w/";
+					       MODEL = MODEL E4D;
+					       MODEL = MODEL "-604 @ 112 MHz";
+				       };
+				       if (E4M > 0) {;
+				               MODEL="G40 w/";
+					       MODEL = MODEL E4M;
+					       MODEL = MODEL "-604 @ 112 MHz";
+					};
+					printf("%s", MODEL) }'`
+
+#
+	case $MODEL in
+
+		"G30 w/2-601 @ 75 MHz" )
+			VERBOSE="\n xx KByte instr cache\n xx KByte data cache\n  x MByte L2-cache\n\n xxxx SPECrate_int92\n xxxx SPECrate_fp92\n\n xxxx tpm (est)\n"
+			;;
+
+		"G30 w/4-601 @ 75 MHz" )
+			VERBOSE="\nxxx KByte instr cache\nxxx KByte data cache\n  x MByte L2-cache\n\n xxxx SPECrate_int92\n xxxx SPECrate_fp92\n\n xxxx tpm (est)\n"
+			;;
+
+		"G40 w/1-604 @ 112 MHz" )
+			VERBOSE="\n 16 KByte instr cache\n 16 KByte data cache\n512 KByte L2-cache\n\n xxxx SPECrate_int92\n xxxx SPECrate_fp92\n\n xxxx tpm (est)\n"
+			;;
+
+		"G40 w/2-604 @ 112 MHz" )
+			VERBOSE="\n 16 KByte instr cache\n 16 KByte data cache\n512 KByte L2-cache\n\n xxxx SPECrate_int92\n xxxx SPECrate_fp92\n\n xxxx tpm (est)\n"
+			;;
+
+		"G40 w/3-604 @ 112 MHz" )
+			VERBOSE="\n 16 KByte instr cache\n 16 KByte data cache\n512 KByte L2-cache\n\n xxxx SPECrate_int92\n xxxx SPECrate_fp92\n\n xxxx tpm (est)\n"
+			;;
+
+		"G40 w/4-604 @ 112 MHz" )
+			VERBOSE="\n 16 KByte instr cache\n 16 KByte data cache\n512 KByte L2-cache\n\n xxxx SPECrate_int92\n xxxx SPECrate_fp92\n\n xxxx tpm (est)\n"
+			;;
+
+		*) VERBOSE="\nPerformance details are not yet available.\n"
+			;;
+	esac
+        ;;
+
+  "F0") MODEL="N40"
+	VERBOSE="50 MHz 601\n32 KByte instr & data cache\n9 DP-MFLOPS\n41.7 SPECint92\n51.0 SPECfp92\nx TPP-MFLOPS\n64-bit memory bus @ 382 MBytes/sec\nIntegrated SCSI2\nIntegrated BR-ISDN"
+        ;;
+
+  "91") MODEL="42T or 42W or PowerSeries 830"
+	VERBOSE="120 MHz 604\n16 KByte instr cache, 16 KByte data cache\n0/512 KBytes L2-cache\n118.2/150.2 SPECint92\n116.5/146.5 SPECfp92\n95.2/121.8 SPECbase_int92\n106.4/133.5 SPECbase_fp92\n\n3.21/4.01 SPECint95\n2.74/3.53 SPECfp95\n\n2.93/3.75 SPECint_base95\n2.57/3.37 SPECfp_base95\n\n26.9/39.7 SP-MFLOPS\nxx.x/22.4 DP-MFLOPS\n42.3/60.9 TPP-MFLOPS\n\n1 PCI bus @ 66 MBytes\sec\n64-bit memory bus @ xxx MBytes/sec\nIntegrated SCSI2\n"
+        ;;
+
+#  "4C") MODEL="43P or PowerSeries 850 or Thinkpad 820 or Thinkpad 850"
+#	VERBOSE="100/120/133/166/200 MHz 604\n 16/ 16/ 16 KByte L1 instr cache\n 16/ 16/ 16 KBytes L1 data cache\n256/512/512 KByte L2-cache\n\n128.1/157.9/176.4 SPECint92\n120.2/139.2/156.5 SPECfp92\n\n104.3/127.1/146.8 SPECbase_int92\n104.8/129.0/146.1 SPECbase_fp92\n\n3.59/4.24/4.72 SPECint95\n3.20/3.41/3.76 SPECfp95\n\n3.36/4.01/4.55 SPECint_base95\n3.04/3.23/3.59 SPECfp_base95\n\n27.9/48.2/51.7 SP-MFLOPS\n    /25.5/27.8 DP-MFLOPS\n56.4/61.0/67.5 TPP-MFLOPS\n\n    /    /     tpcC\n\n64-bit memory bus @ 509 MBytes/sec\n1-PCI bus @ 132 MBytes/sec\n1-ISA bus @ 8.3 MBytes/sec\nIntegrated: audio/ethernet/SCSI2\n"
+#	;;
+
+  "4C") MODEL="43P, F40, F50, H10, PwrSeries 850, TP-820 or TP-850"
+	VERBOSE="\nMany possible models, many different configs, many performance levels.\n"
+        ;;
+
+  "C0") MODEL="E20 (100 MHz) or E30 (133 MHz)"
+	VERBOSE="100/133 MHz 604\n16 KByte instr\n16 KByte data cache\n512 KByte L2-cache\n139.6/x SPECint92\n131.6/x SPECfp92\n110.9/x SPECbase_int92\n121.1x SPECbase_fp92\n3.67/4.74 SPECint95\n3.13/3.49 SPECfp95\n3.43/4.56 SPECint_base95\n3.06/3.34 SPECfp_base95\n39.5/x SP-MFLOPS\n23.5/x DP-MFLOPS\n62.3/x TPP-MFLOPS\n735/850 tpm (est)\n64-bit memory bus @ xxx MBytes/sec\n 5 PCI slots @ 66 MBytes/sec\n 2 AT/ISA bus slots @ 8.33 MBytes/sec\n1 PCI/AT/ISA combo slot\nIntegrated SCSI-2SE-F/W\n"
+        ;;
+
+  "C4") MODEL="F30"
+	VERBOSE="133 MHz 604\n 16 KByte instr\n 16 KByte data cache\n512 KByte L2-cache\n\n4.74 SPECint95\n3.49 SPECfp95\n\n4.56 SPECint_base95\n3.34 SPECfp_base95\n\n850 tpm (est)\n\n64-bit memory bus @ xxx MBytes/sec\n5 PCI slots @ 66 MBytes/sec\n2 AT/ISA bus slots @ 8.33 MBytes/sec\n1 PCI/AT/ISA combo slot\nIntegrated SCSI-2SE-F/W\n"
+        ;;
+#
+     *) MODEL="Error:  This system type ("$TYPE") is unrecognized, please get the latest edition of WIT:\n\n     Douglas R. Ranz\n     DETVMIC1(DRANZ)\n     IBBMAIL(USIB2QXH)\n     \n     CIS:  104356,2220\n     dranz@vnet.ibm.com\n"
+
+esac
+
+echo `hostname`
+echo `uname -a`
+echo "$STRING$MODEL"
+echo "Hardware ID:  $UNIQ"
+echo "$VERBOSE"
+
+OLDLANG=$LANG				# we do this 'cause LSDEV may be broken
+LANG=En_US
+
+lsdev -C -c adapter > /tmp/DEV		# get available adapter list
+
+LANG=$OLDLANG				# undo the hack required by lsdev
+
+SABINE=`grep Available < /tmp/DEV | grep hiprfmge | wc -l`
+GTO=`grep Available < /tmp/DEV | grep hispd3d | wc -l`
+SKYWAY=`grep Available < /tmp/DEV | grep gda | wc -l`
+PED=`grep Available < /tmp/DEV | grep Gt4 | wc -l`
+LEGA=`grep Available < /tmp/DEV | grep Gt3 | wc -l`
+MSLA=`grep Available < /tmp/DEV | grep 5085`
+
+#  Options for Gt3/LEGA adapter
+#  ppr0              00-04             POWER Gt3 Midrange Entry Graphics
+
+if test "$LEGA" -eq 1
+then
+	echo `$LSCFG -l ppr* -v 2>/dev/null | grep Gt3 | cut -c39-80` "(Lega)\n"
+fi
+
+#  Options for Skyway adapter
+#  gda0         8-bit 2D Color Graphics Adapter
+
+if test "$SKYWAY" -eq 1
+then
+	echo "8-bit 2D Color Graphics Adapter (Skyway)\n"
+fi
+
+#  Options for Sabine adapter
+#  hiprfmge0    High Performance 3D Color Graphics Processor
+#  hiprfmrv0    Color Graphics Video Card
+#  hiprfmev0    24-bit Color Graphics frame buffer
+#  hiprfmzb0    24-bit Z-buffer option card
+
+if test "$SABINE" -eq 1
+then
+	OPTION1=`grep hiprfmev < /tmp/DEV | wc -l`
+	if test "$OPTION1" -eq 1
+	then
+		echo "24-bit 3D High-Performance Color Graphics Adapter\c"
+
+		if test `grep hiprfmzb0 /tmp/DEV | wc -l` -eq 1
+		then
+			echo " & 24-bit Z-buffer\c"
+		fi
+	else
+		echo "8-bit 3D High-Performance Color Graphics Adapter\c"
+	fi
+	echo " (Sabine)\n"
+fi
+
+#  Options for GTO adapter
+#  hispd3d0          High Speed 3D Graphics Accelerator
+#  hispdmag0         CVME interface card
+#  hispdgcp0         Graphics control processor card
+#  hispdshp0         Shading processor card
+#  hispddrp0         Drawing processor card
+#  hispdfbb0         Pixel memory card
+
+if test `$LSCFG -v -l hispd* 2>/dev/null | grep TAURUS | wc -l` -gt 0
+then
+
+#	if test `$LSCFG -l hispdfbb* 2>/dev/null | wc -l` -gt 0
+	if test `$LSCFG -l hispdfbb* -v 2>/dev/null | grep ID | grep 6 | wc -l` -eq 0
+	then
+		echo "GTO Model 2 (24-bit, double-buffered w/shading processor\c"
+	else
+		echo "GTO Model 1 (8-bit, double-buffered w/o shading processor\c"
+	fi
+	echo " (Taurus)\n"
+fi
+
+#  Options for Gt1 adapter
+#   sga0              Color Graphics Display Adapter
+
+if test `$LSCFG -v 2>/dev/null | grep sga | wc -l` -gt 0
+then
+	echo "Gt1:  8-bit 2D Color Graphics Adapter\n" 
+fi
+
+\rm /tmp/DEV
+
+# Installed hard disks 
+echo "SCSI Disk Configs:\n"
+$LSCFG -l hd* | grep -v SSA | tr -d "(" | tr -d ")" | grep [0-9] | sort -n -k1.8 | awk '
+	{ if($4 == "MB") { 
+		sum += $3
+		printf("%8s: %6s %s %s %s %s %s %s\n",$1,$3,$4,$5,$6,$7,$8,$9)
+	  }
+	  if($4 == "GB") {
+		sum += $3 * 1024
+		printf("%8s: %6s %s %s %s %s %s %s\n",$1,$3,$4,$5,$6,$7,$8,$9)
+          }
+	  if($9 == "MB") {
+		sum += $8
+		printf("%8s: %6s %s %s %s %s %s %s\n",$8,$9,$1,$3,$4,$5,$6,$7)
+          }
+	  if($9 == "GB") {
+		sum += $8 * 1024
+		printf("%8s: %6s %s %s %s %s %s %s\n",$8,$9,$1,$3,$4,$5,$6,$7)
+          }
+        };
+        END {
+		printf("           -----\n", sum)
+		printf("          %6.1f GBytes\n\n", sum/1024) }'
+
+if test `$LSCFG -l pd* 2> /dev/null | wc -l` -gt 0
+then
+	echo "SSA Disk Configs:\n"
+
+	if [ -e /tmp/.pdisk.lst ]
+	then {
+		rm /tmp/.pdisk.lst
+	}
+	fi
+	#
+	for pdisk in `$LSCFG -l pd* | awk '/pdisk/ { print $1 }'`
+	do
+		$LSATTR -El $pdisk | awk -v PDISK=$pdisk '/connwhere_shad/ { printf("%s %s\n",$2,PDISK) }' >> /tmp/.pdisk.lst
+	done
+	#
+	sort /tmp/.pdisk.lst > /tmp/.pdisk.foo
+	mv /tmp/.pdisk.foo /tmp/.pdisk.lst
+	
+	if [ -e /tmp/.hdisk.lst ]
+	then {
+		rm /tmp/.hdisk.lst
+	}
+	fi
+	#
+	for hdisk in `$LSCFG -l hd* | awk '/hdisk/ { print $1 }'`
+	do
+		$LSATTR -El $hdisk | awk -v HDISK=$hdisk '/connwhere_shad/ { printf("%s %s\n",$2,HDISK) }' >> /tmp/.hdisk.lst
+	done
+	#
+	sort /tmp/.hdisk.lst > /tmp/.hdisk.foo
+	mv /tmp/.hdisk.foo /tmp/.hdisk.lst
+	#
+	join /tmp/.pdisk.lst /tmp/.hdisk.lst | awk '{ printf("%s %s\n",$2,$3) }' | sort > /tmp/.pdisk.xref
+	join /tmp/.hdisk.lst /tmp/.pdisk.lst | awk '{ printf("%s %s\n",$2,$3) }' | sort > /tmp/.hdisk.xref
+	# rm /tmp/.hdisk.lst /tmp/.pdisk.lst
+
+	$LSCFG -l pd* | grep pdisk | sed s'/^[ ][ ]*//' | sort | join - /tmp/.pdisk.xref | awk ' {
+	  	if($3 == "1GB") {
+			$3 = "1.1 GB"
+			sum += 1.1
+		}	
+	  	if($3 == "2GB") {
+			 $3 = "2.2 GB"
+			 sum += 2.2
+		}
+	  	if($3 == "4GB") {
+			$3 = "4.5 GB"
+			sum += 4.5
+		}
+	  	if($3 == "9GB") {
+			$3 = "9.1 GB"
+			sum += 9.1
+		}
+		printf("%8s =%8s:   %4s %s %s %s %s %s\n",$1,$9,$3,$4,$5,$6,$7,$8);
+        	};
+        	END { printf("                    -----\n", sum)
+        	      if ( sum < 1000 ) {
+        	      	printf("                   %6.1f GBytes\n\n", sum)
+		      }
+		      else {
+        	      	printf("                   %6.1f TBytes\n\n", sum)
+		      }
+		}' 
+fi
+
+# Page Space(s)
+lsps -a | awk 'BEGIN {
+	getline;
+	print $0
+	print "----------  ---------------   ------------  ------   -----  ------  ----  ----"
+	}
+	{						# ON EVERY RECORD
+		print $0
+		sum += $4
+	}
+	END {
+		print "                                            ------"
+		if ( sum < 1000 ) {
+			printf("                                             %5d MBytes\n\n", sum)
+		}
+		else {
+			printf("                                             %5d GBytes\n\n", sum/1000)
+		}
+	}'
+
+# Volume Group, LVM and Filesystems
+for vg in `lsvg`
+do
+
+	echo "Volume Group:  "$vg
+        echo "     PP Size:  "`lsvg $vg | grep "PP SIZE" | awk '{ print $6 }'`" MBytes/PP"
+
+	for pv in `lsvg -p $vg | sed 1,2d | awk '{ print $1 }'`
+	do
+		echo "$pv   `lspv $pv | fgrep 'FREE PP' | tr -d ":" | sed 's/        //'`" | awk '{
+		printf("    %8s:  %s %s %s %s %s %s %s\n",$1,$4,$2,$3,$5,$6,$7,$8)
+		}'
+	done | awk '{
+		gsub(/\(/,"",$5)
+		gsub(/\)/,"",$6)
+		sum += $5
+		printf("     %8s%5s %s %s =%6s MB\n",$1,$2,$3,$4,$5)
+		}
+		END {
+		printf("                             ------\n")
+		printf("                             %6s MBytes\n",sum)
+# drr #
+		}'
+
+	echo "\nFilesystems:                    Total (KB)   Free (KB)   %Free"
+	echo "                                ----------   ---------   -----"
+
+	   lsvg -l $vg | grep "jfs " | awk '{ print $7 }' | xargs -n1 df $KFLAG | grep -v Filesystem | awk '
+		$2 > 0 {
+			printf ("%-30s%12d%12d%7d%%\n",$7,$2,$3,$3/$2*100)
+			total += $2
+			free += $3
+		}
+		END {
+			print("                                ----------   ---------")
+			printf("                                %10d   %9d\n\n",total,free)
+		}'
+done
+
+# Installed Memory 
+echo "Memory Config:\n"
+for mem in `$LSCFG -v | grep mem[0-7] | cut -c3-6`
+do
+        $LSATTR -l $mem -E | awk '/^size/ { printf("%4d MByte memory card\n", $2);
+ }'
+done
+
+$LSATTR -l sys0 -E | awk '/realmem/ { printf("----\n%4d MBytes Total Memory",
+ $2/1024); }'
+ 
+# Report usable memory using rmss
+if [ -x /usr/bin/rmss ]
+then {
+        echo ";  \c"
+        /usr/bin/rmss -p
+}
+else {
+	echo ""
+}
+fi
+
+# # Installed tape drives
+# if test `$LSCFG -l rmt* 2>/dev/null | wc -l` -gt 0
+# then
+#     $LSCFG -l rmt* 2>/dev/null | cut -c3-10,39-79 | sed "s/^[ ]*//" | sed "s/[ ]*$//" | sed "s/    /:   /" | grep [0-9]
+#     echo ""
+# fi
+# 
+# # Installed CD-ROMs
+# if test `$LSCFG -l cd* 2>/dev/null | wc -l` -gt 0
+# then
+# 	$LSCFG -l cd* 2>/dev/null | cut -c39-79 | sed "s/^[ ]*//" | sed "s/[ ]*$//" | grep CD
+# 	echo ""
+# fi
+#
+echo "\nSlot Utilization:\n"
+#
+case $TYPE in
+	"A3")	# R30 or R40
+		$LSCFG -v | grep [0]."-0"[1-9] | egrep -vi "(proc)|(cache)|(SSA)"
+		;;
+		
+	"A6" | "A7")	# G30
+		$LSCFG -v | grep [0]."-0"[1-9] | egrep -vi "(00-07)|(proc)|(cache)|(SSA)"
+		;;
+		
+	"C4")	# F30
+		$LSCFG -v | grep "04-" | sort -b -k2 | egrep -vi "SSA"
+		;;
+
+	"4C")	# 43P or PowerSeries 850 or Thinkpad 820 or Thinkpad 850
+		# or F40
+		$LSCFG -v | grep [0][^0]"-" | egrep -vi "SSA" | sort -b -k2
+		;;
+
+	*)	# Default
+		$LSCFG -v | grep [0]."-0"[S1-8] | egrep -vi "(proc)|(cache)|(SSA)"
+		;;
+esac
+#
+#  The End.
+

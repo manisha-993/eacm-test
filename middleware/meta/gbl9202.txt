@@ -1,0 +1,957 @@
+@name=GBL9202
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+ This guy inserts a new record into the trsNavigateTable based
+ upon information in the DynaSearch Table
+
+$Log: gbl9202.txt,v $
+Revision 1.16  2014/04/15 18:11:53  rick
+fixing code problem
+
+Revision 1.15  2014/04/11 15:14:57  rick
+update
+
+Revision 1.14  2014/04/08 16:14:21  rick
+new SP for search child and relator function.
+
+
+@results=1
+@desc=insert a record into the trsnavigateTable from DynaSearch
+@parmstyle=GENERAL
+@sql
+
+// begin sql tag
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9202.txt,v 1.16 2014/04/15 18:11:53 rick Exp $";
+sqlint32 iCount;
+sqlint32 ii;
+sqlint32 i;
+sqlint32 iStepCount;
+sqlint32 iNavCount;
+sqlint32 iNavDelCount;
+sqlint32 idsCount;
+sqlint32 iStop;
+sqlint32 lCount;
+sqlint32 lStep;
+sqlint32 iFound;
+char tmpEntityType[33];
+char tmpAttCode[33];
+char tmpAttType[1];
+char tmpAttValue[255];
+EXEC SQL END DECLARE SECTION;
+
+char actmpEntityType[50][33];
+char actmpAttCode[50][33];
+char actmpAttType[50][1];
+char actmpAttValue[50][255];
+
+
+EXEC SQL DECLARE NavCur CURSOR FOR
+SELECT
+ Entity1Type
+,Entity1ID
+,EntityType
+,EntityID
+,Entity2Type
+,Entity2ID
+FROM @t_schema.trsNavigate
+WHERE
+    Level = 0
+AND SessionID = :SessionID
+AND Enterprise = :Enterprise
+;
+
+EXEC SQL DECLARE curDynaSearchEnt CURSOR FOR
+SELECT DISTINCT
+    ds.EntityType
+  , ds.AttributeCode
+  , ds.AttributeType
+  , ds.AttributeValue
+  FROM @t_schema.DynaSearch ds
+  JOIN @t_schema.MetaEntity me on me.EntityType=ds.EntityType and me.Enterprise=ds.Enterprise
+  WHERE
+      ds.SessionID = :SessionID
+  AND ds.Enterprise = :Enterprise
+  AND ds.Step = :ii
+  AND me.EntityClass='Entity';
+
+EXEC SQL DECLARE curDynaSearchRel CURSOR FOR
+SELECT DISTINCT
+    ds.EntityType
+  , ds.AttributeCode
+  , ds.AttributeType
+  , ds.AttributeValue
+  FROM @t_schema.DynaSearch ds
+  JOIN @t_schema.MetaEntity me on me.EntityType=ds.EntityType and me.Enterprise=ds.Enterprise
+  WHERE
+      ds.SessionID = :SessionID
+  AND ds.Enterprise = :Enterprise
+  AND ds.Step = :ii
+  AND me.EntityClass='Relator';
+
+@execute
+
+// OK.. first we want to get a count of how many search
+// records are in the dyna search
+
+iCount = 0;
+
+EXEC SQL SELECT MAX(ds.Step) INTO :iCount
+FROM @t_schema.DynaSearch ds
+JOIN @t_schema.MetaEntity me on me.EntityType=ds.EntityType and me.Enterprise=ds.Enterprise
+WHERE
+    ds.Enterprise = :Enterprise
+AND ds.SessionID = :SessionID
+AND me.EntityClass='Entity'
+;
+
+EXEC SQL COMMIT WORK;
+
+// OK.. Lets loop and insert total counts here
+
+// Now process the data
+iStop = 0;  // Lets assume we keep going!
+
+
+for (ii = 1; ii <= iCount ;ii++) {
+  iStepCount = 0;
+  // Lets pull the record in first
+  idsCount = 1;
+  EXEC SQL OPEN curDynaSearchEnt;
+  do {
+    EXEC SQL FETCH curDynaSearchEnt INTO :tmpEntityType, :tmpAttCode, :tmpAttType, :tmpAttValue;
+    if (SQLCODE != 0) break;
+    strcpy(actmpEntityType[idsCount],tmpEntityType);
+    strcpy(actmpAttCode[idsCount],tmpAttCode);
+    strcpy(actmpAttType[idsCount],tmpAttType);
+    strcpy(actmpAttValue[idsCount++],tmpAttValue);
+  }   while (1);
+  EXEC SQL CLOSE curDynaSearchEnt WITH RELEASE;
+  EXEC SQL COMMIT WORK;
+  
+  iFound = 0;
+  for (i =1; i < idsCount; i++) {
+      strcpy(tmpEntityType, actmpEntityType[i]);
+      strcpy(tmpAttCode, actmpAttCode[i]);
+      strcpy(tmpAttType, actmpAttType[i]);
+          strcpy(tmpAttValue, actmpAttValue[i]);
+           
+      if (tmpAttType[0] == 'F') {
+        EXEC SQL SELECT COUNT(F.EntityID)  INTO :iStepCount
+        FROM @t_schema.Flag F
+        INNER JOIN @t_schema.trsNavigate Q ON
+              Q.Enterprise = :Enterprise
+        AND Q.SessionID = :SessionID
+        AND Q.Entity2Type = F.EntityType
+        AND Q.Entity2ID = F.EntityID
+        WHERE
+              F.Enterprise = :Enterprise
+        AND F.AttributeCode = :tmpAttCode
+        AND F.AttributeValue = :tmpAttValue
+        AND F.EntityType = :tmpEntityType
+            AND :ValOn BETWEEN F.ValFrom and F.ValTo
+        AND :EffOn BETWEEN F.EffFrom and F.EffTo
+        ;
+      } else {
+        if (iLike == 1) {
+          EXEC SQL SELECT COUNT(T.EntityID)  INTO :iStepCount
+          FROM @t_schema.Text T
+          INNER JOIN @t_schema.trsNavigate Q ON
+                Q.Enterprise = :Enterprise
+          AND Q.SessionID = :SessionID
+          AND Q.Entity2Type = T.EntityType
+          AND Q.Entity2ID = T.EntityID
+          WHERE
+                T.Enterprise = :Enterprise
+          AND T.AttributeCode = :tmpAttCode
+          AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+          AND T.EntityType = :tmpEntityType
+                AND :ValOn BETWEEN T.ValFrom and T.ValTo
+            AND :EffOn BETWEEN T.EffFrom and T.EffTo
+          ;
+        } else {
+          EXEC SQL SELECT COUNT(T.EntityID)  INTO :iStepCount
+          FROM @t_schema.Text T
+          INNER JOIN @t_schema.trsNavigate Q ON
+                Q.Enterprise = :Enterprise
+          AND Q.SessionID = :SessionID
+          AND Q.Entity2Type = T.EntityType
+          AND Q.Entity2ID = T.EntityID
+          WHERE
+                T.Enterprise = :Enterprise
+          AND T.AttributeCode = :tmpAttCode
+          AND T.AttributeValue = :tmpAttValue
+          AND T.EntityType = :tmpEntityType
+                AND :ValOn BETWEEN T.ValFrom and T.ValTo
+            AND :EffOn BETWEEN T.EffFrom and T.EffTo
+          ;
+        }
+      }
+
+      if (idsCount == 1) {
+        if (iStepCount == 0) {
+           iFound = 0;
+           break;              
+        }
+      } else {
+          // for the same step (or condition), 
+          if (iFound == 0) {
+              iFound = iStepCount;
+            }
+      }
+
+    EXEC SQL UPDATE @t_schema.DynaSearch SET SEARCHCOUNT = :iStepCount
+    WHERE
+          Step = :ii
+    AND SessionID = :SessionID
+    AND Enterprise = :Enterprise
+    AND AttributeCode = :tmpAttCode
+    AND AttributeValue = :tmpAttValue
+    AND EntityType = :tmpEntityType
+    ;   
+  }
+
+  // for a step, break if found no matching     
+  if (iFound == 0) {
+   break;
+   iStop = 1;
+  }
+  
+  // for (or condition) , remove the row that find no matching entities.
+  EXEC SQL DELETE from @t_schema.DynaSearch     
+  WHERE
+      Step = :ii
+  AND SessionID = :SessionID
+  AND Enterprise = :Enterprise
+  AND SearchCount = 0
+  ;  
+  
+  // Good enough .. if you find 50 or less in the count .. then we can stop
+  // defaults counts to 99
+  if (iFound < 51) {
+    break;
+  }  
+}
+
+EXEC SQL COMMIT WORK;
+
+
+if (iStop == 0) {
+
+    iCount = 0;
+
+  EXEC SQL SELECT MAX(ds.Step) INTO :iCount
+  FROM @t_schema.DynaSearch ds
+  JOIN @t_schema.MetaEntity me on me.EntityType=ds.EntityType and me.Enterprise=ds.Enterprise
+  WHERE
+    ds.Enterprise = :Enterprise
+  AND ds.SessionID = :SessionID
+  AND me.EntityClass='Entity'
+  ;
+
+  EXEC SQL COMMIT WORK;
+
+  // O.K.  lets do the inserts
+  //
+
+  for (ii = 1; ii <= iCount ;ii++) {
+
+    // Lets pull the record in first
+      idsCount = 1;
+      EXEC SQL OPEN curDynaSearchEnt;
+      do {
+        EXEC SQL FETCH curDynaSearchEnt INTO :tmpEntityType, :tmpAttCode, :tmpAttType, :tmpAttValue;
+        if (SQLCODE != 0) break;
+        strcpy(actmpEntityType[idsCount],tmpEntityType);
+        strcpy(actmpAttCode[idsCount],tmpAttCode);
+        strcpy(actmpAttType[idsCount],tmpAttType);
+        strcpy(actmpAttValue[idsCount++],tmpAttValue);
+      }   while (1);
+      EXEC SQL CLOSE curDynaSearchEnt WITH RELEASE;
+      EXEC SQL COMMIT WORK;
+      
+      for (i =1; i < idsCount; i++) {
+      
+          strcpy(tmpEntityType, actmpEntityType[i]);
+          strcpy(tmpAttCode, actmpAttCode[i]);
+          strcpy(tmpAttType, actmpAttType[i]);
+          strcpy(tmpAttValue, actmpAttValue[i]);
+
+        if (ii == 1) {
+
+          if (tmpAttType[0] == 'F') {
+
+                    EXEC SQL INSERT INTO @t_schema.trsEntities
+                    SELECT DISTINCT
+                     :Enterprise
+                    ,:ii
+                    ,:SessionID
+                    , F.ENTITYID
+                    , F.EntityType
+                    FROM @t_schema.Flag F
+                  INNER JOIN @t_schema.trsNavigate Q ON
+                    Q.Enterprise = :Enterprise
+                AND Q.SessionID = :SessionID
+                AND Q.Entity2Type = F.EntityType
+                AND Q.Entity2ID = F.EntityID
+                    WHERE
+                        F.Enterprise = :Enterprise
+                    AND F.AttributeCode = :tmpAttCode
+                    AND F.AttributeValue = :tmpAttValue
+                    AND F.EntityType = :tmpEntityType
+                    AND :ValOn BETWEEN F.ValFrom and F.ValTo
+                AND :EffOn BETWEEN F.EffFrom and F.EffTo
+                    ;
+
+                } else {
+
+                    if (iLike == 1) {
+                      EXEC SQL INSERT INTO @t_schema.trsEntities
+                      SELECT DISTINCT
+                       :Enterprise
+                      ,:ii
+                      ,:SessionID
+                      , T.ENTITYID
+                      , T.EntityType
+                      FROM @t_schema.Text T
+                      INNER JOIN @t_schema.trsNavigate Q ON
+                          Q.Enterprise = :Enterprise
+                      AND Q.SessionID = :SessionID
+                    AND Q.Entity2Type = T.EntityType
+                    AND Q.Entity2ID = T.EntityID
+                    WHERE
+                        T.Enterprise = :Enterprise
+                    AND T.AttributeCode = :tmpAttCode
+                    AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+                    AND T.EntityType = :tmpEntityType
+                    AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                    AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                    ;
+                    } else {
+
+                      EXEC SQL INSERT INTO @t_schema.trsEntities
+                      SELECT DISTINCT
+                       :Enterprise
+                      ,:ii
+                      ,:SessionID
+                      , T.ENTITYID
+                      , T.EntityType
+                      FROM @t_schema.Text T
+                      INNER JOIN @t_schema.trsNavigate Q ON
+                          Q.Enterprise = :Enterprise
+                      AND Q.SessionID = :SessionID
+                        AND Q.Entity2Type = T.EntityType
+                        AND Q.Entity2ID = T.EntityID
+                        WHERE
+                          T.Enterprise = :Enterprise
+                        AND T.AttributeCode = :tmpAttCode
+                    AND T.AttributeValue = :tmpAttValue
+                  AND T.EntityType = :tmpEntityType
+                        AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                    AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                    ;
+                    }
+                }
+
+          EXEC SQL COMMIT WORK;
+
+        } else {
+
+          if (tmpAttType[0] == 'F') {
+
+                    EXEC SQL INSERT INTO @t_schema.trsEntities
+                    SELECT DISTINCT
+                    :Enterprise
+                    ,:ii
+                    ,:SessionID
+                    ,F.ENTITYID
+                    ,F.EntityType
+                    FROM @t_schema.Flag F
+                    INNER JOIN @t_schema.trsEntities E ON
+                        E.level = :ii - 1
+                    AND E.EntityType = F.EntityType
+                    AND E.EntityID = F.EntityID
+                    AND E.SessionID = :SessionID
+                    WHERE
+                        F.Enterprise = :Enterprise
+                    AND F.AttributeCode = :tmpAttCode
+                    AND F.AttributeValue = :tmpAttValue
+                    AND F.EntityType = :tmpEntityType
+                    AND :ValOn BETWEEN F.ValFrom and F.ValTo
+                AND :EffOn BETWEEN F.EffFrom and F.EffTo
+                    ;
+
+            } else {
+
+                    if (iLike == 1) {
+                
+                        EXEC SQL INSERT INTO @t_schema.trsEntities
+                        SELECT DISTINCT
+                        :Enterprise
+                        ,:ii
+                        ,:SessionID
+                        ,T.ENTITYID
+                        ,T.EntityType
+                        FROM @t_schema.Text T
+                        INNER JOIN @t_schema.trsEntities E ON
+                                E.level = :ii - 1
+                        AND E.EntityType = T.EntityType
+                        AND E.EntityID = T.EntityID
+                        AND E.SessionID = :SessionID
+                        WHERE
+                                T.Enterprise = :Enterprise
+                        AND T.AttributeCode = :tmpAttCode
+                        AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+                        AND T.EntityType = :tmpEntityType
+                        AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                        AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                      ;
+    
+                    } else {
+            
+                    EXEC SQL INSERT INTO @t_schema.trsEntities
+                    SELECT DISTINCT
+                    :Enterprise
+                    ,:ii
+                    ,:SessionID
+                    ,T.ENTITYID
+                    ,T.EntityType
+                    FROM @t_schema.Text T
+                    INNER JOIN @t_schema.trsEntities E ON
+                        E.level = :ii - 1
+                    AND E.EntityType = T.EntityType
+                    AND E.EntityID = T.EntityID
+                    AND E.SessionID = :SessionID
+                    WHERE
+                        T.Enterprise = :Enterprise
+                    AND T.AttributeCode = :tmpAttCode
+                    AND T.AttributeValue = :tmpAttValue
+                    AND T.EntityType = :tmpEntityType
+                        AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                    AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                    ;
+                    }
+                }   
+
+            EXEC SQL COMMIT WORK;
+        }
+    }
+    }
+
+   // O.K.. lets Remove any records from the trsNavigate 
+  // Table that no longer qualify (the answer is always smaller than
+  // what we start out in
+  //
+
+  EXEC SQL SELECT COUNT(*)   INTO :iNavCount
+  FROM @t_schema.trsNavigate WHERE
+  Enterprise = :Enterprise AND SessionID = :SessionID ;
+
+  EXEC SQL SELECT COUNT(*)   INTO :iNavDelCount
+  FROM @t_schema.trsNavigate WHERE
+  (Entity2ID, Entity2Type) IN (
+  SELECT
+   E.EntityID
+  ,E.EntityType
+  FROM @t_schema.trsEntities T
+  INNER JOIN @t_schema.Entity E ON
+      E.Enterprise = :Enterprise
+  AND E.EntityType = T.EntityType
+  AND E.EntityID = T.EntityID
+  AND :ValOn BETWEEN E.ValFrom and E.ValTo
+  AND :EffOn BETWEEN E.EffFrom and E.EffTo
+  WHERE
+      T.Enterprise = :Enterprise
+  AND T.SessionID = :SessionID
+  AND T.Level = :ii - 1
+  )
+  AND Enterprise = :Enterprise
+  AND SessionID = :SessionID
+  ;
+
+  if (iNavDelCount < iNavCount) {
+      EXEC SQL INSERT INTO @t_schema.trsNavDel
+      SELECT * FROM @t_schema.trsNavigate WHERE
+      (Entity2ID, Entity2Type) IN (
+       SELECT
+        E.EntityID
+       ,E.EntityType
+       FROM @t_schema.trsEntities T
+       INNER JOIN @t_schema.Entity E ON
+          E.Enterprise = :Enterprise
+       AND E.EntityType = T.EntityType
+       AND E.EntityID = T.EntityID
+       AND :ValOn BETWEEN E.ValFrom and E.ValTo
+       AND :EffOn BETWEEN E.EffFrom and E.EffTo
+       WHERE
+          T.Enterprise = :Enterprise
+       AND T.SessionID = :SessionID
+       AND T.Level = :ii - 1
+      )
+      AND Enterprise = :Enterprise
+      AND SessionID = :SessionID
+      ;
+
+     EXEC SQL DELETE FROM @t_schema.trsNavigate WHERE
+     Enterprise = :Enterprise
+     AND SessionID = :SessionID
+     ;
+
+     EXEC SQL INSERT INTO @t_schema.trsNavigate
+     SELECT * FROM @t_schema.trsNavDel WHERE
+     Enterprise = :Enterprise
+     AND SessionID = :SessionID
+     ;
+
+     EXEC SQL DELETE FROM @t_schema.trsNavDel WHERE
+     Enterprise = :Enterprise
+     AND SessionID = :SessionID
+     ;
+
+     EXEC SQL COMMIT WORK;
+  }
+
+
+
+// Now lets repeat the whole thing for the relator.
+// OK.. first we want to get a count of how many search
+// records are in the dyna search
+
+iCount = 0;
+
+EXEC SQL SELECT MAX(ds.Step) INTO :iCount
+FROM @t_schema.DynaSearch ds
+JOIN @t_schema.MetaEntity me on me.EntityType=ds.EntityType and me.Enterprise=ds.Enterprise
+WHERE
+    ds.Enterprise = :Enterprise
+AND ds.SessionID = :SessionID
+AND me.EntityClass='Relator'
+;
+
+EXEC SQL COMMIT WORK;
+
+// OK.. Lets loop and insert total counts here
+
+// Now process the data
+iStop = 0;  // Lets assume we keep going!
+
+
+for (ii = 1; ii <= iCount ;ii++) {
+  iStepCount = 0;
+  // Lets pull the record in first
+  idsCount = 1;
+  EXEC SQL OPEN curDynaSearchRel;
+  do {
+    EXEC SQL FETCH curDynaSearchRel INTO :tmpEntityType, :tmpAttCode, :tmpAttType, :tmpAttValue;
+    if (SQLCODE != 0) break;
+    strcpy(actmpEntityType[idsCount],tmpEntityType);
+    strcpy(actmpAttCode[idsCount],tmpAttCode);
+    strcpy(actmpAttType[idsCount],tmpAttType);
+    strcpy(actmpAttValue[idsCount++],tmpAttValue);
+  }   while (1);
+  EXEC SQL CLOSE curDynaSearchRel WITH RELEASE;
+  EXEC SQL COMMIT WORK;
+  
+  iFound = 0;
+  for (i =1; i < idsCount; i++) {
+      strcpy(tmpEntityType, actmpEntityType[i]);
+      strcpy(tmpAttCode, actmpAttCode[i]);
+      strcpy(tmpAttType, actmpAttType[i]);
+          strcpy(tmpAttValue, actmpAttValue[i]);
+           
+      if (tmpAttType[0] == 'F') {
+        EXEC SQL SELECT COUNT(F.EntityID)  INTO :iStepCount
+        FROM @t_schema.Flag F
+        INNER JOIN @t_schema.trsNavigate Q ON
+              Q.Enterprise = :Enterprise
+        AND Q.SessionID = :SessionID
+        AND Q.EntityType = F.EntityType
+        AND Q.EntityID = F.EntityID
+        WHERE
+              F.Enterprise = :Enterprise
+        AND F.AttributeCode = :tmpAttCode
+        AND F.AttributeValue = :tmpAttValue
+        AND F.EntityType = :tmpEntityType
+            AND :ValOn BETWEEN F.ValFrom and F.ValTo
+        AND :EffOn BETWEEN F.EffFrom and F.EffTo
+        ;
+      } else {
+        if (iLike == 1) {
+          EXEC SQL SELECT COUNT(T.EntityID)  INTO :iStepCount
+          FROM @t_schema.Text T
+          INNER JOIN @t_schema.trsNavigate Q ON
+                Q.Enterprise = :Enterprise
+          AND Q.SessionID = :SessionID
+          AND Q.EntityType = T.EntityType
+          AND Q.EntityID = T.EntityID
+          WHERE
+                T.Enterprise = :Enterprise
+          AND T.AttributeCode = :tmpAttCode
+          AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+          AND T.EntityType = :tmpEntityType
+                AND :ValOn BETWEEN T.ValFrom and T.ValTo
+            AND :EffOn BETWEEN T.EffFrom and T.EffTo
+          ;
+        } else {
+          EXEC SQL SELECT COUNT(T.EntityID)  INTO :iStepCount
+          FROM @t_schema.Text T
+          INNER JOIN @t_schema.trsNavigate Q ON
+                Q.Enterprise = :Enterprise
+          AND Q.SessionID = :SessionID
+          AND Q.EntityType = T.EntityType
+          AND Q.EntityID = T.EntityID
+          WHERE
+                T.Enterprise = :Enterprise
+          AND T.AttributeCode = :tmpAttCode
+          AND T.AttributeValue = :tmpAttValue
+          AND T.EntityType = :tmpEntityType
+                AND :ValOn BETWEEN T.ValFrom and T.ValTo
+            AND :EffOn BETWEEN T.EffFrom and T.EffTo
+          ;
+        }
+      }
+
+      if (idsCount == 1) {
+        if (iStepCount == 0) {
+           iFound = 0;
+           break;              
+        }
+      } else {
+          // for the same step (or condition), 
+          if (iFound == 0) {
+              iFound = iStepCount;
+            }
+      }
+
+    EXEC SQL UPDATE @t_schema.DynaSearch SET SEARCHCOUNT = :iStepCount
+    WHERE
+          Step = :ii
+    AND SessionID = :SessionID
+    AND Enterprise = :Enterprise
+    AND AttributeCode = :tmpAttCode
+    AND AttributeValue = :tmpAttValue
+    AND EntityType = :tmpEntityType
+    ;   
+  }
+
+  // for a step, break if found no matching     
+  if (iFound == 0) {
+   break;
+   iStop = 1;
+  }
+  
+  // for (or condition) , remove the row that find no matching entities.
+  EXEC SQL DELETE from @t_schema.DynaSearch     
+  WHERE
+      Step = :ii
+  AND SessionID = :SessionID
+  AND Enterprise = :Enterprise
+  AND SearchCount = 0
+  ;  
+  
+  // Good enough .. if you find 50 or less in the count .. then we can stop
+  // defaults counts to 99
+  if (iFound < 51) {
+    break;
+  }  
+}
+
+EXEC SQL COMMIT WORK;
+
+
+if (iStop == 0) {
+
+    iCount = 0;
+
+  EXEC SQL SELECT MAX(ds.Step) INTO :iCount
+  FROM @t_schema.DynaSearch ds
+  JOIN @t_schema.MetaEntity me on me.EntityType=ds.EntityType and me.Enterprise=ds.Enterprise
+  WHERE
+    ds.Enterprise = :Enterprise
+  AND ds.SessionID = :SessionID
+  AND me.EntityClass='Relator'
+  ;
+
+  EXEC SQL COMMIT WORK;
+
+  // O.K.  lets do the inserts
+  //
+
+  for (ii = 1; ii <= iCount ;ii++) {
+
+    // Lets pull the record in first
+      idsCount = 1;
+      EXEC SQL OPEN curDynaSearchRel;
+      do {
+        EXEC SQL FETCH curDynaSearchRel INTO :tmpEntityType, :tmpAttCode, :tmpAttType, :tmpAttValue;
+        if (SQLCODE != 0) break;
+        strcpy(actmpEntityType[idsCount],tmpEntityType);
+        strcpy(actmpAttCode[idsCount],tmpAttCode);
+        strcpy(actmpAttType[idsCount],tmpAttType);
+        strcpy(actmpAttValue[idsCount++],tmpAttValue);
+      }   while (1);
+      EXEC SQL CLOSE curDynaSearchRel WITH RELEASE;
+      EXEC SQL COMMIT WORK;
+      
+      for (i =1; i < idsCount; i++) {
+      
+          strcpy(tmpEntityType, actmpEntityType[i]);
+          strcpy(tmpAttCode, actmpAttCode[i]);
+          strcpy(tmpAttType, actmpAttType[i]);
+          strcpy(tmpAttValue, actmpAttValue[i]);
+
+        if (ii == 1) {
+
+          if (tmpAttType[0] == 'F') {
+
+                    EXEC SQL INSERT INTO @t_schema.trsEntities
+                    SELECT DISTINCT
+                     :Enterprise
+                    ,:ii
+                    ,:SessionID
+                    , F.ENTITYID
+                    , F.EntityType
+                    FROM @t_schema.Flag F
+                  INNER JOIN @t_schema.trsNavigate Q ON
+                    Q.Enterprise = :Enterprise
+                AND Q.SessionID = :SessionID
+                AND Q.EntityType = F.EntityType
+                AND Q.EntityID = F.EntityID
+                    WHERE
+                        F.Enterprise = :Enterprise
+                    AND F.AttributeCode = :tmpAttCode
+                    AND F.AttributeValue = :tmpAttValue
+                    AND F.EntityType = :tmpEntityType
+                    AND :ValOn BETWEEN F.ValFrom and F.ValTo
+                AND :EffOn BETWEEN F.EffFrom and F.EffTo
+                    ;
+
+                } else {
+
+                    if (iLike == 1) {
+                      EXEC SQL INSERT INTO @t_schema.trsEntities
+                      SELECT DISTINCT
+                       :Enterprise
+                      ,:ii
+                      ,:SessionID
+                      , T.ENTITYID
+                      , T.EntityType
+                      FROM @t_schema.Text T
+                      INNER JOIN @t_schema.trsNavigate Q ON
+                          Q.Enterprise = :Enterprise
+                      AND Q.SessionID = :SessionID
+                    AND Q.EntityType = T.EntityType
+                    AND Q.EntityID = T.EntityID
+                    WHERE
+                        T.Enterprise = :Enterprise
+                    AND T.AttributeCode = :tmpAttCode
+                    AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+                    AND T.EntityType = :tmpEntityType
+                    AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                    AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                    ;
+                    } else {
+
+                      EXEC SQL INSERT INTO @t_schema.trsEntities
+                      SELECT DISTINCT
+                       :Enterprise
+                      ,:ii
+                      ,:SessionID
+                      , T.ENTITYID
+                      , T.EntityType
+                      FROM @t_schema.Text T
+                      INNER JOIN @t_schema.trsNavigate Q ON
+                          Q.Enterprise = :Enterprise
+                      AND Q.SessionID = :SessionID
+                        AND Q.EntityType = T.EntityType
+                        AND Q.EntityID = T.EntityID
+                        WHERE
+                          T.Enterprise = :Enterprise
+                        AND T.AttributeCode = :tmpAttCode
+                    AND T.AttributeValue = :tmpAttValue
+                  AND T.EntityType = :tmpEntityType
+                        AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                    AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                    ;
+                    }
+                }
+
+          EXEC SQL COMMIT WORK;
+
+        } else {
+
+          if (tmpAttType[0] == 'F') {
+
+                    EXEC SQL INSERT INTO @t_schema.trsEntities
+                    SELECT DISTINCT
+                    :Enterprise
+                    ,:ii
+                    ,:SessionID
+                    ,F.ENTITYID
+                    ,F.EntityType
+                    FROM @t_schema.Flag F
+                    INNER JOIN @t_schema.trsEntities E ON
+                        E.level = :ii - 1
+                    AND E.EntityType = F.EntityType
+                    AND E.EntityID = F.EntityID
+                    AND E.SessionID = :SessionID
+                    WHERE
+                        F.Enterprise = :Enterprise
+                    AND F.AttributeCode = :tmpAttCode
+                    AND F.AttributeValue = :tmpAttValue
+                    AND F.EntityType = :tmpEntityType
+                    AND :ValOn BETWEEN F.ValFrom and F.ValTo
+                AND :EffOn BETWEEN F.EffFrom and F.EffTo
+                    ;
+
+            } else {
+
+                    if (iLike == 1) {
+                
+                        EXEC SQL INSERT INTO @t_schema.trsEntities
+                        SELECT DISTINCT
+                        :Enterprise
+                        ,:ii
+                        ,:SessionID
+                        ,T.ENTITYID
+                        ,T.EntityType
+                        FROM @t_schema.Text T
+                        INNER JOIN @t_schema.trsEntities E ON
+                                E.level = :ii - 1
+                        AND E.EntityType = T.EntityType
+                        AND E.EntityID = T.EntityID
+                        AND E.SessionID = :SessionID
+                        WHERE
+                                T.Enterprise = :Enterprise
+                        AND T.AttributeCode = :tmpAttCode
+                        AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+                        AND T.EntityType = :tmpEntityType
+                        AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                        AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                      ;
+    
+                    } else {
+            
+                    EXEC SQL INSERT INTO @t_schema.trsEntities
+                    SELECT DISTINCT
+                    :Enterprise
+                    ,:ii
+                    ,:SessionID
+                    ,T.ENTITYID
+                    ,T.EntityType
+                    FROM @t_schema.Text T
+                    INNER JOIN @t_schema.trsEntities E ON
+                        E.level = :ii - 1
+                    AND E.EntityType = T.EntityType
+                    AND E.EntityID = T.EntityID
+                    AND E.SessionID = :SessionID
+                    WHERE
+                        T.Enterprise = :Enterprise
+                    AND T.AttributeCode = :tmpAttCode
+                    AND T.AttributeValue = :tmpAttValue
+                    AND T.EntityType = :tmpEntityType
+                        AND :ValOn BETWEEN T.ValFrom and T.ValTo
+                    AND :EffOn BETWEEN T.EffFrom and T.EffTo
+                    ;
+                    }
+                }   
+
+            EXEC SQL COMMIT WORK;
+        }
+    }
+    }
+
+  // O.K.. lets Remove any records from the trsNavigate 
+  // Table that no longer qualify (the answer is always smaller than
+  // what we start out in
+  //
+
+  EXEC SQL SELECT COUNT(*)   INTO :iNavCount
+  FROM @t_schema.trsNavigate WHERE
+  Enterprise = :Enterprise AND SessionID = :SessionID ;
+
+  EXEC SQL SELECT COUNT(*)   INTO :iNavDelCount
+  FROM @t_schema.trsNavigate WHERE
+  (EntityID, EntityType) IN (
+  SELECT
+   E.EntityID
+  ,E.EntityType
+  FROM @t_schema.trsEntities T
+  INNER JOIN @t_schema.Entity E ON
+      E.Enterprise = :Enterprise
+  AND E.EntityType = T.EntityType
+  AND E.EntityID = T.EntityID
+  AND :ValOn BETWEEN E.ValFrom and E.ValTo
+  AND :EffOn BETWEEN E.EffFrom and E.EffTo
+  WHERE
+      T.Enterprise = :Enterprise
+  AND T.SessionID = :SessionID
+  AND T.Level = :ii - 1
+  )
+  AND Enterprise = :Enterprise
+  AND SessionID = :SessionID
+  ;
+
+  if (iNavDelCount < iNavCount) {
+      EXEC SQL INSERT INTO @t_schema.trsNavDel
+      SELECT * FROM @t_schema.trsNavigate WHERE
+      (EntityID, EntityType) IN (
+       SELECT
+        E.EntityID
+       ,E.EntityType
+       FROM @t_schema.trsEntities T
+       INNER JOIN @t_schema.Entity E ON
+          E.Enterprise = :Enterprise
+       AND E.EntityType = T.EntityType
+       AND E.EntityID = T.EntityID
+       AND :ValOn BETWEEN E.ValFrom and E.ValTo
+       AND :EffOn BETWEEN E.EffFrom and E.EffTo
+       WHERE
+          T.Enterprise = :Enterprise
+       AND T.SessionID = :SessionID
+       AND T.Level = :ii - 1
+      )
+      AND Enterprise = :Enterprise
+      AND SessionID = :SessionID
+      ;
+
+     EXEC SQL DELETE FROM @t_schema.trsNavigate WHERE
+     Enterprise = :Enterprise
+     AND SessionID = :SessionID
+     ;
+
+     EXEC SQL INSERT INTO @t_schema.trsNavigate
+     SELECT * FROM @t_schema.trsNavDel WHERE
+     Enterprise = :Enterprise
+     AND SessionID = :SessionID
+     ;
+
+     EXEC SQL DELETE FROM @t_schema.trsNavDel WHERE
+     Enterprise = :Enterprise
+     AND SessionID = :SessionID
+     ;
+
+     EXEC SQL COMMIT WORK;
+  }
+
+}
+}
+
+EXEC SQL OPEN NavCur;
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in ActionType varchar(32)
+in iLike int
+in ValOn varchar(27)
+in EffOn varchar(27)
+@end
+
+
+

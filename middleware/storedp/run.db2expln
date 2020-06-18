@@ -1,0 +1,12 @@
+#!/bin/ksh 
+
+. ~/storedp/vars
+
+date
+
+rm $1.planout
+
+db2expln -c $USER -s 0 -d $DBASE -u $USER $PASSWD -p $1 -o $1.planout
+
+date
+

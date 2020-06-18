@@ -1,0 +1,26 @@
+#!/bin/ksh
+
+DBASE=opicmpdh
+USER=opicmadm
+PASSWD=cat9tail
+
+DIR="/data/"
+NAME="ALL"
+COMMIT="10000"
+#MODE="in exclusive mode"
+MODE="in shared mode"
+
+set DB2CODEPAGE 1208
+export DB2CODEPAGE=1208
+
+db2 connect to $DBASE $MODE user $USER using $PASSWD
+find $DIR -name "$NAME*IXF" -print|sort|awk -F. '{print $2 "." $3}'|
+while read TABLE
+  do
+    db2 connect to $DBASE $MODE user $USER using $PASSWD
+    echo Importing $TABLE from $DIR$NAME.$TABLE.IXF
+    db2 "IMPORT FROM $DIR$NAME.$TABLE.IXF OF IXF COMMITCOUNT $COMMIT INSERT INTO $TABLE" >>$DIR$NAME.IMPORT.OUT
+    db2 terminate
+  done
+db2 terminate
+

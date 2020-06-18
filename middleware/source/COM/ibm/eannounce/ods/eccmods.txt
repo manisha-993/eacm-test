@@ -1,0 +1,5470 @@
+-- $Log: eccmods.txt,v $
+-- Revision 1.40  2004/01/16 18:58:21  dave
+-- misc changes
+--
+-- Revision 1.39  2004/01/12 19:15:31  dave
+-- more reorg adds/ changes
+--
+-- Revision 1.38  2003/12/11 06:37:49  dave
+-- more updates to the scripts
+--
+-- Revision 1.37  2003/12/10 20:34:54  dave
+-- updating and making final scripts
+--
+-- Revision 1.36  2003/12/09 17:48:12  dave
+-- Added NLSID Predicate to Join
+--
+-- Revision 1.35  2003/12/08 22:02:08  dave
+-- more changes for prdMessage
+--
+-- Revision 1.34  2003/12/08 21:52:30  dave
+-- updates to ECCM stuff
+--
+-- Revision 1.33  2003/12/05 22:02:47  dave
+-- more eccm changes to make eccm.compat faster
+--
+-- Revision 1.32  2003/12/05 21:15:27  dave
+-- added DISTINCT
+--
+-- Revision 1.31  2003/12/05 19:24:56  dave
+-- adding logging
+--
+--
+------------------------------------------------------------------------------------------
+--  SET UP DATA FOR ECCM ODS
+------------------------------------------------------------------------------------------
+drop table gbli.gamap;
+create table gbli.gamap (
+  NAME CHAR(32) NOT NULL,
+  CODE CHAR(6) NOT NULL,
+  NLSID INT NOT NULL,
+  GENAREANAME_FC CHAR(16) NOT NULL
+);
+drop index gbli.gamap_ix1;
+create index gbli.gamap_ix1 on gbli.gamap(GENAREANAME_FC, NLSID);
+
+--
+-- INSERT STATEMENTS
+--
+INSERT INTO GBLI.GAMAP VALUES('Andorra', 'AD', 1, '10874');
+INSERT INTO GBLI.GAMAP VALUES('Utd.Arab.Emir.', 'AE', 1, '11019');
+INSERT INTO GBLI.GAMAP VALUES('Afghanistan', 'AF', 1, '10871');
+INSERT INTO GBLI.GAMAP VALUES('Albania', 'AL', 1, '10872');
+INSERT INTO GBLI.GAMAP VALUES('Armenia', 'AM', 1, '10877');
+INSERT INTO GBLI.GAMAP VALUES('Angola', 'AO', 1, '10875');
+INSERT INTO GBLI.GAMAP VALUES('Argentina', 'AR', 1, '10876');
+INSERT INTO GBLI.GAMAP VALUES('ASEAN-Cty', 'AS', 1, '11048');
+INSERT INTO GBLI.GAMAP VALUES('Austria', 'AT', 2, '10879');
+INSERT INTO GBLI.GAMAP VALUES('Australia', 'AU', 7, '10878');
+INSERT INTO GBLI.GAMAP VALUES('Azerbaijan', 'AZ', 1, '10880');
+INSERT INTO GBLI.GAMAP VALUES('Bosnia-Herz.', 'BA', 1, '10887');
+INSERT INTO GBLI.GAMAP VALUES('Bangladesh', 'BD', 1, '10881');
+INSERT INTO GBLI.GAMAP VALUES('Belgium', 'BE', 7, '10882');
+INSERT INTO GBLI.GAMAP VALUES('Burkina-Faso', 'BF', 1, '10892');
+INSERT INTO GBLI.GAMAP VALUES('Bulgaria', 'BG', 1, '10891');
+INSERT INTO GBLI.GAMAP VALUES('Bharain', 'BH', 1, '10884');
+INSERT INTO GBLI.GAMAP VALUES('Burundi', 'BI', 1, '10893');
+INSERT INTO GBLI.GAMAP VALUES('Benin', 'BJ', 1, '10883');
+INSERT INTO GBLI.GAMAP VALUES('Brunei Dar-es-S', 'BN', 1, '10890');
+INSERT INTO GBLI.GAMAP VALUES('Bolivia', 'BO', 1, '10886');
+INSERT INTO GBLI.GAMAP VALUES('Brazil', 'BR', 1, '10889');
+INSERT INTO GBLI.GAMAP VALUES('Bhutan', 'BT', 1, '10885');
+INSERT INTO GBLI.GAMAP VALUES('Botswana', 'BW', 1, '10888');
+INSERT INTO GBLI.GAMAP VALUES('White Russia', 'BY', 1, '11025');
+INSERT INTO GBLI.GAMAP VALUES('Canada', 'CA', 7, '10896');
+INSERT INTO GBLI.GAMAP VALUES('Canada', 'CA', 10, '10896');
+INSERT INTO GBLI.GAMAP VALUES('Central Afr.Rep', 'CF', 1, '10898');
+INSERT INTO GBLI.GAMAP VALUES('Congo', 'CG', 1, '10904');
+INSERT INTO GBLI.GAMAP VALUES('Switzerland', 'CH', 7, '11005');
+INSERT INTO GBLI.GAMAP VALUES('Ivory Coast', 'CI', 1, '10939');
+INSERT INTO GBLI.GAMAP VALUES('Chile', 'CL', 1, '10900');
+INSERT INTO GBLI.GAMAP VALUES('Cameroon', 'CM', 1, '10895');
+INSERT INTO GBLI.GAMAP VALUES('China', 'CN', 1, '10901');
+INSERT INTO GBLI.GAMAP VALUES('Columbia', 'CO', 1, '10902');
+INSERT INTO GBLI.GAMAP VALUES('Costa Rica', 'CR', 1, '10905');
+INSERT INTO GBLI.GAMAP VALUES('Cape Verde', 'CV', 1, '10897');
+INSERT INTO GBLI.GAMAP VALUES('Cyprus', 'CY', 1, '10907');
+INSERT INTO GBLI.GAMAP VALUES('Czech Republic', 'CZ', 7, '10908');
+INSERT INTO GBLI.GAMAP VALUES('Germany', 'DE', 2, '10924');
+INSERT INTO GBLI.GAMAP VALUES('Djibouti', 'DJ', 1, '10910');
+INSERT INTO GBLI.GAMAP VALUES('Denmark', 'DK', 7, '10909');
+INSERT INTO GBLI.GAMAP VALUES('Algeria', 'DZ', 1, '10873');
+INSERT INTO GBLI.GAMAP VALUES('Ecuador', 'EC', 1, '10911');
+INSERT INTO GBLI.GAMAP VALUES('Estonia', 'EE', 1, '10915');
+INSERT INTO GBLI.GAMAP VALUES('Egypt', 'EG', 1, '10912');
+INSERT INTO GBLI.GAMAP VALUES('EMEA-Cty', 'EM', 1, '11047');
+INSERT INTO GBLI.GAMAP VALUES('Eritrea', 'ER', 1, '10914');
+INSERT INTO GBLI.GAMAP VALUES('Spain', 'ES', 6, '11000');
+INSERT INTO GBLI.GAMAP VALUES('Ethiopia', 'ET', 1, '10916');
+INSERT INTO GBLI.GAMAP VALUES('Finland', 'FI', 7, '10917');
+INSERT INTO GBLI.GAMAP VALUES('France', 'FR', 5, '10918');
+INSERT INTO GBLI.GAMAP VALUES('Gabon', 'GA', 1, '10921');
+INSERT INTO GBLI.GAMAP VALUES('United Kingdom', 'GB', 7, '11017');
+INSERT INTO GBLI.GAMAP VALUES('Georgia', 'GE', 1, '10923');
+INSERT INTO GBLI.GAMAP VALUES('French Guinea', 'GF', 1, '10920');
+INSERT INTO GBLI.GAMAP VALUES('Ghana', 'GH', 1, '10925');
+INSERT INTO GBLI.GAMAP VALUES('Gambia', 'GM', 1, '10922');
+INSERT INTO GBLI.GAMAP VALUES('Guinea', 'GN', 1, '10928');
+INSERT INTO GBLI.GAMAP VALUES('Guadeloupe', 'GP', 1, '10927');
+INSERT INTO GBLI.GAMAP VALUES('Equatorial Guin', 'GQ', 1, '10913');
+INSERT INTO GBLI.GAMAP VALUES('Greece', 'GR', 7, '10926');
+INSERT INTO GBLI.GAMAP VALUES('Guinea-Bissau', 'GW', 1, '10929');
+INSERT INTO GBLI.GAMAP VALUES('Hong Kong', 'HK', 7, '10930');
+INSERT INTO GBLI.GAMAP VALUES('Croatia', 'HR', 7, '10906');
+INSERT INTO GBLI.GAMAP VALUES('Hungary', 'HU', 7, '10931');
+INSERT INTO GBLI.GAMAP VALUES('Indonesia', 'ID', 1, '10934');
+INSERT INTO GBLI.GAMAP VALUES('Ireland', 'IE', 7, '10936');
+INSERT INTO GBLI.GAMAP VALUES('Israel', 'IL', 1, '10937');
+INSERT INTO GBLI.GAMAP VALUES('India', 'IN', 7, '10933');
+INSERT INTO GBLI.GAMAP VALUES('Iran', 'IR', 1, '10935');
+INSERT INTO GBLI.GAMAP VALUES('Iceland', 'IS', 1, '10932');
+INSERT INTO GBLI.GAMAP VALUES('Italy', 'IT', 3, '10938');
+INSERT INTO GBLI.GAMAP VALUES('Jordan', 'JO', 1, '10941');
+INSERT INTO GBLI.GAMAP VALUES('Japan', 'JP', 4, '10940');
+INSERT INTO GBLI.GAMAP VALUES('Kenya', 'KE', 1, '10943');
+INSERT INTO GBLI.GAMAP VALUES('Kirghistan', 'KG', 1, '10944');
+INSERT INTO GBLI.GAMAP VALUES('Cambodia', 'KH', 1, '10894');
+INSERT INTO GBLI.GAMAP VALUES('Comoro', 'KM', 1, '10903');
+INSERT INTO GBLI.GAMAP VALUES('South Korea', 'KR', 8, '10999');
+INSERT INTO GBLI.GAMAP VALUES('Kuwait', 'KW', 1, '10945');
+INSERT INTO GBLI.GAMAP VALUES('Kazakhstan', 'KZ', 1, '10942');
+INSERT INTO GBLI.GAMAP VALUES('Laos', 'LA', 1, '10946');
+INSERT INTO GBLI.GAMAP VALUES('Lebanon', 'LB', 1, '10948');
+INSERT INTO GBLI.GAMAP VALUES('LAD-Cty', 'LD', 1, '11049');
+INSERT INTO GBLI.GAMAP VALUES('Liechtenstein', 'LI', 1, '10951');
+INSERT INTO GBLI.GAMAP VALUES('Sri Lanka', 'LK', 1, '11001');
+INSERT INTO GBLI.GAMAP VALUES('Liberia', 'LR', 1, '10950');
+INSERT INTO GBLI.GAMAP VALUES('Lesotho', 'LS', 1, '10949');
+INSERT INTO GBLI.GAMAP VALUES('Lithuania', 'LT', 1, '10952');
+INSERT INTO GBLI.GAMAP VALUES('Luxembourg', 'LU', 1, '11033');
+INSERT INTO GBLI.GAMAP VALUES('Latvia', 'LV', 1, '10947');
+INSERT INTO GBLI.GAMAP VALUES('Morocco', 'MA', 1, '10966');
+INSERT INTO GBLI.GAMAP VALUES('Monaco', 'MC', 1, '10965');
+INSERT INTO GBLI.GAMAP VALUES('Moldavia', 'MD', 1, '10964');
+INSERT INTO GBLI.GAMAP VALUES('Madagascar', 'MG', 1, '10954');
+INSERT INTO GBLI.GAMAP VALUES('Macedonia', 'MK', 1, '10953');
+INSERT INTO GBLI.GAMAP VALUES('Mali', 'ML', 1, '10958');
+INSERT INTO GBLI.GAMAP VALUES('Myanmar', 'MM', 1, '10968');
+INSERT INTO GBLI.GAMAP VALUES('Martinique', 'MQ', 1, '10959');
+INSERT INTO GBLI.GAMAP VALUES('Mauretania', 'MR', 1, '10960');
+INSERT INTO GBLI.GAMAP VALUES('Malta', 'MT', 1, '11031');
+INSERT INTO GBLI.GAMAP VALUES('Mauritius', 'MU', 1, '10961');
+INSERT INTO GBLI.GAMAP VALUES('Maldives', 'MV', 1, '10957');
+INSERT INTO GBLI.GAMAP VALUES('Malawi', 'MW', 1, '10955');
+INSERT INTO GBLI.GAMAP VALUES('Mexico', 'MX', 1, '10963');
+INSERT INTO GBLI.GAMAP VALUES('Malaysia', 'MY', 1, '10956');
+INSERT INTO GBLI.GAMAP VALUES('Mozambique', 'MZ', 1, '10967');
+INSERT INTO GBLI.GAMAP VALUES('Namibia', 'NA', 1, '10969');
+INSERT INTO GBLI.GAMAP VALUES('New Caledonia', 'NC', 1, '10972');
+INSERT INTO GBLI.GAMAP VALUES('Niger', 'NE', 1, '10974');
+INSERT INTO GBLI.GAMAP VALUES('Nigeria', 'NG', 1, '10975');
+INSERT INTO GBLI.GAMAP VALUES('Netherlands', 'NL', 7, '10971');
+INSERT INTO GBLI.GAMAP VALUES('Norway', 'NO', 7, '10976');
+INSERT INTO GBLI.GAMAP VALUES('Nepal', 'NP', 1, '10970');
+INSERT INTO GBLI.GAMAP VALUES('New Zealand', 'NZ', 7, '10973');
+INSERT INTO GBLI.GAMAP VALUES('Oman', 'OM', 1, '10977');
+INSERT INTO GBLI.GAMAP VALUES('Peru', 'PE', 1, '10980');
+INSERT INTO GBLI.GAMAP VALUES('Frenc.Polynesia', 'PF', 1, '10919');
+INSERT INTO GBLI.GAMAP VALUES('Philippines', 'PH', 1, '10981');
+INSERT INTO GBLI.GAMAP VALUES('Pakistan', 'PK', 1, '10978');
+INSERT INTO GBLI.GAMAP VALUES('Poland', 'PL', 7, '10982');
+INSERT INTO GBLI.GAMAP VALUES('Portugal', 'PT', 7, '10983');
+INSERT INTO GBLI.GAMAP VALUES('Paraguay', 'PY', 1, '10979');
+INSERT INTO GBLI.GAMAP VALUES('Qatar', 'QA', 1, '10984');
+INSERT INTO GBLI.GAMAP VALUES('Reunion', 'RE', 1, '10985');
+INSERT INTO GBLI.GAMAP VALUES('Romania', 'RO', 7, '10986');
+INSERT INTO GBLI.GAMAP VALUES('Russian Fed.', 'RU', 1, '10987');
+INSERT INTO GBLI.GAMAP VALUES('Rwanda', 'RW', 1, '10988');
+INSERT INTO GBLI.GAMAP VALUES('Saudi Arabia', 'SA', 1, '10990');
+INSERT INTO GBLI.GAMAP VALUES('Seychelles', 'SC', 1, '10992');
+INSERT INTO GBLI.GAMAP VALUES('Sudan', 'SD', 1, '11002');
+INSERT INTO GBLI.GAMAP VALUES('Sweden', 'SE', 7, '11004');
+INSERT INTO GBLI.GAMAP VALUES('Singapore', 'SG', 7, '10994');
+INSERT INTO GBLI.GAMAP VALUES('Slovenia', 'SI', 1, '10996');
+INSERT INTO GBLI.GAMAP VALUES('Slovakia', 'SK', 1, '10995');
+INSERT INTO GBLI.GAMAP VALUES('Sierra Leone', 'SL', 1, '10993');
+INSERT INTO GBLI.GAMAP VALUES('Senegal', 'SN', 1, '10991');
+INSERT INTO GBLI.GAMAP VALUES('Somalia', 'SO', 1, '10997');
+INSERT INTO GBLI.GAMAP VALUES('Serbia', 'SR', 1, '11032');
+INSERT INTO GBLI.GAMAP VALUES('S.Tome,Principe', 'ST', 1, '10989');
+INSERT INTO GBLI.GAMAP VALUES('Syria', 'SY', 1, '11006');
+INSERT INTO GBLI.GAMAP VALUES('Swaziland', 'SZ', 1, '11003');
+INSERT INTO GBLI.GAMAP VALUES('Chad', 'TD', 1, '10899');
+INSERT INTO GBLI.GAMAP VALUES('Thailand', 'TH', 1, '11010');
+INSERT INTO GBLI.GAMAP VALUES('Tadzhikistan', 'TJ', 1, '11007');
+INSERT INTO GBLI.GAMAP VALUES('Turkmenistan', 'TM', 1, '11013');
+INSERT INTO GBLI.GAMAP VALUES('Tunisia', 'TN', 1, '11011');
+INSERT INTO GBLI.GAMAP VALUES('Turkey', 'TR', 1, '11012');
+INSERT INTO GBLI.GAMAP VALUES('Taiwan', 'TW', 1, '11008');
+INSERT INTO GBLI.GAMAP VALUES('Tanzania', 'TZ', 1, '11009');
+INSERT INTO GBLI.GAMAP VALUES('Ukraine', 'UA', 1, '11016');
+INSERT INTO GBLI.GAMAP VALUES('Uganda', 'UG', 1, '11015');
+INSERT INTO GBLI.GAMAP VALUES('USA', 'US', 1, '11014');
+INSERT INTO GBLI.GAMAP VALUES('Uruguay', 'UY', 1, '11018');
+INSERT INTO GBLI.GAMAP VALUES('Uzbekistan', 'UZ', 1, '11020');
+INSERT INTO GBLI.GAMAP VALUES('Venezuela', 'VE', 1, '11022');
+INSERT INTO GBLI.GAMAP VALUES('Vietnam', 'VN', 1, '11023');
+INSERT INTO GBLI.GAMAP VALUES('Vanuatu', 'VU', 1, '11021');
+INSERT INTO GBLI.GAMAP VALUES('Wallis,Futuna', 'WF', 1, '11024');
+INSERT INTO GBLI.GAMAP VALUES('Yemen', 'YE', 1, '11026');
+INSERT INTO GBLI.GAMAP VALUES('Mayotte', 'YT', 1, '10962');
+INSERT INTO GBLI.GAMAP VALUES('Yugoslavia', 'YU', 1, '11027');
+INSERT INTO GBLI.GAMAP VALUES('South Africa', 'ZA', 7, '10998');
+INSERT INTO GBLI.GAMAP VALUES('Zambia', 'ZM', 1, '11029');
+INSERT INTO GBLI.GAMAP VALUES('Zaire', 'ZR', 1, '11028');
+INSERT INTO GBLI.GAMAP VALUES('Zimbabwe', 'ZW', 1, '11030');
+
+------------------------------------------------------------------------------------------
+--  EXTRA TABLES FOR THE ECCM SCHEMA
+------------------------------------------------------------------------------------------
+
+------------------------------------------------
+-- Added INT SCRIPT per Mary
+------------------------------------------------
+-- DDL Statements for table INT.TIMECODE
+------------------------------------------------
+
+ CREATE TABLE INT.TIMECODE  (
+    ENTITYID INTEGER NOT NULL ,
+    NLSID INTEGER NOT NULL ,
+    TIMECODE INTEGER ,
+    ENTITYTYPE VARCHAR(36) NOT NULL )
+   IN USERSPACE1 ;
+ ALTER TABLE INT.TIMECODE PCTFREE 10;
+
+CREATE UNIQUE INDEX INT.TIMECODE_PK ON INT.TIMECODE (ENTITYID, ENTITYTYPE,NLSID);
+
+
+------------------------------------------------
+-- GOT FROM MTM
+-- MADE DROP IMUNE FROM ODSINIT
+------------------------------------------------
+-- DDL Statements for table ECCM.CHAR_VALUE
+------------------------------------------------
+ DROP TABLE ECCM.CHAR_VALUE;
+ CREATE TABLE ECCM.CHAR_VALUE  (
+    PARTNUMBER CHAR(18) NOT NULL ,
+    CHARACTERISTICNAME CHAR(30) NOT NULL ,
+    CHARACTERISTICVALUE CHAR(30) NOT NULL ,
+    LOWERLIMIT DOUBLE ,
+    UPPERLIMIT DOUBLE ,
+    SOURCESYSTEM VARCHAR(10) ,
+    LASTUPDATED TIMESTAMP NOT NULL WITH DEFAULT CURRENT TIMESTAMP,
+    MARKEDFORDELETION CHAR(1) )
+   ;
+ ALTER TABLE ECCM.CHAR_VALUE PCTFREE 10;
+
+
+-- DDL Statements for primary key on Table ECCM.CHAR_VALUE
+
+CREATE UNIQUE INDEX ECCM.CHAR_VALUE_PK ON ECCM.CHAR_VALUE(PARTNUMBER, CHARACTERISTICNAME, CHARACTERISTICVALUE);
+
+-----------------------------------------------
+-- CONVERTED DWB
+-- COMPILED DWB
+-- CHECKED FOR FINAL SCRIPT
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+-- DDL Statements for table ECCM.PROD_RATE_CARD
+------------------------------------------------
+DROP TABLE ECCM.PROD_RATE_CARD;
+CREATE TABLE ECCM.PROD_RATE_CARD  (
+    RATECARDCODE CHAR(10) NOT NULL ,
+    COUNTRYCODE CHAR(3) NOT NULL ,
+    SHIPPINGCONDITION CHAR(2) NOT NULL ,
+    PRICEVALIDFROMDATE DATE NOT NULL ,
+    PRICEAMOUNT DECIMAL(16,3) ,
+    CURRENCYCODE CHAR(5) ,
+    PRICEVALIDTODATE DATE ,
+    SOURCESYSTEM VARCHAR(10) ,
+    LASTUPDATED TIMESTAMP NOT NULL WITH DEFAULT CURRENT TIMESTAMP)
+IN TSPACE01 INDEX IN ISPACE01 LONG IN LSPACE06;
+ALTER TABLE ECCM.PROD_RATE_CARD PCTFREE 10;
+
+CREATE INDEX ECCM.WZ1PROD_RATE_CARD1 ON ECCM.PROD_RATE_CARD
+  (RATECARDCODE ASC,
+   COUNTRYCODE ASC,
+   SHIPPINGCONDITION ASC,
+   PRICEVALIDTODATE ASC,
+   LASTUPDATED ASC,
+   SOURCESYSTEM ASC,
+   CURRENCYCODE ASC,
+   PRICEAMOUNT ASC,
+   PRICEVALIDFROMDATE ASC);
+
+CREATE INDEX ECCM.XIE1PROD_RATE_CARD ON ECCM.PROD_RATE_CARD (COUNTRYCODE ASC) PCTFREE 10 CLUSTER ;
+ALTER TABLE ECCM.PROD_RATE_CARD ADD PRIMARY KEY (RATECARDCODE, COUNTRYCODE, SHIPPINGCONDITION,PRICEVALIDFROMDATE);
+
+------------------------------------------------
+-- DDL Statements for table ECCM.PSGCTNLS
+-- Reference table manually set up
+--
+-- CONVERTED DWB
+-- CHECKED FOR FINAL SCRIPT
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+DROP TABLE ECCM.PSGCTNLS;
+CREATE TABLE ECCM.PSGCTNLS
+(NLSID INTEGER NOT NULL
+,COUNTRYCODE VARCHAR(6)NOT NULL
+)
+--  IN ECCMPSGTS INDEX IN ECCMPSGXS
+;
+ALTER TABLE ECCM.PSGCTNLS PCTFREE 10;
+ALTER TABLE ECCM.PSGCTNLS ADD CONSTRAINT SQL020920182254000 PRIMARY KEY (NLSID, COUNTRYCODE);
+
+------------------------------------------------
+-- DDL Statements for table ECCM.PSGNLS
+-- Reference table data
+-- Converted DWB
+-- CHECKED FOR FINAL SCRIPT
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+DROP TABLE ECCM.PSGNLS;
+CREATE TABLE ECCM.PSGNLS
+(NLSID INTEGER NOT NULL
+,LANGDESC VARCHAR(32)
+,ISOLANGCODE2 CHAR(2)
+,ISOLANGCODE3 CHAR(3)
+,IBMLANGCODE VARCHAR(6)
+)
+-- IN ECCMPSGTS INDEX IN ECCMPSGXS
+;
+ALTER TABLE ECCM.PSGNLS PCTFREE 10;
+
+-- DDL Statements for indexes on Table ECCM.PSGNLS
+
+CREATE INDEX ECCM.TCPSGNLS ON ECCM.PSGNLS (NLSID ASC,ISOLANGCODE2 DESC);
+ALTER TABLE ECCM.PSGNLS ADD CONSTRAINT SQL020920182254080 PRIMARY KEY(NLSID);
+
+------------------------------------------------
+-- CALLED OUT IN TABLE SPEC
+-- CONVERTED DWB
+-- COMPILED DWB
+-- CHECKED FOR FINAL SCRIPT
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+-- DDL Statements for table ECCM.PROD_CHAR_VALUE
+------------------------------------------------
+ DROP TABLE ECCM.PROD_CHAR_VALUE;
+ CREATE TABLE ECCM.PROD_CHAR_VALUE  (
+      PARTNUMBER CHAR(18) NOT NULL ,
+      CHARACTERISTICNAME CHAR(30) NOT NULL ,
+      CHARACTERISTICVALUE CHAR(30) NOT NULL ,
+      LOWERLIMIT DOUBLE ,
+      UPPERLIMIT DOUBLE ,
+      SOURCESYSTEM VARCHAR(10) ,
+      LASTUPDATED TIMESTAMP NOT NULL WITH DEFAULT CURRENT TIMESTAMP)
+ -- IN ECCM001TS INDEX IN ECCM001XS
+ ;
+ALTER TABLE ECCM.PROD_CHAR_VALUE PCTFREE 10;
+ALTER TABLE ECCM.PROD_CHAR_VALUE ADD PRIMARY KEY (PARTNUMBER, CHARACTERISTICNAME,CHARACTERISTICVALUE);
+
+
+------------------------------------------------
+-- Used to support table spec views
+-- Converted DWB
+-- COMPILED DWB
+-- CHECKED FOR FINAL SCRIPT
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+-- DDL Statements for table ECCM.CCECTRY
+------------------------------------------------
+DROP TABLE ECCM.CCECTRY;
+CREATE TABLE ECCM.CCECTRY (
+  COUNTRYCODE CHAR (6) NOT NULL
+)
+--IN ECCMSUMMTS INDEX IN ECCMSUMMTS
+;
+
+---------------------------------------------------
+-- SUPPORTS ANOTHER SUMMARY TABLE IN THE TABLE SPEC
+-- CONVERTED DWB
+-- COMPILED DWB
+-- CHECKED FOR FINAL SCRIPT
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+-- DDL Statements for table ECCM.ATTRUNITS
+------------------------------------------------
+DROP TABLE ECCM.ATTRUNITS;
+CREATE TABLE ECCM.ATTRUNITS
+ (
+    attributetoken VARCHAR(36) NOT NULL,
+    attributeunittoken VARCHAR(36) NOT NULL
+ );
+
+ CREATE INDEX ECCM.ATTRUNITX1 ON ECCM.ATTRUNITS(ATTRIBUTETOKEN ASC);
+ ALTER TABLE ECCM.ATTRUNITS ADD PRIMARY KEY (ATTRIBUTETOKEN, ATTRIBUTEUNITTOKEN);
+
+-------------------------------------------------
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+-- DDL Statements for table ECCM.PROD_PRODUCT_PRICE
+------------------------------------------------
+ DROP TABLE ECCM.PROD_PRODUCT_PRICE;
+ CREATE TABLE ECCM.PROD_PRODUCT_PRICE  (
+    PARTNUMBER CHAR(18) NOT NULL ,
+    CTOVARIANTPARTNUMBER CHAR(18) NOT NULL ,
+    COUNTRYCODE CHAR(3) NOT NULL ,
+    DISTRIBUTIONCHANNEL CHAR(2) NOT NULL ,
+    PRICEVALIDTODATE DATE NOT NULL ,
+    PRICETYPE CHAR(4) NOT NULL ,
+    MATERIALSTATUS CHAR(2) ,
+    MATERIALSTATUSDATE DATE ,
+    PRICEAMOUNT DECIMAL(16,3) ,
+    CURRENCYCODE CHAR(5) ,
+    PRICEVALIDFROMDATE DATE ,
+    CALLFORQUOTE CHAR(1) ,
+    PRECEDENCE SMALLINT ,
+    SOURCESYSTEM VARCHAR(10) ,
+    LASTUPDATED TIMESTAMP NOT NULL WITH DEFAULT CURRENT TIMESTAMP,
+    MARKEDFORDELETION CHAR(1) )
+  ;
+ ALTER TABLE ECCM.PROD_PRODUCT_PRICE PCTFREE 10;
+
+-- DDL Statements for indexes on Table ECCM.PROD_PRODUCT_PRICE
+
+CREATE INDEX ECCM.WZ1PROD_PRODUCT_P ON ECCM.PROD_PRODUCT_PRICE
+  (LASTUPDATED ASC,
+   PARTNUMBER ASC,
+   CTOVARIANTPARTNUMBER ASC,
+   COUNTRYCODE ASC,
+   DISTRIBUTIONCHANNEL ASC,
+   PRICEVALIDTODATE ASC,
+   PRICETYPE ASC);
+
+-- DDL Statements for indexes on Table ECCM.PROD_PRODUCT_PRICE
+
+CREATE INDEX ECCM.XIE1PROD_PRODUCT_P ON ECCM.PROD_PRODUCT_PRICE
+  (COUNTRYCODE ASC,
+   PRICEVALIDTODATE ASC)
+  PCTFREE 10 CLUSTER ;
+
+-- DDL Statements for indexes on Table ECCM.PROD_PRODUCT_PRICE
+
+CREATE INDEX ECCM.XIE2PROD_PRODUCT_P ON ECCM.PROD_PRODUCT_PRICE
+  (CURRENCYCODE ASC)
+  PCTFREE 10 ;
+
+
+-- DDL Statements for primary key on Table ECCM.PROD_PRODUCT_PRICE
+DROP UNIQUE INDEX ECCM.PROD_PRODUCT_P_PK
+CREATE UNIQUE INDEX ECCM.PROD_PRODUCT_P_PK ON ECCM.PROD_PRODUCT_PRICE (PARTNUMBER,CTOVARIANTPARTNUMBER, COUNTRYCODE, DISTRIBUTIONCHANNEL, PRICEVALIDTODATE, PRICETYPE);
+
+------------------------------------------------
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+-- DDL Statements for table ECCM.PRODUCT_PRICE
+------------------------------------------------
+ DROP TABLE ECCM.PRODUCT_PRICE;
+ CREATE TABLE ECCM.PRODUCT_PRICE  (
+    PARTNUMBER CHAR(18) NOT NULL ,
+    CTOVARIANTPARTNUMBER CHAR(18) NOT NULL ,
+    COUNTRYCODE CHAR(3) NOT NULL ,
+    DISTRIBUTIONCHANNEL CHAR(2) NOT NULL ,
+    PRICEVALIDTODATE DATE NOT NULL ,
+    PRICETYPE CHAR(4) NOT NULL ,
+    MATERIALSTATUS CHAR(2) ,
+    MATERIALSTATUSDATE DATE ,
+    PRICEAMOUNT DECIMAL(16,3) ,
+    CURRENCYCODE CHAR(5) ,
+    PRICEVALIDFROMDATE DATE ,
+    CALLFORQUOTE CHAR(1) ,
+    PRECEDENCE SMALLINT ,
+    SOURCESYSTEM VARCHAR(10) ,
+    LASTUPDATED TIMESTAMP NOT NULL WITH DEFAULT CURRENT TIMESTAMP,
+    MARKEDFORDELETION CHAR(1) )
+  ;
+ ALTER TABLE ECCM.PRODUCT_PRICE PCTFREE 10;
+
+-- DDL Statements for indexes on Table ECCM.PRODUCT_PRICE
+
+CREATE INDEX ECCM.WZ1PRODUCT_PRICE1 ON ECCM.PRODUCT_PRICE
+  (LASTUPDATED ASC,
+   PARTNUMBER ASC,
+   CTOVARIANTPARTNUMBER ASC,
+   COUNTRYCODE ASC,
+   DISTRIBUTIONCHANNEL ASC,
+   PRICEVALIDTODATE ASC,
+   PRICETYPE ASC);
+
+-- DDL Statements for indexes on Table ECCM.PRODUCT_PRICE
+
+CREATE INDEX ECCM.XIE1PRODUCT_PRICE ON ECCM.PRODUCT_PRICE
+  (COUNTRYCODE ASC,
+   PRICEVALIDTODATE ASC)
+  PCTFREE 10 CLUSTER ;
+
+
+-- DDL Statements for primary key on Table ECCM.PRODUCT_PRICE
+
+ALTER TABLE ECCM.PRODUCT_PRICE
+ ADD PRIMARY KEY
+  (PARTNUMBER,
+   CTOVARIANTPARTNUMBER,
+   COUNTRYCODE,
+   DISTRIBUTIONCHANNEL,
+   PRICEVALIDTODATE,
+   PRICETYPE);
+
+------------------------------------------------
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+-- DDL Statements for table ECCM.ELEMENT_REPORT
+------------------------------------------------
+ DROP TABLE ECCM.ELEMENT_REPORT;
+ CREATE TABLE ECCM.ELEMENT_REPORT  (
+    PARTNUMBER VARCHAR(36) NOT NULL ,
+    COUNTRYNAME VARCHAR(45) NOT NULL ,
+    AUDIENCE VARCHAR(254) NOT NULL ,
+    LASTUPDATED TIMESTAMP NOT NULL WITH DEFAULT CURRENT TIMESTAMP,
+    REGION VARCHAR(50) ,
+    PARTDESCRIPTION VARCHAR(252) ,
+    WWPARTNUMBER VARCHAR(36) ,
+    FAMILYNAME VARCHAR(60) ,
+    SERIESNAME VARCHAR(254) ,
+    SOURCESYSTEM VARCHAR(10) ,
+    TARGETANNOUNCE VARCHAR(30) ,
+    WITHDRAWALDATE VARCHAR(30) ,
+    SALESSTATUS CHAR(2) ,
+    STATUS VARCHAR(75) ,
+    RULENAME VARCHAR(254) ,
+    ELEMENTNAME VARCHAR(36) ,
+    ELEMENTVALUE VARCHAR(1024) ,
+    USERNAME VARCHAR(128) ,
+    LASTMODIFIED TIMESTAMP NOT NULL WITH DEFAULT CURRENT TIMESTAMP)
+   ;
+ ALTER TABLE ECCM.ELEMENT_REPORT PCTFREE 10;
+
+-- DDL Statements for indexes on Table ECCM.ELEMENT_REPORT
+
+CREATE INDEX ECCM.XIE1ELEMENT_REPORT ON ECCM.ELEMENT_REPORT
+  (COUNTRYNAME ASC,
+   AUDIENCE ASC)
+  PCTFREE 10 CLUSTER ;
+
+
+-- DDL Statements for primary key on Table ECCM.ELEMENT_REPORT
+
+ALTER TABLE ECCM.ELEMENT_REPORT
+ ADD PRIMARY KEY
+  (PARTNUMBER,
+   COUNTRYNAME,
+   AUDIENCE,
+   LASTUPDATED);
+
+------------------------------------------------
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+-- DDL Statements for table ECCM.IFMLOCK
+------------------------------------------------
+ DROP TABLE ECCM.IFMLOCK;
+ CREATE TABLE ECCM.IFMLOCK  (
+    PROCESS_ID INTEGER NOT NULL ,
+    PROCESS_NAME VARCHAR(30) NOT NULL ,
+    STATUS INTEGER NOT NULL ,
+    START_TIME TIMESTAMP ,
+    END_TIME TIMESTAMP )
+   ;
+ ALTER TABLE ECCM.IFMLOCK PCTFREE 10;
+
+-- DDL Statements for indexes on Table ECCM.IFMLOCK
+
+CREATE INDEX ECCM.XIE1IFMLOCK ON ECCM.IFMLOCK
+  (END_TIME ASC,
+   START_TIME ASC)
+  PCTFREE 10 CLUSTER ;
+
+
+-- DDL Statements for primary key on Table ECCM.IFMLOCK
+
+ALTER TABLE ECCM.IFMLOCK
+ ADD PRIMARY KEY
+  (PROCESS_ID);
+
+------------------------------------------------
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+-- DDL Statements for table ECCM.RATECARDDESC
+------------------------------------------------
+ DROP TABLE ECCM.RATECARDDESC;
+ CREATE TABLE ECCM.RATECARDDESC  (
+    COUNTRYCODE CHAR(2) NOT NULL ,
+    SHIPPINGCONDITION CHAR(2) NOT NULL ,
+    NLSID INTEGER NOT NULL ,
+    DESCRIPTION VARCHAR(40) ,
+    LASTUPDATED TIMESTAMP NOT NULL WITH DEFAULT CURRENT TIMESTAMP)
+   ;
+ ALTER TABLE ECCM.RATECARDDESC PCTFREE 10;
+
+-- DDL Statements for indexes on Table ECCM.RATECARDDESC
+
+CREATE UNIQUE INDEX ECCM.XPKRATECARDDESC ON ECCM.RATECARDDESC
+  (COUNTRYCODE ASC,
+   SHIPPINGCONDITION ASC,
+   NLSID ASC)
+  PCTFREE 10 CLUSTER ;
+
+
+-- DDL Statements for primary key on Table ECCM.RATECARDDESC
+
+ALTER TABLE ECCM.RATECARDDESC
+ ADD CONSTRAINT SQL020927112142340 PRIMARY KEY
+  (COUNTRYCODE,
+   SHIPPINGCONDITION,
+   NLSID);
+
+------------------------------------------------
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+-- DDL Statements for table ECCM.RATE_CARD
+------------------------------------------------
+ DROP TABLE ECCM.RATE_CARD;
+ CREATE TABLE ECCM.RATE_CARD  (
+    RATECARDCODE CHAR(10) NOT NULL ,
+    COUNTRYCODE CHAR(3) NOT NULL ,
+    SHIPPINGCONDITION CHAR(2) NOT NULL ,
+    PRICEVALIDFROMDATE DATE NOT NULL ,
+    PRICEAMOUNT DECIMAL(16,3) ,
+    CURRENCYCODE CHAR(5) ,
+    PRICEVALIDTODATE DATE ,
+    SOURCESYSTEM VARCHAR(10) ,
+    LASTUPDATED TIMESTAMP NOT NULL WITH DEFAULT CURRENT TIMESTAMP,
+    MARKEDFORDELETION CHAR(1) )
+    ;
+ ALTER TABLE ECCM.RATE_CARD PCTFREE 10;
+
+-- DDL Statements for indexes on Table ECCM.RATE_CARD
+
+CREATE INDEX ECCM.WZ1RATE_CARD1 ON ECCM.RATE_CARD
+  (LASTUPDATED ASC,
+   MARKEDFORDELETION ASC,
+   SOURCESYSTEM ASC,
+   CURRENCYCODE ASC,
+   PRICEAMOUNT ASC,
+   PRICEVALIDFROMDATE ASC,
+   PRICEVALIDTODATE ASC,
+   SHIPPINGCONDITION ASC,
+   COUNTRYCODE ASC,
+   RATECARDCODE ASC);
+
+-- DDL Statements for indexes on Table ECCM.RATE_CARD
+
+CREATE INDEX ECCM.XIE1RATE_CARD ON ECCM.RATE_CARD
+  (COUNTRYCODE ASC,
+   RATECARDCODE ASC)
+  PCTFREE 10 CLUSTER ;
+
+
+-- DDL Statements for primary key on Table ECCM.RATE_CARD
+
+ALTER TABLE ECCM.RATE_CARD
+ ADD PRIMARY KEY
+  (RATECARDCODE,
+   COUNTRYCODE,
+   SHIPPINGCONDITION,
+   PRICEVALIDFROMDATE);
+
+------------------------------------------------
+-- MADE DROP IMMUNE FROM ODSINIT
+-----------------------------------------------
+-- DDL Statements for table ECCM.SECURITY
+------------------------------------------------
+ DROP TABLE ECCM.SECURITY;
+ CREATE TABLE ECCM.SECURITY  (
+    USERID VARCHAR(100) NOT NULL ,
+    LISTTYPE CHAR(1) NOT NULL ,
+    LISTVALUE VARCHAR(254) NOT NULL ,
+    NAME VARCHAR(254) ,
+    LASTUPDATED TIMESTAMP NOT NULL WITH DEFAULT CURRENT TIMESTAMP,
+    LASTMODIFIED TIMESTAMP NOT NULL WITH DEFAULT CURRENT TIMESTAMP)
+    ;
+ ALTER TABLE ECCM.SECURITY PCTFREE 10;
+
+
+-- DDL Statements for primary key on Table ECCM.SECURITY
+
+ALTER TABLE ECCM.SECURITY
+ ADD PRIMARY KEY
+  (USERID,
+   LISTTYPE,
+   LISTVALUE);
+
+-- EOS
+
+------------------------------------------------------------------------------------------
+--  Additional Indexes Product Family Structures
+--  CHECKED FOR FINAL SCRIPT
+------------------------------------------------------------------------------------------
+
+DROP INDEX ECCM.BR_IX2;
+CREATE INDEX ECCM.BR_IX2 ON ECCM.BR (BRANDCODE_FC ASC, NLSID ASC);
+
+DROP INDEX ECCM.FAM_IX2;
+CREATE INDEX ECCM.FAM_IX2 ON ECCM.FAM (FAMNAMEASSOC_FC ASC,BRID ASC, NLSID ASC);
+
+DROP INDEX ECCM.SE_IX2;
+CREATE INDEX ECCM.SE_IX2 ON ECCM.SE (SENAMEASSOC_FC ASC, FAMID, NLSID ASC);
+
+DROP INDEX ECCM.PR_IX2;
+CREATE INDEX ECCM.PR_IX2 ON ECCM.PR (BRANDCODE_FC ASC, NLSID ASC);
+DROP INDEX ECCM.PR_IX3;
+CREATE INDEX ECCM.PR_IX3 ON ECCM.PR (FAMNAMEASSOC_FC ASC, NLSID ASC);
+DROP INDEX ECCM.PR_IX4;
+CREATE INDEX ECCM.PR_IX4 ON ECCM.PR (SENAMEASSOC_FC ASC, NLSID ASC);
+
+drop index eccm.of_ix1;
+create index eccm.of_ix1 on eccm.of(offeringtype,optgroupname,subgroup);
+
+DROP INDEX ECCM.PRODATTRELATOR_IX1;
+CREATE INDEX ECCM.PRODATTRELATOR_IX1 ON ECCM.PRODATTRELATOR (ENTITY2ID, ENTITY2TYPE, ENTITY1ID, ENTITY1TYPE);
+
+DROP INDEX ECCM.PRODATTRELATOR_IX2;
+CREATE INDEX ECCM.PRODATTRELATOR_IX2 ON ECCM.PRODATTRELATOR (ENTITY1ID, ENTITY1TYPE, ENTITY2ID, ENTITY2TYPE);
+
+DROP INDEX ECCM.GENERALAREA_IX1;
+CREATE INDEX ECCM.GENERALAREA_IX1 ON ECCM.GENERALAREA(genareaname_fc ASC, NLSID ASC);
+
+
+DROP INDEX ECCM.CSOL_IX1;
+CREATE INDEX ECCM.CSOL_IX1 ON ECCM.CSOL(genareaname_fc ASC, OFID ASC, NLSID ASC);
+
+DROP INDEX ECCM.CSOL_IX2;
+CREATE INDEX ECCM.CSOL_IX2 ON ECCM.CSOL(CSOLSTATUS_FC, OFID ASC, NLSID ASC);
+
+DROP INDEX ECCM.csol_ix3;
+create index eccm.csol_ix3 on eccm.csol(act_wdrawdate_ct);
+
+DROP INDEX ECCM.CCTO_IX1;
+CREATE INDEX ECCM.CCTO_IX1 ON ECCM.CCTO(genareaname_fc ASC, CTOID ASC, NLSID ASC);
+
+DROP INDEX ECCM.CCTO_IX2;
+CREATE INDEX ECCM.CCTO_IX2 ON ECCM.CCTO(CCOSOLSTATUS_FC, CTOID ASC, NLSID ASC);
+
+DROP INDEX ECCM.CVAR_IX1;
+CREATE INDEX ECCM.CVAR_IX1 ON ECCM.CVAR(genareaname_fc ASC, VARID ASC, NLSID ASC);
+
+DROP INDEX ECCM.CVAR_IX2;
+CREATE INDEX ECCM.CVAR_IX2 ON ECCM.CVAR(STATUS_CVAR_FC ASC, VARID ASC, NLSID ASC);
+
+DROP INDEX ECCM.CB_IX1;
+CREATE INDEX ECCM.CB_IX1 ON ECCM.CB(genareaname_fc ASC, NLSID ASC);
+
+DROP INDEX ECCM.CB_IX2;
+CREATE INDEX ECCM.CB_IX2 ON ECCM.CB(CBSOLSTATUS_FC ASC, NLSID ASC);
+
+DROP INDEX ECCM.IMG_IX2;
+CREATE INDEX ECCM.IMG_IX2 ON ECCM.IMG(IMGSTATUS_FC ASC, ENTITYID ASC, NLSID ASC);
+
+DROP INDEX ECCM.attribute_ix1;
+create index eccm.attribute_ix1 on eccm.attribute(attributetoken, attributecode);
+
+DROP INDEX ECCM.prodattribute_ix1;
+create index eccm.prodattribute_ix1 on eccm.prodattribute(attributecode, entityid, entitytype);
+
+DROP INDEX ECCM.cg_ix1;
+create index eccm.cg_ix1 on eccm.cg(cgpriced, entityid);
+
+
+
+-------------------------------------------------------------------------------------------
+--  REORG INFORMATIION
+--  CHECKED FOR FINAL SCRIPT
+-------------------------------------------------------------------------------------------
+reorg table ECCM.br index ECCM.br_pk;
+runstats on table ECCM.br and detailed indexes all;
+
+reorg table ECCM.brfam index ECCM.brfam_pk;
+runstats on table ECCM.brfam and detailed indexes all;
+
+reorg table ECCM.famse index ECCM.famse_pk;
+runstats on table ECCM.famse and detailed indexes all;
+
+reorg table ECCM.fam index ECCM.fam_pk;
+runstats on table ECCM.fam and detailed indexes all;
+
+reorg table ECCM.se index ECCM.se_pk;
+runstats on table ECCM.se and detailed indexes all;
+
+reorg table ECCM.pr index ECCM.pr_pk;
+runstats on table ECCM.pr and detailed indexes all;
+
+reorg table ECCM.prof index ECCM.prof_pk;
+runstats on table ECCM.prof and detailed indexes all;
+
+reorg table ECCM.of index ECCM.of_pk;
+runstats on table ECCM.of and detailed indexes all;
+
+reorg table ECCM.ofcsol index ECCM.ofcsol_pk;
+runstats on table ECCM.ofcsol and detailed indexes all;
+
+reorg table ECCM.ofso index ECCM.ofso_pk;
+runstats on table ECCM.ofso and detailed indexes all;
+
+reorg table ECCM.so index ECCM.so_pk;
+runstats on table ECCM.so and detailed indexes all;
+
+reorg table ECCM.csolso index ECCM.csolso_pk;
+runstats on table ECCM.csolso and detailed indexes all;
+
+reorg table ECCM.so index ECCM.so_pk;
+runstats on table ECCM.so and detailed indexes all;
+
+reorg table ECCM.csol index ECCM.csol_pk;
+runstats on table ECCM.csol and detailed indexes all;
+
+reorg table ECCM.cto index ECCM.cto_pk;
+runstats on table ECCM.cto and detailed indexes all;
+
+reorg table ECCM.ctoccto index ECCM.ctoccto_pk;
+runstats on table ECCM.ctoccto and detailed indexes all;
+
+reorg table ECCM.ccto index ECCM.ccto_pk;
+runstats on table ECCM.ccto and detailed indexes all;
+
+reorg table ECCM.var index ECCM.var_pk;
+runstats on table ECCM.var and detailed indexes all;
+
+reorg table ECCM.prvar index ECCM.prvar_pk;
+runstats on table ECCM.prvar and detailed indexes all;
+
+reorg table ECCM.varcvar index ECCM.varcvar_pk;
+runstats on table ECCM.varcvar and detailed indexes all;
+
+reorg table ECCM.cvar index ECCM.cvar_pk;
+runstats on table ECCM.cvar and detailed indexes all;
+
+reorg table ECCM.sbb index ECCM.sbb_pk;
+runstats on table ECCM.sbb and detailed indexes all;
+
+reorg table ECCM.cb index ECCM.cb_pk;
+runstats on table ECCM.cb and detailed indexes all;
+
+reorg table ECCM.cbcsol index ECCM.cbcsol_pk;
+runstats on table ECCM.cbcsol and detailed indexes all;
+
+reorg table ECCM.ctocg index ECCM.ctocg_pk;
+runstats on table ECCM.ctocg and detailed indexes all;
+
+reorg table ECCM.cg index ECCM.cg_pk;
+runstats on table ECCM.cg and detailed indexes all;
+
+
+reorg table ECCM.cctosbb index ECCM.cctosbb_pk;
+runstats on table ECCM.cctosbb and detailed indexes all;
+
+reorg table ECCM.cctomm index ECCM.cctomm_pk;
+runstats on table ECCM.cctomm and detailed indexes all;
+
+reorg table ECCM.csolmm index ECCM.csolmm_ix1;
+runstats on table ECCM.csolmm and detailed indexes all;
+
+reorg table ECCM.ofmm index ECCM.ofmm_ix1;
+runstats on table ECCM.ofmm and detailed indexes all;
+
+reorg table ECCM.ofimg index ECCM.ofimg_pk;
+runstats on table ECCM.ofimg and detailed indexes all;
+
+reorg table ECCM.ctomm index ECCM.ctomm_pk;
+runstats on table ECCM.ctomm and detailed indexes all;
+
+reorg table ECCM.ctoimg index ECCM.ctoimg_pk;
+runstats on table ECCM.ctoimg and detailed indexes all;
+
+reorg table ECCM.mm index ECCM.mm_pk;
+runstats on table ECCM.mm and detailed indexes all;
+
+reorg table ECCM.img index ECCM.img_pk;
+runstats on table ECCM.img and detailed indexes all;
+
+reorg table ECCM.cvarsbb index ECCM.cvarsbb_pk;
+runstats on table ECCM.cvarsbb and detailed indexes all;
+
+reorg table ECCM.ctosbb index ECCM.ctosbb_pk;
+runstats on table ECCM.ctosbb and detailed indexes all;
+
+reorg table ECCM.varsbb index ECCM.varsbb_pk;
+runstats on table ECCM.varsbb and detailed indexes all;
+
+reorg table ECCM.attribute use tempspace1;
+runstats on table ECCM.attribute and detailed indexes all;
+
+reorg table ECCM.prodattribute use tempspace1;
+runstats on table ECCM.prodattribute and detailed indexes all;
+
+reorg table ECCM.prodattrelator;
+runstats on table ECCM.prodattrelator and detailed indexes all;
+
+reorg table ECCM.flag index ECCM.FLAG_PK use tempspace1;
+runstats on table ECCM.flag and detailed indexes all;
+
+reorg table ECCM.generalarea index ECCM.GENERALAREA_IX1;
+runstats on table ECCM.generalarea and detailed indexes all;
+
+reorg table ECCM.ofcmpof index ECCM.ofcmpof_PK;
+runstats on table ECCM.ofcmpof and detailed indexes all;
+
+reorg table ECCM.cpgvar index ECCM.cpgvar_PK;
+runstats on table ECCM.cpgvar and detailed indexes all;
+
+reorg table ECCM.cpg index ECCM.cpg_PK;
+runstats on table ECCM.cpg and detailed indexes all;
+
+reorg table ECCM.cpgcto index ECCM.cpgcto_PK;
+runstats on table ECCM.cpgcto and detailed indexes all;
+
+reorg table ECCM.cpgof index ECCM.cpgof_PK;
+runstats on table ECCM.cpgof and detailed indexes all;
+
+reorg table ECCM.ofcpgos index ECCM.ofcpgos_PK;
+runstats on table ECCM.ofcpgos and detailed indexes all;
+
+
+--
+-- RUN SOFTWARE CREATE TABLE HERE
+--
+
+reorg table ECCM.software index ECCM.software_PK;
+runstats on table ECCM.software and detailed indexes all;
+--
+-- Tables that need to be added post indices and reorgs
+--
+
+------------------------------------------------
+-- CALLED OUT IN SPECFICICATION DOC
+-- CONVERTED DWB
+-- COMPILED DWB
+-- TESTED
+-- CHECKED FOR FINAL SCRIPT
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+-- DDL Statements for table ECCM.PROJSERBRANDFAM
+------------------------------------------------
+DROP TABLE ECCM.PROJSERBRANDFAM;
+CREATE TABLE ECCM.PROJSERBRANDFAM (
+ NLSID INT NOT NULL,
+ PROJECTID INT NOT NULL,
+ SERIESID INT NOT NULL,
+ BRANDID INT NOT NULL,
+ FAMILYID INT NOT NULL,
+ SERIESNAME VARCHAR(50) NOT NULL,
+ BRANDNAME VARCHAR(50) NOT NULL,
+ FAMILYNAME VARCHAR(50) NOT NULL,
+ FAMSERNAME VARCHAR (100) NOT NULL
+);
+CREATE INDEX ECCM.PSBFINDEX ON ECCM.PROJSERBRANDFAM(PROJECTID ASC, NLSID ASC);
+
+DELETE FROM ECCM.PROJSERBRANDFAM;
+INSERT INTO ECCM.PROJSERBRANDFAM
+SELECT
+ PR.NLSID as NLSID
+,PR.ENTITYID AS PROJECTID
+,SE.ENTITYID AS SERIESID
+,BR.ENTITYID  AS BRANDID
+,FAM.ENTITYID AS FAMILYID
+,SE.SERIESNAME AS SERIESNAME
+,BR.SUBGROUPNAME AS BRANDNAME
+,FAM.FAMILYNAME AS FAMILYNAME
+,FAM.Familyname || '@' || SE.SeriesName as FAMSERNAME
+FROM ECCM.pr pr
+join ECCM.br br on
+    br.brandcode = pr.brandcode and
+    br.nlsid = pr.nlsid
+join ECCM.fam fam on
+    fam.FAMNAMEASSOC_FC = pr.FAMNAMEASSOC_FC and
+   fam.nlsid = pr.nlsid
+join ECCM.se se on
+    se.SENAMEASSOC_FC = pr.SENAMEASSOC_FC and
+   se.nlsid = pr.nlsid
+where
+   pr.nlsid = 1 and
+   pr.senameassoc is not null and
+   pr.senameassoc != '' and
+  1 =  CASE WHEN  fam.familyname in (
+'PS/55 Systems','RS/6000 Client','WorkPad','Misc PI','Orphan','NetVista Internet Appliance',
+'NetVista Thin Client','Appliance Division',
+'Aptiva', 'PC Server','Desktop')
+THEN 0
+WHEN
+  fam.familyname='NetVista' and se.seriesname in ('A60p','A40i','A40','A40p','S40',
+'S40p','X40', 'A20','A60','A60i','X40i','A20i','S40i','A10','M41','M41z','A21','A21i',
+'M40','M40i','X41', 'X41z','X42z','X42','M42','M42z','A22','A22i','A25','A22p',
+'X Series')
+THEN 0
+WHEN
+  fam.familyname='ThinkPad' and se.seriesname in ('235','240','315','365','380','390',
+'4XX','535', '560','570','600','730','760','765','770','i Series','MOB Other',
+'ThinkPad TransNote','130 Series')
+THEN 0
+WHEN
+ fam.familyname='Netfinity' and se.seriesname in ('1000','3000','3500','5000',
+'5100R','5500', '5500-M10','5500-M20','5600','56XX','5XXX','5XXXR','7100','6000R',
+'7000','7000-M10','7600', '7XXX','8500R','64EP','4000R','3500 M20','3500 M10','XXXX',
+'5100','4500R','4100R','A100', '3600','A200','A500')
+THEN 0
+WHEN br.subgroupname = 'Archive' THEN 0
+ELSE 1
+END
+;
+reorg table eccm.PROJSERBRANDFAM index eccm.PSBFINDEX;
+runstats on table eccm.PROJSERBRANDFAM and detailed indexes all;
+
+
+------------------------------------------------
+-- DOES NOT APPEAR TO BE CALLED OUT IN ANY TABLE SPEC
+-- NOR SUPPORTING TABLE
+-- Converted DWB
+-- COMPILED DWB
+-- MADE DROP IMMUNE FROM ODSINIT
+-- CHECKED FOR FINAL SCRIPT
+-- Added distinct - per MTM Feedback
+-- ADDED CVAR SELECT - per MTM fb 53343
+------------------------------------------------
+-- DDL Statements for table ECCM.PRDMESSAGE
+------------------------------------------------
+drop table eccm.prdmessage;
+create summary table eccm.prdmessage (
+  parententitytype
+, parententityid
+, nlsid
+, mmentitytype
+, mmentityid
+, datefrom
+, dateto
+, status) AS
+(SELECT DISTINCT
+ 'CSOL'
+, csol.entityID
+, csol.nlsid
+,'MM'
+, COALESCE(mm.entityid,mm2.entityid)
+, COALESCE(mm.mmfrom,mm2.mmfrom)
+, COALESCE(mm.mmto, mm2.mmto)
+, COALESCE(mm.mmstatus,mm2.mmstatus)
+FROM ECCM.csol csol
+LEFT JOIN  ECCM.csolmm csolmm on
+    csol.entityid = csolmm.ID1
+LEFT JOIN ECCM.mm mm on
+    mm.EntityID = csolmm.ID2
+and mm.nlsid = csol.nlsid
+LEFT JOIN ECCM.ofmm ofmm on
+    ofmm.ID1 = csol.ofid
+LEFT JOIN ECCM.mm mm2 on
+    mm2.EntityID =ofmm.ID2
+and mm2.nlsid = csol.nlsid
+UNION ALL
+SELECT DISTINCT
+'CCTO'
+,CCTO.EntityID
+,CCTO.nlsid
+,'MM'
+,COALESCE(mm.entityid,mm2.entityid)
+,COALESCE(mm.mmfrom,mm2.mmfrom)
+,COALESCE(mm.mmto, mm2.mmto)
+,COALESCE(mm.mmstatus,mm2.mmstatus)
+FROM ECCM.ccto ccto
+LEFT JOIN  ECCM.cctomm cctomm on
+    ccto.entityid = cctomm.ID1
+LEFT JOIN ECCM.mm mm on
+    mm.EntityID = cctomm.ID2
+and mm.nlsid = ccto.nlsid
+LEFT JOIN ECCM.ctomm ctomm on
+    ctomm.ID1 = ccto.ctoid
+LEFT JOIN ECCM.mm mm2 on
+    mm2.EntityID =ctomm.ID2
+and mm2.nlsid = ccto.nlsid
+UNION ALL
+SELECT DISTINCT 'CVAR' ,
+ CVAR.EntityID ,
+ CVAR.nlsid ,
+ 'MM' ,
+ COALESCE(mm.entityid,mm2.entityid) ,
+ COALESCE(mm.mmfrom,mm2.mmfrom) ,
+ COALESCE(mm.mmto, mm2.mmto) ,
+ COALESCE(mm.mmstatus,mm2.mmstatus)
+FROM ECCM.cvar cvar
+LEFT JOIN  ECCM.cvarmm cvarmm on
+    cvar.entityid = cvarmm.ID1
+LEFT JOIN ECCM.mm mm on
+    mm.EntityID = cvarmm.ID2 and
+    mm.nlsid = cvar.nlsid
+LEFT JOIN ECCM.varmm varmm on
+    varmm.ID1 = cvar.varid
+LEFT JOIN ECCM.mm mm2 on
+    mm2.EntityID =varmm.ID2 and
+    mm2.nlsid = cvar.nlsid
+UNION ALL
+SELECT
+'CB'
+,CB.EntityID
+,CB.nlsid
+,'MM'
+,mm.entityid
+,mm.mmfrom
+,mm.mmto
+,mm.mmstatus
+FROM ECCM.cb cb
+INNER JOIN  ECCM.cbmm cbmm on
+    cb.entityid = cbmm.ID1
+INNER JOIN ECCM.mm mm on
+    mm.EntityID = cbmm.ID2
+and mm.nlsid = cb.nlsid
+) DATA INITIALLY DEFERRED REFRESH DEFERRED;
+REFRESH TABLE ECCM.PRDMESSAGE;
+
+CREATE INDEX ECCM.MMINDEX001 ON ECCM.PRDMESSAGE (PARENTENTITYID ASC, PARENTENTITYTYPE ASC, NLSID ASC,MMENTITYID ASC) PCTFREE 10 ;
+
+
+------------------------------------------------
+-- CALLED OUT IN THE TABLE SPEC - AND USED IN OTHER VIEWS
+--
+-- Converted DWB
+-- Compiled DWB
+-- MADE DROP IMMUNE FROM ODSINIT
+-- CHECKED FOR FINAL SCRIPT
+------------------------------------------------
+-- DDL Statements for table ECCM.PRODUCTCOUNTRY
+------------------------------------------------
+echo table eccm.productcountry;
+drop table eccm.productcountry;
+create summary table eccm.productcountry
+(parententitytype, parententityid, nlsid,ctid, countrycode) as
+(SELECT 'CSOL' ,
+  csol.entityid ,
+  csol.nlsid ,
+  ga.entityid ,
+  ga.genareacode
+ FROM ECCM.csol csol
+ JOIN ECCM.generalarea ga on ga.genareaname = csol.genareaname and ga.genareatype='Cty'
+ JOIN ECCM.psgctnls ct on ct.countrycode=ga.genareacode
+ UNION ALL
+ SELECT 'CVAR' ,
+  cvar.entityid ,
+  cvar.nlsid ,
+  ga.entityid ,
+  ga.genareacode
+ FROM ECCM.cvar cvar
+ JOIN ECCM.generalarea ga on ga.genareaname = cvar.genareaname and ga.genareatype='Cty'
+ JOIN ECCM.psgctnls ct on ct.countrycode=ga.genareacode
+ UNION ALL
+ SELECT 'CCTO' ,
+  ccto.entityid ,
+  ccto.nlsid ,
+  ga.entityid ,
+  ga.genareacode
+ FROM ECCM.ccto ccto
+ JOIN ECCM.generalarea ga on ga.genareaname = ccto.genareaname and ga.genareatype='Cty'
+ JOIN ECCM.psgctnls ct on ct.countrycode=ga.genareacode
+ UNION ALL
+ SELECT 'CB ' ,
+  cb.entityid ,
+  cb.nlsid ,
+  ga.entityid ,
+  ga.genareacode
+ FROM ECCM.cb cb
+ JOIN ECCM.generalarea ga on ga.genareaname = cb.genareaname and ga.genareatype='Cty'
+ JOIN ECCM.psgctnls ct on ct.countrycode=ga.genareacode
+)
+DATA INITIALLY DEFERRED REFRESH DEFERRED;
+REFRESH TABLE ECCM.PRODUCTCOUNTRY;
+
+CREATE INDEX ECCM.PCINDEX001 ON ECCM.PRODUCTCOUNTRY (PARENTENTITYID ASC, PARENTENTITYTYPE ASC, NLSID ASC) PCTFREE 10;
+CREATE INDEX ECCM.PRODUCTCOUNTRY_I2 ON ECCM.PRODUCTCOUNTRY (CTID ASC) PCTFREE 10 CLUSTER;
+CREATE INDEX ECCM.XIE3PRODUCTCOUNTRY ON ECCM.PRODUCTCOUNTRY (PARENTENTITYID ASC, NLSID ASC, COUNTRYCODE ASC, PARENTENTITYTYPE ASC);
+
+
+------------------------------------------------
+-- CALLED OUT IN THE TABLE SPEC
+-- Converted DWB
+-- Compiled DWB
+-- MADE DROP IMMUNE FROM ODSINIT
+-- CHECKED FOR FINAL SCRIPT
+------------------------------------------------
+-- DDL Statements for table ECCM.CATIMAGE
+------------------------------------------------
+echo eccm.catimage;
+drop table eccm.catimage;
+create summary table eccm.catimage (
+   parententitytype
+ , parententityid
+ , nlsid
+ , imageid
+ , displayname
+ , colorimagename
+ , datefrom
+ , dateto
+ , status ) as
+ (
+  SELECT
+   'FAM'
+   ,fam.entityid
+   ,fam.nlsid
+   ,img.entityid
+   ,img.IMAGEDESCRIPTION
+   ,img.MKT_IMG_FILENAME
+   ,img.imgfrom
+   ,img.imgto
+   ,img.imgstatus
+   from ECCM.fam fam
+   join ECCM.famimg famimg on
+       famimg.ID1 = fam.entityid
+   join ECCM.img img on
+       img.EntityID = famimg.ID2
+   and  img.nlsid = fam.nlsid
+
+   where       img.imgstatus_fc ='0020' and
+              img.MKT_IMG_FILENAME is not null
+   UNION ALL
+
+    select
+   'SE'
+   ,se.entityid
+   ,se.nlsid
+   ,img.entityid
+   ,img.IMAGEDESCRIPTION
+   ,img.MKT_IMG_FILENAME
+   ,img.imgfrom
+   ,img.imgto
+   ,img.imgstatus
+   from ECCM.se se
+   join ECCM.seimg seimg on
+       seimg.ID1 = se.entityid
+   join ECCM.img img on
+       img.EntityID = seimg.ID2
+   and  img.nlsid = se.nlsid
+   where       img.imgstatus_fc ='0020' and
+              img.MKT_IMG_FILENAME is not null
+
+  ) DATA INITIALLY DEFERRED REFRESH DEFERRED ;
+REFRESH TABLE ECCM.CATIMAGE;
+CREATE INDEX ECCM.CATIMINDEX001 ON ECCM.CATIMAGE (PARENTENTITYTYPE ASC, PARENTENTITYID ASC, IMAGEID ASC) PCTFREE 10;
+
+
+------------------------------------------------
+-- CALLED OUT IN THE TABLE SPEC
+-- CONVERTED DWB
+-- COMPILED DWB
+-- MADE DROP IMMUNE FROM ODSINIT
+-- CHECKED FOR FINAL SCRIPT
+-- GAB : Added per FB#52929
+-----------------------------------------------
+-- DDL Statements for table ECCM.ATTRWITHUNIT
+------------------------------------------------
+echo table eccm.attrwithunit;
+DROP TABLE ECCM.ATTRWITHUNIT;
+ create summary table eccm.attrwithunit as
+ ( select
+    attr1.attributecode as attrcode
+  , attr1.attributetoken as attrtoken
+  , attr2.attributecode as attrunitcode
+  , attr2.attributetoken as attrunittoken
+  from eccm.attribute attr1
+  left outer join eccm.attrunits attrunits on
+      attrunits.attributetoken = attr1.attributetoken
+  left join eccm.attribute attr2 on
+      attr2.attributetoken  = attrunits.attributeunittoken
+where attr1.attributetoken not in (select attributeunittoken from eccm.attrunits)
+) Data initially deferred refresh deferred;
+commit work;
+refresh table eccm.attrwithunit;
+
+-- DDL Statements for indexes on Table ECCM.ATTRWITHUNIT
+
+CREATE INDEX ECCM.WZATTRWITHUNIT ON ECCM.ATTRWITHUNIT(ATTRTOKEN ASC, ATTRUNITTOKEN ASC);
+
+------------------------------------------------
+-- NOT USED FROM WHAT I CAN GATHER
+-- Converted DWB
+-- Compiled DWB
+-- MADE DROP IMMUNE FROM ODSINIT
+-- CHECKED FOR FINAL SCRIPT
+------------------------------------------------
+-- DDL Statements for table ECCM.COUNTRYREGION
+------------------------------------------------
+echo table eccm.countryregion;
+drop table eccm.countryregion;
+create summary table eccm.countryregion (ctid, nlsid ,countrycode ,regioncode) as (
+select
+ ga.entityid
+,ga.nlsid
+,ga.GENAREACODE
+,ga.GENAREAPARENT
+FROM ECCM.generalarea ga
+WHERE
+  ga.genareatype = 'Cty'
+
+) DATA INITIALLY DEFERRED REFRESH DEFERRED;
+refresh table eccm.countryregion;
+CREATE INDEX ECCM.CRINDEX001 ON ECCM.COUNTRYREGION(CTID ASC);
+
+
+------------------------------------------------
+-- CALLED OUT IN THE TABLE SPEC
+-- Converted DWB
+-- COMPILED DWB
+-- MTM CHANGED
+-- MADE DROP IMMUNE FROM ODSINIT
+-- CHECKED FOR FINAL SCRIPT
+------------------------------------------------
+-- DDL Statements for table ECCM.CBUNSPSC
+------------------------------------------------
+echo table eccm.cbunspsc;
+drop table eccm.cbunspsc;
+create summary table eccm.cbunspsc (entitytype, entityid,nlsid, unspsc) as
+(
+with tof (cbid, cbnlsid, type, ofid, count) as (
+
+select    cb.entityid,
+          cb.nlsid,
+          case of.offeringtype when 'SYSTEM' then 'SYSTEM' else 'OPTION' end,
+          max(of.entityid),
+          count(distinct of.entityid)
+
+from      eccm.cb cb
+
+join      eccm.cbcsol cbcsol on
+          cbcsol.id1 = cb.entityid
+
+join      eccm.csol csol on
+          csol.entityid = cbcsol.id2 and
+          csol.nlsid = cb.nlsid
+
+join      eccm.of of on
+          of.entityid = csol.ofid and
+          of.nlsid = csol.nlsid
+
+group by  cb.entityid,
+          cb.nlsid,
+          of.offeringtype
+
+)
+--
+-- Produces SYSTEM or OPTION recs
+--
+, t1of (cbid, cbnlsid, type, ofid, count) as
+(
+select    cbid,
+          cbnlsid,
+          type,
+          max(ofid),
+          sum(count)
+
+from      tof
+
+group
+by        cbid,
+          cbnlsid,
+          type
+)
+--
+--  CB's w/ Systems on them
+--
+,tsys (cbid, cbnlsid, type, ofid)  as (
+
+select
+distinct  cbid,
+          cbnlsid,
+          type,
+          ofid
+
+from      t1of t1
+
+where t1.type = 'SYSTEM'
+)
+
+,tvar (cbid, cbnlsid, varid,count) as (
+
+select    cb.entityid,
+          cb.nlsid,
+          max(var.entityid),
+          count(distinct var.entityid)
+from      eccm.cb cb
+
+join      eccm.cbcvar cbcvar on
+          cbcvar.id1 = cb.entityid
+
+join      eccm.cvar cvar on
+          cvar.entityid = cbcvar.id2 and
+          cvar.nlsid = cb.nlsid
+
+join      eccm.var var on
+          var.entityid = cvar.varid and
+          var.nlsid = cvar.nlsid
+where     (cb.entityid, cb.nlsid) not in (select cbid, cbnlsid from tsys)
+
+group by  cb.entityid,
+          cb.nlsid
+)
+
+-- CBs WITH AT LEAST ONE SYSTEM
+select    'CB',
+          cbid,
+          cbnlsid,
+          of.unspsc
+from      tsys  tsys
+join      eccm.of of on
+          of.entityid =  tsys.ofid and
+          of.nlsid = tsys.cbnlsid
+union all
+-- CBs w/ No MTM but Variant
+select    'CB',
+          cbid,
+          cbnlsid,
+          var.unspsc
+from      tvar  tvar
+join      eccm.var var on
+          var.entityid =  tvar.varid and
+          var.nlsid = tvar.cbnlsid
+
+union all
+
+-- OPTIONS ONLY Section
+select    'CB',
+          cbid,
+          cbnlsid,
+          coalesce(of.unspsc,'43171800')
+from      t1of t1
+join      eccm.of of on
+          of.entityid =  t1.ofid and
+          of.nlsid = t1.cbnlsid
+where    (t1.cbid, t1.cbnlsid) not in (select cbid, cbnlsid from tsys) and
+         (t1.cbid, t1.cbnlsid) not in (select cbid, cbnlsid from tvar)
+
+) DATA INITIALLY DEFERRED REFRESH DEFERRED;
+refresh table eccm.cbunspsc;
+
+CREATE INDEX ECCM.CBUX0001 ON ECCM.CBUNSPSC (ENTITYID ASC,ENTITYTYPE ASC, nlsid ASC);
+
+
+-----------------------------------------------
+-- CALLED OUT IN THE SPEC
+-- ADDED NLSID
+-- CONVERTED DWB
+-- COMPILED DWB
+-- MADE DROP IMMUNE FROM ODSINIT
+-- CHECKED FOR FINAL SCRIPT
+------------------------------------------------
+-- DDL Statements for table ECCM.PSGSERVICETYPE
+------------------------------------------------
+echo table eccm.psgservicetype;
+drop table eccm.psgservicetype;
+create summary table eccm.psgservicetype
+(  entitytype,
+   entityid,
+   nlsid,
+   flagcode
+
+) AS (
+
+select 'CSOL',
+        csolser.ID1,
+        ser.nlsid,
+        SER.SERVICETYPE_FC
+
+from    ECCM.csolser csolser
+
+join    ECCM.ser ser on
+        ser.entityid = csolser.ID2
+
+union all
+
+select 'OF',
+        ofser.ID1,
+        ser.nlsid,
+        SER.SERVICETYPE_FC
+
+from    ECCM.ofser ofser
+
+join    ECCM.ser ser on
+        ser.entityid = ofser.ID2
+
+union all
+
+select 'SBB',
+        sbbser.ID1,
+        ser.nlsid,
+        SER.SERVICETYPE_FC
+
+from    ECCM.sbbser sbbser
+
+join    ECCM.ser ser on
+        ser.entityid = sbbser.ID2
+
+) DATA INITIALLY DEFERRED REFRESH DEFERRED;
+REFRESH TABLE ECCM.PSGSERVICETYPE;
+
+------------------------------------------------
+-- USED TO SUPPORT OTHER TABLES
+-- Converted DWB
+-- Compiled DWB
+-- MADE DROP IMMUNE FROM ODSINIT
+-- CHECKED FOR FINAL SCRIPT
+-- New version from MTM
+-- CHANGED 0120 to 10054 and 0200 to 10062 for
+-- CVAR catalog
+------------------------------------------------
+-- DDL Statements for table ECCM.AUDIENCE
+------------------------------------------------
+echo table eccm.audience;
+DROP TABLE ECCM.AUDIENCE;
+CREATE SUMMARY TABLE ECCM.AUDIENCE
+(
+  nlsid,
+  entityname,
+  entityid,
+  columnname,
+  longdescription
+) AS (
+
+  select    csol.nlsid as nlsid,
+            'CSOL' as entityname,
+            csol.entityid as entityid,
+            f.attributecode as columnname,
+            case f.flagcode
+              when '0120' then 'SHOP'
+              when '0200' then 'LE'
+            end as longdescription
+
+  from      ECCM.csol csol
+
+  join      ECCM.FLAG f on
+            f.entityid = csol.entityid and
+            f.entitytype = 'CSOL' and
+            f.attributecode = 'CATALOG_NAME_CT' and
+            f.flagcode in ('0120','0200') and
+            f.nlsid = csol.nlsid
+
+  UNION
+  ALL
+
+  select    ccto.nlsid as nlsid,
+            'CCTO' as entityname,
+            ccto.entityid as entityid,
+            f.attributecode as columnname,
+            case f.flagcode
+              when '0120' then 'SHOP'
+              when '0200' then 'LE'
+            end as longdescription
+
+  from      ECCM.ccto ccto
+
+  join      ECCM.FLAG f on
+            f.entityid = ccto.entityid and
+            f.entitytype = 'CCTO' and
+            f.attributecode = 'CCOSOLCATALOGNAME' and
+            f.flagcode in ('0120','0200') and
+            f.nlsid = ccto.nlsid
+
+  UNION
+  ALL
+
+  select    cb.nlsid as nlsid,
+            'CB' as entityname,
+            cb.entityid as entityid,
+            f.attributecode as columnname,
+            case f.flagcode
+              when '0120' then 'SHOP'
+              when '0200' then 'LE'
+            end as longdescription
+
+  from      ECCM.cb cb
+
+  join      ECCM.FLAG f on
+            f.entityid = cb.entityid and
+            f.entitytype = 'CB' and
+            f.attributecode = 'CATALOG_NAME_CB' and
+            f.flagcode in ('0120','0200') and
+            f.nlsid = cb.nlsid
+
+  UNION
+  ALL
+
+  select    cvar.nlsid as nlsid,
+            'CVAR' as entityname,
+            cvar.entityid as entityid,
+            f.attributecode as columnname,
+            case f.flagcode
+              when '10054' then 'SHOP'
+              when '10062' then 'LE'
+            end as longdescription
+
+  from      ECCM.cvar cvar
+
+  join      ECCM.FLAG f on
+            f.entityid = cvar.entityid and
+            f.entitytype = 'CVAR' and
+            f.attributecode = 'CATALOGNAME_CVAR' and
+            f.flagcode in ('10054','10062') and
+            f.nlsid = cvar.nlsid
+  UNION
+  ALL
+
+  select    csol.nlsid as nlsid,
+            'CSOL' as entityname,
+            csol.entityid as entityid,
+            f.attributecode as columnname,
+            CASE f.flagcode
+              when '0250' THEN 'DACMAX'
+            END
+
+  from      eccm.csol csol
+
+  join      eccm.flag f on
+            f.entityid=csol.entityid and
+            f.entitytype='CSOL' and
+            f.attributecode='CATALOG_NAME_CT' and
+            f.flagcode='0250' and
+            csol.nlsid=1
+
+  where     csol.entityid not in
+            (select entityid from eccm.flag where flagcode in('0120','0200')
+            and entitytype='CSOL' and attributecode='CATALOG_NAME_CT' and nlsid=1)
+
+  UNION ALL
+
+  select    csol.nlsid as nlsid,
+            'CSOL' as entityname,
+            csol.entityid as entityid,
+            f.attributecode as columnname,
+            case f.flagcode
+              when '0250' then 'LE and DACMAX'
+            end
+
+  from      eccm.csol csol
+
+  join      eccm.flag f on
+            f.entityid=csol.entityid and
+            f.entitytype='CSOL' and
+            f.attributecode='CATALOG_NAME_CT' and
+            f.flagcode='0250' and
+            csol.nlsid=1
+
+  where     csol.entityid not in
+            (select entityid from eccm.flag where flagcode in('0120') and
+            entitytype='CSOL' and attributecode='CATALOG_NAME_CT' and nlsid=1)
+            and csol.entityid in
+            (select entityid from eccm.flag
+            where flagcode in('0200') and entitytype='CSOL'
+            and attributecode='CATALOG_NAME_CT' and nlsid=1)
+
+) DATA INITIALLY DEFERRED REFRESH DEFERRED ;
+
+REFRESH TABLE ECCM.AUDIENCE;
+
+-- DDL Statements for indexes on Table ECCM.AUDIENCE
+
+CREATE INDEX ECCM.AUDIENCEIX1 ON ECCM.AUDIENCE
+  (ENTITYID ASC,
+   ENTITYNAME ASC,
+   NLSID ASC)
+  PCTFREE 10 ;
+
+
+
+-------------------------------------------------------------
+-- CONVERTED DWB
+-- COMPILED DWB
+-- DOCUMENTATION REFERS TO DELTAFORCE?
+-- CANNOT FIND THAT VIEW HERE
+-- MADE DROP IMMUNE FROM ODSINIT
+-- CHECKED FOR FINAL SCRIPT
+-- New version from MTM -cleaned up 53185
+-- More changes from MTM - missing prefix - sub select wrong
+------------------------------------------------
+-- DDL Statements for table ECCM.COMPAT
+-- This should be NLSID 1 only because we are only
+-- Reoporting on partnumbers
+--
+-- What is the purpose of joining data to the int table avwwprd
+------------------------------------------------
+echo table eccm.compat;
+DROP TABLE ECCM.COMPAT;
+create summary table eccm.compat
+(
+  entitytype,
+  wwpartnum,
+  optionpnumb,
+  mtm,
+  operatingsys,
+  exceptmodel
+)
+  as
+    (
+with avwwprd_tmp (entityid) as
+ (
+    select
+    distinct    of.entityid
+
+    from        int.avwwprd prd
+
+    join        ECCM.csol csol on
+                prd.prdentityid = csol.entityid and
+                prd.prdnlsid = csol.nlsid
+
+    join        ECCM.of of on
+                of.entityid = csol.ofid and
+                of.nlsid = csol.nlsid
+
+    where       prd.prdentitytype = 'CSOL'
+
+ ),
+
+ avwwprd_tmp2 (entityid) as
+  (
+    select
+    distinct    cto.entityid
+
+    from        int.avwwprd prd
+
+    join        ECCM.ccto ccto on
+                prd.prdentityid = ccto.entityid and
+                prd.prdnlsid = ccto.nlsid
+
+
+    join        ECCM.cto cto on
+                cto.entityid = ccto.ctoid and
+                cto.nlsid = ccto.nlsid
+
+    where       prd.prdentitytype = 'CCTO'
+
+ ),
+
+ avwwprd_tmp3(entityid) as
+  (
+    select
+    distinct    varcvar.id1
+
+    from        int.avwwprd prd
+
+    join        ECCM.cvar cvar on
+                prd.prdentityid = cvar.entityid and
+                prd.prdnlsid = cvar.nlsid
+
+    join        ECCM.varcvar varcvar on
+                varcvar.ID2 = cvar.entityid
+
+    join        ECCM.var var on
+                var.entityid = varcvar.id1 and
+                var.nlsid =cvar.nlsid
+
+    where       prd.prdentitytype = 'CVAR'
+ )
+(
+
+  select
+  distinct      'PSGOFCMPOF',
+                of1.OFFERINGPNUMB,
+                of2.OFFERINGPNUMB,
+                '-',
+                '-',
+                '-'
+
+  from          ECCM.ofcmpof ofcmpof
+
+  join          ECCM.of of1 on
+                of1.entityid = ofcmpof.ID1
+
+  join          ECCM.of of2 on
+                of2.entityid = ofcmpof.ID2 and
+                of2.nlsid = of1.nlsid
+
+  join          avwwprd_tmp tmp1 on
+                tmp1.entityid = of1.entityid
+
+  join          avwwprd_tmp tmp2 on
+                tmp2.entityid = of2.entityid
+
+  UNION ALL
+
+  select
+  distinct      'PSGOFCMPOF',
+                of2.OFFERINGPNUMB,
+                of1.OFFERINGPNUMB,
+                '-',
+                '-',
+                '-'
+
+  from          ECCM.ofcmpof ofcmpof
+
+  join          ECCM.of of1 on
+                of1.entityid = ofcmpof.ID1
+
+  join          ECCM.of of2 on
+                of2.entityid = ofcmpof.ID2 and
+                of2.nlsid = of1.nlsid
+
+  join          avwwprd_tmp tmp1 on
+                tmp1.entityid = of1.entityid
+
+  join          avwwprd_tmp tmp2 on
+                tmp2.entityid = of2.entityid
+
+  )
+
+UNION ALL
+
+select
+distinct    'PSGMTOSOF',
+            of.OFFERINGPNUMB,
+            '-',
+            cpg.MACHTYPE,
+            coalesce(cpgos.CPGOSNAME,'-'),
+            '-'
+
+from        ECCM.cpgos cpgos
+
+join        ECCM.cpgcpgos cpgcpgos on
+            cpgcpgos.id2 = cpgos.entityid
+
+join        ECCM.cpg cpg on
+            cpg.entityid = cpgcpgos.id1 and
+            cpg.nlsid = cpgos.nlsid
+
+join        ECCM.ofcpgos ofcpgos on
+            ofcpgos.id2 = cpgos.entityid
+
+join        ECCM.of of on
+            of.entityid = ofcpgos.id1 and
+            of.nlsid = cpgos.nlsid
+
+join        avwwprd_tmp tmp on
+            tmp.entityid = of.entityid
+
+UNION
+ALL
+
+select
+distinct    'PSGMTOSOF',
+            of.OFFERINGPNUMB,
+            '-',
+            cpg.MACHTYPE,
+            '-',
+            '-'
+
+from        ECCM.of of
+
+join        ECCM.cpgof cpgof on
+            cpgof.ID2 = of.entityid
+
+join        ECCM.cpg cpg on
+            cpg.entityid = cpgof.id1 and
+            cpg.nlsid = of.nlsid
+
+join        avwwprd_tmp tmp on
+            tmp.entityid = of.entityid
+
+where       of.entityid not in (select id1 from ECCM.ofcpgos)
+
+UNION
+ALL
+
+select
+distinct    'PSGMTOSOF',
+            cto.COFPNUMB,
+            '-',
+            cpg.MACHTYPE,
+            '-',
+            '-'
+
+from        ECCM.cto cto
+
+join        ECCM.cpgcto cpgcto on
+            cpgcto.id2 = cto.entityid
+
+join        ECCM.cpg cpg on
+            cpg.entityid = cpgcto.id1 and
+            cpg.nlsid = cto.nlsid
+
+join        avwwprd_tmp2 tmp on
+            tmp.entityid = cto.entityid
+
+UNION
+ALL
+
+select
+distinct    'PSGMTOSOF',
+            var.offeringPNUMB,
+            '-',
+            cpg.MACHTYPE,
+            '-',
+            '-'
+
+from        ECCM.var var
+
+join        ECCM.cpgvar cpgvar on
+            cpgvar.id2 = var.entityid
+
+join        ECCM.cpg cpg on
+            cpg.entityid = cpgvar.id1 and
+            cpg.nlsid = var.nlsid
+join        avwwprd_tmp3 tmp on
+            tmp.entityid = var.entityid
+
+  ) DATA INITIALLY DEFERRED REFRESH DEFERRED
+  ;
+  REFRESH TABLE ECCM.COMPAT;
+
+
+-- echo table eccm.compat;
+--  DROP TABLE ECCM.COMPAT;
+--  create summary table eccm.compat
+--  (
+--    entitytype,
+--    wwpartnum,
+--    optionpnumb,
+--    mtm,
+--    operatingsys,
+--    exceptmodel
+--  )
+--    as
+--      (
+--       with avwwprd_tmp (entityid) as
+--
+--        (
+--
+--        select
+--        distinct ofcsol.id1
+--
+--        from        ECCM.csol csol
+--
+--        join        int.avwwprd prd on
+--                    prd.prdentitytype = 'CSOL' and
+--                    prd.prdentityid = csol.entityid and
+--                    prd.prdnlsid = csol.nlsid
+--
+--        join        ECCM.ofcsol ofcsol on
+--                    ofcsol.ID2 = csol.entityid
+--
+--        where       csol.nlsid = 1
+--        )
+--        , avwwprd_tmp2 (entityid) as
+--
+--        (
+--
+--        select
+--        distinct    ctoccto.id1
+--
+--        from        ECCM.ccto ccto
+--
+--        join        int.avwwprd prd on
+--                    prd.prdentitytype = 'CCTO' and
+--                    prd.prdentityid = ccto.entityid and
+--                    prd.prdnlsid = 1
+--
+--        join        ECCM.ctoccto ctoccto on
+--                    ctoccto.ID2 = ccto.entityid
+----        where       ccto.nlsid = 1
+--        )
+--
+--        select
+--        distinct    'OFCMPOF',
+--                    of1.OFFERINGPNUMB,
+--                    of2.OFFERINGPNUMB,
+--                    '-',
+--                    '-',
+--                    '-'
+--
+--        from       ECCM.ofcmpof ofcmpof
+--
+--        join        ECCM.of of1 on
+--                    of1.entityid = ofcmpof.ID1 and
+--                    of1.nlsid = 1
+--
+--        join        ECCM.of of2 on
+--                    of2.entityid = ofcmpof.ID2 and
+--                    of2.nlsid = 1
+--
+--        join        avwwprd_tmp tmp1 on
+--                    tmp1.entityid = of1.entityid
+--
+--        join        avwwprd_tmp tmp2 on
+--                    tmp2.entityid = of2.entityid
+--
+--        UNION all
+--
+--        select
+--        distinct    'CPGOS',
+--                    of.OFFERINGPNUMB,
+--                    '-',
+--                    cpg.MACHTYPE,
+--                    coalesce(cpgos.CPGOSNAME,'-'),
+--                    coalesce('NOT SURE','-')
+--
+--        from        ECCM.cpgos cpgos
+--
+--        join        ECCM.cpgcpgos cpgcpgos on
+--                    cpgcpgos.id2 = cpgos.entityid
+--
+--        join        ECCM.cpg cpg on
+--                    cpg.entityid = cpgcpgos.id1 and
+--                    cpg.nlsid = 1
+--
+--        join        ECCM.cpgof cpgof on
+--                    cpgof.id1 = cpg.entityid
+--
+--        join        ECCM.of of on
+--                    of.entityid = cpgof.id2 and
+--                    of.nlsid = 1
+----
+--        join        avwwprd_tmp tmp on
+--                    tmp.entityid = of.entityid
+--
+--        where       cpgos.nlsid = 1
+--
+--        union ALL
+--
+--        select
+--        distinct    'CPGMT',
+--                    of.OFFERINGPNUMB,
+--                    '-',
+--                    cpg.MACHTYPE,
+--                    '-',
+--                    '-'
+--
+--        from        ECCM.of of
+--
+--        join        ECCM.cpgof cpgof on
+--                    cpgof.ID2 = of.entityid
+--
+--        join        ECCM.cpg cpg on
+--                    cpg.entityid = cpgof.id1 and
+--                    cpg.nlsid = 1
+--
+--        join        avwwprd_tmp tmp on
+--                    tmp.entityid = of.entityid
+--
+--        where       of.nlsid = 1 and
+--                    of.entityid not in (select entityid from ECCM.ofcpgos)
+--
+--        union ALL
+--
+--        select
+--        distinct    'PSGMTOSOF',
+--                    cto.COFPNUMB,
+--                    '-',
+--                    cpg.MACHTYPE,
+--                    '-',
+--                    '-'
+--
+--        from        ECCM.cto cto
+--
+--        join        ECCM.cpgcto cpgcto on
+--                    cpgcto.id2 = cto.entityid
+--
+--        join        ECCM.cpg cpg on
+--                    cpg.entityid = cpgcto.id1 and
+--                    cpg.nlsid = 1
+--
+--        join        avwwprd_tmp2 tmp on
+--                    tmp.entityid = cto.entityid
+--
+--        where       cto.nlsid = 1
+--
+--    ) DATA INITIALLY DEFERRED REFRESH DEFERRED
+--    ;
+--  REFRESH TABLE ECCM.COMPAT;
+
+
+
+-----------------------------------------------
+-- Used to support SPECT TABLES
+-- Converted DWB
+-- COMPILED DWB
+-- CHECKED FOR FINAL SCRIPT
+-- MADE DROP IMMUNE FROM ODSINIT
+-- Mod from MTM
+-- CVAR DATE INHERITECE FIX FROM MTM
+------------------------------------------------
+-- DDL Statements for table ECCM.SBBALLDATES
+------------------------------------------------
+ DROP TABLE ECCM.sbbAllDates;
+ CREATE SUMMARY TABLE eccm.sbballdates
+ (
+   entitytype,
+   entityid,
+   nlsid,
+   sbbid,
+   anndate,
+   wdate
+) as (
+
+  with sbbctydate_tmp (entitytype,entityid,nlsid,sbbid,anndate,wdate)
+  as (
+
+    select      'CCTO',
+                a.entityid,
+                a.nlsid,
+                b.id2,
+                b.sbbpublishctdate,
+                b.sbbunpublishctdate
+
+    from        eccm.ccto a,
+                eccm.cctosbb b ,
+                eccm.sbb c
+
+    where       a.entityid=b.id1 and
+                b.id2=c.entityid and
+                c.nlsid=a.nlsid
+
+    union all
+
+    select      'CVAR',
+                a.entityid,
+                a.nlsid,
+                b.entityid,
+                b.sbbannouncetgt,
+                b.sbbwithdrawldate
+
+    from        eccm.cvar a,
+                eccm.varsbb d,
+                eccm.sbb b
+
+    where       d.id1=a.varid and
+                d.id2=b.entityid and
+                a.nlsid=b.nlsid
+  ),
+
+  sbbwwdate_tmp (entitytype,entityid,nlsid, sbbid,anndate,wdate)
+  as (
+
+    select      'CCTO',
+                a.entityid,
+                a.nlsid,
+                f.id2,
+                b.sbbpublishwwdate,
+                b.sbbunpublishwwdate
+
+    from        eccm.ccto a,
+                eccm.cto c,
+                eccm.ctosbb b,
+                eccm.cctosbb f ,
+                eccm.sbb g
+
+    where       a.ctoid = c.entityid and
+                a.nlsid=c.nlsid and
+                a.entityid=f.id1 and
+                f.id2=b.id2 and
+                c.entityid=b.id1 and
+                g.entityid=b.id2 and
+                g.nlsid=c.nlsid
+
+  ),
+
+  sbbdate_tmp (entitytype,entityid,nlsid,sbbid,anndate,wdate)
+  as (
+
+    select      'CCTO',
+                a.entityid,
+                a.nlsid,
+                b.entityid,
+                b.sbbannouncetgt,
+                b.sbbwithdrawldate
+
+    from        eccm.ccto a,
+                eccm.cctosbb c,
+                eccm.sbb b
+
+    where       a.entityid=c.id1 and
+                b.entityid=c.id2
+                and a.nlsid=b.nlsid
+  )
+
+  select
+  distinct    a.entitytype,
+              a.entityid,
+              a.nlsid,
+              a.sbbid,
+              coalesce(a.anndate,c.anndate,d.anndate),
+              coalesce(a.wdate,c.wdate,d.wdate)
+
+  from        sbbctydate_tmp a
+
+  left join   sbbwwdate_tmp c on
+              a.entitytype=c.entitytype and
+              a.entityid=c.entityid and
+              a.nlsid=c.nlsid and
+              a.sbbid=c.sbbid
+
+  left join   sbbdate_tmp d on
+              a.entitytype=d.entitytype and
+              a.entityid=d.entityid and
+              a.nlsid=d.nlsid and
+              a.sbbid=d.sbbid
+
+)
+DATA INITIALLY DEFERRED REFRESH DEFERRED
+;
+refresh table eccm.sbballdates;
+CREATE INDEX ECCM.SBBALLDATESIDX ON ECCM.SBBALLDATES(ENTITYID ASC, ENTITYTYPE ASC, NLSID ASC, SBBID ASC) PCTFREE 10 ;
+
+
+------------------------------------------------
+-- CONVERTED MTM
+-- COMPILED DWB
+-- CHECKED FOR FINAL SCRIPT
+-- MADE DROP IMMUNE FROM ODSINIT
+------------------------------------------------
+-- DDL Statements for table ECCM.PRDIMAGE
+------------------------------------------------
+echo table eccm.prdimage;
+drop table eccm.prdimage;
+create summary table eccm.prdimage
+(
+  parententitytype,
+  parententityid,
+  parentnlsid,
+  imageid,
+  displayname,
+  colorimagename,
+  datefrom,
+  dateto,
+  status
+) as (
+
+  (select      'CSOL',
+              csol.entityid,
+              csol.nlsid,
+              img.entityid,
+              img.name,
+              img.MKT_IMG_FILENAME,
+              img.imgfrom,
+              img.imgto,
+              img.imgstatus
+
+  from        eccm.csol csol
+
+  join        eccm.csolimg csolimg on
+              csol.entityid=csolimg.ID1
+
+  join        eccm.img img on
+              img.entityid=csolimg.ID2 and
+              img.nlsid=csolimg.nlsid
+
+  where       img.imgstatus_fc ='0020' and
+              img.MKT_IMG_FILENAME is not null
+
+  union
+
+  select      'CSOL',
+              csol.entityid,
+              csol.nlsid,
+              img.entityid,
+              img.name,
+              img.MKT_IMG_FILENAME,
+              img.imgfrom,
+              img.imgto,
+              img.imgstatus
+
+  from        eccm.csol csol
+
+  join        eccm.ofimg ofimg on
+              csol.ofid=ofimg.ID1
+
+  join        eccm.img img on
+              img.entityid=ofimg.ID2 and
+              img.nlsid=csol.nlsid
+
+  where       img.imgstatus_fc ='0020' and
+              img.MKT_IMG_FILENAME is not null
+
+  )
+  UNION ALL
+
+  (
+    select      'CCTO',
+              ccto.entityid,
+              ccto.nlsid,
+              img.entityid,
+              img.name,
+              img.MKT_IMG_FILENAME,
+              img.imgfrom,
+              img.imgto,
+              img.imgstatus
+
+  from        eccm.ccto ccto
+
+  join        eccm.cctoimg cctoimg on
+              ccto.entityid=cctoimg.ID1
+
+  join        eccm.img img on
+              img.entityid=cctoimg.ID2 and
+              img.nlsid=cctoimg.nlsid
+
+  where       img.imgstatus_fc='0020' and
+              img.MKT_IMG_FILENAME is not null
+
+  union
+
+  select      'CCTO',
+              ccto.entityid,
+              ccto.nlsid,
+              img.entityid,
+              img.name,
+              img.MKT_IMG_FILENAME,
+              img.imgfrom,
+              img.imgto,
+              img.imgstatus
+
+  from        eccm.ccto ccto
+
+  join        eccm.ctoimg ctoimg on
+              ccto.ctoid=ctoimg.ID1
+
+  join        eccm.img img on
+              img.entityid=ctoimg.ID2 and img.nlsid=ccto.nlsid
+
+  where       img.imgstatus_fc='0020' and
+              img.MKT_IMG_FILENAME is not null
+
+  )
+  UNION ALL
+
+  (
+    select      'CVAR',
+              cvar.entityid,
+              cvar.nlsid,
+              img.entityid,
+              img.name,
+              img.MKT_IMG_FILENAME,
+              img.imgfrom,
+              img.imgto,
+              img.imgstatus
+
+  from        eccm.cvar cvar
+
+  join        eccm.cvarimg cvarimg on
+              cvarimg.ID1=cvar.entityid
+
+  join        eccm.img img on
+              img.entityid=cvarimg.ID2 and
+              img.nlsid=cvar.nlsid
+
+  where       img.imgstatus_fc='0020' and
+              img.MKT_IMG_FILENAME is not null
+
+  UNION
+
+  select      'CVAR',
+              cvar.entityid,
+              cvar.nlsid,
+              img.entityid,
+              img.name,
+              img.MKT_IMG_FILENAME,
+              img.imgfrom,
+              img.imgto,
+              img.imgstatus
+
+  from        eccm.cvar cvar
+
+  join        eccm.varimg varimg on
+              varimg.ID1=cvar.varid
+
+  join        eccm.img img on
+              img.entityid=varimg.ID2 and
+              img.nlsid=cvar.nlsid
+
+  where       img.imgstatus_fc ='0020' and
+              img.MKT_IMG_FILENAME is not null
+  )
+
+  UNION ALL
+
+  select      'CB',
+              cb.entityid,
+              cb.nlsid,
+              img.entityid,
+              img.name,
+              img.MKT_IMG_FILENAME,
+              img.imgfrom,
+              img.imgto,
+              img.imgstatus
+
+  from        eccm.cb cb
+
+  join        eccm.cbimg cbimg on
+              cb.entityid = cbimg.ID1
+
+  join        eccm.img img on
+              img.entityid = cbimg.ID2 and
+              img.nlsid = cb.nlsid
+
+  where       img.imgstatus_fc ='0020' and
+              img.MKT_IMG_FILENAME is not null
+ ) DATA INITIALLY DEFERRED REFRESH DEFERRED ;
+refresh table eccm.prdimage;
+
+CREATE INDEX ECCM.WZ2PRDIMAGE ON ECCM.PRDIMAGE (PARENTENTITYTYPE DESC, PARENTENTITYID DESC);
+
+-------------------------------------------------
+-- Used to support Other required views and tables
+-- Converted DWB
+-- Compiled DWB
+-- ADDed CHildType, CHild ID to help out other views
+-- CHANGED BY MTM
+-- NEED TO SEE HOW TO SIMPLIFY THIS
+-- CHECKED FOR FINAL SCRIPT
+-- MADE DROP IMMUNE FROM ODSINIT
+-- REMOVED NLSID JOIN PREDICATE ON ECCM.PROJSERBRANDFAM PER MTM
+-- Implementing FB 53305
+-----------------------------------------------
+-- DDL Statements for table ECCM.CBPARTS
+------------------------------------------------
+echo "table eccm.cbparts";
+drop table eccm.cbparts;
+create summary table eccm.cbparts (
+  entitytype,
+  entityid,
+  nlsid,
+  catid,
+  PROJECTID,
+  BRANDNAME,
+  FAMILYNAME,
+  SERIESNAME
+
+) as (
+
+with badparts (cbid) as (
+select    cb.entityid
+from      eccm.csol csol join eccm.cbcsol cbcsol on csol.entityid=cbcsol.id2
+join   eccm.cb cb on cb.entityid=cbcsol.id1 and
+   cb.nlsid=csol.nlsid
+where     (csol.act_wdrawdate_ct is not null and
+   csol.act_wdrawdate_ct < date(current timestamp))
+union
+select    cb.entityid
+from   eccm.cvar cvar join eccm.cbcvar cbcvar on cvar.entityid=cbcvar.id2
+join   eccm.cb cb on cb.entityid=cbcvar.id1 and
+   cb.nlsid=cvar.nlsid
+where     (cvar.actwdrawdate_cvar is not null and
+   cvar.actwdrawdate_cvar < date(current timestamp)))
+
+, tof (cbid, cbnlsid, type, ofid, count) as (
+
+select    cb.entityid,
+          cb.nlsid,
+          case of.offeringtype when 'SYSTEM' then 'SYSTEM' else 'OPTION' end,
+
+          max(of.entityid),
+          count(distinct of.entityid)
+
+from      eccm.cb cb
+
+join      eccm.cbcsol cbcsol on
+          cbcsol.id1 = cb.entityid
+
+join      eccm.csol csol on
+          csol.entityid = cbcsol.id2 and
+          csol.nlsid = cb.nlsid
+
+join      eccm.of of on
+          of.entityid = csol.ofid and
+          of.nlsid = csol.nlsid
+
+group by  cb.entityid,
+          cb.nlsid,
+          of.offeringtype
+
+
+
+
+)
+--
+-- Produces SYSTEM or OPTION recs
+--
+, t1of (cbid, cbnlsid, type, ofid, count) as
+(
+select    cbid,
+          cbnlsid,
+          type,
+          max(ofid),
+          sum(count)
+
+from      tof
+
+group
+by        cbid,
+          cbnlsid,
+          type
+)
+--
+--  CB's w/ Systems on them
+--
+,tsys (cbid, cbnlsid, type, ofid)  as (
+
+select
+distinct  cbid,
+          cbnlsid,
+          type,
+          ofid
+
+from      t1of t1
+
+where t1.type = 'SYSTEM'
+)
+
+--
+--  CB's w/ Variants (but no MTMs)
+--
+,tvar (cbid, cbnlsid, varid,count) as (
+
+select    cb.entityid,
+          cb.nlsid,
+          max(var.entityid),
+          count(distinct var.entityid)
+from      eccm.cb cb
+
+join      eccm.cbcvar cbcvar on
+          cbcvar.id1 = cb.entityid
+
+join      eccm.cvar cvar on
+          cvar.entityid = cbcvar.id2 and
+          cvar.nlsid = cb.nlsid
+
+join      eccm.var var on
+          var.entityid = cvar.varid and
+          var.nlsid = cvar.nlsid
+where     (cb.entityid, cb.nlsid) not in (select cbid, cbnlsid from tsys)
+
+
+group by  cb.entityid,
+          cb.nlsid
+)
+
+-- CBs WITH AT LEAST ONE SYSTEM
+select    'CB',
+          cbid,
+          cbnlsid,
+          fam.famsername,
+          fam.projectid,
+          fam.brandname,
+          fam.familyname,
+          fam.seriesname
+from      tsys  tsys
+join      eccm.of of on
+          of.entityid =  tsys.ofid and
+          of.nlsid = tsys.cbnlsid
+join      eccm.projserbrandfam fam on
+          fam.projectid = of.prid
+
+where   cbid not in (select cbid from badparts)
+
+union all
+
+-- CBs w/ No MTM but Variant
+select    'CB',
+          cbid,
+          cbnlsid,
+          fam.famsername,
+          fam.projectid,
+          fam.brandname,
+          fam.familyname,
+          fam.seriesname
+from      tvar  tvar
+join      eccm.var var on
+          var.entityid =  tvar.varid and
+          var.nlsid = tvar.cbnlsid
+join      eccm.projserbrandfam fam on
+          fam.projectid = var.prid
+
+where   cbid not in (select cbid from badparts)
+
+union all
+-- OPTIONS ONLY Section
+select        'CB',
+          cbid,
+          cbnlsid,
+          case when of.subgroup is null then fam.famsername || '@' || of.optgroupname
+               else fam.famsername || '@' || of.optgroupname || '@' || of.subgroup
+          end,
+          fam.projectid,
+          fam.brandname,
+          fam.familyname,
+          fam.seriesname
+from      t1of t1
+join      eccm.of of on
+          of.entityid =  t1.ofid and
+          of.nlsid = t1.cbnlsid
+join      eccm.projserbrandfam fam on
+          fam.projectid = of.prid
+
+where     (cbid,cbnlsid) not in (select cbid, cbnlsid from tsys) and
+          (cbid,cbnlsid) not in (select cbid, cbnlsid from tvar) and
+   cbid not in (select cbid from badparts) and
+          of.optgroupname is not null
+--
+union all
+-- OPTIONS THAT HAVE NULL OPTGROUPNAME
+select        'CB',
+          cbid,
+          cbnlsid,
+          fam.famsername,
+          fam.projectid,
+          fam.brandname,
+          fam.familyname,
+          fam.seriesname
+from      t1of t1
+join      eccm.of of on
+          of.entityid =  t1.ofid and
+          of.nlsid = t1.cbnlsid
+join      eccm.projserbrandfam fam on
+          fam.projectid = of.prid
+
+where     (cbid,cbnlsid) not in (select cbid, cbnlsid from tsys) and
+          (cbid,cbnlsid) not in (select cbid, cbnlsid from tvar) and
+   cbid not in (select cbid from badparts) and
+          of.optgroupname is null
+
+
+)DATA INITIALLY DEFERRED REFRESH DEFERRED;
+commit work;
+refresh table mary.cbparts;
+
+CREATE INDEX ECCM.CBPARTSIDX ON ECCM.CBPARTS  (ENTITYID ASC, ENTITYTYPE ASC, NLSID ASC) PCTFREE 10;
+
+------------------------------------------------
+-- SUPPORTS THE TABLE SPEC TABLES
+-- CONVERTED DWB
+-- COMPILED DWB
+-- FIX FROM MTM
+-- ADDED PUBLISH FLAG
+-- CHECKED FOR FINAL SCRIPT
+-- MADE DROP IMMUNE FROM ODSINIT
+-- CHANGED TARGET TO ACT FOR CCTO AND CSOL
+-- NEW VIEW UPDATE FROM MARY TAYLOR
+-- NEW VIEW TO FIX NLS PROBLEM MT
+-- ADDED GRANT STATEMENT TO THE END
+-- Removed the join to Project DWB
+------------------------------------------------
+-- DDL Statements for table ECCM.PRDROOT
+------------------------------------------------
+DROP TABLE eccm.prdroot;
+create summary table eccm.prdroot
+(
+  entitytype,
+  entityid,
+  nlsid,
+  genareaname,
+  genareacode,
+  partnumber,
+  partnumberdescription,
+  announcedate,
+  withdrawaldate,
+  specialbid,
+  status,
+  solentitytype,
+  solentityid,
+  modelname,
+  ofentitytype,
+  ofentityid,
+  wwpartnumber,
+  contractinvtitle,
+  type,
+  installopt,
+  ratecardcode,
+  unspsc,
+  unuom,
+  projectid,
+  lastupdated,
+  rglastupdated,
+  wwlastupdated,
+  publishflag
+
+) as
+    (
+ select   'CSOL',
+          csol.entityid,
+          csol.nlsid,
+          csol.GENAREANAME,
+          ga.GENAREACODE,
+          csol.PNUMB_CT,
+          csol.PNUMB_DESC_CT,
+          csol.TARG_ANN_DATE_CT,
+          csol.TARG_WDRAWDATE_CT,
+          of.BAVLFORSPECIALBID,
+          csol.CSOLSTATUS,
+          'SOL',
+          of.entityid,
+          of.OFMODELNAME,
+          'OF',
+          of.entityid,
+          of.OFFERINGPNUMB,
+          of.OFCONTRCTINVTITLE,
+          of.OFFERINGTYPE,
+          of.OFINSTOPT,
+          of.OFRATECARDCODE,
+          of.UNSPSC,
+          of.UNUOM,
+          of.prid,
+          csol.VALFROM,
+          of.VALFROM,
+          of.VALFROM,
+          csol.publishflag
+
+from      ECCM.csol csol
+
+join      ECCM.generalarea ga on
+          ga.genareaname_fc=csol.genareaname_fc and
+          ga.genareatype='Cty'
+
+join      eccm.ccectry ccectry on
+          ga.genareacode=ccectry.countrycode
+
+join      ECCM.of of on
+          of.entityid = csol.ofid and
+          of.nlsid = csol.nlsid
+
+where     csol.CSOLSTATUS_FC in ('0020','0040')
+
+UNION ALL
+
+select    'CCTO',
+          ccto.entityid,
+          ccto.nlsid,
+          ccto.GENAREANAME,
+          ga.GENAREACODE,
+          ccto.CCOSOLPNUMB,
+          ccto.CCOSOLPNUMBDESC,
+          ccto.CCOSOLTARGANNDATE,
+          ccto.CCOSOLTRGWDRAWDAT,
+          '',
+          ccto.CCOSOLSTATUS,
+          'CTO',
+          cto.entityid,
+          cto.COFMODELNAME,
+          'CTO',
+          cto.entityid,
+          cto.COFPNUMB,
+          '',
+          '',
+          '',
+          cto.CVOFRATECARDCODE,
+          cto.UNSPSC,
+          cto.UNUOM,
+          cto.prid,
+          ccto.VALFROM,
+          cto.VALFROM,
+          cto.VALFROM,
+          ccto.publishflag
+
+from      ECCM.ccto ccto
+
+join      ECCM.generalarea ga on
+          ga.genareaname_fc= ccto.genareaname_fc and
+          ga.nlsid=1 and
+          ga.genareatype='Cty'
+
+join      eccm.ccectry ccectry on
+          ga.genareacode=ccectry.countrycode
+
+join      ECCM.cto cto on
+          cto.entityid = ccto.ctoid and
+          cto.nlsid = ccto.nlsid
+
+where     ccto.CCOSOLSTATUS_FC in ('0020','0040')
+
+UNION ALL
+
+select    'CVAR',
+          cvar.entityid,
+          cvar.nlsid,
+          cvar.GENAREANAME,
+          ga.GENAREACODE,
+          cvar.PNUMB_CT,
+          cvar.PNUMBDESC_CVAR,
+          cvar.TARGANNDATE_CVAR,
+          cvar.ACTWDRAWDATE_CVAR,
+          '',
+          cvar.STATUS_CVAR,
+          'VAR',
+          var.entityid,
+          var.VARMODELNAME,
+          'VAR',
+          var.entityid,
+          var.OFFERINGPNUMB,
+          '',
+          '',
+          '',
+          var.VARRATECARDCODE,
+          var.UNSPSC,
+          var.UNUOM,
+          var.prid,
+          cvar.VALFROM,
+          var.VALFROM,
+          var.VALFROM,
+          cvar.publishflag
+
+from      ECCM.cvar cvar
+
+join      ECCM.generalarea ga on
+          ga.genareaname_fc=cvar.genareaname_fc and
+          ga.nlsid=1 and
+          ga.genareatype='Cty'
+
+join      eccm.ccectry ccectry on
+          ga.genareacode=ccectry.countrycode
+
+join      ECCM.var var on
+          var.entityid = cvar.varid and
+          var.nlsid = cvar.nlsid
+
+where     cvar.STATUS_CVAR_FC in ('0020','0040')
+
+UNION ALL
+
+select    'CB',
+          cb.entityid,
+          cb.nlsid,
+          cb.GENAREANAME,
+          ga.GENAREACODE,
+          cb.PNUMB_CT,
+          cb.PNUMB_DESC_CB,
+          cb.TARG_ANN_DATE_CB,
+          cb.ACT_WDRAWDATE_CB,
+          '',
+          cb.CBSOLSTATUS,
+          'CB',
+          0,
+          cb.PNUMB_DESC_CB,
+          'CB',
+          0,
+          cb.PNUMB_CT,
+          '',
+          '',
+          '',
+          cb.CBRATECARDCODE,
+          '',
+          '',
+          0,
+          cb.valfrom,
+          cb.valfrom,
+          cb.valfrom,
+          cb.publishflag
+
+from      ECCM.cb cb
+
+join      ECCM.generalarea ga on
+          ga.genareaname_fc =cb.genareaname_fc and
+          ga.nlsid=1 and
+          ga.genareatype='Cty'
+
+join      eccm.ccectry ccectry on
+          ga.genareacode=ccectry.countrycode
+
+where     cb.CBSOLSTATUS_FC in ('0010')
+
+
+) DATA INITIALLY DEFERRED REFRESH DEFERRED
+-- IN ECCMSUMMTS INDEX IN ECCMSUMMTS
+;
+REFRESH TABLE ECCM.PRDROOT;
+CREATE INDEX ECCM.I_PRDROOT_OFENID ON ECCM.PRDROOT (OFENTITYID ASC);
+CREATE INDEX ECCM.I_PRDROOT_OFENTYPE ON ECCM.PRDROOT (OFENTITYTYPE ASC);
+CREATE INDEX ECCM.PRDRINDEX001 ON ECCM.PRDROOT (ENTITYID ASC, ENTITYTYPE ASC, NLSID ASC, PARTNUMBER ASC, PROJECTID ASC) PCTFREE 10;
+CREATE INDEX ECCM.WZ2APRDROOT ON ECCM.PRDROOT (PARTNUMBER ASC, LASTUPDATED ASC, ENTITYTYPE ASC, ENTITYID ASC);
+CREATE INDEX ECCM.WZ2PRDROOT ON ECCM.PRDROOT(NLSID DESC, PARTNUMBER ASC);
+CREATE INDEX INST1.WIZ4836 ON ECCM.PRDROOT (PROJECTID ASC, OFENTITYID ASC, ENTITYTYPE ASC, ENTITYID ASC);
+
+grant select on eccm.prdroot to int;
+
+
+------------------------------------------------
+-- USED TO SUPPORT VIEWS THAT ARE IN THE TABLE SPEc
+-- CONVERTED DWB
+-- COMPILED DWB
+-- CHECKED FOR FINAL SCRIPT
+-- MADE DROP IMMUNE FROM ODSINIT
+-- UPDATE FROM MTM
+-- NEED TO MAKE SURE WE REORG eccm.prod_product_price and other
+-- Large tables to make this thing refresh fast
+------------------------------------------------
+-- DDL Statements for table ECCM.PACKAGE1
+------------------------------------------------
+echo table eccm.package1;
+drop table eccm.package1;
+create summary table eccm.package1
+ (
+   entitytype,
+   entityid,
+   nlsid,
+   wunits,
+   weight,
+   width,
+   height,
+   dunits,
+   depth
+ )  AS (
+
+  SELECT
+  distinct    par.entity1type,
+              par.entity1id,
+              p.nlsid,
+              case a.attributetoken  when 'PSGB1WEIGHTUNITS_US' then substr(p.attributevalue,1,5) else ' '  end,
+              case a.attributetoken when 'PSGB1WEIGHT_US' then substr(p.attributevalue,1,5) else ' ' end,
+              case a.attributetoken when 'PSGB1WIDTH_US' then substr(p.attributevalue,1,5) else ' ' end,
+              case a.attributetoken when 'PSGB1HEIGHT_US' then substr(p.attributevalue,1,5) else ' ' end,
+              case a.attributetoken when 'PSGB1DEPTHUNITS_US' then substr(p.attributevalue,1,5) else ' ' end,
+              case a.attributetoken when 'PSGB1DEPTH_US' then substr(p.attributevalue,1,5) else ' ' end
+
+  FROM        ECCM.attribute a
+
+  JOIN        ECCM.prodattribute p on
+              p.attributecode = a.attributecode
+
+  JOIN        ECCM.prodattrelator par on
+              p.entitytype = par.entity2type and
+              p.entityid = par.entity2id
+
+  where       a.attributetoken IN
+              ( 'PSGB1WEIGHTUNITS_US',
+                'PSGB1WEIGHT_US',
+                'PSGB1WIDTH_US',
+                'PSGB1HEIGHT_US',
+                'PSGB1DEPTHUNITS_US',
+                'PSGB1DEPTH_US'
+              )
+) DATA INITIALLY DEFERRED REFRESH DEFERRED;
+refresh table eccm.package1;
+
+-- DDL Statements for indexes on Table ECCM.PACKAGE1
+
+CREATE INDEX ECCM.PK1INDEX ON ECCM.PACKAGE1
+  (ENTITYID ASC,
+   ENTITYTYPE ASC,
+   NLSID ASC);
+
+-------------------------------------------------
+-- TOTALLY NEW SUMMARY TABLE FROM MTM (REDESIGN)
+-- ADDED NLSID PREDICATE TO JOIN
+------------------------------------------------
+-- DDL Statements for table ECCM.PRODPRICE1SUMM
+------------------------------------------------
+DROP TABLE eccm.prodprice1summ;
+ CREATE SUMMARY TABLE eccm.prodprice1summ (
+  partnumber,
+  sbbpartnumber,
+  country,
+  nls,
+  family,
+  price,
+  usdprice,
+  currency,
+  fromdate,
+  todate,
+  pricetype,
+  callforquote,
+  salesstatus,
+  precedence,
+  sourcesystem,
+  announcedate,
+  timecode,
+  materialstatusdate,
+  markedfordeletion,
+  lastupdated
+) as  (
+    with nonctoprice1_tmp (partnumber,family,countrycode,nls,timecode,announcedate) as (
+
+    select      csol.pnumb_ct,
+                psbf.familyname,
+                gen.genareacode,
+                csol.nlsid,
+                tc.timecode,
+                csol.TARG_ANN_DATE_CT
+
+    from        eccm.generalarea gen
+
+    join        eccm.csol csol on
+                csol.genareaname_fc =gen.genareaname_fc
+
+    join        eccm.of of on
+                csol.ofid = of.entityid and
+                csol.nlsid=of.nlsid
+
+    join        eccm.projserbrandfam psbf on
+                of.prid = psbf.projectid
+
+    join        int.timecode tc on
+                tc.entitytype='CSOL' and
+                csol.entityid=tc.entityid and
+                tc.nlsid=csol.nlsid
+
+    where       gen.genareatype='Cty'
+
+    UNION ALL
+
+    select      cvar.pnumb_ct,
+                psbf.familyname,
+                gen.genareacode,
+                cvar.nlsid,
+                tc.timecode,
+                cvar.TARGANNDATE_CVAR
+
+    from        eccm.generalarea gen
+
+    join        eccm.cvar cvar on
+                cvar.genareaname_fc =gen.genareaname_fc
+
+    join        eccm.var var on
+                cvar.varid=var.entityid and
+                cvar.nlsid=var.nlsid
+
+    join        eccm.projserbrandfam psbf on
+                var.prid = psbf.projectid
+
+    join        int.timecode tc on
+                'CVAR'=tc.entitytype and
+                cvar.entityid=tc.entityid and
+                tc.nlsid=cvar.nlsid
+
+    where       gen.genareatype='Cty'
+
+    UNION ALL
+
+    select      cb.pnumb_ct,
+                '-',
+                gen.genareacode,
+                cb.nlsid,
+                tc.timecode,
+                cb.TARG_ANN_DATE_CB
+
+    from        eccm.cb cb
+
+    join        eccm.generalarea gen on
+                cb.genareaname_fc=gen.genareaname_fc and
+                gen.genareatype='Cty'
+
+    join        int.timecode tc on
+                'CB'=tc.entitytype and
+                cb.entityid=tc.entityid and tc.nlsid=cb.nlsid
+
+    )
+
+    ,ctoprice1_tmp
+      (
+        ctopartnumber,
+        sbbpartnumber,
+        countrycode,
+        nlsid,
+        timecode,
+        announcedate
+      ) as (
+
+      select    ccto.ccosolpnumb,
+                sbb.sbbpnumb,
+                gen.genareacode,
+                ccto.nlsid,
+                case
+                  when (ccto.CCOSOLTARGANNDATE > (current date + 1 day)) then
+                    case
+                      when ((days(ccto.CCOSOLTARGANNDATE) - days(current date)) <= 0) then 0
+                      when ((days(ccto.CCOSOLTARGANNDATE) - days(current date)) <= 1) then 1
+                      when ((days(ccto.CCOSOLTARGANNDATE) - days(current date)) <= 7) then 7
+                      when ((days(ccto.CCOSOLTARGANNDATE) - days(current date)) <= 21) then 21
+                      when ((days(ccto.CCOSOLTARGANNDATE) - days(current date)) <= 35) then 35
+                      when ((days(ccto.CCOSOLTARGANNDATE) - days(current date)) <= 56) then 56
+                      else 99
+                    end
+                  else
+                    case
+                      when (cctosbb.SBBPUBLISHCTDATE is not null) then
+                        case
+                          when ((days(cctosbb.SBBPUBLISHCTDATE) - days(current date)) <= 0) then 0
+                          when ((days(cctosbb.SBBPUBLISHCTDATE) - days(current date)) <= 1) then 1
+                          when ((days(cctosbb.SBBPUBLISHCTDATE) - days(current date)) <= 7) then 7
+                          when ((days(cctosbb.SBBPUBLISHCTDATE) - days(current date)) <= 21) then 21
+                          when ((days(cctosbb.SBBPUBLISHCTDATE) - days(current date)) <= 35) then 35
+                          when ((days(cctosbb.SBBPUBLISHCTDATE) - days(current date)) <= 56) then 56
+                          else 99
+                        end
+                      when (ctosbb.SBBPUBLISHWWDATE is not null) then
+                        case
+                          when ((days(ctosbb.SBBPUBLISHWWDATE) - days(current date)) <= 0) then 0
+                          when ((days(ctosbb.SBBPUBLISHWWDATE) - days(current date)) <= 1) then 1
+                          when ((days(ctosbb.SBBPUBLISHWWDATE) - days(current date)) <= 7) then 7
+                          when ((days(ctosbb.SBBPUBLISHWWDATE) - days(current date)) <= 21) then 21
+                          when ((days(ctosbb.SBBPUBLISHWWDATE) - days(current date)) <= 35) then 35
+                          when ((days(ctosbb.SBBPUBLISHWWDATE) - days(current date)) <= 56) then 56
+                          else 99
+                        end
+                      else
+                        case
+                          when ((days(sbb.SBBANNOUNCETGT) - days(current date)) <= 0) then 0
+                          when ((days(sbb.SBBANNOUNCETGT) - days(current date)) <= 1) then 1
+                          when ((days(sbb.SBBANNOUNCETGT) - days(current date)) <= 7) then 7
+                          when ((days(sbb.SBBANNOUNCETGT) - days(current date)) <= 21) then 21
+                          when ((days(sbb.SBBANNOUNCETGT) - days(current date)) <= 35) then 35
+                          when ((days(sbb.SBBANNOUNCETGT) - days(current date)) <= 56) then 56
+                          else 99
+                        end
+                    end
+                end ,
+                case
+                  when (ccto.CCOSOLTARGANNDATE > (current date + 1 day)) then ccto.CCOSOLTARGANNDATE
+                  else coalesce(cctosbb.SBBPUBLISHCTDATE,ctosbb.SBBPUBLISHWWDATE,sbb.SBBANNOUNCETGT)
+                end
+
+      from      eccm.ccto ccto
+
+      join      eccm.cto cto on
+                ccto.ctoid=cto.entityid and
+                ccto.nlsid=cto.nlsid
+
+      join      eccm.cctosbb cctosbb on
+                ccto.entityid = cctosbb.ID1 and
+                cctosbb.nlsid = 1
+
+      join      eccm.ctocg ctocg on
+                ctocg.ID1=cto.entityid
+
+      join      eccm.cg cg on
+                ctocg.ID2=cg.entityid and
+                ccto.nlsid=cg.nlsid
+
+      join      eccm.sbb sbb on
+                sbb.entityid=cctosbb.ID2 and
+                sbb.sbbtype=cg.cgtype and
+                sbb.nlsid = ccto.nlsid
+
+      join      eccm.generalarea gen on
+                ccto.genareaname_fc=gen.genareaname_fc and
+                gen.genareatype='Cty'
+
+--
+      join      eccm.ctosbb ctosbb on
+                ctosbb.id1=cto.entityid and
+                ctosbb.id2=sbb.entityid
+--
+      join      int.timecode tc on
+                'CCTO'=tc.entitytype and
+                ccto.entityid=tc.entityid and
+                tc.nlsid=ccto.nlsid
+
+      where     cg.cgpriced='Yes'
+    )
+
+  select        substr(nonctotmp.partnumber,1,7) as partnumber,
+                '-' as sbbpartnumber,
+                substr(nonctotmp.countrycode,1,2) as country,
+                nonctotmp.nls,
+                rtrim(nonctotmp.family) as family,
+                decimal(round(priceamount,2),16,2) as price,
+                decimal(round(priceamount*xchgratemul,2),16,2) as usdprice,
+                substr(price.currencycode,1,3) as currency,
+                coalesce(pricevalidfromdate,date('1900-01-01')) as fromdate,
+                coalesce(pricevalidtodate,date('1900-01-01')) as todate,
+                coalesce(distributionchannel,'-') as pricetype,
+                callforquote,
+                materialstatus,
+                precedence,
+                sourcesystem,
+                announcedate,
+                timecode,
+                materialstatusdate,
+                markedfordeletion,
+                price.lastupdated
+
+  from          nonctoprice1_tmp nonctotmp
+
+  left join     eccm.prod_product_price price on
+                (nonctotmp.partnumber=price.partnumber and nonctotmp.countrycode=price.countrycode)
+
+  left join     int.currency_xchg curr on
+                (price.currencycode=curr.currencycode)
+
+  UNION ALL
+
+  select        substr(ctopartnumber,1,7) as partnumber,
+                substr(sbbpartnumber,1,7) as sbbpartnumber,
+                substr(ctotmp.countrycode,1,2) as country,
+                nlsid,
+                '-' as family,
+                decimal(round(priceamount,2),16,2) as price,
+                decimal(round(priceamount*xchgratemul,2),16,2) as usdprice,
+                substr(price.currencycode,1,3) as currency,
+                coalesce(pricevalidfromdate,date('1900-01-01')) as fromdate,
+                coalesce(pricevalidtodate,date('1900-01-01')) as todate,
+                coalesce(distributionchannel,'-') as pricetype,
+                callforquote,
+                materialstatus,
+                precedence,
+                sourcesystem,
+                announcedate,
+                timecode,
+                materialstatusdate,
+                markedfordeletion,
+                price.lastupdated
+
+  from          ctoprice1_tmp ctotmp
+
+  left join     eccm.prod_product_price price on
+                (ctopartnumber=partnumber and
+                sbbpartnumber=ctovariantpartnumber and
+                ctotmp.countrycode=price.countrycode)
+
+  left join     int.currency_xchg curr on
+                (price.currencycode=curr.currencycode)
+  ) DATA INITIALLY DEFERRED REFRESH DEFERRED
+
+  ;
+commit work;
+refresh table eccm.prodprice1summ;
+
+-- DDL Statements for indexes on Table ECCM.PRODPRICE1SUMM
+
+CREATE INDEX INT .PRPRSUMMINDEX001 ON ECCM.PRODPRICE1SUMM
+  (PARTNUMBER ASC,
+   SBBPARTNUMBER ASC,
+   COUNTRY ASC,
+   PRICETYPE ASC,
+   TODATE ASC)
+  PCTFREE 10 ;
+
+-- DDL Statements for indexes on Table ECCM.PRODPRICE1SUMM
+
+CREATE INDEX INT .PRPRSUMMINDEX002 ON ECCM.PRODPRICE1SUMM
+  (FAMILY ASC)
+  PCTFREE 10 ;
+
+
+--------------------------------------------------------------------------------------
+-- VIEWS
+--------------------------------------------------------------------------------------
+
+
+----------------------------------
+-- SUPPORTS OTHER TABLE SPEC NEEDS
+-- CONVERTED DWB
+-- COMPILED DWB
+-- ADDED NLSID
+-- CHECKED FOR FINAL SCRIPT
+----------------------------------
+echo view eccm.package;
+DROP VIEW eccm.package;
+CREATE VIEW eccm.package
+----------------------------------
+(
+    entitytype,
+    entityid,
+    nlsid,
+    wunits,
+    weight,
+    width,
+    height,
+    dunits,
+    depth
+ ) AS
+
+    SELECT    entitytype,
+              entityid,
+              nlsid,
+              MAX(wunits),
+              MAX(weight),
+              MAX(width),
+              MAX(height),
+              MAX(dunits),
+              MAX(depth)
+
+    FROM      eccm.package1
+
+    GROUP BY  entitytype,
+              entityid,
+              nlsid
+;
+
+----------------------------------------
+-- CALLED OUT IN TABLE SPEC
+-- CONVERTED DWB
+-- COMPILED DWB
+-- CHECKED FOR FINAL SCRIPT
+----------------------------------------
+echo view eccm.wwcat;
+DROP VIEW eccm.wwcat;
+CREATE VIEW eccm.wwcat
+(
+  countrycode,
+  language,
+  categoryidentifier,
+  parentidentifier,
+  source
+) AS (
+
+  SELECT      cat.countrycode,
+              cat.language,
+              cat.catidentifier,
+              cat.catidentifier,
+             'ECCM'
+
+   FROM      int.avwwcat cat
+
+   WHERE     posstr(cat.catidentifier, '@') <> 0
+ );
+
+
+----------------------------------------
+-- CALLED OUT IN TABLE SPEC
+-- CONVERTED DWB
+-- COMPILED DWB
+-- CHECKED FOR FINAL SCRIPT
+----------------------------------------
+echo eccm.ratecarddesc_ww;
+DROP VIEW eccm.ratecarddesc_vw;
+CREATE VIEW eccm.ratecarddesc_vw
+AS
+    SELECT
+    DISTINCT    rc.countrycode,
+                isolangcode2 AS language,
+                shippingcondition
+
+    FROM        eccm.prod_rate_card rc,
+                eccm.psgctnls ctnls,
+                eccm.psgnls nls
+
+    WHERE       ctnls.countrycode = rc.countrycode and
+                ctnls.nlsid = nls.nlsid
+ ;
+
+
+-----------------------------------------------
+-- CALLED OUT IN THE TABLE SPEC
+-- CONVERTED DWB
+-- COMPILE DWB
+-- REMOVED ONE UNION..Inthe WITH CLAUSE..LOOKED
+-- LIKE A DUMPLICATE
+-- CHANGE FROM MTM
+-----------------------------------------------
+echo eccmp.pack_complete;
+DROP VIEW ECCM.PACK_COMPLETE;
+CREATE VIEW eccm.pack_complete
+(
+  partnumber,
+  country,
+  nlsid,
+  wunits,
+  weight,
+  width,
+  height,
+  dunits,
+  depth
+) AS
+
+SELECT      csol.pnumb_ct,
+            ga.genareacode,
+            pk.nlsid,
+            MAX(pk.wunits),
+            MAX(pk.weight),
+            MAX(pk.width),
+            MAX(pk.height),
+            MAX(pk.dunits),
+            MAX(pk.depth)
+
+FROM        eccm.package1  pk
+
+JOIN        eccm.ofcsol ofcsol on
+            ofcsol.id1 = pk.entityid
+
+JOIN        eccm.csol csol on
+            csol.entityid = ofcsol.id2 and
+            csol.nlsid=pk.nlsid
+
+join        eccm.generalarea ga on
+            ga.genareaname_fc= csol.genareaname_fc and
+            ga.genareatype='Cty'
+
+join        int.avprice_state pp on
+            pp.partnumber=csol.pnumb_ct and
+            pp.countrycode= ga.genareacode
+
+join        eccm.psgctnls ctnls on
+            ctnls.countrycode = ga.genareacode and
+            ctnls.nlsid = pk.nlsid
+
+join        int.avwwprd prd on
+            prd.prdentitytype='CSOL' and
+            prd.prdentityid=csol.entityid and
+            prd.countrycode=ga.genareacode and
+            prd.prdnlsid=pk.nlsid
+
+where       pk.entitytype='OF' and
+            pp.distributionchannel = '00'and
+            (pp.callforquote ='0' OR pp.callforquote = '1') and
+            current date BETWEEN date(pp.pricevalidfromdate) and date(pp.pricevalidtodate)
+
+GROUP BY  csol.pnumb_ct, ga.genareacode, pk.nlsid
+;
+
+-----------------------------------------
+-- CALLED OUT IN THE TABLE SPEC
+-- CONVERTED DWB
+-- COMPILED DWB
+-- CHECKED FOR FINAL SCRIPT
+-----------------------------------------
+echo view.eccmwwprdctry;
+DROP VIEW eccm.wwprdctry;
+CREATE VIEW eccm.wwprdctry
+-----------------------------------------
+(
+  PARTNUMBER,
+  ENTITYTYPE,
+  ENTITYID,
+  NLSID,
+  COUNTRYCODE,
+  LANGUAGE,
+  AUDIENCE,
+  QUANTITY,
+  NEW_FLAG,
+  BUYABLE_FLAG,
+  ADDTOCART_FLAG,
+  CUSTOMIZE_FLAG,
+  FOCUS_FLAG,
+  HIDE_FLAG,
+  REFRESHTIME,
+  PRODUCTCLASS,
+  RATETYPE,
+  COUNTRY_NEWFLAG,
+  LASTUPDATED
+) AS
+
+  SELECT      prd.partnumber,
+              prd.prdentitytype,
+              prd.prdentityid,
+              prd.prdnlsid,
+              prd.countrycode,
+              prd.language,
+              multi.longdescription,
+              dac.available_quantity,
+              prdavail.new_flag,
+              prdavail.buyable_flag,
+              prdavail.addtocart_flag,
+              prdavail.customize_flag,
+              prdavail.focus_flag,
+              prdavail.hide_flag ,
+              prd.refreshtime,
+              prd.productclass,
+              prdavail.ratetype,
+              CASE WHEN
+                current date - date(prd.announcedate) <= newdate.numberofdays THEN 1 ELSE 0
+              END,
+              dac.lastupdated
+
+  FROM        int.avwwprd prd
+
+  JOIN        eccm.audience multi on
+              multi.entityid = prd.prdentityid and
+              multi.entityname = prd.prdentitytype and
+              multi.nlsid = prd.prdnlsid
+
+  LEFT JOIN   int.dacavail dac on
+              dac.partnumber = prd.partnumber and
+              dac.countrycode = prd.countrycode and
+              multi.longdescription = 'SHOP'
+
+  LEFT JOIN   int.avprdavail prdavail on
+              prd.partnumber = prdavail.partnumber and
+              prd.countrycode = prdavail.countrycode and
+              prd.language = prdavail.language and
+              multi.longdescription = prdavail.audience
+
+  LEFT JOIN   int.newflagdates newdate on
+              prd.countrycode = newdate.countrycode
+
+;
+
+
+-------------------------------------------
+-- USED IN SUPPORT OF THE TABLE SPEC
+-- CONVERTED DWB
+-- COMPILED DWB
+-- CHECKED FOR FINAL SCRIPT
+-------------------------------------------
+echo view eccm.catcatrel;
+DROP VIEW eccm.catcatrel;
+CREATE VIEW eccm.catcatrel
+(
+  parentidentifier,
+  childidentifier
+) AS (
+
+      SELECT
+      DISTINCT      'PSG',
+                    fam.familyname
+      FROM          eccm.projserbrandfam fam
+
+      UNION ALL
+
+      SELECT        fam.familyname,
+                    fam.famsername
+
+      FROM          eccm.projserbrandfam fam
+
+      UNION ALL
+
+      SELECT
+      DISTINCT      fam.famsername,
+                    fam.famsername || '@' || of.OPTGROUPNAME
+
+      FROM          ECCM.of of
+
+      join          eccm.projserbrandfam fam on
+                    of.prid = fam.projectid and
+                    of.nlsid = fam.nlsid
+
+      WHERE         (of.OPTGROUPNAME <> '' or of.OPTGROUPNAME IS NOT NULL) and
+                    of.nlsid <> 8
+
+      UNION ALL
+
+      SELECT
+      DISTINCT      fam.famsername || '@' || of.OPTGROUPNAME,
+                    fam.famsername || '@' || of.OPTGROUPNAME || '@' || of.subgroup
+
+      FROM          ECCM.of of
+
+      join          eccm.projserbrandfam fam on
+                    of.prid = fam.projectid and
+                    of.nlsid = fam.nlsid
+
+      WHERE         of.subgroup <> ''  and
+                    of.OPTGROUPNAME <> '' and
+                    of.nlsid <> 8
+ );
+
+-------------------------------------------------
+-- CALLED OUT IN THE TABLE SPEC
+-- TOOK OUT THE REFERENCE TO BR
+-- CONVERTED DWB
+-- COMPILED DWB
+-- MAKING SURE WE USE NLSID From ctnls
+-- CHECKED FOR FINAL SCRIPT
+-------------------------------------------------
+-------------------------------------------------
+-- CALLED OUT IN THE TABLE SPEC
+-- TOOK OUT THE REFERENCE TO BR
+-- CONVERTED DWB
+-- COMPILED DWB
+-- MAKING SURE WE USE NLSID From ctnls
+-- CHECKED FOR FINAL SCRIPT
+-- New version per FB53296
+-------------------------------------------------
+echo "view eccm.catroot";
+DROP VIEW eccm.catroot;
+CREATE VIEW eccm.catroot
+-------------------------------------------------
+(
+  CATEGORYIDENTIFIER,
+  COUNTRYCODE,
+  LANGUAGE,
+  PARENTIDENTIFIER,
+  NAMEDESC,
+  ENTITYTYPE,
+  ENTITYID,
+  NLSID,
+  SOURCE,
+  LASTUPDATED
+) AS
+
+  SELECT
+  DISTINCT        fam.familyname,
+                  ctnls.countrycode,
+                  nls.isolangcode2,
+                  '',
+                  fam.familyname,
+                  'FAM',
+                  fam.familyid,
+                  ctnls.nlsid,
+                  '',
+                  current timestamp
+
+  FROM            eccm.psgctnls ctnls,
+                  eccm.projserbrandfam fam,
+                  eccm.psgnls nls
+
+  WHERE           ctnls.nlsid = nls.nlsid and
+                  fam.nlsid = 1
+
+  UNION ALL
+
+  SELECT
+  DISTINCT        fam.famsername,
+                  ctnls.countrycode,
+                  nls.isolangcode2,
+                  fam.familyname,
+                  fam.seriesname,
+                  'SE',
+                  fam.seriesid,
+                  ctnls.nlsid,
+                  '',
+                  current timestamp
+
+  FROM            eccm.psgctnls ctnls,
+                  eccm.projserbrandfam fam,
+                  eccm.psgnls nls
+
+  WHERE           ctnls.nlsid = nls.nlsid and
+                  fam.nlsid= 1
+
+  UNION ALL
+
+  SELECT
+  DISTINCT        cat.catidentifier,
+                  ctnls.countrycode,
+                  nls.isolangcode2,
+                  cat.parentidentifier,
+                  '',
+                  '',
+                  0,
+                  1,
+                  'ECCM',
+                  current timestamp
+
+   FROM           eccm.psgctnls ctnls,
+                  int.avcatcatrel cat,
+                  eccm.psgnls nls
+
+   WHERE          ctnls.nlsid = nls.nlsid and
+                  cat.relationshiponly = 'N'
+
+   UNION ALL
+
+   SELECT
+   DISTINCT         cat.parentidentifier,
+                  ctnls.countrycode,
+                  nls.isolangcode2,
+                  '',
+                  '',
+                  '',
+                  0,
+                  1,
+                  'ECCM',
+                  current timestamp
+
+ FROM             eccm.psgctnls ctnls,
+                  int.avcatcatrel cat,
+                  eccm.psgnls nls
+
+ WHERE            ctnls.nlsid = nls.nlsid and
+                  cat.parentidentifier NOT IN (
+                      SELECT    catidentifier
+                      FROM      int.avcatcatrel
+                      WHERE     relationshiponly = 'N'
+                  )
+ UNION ALL
+
+ SELECT
+ DISTINCT         psbf.famsername ||'@'|| of.OPTGROUPNAME,
+                  ctnls.countrycode,
+                  nls.isolangcode2,
+                  psbf.famsername,
+                  of.OPTGROUPNAME,
+                  '',
+                  0,
+                  of.nlsid,
+                  '',
+                  current timestamp
+
+ FROM             ECCM.of of
+
+ join             eccm.projserbrandfam psbf on
+                  of.prid = psbf.projectid and
+                  of.nlsid = psbf.nlsid
+
+                  ,
+                  eccm.psgctnls ctnls,
+                  eccm.psgnls nls
+
+  WHERE           ctnls.nlsid = nls.nlsid and
+                  of.OPTGROUPNAME IS NOT NULL and
+                  of.OPTGROUPNAME <> ''
+  UNION ALL
+
+  SELECT
+  DISTINCT        psbf.famsername || '@'||  of.OPTGROUPNAME ||  '@' || of.subgroup,
+                  ctnls.countrycode,
+                  nls.isolangcode2,
+                  psbf.famsername || '@'||  of.OPTGROUPNAME,
+                  of.subgroup,
+                  '',
+                  0,
+                  of.nlsid,
+                  '',
+                  current timestamp
+
+ FROM             ECCM.of of
+
+ join             eccm.projserbrandfam psbf on
+                  of.prid = psbf.projectid and
+                  of.nlsid = psbf.nlsid
+
+                  ,
+                  eccm.psgctnls ctnls,
+                  eccm.psgnls nls
+
+  WHERE           ctnls.nlsid = nls.nlsid and
+                  of.OPTGROUPNAME IS NOT NULL and
+                  of.OPTGROUPNAME <> '' and
+                  of.SUBGROUP IS NOT NULL and
+                  of.SUBGROUP <> ''
+;
+
+-------------------------------------------
+-- CALLED OUT IN TABLE SPEC
+-- CONVERTED DWB
+-- COMPILED DWB
+-- CHECKED FOR FINAL SCRIPT
+-------------------------------------------
+echo view eccm.wwcatcatrel;
+DROP VIEW eccm.wwcatcatrel;
+CREATE VIEW eccm.wwcatcatrel
+
+( PARENTIDENTIFIER,
+  CHILDIDENTIFIER,
+  COUNTRYCODE,
+  AUDIENCE,
+  MASTNAV,
+  PUB_FLAG,
+  SEQUENCE,
+  SOURCE ) AS (
+
+    SELECT      COALESCE(avcatrel.parentidentifier,cat.parentidentifier),
+                cat.childidentifier,
+                rtrim(ctry.countrycode),
+                'LE',
+                'M',
+                avcat.pub_flag,
+                avcat.sequence,
+                ''
+    FROM        eccm.catcatrel cat
+
+    JOIN        eccm.ccectry ctry on 1 = 1
+
+    LEFT JOIN   int.avcatcatseq avcat on
+                cat.parentidentifier = avcat.parentidentifier and
+                cat.childidentifier =avcat.catidentifier and
+                ctry.countrycode = avcat.countrycode and
+                avcat.audience = 'LE'
+
+    LEFT JOIN   int.avcatcatrel avcatrel on
+                cat.childidentifier = avcatrel.catidentifier
+                and avcatrel.mastnav = 'M'
+
+    UNION ALL
+
+    SELECT      COALESCE(avcatrel.parentidentifier, cat.parentidentifier),
+                cat.childidentifier,
+                rtrim(ctry.countrycode),
+                'SHOP',
+                'M',
+                avcat.pub_flag,
+                avcat.sequence,
+                ''
+
+    FROM        eccm.catcatrel cat
+
+    JOIN        eccm.ccectry ctry on 1 = 1
+
+    LEFT JOIN   int.avcatcatseq avcat on
+                cat.parentidentifier = avcat.parentidentifier and
+                cat.childidentifier = avcat.catidentifier and
+                ctry.countrycode = avcat.countrycode and
+                avcat.audience = 'SHOP'
+
+    LEFT JOIN   int.avcatcatrel avcatrel on
+                cat.childidentifier = avcatrel.catidentifier and
+                avcatrel.mastnav = 'M'
+
+    UNION ALL
+
+    SELECT      cat.parentidentifier,
+                cat.catidentifier,
+                rtrim(ctry.countrycode),
+                'LE',
+                cat.mastnav,
+                avcat.pub_flag,
+                avcat.sequence,
+                cat.source
+
+    FROM        int.avcatcatrel cat
+
+    JOIN        eccm.ccectry ctry on
+                1 = 1
+
+    LEFT JOIN   int.avcatcatseq avcat on
+                cat.parentidentifier = avcat.parentidentifier and
+                cat.catidentifier = avcat.catidentifier
+                and ctry.countrycode = avcat.countrycode and
+                avcat.audience = 'LE'
+
+    WHERE       NOT ( cat.mastnav = 'M' and cat.catidentifier IN
+                (SELECT DISTINCT childidentifier FROM eccm.catcatrel ))
+
+    UNION
+
+    SELECT      cat.parentidentifier,
+                cat.catidentifier,
+                rtrim(ctry.countrycode),
+                'SHOP',
+                cat.mastnav,
+                avcat.pub_flag,
+                avcat.sequence,
+                cat.source
+
+    FROM        int.avcatcatrel cat
+
+    JOIN        eccm.ccectry ctry on
+                1 = 1
+
+    LEFT JOIN   int.avcatcatseq avcat on
+                cat.parentidentifier = avcat.parentidentifier and
+                cat.catidentifier = avcat.catidentifier and
+                ctry.countrycode = avcat.countrycode and
+                Upper(avcat.audience) = 'SHOP'
+
+    WHERE       NOT (cat.mastnav = 'M'AND cat.catidentifier IN
+                (SELECT DISTINCT childidentifier FROM eccm.catcatrel))
+
+    UNION ALL
+
+    SELECT      'PSG',
+                cat.parentidentifier,
+                rtrim(ctry.countrycode),
+                'SHOP',
+                'M',
+                1,
+                1,
+                'ECCM'
+
+    FROM        int.avcatroot cat
+
+    JOIN        eccm.ccectry ctry on
+                1 = 1
+
+    WHERE       cat.parentidentifier <> 'Popular Models' and cat.parentidentifier
+                NOT IN (SELECT catidentifier FROM int.avcatcatrel WHERE     mastnav = 'M')
+
+    UNION ALL
+
+    SELECT      'PSG',
+                cat.parentidentifier,
+                rtrim(ctry.countrycode),
+                'LE',
+                'M',
+                1,
+                1,
+                'ECCM'
+
+    FROM        int.avcatroot cat
+
+    JOIN        eccm.ccectry ctry on
+                1 = 1
+
+    WHERE       cat.parentidentifier <> 'Popular Models' AND cat.parentidentifier NOT IN
+                (SELECT catidentifier FROM int.avcatcatrel WHERE  mastnav = 'M')
+
+    UNION ALL
+
+    select      'DAC',
+                'DAC@DAC1',
+                rtrim(ctry.countrycode),
+                'DACMAX',
+                'M',
+                1,
+                0,
+                'ECCM'
+
+    from        eccm.ccectry ctry
+
+    where       ctry.countrycode='US'
+
+    );
+
+
+
+--------------------------------------------
+-- CALLED OUT IN TABLE SPEC
+-- CONVERTED DWB
+-- COMPILED DWB
+-- DWB NEEDS TO BE REVIEWED
+-- Received update from MT
+-- Removed the nLSID
+--------------------------------------------
+echo view eccm.wwprdprdrel;
+DROP VIEW eccm.wwprdprdrel;
+CREATE VIEW  eccm.wwprdprdrel
+(
+  PARENTPARTNUMBER,
+  CHILDPARTNUMBER,
+  COUNTRYCODE,
+  AUDIENCE,
+  PRODUCTCLASS,
+  SCHEDULERELEV,
+  SBBANNOUNCEDATE,
+  SBBWITHDRAWDATE,
+  SEQUENCE,
+  PUB_FLAG,
+  REFRESHTIME,
+  CHILDSTATUS
+) AS (
+
+  SELECT
+  DISTINCT  prd.partnumber,
+            sbb.SBBPNUMB,
+            prd.countrycode,
+            multi.longdescription,
+            prd.productclass,
+            sbb.SBBPLANNINGRELEV,
+            a.anndate,
+            a.wdate,
+            seq.sequence,
+            seq.pub_flag,
+            prd.refreshtime,
+            sbb.SBBSTATUS
+
+  FROM      int.avwwprd prd
+
+  JOIN      eccm.sbballdates a on
+            a.entityid = prd.prdentityid and
+            a.entitytype = prd.prdentitytype and
+            a.nlsid = prd.prdnlsid
+
+  JOIN      eccm.sbb sbb on
+            sbb.entityid = a.sbbid and
+            sbb.nlsid = a.nlsid
+
+  JOIN      eccm.audience multi on
+            multi.entityid = prd.prdentityid and
+            multi.entityname = prd.prdentitytype and
+            multi.nlsid = prd.prdnlsid
+
+  LEFT
+  JOIN      int.avprdprdseq seq on
+            seq.parentpartnumber = prd.partnumber  and
+            seq.childpartnumber = sbb.SBBPNUMB and
+            seq.countrycode = prd.countrycode
+
+  WHERE     ((prd.prdentitytype IN ('CCTO') and prd.productclass = 'CTO') or
+            (prd.prdentitytype IN ('CVAR') and prd.productclass = 'V'))
+            and ((a.wdate is NULL) OR
+            (a.wdate >=current date - 14 days))
+
+  UNION ALL
+
+  SELECT
+  DISTINCT  prd.partnumber,
+            childprd.partnumber,
+            prd.countrycode,
+            multi.longdescription,
+            prd.productclass,
+            '',
+            CAST(NULL AS DATE),
+            CAST(NULL AS DATE),
+            seq.sequence,
+            seq.pub_flag,
+            prd.refreshtime,
+            childprd.fotstatus
+
+  FROM      int.avwwprd prd
+
+  JOIN      eccm.cbparts cbs ON
+            prd.prdentitytype = cbs.entitytype and
+            prd.prdentityid = cbs.entityid and
+            cbs.nlsid = prd.prdnlsid
+
+  JOIN      eccm.cbcsol rel ON
+            prd.prdentityid=rel.ID1
+
+  JOIN      int.avwwprd childprd ON
+            childprd.prdentityid = rel.ID2 and
+            childprd.prdnlsid = prd.prdnlsid
+
+  JOIN      int.effectiveprice price ON
+            price.parentpartnumber = childprd.partnumber and
+            price.countrycode = childprd.countrycode
+
+  JOIN      eccm.audience multi on
+            multi.entityid = prd.prdentityid and
+            multi.entityname = prd.prdentitytype and
+            multi.nlsid = prd.prdnlsid
+
+  LEFT
+  JOIN      int.avprdprdseq seq on
+            seq.parentpartnumber = prd.partnumber and
+            seq.childpartnumber = childprd.partnumber and
+            seq.countrycode = prd.countrycode
+
+  WHERE     (prd.prdentitytype IN ('CB') and prd.productclass = 'CB')
+
+  UNION ALL
+
+  SELECT
+  DISTINCT  prd.partnumber,
+            childprd.partnumber,
+            prd.countrycode,
+            multi.longdescription,
+            prd.productclass,
+            '',
+            CAST(NULL AS DATE),
+            CAST(NULL AS DATE),
+            seq.sequence,
+            seq.pub_flag,
+            prd.refreshtime,
+            childprd.fotstatus
+
+  FROM      int.avwwprd prd
+
+  JOIN      eccm.cbparts cbs ON
+            prd.prdentitytype = cbs.entitytype and
+            prd.prdentityid = cbs.entityid and
+            cbs.nlsid = prd.prdnlsid
+
+  JOIN      eccm.cbcvar rel ON
+            prd.prdentityid=rel.ID1
+
+  JOIN      int.avwwprd childprd ON
+            childprd.prdentityid = rel.ID2 and
+            childprd.prdnlsid = prd.prdnlsid
+
+  JOIN      int.effectiveprice price ON
+            price.parentpartnumber = childprd.partnumber and
+            price.countrycode = childprd.countrycode
+
+  JOIN      eccm.audience multi on
+            multi.entityid = prd.prdentityid and
+            multi.entityname = prd.prdentitytype and
+            multi.nlsid = prd.prdnlsid
+  LEFT
+  JOIN      int.avprdprdseq seq on
+            seq.parentpartnumber = prd.partnumber and
+            seq.childpartnumber = childprd.partnumber and
+            seq.countrycode = prd.countrycode
+
+  WHERE     (prd.prdentitytype IN ('CB') and prd.productclass = 'CB'))
+
+;
+
+
+
+------------------------------------------
+-- Called out in Table SPec
+-- Converted DWB
+-- COMPILED DWB
+-- Added NLS ID
+-- CHANGES PER MT
+-- MADE CHANGES FOR ATTRIBUTETOKEN
+-- CHECKED FOR FINAL SCRIPT
+-- ADDED SOFTWARE UNION ALL
+-- CHANGED PER CR1105032935
+-- ANOTHER CHANGE PER MTM
+------------------------------------------
+echo "view eccm.ctattr";
+drop view eccm.ctattr;
+create view eccm.ctattr
+------------------------------------------
+(
+    parententitytype,
+    parententityid,
+    nlsid,
+    attributetoken,
+    value
+) as (
+
+  select    c.entity1type,
+            c.entity1id,
+            a.nlsid,
+            rtrim('CT_' concat (select att.attributetoken from eccm.attribute att where att.attributecode = a.attributecode)),
+            a.attributevalue
+
+  from      ECCM.prodattribute a
+
+  join      ECCM.prodattrelator c on
+            c.entity2type=a.entitytype and
+            c.entity2id=a.entityid and
+            c.entity1type='CSOL'
+
+  join      eccm.prdroot prd on
+            prd.entitytype='CSOL' and
+            prd.entityid=c.entity1id and
+            prd.nlsid=a.nlsid
+
+  union all
+
+  select    c.entity1type,
+            c.entity1id,
+            a.nlsid,
+            rtrim('CT_' concat (select att.attributetoken from eccm.attribute att where att.attributecode = a.attributecode)),
+            a.attributevalue
+
+  from      ECCM.prodattribute a
+
+  join      ECCM.prodattrelator c on
+            c.entity2type=a.entitytype and
+            c.entity2id=a.entityid and
+            c.entity1type='CCTO'
+
+  join      eccm.prdroot prd on
+            prd.entitytype='CCTO' and
+            prd.entityid=c.entity1id and
+            prd.nlsid=a.nlsid
+
+  union all
+
+  select    c.entity1type,
+            c.entity1id,
+            a.nlsid,
+            rtrim('CT_' concat (select att.attributetoken from eccm.attribute att where att.attributecode = a.attributecode)),
+            a.attributevalue
+
+  from      ECCM.prodattribute a
+
+  join      ECCM.prodattrelator c on
+            c.entity2type=a.entitytype and
+            c.entity2id=a.entityid and
+            c.entity1type='CVAR'
+
+  join      eccm.prdroot prd on
+            prd.entitytype='CVAR' and
+            prd.entityid=c.entity1id and
+            prd.nlsid=a.nlsid
+
+  union all
+
+  select    'CSOL',
+            csolsbb.id1,
+            a.nlsid,
+            rtrim('CT_' concat (select att.attributetoken from eccm.attribute att where att.attributecode = a.attributecode)),
+            a.attributevalue
+
+  from      ECCM.prodattribute a
+
+  join      ECCM.prodattrelator c on
+            c.entity2type=a.entitytype and
+            c.entity2id=a.entityid and
+            c.entity1type='SBB'
+
+  join     eccm.csolsbb csolsbb on
+        csolsbb.id2=c.entity2id
+
+  join      eccm.prdroot prd on
+            prd.entitytype='CSOL' and
+            prd.entityid=csolsbb.id1 and
+            prd.nlsid=a.nlsid
+
+  union all
+
+  select    software.entitytype,
+            software.entityid,
+            software.nlsid,
+            CASE software.category_fc
+              When '0010' Then 'CT_SODEVICE'
+              When '0020' Then 'CT_SOMAIL'
+              When '0030' Then 'CT_SOMULTI'
+              When '0040' Then 'CT_SONET'
+              When '0060' Then 'CT_SOOPT'
+              When '0070' Then 'CT_SOOTH'
+              When '0080' Then 'CT_SOPRD'
+            END,
+            software.value
+
+  from      eccm.software software
+
+  where     software.entitytype = 'CSOL' and
+            category_FC in ( '0010','0020','0030','0040','0060','0070','0080')
+
+  );
+
+-----------------------------------------
+-- Called out in Table Spec
+-- Converted DWB
+-- Added NLS ID
+-- COMPILED DWB
+-- CONVERTED W MARY
+-- CONVERTED FOR ATTIRB
+-- CHECKED FOR FINAL SCRIPT
+-- ADDED SOFTWARE UNION ALL
+-- CHANGED PER CR1105032935
+-----------------------------------------
+-- Called out in Table Spec
+-- Converted DWB
+-- Added NLS ID
+-- COMPILED DWB
+-- CONVERTED W MARY
+-- CONVERTED FOR ATTIRB
+-- CHECKED FOR FINAL SCRIPT
+-- ADDED SOFTWARE UNION ALL
+-- CHANGE PER MTM
+----------------------------------------
+echo "view eccm.wwattr";
+drop view eccm.wwattr;
+create view eccm.wwattr
+----------------------------------------
+(
+  parententitytype,
+  parententityid,
+  nlsid,
+  attributetoken,
+  value
+
+) as (
+
+  select    c.entity1type,
+            c.entity1id,
+            a.nlsid,
+            rtrim('WW_' concat (select att.attributetoken from eccm.attribute att where att.attributecode = a.attributecode)),
+            a.attributevalue
+
+  from      ECCM.prodattribute a
+
+  join ECCM.prodattrelator c on
+            c.entity2type= a.entitytype and
+            c.entity2id=a.entityid and
+            c.entity1type='OF'
+
+  join eccm.prdroot prd on
+            prd.entitytype='CSOL' and
+            prd.ofentityid=c.entity1id and
+            prd.nlsid=a.nlsid
+
+  union all
+
+  select    c.entity1type,
+            c.entity1id,
+            a.nlsid,
+            rtrim('WW_' concat (select att.attributetoken from eccm.attribute att where att.attributecode = a.attributecode)),
+            a.attributevalue
+
+  from      ECCM.prodattribute a
+
+  join      ECCM.prodattrelator c on
+            c.entity2type=a.entitytype and
+            c.entity2id=a.entityid and
+            c.entity1type='CTO'
+
+  join      eccm.prdroot prd on
+            prd.entitytype='CCTO' and
+            prd.ofentityid=c.entity1id and
+            prd.nlsid=a.nlsid
+
+  union all
+
+  select    c.entity1type,
+            c.entity1id,
+            a.nlsid,
+            rtrim('WW_' concat (select att.attributetoken from eccm.attribute att where att.attributecode = a.attributecode)),
+            a.attributevalue
+
+  from      ECCM.prodattribute a
+
+  join      ECCM.prodattrelator c on
+
+            c.entity2type=a.entitytype and
+            c.entity2id=a.entityid and c.entity1type='VAR'
+
+  join      eccm.prdroot prd on
+            prd.entitytype='CVAR' and
+            prd.ofentityid=c.entity1id and
+            prd.nlsid=a.nlsid
+
+  union all
+
+  select
+       'OF',
+            ofsbb.id1,
+            a.nlsid,
+            rtrim('WW_' concat (select att.attributetoken from eccm.attribute att where att.attributecode = a.attributecode)),
+            a.attributevalue
+
+  from      ECCM.prodattribute a
+
+
+  join ECCM.prodattrelator c on
+            c.entity2type= a.entitytype and
+            c.entity2id=a.entityid and
+            c.entity1type='SBB'
+
+  join eccm.ofsbb ofsbb on
+       ofsbb.id2 = c.entity1id
+
+  join eccm.prdroot prd on
+            prd.entitytype='CSOL' and
+            prd.ofentityid=ofsbb.id1 and
+            prd.nlsid=a.nlsid
+
+  union all
+
+  select    software.entitytype,
+            software.entityid,
+            software.nlsid,
+            CASE software.category_fc
+              When '0010' Then 'WW_SODEVICE'
+              When '0020' Then 'WW_SOMAIL'
+              When '0030' Then 'WW_SOMULTI'
+              When '0040' Then 'WW_SONET'
+              When '0060' Then 'WW_SOOPT'
+              When '0070' Then 'WW_SOOTH'
+              When '0080' Then 'WW_SOPRD'
+            END,
+            software.value
+
+  from      eccm.software software
+
+  where     software.entitytype = 'OF' and
+            category_FC in ( '0010','0020','0030','0040','0060','0070','0080' ))
+
+;
+
+--------------------------------------
+-- CALLED OUT IN THE TABLE SPEC
+-- CONVERTED DWB (ADDED NLS)
+-- COMPILED DWB
+-- REVIEWED W MTM
+-- MADE CHANGES FOR ATTRIBUTETOKEN
+-- CHECKED FOR FINAL SCRIPT
+--------------------------------------
+echo view eccm.variantattr;
+drop view eccm.variantattr;
+--------------------------------------
+create view eccm.variantattr (
+    parententitytype,
+    parententityid,
+    nlsid,
+    attributetoken,
+    value) as
+
+  select        'CVAR',
+                cvar.entityid,
+                cvar.nlsid,
+                rtrim('WW_' concat (select att.attributetoken from eccm.attribute att where att.attributecode = a.attributecode)),
+                a.attributevalue
+
+  from          ECCM.cvar cvar
+
+  join          ECCM.varsbb varsbb on
+                cvar.varid = varsbb.ID1 and
+                cvar.nlsid = varsbb.nlsid
+
+  join          ECCM.prodattrelator c on
+                c.entity1type='SBB' and
+                c.entity1id=varsbb.ID2
+
+  join          ECCM.prodattribute a on
+                a.entitytype=c.entity2type and
+                a.entityid=c.entity2id and
+                a.nlsid=cvar.nlsid
+ ;
+
+--------------------------------------------
+-- CALLED OUT IN TABLE SPEC
+-- CONVERTED DWB
+-- COMPILED DWB
+-- CHECKED FOR FINAL SCRIPT
+--------------------------------------------
+echo view eccm.wwcatmtmrel;
+DROP VIEW eccm.wwcatmtmrel;
+CREATE VIEW eccm.wwcatmtmrel
+--------------------------------------------
+(
+    identifier,
+    partnumber,
+    mastnav,
+    countrycode,
+    language,
+    audience,
+    sequence
+)
+  AS (
+
+      SELECT      psbf.FAMSERNAME,
+                  prd.partnumber,
+                  'M',
+                  prd.countrycode,
+                  prd.language,
+                  multi.longdescription,
+                  seq.sequence
+
+      FROM        int.avwwprd prd
+
+      JOIN        eccm.prdroot root on
+                  prd.prdentityid = root.entityid and
+                  prd.prdentitytype = root.entitytype and
+                  prd.prdnlsid = root.nlsid
+
+      JOIN        ECCM.of of on
+                  root.ofentityid = of.entityid and
+                  root.nlsid =of.nlsid
+
+      JOIN        eccm.projserbrandfam psbf on
+                  psbf.projectid =root.projectid
+
+      JOIN        eccm.audience multi on
+                  multi.entityid = root.entityid and
+                  multi.entityname = root.entitytype and
+                  multi.nlsid = root.nlsid
+
+      LEFT JOIN   int.avprdcatseq seq on
+                  seq.catidentifier = psbf.famsername and
+                  seq.partnumber = prd.partnumber and
+                  seq.countrycode = prd.countrycode and
+                  seq.language = prd.language and
+                  multi.longdescription = Upper(seq.audience)
+
+      WHERE       prd.productclass = 'MTM' AND
+                  of.OPTGROUPNAME is NULL AND
+                  of.subgroup is NULL AND
+                  (seq.pub_flag is NULL OR seq.pub_flag = 1)
+);
+
+------------------------------------------
+-- CALLED OUT IN THE TABLE SPEC
+-- CONVERTED DWB
+-- COMPILED
+-- CHECKED FOR FINAL SCRIPT
+-- CHANGED FOR MTM
+------------------------------------------
+echo view eccm.wwcatprdrel;
+drop view eccm.wwcatprdrel;
+create view eccm.wwcatprdrel
+( identifier, partnumber, mastnav, countrycode, language, audience, sequence, pub_flag,
+ranking, refreshtime ) as
+select
+ psbf.famsername,
+ prd.partnumber,
+ 'M',
+ prd.countrycode,
+ prd.language,
+ multi.longdescription,
+ seq.sequence,
+ seq.pub_flag,
+ '',
+ prd.refreshtime
+from
+int.avwwprd prd
+ join eccm.prdroot root on prd.prdentityid = root.entityid and
+  prd.prdentitytype = root.entitytype and
+  prd.prdnlsid=root.nlsid
+ join eccm.of of on root.ofentityid = of.entityid and root.nlsid=of.nlsid
+ join eccm.projserbrandfam psbf on root.projectid = psbf.projectid
+ join eccm.audience multi on root.entityid = multi.entityid and
+  multi.entityname = root.entitytype and
+  root.nlsid=multi.nlsid
+ left outer join int.avprdcatseq seq on psbf.famsername = seq.catidentifier and
+  prd.partnumber = seq.partnumber and
+  prd.countrycode = seq.countrycode and
+  prd.language = seq.language and
+  multi.longdescription= Upper(seq.audience)
+where
+ (prd.productclass = 'MTM' or
+ prd.productclass = 'SERVICE' or
+ prd.productclass = 'SO') and
+ multi.longdescription in('LE','SHOP') and
+ of.optgroupname is null and
+ of.subgroup is null
+union
+select
+ psbf.famsername,
+ prd.partnumber,
+ 'M',
+ prd.countrycode,
+ prd.language,
+ multi.longdescription ,
+ seq.sequence,
+ seq.pub_flag,
+ '',
+ prd.refreshtime
+from   int.avwwprd prd
+ join eccm.prdroot root on prd.prdentityid = root.entityid and
+  prd.prdentitytype = root.entitytype and
+  prd.prdnlsid=root.nlsid
+ join eccm.projserbrandfam psbf on root.projectid = psbf.projectid
+ join eccm.audience multi on root.entityid = multi.entityid and
+  multi.entityname = root.entitytype and
+  multi.nlsid=root.nlsid
+ left outer join int.avprdcatseq seq on psbf.famsername= seq.catidentifier and
+  prd.partnumber = seq.partnumber and
+  prd.countrycode = seq.countrycode and
+  prd.language = seq.language and
+  multi.longdescription= Upper(seq.audience)
+where  (prd.productclass='V' or prd.productclass='CTO')
+union
+select
+ psbf.famsername concat '@' concat of.optgroupname,
+ prd.partnumber,
+ 'M',
+ prd.countrycode,
+ prd.language ,
+ multi.longdescription ,
+ seq.sequence,
+ seq.pub_flag,
+ '',
+ prd.refreshtime
+from int.avwwprd prd
+ join eccm.prdroot root on prd.prdentityid = root.entityid and
+  prd.prdentitytype = root.entitytype and
+  prd.prdnlsid=root.nlsid
+ join eccm.of of on root.ofentityid = of.entityid and root.nlsid=of.nlsid
+ join eccm.projserbrandfam psbf on root.projectid = psbf.projectid
+ join eccm.audience multi on root.entityid = multi.entityid and
+  multi.entityname = root.entitytype and
+  multi.nlsid=root.nlsid
+ left outer join int.avprdcatseq seq on psbf.famsername
+  concat '@' concat of.optgroupname = seq.catidentifier and
+  prd.partnumber = seq.partnumber and
+  prd.countrycode = seq.countrycode and
+  prd.language = seq.language and
+  multi.longdescription = Upper(seq.audience)
+where
+ (prd.productclass = 'MTM' or prd.productclass = 'SERVICE' or
+ prd.productclass = 'SO') and
+ multi.longdescription in('LE','SHOP') and
+ of.optgroupname is not null and
+ of.subgroup is null
+union
+select
+ psbf.famsername concat '@' concat of.optgroupname concat '@' concat of.subgroup,
+ prd.partnumber,
+ 'M',
+ prd.countrycode,
+ prd.language,
+ multi.longdescription,
+ seq.sequence,
+ seq.pub_flag,
+ '',
+ prd.refreshtime
+from   int.avwwprd prd
+ join eccm.prdroot root on prd.prdentityid = root.entityid and
+  prd.prdentitytype = root.entitytype and
+  prd.prdnlsid=root.nlsid
+ join eccm.of of on root.ofentityid = of.entityid and root.nlsid=of.nlsid
+ join eccm.projserbrandfam psbf on root.projectid = psbf.projectid
+ join eccm.audience multi on root.entityid = multi.entityid and
+  multi.entityname = root.entitytype and
+  root.nlsid=multi.nlsid
+ left outer join int.avprdcatseq seq on psbf.famsername
+  concat '@' concat of.optgroupname concat '@' concat of.subgroup =
+  seq.catidentifier and
+  prd.partnumber = seq.partnumber and
+  prd.countrycode = seq.countrycode and
+  prd.language = seq.language and
+  multi.longdescription = Upper(seq.audience)
+where
+ (prd.productclass = 'MTM' or
+ prd.productclass = 'SERVICE' or prd.productclass = 'SO')
+ and multi.longdescription in('LE','SHOP') and
+ of.optgroupname is not null and
+ of.subgroup is not null
+union
+select
+ cb.catid,
+ prd.partnumber,
+ 'M',
+ prd.countrycode,
+ prd.language,
+ multi.longdescription,
+ seq.sequence,
+ seq.pub_flag,
+ '',
+ prd.refreshtime
+from int.avwwprd prd
+ join eccm.prdroot root on prd.prdentityid = root.entityid and
+  prd.prdentitytype = root.entitytype and
+  prd.prdnlsid=root.nlsid
+ join eccm.cbparts cb on root.entitytype = cb.entitytype and
+  root. entityid=cb.entityid and
+  root.nlsid=cb.nlsid
+ join eccm.audience multi on root.entityid = multi.entityid and
+  multi.entityname = root.entitytype and
+  multi.nlsid=root.nlsid
+ left outer join int.avprdcatseq seq on cb .catid = seq.catidentifier and
+  prd.partnumber = seq.partnumber and
+  prd.countrycode = seq.countrycode and
+  prd.language = seq.language and
+  multi.longdescription = Upper(seq.audience)
+where multi.longdescription in('LE','SHOP')
+union
+select
+ prd.catidentifier,
+ prd.partnumber,
+ 'N',
+ prd.countrycode,
+ prd.language,
+ prd.audience,
+ seq.sequence,
+ seq.pub_flag,
+ '',
+ avwwprd.refreshtime
+from  int.avprdcat prd
+ left outer join int.avprdcatseq seq on prd.catidentifier = seq.catidentifier and
+  prd.partnumber = seq.partnumber and
+  prd.countrycode = seq.countrycode and
+  prd.language = seq.language and
+  prd.audience = seq.audience
+ join int.avwwprd avwwprd on avwwprd.partnumber=prd.partnumber and
+  avwwprd.countrycode=prd.countrycode and
+  avwwprd.language = prd.language
+ join eccm.audience multi on prd.prdentityid = multi.entityid and
+  prd.prdentitytype = multi.entityname and
+  seq.audience = multi.longdescription
+where multi.longdescription in('LE','SHOP')
+union
+select
+ evp.catidentifier,
+ evp.partnumber,
+ 'N',
+ evp.countrycode,
+ evp.language,
+ evp.audience,
+ 1,
+ 1,
+ evp.evp_indicator,
+ prd.refreshtime
+from   int.avprdevp evp
+ join int.avwwprd prd on evp.partnumber = prd.partnumber and
+  evp.countrycode = prd.countrycode and
+  evp.language = prd.language
+ join eccm.audience multi on prd.prdentityid = multi.entityid and
+ prd.prdentitytype = multi.entityname and
+ evp.audience = multi.longdescription
+where multi.longdescription in('LE','SHOP')
+union
+select 'DAC@DAC1',
+ prd.partnumber,
+ 'M',
+ prd.countrycode,
+ prd.language,
+ multi.longdescription,
+ 0,
+ 1,
+ '',
+ prd.refreshtime
+from int.avwwprd prd
+ join eccm.audience multi on prd.prdentityid = multi.entityid and
+  multi.entityname = prd.prdentitytype
+where multi.longdescription in('DACMAX','LE and DACMAX')
+
+;
+
+------------------------------------------
+-- CONVERTED DWB
+-- COMPILED DWB
+-- UNIT TESTED DWB
+-- CALLED OUT IN TABLE SPEC DWB
+-- CHECKED FOR FINAL SCRIPT
+------------------------------------------
+echo view eccm.compat_deltaforce;
+drop view eccm.compat_deltaforce;
+create view eccm.compat_deltaforce
+(
+    ENTITYTYPE,
+    WWPARTNUM,
+    OPTIONPNUMB,
+    MTM,
+    OPERATINGSYS,
+    EXCEPTMODEL,
+    DELTA_INDICATOR
+) as
+
+  with compat_delta_indicator (delta_indicator) as (
+
+    select    max(delta_indicator)
+
+    from      int.teamcatalog_deltaforce
+
+    where     catalog='compat'
+  )
+
+  select    ENTITYTYPE,
+            WWPARTNUM,
+            OPTIONPNUMB,
+            MTM,
+            OPERATINGSYS,
+            EXCEPTMODEL,
+            DELTA_INDICATOR
+
+  from      eccm.compat
+
+  join      compat_delta_indicator on 1=1
+
+ ;
+
+
+------------------------------------------
+-- CONVERTED DWB
+-- COMPILED DWB
+-- UNIT TESTED DWB
+-- CALLED OUT IN TABLE SPEC DWB
+-- CONVERTED FOR ATTRIBUTE TOKEN
+-- CHECKED FOR FINAL SCRIPT
+------------------------------------------
+echo view eccm.wwmvattr;
+DROP VIEW eccm.wwmvattr;
+CREATE VIEW eccm.wwmvattr
+------------------------------------------
+(entitytype
+,entityid
+,nlsid
+,columnname
+,longdescription
+) AS (
+
+select    'OF',
+          pad.entity1id,
+          f.nlsid,
+          rtrim('WW_' concat (select att.attributetoken from eccm.attribute att where att.attributecode = f.attributecode)),
+          f.flagdescription
+
+from      eccm.prodattrelator pad
+
+join      eccm.flag f on
+          f.entitytype = pad.entity2type and
+          f.entityid = pad.entity2id and
+          f.sfvalue = 1
+
+where     pad.entity1type = 'OF'
+
+union all
+
+SELECT    'OF',
+          of.entityid,
+          of.nlsid,
+          rtrim('WW_PSG' || f.attributecode),
+          (select longdescription from eccm.metaflagtable where attributecode = f.attributecode and ATTRIBUTEVALUE= f.flagcode and nlsid =of.nlsid)
+
+FROM      eccm.of of
+join      eccm.flag f on
+          f.entitytype = 'OF' and
+          f.entityid = of.entityid and
+          f.attributecode in ('OFAPPROVALS_CERTS')
+);
+
+------------------------------------------
+-- CONVERTED DWB
+-- COMPILED DWB
+-- UNIT TESTED DWB
+-- GOT FROM MTM
+------------------------------------------
+echo view eccm.translated_attr;
+drop view eccm.translated_attr;
+------------------------------------------
+create view eccm.translated_attr
+(
+  attribtoken,
+  language,
+  isocode,
+  ibmlangcode,
+  attrsourcename,
+  attribname,
+  attrgroup,
+  grouptoken,
+  attrsort,
+  comparisononly,
+  lastupdated,
+  default_value
+
+) as
+
+  with eccm.attrnls (
+    attributetoken,
+    language,
+    isocode,
+    ibmlangcode,
+    attrsourcename,
+    grouptoken,
+    groupname,
+    attrsort,
+    comparisononly,
+    lastupdated
+  ) as (
+
+    select  attr.attributetoken,
+            nls.nlsid,
+            nls.isolangcode2,
+            nls.ibmlangcode,
+            attr.description,
+            group.grouptoken,
+            group.description,
+            attr.attrsortorder,
+            'N',
+            attr.valfrom
+
+    from    eccm.psgnls nls,
+            eccm.attribute attr,
+            eccm.attrgroup group
+
+    where   attr.entitytype = group.entitytype
+
+    union
+
+    select  eccmattr.attributetoken,
+            nls.nlsid,
+            nls.isolangcode2,
+            nls.ibmlangcode,
+            eccmattr.attributename,
+            coalesce(group.grouptoken,eccmatgp.grouptoken),
+            coalesce(group.description,eccmatgp.groupname),
+            eccmattr.attrsort, eccmattr.comparisononly,
+            eccmattr.lastupdated
+
+    from    eccm.psgnls nls,
+            int.eccmattr eccmattr
+
+    left    outer join eccm.attrgroup group on
+            eccmattr.grouptoken = group.grouptoken
+
+    left    outer join int.eccmatgp eccmatgp on
+            eccmattr.grouptoken= eccmatgp.grouptoken
+
+    where   eccmattr.comparisononly='N'
+
+  )
+
+  select
+  distinct  attr.attributetoken,
+            language,
+            isocode,
+            ibmlangcode,
+            attrsourcename,
+            coalesce(label.attributelabel, attrsourcename),
+            groupname,
+            attr.grouptoken,
+            attrsort,
+            comparisononly,
+            attr.lastupdated,
+            coalesce(label.attributelabel, 'FALSE')
+
+  from      eccm.attrnls attr
+
+  left      outer join int.attrlabel label on
+            attr.attributetoken=label.attributetoken and
+            attr.language=label.nlsid
+;
+
+------------------------------------------
+-- CONVERTED DWB
+-- COMPILED DWB
+-- UNIT TESTED DWB
+-- GOT FROM MTM
+-- REMOVED REDUNDANT UNION IN WITH table
+------------------------------------------
+echo view eccm.translated_attrgroup;
+drop view eccm.translated_attrgroup;
+create view eccm.translated_attrgroup as
+with eccm.attrnls (
+  grouptoken,
+  language,
+  isocode,
+  ibmlangcode,
+  groupsourcename,
+  groupsort
+
+  ) as (
+
+    select      ag.grouptoken,
+                pn.nlsid,
+                pn.isolangcode2,
+                pn.ibmlangcode,
+                ag.description,
+                ag.groupsort
+
+    from        eccm.psgnls pn,
+                eccm.attrgroup ag
+    )
+
+    select    attr.grouptoken,
+              language,
+              isocode,
+              ibmlangcode,
+              groupsourcename,
+              groupsort,
+              coalesce(al.attributelabel, groupsourcename) as groupname,
+              lastupdated,
+              coalesce(al.attributelabel, 'FALSE') as default_value
+
+    from      eccm.attrnls attr
+
+    left      join int.attrgrouplabel al on
+              attr.grouptoken=al.grouptoken and
+              attr.language=al.nlsid
+
+;
+
+------------------------------------------
+-- CONVERTED DWB
+-- COMPILED DWB
+-- UNIT TESTED DWB
+-- GOT FROM MTM
+--
+------------------------------------------
+echo view eccm.attrgroupview;
+drop view eccm.attrgroupview;
+create view eccm.attrgroupview as
+------------------------------------------
+select
+distinct    coalesce(tg.groupname,groupsourcename) as groupname,
+            countrycode,
+            isocode as language,
+            attributetoken
+
+from        eccm.psgctnls nls,
+            eccm.translated_attrgroup tg,
+            eccm.attrgroup ag,
+            eccm.attribute at
+
+where       tg.language=nls.nlsid and
+            ag.grouptoken=tg.grouptoken and
+            ag.grouptoken=at.entitytype
+
+union
+
+select
+distinct    coalesce(tg.groupname,groupsourcename) as groupname,
+            countrycode,
+            isocode as language,
+            attributetoken
+
+from        eccm.psgctnls nls,
+            eccm.translated_attrgroup tg,
+            int.eccmattr at
+
+where       tg.language=nls.nlsid and
+            at.grouptoken=tg.grouptoken
+;
+
+------------------------------------------
+-- CONVERTED DWB
+-- COMPILED DWB
+-- UNIT TESTED DWB
+-- GOT FROM MTM
+--
+------------------------------------------
+echo eccm.attributeview;
+drop view eccm.attributeview;
+create view eccm.attributeview as
+------------------------------------------
+select
+distinct    coalesce(ta.attribname,attrsourcename) as attribname,
+            countrycode,
+            isocode as language,
+            attributetoken,
+            comparisononly
+
+from        eccm.psgctnls ctnls,
+            eccm.translated_attr ta,
+            eccm.attribute at
+
+where       ta.language=ctnls.nlsid and
+            at.attributetoken=ta.attribtoken
+
+union
+
+select
+distinct    coalesce(ta.attribname,attrsourcename) as attribname,
+            countrycode,
+            isocode as language,
+            attributetoken,
+            at.comparisononly
+
+from        eccm.psgctnls ctnls,
+            eccm.translated_attr ta,
+            int.eccmattr at
+
+where       ta.language=ctnls.nlsid and
+            at.attributetoken=ta.attribtoken
+            and at.comparisononly='N'
+union
+
+select
+distinct    attributename as attribname,
+            countrycode,
+            isolangcode2 as language,
+            attributetoken,
+            comparisononly
+
+from        eccm.psgctnls,
+            eccm.psgnls,
+            int.eccmattr
+
+where       comparisononly='Y' and
+            eccm.psgctnls.nlsid=eccm.psgnls.nlsid
+;
+
+------------------------------------------
+-- CONVERTED DWB
+-- COMPILED DWB
+-- UNIT TESTED DWB
+-- GOT FROM MTM
+------------------------------------------
+echo eccm.finalimage;
+drop view eccm.finalimage;
+create view eccm.finalimage
+(
+  parententitytype,
+  parententityid,
+  nlsid,
+  imageid,
+  colorimagename,
+  datefrom,
+  dateto
+) as
+  with tmp (parenttype, parentid, parentnlsid, datefrom)
+  as (
+
+  select    parententitytype ,
+            parententityid ,
+            parentnlsid,
+            max(datefrom)
+
+  from      eccm.prdimage
+
+  where     datefrom <= date(current timestamp) and
+            (dateto >= date(current timestamp) or dateto is null)
+
+  group
+  by        parententitytype,parententityid,parentnlsid
+
+  )
+
+  select    a.parententitytype,
+            a.parententityid,
+            a.parentnlsid,
+            a.imageid,
+            a.colorimagename,
+            a.datefrom,
+            a.dateto
+
+  from      eccm.prdimage a,
+            tmp
+
+  where     a.parententitytype=tmp.parenttype and
+            a.parententityid=tmp.parentid and a.parentnlsid=tmp.parentnlsid and
+            a.datefrom=tmp.datefrom
+  ;
+
+--
+-- New View per MTM and CR110503591
+--
+------------------------------------------
+echo view eccm.ctmvattr;
+DROP VIEW eccm.ctmvattr;
+CREATE VIEW eccm.ctmvattr
+------------------------------------------
+(entitytype
+,entityid
+,nlsid
+,columnname
+,longdescription
+) AS (
+
+select    'CSOL',
+          pad.entity1id,
+          f.nlsid,
+          'CT_PSGWARRANTYTYPE',
+          f.flagdescription
+
+from      eccm.prodattrelator pad
+
+join      eccm.flag f on
+          f.entitytype = pad.entity2type and
+          f.entityid = pad.entity2id and
+          f.sfvalue = 1 and
+          f.attributecode='WARRANTYTYPE'
+
+where     pad.entity1type = 'CSOL'
+
+);
+
+
+grant select,insert,update,delete on eccm.ctmvattr to int,eccmfeed;
+
+ ------------------------------------------------------------------------------
+ -- ALIAS SECTION
+ ------------------------------------------------------------------------------
+
+ CREATE ALIAS INT.ATTRGROUP FOR ECCM.ATTRGROUP;
+
+ CREATE ALIAS INT.ATTRIBUTE FOR ECCM.ATTRIBUTE;
+
+ CREATE ALIAS INT.PRODUCT_PRICE FOR ECCM.PRODUCT_PRICE;
+
+ CREATE ALIAS INT.PROD_PRODUCT_PRICE FOR ECCM.PROD_PRODUCT_PRICE;
+
+ CREATE ALIAS INT.WWCAT FOR ECCM.WWCAT;
+
+ CREATE ALIAS INT.WWCATCATREL FOR ECCM.WWCATCATREL;
+
+ CREATE ALIAS INT.WWCATPRDREL FOR ECCM.WWCATPRDREL;
+
+ CREATE ALIAS INT.WWPRDPRDREL FOR ECCM.WWPRDPRDREL;
+
+ ------------------------------------------------------------------------------
+ -- SUMMARY REFESH SECTION
+ ------------------------------------------------------------------------------
+
+ refresh table  ECCM.ATTRWITHUNIT    ;
+ refresh table  ECCM.AUDIENCE        ;
+ refresh table  ECCM.CBPARTS         ;
+ refresh table  ECCM.CBUNSPSC        ;
+ refresh table  ECCM.COMPAT          ;
+ refresh table  ECCM.PACKAGE1        ;
+ refresh table  ECCM.PRDMESSAGE      ;
+ refresh table  ECCM.PRDROOT         ;
+ refresh table  ECCM.PSGSERVICETYPE  ;
+ refresh table  ECCM.SBBALLDATES     ;
+ refresh table  INT.CHARVALUE        ;
+ refresh table  INT.EFFECTIVEPRICE   ;
+ refresh table  ECCM.CATIMAGE        ;
+ refresh table  ECCM.PRDIMAGE        ;
+
+---------------------------------------------------------------------------------
+--  GRANT SECTION
+---------------------------------------------------------------------------------
+GRANT SELECT ON ECCM.ATTRGROUP TO INT;
+GRANT SELECT ON ECCM.ATTRGROUPVIEW TO INT;
+GRANT SELECT ON ECCM.ATTRIBUTE TO INT;
+GRANT SELECT ON ECCM.ATTRIBUTEVIEW TO INT;
+GRANT SELECT ON ECCM.ATTRUNITS TO INT;
+GRANT SELECT ON ECCM.ATTRWITHUNIT TO INT;
+GRANT SELECT ON ECCM.AUD TO INT;
+GRANT SELECT ON ECCM.AUDIENCE TO INT;
+GRANT SELECT ON ECCM.BAT TO INT;
+GRANT SELECT ON ECCM.BB TO INT;
+GRANT SELECT ON ECCM.BR TO INT;
+GRANT SELECT ON ECCM.BRFAM TO INT;
+GRANT SELECT ON ECCM.CA TO INT;
+GRANT SELECT ON ECCM.CATCATREL TO INT;
+GRANT SELECT ON ECCM.CATIMAGE TO INT;
+GRANT SELECT ON ECCM.CATROOT TO INT;
+GRANT SELECT ON ECCM.CB TO INT;
+GRANT SELECT ON ECCM.CBCSOL TO INT;
+GRANT SELECT ON ECCM.CBCVAR TO INT;
+GRANT SELECT ON ECCM.CBFB TO INT;
+GRANT SELECT ON ECCM.CBIMG TO INT;
+GRANT SELECT ON ECCM.CBMM TO INT;
+GRANT SELECT ON ECCM.CBPARTS TO INT;
+GRANT SELECT ON ECCM.CBUNSPSC TO INT;
+GRANT SELECT ON ECCM.CCECTRY TO INT;
+GRANT SELECT ON ECCM.CCTO TO INT;
+GRANT SELECT ON ECCM.CCTOFB TO INT;
+GRANT SELECT ON ECCM.CCTOIMG TO INT;
+GRANT SELECT ON ECCM.CCTOMM TO INT;
+GRANT SELECT ON ECCM.CCTOPK TO INT;
+GRANT SELECT ON ECCM.CCTOSBB TO INT;
+GRANT SELECT ON ECCM.CCTOWAR TO INT;
+GRANT SELECT ON ECCM.CDR TO INT;
+GRANT SELECT ON ECCM.CFGR TO INT;
+GRANT SELECT ON ECCM.CG TO INT;
+GRANT SELECT ON ECCM.CHAR_VALUE TO INT;
+GRANT SELECT ON ECCM.COMPAT TO INT;
+GRANT SELECT ON ECCM.COMPAT_DELTAFORCE TO INT;
+GRANT SELECT ON ECCM.COUNTRYREGION TO INT;
+GRANT SELECT ON ECCM.CP TO INT;
+GRANT SELECT ON ECCM.CPG TO INT;
+GRANT SELECT ON ECCM.CPGCPGOS TO INT;
+GRANT SELECT ON ECCM.CPGCTO TO INT;
+GRANT SELECT ON ECCM.CPGOF TO INT;
+GRANT SELECT ON ECCM.CPGOS TO INT;
+GRANT SELECT ON ECCM.CPGVAR TO INT;
+GRANT SELECT ON ECCM.CSOL TO INT;
+GRANT SELECT ON ECCM.CSOLCD TO INT;
+GRANT SELECT ON ECCM.CSOLCDG TO INT;
+GRANT SELECT ON ECCM.CSOLCP TO INT;
+GRANT SELECT ON ECCM.CSOLFB TO INT;
+GRANT SELECT ON ECCM.CSOLGENCSOL TO INT;
+GRANT SELECT ON ECCM.CSOLIMG TO INT;
+GRANT SELECT ON ECCM.CSOLKB TO INT;
+GRANT SELECT ON ECCM.CSOLLP TO INT;
+GRANT SELECT ON ECCM.CSOLMM TO INT;
+GRANT SELECT ON ECCM.CSOLPK TO INT;
+GRANT SELECT ON ECCM.CSOLPOS TO INT;
+GRANT SELECT ON ECCM.CSOLSBB TO INT;
+GRANT SELECT ON ECCM.CSOLSER TO INT;
+GRANT SELECT ON ECCM.CSOLSO TO INT;
+GRANT SELECT ON ECCM.CSOLWAR TO INT;
+GRANT SELECT ON ECCM.CTATTR TO INT;
+GRANT SELECT ON ECCM.CTO TO INT;
+GRANT SELECT ON ECCM.CTOCCTO TO INT;
+GRANT SELECT ON ECCM.CTOCFGR TO INT;
+GRANT SELECT ON ECCM.CTOCG TO INT;
+GRANT SELECT ON ECCM.CTOFB TO INT;
+GRANT SELECT ON ECCM.CTOIMG TO INT;
+GRANT SELECT ON ECCM.CTOMM TO INT;
+GRANT SELECT ON ECCM.CTOOF TO INT;
+GRANT SELECT ON ECCM.CTOSBB TO INT;
+GRANT SELECT ON ECCM.CTOVAR TO INT;
+GRANT SELECT ON ECCM.CTOWAR TO INT;
+GRANT SELECT ON ECCM.CVAR TO INT;
+GRANT SELECT ON ECCM.CVARCD TO INT;
+GRANT SELECT ON ECCM.CVARCDG TO INT;
+GRANT SELECT ON ECCM.CVARFB TO INT;
+GRANT SELECT ON ECCM.CVARGENCVAR TO INT;
+GRANT SELECT ON ECCM.CVARIMG TO INT;
+GRANT SELECT ON ECCM.CVARMM TO INT;
+GRANT SELECT ON ECCM.CVARPK TO INT;
+GRANT SELECT ON ECCM.CVARSBB TO INT;
+GRANT SELECT ON ECCM.CVARWAR TO INT;
+GRANT SELECT ON ECCM.DD TO INT;
+GRANT SELECT ON ECCM.DELETELOG TO INT;
+GRANT SELECT ON ECCM.DIV TO INT;
+GRANT SELECT ON ECCM.DIVBR TO INT;
+GRANT SELECT ON ECCM.DIVGENAREA TO INT;
+GRANT SELECT ON ECCM.ED TO INT;
+GRANT SELECT ON ECCM.EI TO INT;
+GRANT SELECT ON ECCM.ELEMENT_REPORT TO INT;
+GRANT SELECT ON ECCM.FAM TO INT;
+GRANT SELECT ON ECCM.FAMIMG TO INT;
+GRANT SELECT ON ECCM.FAMIMGL TO INT;
+GRANT SELECT ON ECCM.FAMSE TO INT;
+GRANT SELECT ON ECCM.FB TO INT;
+GRANT SELECT ON ECCM.FD TO INT;
+GRANT SELECT ON ECCM.FINALIMAGE TO INT;
+GRANT SELECT ON ECCM.FLAG TO INT;
+GRANT SELECT ON ECCM.FM TO INT;
+GRANT SELECT ON ECCM.GENERALAREA TO INT;
+GRANT SELECT ON ECCM.GOA TO INT;
+GRANT SELECT ON ECCM.GRA TO INT;
+GRANT SELECT ON ECCM.HD TO INT;
+GRANT SELECT ON ECCM.HDC TO INT;
+GRANT SELECT ON ECCM.IFMLOCK TO INT;
+GRANT SELECT ON ECCM.IMG TO INT;
+GRANT SELECT ON ECCM.IN TO INT;
+GRANT SELECT ON ECCM.KB TO INT;
+GRANT SELECT ON ECCM.LP TO INT;
+GRANT SELECT ON ECCM.MB TO INT;
+GRANT SELECT ON ECCM.MEM TO INT;
+GRANT SELECT ON ECCM.METAFLAGTABLE TO INT;
+GRANT SELECT ON ECCM.MM TO INT;
+GRANT SELECT ON ECCM.MON TO INT;
+GRANT SELECT ON ECCM.NIC TO INT;
+GRANT SELECT ON ECCM.NLS TO INT;
+GRANT SELECT ON ECCM.NP TO INT;
+GRANT SELECT ON ECCM.OF TO INT;
+GRANT SELECT ON ECCM.OFAUD TO INT;
+GRANT SELECT ON ECCM.OFBAT TO INT;
+GRANT SELECT ON ECCM.OFCA TO INT;
+GRANT SELECT ON ECCM.OFCDR TO INT;
+GRANT SELECT ON ECCM.OFCMPOF TO INT;
+GRANT SELECT ON ECCM.OFCPGOS TO INT;
+GRANT SELECT ON ECCM.OFCSOL TO INT;
+GRANT SELECT ON ECCM.OFDD TO INT;
+GRANT SELECT ON ECCM.OFED TO INT;
+GRANT SELECT ON ECCM.OFEI TO INT;
+GRANT SELECT ON ECCM.OFFB TO INT;
+GRANT SELECT ON ECCM.OFFD TO INT;
+GRANT SELECT ON ECCM.OFFM TO INT;
+GRANT SELECT ON ECCM.OFGOA TO INT;
+GRANT SELECT ON ECCM.OFGRA TO INT;
+GRANT SELECT ON ECCM.OFHD TO INT;
+GRANT SELECT ON ECCM.OFHDC TO INT;
+GRANT SELECT ON ECCM.OFIMG TO INT;
+GRANT SELECT ON ECCM.OFIN TO INT;
+GRANT SELECT ON ECCM.OFKB TO INT;
+GRANT SELECT ON ECCM.OFMB TO INT;
+GRANT SELECT ON ECCM.OFMEM TO INT;
+GRANT SELECT ON ECCM.OFMFMOF TO INT;
+GRANT SELECT ON ECCM.OFMM TO INT;
+GRANT SELECT ON ECCM.OFMON TO INT;
+GRANT SELECT ON ECCM.OFNIC TO INT;
+GRANT SELECT ON ECCM.OFNP TO INT;
+GRANT SELECT ON ECCM.OFPBY TO INT;
+GRANT SELECT ON ECCM.OFPBYAVAIL TO INT;
+GRANT SELECT ON ECCM.OFPCDPDG1 TO INT;
+GRANT SELECT ON ECCM.OFPK TO INT;
+GRANT SELECT ON ECCM.OFPORT TO INT;
+GRANT SELECT ON ECCM.OFPOS TO INT;
+GRANT SELECT ON ECCM.OFPP TO INT;
+GRANT SELECT ON ECCM.OFPRC TO INT;
+GRANT SELECT ON ECCM.OFPRJ TO INT;
+GRANT SELECT ON ECCM.OFPS TO INT;
+GRANT SELECT ON ECCM.OFPSL TO INT;
+GRANT SELECT ON ECCM.OFPSLAVAIL TO INT;
+GRANT SELECT ON ECCM.OFRC TO INT;
+GRANT SELECT ON ECCM.OFSBB TO INT;
+GRANT SELECT ON ECCM.OFSC TO INT;
+GRANT SELECT ON ECCM.OFSER TO INT;
+GRANT SELECT ON ECCM.OFSM TO INT;
+GRANT SELECT ON ECCM.OFSO TO INT;
+GRANT SELECT ON ECCM.OFSP TO INT;
+GRANT SELECT ON ECCM.OFTD TO INT;
+GRANT SELECT ON ECCM.OFTI TO INT;
+GRANT SELECT ON ECCM.OFTIF TO INT;
+GRANT SELECT ON ECCM.OFWAR TO INT;
+GRANT SELECT ON ECCM.OFWS TO INT;
+GRANT SELECT ON ECCM.PACKAGE TO INT;
+GRANT SELECT ON ECCM.PACKAGE1 TO INT;
+GRANT SELECT ON ECCM.PACK_COMPLETE TO INT;
+GRANT SELECT ON ECCM.PBY TO INT;
+GRANT SELECT ON ECCM.PBYAVAIL TO INT;
+GRANT SELECT ON ECCM.PK TO INT;
+GRANT SELECT ON ECCM.PORT TO INT;
+GRANT SELECT ON ECCM.POS TO INT;
+GRANT SELECT ON ECCM.PP TO INT;
+GRANT SELECT ON ECCM.PR TO INT;
+GRANT SELECT ON ECCM.PRC TO INT;
+GRANT SELECT ON ECCM.PRCTO TO INT;
+GRANT SELECT ON ECCM.PRDIMAGE TO INT;
+GRANT SELECT ON ECCM.PRDMESSAGE TO INT;
+GRANT SELECT ON ECCM.PRDROOT TO INT;
+GRANT SELECT ON ECCM.PRJ TO INT;
+GRANT SELECT ON ECCM.PRODATTRELATOR TO INT;
+GRANT SELECT ON ECCM.PRODATTRIBUTE TO INT;
+GRANT SELECT ON ECCM.PRODUCTCOUNTRY TO INT;
+GRANT SELECT ON ECCM.PRODUCT_PRICE TO INT;
+GRANT SELECT ON ECCM.PROD_CHAR_VALUE TO INT;
+GRANT SELECT ON ECCM.PROD_PRODUCT_PRICE TO INT;
+GRANT SELECT ON ECCM.PROD_RATE_CARD TO INT;
+GRANT SELECT ON ECCM.PROF TO INT;
+GRANT SELECT ON ECCM.PROJSERBRANDFAM TO INT;
+GRANT SELECT ON ECCM.PRVAR TO INT;
+GRANT SELECT ON ECCM.PS TO INT;
+GRANT SELECT ON ECCM.PSGCTNLS TO INT;
+GRANT SELECT ON ECCM.PSGNLS TO INT;
+GRANT SELECT ON ECCM.PSGSERVICETYPE TO INT;
+GRANT SELECT ON ECCM.PSL TO INT;
+GRANT SELECT ON ECCM.PSLAVAIL TO INT;
+GRANT SELECT ON ECCM.RATE_CARD TO INT;
+
+GRANT SELECT ON ECCM.RATECARDDESC TO INT;
+GRANT SELECT ON ECCM.RATECARDDESC_VW TO INT;
+GRANT SELECT ON ECCM.RC TO INT;
+GRANT SELECT ON ECCM.RESTARTABLE TO INT;
+GRANT SELECT ON ECCM.SBB TO INT;
+GRANT SELECT ON ECCM.SBBALLDATES TO INT;
+GRANT SELECT ON ECCM.SBBAUD TO INT;
+GRANT SELECT ON ECCM.SBBBAT TO INT;
+GRANT SELECT ON ECCM.SBBCA TO INT;
+GRANT SELECT ON ECCM.SBBCDR TO INT;
+GRANT SELECT ON ECCM.SBBCP TO INT;
+GRANT SELECT ON ECCM.SBBED TO INT;
+GRANT SELECT ON ECCM.SBBEI TO INT;
+GRANT SELECT ON ECCM.SBBFD TO INT;
+GRANT SELECT ON ECCM.SBBFM TO INT;
+GRANT SELECT ON ECCM.SBBGOA TO INT;
+GRANT SELECT ON ECCM.SBBGRA TO INT;
+GRANT SELECT ON ECCM.SBBHD TO INT;
+GRANT SELECT ON ECCM.SBBHDC TO INT;
+GRANT SELECT ON ECCM.SBBIN TO INT;
+GRANT SELECT ON ECCM.SBBKB TO INT;
+GRANT SELECT ON ECCM.SBBLP TO INT;
+GRANT SELECT ON ECCM.SBBMB TO INT;
+GRANT SELECT ON ECCM.SBBMEM TO INT;
+GRANT SELECT ON ECCM.SBBMON TO INT;
+GRANT SELECT ON ECCM.SBBNIC TO INT;
+GRANT SELECT ON ECCM.SBBPBY TO INT;
+GRANT SELECT ON ECCM.SBBPK TO INT;
+GRANT SELECT ON ECCM.SBBPORT TO INT;
+GRANT SELECT ON ECCM.SBBPOS TO INT;
+GRANT SELECT ON ECCM.SBBPP TO INT;
+GRANT SELECT ON ECCM.SBBPRC TO INT;
+GRANT SELECT ON ECCM.SBBPS TO INT;
+GRANT SELECT ON ECCM.SBBPSL TO INT;
+GRANT SELECT ON ECCM.SBBRC TO INT;
+GRANT SELECT ON ECCM.SBBSER TO INT;
+GRANT SELECT ON ECCM.SBBSM TO INT;
+GRANT SELECT ON ECCM.SBBSO TO INT;
+GRANT SELECT ON ECCM.SBBSP TO INT;
+GRANT SELECT ON ECCM.SBBTD TO INT;
+GRANT SELECT ON ECCM.SBBTI TO INT;
+GRANT SELECT ON ECCM.SBBTIF TO INT;
+GRANT SELECT ON ECCM.SBBWAR TO INT;
+GRANT SELECT ON ECCM.SBBWS TO INT;
+GRANT SELECT ON ECCM.SC TO INT;
+GRANT SELECT ON ECCM.SE TO INT;
+GRANT SELECT ON ECCM.SECURITY TO INT;
+GRANT SELECT ON ECCM.SEFB TO INT;
+GRANT SELECT ON ECCM.SEFBL TO INT;
+GRANT SELECT ON ECCM.SEIMG TO INT;
+GRANT SELECT ON ECCM.SEIMGL TO INT;
+GRANT SELECT ON ECCM.SEMM TO INT;
+GRANT SELECT ON ECCM.SEMML TO INT;
+GRANT SELECT ON ECCM.SER TO INT;
+GRANT SELECT ON ECCM.SM TO INT;
+GRANT SELECT ON ECCM.SO TO INT;
+GRANT SELECT ON ECCM.SOFTWARE TO INT;
+GRANT SELECT ON ECCM.SP TO INT;
+GRANT SELECT ON ECCM.SUB TO INT;
+GRANT SELECT ON ECCM.TD TO INT;
+GRANT SELECT ON ECCM.TI TO INT;
+GRANT SELECT ON ECCM.TIF TO INT;
+GRANT SELECT ON ECCM.TIMETABLE TO INT;
+GRANT SELECT ON ECCM.TRANSLATED_ATTR TO INT;
+GRANT SELECT ON ECCM.TRANSLATED_ATTRGROUP TO INT;
+GRANT SELECT ON ECCM.VAR TO INT;
+GRANT SELECT ON ECCM.VARCVAR TO INT;
+GRANT SELECT ON ECCM.VARDD TO INT;
+GRANT SELECT ON ECCM.VARFB TO INT;
+GRANT SELECT ON ECCM.VARIANTATTR TO INT;
+GRANT SELECT ON ECCM.VARIMG TO INT;
+GRANT SELECT ON ECCM.VARMM TO INT;
+GRANT SELECT ON ECCM.VARPBYAVAIL TO INT;
+GRANT SELECT ON ECCM.VARPK TO INT;
+GRANT SELECT ON ECCM.VARPSLAVAIL TO INT;
+GRANT SELECT ON ECCM.VARSBB TO INT;
+GRANT SELECT ON ECCM.VARWAR TO INT;
+GRANT SELECT ON ECCM.WAR TO INT;
+GRANT SELECT ON ECCM.WS TO INT;
+GRANT SELECT ON ECCM.WWATTR TO INT;
+GRANT SELECT ON ECCM.WWCAT TO INT;
+GRANT SELECT ON ECCM.WWCATCATREL TO INT;
+GRANT SELECT ON ECCM.WWCATMTMREL TO INT;
+GRANT SELECT ON ECCM.WWMVATTR TO INT;
+GRANT SELECT ON ECCM.WWPRDCTRY TO INT;
+GRANT SELECT ON ECCM.PRODPRICE1SUMM TO INT;
+GRANT SELECT ON ECCM.WWPRDPRDREL TO INT;
+
+--
+-- GRANTS FOR ECCMFEED
+--
+GRANT CONTROL ON ECCM.ATTRGROUP TO ECCMFEED;
+GRANT CONTROL ON ECCM.ATTRGROUPVIEW TO ECCMFEED;
+GRANT CONTROL ON ECCM.ATTRIBUTE TO ECCMFEED;
+GRANT CONTROL ON ECCM.ATTRIBUTEVIEW TO ECCMFEED;
+GRANT CONTROL ON ECCM.ATTRUNITS TO ECCMFEED;
+GRANT CONTROL ON ECCM.ATTRWITHUNIT TO ECCMFEED;
+GRANT CONTROL ON ECCM.AUDIENCE TO ECCMFEED;
+GRANT CONTROL ON ECCM.CATCATREL TO ECCMFEED;
+GRANT CONTROL ON ECCM.CATIMAGE TO ECCMFEED;
+GRANT CONTROL ON ECCM.CATROOT TO ECCMFEED;
+GRANT CONTROL ON ECCM.CBPARTS TO ECCMFEED;
+GRANT CONTROL ON ECCM.CBUNSPSC TO ECCMFEED;
+GRANT CONTROL ON ECCM.CCECTRY TO ECCMFEED;
+GRANT CONTROL ON ECCM.CHAR_VALUE TO ECCMFEED;
+GRANT CONTROL ON ECCM.COMPAT TO ECCMFEED;
+GRANT CONTROL ON ECCM.COMPAT_DELTAFORCE TO ECCMFEED;
+GRANT CONTROL ON ECCM.COUNTRYREGION TO ECCMFEED;
+GRANT CONTROL ON ECCM.CTATTR TO ECCMFEED;
+GRANT CONTROL ON ECCM.ELEMENT_REPORT TO ECCMFEED;
+GRANT CONTROL ON ECCM.FINALIMAGE TO ECCMFEED;
+--GRANT CONTROL ON ECCM.PACKAGE TO ECCMFEED;
+GRANT CONTROL ON ECCM.PACKAGE1 TO ECCMFEED;
+GRANT CONTROL ON ECCM.PACK_COMPLETE TO ECCMFEED;
+GRANT CONTROL ON ECCM.PRDIMAGE TO ECCMFEED;
+GRANT CONTROL ON ECCM.PRDMESSAGE TO ECCMFEED;
+GRANT CONTROL ON ECCM.PRDROOT TO ECCMFEED;
+GRANT CONTROL ON ECCM.PRODATTRELATOR TO ECCMFEED;
+GRANT CONTROL ON ECCM.PRODATTRIBUTE TO ECCMFEED;
+GRANT CONTROL ON ECCM.PRODUCTCOUNTRY TO ECCMFEED;
+GRANT CONTROL ON ECCM.PRODUCT_PRICE TO ECCMFEED;
+GRANT CONTROL ON ECCM.PROD_CHAR_VALUE TO ECCMFEED;
+GRANT CONTROL ON ECCM.PROD_PRODUCT_PRICE TO ECCMFEED;
+GRANT CONTROL ON ECCM.PRODPRICE1SUMM TO eccmfeed;
+GRANT CONTROL ON ECCM.PROD_RATE_CARD TO ECCMFEED;
+GRANT CONTROL ON ECCM.PROJSERBRANDFAM TO ECCMFEED;
+GRANT CONTROL ON ECCM.PSGCTNLS TO ECCMFEED;
+GRANT CONTROL ON ECCM.PSGSERVICETYPE TO ECCMFEED;
+GRANT CONTROL ON ECCM.RATE_CARD TO ECCMFEED;
+GRANT CONTROL ON ECCM.RATECARDDESC TO ECCMFEED;
+GRANT CONTROL ON ECCM.RATECARDDESC_VW TO ECCMFEED;
+GRANT CONTROL ON ECCM.SBBALLDATES TO ECCMFEED;
+GRANT CONTROL ON ECCM.SECURITY TO ECCMFEED;
+GRANT CONTROL ON ECCM.TIMETABLE TO ECCMFEED;
+GRANT CONTROL ON ECCM.TRANSLATED_ATTR TO ECCMFEED;
+GRANT CONTROL ON ECCM.TRANSLATED_ATTRGROUP TO ECCMFEED;
+GRANT CONTROL ON ECCM.VARIANTATTR TO ECCMFEED;
+GRANT CONTROL ON ECCM.WWATTR TO ECCMFEED;
+GRANT CONTROL ON ECCM.WWCAT TO ECCMFEED;
+GRANT CONTROL ON ECCM.WWCATCATREL TO ECCMFEED;
+GRANT CONTROL ON ECCM.WWCATMTMREL TO ECCMFEED;
+GRANT CONTROL ON ECCM.WWMVATTR TO ECCMFEED;
+GRANT CONTROL ON ECCM.WWPRDCTRY TO eccmfeed;
+GRANT SELECT ON ECCM.WWPRDPRDREL TO ECCMFEED;
+
+GRANT CONTROL ON INT.CHARVALUE TO ECCMFEED;
+GRANT CONTROL ON INT.EFFECTIVEPRICE TO ECCMFEED;
+
+
+-- WIP

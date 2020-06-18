@@ -1,0 +1,52 @@
+@name=GBL9995
+@noremote=true
+@parmstyle=GENERAL
+@type=insert2
+@dbase=opicmods
+@table=gbli.ProductAttribute
+@narrative
+----------------------------------------------------------------------
+--  This is insert for @table
+----------------------------------------------------------------------
+$Log: gbl9995.txt,v $
+Revision 1.3  2010/06/21 15:42:38  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.2  2004/10/20 21:01:51  dave
+changes to gen parm
+
+Revision 1.1  2004/06/22 18:02:17  roger
+New SP
+
+Revision 1.2  2004/06/22 17:49:45  roger
+Wrong name
+
+Revision 1.1  2004/06/22 15:51:15  roger
+New SP for hula
+
+
+@desc=Insert for @table
+@fenced=true
+@results=0
+@change_cols=Enterprise ChangeDate SessionID ParentEntityType ParentEntityID EntityType EntityID nlsid AttibuteCode FlagCode AttributeValue
+@update_cols=Enterprise ChangeDate SessionID ParentEntityType ParentEntityID EntityType EntityID nlsid AttibuteCode FlagCode AttributeValue
+@insert_cols=Enterprise ChangeDate SessionID ParentEntityType ParentEntityID EntityType EntityID nlsid AttibuteCode FlagCode AttributeValue
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9995.txt,v 1.3 2010/06/21 15:42:38 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(8)
+in ChangeDate varchar(27)
+in SessionID int
+in ParentEntityType varchar(32)
+in ParentEntityID int
+in EntityType varchar(32)
+in EntityID int
+in nlsid int
+in AttributeCode varchar(32)
+in FlagCode varchar(32)
+in AttributeValue varchar(32)
+@end

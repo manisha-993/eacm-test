@@ -1,0 +1,74 @@
+@name=GBL1097
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=true
+@narrative
+-----------------------------------------------------------------------------------------------------
+-- This SP returns operators for Operator Report
+-- This is for a given enterprise
+--
+--  Used in The Admin Meta Reports Section
+--
+-----------------------------------------------------------------------------------------------------
+$Log: gbl1097.txt,v $
+Revision 1.14  2010/06/21 15:43:07  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.13  2009/03/11 18:05:11  wendy
+Restored - required by mdui
+
+Revision 1.11  2004/10/20 21:01:38  dave
+changes to gen parm
+
+Revision 1.10  2004/02/20 20:21:47  roger
+Must be @t_schema
+
+Revision 1.9  2004/02/20 18:09:28  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.8  2003/09/08 16:31:09  roger
+Enterprise was changed to 16 char length
+
+Revision 1.7  2002/07/30 17:18:48  dave
+Added Back used SP's
+
+Revision 1.5  2002/07/17 17:33:17  roger
+Ensured Log was in @narrative
+
+@desc=Available Operators. 
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT DISTINCT   
+     T.ATTRIBUTEVALUE,    
+     E.ENTITYID           
+ FROM   @t_schema .ENTITY AS E            
+ INNER JOIN   @t_schema.TEXT AS T ON    
+     T.ENTERPRISE = E.ENTERPRISE AND                         
+     T.ENTITYTYPE = 'OP' AND                         
+     T.ENTITYID = E.ENTITYID AND                    
+     T.ATTRIBUTECODE = 'NAME'   
+     AND T.ValFrom <= :ValOn and :ValOn < T.ValTo
+     AND T.EffFrom <= :EffOn and :EffOn < T.EffTo
+ WHERE                                     
+     E.ENTERPRISE = :Enterprise      AND                          
+     E.ENTITYTYPE = 'OP' AND  
+     E.ValFrom <= :ValOn and :ValOn < E.ValTo
+     AND E.EffFrom <= :EffOn and :EffOn < E.EffTo
+ ORDER BY T.ATTRIBUTEVALUE ;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPENID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

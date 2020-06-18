@@ -1,0 +1,103 @@
+@name=GBL7532
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7532.txt,v $
+Revision 1.11  2010/06/21 15:43:01  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.10  2004/10/20 21:01:45  dave
+changes to gen parm
+
+Revision 1.9  2004/02/20 20:21:55  roger
+Must be @t_schema
+
+Revision 1.8  2004/02/20 18:09:34  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.7  2003/09/08 16:31:18  roger
+Enterprise was changed to 16 char length
+
+Revision 1.6  2003/05/15 21:20:18  gregg
+remove Role/Entity check
+
+Revision 1.5  2002/11/27 19:26:16  gregg
+change input param to RoleCode b/c we might want records for OPWG's other than the caller's
+(in which case we'll have the rolecode, not OPWGID)
+
+Revision 1.4  2002/11/26 22:42:56  gregg
+OPWGID must be OPENIF for addperm
+
+Revision 1.3  2002/11/26 22:36:59  gregg
+addperm=true
+
+Revision 1.2  2002/11/26 22:22:07  gregg
+cleanup Log
+
+Revision 1.1  2002/11/26 22:20:58  gregg
+intial load
+
+@desc=Get all possible Meta Entities + Relators for navigation for a given Navigate/Extract Action Item. Role Sensitive.
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7532.txt,v 1.11 2010/06/21 15:43:01 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+with myEnts (entitytype) AS
+(SELECT DISTINCT
+  REL1.linktype2
+from @t_schema.METALINKATTR REL1
+where
+    REL1.enterprise = :Enterprise
+AND REL1.linktype = 'Action/Entity' 
+AND REL1.linktype1 = :ActionItemKey 
+AND REL1.valFrom <= :ValOn 
+AND REL1.valTo > :ValOn 
+AND REL1.effFrom <= :EffOn 
+AND REL1.effTo > :EffOn     
+UNION ALL
+SELECT DISTINCT
+  REL2.linktype2
+from @t_schema.METALINKATTR REL2 
+INNER JOIN @t_schema.METALINKATTR REL1 ON
+    REL1.enterprise = :Enterprise
+AND REL1.linktype = 'Action/Entity' 
+AND REL1.linktype1 = :ActionItemKey 
+AND REL1.valFrom <= :ValOn 
+AND REL1.valTo > :ValOn 
+AND REL1.effFrom <= :EffOn 
+AND REL1.effTo > :EffOn   
+where
+    REL2.enterprise = :Enterprise
+AND REL2.linktype = REL1.LINKTYPE2
+AND REL2.linkcode IN ('Relator','Assoc')
+AND REL2.valFrom <= :ValOn 
+AND REL2.valTo > :ValOn 
+AND REL2.effFrom <= :EffOn 
+AND REL2.effTo > :EffOn     
+)
+SELECT 
+ ENTS.entitytype 
+from myEnts ENTS
+where 3.14159265 = 3.14159265
+order by ENTS.entitytype
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in RoleCode varchar(32)
+in ActionItemKey varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+
+

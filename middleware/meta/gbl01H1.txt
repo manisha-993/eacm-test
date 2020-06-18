@@ -1,0 +1,79 @@
+@name=GBL01H1
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+
+FEEDING THE TRSNETTERPASS2 table with all matches in a select insert statement for
+a given range of entityid's (based on GBL8010).
+
+$Log: gbl01H1.txt,v $
+Revision 1.1  2009/01/22 23:26:26  yang
+initial load
+
+
+
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+
+char brand[80] = "$Id: gbl01H1.txt,v 1.1 2009/01/22 23:26:26 yang Exp $";
+EXEC SQL END DECLARE SECTION;
+
+// O.K. Lets seed the Explosion table with all the relator churn.
+
+EXEC SQL insert into bigcath.trsNetterFinal
+SELECT
+ :enterprise
+,:sessionid_curr
+,:actiontype
+,:epoch
+,:forever
+,E.ValFrom
+,case E.Direction when 'D' then E.Entity2Type else E.Entity1Type END
+,case E.Direction when 'D' then E.Entity2ID else E.Entity1ID END
+,E.TRAN
+,case E.direction when 'D' THEN  E.Entity2Type  Else E.Entity1Type END
+,case E.direction when 'D' THEN  E.Entity2ID Else E.Entity1ID END
+,E.TRAN
+,0
+,'S'
+,''
+,'XX'
+,0
+,'XX'
+,0
+FROM bigcath.trsnetterpass1 E
+where
+    e.enterprise = :enterprise
+and e.sessionid = :sessionid_prior
+and E.level = 0
+and E.Enterprise = :enterprise
+and :roottype in (E.Entity1Type, E.EntityType, E.Entity2Type)
+and e.entityid*1 between :startentityid and :endentityid
+
+    group by
+
+  	case E.Direction when 'D' then E.Entity2Type else E.Entity1Type END,
+	case E.Direction when 'D' then E.Entity2ID else E.Entity1ID END,
+        E.TRAN,
+	E.Valfrom
+
+;
+
+EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in sessionid_prior int
+in sessionid_curr int
+in enterprise varchar(16)
+in actiontype varchar(32)
+in roottype varchar(32)
+in startentityid int
+in endentityid int
+@end
+

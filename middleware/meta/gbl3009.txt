@@ -1,0 +1,76 @@
+@name=GBL3009
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+--------------------------------------------------------------------------
+--  This guy Returns all ABR Records from the Queue Table
+--  That are in a queud state
+--  Status = 20 and SessionId=0
+--------------------------------------------------------------------------
+$Log: gbl3009.txt,v $
+Revision 1.8  2010/06/21 15:42:39  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2006/08/10 17:51:28  joan
+sort by pushdate
+
+Revision 1.6  2005/05/04 19:16:11  joan
+fix compile
+
+Revision 1.5  2005/05/04 18:32:44  joan
+fix typo
+
+Revision 1.4  2005/05/03 19:26:50  bala
+fix to eliminate duplicate processing by taskmaster
+
+Revision 1.3  2004/10/20 21:01:41  dave
+changes to gen parm
+
+Revision 1.2  2004/05/05 18:30:35  bala
+innerjoin to metadescription
+
+Revision 1.1  2004/05/05 16:33:10  bala
+SP to list 'Group Que' type of queues in the que table to be merged with
+the ABR ques from the flag table (gbl3000)
+
+
+@desc=Return All ABR Records in a Queued State
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl3009.txt,v 1.8 2010/06/21 15:42:39 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT 
+  F.EntityType
+ ,F.EntityID
+ ,MD.LongDescription 
+ ,F.QUEUE
+ ,F.STATUS
+ ,F.intervalstartdate
+ ,F.OPWGID
+ ,F.pushdate
+ FROM opicm.QUEUE F
+ INNER JOIN opicm.MetaDescription MD on
+  MD.enterprise = :Enterprise and 
+  MD.descriptiontype = F.QUEUE and
+  MD.descriptionclass = 'GA' and 
+  MD.valto = '9999-12-31-00.00.00.000000' and 
+  current timestamp between MD.efffrom and MD.effto
+where F.sessionid=0
+and F.Status = :AttributeValue
+and F.enterprise= :Enterprise
+order by F.pushdate
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in AttributeValue int
+@end
+
+

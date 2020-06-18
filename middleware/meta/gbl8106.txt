@@ -1,0 +1,61 @@
+@name=GBL8106
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Check for Delete/Entity/Relator for an entity type
+
+$Log: gbl8106.txt,v $
+Revision 1.2  2010/06/21 15:43:01  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.1  2005/04/20 17:33:06  joan
+work on CR
+
+
+
+@desc=Check for Delete/Entity/Relator for an entity type
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8106.txt,v 1.2 2010/06/21 15:43:01 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT MD1.DescriptionClass
+, ML.linktype2 AS ENTITYTYPE
+, ML.linkcode AS ATTRIBUTECODE
+, ML.linkvalue AS ATTRIBUTEVALUE
+FROM @t_schema.metalinkattr ML
+
+LEFT JOIN @t_schema.metadescription MD1 ON
+    MD1.Enterprise = ML.enterprise
+AND MD1.DescriptionType = ML.linktype1
+AND MD1.DescriptionClass in ('Entity', 'Relator')
+AND MD1.ValFrom <= :ValOn AND :ValOn < MD1.ValTo AND MD1.EffFrom <= :EffOn AND :EffOn < MD1.EffTo
+
+LEFT JOIN @t_schema.metadescription MD2 ON
+    MD2.Enterprise = ML.enterprise
+AND MD2.DescriptionType = ML.linkcode
+AND MD2.DescriptionClass in ('U', 'S', 'A', 'F', 'T')
+AND MD2.ValFrom <= :ValOn AND :ValOn < MD2.ValTo AND MD2.EffFrom <= :EffOn AND :EffOn < MD2.EffTo
+
+WHERE ML.enterprise = :Enterprise
+and ML.linktype = 'Delete/Entity/Relator'
+and ML.linktype1 = :EntityType
+AND ML.ValFrom <= :ValOn AND :ValOn < ML.ValTo AND ML.EffFrom <= :EffOn AND :EffOn < ML.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in ValOn varchar(27)
+in EffOn varchar(27)
+@end
+
+

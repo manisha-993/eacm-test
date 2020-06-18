@@ -1,0 +1,69 @@
+@name=GBL7516
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7516.txt,v $
+Revision 1.11  2010/06/21 15:42:43  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.10  2004/10/20 21:01:44  dave
+changes to gen parm
+
+Revision 1.9  2004/02/20 20:21:54  roger
+Must be @t_schema
+
+Revision 1.8  2004/02/20 18:09:34  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.7  2003/09/08 16:31:17  roger
+Enterprise was changed to 16 char length
+
+Revision 1.6  2002/07/17 17:33:21  roger
+Ensured Log was in @narrative
+
+@desc=get operators
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7516.txt,v 1.11 2010/06/21 15:42:43 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+with myList (attributevalue) AS
+(SELECT DISTINCT
+  TEXT.attributevalue
+from @t_schema.TEXT TEXT
+join @t_schema.entity ENT on
+  ENT.enterprise = :Enterprise and
+  ENT.entitytype = 'OP' and
+  ENT.ValFrom <= :ValOn AND 
+  :ValOn < ENT.ValTo AND 
+  ENT.EffFrom <= :EffOn AND 
+  :EffOn < ENT.EffTo
+where
+  TEXT.enterprise = :Enterprise and
+  TEXT.entitytype = 'OP' and
+  TEXT.attributecode = 'USERTOKEN' and
+  TEXT.entityid = ENT.entityid and
+  TEXT.ValFrom <= :ValOn AND 
+  :ValOn < TEXT.ValTo AND 
+  TEXT.EffFrom <= :EffOn AND 
+  :EffOn < TEXT.EffTo
+)
+select attributevalue from myList
+order by UPPER(attributevalue)
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

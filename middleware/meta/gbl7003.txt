@@ -1,0 +1,115 @@
+@name=GBL7003
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Returns an ActionKey's Class and Description 
+
+$Log: gbl7003.txt,v $
+Revision 1.18  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.17  2004/08/31 22:23:51  dave
+new mass idl based upon static session id
+
+Revision 1.16  2004/08/31 19:44:42  dave
+changes for 7003 to be more consistient
+
+Revision 1.15  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.14  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.13  2003/09/08 16:31:15  roger
+Enterprise was changed to 16 char length
+
+Revision 1.12  2003/05/09 22:23:54  dave
+simplify to run faster
+
+Revision 1.11  2002/05/13 20:40:33  joan
+add resetLockGroup method
+
+Revision 1.10  2002/04/26 22:12:19  dave
+new WatchDog SP
+
+Revision 1.9  2002/04/25 20:11:34  dave
+fixes for null pointer
+
+Revision 1.8  2002/04/25 18:43:34  dave
+sp 7003 fix
+
+Revision 1.7  2002/04/25 17:27:09  dave
+Attempt to adding category to Action items.. (as a tag)
+
+Revision 1.6  2002/01/17 00:16:18  dave
+DB2 rs read fix
+
+Revision 1.5  2002/01/16 23:50:15  dave
+interject first NavigateObject constructor test
+
+Revision 1.4  2002/01/14 23:06:42  dave
+more sp fixes
+
+Revision 1.3  2002/01/14 22:59:18  dave
+sp fixes
+
+Revision 1.2  2002/01/14 21:01:45  dave
+new Object to manage ActionGroups
+
+
+@desc= Returns class and NLS Description based upon the given ActionKey NLSID
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7003.txt,v 1.18 2004/10/20 21:01:43 dave Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT
+ RTRIM(ME.EntityClass)  as ActionClass
+,:NLSID
+,COALESCE(RTRIM(MD.ShortDescription),'NO DESCRIPTION FOUND') as ShortDescription
+,COALESCE(RTRIM(MD.LongDescription),'NO DESCRIPTION FOUND') as LongDescription
+,COALESCE(RTRIM(MD1.DescriptionType),'GENERAL')
+,COALESCE(MD1.NLSID,1)
+,COALESCE(RTRIM(MD1.ShortDescription),'NOT CATEGORIZED')
+,COALESCE(RTRIM(MD1.LongDescription),'NOT CATEGORIZED')
+FROM @t_schema.metaEntity ME
+LEFT JOIN @t_schema.MetaLinkAttr MLA ON
+	  MLA.Enterprise = :Enterprise
+AND MLA.LinkType = 'Action/Category'
+AND MLA.LinkType1 = :ActionType
+AND MLA.LinkCode = 'Link'
+AND MLA.ValFrom <= :ValOn and :ValOn < MLA.ValTo AND MLA.EffFrom <= :EffOn and :EffOn < MLA.EffTo
+LEFT JOIN @t_schema.MetaDescription MD1 ON
+	  MD1.Enterprise = :Enterprise
+AND MD1.DescriptionType  =  MLA.LinkType2
+AND MD1.DescriptionClass = 'Category'
+AND MD1.NLSID IN (1,:NLSID)
+AND MD1.ValFrom <= :ValOn and :ValOn < MD1.ValTo AND MD1.EffFrom <= :EffOn and :EffOn < MD1.EffTo
+LEFT JOIN @t_schema.MetaDescription MD ON
+	  MD.Enterprise = :Enterprise
+AND MD.DescriptionType  =  ME.EntityType
+AND MD.NLSID IN (1,:NLSID)
+AND MD.ValFrom <= :ValOn and :ValOn < MD.ValTo AND MD.EffFrom <= :EffOn and :EffOn < MD.EffTo
+WHERE
+    ME.Enterprise = :Enterprise
+AND ME.EntityType = :ActionType
+AND ME.ValFrom <= :ValOn and :ValOn < ME.ValTo AND ME.EffFrom <= :EffOn and :EffOn < ME.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in ActionType varchar(32)
+in NLSID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

@@ -1,0 +1,70 @@
+@name=GBL9201
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=true
+@fenced=true
+@results=1
+@narrative
+$Log: gbl9201.txt,v $
+Revision 1.8  2010/06/21 15:42:46  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2004/10/20 21:01:50  dave
+changes to gen parm
+
+Revision 1.6  2004/03/19 21:18:35  joan
+change to t_schema
+
+Revision 1.5  2004/03/15 17:02:37  joan
+fix compile
+
+Revision 1.4  2004/03/15 16:56:49  joan
+add sp
+
+Revision 1.2  2004/02/12 22:29:05  joan
+initial load
+
+
+@desc=Get All Roles for Enterprise
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9201.txt,v 1.8 2010/06/21 15:42:46 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT 
+ ME.entitytype
+, MD.longdescription
+, MD.shortdescription
+from 
+@t_schema.METAENTITY ME
+
+JOIN
+@t_schema.METADESCRIPTION MD ON
+    MD.enterprise = ME.enterprise 
+AND MD.descriptiontype = ME.EntityType
+AND MD.descriptionclass = 'Role' 
+AND MD.nlsid IN (1,:NLSID)
+AND MD.valto > :ValEffOn 
+AND MD.valfrom <= :ValEffOn 
+AND MD.effto > :ValEffOn 
+AND MD.efffrom <= :ValEffOn
+
+where
+    ME.enterprise = :Enterprise 
+AND ME.entityclass = 'Role'
+AND ME.valto > :ValEffOn 
+AND ME.valfrom <= :ValEffOn 
+AND ME.effto > :ValEffOn 
+AND ME.efffrom <= :ValEffOn
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in NLSID int
+in ValEffOn varchar(26)
+in OPENID int
+@end

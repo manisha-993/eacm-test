@@ -1,0 +1,203 @@
+@name=GBL8991
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+@nulls_ok=true
+
+Manages the limit of history
+
+//
+// $Log: gbl8991.txt,v $
+// Revision 1.2  2010/06/21 15:42:58  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.1  2009/11/05 13:45:24  rick
+// new SP to limit history of an attributecode
+//
+//
+//
+
+@desc= Manages the limitation of history for an Attribute based on meta
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8991.txt,v 1.2 2010/06/21 15:42:58 wendy Exp $";
+sqlint32 count=0;
+sqlint32 KeepNum=0;
+sqlint32 DelNum=0;
+char tstamp[27];
+EXEC SQL END DECLARE SECTION;
+@execute
+
+//
+// BEGIN ERROR CHECK DECLARE SECTION
+//
+const int SQLERROR = -1;
+const int SQLCOMPLETE = 1;
+//set this to SQLCOMPLETE when finished!
+int m_iSQLState = SQLERROR;
+EXEC SQL WHENEVER SQLERROR GOTO error_exit;
+EXEC SQL WHENEVER SQLWARNING CONTINUE;
+//
+// END ERROR CHECK DECLARE SECTION
+//
+EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+
+FILE *t;
+mode_t Mode2;
+Mode2 = 0777;
+chmod("/tmp/8991.log",Mode2);
+// append...
+t=fopen("/tmp/8991.log","a+");
+//t=fopen("/tmp/8991.log","w");
+fprintf(t,"%s: -->start of stored procedure GBL8991\n",tstamp);
+
+EXEC SQL
+      SELECT int(linkvalue) into :KeepNum
+      from opicm.metalinkattr WHERE
+          enterprise=:Enterprise
+      and linktype = 'Attribute/History'
+      and linktype1 = :AttributeCode
+      and linktype2 = :EntityType
+      AND ValFrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo;
+
+DelNumParm = 0;
+if (KeepNum > 0) {
+   if (strcmp(AttributeType,"SingleFlag") == 0)
+   {
+      EXEC SQL
+      select count(*) into :count 
+      from opicm.flag where 
+          enterprise = :Enterprise
+      and entitytype = :EntityType  
+      and entityid = :EntityID
+      and attributecode = :AttributeCode 
+      and (valto < :ValOn or effto < :EffOn);
+
+      DelNum = count - KeepNum; 
+
+     if (DelNum > 0) {
+      DelNumParm = DelNum;
+      do {
+      EXEC SQL
+      delete from opicm.flag f1 where
+      (f1.ENTERPRISE,f1.ENTITYTYPE,f1.ENTITYID,f1.ATTRIBUTECODE,f1.ATTRIBUTEVALUE,f1.VALFROM,f1.VALTO,f1.EFFFROM,
+       f1.EFFTO,f1.OPENID,f1.TRANID,f1.REF_NLSID)
+       in
+       (select f2.ENTERPRISE,f2.ENTITYTYPE,f2.ENTITYID,f2.ATTRIBUTECODE,f2.ATTRIBUTEVALUE,f2.VALFROM,f2.VALTO,
+        f2.EFFFROM,f2.EFFTO,f2.OPENID,f2.TRANID,f2.REF_NLSID from opicm.flag f2
+        where f2.enterprise = :Enterprise
+        and f2.entitytype = :EntityType
+        and f2.entityid = :EntityID
+        and f2.attributecode = :AttributeCode
+        and (f2.valto < :ValOn or f2.effto < :EffOn)
+        order by f2.valfrom asc fetch first 1 rows only);
+       DelNum = DelNum - 1;
+       } while (DelNum > 0);
+      }
+     }
+   
+     if (strcmp(AttributeType,"Text") == 0)
+     {
+      EXEC SQL
+      select count(*) into :count 
+      from opicm.text where 
+          enterprise = :Enterprise
+      and entitytype = :EntityType  
+      and entityid = :EntityID
+      and attributecode = :AttributeCode
+      and nlsid = 1  
+      and (valto < :ValOn or effto < :EffOn);
+
+      DelNum = count - KeepNum; 
+
+     if (DelNum > 0) {
+      DelNumParm = DelNum;      
+      do {
+      EXEC SQL
+      delete from opicm.text t1 where
+      (t1.ENTERPRISE,t1.ENTITYTYPE,t1.ENTITYID,t1.ATTRIBUTECODE,t1.ATTRIBUTEVALUE,t1.VALFROM,t1.VALTO,t1.EFFFROM,
+       t1.EFFTO,t1.OPENID,t1.TRANID,t1.NLSID)
+       in 
+       (select t2.ENTERPRISE,t2.ENTITYTYPE,t2.ENTITYID,t2.ATTRIBUTECODE,t2.ATTRIBUTEVALUE,t2.VALFROM,t2.VALTO,t2.EFFFROM,
+        t2.EFFTO,t2.OPENID,t2.TRANID,t2.NLSID from opicm.text t2
+       where t2.enterprise = :Enterprise
+        and t2.entitytype = :EntityType
+        and t2.entityid = :EntityID
+        and t2.attributecode = :AttributeCode
+        and t2.nlsid = 1 
+        and (t2.valto < :ValOn or t2.effto < :EffOn)  
+        order by t2.valfrom asc fetch first 1 rows only);
+      DelNum = DelNum - 1;
+      } while (DelNum > 0);
+      }
+     }
+} 
+EXEC SQL COMMIT WORK;
+//
+// BEGIN ERROR CHECK SECTION
+//
+
+// this won't get executed if sql error occurs
+m_iSQLState = SQLCOMPLETE;
+
+error_exit:
+
+if(m_iSQLState == SQLERROR) {
+
+    // ensure no infinite loops in the case that a failed SQL connection is used past this point...
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+
+    fprintf(t,"********************  GBL8991 SQLCA DUMP  ********************\n");
+    char msg[1025];
+    sqlaintp(msg, 1024, 0, &sqlca);
+    fprintf(t,"msg:%s\n",msg);
+    fprintf(t,"SQLCAID: %s\n", sqlca.sqlcaid);
+    fprintf(t,"SQLCABC: %d\n", sqlca.sqlcabc);
+    fprintf(t,"SQLCODE: %d\n", sqlca.sqlcode);
+    fprintf(t,"SQLERRML: %d\n", sqlca.sqlerrml);
+    fprintf(t,"SQLERRMC: %s\n", sqlca.sqlerrmc);
+    fprintf(t,"SQLERRP: %s\n", sqlca.sqlerrp);
+    fprintf(t,"SQLERRD[0]: %d\n", sqlca.sqlerrd[0]);
+    fprintf(t,"SQLERRD[1]: %d\n", sqlca.sqlerrd[1]);
+    fprintf(t,"SQLERRD[2]: %d\n", sqlca.sqlerrd[2]);
+    fprintf(t,"SQLERRD[3]: %d\n", sqlca.sqlerrd[3]);
+    fprintf(t,"SQLERRD[4]: %d\n", sqlca.sqlerrd[4]);
+    fprintf(t,"SQLERRD[5]: %d\n", sqlca.sqlerrd[5]);
+    fprintf(t,"SQLWARN: %s\n", sqlca.sqlwarn);
+    fprintf(t,"SQLSTATE: %s\n", sqlca.sqlstate);
+    //
+    // Dumping Input params:
+    fprintf(t,"Enterprise:\"%s\"\n",Enterprise);
+    fprintf(t,"EntityType:\"%s\"\n",EntityType);
+    fprintf(t,"EntityID:\"%s\"\n",EntityID);
+    fprintf(t,"AttributeCode:\"%d\"\n",AttributeCode);
+    fprintf(t,"AttributeType:\"%s\"\n",AttributeType);
+    fprintf(t,"ValOn:\"%s\"\n",ValOn);
+    fprintf(t,"EffOn:\"%d\"\n",EffOn);
+    // End dump params
+    fprintf(t,"******************  END OF GBL8991 SQLCA DUMP  *******************\n");
+}
+//
+// END ERROR CHECK SECTION
+//
+
+fprintf(t,"%s:end of GBL8991\n",tstamp);
+fclose(t);
+
+@parameters
+inout ReturnStatus int
+inout DelNumParm int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in AttributeCode varchar(32)
+in AttributeType varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+

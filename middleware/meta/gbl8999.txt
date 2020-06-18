@@ -1,0 +1,44 @@
+@name=GBL8999
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+$Log: gbl8999.txt,v $
+Revision 1.5  2010/06/21 15:42:56  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.4  2004/10/20 21:01:49  dave
+changes to gen parm
+
+Revision 1.3  2004/02/20 20:21:58  roger
+Must be @t_schema
+
+Revision 1.2  2004/02/20 18:09:38  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.1  2003/07/10 15:36:18  roger
+New SP to verify DB2 8 works
+
+@desc=Just a test SP to verify DB2 8 works
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8999.txt,v 1.5 2010/06/21 15:42:56 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  COUNT(*)
+FROM @t_schema.Entity E
+WHERE
+E.EntityType = :EntityType
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in EntityType varchar(32)
+@end
+
+

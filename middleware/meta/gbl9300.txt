@@ -1,0 +1,119 @@
+@name=GBL9300
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------
+-- Pulling out FEATURE info
+----------------------------------------------------------------------
+$Log: gbl9300.txt,v $
+Revision 1.18  2015/02/24 21:43:23  ptatinen
+Add INVNAME as per Lenovo CQ
+
+Revision 1.17  2010/06/21 15:42:51  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.16  2006/09/15 17:51:50  gregg
+backing out configurator flag
+
+Revision 1.15  2006/09/11 20:33:11  gregg
+configuratorflag_fc
+
+Revision 1.14  2005/11/07 22:16:57  joan
+change COMPTYPE to CGTYPE for feature
+
+Revision 1.13  2005/10/24 19:28:48  joan
+fixes
+
+Revision 1.12  2005/10/24 19:15:49  joan
+FIXES
+
+Revision 1.11  2005/10/24 18:58:23  joan
+fixes
+
+Revision 1.10  2005/09/12 22:28:30  joan
+fixes for change of columns
+
+Revision 1.9  2005/08/11 20:29:51  joan
+fixes
+
+Revision 1.8  2005/06/23 21:20:45  joan
+adjust for countrylist
+
+Revision 1.7  2005/05/24 19:39:52  joan
+fixes
+
+Revision 1.6  2005/05/20 21:24:07  joan
+fixes
+
+Revision 1.5  2005/05/20 21:14:29  joan
+fixes
+
+Revision 1.4  2005/05/20 19:45:37  joan
+fixes
+
+Revision 1.3  2005/05/16 21:42:31  joan
+change table
+
+Revision 1.2  2005/05/02 21:25:08  joan
+fix compile
+
+Revision 1.1  2005/05/02 21:03:31  joan
+work on comp
+
+
+
+@desc=Pulling out FEATURE info
+@fenced=true
+@parmstyle=GENERAL
+@sql
+@results=1
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9300.txt,v 1.18 2015/02/24 21:43:23 ptatinen Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE Cur CURSOR FOR
+SELECT 
+  FEATURECODE
+, FCMKTGNAME
+, FCTYPE
+, FCTYPE_FC
+, ANNDATE
+, WITHDRAWDATE
+, PRICEDFEATURE
+, PRICEDFEATURE_FC
+, TANDC
+, CATEGORY
+, CATEGORY_FC
+, SUBCATEGORY
+, SUBCATEGORY_FC
+, GROUP
+, GROUP_FC
+, cgtype
+, cgtype_FC
+, OSLEVEL
+, OSLEVEL_FC
+, STATUS
+, STATUS_FC
+--, CONFIGURATORFLAG_FC
+, VALFROM
+, VALTO
+, ISACTIVE
+, INVNAME
+
+FROM GBLI.FEATURE
+WHERE ENTERPRISE = :Enterprise
+AND FEATENTITYTYPE = :FeatEntityType
+AND FEATENTITYID = :FeatEntityID
+AND COUNTRYLIST = :CountryList
+;
+                                         
+
+@execute
+EXEC SQL OPEN Cur;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(8)
+in CountryList varchar(8)
+in FeatEntityType varchar(32)
+in FeatEntityID int
+@end

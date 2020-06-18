@@ -1,0 +1,52 @@
+@name=GBL0001
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+Rule51: (part1 - check for all related Domain Entities)
+Given a (domain) entity, its parent, and a known attributevalue on the parent,
+check to ensure that this attribute value is unique across any parent of this (domain) entity
+through a given relator.
+--------------------------------------------------------------------------------------------
+$Log: gbl0001.txt,v $
+Revision 1.2  2010/06/21 15:42:53  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.1  2005/01/17 19:10:28  gregg
+initial load
+
+
+
+
+@desc=Unique one-off sibling check part 1
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0001.txt,v 1.2 2010/06/21 15:42:53 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+
+SELECT R.Entity2ID FROM
+ @schema.Relator R WHERE
+R.Enterprise = :Enterprise
+AND R.EntityType = :RelatorType
+AND R.Entity1Type = :ParentEntityType
+AND R.Entity1ID = :ParentEntityID
+AND R.Entity2Type = :DomainEntityType
+AND R.ValFrom <= :now AND :now < R.ValTo AND R.EffFrom <= :now AND :now < R.EffTo
+
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in ParentEntityType varchar(32)
+in ParentEntityID int
+in DomainEntityType varchar(32)
+in RelatorType varchar(32)
+@end

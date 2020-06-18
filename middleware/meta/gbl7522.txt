@@ -1,0 +1,82 @@
+@name=GBL7522
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7522.txt,v $
+Revision 1.8  2010/06/21 15:43:20  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2004/10/20 21:01:44  dave
+changes to gen parm
+
+Revision 1.6  2004/02/20 20:21:54  roger
+Must be @t_schema
+
+Revision 1.5  2004/02/20 18:09:34  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.4  2003/09/04 18:55:12  dave
+adding Enterprise and OPID negativity
+
+Revision 1.3  2003/02/05 00:55:25  gregg
+add interval start/end dates
+
+Revision 1.2  2002/08/01 00:46:59  gregg
+updated w/ working version from v10
+
+Revision 1.1.2.3  2002/08/01 00:17:09  gregg
+modifying for compile
+
+Revision 1.1.2.2  2002/07/31 23:58:20  gregg
+modified template format for updqtes..
+
+Revision 1.1.2.1  2002/07/31 23:37:44  gregg
+initial load for v10
+
+Revision 1.1  2002/07/31 23:36:41  gregg
+initial load
+
+
+@desc=update the status/pullDate for an opwgid/entitytype/entityid/queue-type.  
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7522.txt,v 1.8 2010/06/21 15:43:20 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+@execute
+EXEC SQL 
+
+update @t_schema.QUEUE
+ set 
+ STATUS = :Status
+,PULLDATE = :PullDate
+where
+    Enterprise = :Enterprise
+AND (OPWGID = :OPWGID OR OPWGID = (:OPID *-1))
+AND QUEUE = :Queue
+AND ENTITYTYPE = :EntityType
+AND ENTITYID = :EntityID
+AND INTERVALSTARTDATE >= :IntervalStartDate
+AND INTERVALENDDATE <= :IntervalEndDate
+;
+EXEC SQL COMMIT WORK;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPWGID int
+in OPID int
+in Queue varchar(32)
+in Status int
+in EntityType varchar(32)
+in EntityID int
+in PullDate varchar(26)
+in IntervalStartDate varchar(26)
+in IntervalEndDate varchar(26)
+@end
+
+

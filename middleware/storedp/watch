@@ -1,0 +1,23 @@
+#!/bin/sh
+
+#
+# Useful script to execute a command every N seconds
+#
+
+if [ "" = "$1" ]; then
+  COMMAND="ls"
+else
+  COMMAND=$1
+fi
+
+if [ "" = "$2" ]; then
+  PAUSE=10
+else
+  PAUSE=$2
+fi
+
+while [ true ]; do
+  clear
+  $COMMAND
+  sleep $PAUSE
+done

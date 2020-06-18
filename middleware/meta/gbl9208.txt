@@ -1,0 +1,129 @@
+@name=GBL9208
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+This will return the entity items that have attribute value within date range 
+
+
+$Log: gbl9208.txt,v $
+Revision 1.3  2010/06/21 15:43:26  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.2  2005/12/20 20:01:00  joan
+fixes
+
+Revision 1.1  2005/12/20 16:36:52  joan
+changes
+
+
+
+@desc=Search for all MODEL within the Workgroup’s PDHDOMAINs where COFCAT= {Service | Software} or COFSUBCAT= {Option},
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9208.txt,v 1.3 2010/06/21 15:43:26 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+ E.EntityType  as EntityType
+,E.EntityID  as EntityID
+
+FROM opicm.Entity E 
+
+INNER JOIN opicm.Flag F1 ON
+    F1.Enterprise = :Enterprise
+AND F1.EntityType = E.EntityType
+AND F1.EntityID = E.EntityID
+AND F1.AttributeCode = 'COFCAT'
+AND F1.AttributeValue = '101'
+AND F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+INNER JOIN opicm.Flag F2 ON
+    F2.Enterprise = :Enterprise
+AND F2.EntityType = E.EntityType
+AND F2.EntityID = E.EntityID
+AND F2.AttributeCode = 'PDHDOMAIN'
+AND F2.AttributeValue = :PDHDomain
+AND F2.ValFrom <= :ValOn AND :ValOn < F2.ValTo AND F2.EffFrom <= :EffOn AND :EffOn < F2.EffTo
+
+WHERE E.Enterprise = :Enterprise
+AND E.EntityType = 'MODEL'
+AND E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+
+UNION ALL
+
+SELECT
+ E.EntityType  as EntityType
+,E.EntityID  as EntityID
+
+FROM opicm.Entity E 
+
+INNER JOIN opicm.Flag F1 ON
+    F1.Enterprise = :Enterprise
+AND F1.EntityType = E.EntityType
+AND F1.EntityID = E.EntityID
+AND F1.AttributeCode = 'COFCAT'
+AND F1.AttributeValue = '102'
+AND F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+INNER JOIN opicm.Flag F2 ON
+    F2.Enterprise = :Enterprise
+AND F2.EntityType = E.EntityType
+AND F2.EntityID = E.EntityID
+AND F2.AttributeCode = 'PDHDOMAIN'
+AND F2.AttributeValue = :PDHDomain
+AND F2.ValFrom <= :ValOn AND :ValOn < F2.ValTo AND F2.EffFrom <= :EffOn AND :EffOn < F2.EffTo
+
+WHERE E.Enterprise = :Enterprise
+AND E.EntityType = 'MODEL'
+AND E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+
+UNION ALL
+
+SELECT
+ E.EntityType  as EntityType
+,E.EntityID  as EntityID
+
+FROM opicm.Entity E 
+
+INNER JOIN opicm.Flag F1 ON
+    F1.Enterprise = :Enterprise
+AND F1.EntityType = E.EntityType
+AND F1.EntityID = E.EntityID
+AND F1.AttributeCode = 'COFSUBCAT'
+AND F1.AttributeValue = '138'
+AND F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+INNER JOIN opicm.Flag F2 ON
+    F2.Enterprise = :Enterprise
+AND F2.EntityType = E.EntityType
+AND F2.EntityID = E.EntityID
+AND F2.AttributeCode = 'PDHDOMAIN'
+AND F2.AttributeValue = :PDHDomain
+AND F2.ValFrom <= :ValOn AND :ValOn < F2.ValTo AND F2.EffFrom <= :EffOn AND :EffOn < F2.EffTo
+
+WHERE E.Enterprise = :Enterprise
+AND E.EntityType = 'MODEL'
+AND E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+
+;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in PDHDomain varchar(32)
+in ValOn varchar(27)
+in EffOn varchar(27)
+@end
+
+

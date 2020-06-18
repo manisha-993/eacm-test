@@ -1,0 +1,157 @@
+#!/bin/sh
+
+#
+# $Log: stoptm-aix,v $
+# Revision 1.11  2004/09/15 20:22:04  roger
+# Record stop/kill/DIE in log
+#
+# Revision 1.10  2003/12/01 20:39:14  roger
+# Send mail command output to /dev/null
+#
+# Revision 1.9  2003/11/21 17:31:48  roger
+# Report home when called
+#
+# Revision 1.8  2002/10/16 19:37:01  roger
+# Support multiple instances
+#
+# Revision 1.7  2002/10/15 16:42:25  roger
+# Parameterize port settings to allow multiple instances of TM
+#
+#
+
+#
+# This script stops the TaskMaster under Linux or AIX
+#
+
+#
+# determine if we are AIX or Linux
+#
+OS=`uname | cut -f1`
+LINUX=`expr "Linux" = "$OS"`
+CURRENT_REPORT="./taskmaster.out"
+DIR=`basename $PWD`
+HOSTNAME=`hostname -s`
+INSTANCE="$HOSTNAME@$DIR"
+MAILTO="roger.mccarty@gbli.com"
+
+#
+# if we are Linux
+#
+if [ $LINUX -eq 1 ]; then
+  FUSER="/sbin/fuser"
+else
+  FUSER="/usr/sbin/fuser"
+fi
+
+#
+# record this execution in logfile 
+#
+echo "+++ TaskMaster instance $INSTANCE has used ./stoptm-aix" >>$CURRENT_REPORT
+
+#
+# if we are NOT running in this directory, bail out
+#
+if [ ! -f tmrunning ]; then
+  echo TaskMaster does not appear to be running -- you might consider using kill as well
+  exit
+fi
+
+#
+# create a semaphore file to cause taskmaster and idlers to stop
+#
+touch tmshut
+
+#
+# log that we are stopping
+#
+now=`date +%Y-%m-%d-%H.%M.%S.000000`
+echo $now TaskMaster STOPPING >>$CURRENT_REPORT
+
+#
+# stop the RMI activation daemon
+#
+#pid=`ps x | grep [r]mid | awk '{print $1}'`
+#if [ "" != "$pid" ]; then
+#  echo " "
+#  echo killing RMID process $pid
+#  ps  -o "%p %a" -p "$pid"
+#  kill $pid
+#else
+#  echo " "
+#  echo "RMID is not running"
+#fi
+if [ -f rmid.pid ]; then
+  echo killing RMID
+  kill `cat rmid.pid`
+fi
+
+#
+# remove the rmid persistent info
+#
+rm -Rf log
+
+#
+# kill the rmiregistry process
+#
+#pid=`ps x | grep [r]miregistry | awk '{print $1}'`
+#if [ "" != "$pid" ]; then
+#  echo " "
+#  echo killing RMIREGISTRY process $pid
+#  ps  -o "%p %a" -p "$pid"
+#  kill $pid
+#else
+#  echo " "
+#  echo "RMIREGISTRY is not running"
+#fi
+if [ -f rmiregistry.pid ]; then
+  echo killing RMIREGISTRY
+  kill `cat rmiregistry.pid`
+fi
+
+echo " "
+echo "cleaning up saved files ..."
+
+#
+# these directories store prior copies of TaskMaster software and reports (make sure they exist and are secure)
+#
+if [ ! -d rpt ]; then
+  mkdir rpt
+  chmod 700 rpt
+fi
+if [ ! -d archive ]; then
+  mkdir archive
+  chmod 700 archive
+fi
+
+#
+# delete reports more than 30 days old
+#
+echo deleting the following reports:
+find ./rpt -mtime +30 -print -exec rm -Rf {} \;
+echo "*** end ***"
+
+#
+# delete jar files more than 360 days old
+#
+echo deleting the following archives:
+find ./archive -mtime +360 -print -exec rm -Rf {} \;
+echo "*** end ***"
+
+#
+# remove any semaphore files
+#
+if [ -f tmrunning ]; then
+  rm tmrunning
+fi
+
+#
+# show if any process is still using the output file
+#
+$FUSER *out
+
+
+mail -s "TaskMaster instance $INSTANCE has used ./stoptm-aix" "$MAILTO" < /dev/null > /dev/null
+
+#
+# end of script
+#

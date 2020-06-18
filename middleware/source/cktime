@@ -1,0 +1,1 @@
+grep timing *out|cut -d" " -f3,4|sort

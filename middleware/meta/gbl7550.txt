@@ -1,0 +1,108 @@
+@name=GBL7550
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@results=1
+@narrative
+
+$Log: gbl7550.txt,v $
+Revision 1.8  2010/06/21 15:42:55  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2004/10/20 21:01:46  dave
+changes to gen parm
+
+Revision 1.6  2004/04/29 16:52:37  gregg
+more on Derived attributes
+
+Revision 1.5  2004/02/20 20:21:55  roger
+Must be @t_schema
+
+Revision 1.4  2004/02/20 18:09:35  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.3  2003/09/08 16:31:19  roger
+Enterprise was changed to 16 char length
+
+Revision 1.2  2003/04/12 23:50:35  dave
+search simplification III
+
+Revision 1.1  2003/04/12 22:32:58  dave
+new SP
+
+@desc=retreive all AttributeCodes that are deemed searchable
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7550.txt,v 1.8 2010/06/21 15:42:55 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+
+SELECT
+ 1
+,RTRIM(EA.LINKTYPE2)
+,RTRIM(ME.ENTITYCLASS)
+FROM @t_schema.METALINKATTR EA
+JOIN @t_schema.METALINKATTR SEARCH on
+        SEARCH.enterprise = EA.enterprise
+AND SEARCH.linktype = 'Attribute/Test'
+AND SEARCH.linktype1 = EA.LinkType2
+AND SEARCH.linktype2 = 'SEARCHABLE'
+AND SEARCH.valfrom <= :ValOn 
+AND SEARCH.valto > :ValOn
+AND SEARCH.efffrom <= :EffOn
+AND SEARCH.effto > :EffOn
+JOIN @t_schema.METAENTITY ME ON
+        ME.enterprise = EA.enterprise
+AND ME.entitytype = EA.linktype2
+AND ME.entityclass IN ('T', 'I', 'L', 'F', 'U', 'S', 'A','X','B')
+AND ME.valfrom <= :ValOn
+AND ME.valto > :ValOn
+AND ME.efffrom <= :EffOn
+AND ME.effto > :EffOn
+WHERE
+        EA.enterprise = :Enterprise
+AND EA.linktype = 'Entity/Attribute'
+AND EA.linktype1 = :EntityType
+AND EA.linkcode = 'EntityAttribute'
+AND EA.valfrom <= :ValOn
+AND EA.valto > :ValOn
+AND EA.efffrom <= :EffOn
+AND EA.effto > :EffOn
+
+UNION ALL
+SELECT 
+ 999
+,RTRIM(MLADERIVED.LinkType2)
+,'DT'
+FROM @t_schema.METALINKATTR MLADERIVED 
+
+INNER JOIN @t_schema.MetaEntity ME ON
+    ME.Enterprise = :Enterprise
+AND ME.EntityType = MLADERIVED.LinkType2
+AND ME.EntityClass = 'DT'
+AND ME.ValFrom <= :ValOn AND :ValOn < ME.ValTo AND ME.EffFrom <= :EffOn AND :EffOn < ME.EffTo
+
+WHERE
+    MLADERIVED.enterprise = :Enterprise
+AND MLADERIVED.linktype = 'Entity/Attribute'
+AND MLADERIVED.linktype1 = :EntityType
+AND MLADERIVED.linkcode = 'Derived'
+AND MLADERIVED.valfrom <= :ValOn
+AND MLADERIVED.valto > :ValOn
+AND MLADERIVED.efffrom <= :EffOn
+AND MLADERIVED.effto > :EffOn
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

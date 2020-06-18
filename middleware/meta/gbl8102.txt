@@ -1,0 +1,3287 @@
+@name=GBL8102
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+//
+// ARE YOU GOING TO NEED TO KNOW
+// IF THE TRIGGERED EVENT WAS ON?
+//
+// AND IF THE LEVEL IS ZERO.. IT SHOULD BE
+// POINT TO THE ROOT WHEN DONE
+// WE CAN PICK UP THE DIRECTION OF THE STEP
+// TO D = ET2 is where the root is
+// U is EI Type on where the root is
+
+Ulitmate VE based net changes calculator
+
+ $Log: gbl8102.txt,v $
+ Revision 1.126  2010/06/21 15:43:01  wendy
+ Exceeded RMI 64k static block limit, not needed for RMI
+
+ Revision 1.125  2009/10/20 00:22:00  rick
+ update to change long datatype to sqlint32
+
+ Revision 1.124  2005/05/11 13:49:46  dave
+ fixing merge conflict
+
+ Revision 1.123  2005/05/09 20:25:41  dave
+ more tweeks
+
+ Revision 1.122  2005/05/09 17:14:34  dave
+ syntax
+
+ Revision 1.121  2005/05/09 17:06:42  dave
+ adding performance RTRIMS and pulling
+ attribute filter into its own table
+
+ Revision 1.120  2004/11/11 17:16:06  dave
+ syntax fix
+
+ Revision 1.119  2004/11/11 17:03:35  dave
+ new gbl8000 for filtering
+
+ Revision 1.118  2004/11/10 17:49:07  dave
+ miminzing file writes in SPs and pulling in all variable to
+ sp innards to isolate SP4 db2 8.1 Dari fall over
+
+ Revision 1.117  2004/10/27 20:50:32  dave
+ more tweaking to force indexes
+
+ Revision 1.116  2004/10/20 21:01:47  dave
+ changes to gen parm
+
+ Revision 1.115  2004/10/15 18:30:58  dave
+ making sure R shows up
+
+ Revision 1.114  2004/10/15 17:58:13  dave
+ more fixes
+
+ Revision 1.113  2004/10/15 17:56:27  dave
+ looking to add relators to the final change list
+
+ Revision 1.112  2004/10/07 07:07:32  dave
+ minor sp changes
+
+ Revision 1.111  2004/10/01 17:02:01  dave
+ found an GBL8102 bug
+
+ Revision 1.110  2004/09/23 19:22:27  dave
+ sp fixes
+
+ Revision 1.109  2004/09/20 22:51:56  dave
+ syntax
+
+ Revision 1.108  2004/09/20 22:50:25  dave
+ more trickery
+
+ Revision 1.107  2004/09/20 22:42:43  dave
+ sp syntax
+
+ Revision 1.106  2004/09/11 19:41:43  dave
+ temp comment to focus on software
+
+ Revision 1.105  2004/09/03 21:27:28  dave
+ removing NLS contraint
+
+ Revision 1.104  2004/08/31 04:44:10  dave
+ fixing path on full image
+
+ Revision 1.103  2004/08/31 04:11:34  dave
+ some SP update
+
+ Revision 1.102  2004/08/30 21:19:51  dave
+ new stuff of getting complete image
+
+ Revision 1.101  2004/08/25 23:31:59  dave
+ ok.. now i have it
+
+ Revision 1.100  2004/08/25 23:13:37  dave
+ using core level. .and core direction for pass2
+
+ Revision 1.99  2004/08/25 22:29:37  dave
+ one more tweek
+
+ Revision 1.98  2004/08/25 22:13:27  dave
+ more reversal
+
+ Revision 1.97  2004/08/25 22:01:05  dave
+ GBL8102 change
+
+ Revision 1.96  2004/08/24 23:55:43  dave
+ small change to 8102
+ and whip
+
+ Revision 1.95  2004/08/19 16:34:28  dave
+ exposing methods
+
+ Revision 1.94  2004/08/09 14:41:36  dave
+ adding relchildtype and genareacode
+
+ Revision 1.93  2004/08/09 14:17:20  dave
+ adding GENAREANAME / Relator into the answer
+ for 8102
+
+ Revision 1.92  2004/08/05 23:14:30  dave
+ more r.valto stuff
+
+ Revision 1.91  2004/08/05 23:03:09  dave
+ experimient number 2 reltaor control block
+
+ Revision 1.90  2004/08/05 22:36:23  dave
+ Enterpries
+
+ Revision 1.89  2004/08/05 22:19:46  dave
+ small fix
+
+ Revision 1.88  2004/08/05 22:15:10  dave
+ session id fixing
+
+ Revision 1.87  2004/08/05 05:50:55  dave
+ results=1
+
+ Revision 1.86  2004/08/05 05:43:52  dave
+ syntax
+
+ Revision 1.85  2004/08/05 05:38:20  dave
+ first cut at new EntityList Constructor
+
+ Revision 1.84  2004/08/04 22:20:00  dave
+ simplifying associations
+
+ Revision 1.83  2004/08/04 21:44:15  dave
+ fixing merge
+
+ Revision 1.82  2004/08/04 21:25:44  dave
+ more association trickery
+
+ Revision 1.81  2004/08/04 21:15:25  dave
+ Direction for Associations
+
+ Revision 1.80  2004/08/04 21:07:04  dave
+ more change
+
+ Revision 1.79  2004/08/04 20:41:58  dave
+ ET1 Assoc
+
+ Revision 1.78  2004/08/04 19:35:31  dave
+ more fixes to dynsdflkjtax
+
+ Revision 1.77  2004/08/04 19:28:19  dave
+ more changes
+
+ Revision 1.76  2004/08/04 19:24:19  dave
+ another change
+
+ Revision 1.75  2004/08/04 19:19:17  dave
+ minor var changes
+
+ Revision 1.74  2004/08/04 19:04:14  dave
+ associations  pass 1
+
+ Revision 1.73  2004/08/04 18:34:44  dave
+ fixing reference error
+
+ Revision 1.72  2004/08/04 18:22:20  dave
+ syntax
+
+ Revision 1.71  2004/08/04 18:10:03  dave
+ attempting to encorporate Assocications into this
+
+ Revision 1.70  2004/08/04 00:35:05  dave
+ adding back empty string
+
+ Revision 1.69  2004/08/04 00:33:34  dave
+ path simpilfication
+
+ Revision 1.68  2004/08/04 00:06:52  dave
+ see if we have a decent path now
+
+ Revision 1.67  2004/08/03 23:45:10  dave
+ some misc updates
+
+ Revision 1.66  2004/08/03 23:37:33  dave
+ attempting to introduce path
+
+ Revision 1.65  2004/08/03 22:52:53  dave
+ adding child level and child
+
+ Revision 1.64  2004/08/03 22:35:52  dave
+ adding relator w/ attribute changes
+
+ Revision 1.63  2004/08/03 22:27:10  dave
+ trying to make sure Entity Data changes show up
+
+ Revision 1.62  2004/08/03 21:45:59  dave
+ squeezing out mutliple offs
+
+ Revision 1.61  2004/08/03 21:23:51  dave
+ more enterprise in where clause
+
+ Revision 1.60  2004/08/03 21:09:15  dave
+ need enterprise in where clause
+
+ Revision 1.59  2004/08/03 21:02:37  dave
+ fixing 'L2' Enterprise
+
+ Revision 1.58  2004/08/03 20:35:00  dave
+ more simplfication
+
+ Revision 1.57  2004/08/03 20:13:39  dave
+ fixing syntax
+
+ Revision 1.56  2004/08/03 00:53:45  dave
+ checking in NOOP filter
+
+ Revision 1.55  2004/08/03 00:00:29  dave
+ here is more information
+
+ Revision 1.54  2004/08/02 23:39:37  dave
+ fixing a comma
+
+ Revision 1.53  2004/08/02 23:31:02  dave
+ fixing sp code
+
+ Revision 1.52  2004/08/02 23:08:33  dave
+ adding ; to sql
+
+ Revision 1.51  2004/08/02 23:03:42  dave
+ END CASE --> END
+
+ Revision 1.50  2004/08/02 22:59:06  dave
+ syntax
+
+ Revision 1.49  2004/08/02 22:54:51  dave
+ fixing endTime = EndDate
+
+ Revision 1.48  2004/08/02 22:50:28  dave
+ checking in some fixes
+
+ Revision 1.47  2004/08/02 22:44:21  dave
+ adding the explosion piece
+
+ Revision 1.46  2004/08/02 21:38:22  dave
+ adding to the PassII table
+
+ Revision 1.45  2004/08/02 20:44:08  dave
+ adding inserts into the TRSNetterFinal Table
+
+ Revision 1.44  2004/08/02 20:19:02  dave
+ fixing :Level
+
+ Revision 1.43  2004/08/02 19:47:55  dave
+ making sure direction is in NetterPass1
+
+ Revision 1.42  2004/08/02 19:01:43  dave
+ changing trsNetter to trsNetterPass1
+
+ Revision 1.41  2004/08/02 18:47:45  dave
+ linktype needed to be linkcode
+
+ Revision 1.40  2004/08/02 18:35:33  dave
+ more fixes
+
+ Revision 1.39  2004/08/02 18:31:14  dave
+ syntax
+
+ Revision 1.38  2004/08/02 18:25:33  dave
+ minor changes
+
+ Revision 1.37  2004/08/02 18:09:28  dave
+ adding direction to the core section of the netter table
+ need to carry forward so when we explode back out
+ we will know what to do
+
+ Revision 1.36  2004/08/02 17:12:28  dave
+ more expansionist tatics
+
+ Revision 1.35  2004/07/31 04:08:54  dave
+ more cleanup
+
+ Revision 1.34  2004/07/31 03:56:00  dave
+ more timestamp
+
+ Revision 1.33  2004/07/31 03:31:56  dave
+ more cleanup
+
+ Revision 1.32  2004/07/31 03:12:37  dave
+ adding more stuff
+
+ Revision 1.31  2004/07/31 03:10:47  dave
+ removing result set
+
+ Revision 1.30  2004/07/31 02:46:45  dave
+ cleaner tracking
+
+ Revision 1.29  2004/07/31 02:35:18  dave
+ more cleanup
+
+ Revision 1.28  2004/07/31 02:30:55  dave
+ more comments
+
+ Revision 1.27  2004/07/31 02:15:27  dave
+ adding ValFrom
+
+ Revision 1.26  2004/07/30 23:40:13  dave
+ solving commit from within a SQL loop
+
+ Revision 1.25  2004/07/30 23:14:53  dave
+ N to N1
+
+ Revision 1.24  2004/07/30 22:57:06  dave
+ fixing sessionid
+
+ Revision 1.23  2004/07/30 22:47:54  dave
+ delete prior to starting insterting in the trsNetterPass1 table
+
+ Revision 1.22  2004/07/30 22:46:15  dave
+ just alittle more tracking
+
+ Revision 1.21  2004/07/30 22:35:55  dave
+ more thinning out the herd logic
+
+ Revision 1.20  2004/07/30 22:18:33  dave
+ simplifying on/off switch
+
+ Revision 1.19  2004/07/30 20:18:37  dave
+ fix missing ,
+
+ Revision 1.18  2004/07/30 20:12:45  dave
+ small fixes and more tracking
+
+ Revision 1.17  2004/07/30 20:08:37  dave
+ let us save some progress
+
+ Revision 1.16  2004/07/30 18:30:08  dave
+ minor syntax
+
+ Revision 1.15  2004/07/30 18:12:02  dave
+ fixing left join
+
+ Revision 1.14  2004/07/30 18:05:59  dave
+ more code.. lets carry forward any relators
+ we pass by as we move to the root.. to
+ be the new core
+
+ Revision 1.13  2004/07/30 17:52:43  dave
+ adding variables
+
+ Revision 1.12  2004/07/30 17:46:59  dave
+ more comments
+
+ Revision 1.11  2004/07/30 17:43:55  dave
+ adding simple pathing back to anchor entity
+
+ Revision 1.10  2004/07/29 23:10:50  dave
+ more \n fixes
+
+ Revision 1.9  2004/07/29 22:55:34  dave
+ update trace
+
+ Revision 1.8  2004/07/29 22:43:09  dave
+ logging for timings
+
+ Revision 1.7  2004/07/29 21:58:02  dave
+ clean up
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+sqlint32 lCount;
+char cCoreType[32];
+sqlint32 lCoreID;
+char tstamp[27];
+sqlint32 Level;
+sqlint32 LeafLevel;
+char FromEntity[34];
+char ToEntity[34];
+char RelatorType[34];
+char PDirection[2];
+char Direction[2];
+char Category[2];
+char RClass[34];
+
+sqlint32 track;
+sqlint32 i;
+
+EXEC SQL END DECLARE SECTION;
+//
+// Open the log file
+//
+//FILE *t;
+//mode_t Mode2;
+//Mode2 = 0777;
+//chmod("/tmp/testlog",Mode2);
+//t=fopen("/tmp/testlog","a");
+//t=fopen("/tmp/testlog","w");
+//// fprintf(t,"-->start of stored procedure GBL8102\n");
+
+
+//==================================================================
+// This Guy Returns the entire Nav structure to the caller.
+//==================================================================
+EXEC SQL DECLARE NavCur CURSOR FOR
+SELECT DISTINCT
+  RTRIM(COALESCE(F.AttributeValue,'000000'))
+ ,RTRIM(N.RootType)
+ ,N.RootID
+ ,RTRIM(N.RootTran)
+ ,RTRIM(N.ChildType)
+ ,N.ChildID
+ ,RTRIM(N.ChildTran)
+ ,N.ChildLevel
+ ,RTRIM(N.ChildClass)
+ ,RTRIM(N.ChildPath)
+ ,RTRIM(COALESCE(R.Entity2Type,'NOOP'))
+ ,COALESCE(R.Entity2ID,0)
+FROM @t_schema.trsNetterFinal N
+LEFT JOIN @t_schema.flag F ON
+    F.Enterprise = :Enterprise
+AND F.EntityType = N.RootType
+AND F.EntityID = N.RootID
+AND F.AttributeCode = 'GENAREANAME'
+AND F.Valto = :forever
+LEFT JOIN @t_schema.Relator R ON
+    R.Enterprise = :Enterprise
+AND N.ChildClass = 'R'
+AND R.EntityType = N.ChildType
+AND R.EntityID = N.ChildID
+AND R.Valto = :forever
+WHERE
+    N.SessionID = :SessionID and
+    N.Enterprise = :Enterprise
+ORDER BY
+   2,3,4,5,6,7,8
+;
+
+
+// ===================================================================
+// This guy Generates a Navigation Template based upon the Navigation
+// Type and the EntityType
+// This guy is the big kahuna that replaces  all previous Navigation
+// This guy is a repeat and must match the section in GBL8000
+// ===================================================================
+EXEC SQL DECLARE ActionTemplate CURSOR FOR
+WITH myWire
+  (Level
+  ,FromEntity
+  ,ToEntity
+  ,RelatorType
+  ,ParentDirection
+  ,ChildDirection
+  ,Category
+  ,RClass)
+AS
+(SELECT DISTINCT
+  INT(ROOT.LinkValue)
+, E.LinkType1
+, E.LinkType2
+, ROOT.LinkType2
+--, CHAR(ROOT.LinkCode,1)
+,'D'
+, CHAR(ROOT.LinkCode,1)
+, 'E'
+, E.LinkCode
+FROM @t_schema.MetaLinkAttr ROOT
+INNER JOIN @t_schema.MetaLinkAttr E ON
+   E.Enterprise = :Enterprise
+AND E.LinkCode in ('Relator','Assoc')
+AND E.LinkType = ROOT.LinkType2
+AND CASE ROOT.LinkCode
+     WHEN 'D' THEN E.LinkType1
+     WHEN 'U' THEN E.LinkType2
+   END = :TargetEntityType
+AND E.ValFrom <= Current Timestamp AND Current Timestamp < E.ValTo AND E.EffFrom <= Current Timestamp AND Current Timestamp < E.EffTo
+WHERE
+    ROOT.Enterprise = :Enterprise
+AND ROOT.LinkType in ('Action/Entity')
+AND ROOT.LinkType1= :ActionType
+AND ROOT.LinkCode IN ('D','U')
+AND INT(ROOT.LinkValue) >= 0
+AND ROOT.ValFrom <= Current Timestamp AND Current Timestamp < ROOT.ValTo AND ROOT.EffFrom <= Current Timestamp AND Current Timestamp < ROOT.EffTo
+UNION ALL
+-- CASE I   Parent Direction is Down .. and Child Direction is Down
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= Current Timestamp AND Current Timestamp < E.ValTo AND E.EffFrom <= Current Timestamp AND Current Timestamp < E.EffTo
+  WHERE
+     E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'D'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= Current Timestamp AND Current Timestamp < E1.ValTo AND E1.EffFrom <= Current Timestamp AND  Current Timestamp < E1.EffTo) CHILD
+WHERE
+    PARENT.ToEntity  = CHILD.FromEntity
+AND PARENT.ChildDirection = 'D'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= Current Timestamp AND Current Timestamp < E.ValTo AND E.EffFrom <= Current Timestamp AND Current Timestamp < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'U'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= Current Timestamp AND Current Timestamp < E1.ValTo AND E1.EffFrom <= Current Timestamp AND  Current Timestamp < E1.EffTo) CHILD
+WHERE
+PARENT.FromEntity =  CHILD.ToEntity
+AND PARENT.ChildDirection = 'U'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= Current Timestamp AND Current Timestamp < E.ValTo AND E.EffFrom <= Current Timestamp AND Current Timestamp < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'D'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= Current Timestamp AND Current Timestamp < E1.ValTo AND E1.EffFrom <= Current Timestamp AND  Current Timestamp < E1.EffTo) CHILD
+WHERE
+    PARENT.FromEntity =  CHILD.FromEntity
+AND PARENT.ChildDirection = 'U'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+   INT(E1.LinkValue) AS Level
+  ,E.LinkType1 AS FromEntity
+  ,E.LinkType2 AS ToEntity
+  ,E1.LinkType2 AS RelatorType
+  ,E1.LinkCode AS Direction
+  ,E.LinkCode AS RCLASS
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= Current Timestamp AND Current Timestamp < E.ValTo AND E.EffFrom <= Current Timestamp AND Current Timestamp < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType IN ('Action/Entity')
+  AND E1.LinkCode = 'U'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= Current Timestamp AND Current Timestamp < E1.ValTo AND E1.EffFrom <= Current Timestamp AND  Current Timestamp < E1.EffTo) CHILD
+WHERE
+    PARENT.ToEntity =  CHILD.ToEntity
+AND PARENT.ChildDirection = 'D'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'R'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+   INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+     E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= Current Timestamp AND Current Timestamp < E.ValTo AND E.EffFrom <= Current Timestamp AND Current Timestamp < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'U'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= Current Timestamp AND Current Timestamp < E1.ValTo AND E1.EffFrom <= Current Timestamp AND  Current Timestamp < E1.EffTo) CHILD
+WHERE
+    PARENT.RelatorType =  CHILD.ToEntity
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'R'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= Current Timestamp AND Current Timestamp < E.ValTo AND E.EffFrom <= Current Timestamp AND Current Timestamp < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType IN ('Action/Entity')
+  AND E1.LinkCode = 'D'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= Current Timestamp AND Current Timestamp < E1.ValTo AND E1.EffFrom <= Current Timestamp AND  Current Timestamp < E1.EffTo) CHILD
+WHERE
+    PARENT.RelatorType = CHILD.FromEntity
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'T'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+   INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+     E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= Current Timestamp AND Current Timestamp < E.ValTo AND E.EffFrom <= Current Timestamp AND Current Timestamp < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode in ('U','D')
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= Current Timestamp AND Current Timestamp < E1.ValTo AND E1.EffFrom <= Current Timestamp AND  Current Timestamp < E1.EffTo) CHILD
+WHERE
+    PARENT.ToEntity =  CHILD.RelatorType
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'T'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= Current Timestamp AND Current Timestamp < E.ValTo AND E.EffFrom <= Current Timestamp AND Current Timestamp < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType IN ('Action/Entity')
+  AND E1.LinkCode in ('U','D')
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= Current Timestamp AND Current Timestamp < E1.ValTo AND E1.EffFrom <= Current Timestamp AND  Current Timestamp < E1.EffTo) CHILD
+WHERE
+    PARENT.FromEntity = CHILD.RelatorType
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+
+)
+SELECT DISTINCT
+  Level
+, CASE(Select Max(Level) from myWire) WHEN Level THEN 1 ELSE 0 END
+, RTRIM(FromEntity)
+, RTRIM(ToEntity)
+, RTRIM(RelatorType)
+, RTRIM(ParentDirection)
+, RTRIM(ChildDirection)
+, RTRIM(Category)
+, RTRIM(RClass)
+FROM myWire
+ORDER BY Level
+;
+//
+// This is the action template for the build code to follow
+// It gets them to arrive at the root
+// ===================================================================
+// This guy Generates a Navigation Template based upon the Navigation
+// Type and the EntityType
+// This guy is the big kahuna that replaces  all previous Navigation
+// ===================================================================
+EXEC SQL DECLARE RevActionTemplate CURSOR FOR
+WITH myWire
+  (Level
+  ,FromEntity
+  ,ToEntity
+  ,RelatorType
+  ,ParentDirection
+  ,ChildDirection
+  ,Category
+  ,RClass)
+AS
+(SELECT DISTINCT
+  INT(ROOT.LinkValue)
+, E.LinkType1
+, E.LinkType2
+, ROOT.LinkType2
+, 'D'
+, CHAR(ROOT.LinkCode,1)
+, 'E'
+, E.LinkCode
+FROM @t_schema.MetaLinkAttr ROOT
+INNER JOIN @t_schema.MetaLinkAttr E ON
+   E.Enterprise = :Enterprise
+AND E.LinkCode in ('Relator','Assoc')
+AND E.LinkType = ROOT.LinkType2
+AND CASE ROOT.LinkCode
+     WHEN 'D' THEN E.LinkType1
+     WHEN 'U' THEN E.LinkType2
+   END = :TargetEntityType
+AND E.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.ValTo AND E.EffFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.EffTo
+WHERE
+    ROOT.Enterprise = :Enterprise
+AND ROOT.LinkType in ('Action/Entity')
+AND ROOT.LinkType1= :ActionType
+AND ROOT.LinkCode IN ('D','U')
+AND INT(ROOT.LinkValue) >= 0
+AND ROOT.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < ROOT.ValTo AND ROOT.EffFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < ROOT.EffTo
+UNION ALL
+-- CASE I   Parent Direction is Down .. and Child Direction is Down
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+      INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.ValTo AND E.EffFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.EffTo
+  WHERE
+     E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'D'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E1.ValTo AND E1.EffFrom <= CURRENT TIMESTAMP AND  CURRENT TIMESTAMP < E1.EffTo) CHILD
+WHERE
+    PARENT.ToEntity  = CHILD.FromEntity
+AND PARENT.ChildDirection = 'D'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.ValTo AND E.EffFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'U'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E1.ValTo AND E1.EffFrom <= CURRENT TIMESTAMP AND  CURRENT TIMESTAMP < E1.EffTo) CHILD
+WHERE
+PARENT.FromEntity =  CHILD.ToEntity
+AND PARENT.ChildDirection = 'U'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+     ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.ValTo AND E.EffFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'D'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E1.ValTo AND E1.EffFrom <= CURRENT TIMESTAMP AND  CURRENT TIMESTAMP < E1.EffTo) CHILD
+WHERE
+    PARENT.FromEntity =  CHILD.FromEntity
+AND PARENT.ChildDirection = 'U'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+     INT(E1.LinkValue) AS Level
+  ,E.LinkType1 AS FromEntity
+  ,E.LinkType2 AS ToEntity
+  ,E1.LinkType2 AS RelatorType
+  ,E1.LinkCode AS Direction
+  ,E.LinkCode AS RCLASS
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.ValTo AND E.EffFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType IN ('Action/Entity')
+  AND E1.LinkCode = 'U'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E1.ValTo AND E1.EffFrom <= CURRENT TIMESTAMP AND  CURRENT TIMESTAMP < E1.EffTo) CHILD
+WHERE
+    PARENT.ToEntity =  CHILD.ToEntity
+AND PARENT.ChildDirection = 'D'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'R'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+   INT(E1.LinkValue) AS Level
+     ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+     E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.ValTo AND E.EffFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'U'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E1.ValTo AND E1.EffFrom <= CURRENT TIMESTAMP AND  CURRENT TIMESTAMP < E1.EffTo) CHILD
+WHERE
+    PARENT.RelatorType =  CHILD.ToEntity
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'R'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+     ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.ValTo AND E.EffFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType IN ('Action/Entity')
+  AND E1.LinkCode = 'D'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < E1.ValTo AND E1.EffFrom <= CURRENT TIMESTAMP AND  CURRENT TIMESTAMP < E1.EffTo) CHILD
+WHERE
+    PARENT.RelatorType = CHILD.FromEntity
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+)
+, myTemp1 (Level, FE, TE, RT, PD, CD, CAT, CLASS) AS
+(SELECT DISTINCT
+  Root.Level
+, RTRIM(Root.FromEntity) FE
+, RTRIM(Root.ToEntity) TE
+, RTRIM(Root.RelatorType) RT
+, RTRIM('R') PD
+, RTRIM(Root.ChildDirection) CD
+, RTRIM(Root.Category)CAT
+, RTRIM(Root.RClass) CLASS
+FROM myWire ROOT
+LEFT JOIN myWire my1 ON
+  ROOT.FromEntity = my1.ToEntity
+AND ROOT.Level + 1 = my1.Level
+AND ROOT.ChildDirection= 'U'
+AND my1.ParentDirection = 'U'
+AND my1.ChildDirection = 'U'
+LEFT JOIN myWire my2 ON
+  ROOT.FromEntity = my2.FromEntity
+AND ROOT.Level + 1 = my2.Level
+AND ROOT.ChildDirection = 'U'
+AND my2.ParentDirection = 'U'
+AND my2.ChildDirection = 'D'
+LEFT JOIN myWire my3 ON
+  ROOT.ToEntity = my3.FromEntity
+AND ROOT.Level + 1 = my3.Level
+AND ROOT.ChildDirection =  'D'
+AND my3.ParentDirection = 'D'
+AND my3.ChildDirection = 'D'
+LEFT JOIN myWire my4 ON
+  ROOT.ToEntity = my4.ToEntity
+AND ROOT.Level + 1 = my4.Level
+AND ROOT.ChildDirection = 'D'
+AND my4.ParentDirection = 'D'
+AND my4.ChildDirection = 'U'
+WHERE
+    my1.RelatorType IS NULL
+AND my2.RelatorType IS NULL
+AND my3.RelatorType IS NULL
+AND my4.RelatorType IS NULL
+UNION ALL
+SELECT
+ PARENT.Level - 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.ChildDirection,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,myWire CHILD
+WHERE
+    PARENT.ToEntity  = CHILD.FromEntity
+AND PARENT.ChildDirection = 'U'
+AND CHILD.ChildDirection = 'U'
+AND CHILD.Level = PARENT.Level -1
+AND PARENT.Level >= 0
+UNION ALL
+SELECT
+ PARENT.Level - 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.ChildDirection,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,myWire CHILD
+WHERE
+    PARENT.ToEntity  = CHILD.ToEntity
+AND PARENT.ChildDirection = 'U'
+AND CHILD.ChildDirection = 'D'
+AND CHILD.Level = PARENT.Level -1
+AND PARENT.Level >= 0
+UNION ALL
+SELECT
+ PARENT.Level - 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.ChildDirection,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,myWire CHILD
+WHERE
+    PARENT.FromEntity  = CHILD.FromEntity
+AND PARENT.ChildDirection = 'D'
+AND CHILD.ChildDirection = 'U'
+AND CHILD.Level = PARENT.Level -1
+AND PARENT.Level >= 0
+UNION ALL
+SELECT
+ PARENT.Level - 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.ChildDirection,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,myWire CHILD
+WHERE
+    PARENT.FromEntity  = CHILD.ToEntity
+AND PARENT.ChildDirection = 'D'
+AND CHILD.ChildDirection = 'D'
+AND CHILD.Level = PARENT.Level -1
+AND PARENT.Level >= 0
+)
+select Distinct * from myTemp1
+WHERE PD <> 'R'
+order by Level DESC
+;
+
+@execute
+
+// Adds and Changes for the VE into trsNetterPass1
+
+// Lets Log here
+EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+//// fprintf(t,"GBL8102:%s Starting:SessionID:%ld,Enterprise:%s,RoleCode:%s,ActionType:%s,TargetEntityType:%s,StartDate:%s,EndDate:%s\n",tstamp,SessionID, Enterprise, RoleCode, ActionType,TargetEntityType, StartDate, EndDate);
+
+// Adds and Changes for the VE into trsNetterPass1
+EXEC SQL delete from @t_schema.trsNetterPass1 where sessionid = :SessionID and Enterprise = :Enterprise;
+EXEC SQL delete from @t_schema.trsNetterAtts where sessionid = :SessionID and Enterprise = :Enterprise;
+
+EXEC SQL COMMIT WORK;
+
+// Lets Log here
+// Lets Log here
+EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+// fprintf(t,"GBL8102:%s Completed Cleanup...\n",tstamp);
+
+//
+// OK.llets get out of dodge if we have too
+//
+//
+if (iPass == 1) {
+ goto genfullimage;
+}
+
+//
+// Lets go for the atts check in the window
+//
+
+EXEC SQL
+INSERT INTO opicm.trsNetterAtts 
+With MyETs (EntityType) AS
+(
+SELECT
+  RTRIM(MLA1.LinkType1)
+  FROM  @t_schema.MetaLinkAttr MLA
+  INNER JOIN @t_schema.MetaLinkAttr MLA1 ON
+      MLA1.Enterprise = :Enterprise
+  AND MLA1.LinkType = MLA.LinkType2
+  AND MLA1.LinkCode IN ('Relator','Assoc')
+  AND MLA1.ValFrom <= Current timestamp AND Current timestamp < MLA1.ValTo AND MLA1.EffFrom <= Current timestamp AND Current timestamp < MLA1.EffTo
+  WHERE
+      MLA.Enterprise = :Enterprise
+  AND RTRIM(MLA.LinkType) = 'Action/Entity'
+  AND MLA.LinkType1 = :ActionType
+  AND MLA.LinkCode in ('D','U')
+  AND MLA.ValFrom <= Current timestamp AND Current timestamp < MLA.ValTo AND MLA.EffFrom <= Current timestamp AND Current timestamp < MLA.EffTo
+UNION
+SELECT
+  RTRIM(MLA1.LinkType2)
+  FROM @t_schema.MetaLinkAttr MLA
+  INNER JOIN @t_schema.MetaLinkAttr MLA1 ON
+      MLA1.Enterprise = :Enterprise
+  AND MLA1.LinkType = MLA.LinkType2
+  AND MLA1.LinkCode IN ('Relator','Assoc')
+  AND MLA1.ValFrom <= Current timestamp AND Current timestamp < MLA1.ValTo AND MLA1.EffFrom <= Current timestamp AND Current timestamp < MLA1.EffTo
+  WHERE
+      MLA.Enterprise = :Enterprise
+  AND RTRIM(MLA.LinkType) = 'Action/Entity'
+  AND MLA.LinkType1 = :ActionType
+  AND MLA.linkCode in ('D','U')
+  AND MLA.ValFrom <= Current timestamp AND Current timestamp < MLA.ValTo AND MLA.EffFrom <= Current timestamp AND Current timestamp < MLA.EffTo
+UNION
+SELECT
+  RTRIM(MLA.LinkType2)
+  FROM @t_schema.MetaLinkAttr MLA
+  WHERE
+      MLA.Enterprise =  :Enterprise
+  AND RTRIM(MLA.LinkType) = 'Action/Entity'
+  AND MLA.LinkType1 = :ActionType
+  AND MLA.LinkCode in ('D','U')
+  AND MLA.ValFrom <= Current timestamp AND Current timestamp < MLA.ValTo AND MLA.EffFrom <= Current timestamp AND Current timestamp < MLA.EffTo
+)
+Select  DISTINCT 
+    :SessionID, 
+        T.EntityID,
+        T.EntityType,
+        T.Enterprise
+FROM opicm.Textx T
+INNER JOIN opicm.metalinkattr MLA ON
+
+    MLA.Enterprise  = :Enterprise
+    AND RTRIM(MLA.LinkType) = 'Role/Attribute'
+    AND RTRIM(MLA.LinkType1) = :RoleCode
+    AND MLA.LinkType2 = T.AttributeCode
+    AND MLA.ValTo > current timestamp
+    AND MLA.EffTo > Current TimeStamp
+
+INNER JOIN myETs ET on
+
+    ET.EntityType = T.EntityType 
+
+WHERE
+        T.Enterprise = :Enterprise
+    AND T.ValFrom Between :StartDate AND :EndDate
+
+UNION 
+Select  DISTINCT 
+    :SessionID, 
+        T.EntityID,
+        T.EntityType,
+        T.Enterprise
+FROM opicm.Flagx T
+INNER JOIN opicm.metalinkattr MLA ON
+    MLA.Enterprise  = :Enterprise
+    AND RTRIM(MLA.LinkType) = 'Role/Attribute'
+    AND RTRIM(MLA.LinkType1) = :RoleCode
+    AND MLA.LinkType2 = T.AttributeCode
+    AND MLA.ValTo > current timestamp
+    AND MLA.EffTo > Current TimeStamp
+INNER JOIN myETs ET on
+    ET.EntityType = T.EntityType 
+WHERE
+    T.Enterprise = :Enterprise
+    AND T.ValFrom Between :StartDate AND :EndDate
+UNION 
+Select  DISTINCT 
+    :SessionID, 
+        T.EntityID,
+        T.EntityType,
+        T.Enterprise
+FROM opicm.LongTextx T
+INNER JOIN opicm.metalinkattr MLA ON
+    MLA.Enterprise  = :Enterprise
+    AND RTRIM(MLA.LinkType) = 'Role/Attribute'
+    AND RTRIM(MLA.LinkType1) = :RoleCode
+    AND MLA.LinkType2 = T.AttributeCode
+    AND MLA.ValTo > current timestamp
+    AND MLA.EffTo > Current TimeStamp
+INNER JOIN myETs ET on
+    ET.EntityType = T.EntityType 
+WHERE
+    T.Enterprise = :Enterprise
+    AND T.ValFrom Between :StartDate AND :EndDate
+UNION
+Select  DISTINCT 
+    :SessionID, 
+        T.EntityID,
+        T.EntityType,
+        T.Enterprise
+FROM opicm.Blobx T
+INNER JOIN opicm.metalinkattr MLA ON
+    MLA.Enterprise  = :Enterprise
+    AND RTRIM(MLA.LinkType) = 'Role/Attribute'
+    AND RTRIM(MLA.LinkType1) = :RoleCode
+    AND MLA.LinkType2 = T.AttributeCode
+    AND MLA.ValTo > current timestamp
+    AND MLA.EffTo > Current TimeStamp
+INNER JOIN myETs ET on
+    ET.EntityType = T.EntityType 
+WHERE
+    T.Enterprise = :Enterprise
+    AND T.ValFrom Between :StartDate AND :EndDate
+;
+
+EXEC SQL COMMIT WORK;
+
+
+EXEC SQL
+insert into @t_schema.trsNetterPass1
+WITH myEntities (Level, Side, EntityType, RelatorType, OtherSideType,
+RelatorClass, LinkValue, Class) AS
+(SELECT DISTINCT
+ int(MLA.LinkValue)
+,'ET2'
+,MR.LinkType2
+,MR.LinkType
+,MR.LinkType1
+,MR.LinkCode
+,MR.LinkValue
+,'E'
+FROM @t_schema.MetaLinkAttr MLA
+INNER JOIN @t_schema.MetaLinkAttr MR ON
+    MR.Enterprise = :Enterprise
+AND MR.LinkType = MLA.LinkType2
+AND MR.LinkCode IN ('Relator', 'Assoc')
+AND MR.LinkValue not in ('NoOrphan')
+AND MR.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MR.ValTo
+AND MR.EffFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MR.EffTo
+WHERE
+    MLA.Enterprise = :Enterprise
+AND RTRIM(MLA.LinkType) = 'Action/Entity'
+AND MLA.LinkType1 = :ActionType
+AND MLA.valfrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MLA.ValTo
+AND MLA.efffrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MLA.EffTo
+AND MLA.LinkCode = 'D'
+UNION ALL
+-- OK.. this is all the ET1 --> ET2 records that are relators
+SELECT DISTINCT
+ int(MLA.LinkValue)
+,'ET1'
+,MR.LinkType1
+,MR.LinkType
+,MR.LinkType2
+,MR.LinkCode
+,MR.LinkValue
+,'E'
+FROM @t_schema.MetaLinkAttr MLA
+INNER JOIN  @t_schema.MetaLinkAttr MR ON
+    MR.Enterprise = :Enterprise
+AND MR.LinkType = MLA.LinkType2
+AND MR.LinkCode in ('Relator','Assoc')
+AND MR.LinkValue not in ('NoOrphan')
+AND MR.valfrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MR.ValTo
+AND MR.efffrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MR.EffTo
+WHERE
+    MLA.Enterprise = :Enterprise
+AND RTRIM(MLA.LinkType) = 'Action/Entity'
+AND MLA.LinkType1 = :ActionType
+AND MLA.valfrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MLA.ValTo
+AND MLA.efffrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MLA.EffTo
+AND MLA.LinkCode = 'U'
+UNION ALL
+--
+-- These are relators themselves
+--
+SELECT DISTINCT
+ int(MLA.LinkValue)
+,'ET'
+,MR.LinkType
+,MR.LinkType
+,MR.LinkType
+,MR.LinkCode
+,MR.LinkValue
+,'R'
+FROM @t_schema.MetaLinkAttr mla
+INNER JOIN  @t_schema.MetaLinkAttr mr on
+    MR.Enterprise = :Enterprise
+AND MR.LinkType = MLA.LinkType2
+AND MR.LinkCode in ('Relator')
+AND MR.LinkValue = 'L'
+AND MR.valfrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MR.ValTo
+AND MR.efffrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MR.EffTo
+WHERE
+    MLA.Enterprise = :Enterprise
+AND RTRIM(MLA.LinkType) = 'Action/Entity'
+AND MLA.LinkType1 = :ActionType
+AND MLA.valfrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MLA.ValTo
+AND MLA.efffrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MLA.EffTo
+UNION ALL
+--
+--  These are the target Entities themselvs
+--
+SELECT DISTINCT
+  0
+,'T'
+,MR.LinkType1
+,MR.LinkType1
+,MR.LinkType1
+,'E'
+,'E'
+,'E'
+FROM @t_schema.MetaLinkAttr mla
+INNER JOIN  @t_schema.MetaLinkAttr mr on
+     MR.Enterprise = :Enterprise
+AND MR.LinkType = MLA.LinkType2
+AND MR.LinkType1 = :TargetEntityType
+AND MR.LinkCode in ('Relator','Assoc')
+AND MR.LinkValue not in ('NoOrphan')
+AND MR.valfrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MR.ValTo
+AND MR.efffrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MR.EffTo
+WHERE
+     MLA.Enterprise = :Enterprise
+AND RTRIM(MLA.LinkType) = 'Action/Entity'
+AND MLA.LinkType1 = :ActionType
+AND MLA.valfrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MLA.ValTo
+AND MLA.efffrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MLA.EffTo
+UNION ALL
+SELECT DISTINCT
+  0
+,'T'
+,MR.LinkType2
+,MR.LinkType2
+,MR.LinkType2
+,'E'
+,'E'
+,'E'
+FROM @t_schema.MetaLinkAttr mla
+INNER JOIN  @t_schema.MetaLinkAttr mr on
+     MR.Enterprise = :Enterprise
+AND MR.LinkType = MLA.LinkType2
+AND MR.LinkType2 = :TargetEntityType
+AND MR.LinkCode in ('Relator','Assoc')
+AND MR.LinkValue not in ('NoOrphan')
+AND MR.valfrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MR.ValTo
+AND MR.efffrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MR.EffTo
+WHERE
+     MLA.Enterprise = :Enterprise
+AND RTRIM(MLA.LinkType) = 'Action/Entity'
+AND MLA.LinkType1 = :ActionType
+AND MLA.valfrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MLA.ValTo
+AND MLA.efffrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < MLA.EffTo
+)
+--
+--  Lets distinct them out
+--
+,myList (Level, Side, EntityType, RelatorType, OtherSideType, RelatorClass,
+LinkValue, Class) AS
+(SELECT DISTINCT
+  E.Level
+,E.Side
+,E.EntityType
+,E.RelatorType
+,E.OtherSideType
+,E.RelatorClass
+,E.LinkValue
+)
+
+--
+-- Lets get the data baby!
+-- FIRST lets get entitychanges that impact the VE upward
+--
+SELECT 
+1
+,EX.enterprise
+,:SessionID
+,CASE WHEN EX.EffTo > :EndDate  AND EX.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,E.Level
+,R.Entity1Type
+,R.Entity1ID
+,R.EntityType
+,R.EntityID
+,R.Entity2Type
+,R.Entity2ID
+,CASE coalesce((select char(linkcode,1) from opicm.metalinkattr 
+ where      Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = R.EntityType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+ ),'X') WHEN 'U' THEN 'D' WHEN 'D' THEN 'U' ELSE 'X' END    
+,EX.EntityType
+,EX.EntityID
+,E.Level
+,CASE WHEN EX.EffTo > :EndDate  AND EX.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,coalesce((select char(linkcode,1) from opicm.metalinkattr 
+    where       Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = EX.EntityType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+  ),'X') 
+ ,'E1'
+,EX.Valfrom
+,RTRIM(R.EntityType)
+FROM myList E
+INNER JOIN  opicm.EntityX EX ON
+    RTRIM(EX.Enterprise) = :Enterprise
+AND EX.EntityType = E.EntityType
+AND EX.Valfrom between :StartDate AND :EndDate
+INNER JOIN opicm.Relator R ON
+     RTRIM(R.Enterprise) = :Enterprise
+AND R.Entity1Type = EX.EntityType
+AND R.Entity1ID = EX.EntityID*1
+AND RTRIM(R.EntityType) = E.RelatorType
+AND R.ValFrom <= :EndDate AND :EndDate < R.ValTo
+AND R.EffFrom <= :EndDate AND :EndDate < R.EffTo
+JOIN opicm.trsNetterAtts A ON
+    R.Entity1Type = A.EntityType AND
+    R.Entity1ID = A.EntityID  AND
+    A.SessionID = :SessionID AND
+    A.Enterprise = :Enterprise
+WHERE
+    E.Class = 'E'
+AND E.Side = 'ET1'
+AND E.EntityType <> :TargetEntityType
+AND E.RelatorClass = 'Relator'
+
+UNION ALL
+
+SELECT 
+ 1
+,EX.Enterprise
+,:SessionID
+,CASE WHEN EX.EffTo  > :EndDate AND EX.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,E.Level
+,R.Entity1Type
+,R.Entity1ID
+,R.EntityType
+,R.EntityID
+,R.Entity2Type
+,R.Entity2ID
+,CASE coalesce((select char(linkcode,1) from opicm.metalinkattr 
+ where      Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = R.EntityType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+ ),'X') WHEN 'U' THEN 'D' WHEN 'D' THEN 'U' ELSE 'X' END    
+,EX.EntityType
+,EX.EntityID
+,E.Level
+,CASE WHEN EX.EffTo  > :EndDate AND EX.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,coalesce((select char(linkcode,1) from opicm.metalinkattr 
+    where       Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = EX.EntityType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+ ),'X') 
+,'E2'
+,EX.ValFrom
+,RTRIM(R.EntityType)
+FROM myList E
+INNER JOIN  opicm.EntityX EX ON
+    RTRIM(EX.Enterprise) = :Enterprise
+AND EX.EntityType = E.EntityType
+AND EX.Valfrom between :StartDate AND :EndDate
+INNER JOIN opicm.Relator R ON
+    RTRIM(R.Enterprise) = :Enterprise
+AND R.Entity2Type = EX.EntityType
+AND R.Entity2ID = EX.EntityID*1
+AND RTRIM(R.EntityType) = E.RelatorType
+AND R.ValFrom <= :EndDate AND :EndDate < R.ValTo
+AND R.EffFrom <= :EndDate AND :EndDate < R.EffTo
+JOIN opicm.trsNetterAtts A ON
+    R.Entity2Type = A.EntityType AND
+    R.Entity2ID = A.EntityID  AND
+    A.SessionID = :SessionID AND
+    A.Enterprise = :Enterprise
+WHERE
+    E.Class = 'E'
+AND E.Side = 'ET2'
+AND E.EntityType <> :TargetEntityType
+AND E.RelatorClass = 'Relator'
+--
+-- Backwards Association for now we comment out .. 
+-- We only care if the association flag has changed
+-- for this case.. for this entity
+--
+UNION ALL
+
+SELECT 
+ 1
+,EX.Enterprise
+,:SessionID
+,CASE WHEN E1.EffTo  > :EndDate AND E1.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,E.Level
+,E2.EntityType
+,E2.EntityID
+,E.RelatorType
+,EX.EntityID    
+,EX.EntityType
+,EX.EntityID
+,CASE coalesce((select char(linkcode,1) from opicm.metalinkattr 
+ where      Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = E.RelatorType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+ ),'X') WHEN 'U' THEN 'D' WHEN 'D' THEN 'U' ELSE 'X' END    
+,E.RelatorType
+,EX.EntityID
+,E.Level
+,CASE WHEN E1.EffTo  > :EndDate AND E1.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,coalesce((select char(linkcode,1) from opicm.metalinkattr 
+    where       Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = E.RelatorType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+ ),'X') 
+,'A'
+,EX.ValFrom
+,RTRIM(E.RelatorType)
+FROM myList E
+INNER JOIN  opicm.EntityX EX ON
+    RTRIM(EX.Enterprise) = :Enterprise
+AND EX.EntityType = E.EntityType
+AND EX.Valfrom between :StartDate AND :EndDate
+INNER JOIN opicm.MetaLinkAttr ML2 ON
+    ML2.Enterprise = :Enterprise
+AND RTRIM(ML2.LinkType) =  'Assoc/Attribute'
+AND ML2.LinkType1 = E.RelatorType
+AND ML2.LinkCode = 'Transform'
+AND ML2.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < ML2.ValTo 
+AND ML2.EffFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < ML2.EffTo
+INNER JOIN opicm.Flag E1 ON
+    E1.Enterprise = :Enterprise
+AND E1.EntityType = EX.EntityType
+AND E1.EntityID = EX.EntityID*1
+AND RTRIM(E1.AttributeCode) = ML2.LinkValue
+-- Need to pick up the turn offs here...
+AND (E1.ValFrom BETWEEN :StartDate and :EndDate OR  E1.Valto BETWEEN :StartDate and :EndDate)
+JOIN opicm.trsNetterAtts A ON
+    E1.EntityType = A.EntityType AND
+    E1.EntityID = A.EntityID  AND
+    A.SessionID = :SessionID AND
+    A.Enterprise = :Enterprise
+INNER JOIN opicm.Flag E2 ON
+    E2.Enterprise = :Enterprise
+AND E2.AttributeCode = ML2.LinkType2
+AND E2.AttributeValue = E1.AttributeValue
+AND E2.EntityType = E.OtherSideType
+AND E2.ValFrom <= :EndDate AND :EndDate < E2.ValTo 
+AND E2.EffFrom <= :EndDate AND :EndDate < E2.EffTo 
+WHERE
+    E.Class = 'E'
+AND E.Side = 'ET2'
+AND E.RelatorClass = 'Assoc'
+--
+-- Forward Association for now we comment out .. 
+-- We only care if the association flag has changed
+-- for this case.. for this entity
+--
+UNION ALL
+
+SELECT 
+ 1
+,EX.Enterprise
+,:SessionID
+,CASE WHEN E1.EffTo  > :EndDate AND E1.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,E.Level
+,EX.EntityType
+,EX.EntityID
+,E.RelatorType
+,E2.EntityID
+,E2.EntityType
+,E2.EntityID
+,CASE coalesce((select char(linkcode,1) from opicm.metalinkattr 
+ where      Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = E.RelatorType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+ ),'X') WHEN 'U' THEN 'D' WHEN 'D' THEN 'U' ELSE 'X' END    
+,E.RelatorType
+,E2.EntityID
+,E.Level
+,CASE WHEN E1.EffTo  > :EndDate AND E1.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,coalesce((select char(linkcode,1) from opicm.metalinkattr 
+    where       Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = E.RelatorType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+ ),'X') 
+,'A'
+,EX.ValFrom
+,RTRIM(E.RelatorType)
+FROM myList E
+INNER JOIN  opicm.EntityX EX ON
+    EX.Enterprise = :Enterprise
+AND EX.EntityType = E.EntityType
+AND EX.Valfrom between :StartDate AND :EndDate
+INNER JOIN opicm.MetaLinkAttr ML2 ON
+    ML2.Enterprise = :Enterprise
+AND RTRIM(ML2.LinkType) =  'Assoc/Attribute'
+AND ML2.LinkType1 = E.RelatorType
+AND ML2.LinkCode = 'Transform'
+AND ML2.ValFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < ML2.ValTo 
+AND ML2.EffFrom <= CURRENT TIMESTAMP AND CURRENT TIMESTAMP < ML2.EffTo
+INNER JOIN opicm.Flag E1 ON
+    E1.Enterprise = :Enterprise
+AND E1.EntityType = EX.EntityType
+AND E1.EntityID = EX.EntityID*1
+AND RTRIM(E1.AttributeCode) = ML2.LinkType2
+-- Need to pick up the turn offs here...
+AND (E1.ValFrom BETWEEN :StartDate and :EndDate OR  E1.Valto BETWEEN :StartDate and :EndDate)
+JOIN opicm.trsNetterAtts A ON
+    E1.EntityType = A.EntityType AND
+    E1.EntityID = A.EntityID  AND
+    A.SessionID = :SessionID AND
+    A.Enterprise = :Enterprise
+INNER JOIN opicm.Flag E2 ON
+    E2.Enterprise = :Enterprise
+AND E2.AttributeCode = ML2.LinkValue
+AND E2.AttributeValue = E1.AttributeValue
+AND E2.EntityType = E.OtherSideType
+AND E2.ValFrom <= :EndDate AND :EndDate < E2.ValTo 
+AND E2.EffFrom <= :EndDate AND :EndDate < E2.EffTo 
+WHERE
+    E.Class = 'E'
+AND E.Side = 'ET1'
+AND E.RelatorClass = 'Assoc'
+--
+-- Get the Relator stricktly for linking
+-- These seem to be ..on reletors..
+--
+
+UNION ALL
+SELECT
+ 1
+,RX.Enterprise
+,:SessionID
+,CASE WHEN RX.EffTo > :EndDate AND RX.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,E.Level
+,RX.Entity1Type
+,RX.Entity1ID
+,RX.EntityType
+,RX.EntityID
+,RX.Entity2Type
+,RX.Entity2ID
+,CASE coalesce((select char(linkcode,1) from opicm.metalinkattr 
+ where      Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = RX.EntityType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+ ),'X') WHEN 'U' THEN 'D' WHEN 'D' THEN 'U' ELSE 'X' END    
+,RX.EntityType
+,RX.EntityID
+,E.Level
+,CASE WHEN RX.EffTo > :EndDate AND RX.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,coalesce((select char(linkcode,1) from opicm.metalinkattr 
+    where       Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = RX.EntityType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+ ),'X') 
+,'R'
+,RX.ValFrom
+,RTRIM(RX.EntityType)
+FROM myList E
+INNER JOIN  opicm.RelatorX RX ON
+    RTRIM(RX.Enterprise) = :Enterprise
+AND RX.EntityType = E.EntityType
+AND RX.Valfrom BETWEEN :StartDate AND :EndDate
+WHERE
+    E.Class = 'R'
+AND E.Side = 'ET'
+--
+-- Get the Relator just in case attributes were changed  (Need this case)
+--
+UNION ALL
+SELECT 
+ 1
+,R.Enterprise
+,:SessionID
+,CASE WHEN EX.EffTo > :EndDate AND EX.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,E.Level
+,R.Entity1Type
+,R.Entity1ID
+,R.EntityType
+,R.EntityID
+,R.Entity2Type
+,R.Entity2ID
+,CASE coalesce((select char(linkcode,1) from opicm.metalinkattr 
+ where      Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = R.EntityType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+ ),'X') WHEN 'U' THEN 'D' WHEN 'D' THEN 'U' ELSE 'X' END    
+,R.EntityType
+,R.EntityID
+,E.Level
+,CASE WHEN EX.EffTo > :EndDate AND EX.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,coalesce((select char(linkcode,1) from opicm.metalinkattr 
+    where       Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = EX.EntityType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+ ),'X') 
+,'E'
+,EX.ValFrom
+,RTRIM(R.EntityType)
+FROM myList E
+INNER JOIN  opicm.EntityX EX ON
+    RTRIM(EX.Enterprise) = :Enterprise
+AND EX.EntityType = E.EntityType
+AND EX.Valfrom BETWEEN :StartDate AND :EndDate
+INNER JOIN opicm.Relator R ON
+    RTRIM(R.Enterprise) = :Enterprise
+AND RTRIM(R.EntityType) = EX.EntityType
+AND R.EntityID = EX.EntityID*1
+AND R.ValFrom <= :EndDate AND :EndDate < R.ValTo
+AND R.EffFrom <= :EndDate AND :EndDate < R.EffTo
+WHERE
+    E.Class = 'R'
+AND E.Side = 'ET'
+--
+-- Get The Target Level Entities
+--
+UNION ALL
+SELECT 
+ 1
+,EX.Enterprise
+,:SessionID
+,CASE WHEN EX.EffTo > :EndDate AND EX.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,E.Level
+,EX.EntityType
+,EX.EntityID
+,EX.EntityType
+,EX.EntityID
+,EX.EntityType
+,EX.EntityID
+,CASE coalesce((select char(linkcode,1) from opicm.metalinkattr 
+ where      Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = EX.EntityType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+ ),'X') WHEN 'U' THEN 'D' WHEN 'D' THEN 'U' ELSE 'X' END    
+,EX.EntityType
+,EX.EntityID
+,E.Level
+,CASE WHEN EX.EffTo > :EndDate AND EX.ValTo > :EndDate THEN 'ON' ELSE 'OFF' END
+,coalesce((select char(linkcode,1) from opicm.metalinkattr 
+    where       Enterprise = :Enterprise and 
+                        RTRIM(Linktype) = 'Action/Entity' and 
+                        Linktype1 = :ActionType and 
+                        Linktype2 = EX.EntityType and 
+                        int(LinkValue) = E.level and
+                        valto = :forever and
+                        effto > :now
+  ),'X') 
+,'T'
+,EX.ValFrom
+,''
+FROM myList E
+INNER JOIN  opicm.EntityX EX ON
+    RTRIM(EX.Enterprise) =  :Enterprise
+AND EX.EntityType = E.EntityType
+AND EX.Valfrom BETWEEN :StartDate AND :EndDate
+JOIN opicm.trsNetterAtts A ON
+    EX.EntityType = A.EntityType AND
+    EX.EntityID*1 = A.EntityID  AND
+    A.SessionID = :SessionID AND
+    A.Enterprise = :Enterprise
+WHERE
+    E.Class = 'E'
+AND E.Side = 'T'
+
+;
+
+EXEC SQL COMMIT WORK;
+
+EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+// fprintf(t,"GBL8102:%s Done with the trsNetterPass1 insert...\n",tstamp);
+
+//
+// Lets delete anything dup records that have both and R, A, E1, and E2.
+// R's and A's should win
+
+EXEC SQL
+delete from @t_schema.trsNetterPass1
+where
+    TYPE in ('E1','E2')
+and sessionid = :SessionID
+and enterprise = :Enterprise
+and (entitytype, entityid,corelevel)
+in (
+    select
+    entitytype,
+    entityid,
+    corelevel
+
+    from @t_schema.trsNetterPass1
+
+    where
+            sessionid = :SessionID
+    and enterprise = :Enterprise
+    and TYPE IN ('R','A')
+)
+;
+
+EXEC SQL COMMIT WORK;
+
+EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+// fprintf(t,"GBL8102:%s Done with the Delete of Mirror Entites...\n",tstamp);
+
+//
+//  Anything that says we are both on and off.. should be ON
+//  In theory you do not have an ON go to an OFF..
+//  We will be adding VALFROM's to the mix so we can track what happened/ when
+//
+//
+EXEC SQL
+delete from @t_schema.trsNetterPass1
+where
+       sessionid = :SessionID
+and enterprise = :Enterprise
+and tran = 'OFF'
+and marker = 1
+and (entitytype, entityid,corelevel)
+in (
+    select
+    entitytype,
+    entityid,
+    corelevel
+
+    from @t_schema.trsNetterPass1
+
+    where
+            sessionid = :SessionID
+    and enterprise = :Enterprise
+    and tran = 'ON'
+    and marker = 1
+)
+;
+
+EXEC SQL COMMIT WORK;
+
+EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+// fprintf(t,"GBL8102:%s Done with ON/OFF predicate Entities...\n",tstamp);
+
+
+// IF we have multile offs.. which you will get
+// lets only keep the one with the Max Valfrom
+//
+//
+//
+EXEC SQL
+delete from opicm.trsNetterPass1 N
+where
+       N.sessionid = :SessionID
+and N.enterprise = :Enterprise
+and N.tran = 'OFF'
+and N.marker = 1
+and (N.entitytype, N.entityid,N.corelevel)
+in (
+    select
+    entitytype,
+    entityid,
+    corelevel
+
+    from opicm.trsNetterPass1
+
+    where
+            sessionid = :SessionID
+    and enterprise = :Enterprise
+    and tran = 'OFF'
+    and marker = 1 
+                and valfrom > N.valfrom
+)
+
+;
+
+EXEC SQL COMMIT WORK;
+
+EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+// fprintf(t,"GBL8102:%s Done with OFF/OFF predicate Entities...\n",tstamp);
+
+
+// Provide some temp place holders for the information so we do not have nested SQL statements open.. etc.
+sqlint32 alLevel[150];
+sqlint32 alLeafLevel[300];
+char acFromEntity[150][34];
+char acToEntity[150][34];
+char acRelatorType[150][34];
+char acPDirection[150][2];
+char acDirection[150][2];
+char acCategory[150][2];
+char acRClass[150][34];
+
+EXEC SQL OPEN RevActionTemplate;
+track = 0;
+do {
+
+  EXEC SQL FETCH RevActionTemplate INTO :Level, :FromEntity, :ToEntity, :RelatorType, :PDirection, :Direction, :Category, :RClass;
+
+  if (SQLCODE != 0) break;
+
+  alLevel[track] = Level;
+  strcpy(acFromEntity[track],FromEntity);
+  strcpy(acToEntity[track], ToEntity);
+  strcpy(acRelatorType[track], RelatorType);
+  strcpy(acPDirection[track], PDirection);
+  strcpy(acDirection[track], Direction);
+  strcpy(acCategory[track], Category);
+  strcpy(acRClass[track], RClass);
+
+  track = track + 1;
+  
+} while (1);
+
+// Close and release resources
+EXEC SQL CLOSE RevActionTemplate WITH RELEASE;
+
+
+//
+//  Now .. lets build ourselves up here to discover the root
+//
+
+// Now lets loop through the control records and build out the rest of the the information
+// Now process the data
+for (i = 0; i < track;i++) {
+
+    // Pull all the attributes in
+  Level = alLevel[i];
+  strcpy(FromEntity,acFromEntity[i]);
+  strcpy(ToEntity,acToEntity[i]);
+    strcpy(RelatorType,acRelatorType[i]);
+    strcpy(PDirection,acPDirection[i]);
+    strcpy(Direction,acDirection[i]);
+    strcpy(Category,acCategory[i]);
+    strcpy(RClass,acRClass[i]);
+
+    EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+  // fprintf(t,"GBL8102:%s Path:%ld -->L:%ld FmE:%s ToE:%s Rel:%s PD:%s CD:%s CAT:%s CLS:%s\n", tstamp, i,Level, FromEntity, ToEntity, RelatorType, PDirection, Direction, Category, RClass);
+
+    if (Direction [0] == 'U' && PDirection [0] == 'U' && Category [0] == 'E')  {
+
+        EXEC SQL INSERT INTO @t_schema.trsNetterPass1
+            SELECT 
+             0
+            ,:Enterprise
+            ,:SessionID
+            ,N.Tran
+            ,:Level
+            ,R.Entity1Type
+            ,R.Entity1ID
+            ,R.EntityType
+            ,R.EntityID
+            ,R.Entity2Type
+            ,R.Entity2ID
+            ,CASE coalesce((select char(linkcode,1) from opicm.metalinkattr 
+                where       Enterprise = :Enterprise and 
+                                    Linktype = 'Action/Entity' and 
+                                    Linktype1 = :ActionType and 
+                                    Linktype2 = R.EntityType and 
+                                    int(LinkValue) = :Level and
+                                    valto = :forever and
+                                    effto > :now
+             ),'X') WHEN 'U' THEN 'D' WHEN 'D' THEN 'U' ELSE 'X' END    
+            ,COALESCE(N1.CoreType,N.CoreType)
+            ,COALESCE(N1.CoreID,N.CoreID)
+            ,COALESCE(N1.CORELEVEL,N.CORELEVEL)
+            ,COALESCE(N1.CORETRAN,N.CORETRAN)
+            ,COALESCE(N1.COREDIRECTION,N.COREDIRECTION)
+            ,COALESCE(N1.TYPE,N.TYPE)
+            ,COALESCE(N1.Valfrom,N.ValFrom)
+            ,COALESCE(N1.COREPATH, RTRIM(R.EntityType) || ':' || N.COREPATH)
+            FROM @t_schema.trsNetterPass1 N
+            INNER JOIN @t_schema.Relator R ON
+                 R.Enterprise = :Enterprise
+            AND R.EntityType = :RelatorType
+            AND R.Entity1Type = N.Entity2Type
+            AND R.Entity1ID = N.Entity2ID
+            AND R.ValFrom <= :EndDate and :EndDate < R.ValTo AND R.EffFrom <= :EndDate and :EndDate < R.EffTo
+            LEFT JOIN @t_schema.trsNetterPass1 N1 on
+                    N1.Enterprise = :Enterprise
+            AND N1.SessionID = :SessionID
+            AND N1.Marker = 1
+            AND N1.TYPE = 'R'
+            AND N1.CoreType = R.EntityType
+            AND N1.CoreID = R.EntityID
+            WHERE
+                N.Level = :Level + 1
+            AND N.SessionID = :SessionID
+            AND N.Entity2Type = :FromEntity
+            AND N.Enterprise = :Enterprise
+          ;
+
+            EXEC SQL COMMIT WORK;
+
+    } else if (Direction [0] == 'D' && PDirection [0] == 'D' && Category [0] == 'E') {
+
+      if (RClass[0] == 'R') {
+      
+            EXEC SQL INSERT INTO @t_schema.trsNetterPass1
+                SELECT 
+                 0
+                ,:Enterprise
+                ,:SessionID
+                ,N.Tran
+                ,:Level
+                ,R.Entity1Type
+                ,R.Entity1ID
+                ,R.EntityType
+                ,R.EntityID
+                ,R.Entity2Type
+                ,R.Entity2ID
+                ,CASE coalesce((select char(linkcode,1) from opicm.metalinkattr 
+                    where       Enterprise = :Enterprise and 
+                                    Linktype = 'Action/Entity' and 
+                                    Linktype1 = :ActionType and 
+                                    Linktype2 = R.EntityType and 
+                                    int(LinkValue) = :Level and
+                                    valto = :forever and
+                                    effto > :now
+                 ),'X') WHEN 'U' THEN 'D' WHEN 'D' THEN 'U' ELSE 'X' END    
+                ,COALESCE(N1.CoreType,N.CoreType)
+                ,COALESCE(N1.CoreID,N.CoreID)
+                ,COALESCE(N1.CORELEVEL,N.CORELEVEL)
+                ,COALESCE(N1.CORETRAN,N.CORETRAN)
+                ,COALESCE(N1.COREDIRECTION,N.COREDIRECTION)
+                ,COALESCE(N1.TYPE,N.TYPE)
+                ,COALESCE(N1.Valfrom,N.ValFrom)
+                ,COALESCE(N1.COREPATH, RTRIM(R.EntityType) || ':' || N.COREPATH)
+                FROM @t_schema.trsNetterPass1 N
+                INNER JOIN @t_schema.Relator R ON
+                        R.Enterprise = :Enterprise
+                AND R.EntityType = :RelatorType
+                AND R.Entity2Type = N.Entity1Type
+                AND R.Entity2ID = N.Entity1ID
+                AND R.ValFrom <= :EndDate and :EndDate < R.ValTo AND R.EffFrom <= :EndDate and :EndDate < R.EffTo
+                LEFT JOIN @t_schema.trsNetterPass1 N1 on
+                        N1.Enterprise = :Enterprise
+                AND N1.SessionID = :SessionID
+                AND N1.Marker = 1
+                AND N1.TYPE = 'R'
+                AND N1.CoreType = R.EntityType
+                AND N1.CoreID = R.EntityID
+                WHERE
+                    N.Level = :Level + 1
+                AND N.SessionID = :SessionID
+                AND N.Entity1Type = :ToEntity
+                AND N.Enterprise = :Enterprise
+              ;
+
+            } else {
+
+                //
+                // Its an association
+                //
+            
+                EXEC SQL INSERT INTO @t_schema.trsNetterPass1
+                SELECT 
+                 0
+                ,:Enterprise
+                ,:SessionID
+                ,N.Tran
+                ,:Level
+                ,E2.EntityType
+                ,E2.EntityID
+                ,:RelatorType
+                ,E2.EntityID
+                ,E.EntityType
+                ,E.EntityID
+            ,CASE coalesce((select char(linkcode,1) from opicm.metalinkattr 
+                where       Enterprise = :Enterprise and 
+                                    Linktype = 'Action/Entity' and 
+                                    Linktype1 = :ActionType and 
+                                    Linktype2 = :RelatorType and 
+                                    int(LinkValue) = :Level and
+                                    valto = :forever and
+                                    effto > :now
+             ),'X') WHEN 'U' THEN 'D' WHEN 'D' THEN 'U' ELSE 'X' END    
+                ,COALESCE(N1.CoreType,N.CoreType)
+                ,COALESCE(N1.CoreID,N.CoreID)
+                ,COALESCE(N1.CORELEVEL,N.CORELEVEL)
+                ,COALESCE(N1.CORETRAN,N.CORETRAN)
+                ,COALESCE(N1.COREDIRECTION,N.COREDIRECTION)
+                ,COALESCE(N1.TYPE,N.TYPE)
+                ,COALESCE(N1.Valfrom,N.ValFrom)
+                ,COALESCE(N1.COREPATH, RTRIM(:RelatorType) || ':' || N.COREPATH)
+                FROM @t_schema.trsNetterPass1 N
+                INNER JOIN @t_schema.Entity E ON
+                    E.Enterprise = :Enterprise
+                AND E.EntityType = N.Entity1Type
+                AND E.EntityID = N.Entity1ID
+                AND E.ValFrom <= :EndDate and :EndDate < E.ValTo AND E.EffFrom <= :EndDate and :EndDate < E.EffTo
+                INNER JOIN @t_schema.MetaLinkAttr ML2 ON
+                    ML2.Enterprise = :Enterprise
+                AND RTRIM(ML2.LinkType) =  'Assoc/Attribute'
+                AND ML2.LinkType1 = :RelatorType
+                AND ML2.LinkCode = 'Transform'
+                AND ML2.ValFrom <= :EndDate AND :EndDate < ML2.ValTo AND ML2.EffFrom <= :EndDate AND :EndDate < ML2.EffTo
+                INNER JOIN @t_schema.Flag E1 ON
+                    E1.Enterprise = :Enterprise
+                AND E1.EntityType = E.EntityType
+                AND E1.EntityID = E.EntityID
+                AND E1.AttributeCode = ML2.LinkValue
+                AND E1.ValFrom <= :EndDate and :EndDate < E1.ValTo AND E1.EffFrom <= :EndDate and :EndDate < E1.EffTo
+                INNER JOIN @t_schema.Flag E2 ON
+                    E2.Enterprise = :Enterprise
+                AND E2.AttributeCode = ML2.LinkType2
+                AND E2.AttributeValue = E1.AttributeValue
+                AND E2.EntityType = :FromEntity
+                AND E2.ValFrom <= :EndDate AND :EndDate < E2.ValTo AND E2.EffFrom <= :EndDate AND :EndDate < E2.EffTo 
+                LEFT JOIN @t_schema.trsNetterPass1 N1 on
+                        N1.Enterprise = :Enterprise
+                AND N1.SessionID = :SessionID
+                AND N1.Marker = 1
+                AND N1.TYPE IN ('A')
+                AND N1.CoreType = :RelatorType
+                AND N1.CoreID = E.EntityID
+                WHERE 
+                    N.Level = :Level + 1
+                AND N.SessionID = :SessionID
+                AND N.Entity1Type = :ToEntity
+                AND N.Enterprise = :Enterprise
+            ;   
+    
+        }
+
+        EXEC SQL COMMIT WORK;
+
+
+    } else if (Direction [0] == 'D' && PDirection [0] == 'U' && Category [0] == 'E') {
+
+    if (RClass[0] == 'R') {
+
+            EXEC SQL INSERT INTO @t_schema.trsNetterPass1
+                SELECT 
+                 0
+                ,:Enterprise
+                ,:SessionID
+                ,N.Tran
+                ,:Level
+                ,R.Entity1Type
+                ,R.Entity1ID
+                ,R.EntityType
+                ,R.EntityID
+                ,R.Entity2Type
+                ,R.Entity2ID
+              ,CASE coalesce((select char(linkcode,1) from opicm.metalinkattr 
+                where       Enterprise = :Enterprise and 
+                                    Linktype = 'Action/Entity' and 
+                                    Linktype1 = :ActionType and 
+                                    Linktype2 = R.EntityType and 
+                                    int(LinkValue) = :Level and
+                                    valto = :forever and
+                                    effto > :now
+             ),'X') WHEN 'U' THEN 'D' WHEN 'D' THEN 'U' ELSE 'X' END    
+                ,COALESCE(N1.CoreType,N.CoreType)
+                ,COALESCE(N1.CoreID,N.CoreID)
+                ,COALESCE(N1.CORELEVEL,N.CORELEVEL)
+                ,COALESCE(N1.CORETRAN,N.CORETRAN)
+                ,COALESCE(N1.COREDIRECTION,N.COREDIRECTION)
+                ,COALESCE(N1.TYPE,N.TYPE)
+                ,COALESCE(N1.Valfrom,N.ValFrom)
+                ,COALESCE(N1.COREPATH, RTRIM(R.EntityType) || ':' || N.COREPATH)
+                FROM @t_schema.trsNetterPass1 N
+                INNER JOIN @t_schema.Relator R ON
+                     R.Enterprise = :Enterprise
+                AND R.EntityType = :RelatorType
+                AND R.Entity2Type = N.Entity2Type
+                AND R.Entity2ID = N.Entity2ID
+                AND R.ValFrom <= :EndDate and :EndDate < R.ValTo AND R.EffFrom <= :EndDate and :EndDate < R.EffTo
+                LEFT JOIN @t_schema.trsNetterPass1 N1 on
+                        N1.Enterprise = :Enterprise
+                AND N1.SessionID = :SessionID
+                AND N1.Marker = 1
+                AND N1.TYPE = 'R'
+                AND N1.CoreType = R.EntityType
+                AND N1.CoreID = R.EntityID
+                WHERE
+                      N.Level = :Level + 1
+                AND N.SessionID = :SessionID
+                AND N.Entity2Type = :ToEntity
+                AND N.Enterprise = :Enterprise 
+    
+        ;   
+        
+        } else {
+        
+            //
+            // Its an association
+            //
+
+            EXEC SQL INSERT INTO @t_schema.trsNetterPass1
+            SELECT 
+             0
+            ,:Enterprise
+            ,:SessionID
+            ,N.Tran
+            ,:Level
+            ,E2.EntityType
+            ,E2.EntityID
+            ,:RelatorType
+            ,E.EntityID
+            ,E.EntityType
+            ,E.EntityID
+              ,CASE coalesce((select char(linkcode,1) from opicm.metalinkattr 
+                where       Enterprise = :Enterprise and 
+                                    Linktype = 'Action/Entity' and 
+                                    Linktype1 = :ActionType and 
+                                    Linktype2 = :RelatorType and 
+                                    int(LinkValue) = :Level and
+                                    valto = :forever and
+                                    effto > :now
+             ),'X') WHEN 'U' THEN 'D' WHEN 'D' THEN 'U' ELSE 'X' END    
+            ,COALESCE(N1.CoreType,N.CoreType)
+            ,COALESCE(N1.CoreID,N.CoreID)
+            ,COALESCE(N1.CORELEVEL,N.CORELEVEL)
+            ,COALESCE(N1.CORETRAN,N.CORETRAN)
+            ,COALESCE(N1.COREDIRECTION,N.COREDIRECTION)
+            ,COALESCE(N1.TYPE,N.TYPE)
+            ,COALESCE(N1.Valfrom,N.ValFrom)
+            ,COALESCE(N1.COREPATH, RTRIM(:RelatorType) || ':' || N.COREPATH)
+            FROM @t_schema.trsNetterPass1 N
+            INNER JOIN @t_schema.Entity E ON
+                E.Enterprise = :Enterprise
+            AND E.EntityType = N.Entity2Type
+            AND E.EntityID = N.Entity2ID
+            AND E.ValFrom <= :EndDate and :EndDate < E.ValTo AND E.EffFrom <= :EndDate and :EndDate < E.EffTo
+            INNER JOIN @t_schema.MetaLinkAttr ML2 ON
+                ML2.Enterprise = :Enterprise
+            AND RTRIM(ML2.LinkType) =  'Assoc/Attribute'
+            AND ML2.LinkType1 = :RelatorType
+            AND ML2.LinkCode = 'Transform'
+            AND ML2.ValFrom <= :EndDate AND :EndDate < ML2.ValTo AND ML2.EffFrom <= :EndDate AND :EndDate < ML2.EffTo
+            INNER JOIN @t_schema.Flag E1 ON
+                E1.Enterprise = :Enterprise
+            AND E1.EntityType = E.EntityType
+            AND E1.EntityID = E.EntityID
+            AND E1.AttributeCode = ML2.LinkValue
+            AND E1.ValFrom <= :EndDate and :EndDate < E1.ValTo AND E1.EffFrom <= :EndDate and :EndDate < E1.EffTo
+            INNER JOIN @t_schema.Flag E2 ON
+                E2.Enterprise = :Enterprise
+            AND E2.AttributeCode = ML2.LinkType2
+            AND E2.AttributeValue = E1.AttributeValue
+            AND E2.EntityType = :FromEntity
+            AND E2.ValFrom <= :EndDate AND :EndDate < E2.ValTo AND E2.EffFrom <= :EndDate AND :EndDate < E2.EffTo 
+            LEFT JOIN @t_schema.trsNetterPass1 N1 on
+                    N1.Enterprise = :Enterprise
+            AND N1.SessionID = :SessionID
+            AND N1.Marker = 1
+            AND N1.TYPE IN ('A')
+            AND N1.CoreType = :RelatorType
+            AND N1.CoreID = E.EntityID
+            WHERE 
+                N.Level = :Level + 1
+            AND N.SessionID = :SessionID
+            AND N.Entity2Type = :ToEntity
+            AND N.Enterprise = :Enterprise
+            ;
+    
+        }
+        
+        EXEC SQL COMMIT WORK;
+
+
+    } else if (Direction [0] == 'U' && PDirection [0] == 'D' && Category [0] == 'E') {
+
+        EXEC SQL INSERT INTO @t_schema.trsNetterPass1
+            SELECT 
+             0
+            ,:Enterprise
+            ,:SessionID
+            ,N.Tran
+            ,:Level
+            ,R.Entity1Type
+            ,R.Entity1ID
+            ,R.EntityType
+            ,R.EntityID
+            ,R.Entity2Type
+            ,R.Entity2ID
+          ,CASE coalesce((select char(linkcode,1) from opicm.metalinkattr 
+                where       Enterprise = :Enterprise and 
+                                    Linktype = 'Action/Entity' and 
+                                    Linktype1 = :ActionType and 
+                                    Linktype2 = R.EntityType and 
+                                    int(LinkValue) = :Level and
+                                    valto = :forever and
+                                    effto > :now
+             ),'X') WHEN 'U' THEN 'D' WHEN 'D' THEN 'U' ELSE 'X' END    
+             
+            ,COALESCE(N1.CoreType,N.CoreType)
+            ,COALESCE(N1.CoreID,N.CoreID)
+            ,COALESCE(N1.CORELEVEL,N.CORELEVEL)
+            ,COALESCE(N1.CORETRAN,N.CORETRAN)
+            ,COALESCE(N1.COREDIRECTION,N.COREDIRECTION)
+            ,COALESCE(N1.TYPE,N.TYPE)
+            ,COALESCE(N1.Valfrom,N.ValFrom)
+            ,COALESCE(N1.COREPATH, RTRIM(R.EntityType) || ':' || N.COREPATH)
+            FROM @t_schema.trsNetterPass1 N
+            INNER JOIN @t_schema.Relator R ON
+                R.Enterprise = :Enterprise
+            AND R.EntityType = :RelatorType
+            AND R.Entity1Type = N.Entity1Type
+            AND R.Entity1ID = N.Entity1ID
+            AND R.ValFrom <= :EndDate and :EndDate < R.ValTo AND R.EffFrom <= :EndDate and :EndDate < R.EffTo
+            LEFT JOIN @t_schema.trsNetterPass1 N1 on
+                    N1.Enterprise = :Enterprise
+            AND N1.SessionID = :SessionID
+            AND N1.Marker = 1
+            AND N1.TYPE = 'R'
+            AND N1.CoreType = R.EntityType
+            AND N1.CoreID = R.EntityID
+            WHERE
+                  N.Level = :Level + 1
+            AND N.SessionID = :SessionID
+            AND N.Entity1Type = :FromEntity
+            AND N.Enterprise = :Enterprise
+      ;
+
+        EXEC SQL COMMIT WORK;
+    }
+};
+
+
+// Now.. we need to insert anything that has a R as a TYPE.. 
+// trsExplode Net Changes
+// Then run a Navigate Look alike below
+// when we are done. will will have all the entities and
+// relators for that Anchor
+// and we can add them to all the ones from above
+
+// Adds and Changes for the VE into trsNetterPass1
+EXEC SQL delete from @t_schema.trsNetterPass2 where sessionid = :SessionID and Enterprise = :Enterprise
+;
+
+// Adds and Changes for the VE into trsNetterPass1
+EXEC SQL delete from @t_schema.trsNetterFinal where sessionid = :SessionID and Enterprise = :Enterprise
+;
+
+EXEC SQL COMMIT WORK;
+
+// O.K.  Lets write some final answers here in the mix
+// We need all Entities that survived back to a root
+// and all relators.. since they need to be reported on
+// only skip associations.. since no real data exists on them
+// 
+
+EXEC SQL insert into @t_schema.trsNetterFinal 
+select  
+:Enterprise
+,SessionID
+,:ActionType
+,:StartDate
+,:EndDate
+,ValFrom
+,case direction when 'D' THEN  Entity2Type Else Entity1Type END
+,case direction when 'D' THEN  Entity2ID Else Entity1ID END
+,Tran
+,coreType
+,coreID
+,coreTran
+,coreLevel
+,case type when 'E' then 'R' WHEN 'R' THEN 'R' ELSE 'E' END
+,corePath
+ from @t_schema.trsNetterPass1 
+ where 
+         level = 0 
+ and Enterprise = :Enterprise
+ and SessionID = :SessionID
+ and type not in ('A')
+; 
+
+EXEC SQL COMMIT WORK;
+
+
+
+// O.K. Lets seed the Explosion table with all the relator churn.
+// We will have to do something different.. when we have a relator meet a relator
+// its not as easy as picking off simply the end.. you may have a tBone 
+// scenario
+
+EXEC SQL insert into @t_schema.trsNetterPass2 
+select
+ :Enterprise
+,:SessionID
+,:ActionType
+,N.coreLevel
+,N.coreDirection
+,'X'
+,case N.coreDirection when 'U' then R.Entity1Type else 'NOOP' END
+,case N.coreDirection when 'U' then  R.Entity1ID else 0 END
+,case N.coreDirection when 'T'  then R.EntityType else 'NOOP' END
+,case N.coreDirection when 'T' then R.EntityID else 0 END
+,case N.coreDirection when 'D' then R.Entity2Type else 'NOOP' END
+,case N.coreDirection when 'D' then R.Entity2ID else 0 END
+,N.CoreTran
+,N.ValFrom
+,case N.direction when 'D' THEN  N.Entity2Type  Else N.Entity1Type END
+,case N.direction when 'D' THEN  N.Entity2ID Else N.Entity1ID END
+,N.TRAN as RootTRAN
+,N.CorePath
+from opicm.trsNetterPass1  N
+ --
+ -- Just get me a valid Relator
+ -- Do not care if its on or off
+ -- We just need one of the ends to start us off
+ join opicm.Relator R ON
+     R.Enterprise = :Enterprise
+ AND  R.EntityType =  N.CoreType
+ AND  R.EntityID = N.CoreID
+ AND  R.Valto = :forever
+ where 
+    N.level = 0 and 
+    N.Enterprise = :Enterprise and
+    N.SessionID = :SessionID and
+    N.type in  ('R') 
+;
+
+
+EXEC SQL COMMIT WORK;
+
+// O.K. Lets seed the Explosion table with all the relator churn.
+
+EXEC SQL insert into @t_schema.trsNetterPass2 
+select DISTINCT
+ :Enterprise
+,:SessionID
+,:ActionType
+,N.Level
+,N.Direction
+,'X'
+,case N.coreDirection when 'U' then R.Entity1Type else 'NOOP' END
+,case N.coreDirection when 'U' then  R.Entity1ID else 0 END
+,case N.coreDirection when 'T'  then R.EntityType else 'NOOP' END
+,case N.coreDirection when 'T' then R.EntityID else 0 END
+,case N.coreDirection when 'D' then R.Entity2Type else 'NOOP' END
+,case N.coreDirection when 'D' then R.Entity2ID else 0 END
+,N.CoreTran
+,N.ValFrom
+,case N.direction when 'D' THEN  N.Entity2Type  Else N.Entity1Type END
+,case N.direction when 'D' THEN  N.Entity2ID Else N.Entity1ID END
+,N.TRAN as RootTRAN
+,N.CorePath
+from opicm.trsNetterPass1  N
+ --
+ -- Just get me a valid Relator
+ -- Do not care if its on or off
+ -- We just need one of the ends to start us off
+ join opicm.trsNetterPass1 R ON
+     R.Enterprise = :Enterprise
+ AND  R.EntityType =  N.CoreType
+ AND  R.SessionID = :SessionID
+ AND  R.EntityID = N.CoreID
+ where N.level = 0 and N.type in  ('A') 
+;
+
+
+EXEC SQL COMMIT WORK;
+
+
+genfullimage:
+
+EXEC SQL OPEN ActionTemplate;
+track = 0;
+do {
+
+  EXEC SQL FETCH ActionTemplate INTO :Level, :LeafLevel, :FromEntity, :ToEntity, :RelatorType, :PDirection, :Direction, :Category, :RClass;
+
+  if (SQLCODE != 0) break;
+
+  alLevel[track] = Level;
+  alLeafLevel[track] = LeafLevel;
+  strcpy(acFromEntity[track],FromEntity);
+  strcpy(acToEntity[track], ToEntity);
+  strcpy(acRelatorType[track], RelatorType);
+  strcpy(acPDirection[track], PDirection);
+  strcpy(acDirection[track], Direction);
+  strcpy(acCategory[track], Category);
+  strcpy(acRClass[track], RClass);
+
+  track = track + 1;
+
+} while (1);
+
+// Close and release resources
+EXEC SQL CLOSE ActionTemplate WITH RELEASE;
+EXEC SQL COMMIT WORK;
+
+// Now process the data
+for (i = 0; i < track;i++) {
+
+// Pull all the attributes in
+  Level = alLevel[i];
+  LeafLevel = alLeafLevel[i];
+  strcpy(FromEntity,acFromEntity[i]);
+  strcpy(ToEntity,acToEntity[i]);
+  strcpy(RelatorType,acRelatorType[i]);
+  strcpy(PDirection,acPDirection[i]);
+  strcpy(Direction,acDirection[i]);
+  strcpy(Category,acCategory[i]);
+  strcpy(RClass,acRClass[i]);
+
+  // Debug
+
+  // fprintf(t,"GBL8102:%s %ld -->L:%ld LL:%ld FE:%s TE:%s RT:%s PD:%s CD:%s CAT:%s CLS:%s\n", tstamp,
+  //  i,Level, LeafLevel, FromEntity, ToEntity, RelatorType, PDirection, Direction, Category, RClass);
+
+  if (PDirection [0] == 'D' && Direction [0] == 'D' && Category [0] == 'E') {
+
+    if (RClass[0] == 'R') {
+
+      EXEC SQL INSERT INTO @t_schema.trsNetterPass2
+      SELECT DISTINCT
+      :Enterprise
+      ,:SessionID
+      ,:ActionType
+      ,:Level
+      ,:Direction
+      ,:PDirection
+      ,R.Entity1Type
+      ,R.Entity1ID
+      ,R.EntityType
+      ,R.EntityID
+      ,R.Entity2Type
+      ,R.Entity2ID
+      ,CASE N.TRAN WHEN 'OFF' THEN 'OFF' ELSE (
+            CASE WHEN R.EffTo > :EndDate THEN 'ON' ELSE 'OFF'
+            END) 
+       END
+      ,R.ValFrom
+      ,N.RootType
+      ,N.RootID
+      ,N.RootTran
+      ,CASE N.PATH WHEN '' THEN RTRIM(R.EntityType) ELSE  N.Path || ':' || RTRIM(R.EntityType) END
+      FROM @t_schema.trsNetterPass2 N
+      INNER JOIN @t_schema.Relator R ON
+          R.Enterprise = :Enterprise
+      AND R.EntityType = :RelatorType
+      AND R.EntityID > 0
+      AND R.Entity1Type = N.Entity2Type
+      AND (R.Entity1ID = N.Entity2ID AND R.Entity1ID > 0)
+      AND R.Entity2ID > 0
+      AND R.Valto = :forever  AND R.EffTo > :StartDate
+      --AND R.ValFrom < :EndDate AND :EndDate < R.ValTo
+      WHERE
+          N.SessionID = :SessionID
+      AND N.Level = :Level -1
+      AND N.MyDirection = (CASE
+        WHEN N.MyDirection = 'X' THEN 'X'
+        ELSE :PDirection END)
+      AND N.Entity2Type = :FromEntity
+      AND N.Enterprise = :Enterprise
+
+    ;
+    
+   } else {    // It an association...
+
+      EXEC SQL INSERT INTO @t_schema.trsNetterPass2
+      SELECT DISTINCT
+      :Enterprise
+      ,:SessionID
+      ,:ActionType
+      ,:Level
+      ,:Direction
+      ,:PDirection
+      ,E1.EntityType
+      ,E1.EntityID
+      ,:RelatorType
+      ,E2.EntityID
+      ,E2.EntityType
+      ,E2.EntityID
+      ,CASE N.TRAN WHEN 'OFF' THEN 'OFF' ELSE (
+            CASE WHEN E1.EffTo > :EndDate THEN 'ON' ELSE 'OFF'
+            END) 
+       END
+      ,E1.ValFrom
+      ,N.RootType
+      ,N.RootID
+      ,N.RootTran
+      ,CASE N.PATH WHEN '' THEN RTRIM(:RelatorType) ELSE  N.Path || ':' || RTRIM(:RelatorType) END
+      FROM @t_schema.trsNetterPass2 N
+      INNER JOIN @t_schema.MetaLinkAttr ML2 ON
+          ML2.Enterprise = :Enterprise
+      AND RTRIM(ML2.LinkType) =  'Assoc/Attribute'
+      AND ML2.LinkType1 = :RelatorType
+      AND ML2.LinkCode = 'Transform'
+      AND ML2.ValFrom <= :EndDate AND :EndDate < ML2.ValTo AND ML2.EffFrom <= :EndDate AND :EndDate < ML2.EffTo
+      INNER JOIN @t_schema.Flag E1 ON
+          E1.Enterprise = :Enterprise
+      AND E1.EntityType = N.Entity2Type
+      AND (E1.EntityID = N.Entity2ID AND E1.EntityID > 0)
+      AND E1.AttributeCode = ML2.LinkType2
+      AND E1.ValFrom < :EndDate AND :EndDate < E1.ValTo
+      INNER JOIN @t_schema.Flag E2 ON
+          E2.Enterprise = :Enterprise
+      AND E2.AttributeCode = ML2.LinkValue
+      AND E2.AttributeValue = E1.AttributeValue
+      AND E2.EntityType = :ToEntity
+      AND E2.EntityID > 0
+      AND E2.ValFrom <= :EndDate AND :EndDate < E2.ValTo AND E2.EffFrom <= :EndDate AND :EndDate < E2.EffTo
+      WHERE
+          N.SessionID = :SessionID
+      AND N.Level = :Level -1
+      AND N.MyDirection = (CASE
+        WHEN N.MyDirection = 'X' THEN 'X'
+        ELSE :PDirection END)
+      AND N.Entity2Type = :FromEntity
+      ;
+
+    }
+
+  } else if (PDirection [0] == 'U' && Direction [0] == 'U' && Category[0] == 'E') {
+
+    if (RClass[0] == 'R') {
+
+      EXEC SQL INSERT INTO @t_schema.trsNetterPass2
+      SELECT DISTINCT
+      :Enterprise
+      ,:SessionID
+      ,:ActionType
+      ,:Level
+      ,:Direction
+      ,:PDirection
+      ,R.Entity1Type
+      ,R.Entity1ID
+      ,R.EntityType
+      ,R.EntityID
+      ,R.Entity2Type
+      ,R.Entity2ID
+      ,CASE N.TRAN WHEN 'OFF' THEN 'OFF' ELSE (
+            CASE WHEN R.EffTo > :EndDate THEN 'ON' ELSE 'OFF'
+            END) 
+       END
+      ,R.ValFrom
+      ,N.RootType
+      ,N.RootID
+      ,N.RootTran
+      ,CASE N.PATH WHEN '' THEN RTRIM(R.EntityType) ELSE  N.Path || ':' || RTRIM(R.EntityType) END
+      FROM @t_schema.trsNetterPass2 N
+      INNER JOIN @t_schema.Relator R ON
+          R.Enterprise = :Enterprise
+      AND R.EntityType = :RelatorType
+      AND R.EntityID > 0
+      AND R.Entity1ID > 0
+      AND R.Entity2Type = N.Entity1Type
+      AND (R.Entity2ID = N.Entity1ID AND R.Entity2ID > 0)
+      AND R.Valto = :forever  AND R.EffTo > :StartDate
+      --AND R.ValFrom < :EndDate AND :EndDate < R.ValTo
+      WHERE
+          N.SessionID = :SessionID
+      AND N.Level = :Level -1
+      AND N.MyDirection = (
+          CASE
+            WHEN N.MyDirection = 'X' THEN 'X'
+          ELSE :PDirection END)
+      AND N.Entity1Type = :ToEntity
+      AND N.Enterprise = :Enterprise
+      ;
+   }
+
+  } else if (PDirection [0] == 'U' && Direction [0] == 'D'  && Category[0] == 'E') {
+
+    if (RClass [0] == 'R') {
+
+      EXEC SQL INSERT INTO @t_schema.trsNetterPass2
+      SELECT DISTINCT
+      :Enterprise
+      ,:SessionID
+      ,:ActionType
+      ,:Level
+      ,:Direction
+      ,:PDirection
+      ,R.Entity1Type
+      ,R.Entity1ID
+      ,R.EntityType
+      ,R.EntityID
+      ,R.Entity2Type
+      ,R.Entity2ID
+      ,CASE N.TRAN WHEN 'OFF' THEN 'OFF' ELSE (
+            CASE WHEN R.EffTo > :EndDate THEN 'ON' ELSE 'OFF'
+            END) 
+       END
+      ,R.ValFrom
+      ,N.RootType
+      ,N.RootID
+      ,N.RootTran
+      ,CASE N.PATH WHEN '' THEN RTRIM(R.EntityType) ELSE  N.Path || ':' || RTRIM(R.EntityType) END
+     
+      FROM @t_schema.trsNetterPass2 N
+      INNER JOIN @t_schema.Relator R ON
+          R.Enterprise = :Enterprise
+      AND R.EntityType = :RelatorType
+      AND R.EntityID > 0
+      AND R.Entity1Type = N.Entity1Type
+      AND (R.Entity1ID = N.Entity1ID AND R.Entity1ID > 0)
+      AND R.Entity2ID > 0
+      AND R.Valto = :forever  AND R.EffTo > :StartDate
+      --AND R.ValFrom < :EndDate AND :EndDate < R.ValTo
+      --AND R.ValFrom < :EndDate AND :EndDate < R.ValTo
+      WHERE
+          N.SessionID = :SessionID
+      AND N.Level = :Level -1
+      AND N.MyDirection = (
+          CASE
+            WHEN N.MyDirection = 'X' THEN 'X'
+          ELSE :PDirection END)
+      AND N.Entity1Type = :FromEntity
+      AND N.Enterprise = :Enterprise
+
+        ;
+        
+   } else {    // It an association...
+
+      EXEC SQL INSERT INTO @t_schema.trsNetterPass2
+      SELECT DISTINCT
+      :Enterprise
+      ,:SessionID
+      ,:ActionType
+      ,:Level
+      ,:Direction
+      ,:PDirection
+      ,E1.EntityType
+      ,E1.EntityID
+      ,:RelatorType
+      ,E2.EntityID
+      ,E2.EntityType
+      ,E2.EntityID
+      ,CASE N.TRAN WHEN 'OFF' THEN 'OFF' ELSE (
+            CASE WHEN E1.EffTo > :EndDate THEN 'ON' ELSE 'OFF'
+            END) 
+       END
+      ,E1.ValFrom
+      ,N.RootType
+      ,N.RootID
+      ,N.RootTran
+      ,CASE N.PATH WHEN '' THEN RTRIM(:RelatorType) ELSE  N.Path || ':' || RTRIM(:RelatorType) END
+      FROM @t_schema.trsNetterPass2 N
+      INNER JOIN @t_schema.MetaLinkAttr ML2 ON
+          ML2.Enterprise = :Enterprise
+      AND RTRIM(ML2.LinkType) =  'Assoc/Attribute'
+      AND ML2.LinkType1 = :RelatorType
+      AND ML2.LinkCode = 'Transform'
+      AND ML2.ValFrom <= :EndDate AND :EndDate < ML2.ValTo AND ML2.EffFrom <= :EndDate AND :EndDate < ML2.EffTo
+      INNER JOIN @t_schema.Flag E1 ON
+          E1.Enterprise = :Enterprise
+      AND E1.EntityType = N.Entity1Type
+      AND (E1.EntityID = N.Entity1ID AND E1.EntityID > 0)
+      AND E1.AttributeCode = ML2.LinkType2
+      AND E1.ValFrom < :EndDate AND :EndDate < E1.ValTo
+      INNER JOIN @t_schema.Flag E2 ON
+          E2.Enterprise = :Enterprise
+      AND E2.AttributeCode = ML2.LinkValue
+      AND E2.AttributeValue = E1.AttributeValue
+      AND E2.EntityType = :ToEntity
+      AND E2.EntityID > 0
+      AND E2.ValFrom <= :EndDate AND :EndDate < E2.ValTo AND E2.EffFrom <= :EndDate AND :EndDate < E2.EffTo
+      WHERE
+          N.SessionID = :SessionID
+      AND N.Level = :Level -1
+      AND N.MyDirection = (CASE
+        WHEN N.MyDirection = 'X' THEN 'X'
+        ELSE :PDirection END)
+      AND N.Entity1Type = :FromEntity
+      ;
+
+    }
+        
+ } else if (PDirection [0] == 'D' && Direction [0] == 'U' && Category[0] == 'E') {
+
+    if (RClass [0] == 'R') {
+      EXEC SQL INSERT INTO @t_schema.trsNetterPass2
+      SELECT DISTINCT
+      :Enterprise
+      ,:SessionID
+      ,:ActionType
+      ,:Level
+      ,:Direction
+      ,:PDirection
+      ,R.Entity1Type
+      ,R.Entity1ID
+      ,R.EntityType
+      ,R.EntityID
+      ,R.Entity2Type
+      ,R.Entity2ID
+      ,CASE N.TRAN WHEN 'OFF' THEN 'OFF' ELSE (
+            CASE WHEN R.EffTo > :EndDate THEN 'ON' ELSE 'OFF'
+            END) 
+       END
+      ,R.ValFrom
+      ,N.RootType
+      ,N.RootID
+      ,N.RootTran
+      ,CASE N.PATH WHEN '' THEN RTRIM(R.EntityType) ELSE  N.Path || ':' || RTRIM(R.EntityType) END
+     
+      FROM @t_schema.trsNetterPass2 N
+       INNER JOIN @t_schema.Relator R ON
+           R.Enterprise = :Enterprise
+       AND R.EntityType = :RelatorType
+       AND R.EntityID > 0
+       AND R.Entity1ID > 0
+       AND R.Entity2Type = N.Entity2Type
+       AND (R.Entity2ID = N.Entity2ID AND R.Entity2ID > 0)
+       AND R.Valto = :forever  AND R.EffTo > :StartDate
+      --AND R.ValFrom < :EndDate AND :EndDate < R.ValTo
+      WHERE
+          N.SessionID = :SessionID
+      AND N.Level = :Level -1
+      AND N.MyDirection = (
+          CASE
+            WHEN N.MyDirection = 'X' THEN 'X'
+          ELSE :PDirection END)
+      AND N.Entity2Type = :ToEntity
+      AND N.Enterprise = :Enterprise
+
+     ;
+    }
+
+  } else if (Category[0] == 'R' && Direction[0] == 'U') {
+
+    if (RClass [0] == 'R') {
+
+      EXEC SQL INSERT INTO @t_schema.trsNetterPass2
+      SELECT DISTINCT
+      :Enterprise
+      ,:SessionID
+      ,:ActionType
+      ,:Level
+      ,:Direction
+      ,:PDirection
+      ,R.Entity1Type
+      ,R.Entity1ID
+      ,R.EntityType
+      ,R.EntityID
+      ,R.Entity2Type
+      ,R.Entity2ID
+      ,CASE N.TRAN WHEN 'OFF' THEN 'OFF' ELSE (
+            CASE WHEN R.EffTo > :EndDate THEN 'ON' ELSE 'OFF'
+            END) 
+       END
+      ,R.ValFrom
+      ,N.RootType
+      ,N.RootID
+      ,N.RootTran
+      ,CASE N.PATH WHEN '' THEN RTRIM(R.EntityType) ELSE  N.Path || ':' || RTRIM(R.EntityType) END
+      
+      FROM @t_schema.trsNetterPass2 N
+      INNER JOIN @t_schema.Relator R ON
+           R.Enterprise = :Enterprise
+      AND R.EntityType = :RelatorType
+      AND R.EntityID > 0
+      AND R.Entity1Type = N.EntityType
+      AND (R.Entity1ID = N.EntityID AND R.Entity1ID > 0)
+      AND R.Entity2ID > 0
+      AND R.Valto = :forever  AND R.EffTo > :StartDate
+      --AND R.ValFrom < :EndDate AND :EndDate < R.ValTo
+      WHERE
+           N.SessionID = :SessionID
+      AND N.Level = :Level -1
+      AND N.EntityType = :FromEntity
+      AND N.Enterprise = :Enterprise
+      ;
+    }
+  } else if (Category[0] == 'R' && Direction[0] == 'D') {
+
+    if (RClass [0] == 'R') {
+
+      EXEC SQL INSERT INTO @t_schema.trsNetterPass2
+      SELECT DISTINCT
+      :Enterprise
+      ,:SessionID
+      ,:ActionType
+      ,:Level
+      ,:Direction
+      ,:PDirection
+      ,R.Entity1Type
+      ,R.Entity1ID
+      ,R.EntityType
+      ,R.EntityID
+      ,R.Entity2Type
+      ,R.Entity2ID
+      ,CASE N.TRAN WHEN 'OFF' THEN 'OFF' ELSE (
+            CASE WHEN R.EffTo > :EndDate THEN 'ON' ELSE 'OFF'
+            END) 
+       END
+      ,R.ValFrom
+      ,N.RootType
+      ,N.RootID
+      ,N.RootTran
+      ,CASE N.PATH WHEN ''THEN RTRIM(R.EntityType) ELSE  N.Path || ':' || RTRIM(R.EntityType) END
+     
+      FROM @t_schema.trsNetterPass2 N
+      INNER JOIN @t_schema.Relator R ON
+          R.Enterprise = :Enterprise
+      AND R.EntityType = :RelatorType
+      AND R.EntityID > 0
+      AND R.Entity1Type = N.EntityType
+      AND (R.Entity1ID = N.EntityID AND R.Entity1ID > 0)
+      AND R.Entity2ID > 0
+      AND R.Valto = :forever  AND R.EffTo > :StartDate
+      --AND R.ValFrom < :EndDate AND :EndDate < R.ValTo
+      WHERE
+           N.SessionID = :SessionID
+      AND N.Level = :Level -1
+      AND N.Enterprise = :Enterprise
+      AND N.EntityType = :ToEntity
+     ;
+    }
+    
+ } else if (Category[0] == 'T' && PDirection[0] == 'U') {
+
+    if (RClass [0] == 'R') {
+
+      EXEC SQL INSERT INTO @t_schema.trsNetterPass2
+      SELECT DISTINCT
+      :Enterprise
+      ,:SessionID
+      ,:ActionType
+      ,:Level
+      ,:Direction
+      ,:PDirection
+      ,R.Entity1Type
+      ,R.Entity1ID
+      ,R.EntityType
+      ,R.EntityID
+      ,R.Entity2Type
+      ,R.Entity2ID
+      ,CASE N.TRAN WHEN 'OFF' THEN 'OFF' ELSE (
+            CASE WHEN R.EffTo > :EndDate THEN 'ON' ELSE 'OFF'
+            END) 
+       END
+      ,R.ValFrom
+      ,N.RootType
+      ,N.RootID
+      ,N.RootTran
+      ,CASE N.PATH WHEN ''THEN RTRIM(R.EntityType) ELSE  N.Path || ':' || RTRIM(R.EntityType) END
+     
+      FROM @t_schema.trsNetterPass2 N
+      INNER JOIN @t_schema.Relator R ON
+           R.Enterprise = :Enterprise
+       AND R.EntityType = N.Entity1Type
+       AND (R.EntityID = N.Entity1ID AND R.EntityID > 0)
+       AND R.Entity1ID > 0
+       AND R.Entity2ID > 0
+       AND R.Valto = :forever  AND R.EffTo > :StartDate
+      --AND R.ValFrom < :EndDate AND :EndDate < R.ValTo
+       WHERE
+           N.SessionID = :SessionID
+        AND N.Level = :Level -1
+        AND N.Enterprise = :Enterprise
+       AND N.Entity1Type = :RelatorType
+      ;
+    }
+ } else if (Category[0] == 'T' && PDirection[0] == 'D') {
+
+    if (RClass [0] == 'R') {
+
+      EXEC SQL INSERT INTO @t_schema.trsNetterPass2
+      SELECT DISTINCT
+      :Enterprise
+      ,:SessionID
+      ,:ActionType
+      ,:Level
+      ,:Direction
+      ,:PDirection
+      ,R.Entity1Type
+      ,R.Entity1ID
+      ,R.EntityType
+      ,R.EntityID
+      ,R.Entity2Type
+      ,R.Entity2ID
+      ,CASE N.TRAN WHEN 'OFF' THEN 'OFF' ELSE (
+            CASE WHEN R.EffTo > :EndDate THEN 'ON' ELSE 'OFF'
+            END) 
+       END
+      ,R.ValFrom
+      ,N.RootType
+      ,N.RootID
+      ,N.RootTran
+      ,CASE N.PATH WHEN ''THEN RTRIM(R.EntityType) ELSE  N.Path || ':' || RTRIM(R.EntityType) END
+    
+      FROM @t_schema.trsNetterPass2 N
+      INNER JOIN @t_schema.Relator R ON
+           R.Enterprise = :Enterprise
+       AND R.EntityType = N.Entity2Type
+       AND (R.EntityID = N.Entity2ID AND R.EntityID > 0)
+       AND R.Entity1ID > 0
+       AND R.Entity2ID > 0
+       AND R.Valto = :forever  AND R.EffTo > :StartDate
+      --AND R.ValFrom < :EndDate AND :EndDate < R.ValTo
+       WHERE
+            N.SessionID = :SessionID
+        AND N.Enterprise = :Enterprise
+        AND N.Level = :Level -1
+        AND N.Entity2Type = :RelatorType
+      ;
+    }
+  }
+
+  // Commit the work
+  EXEC SQL COMMIT WORK;
+}
+
+// OK lets put it all into the final 
+// and then we must remember to pick off relators w/ attributes
+// so we can add them to the union
+// Lets pick off the max valfrom date for fun
+EXEC SQL insert into @t_schema.trsNetterFinal 
+select A,B,C,D,E,MAX(F),G,H,I,J,K,L,M,N,O from ( SELECT
+ :Enterprise A
+,:SessionID B
+,:ActionType C
+,:StartDate D
+,:EndDate E
+,ValFrom F
+,RootType G
+,RootID H
+,RootTran I
+,Entity1Type J
+,Entity1ID K
+,Tran L
+,Level M
+,'E' N
+,Path O
+ from opicm.trsNetterPass2 
+where       sessionid = :SessionID AND
+                Enterprise = :Enterprise AND Entity1Type <> 'NOOP' and MYDIRECTION = 'U'
+
+UNION ALL
+
+select  
+ :Enterprise A
+,:SessionID B
+,:ActionType C
+,:StartDate D
+,:EndDate E
+,ValFrom F
+,RootType G
+,RootID H
+,RootTran I
+,Entity2Type J
+,Entity2ID K
+,Tran L
+,Level M
+,'E' N
+,Path O
+ from opicm.trsNetterPass2 
+where       sessionid = :SessionID AND
+                Enterprise = :Enterprise AND Entity2Type <> 'NOOP' AND MYDIRECTION = 'D'
+) AS BOO
+GROUP BY A,B,C,D,E,G,H,I,J,K,L,M,N, O
+;
+
+//
+// Now lets pick up any straggler Relators that are also entites
+//
+EXEC SQL insert into @t_schema.trsNetterFinal 
+select  
+ :Enterprise A
+,:SessionID B
+,:ActionType C
+,:StartDate D
+,:EndDate E
+,ValFrom F
+,RootType G
+,RootID H
+,RootTran I
+,EntityType J
+,EntityID K
+,Tran L
+,Level M
+,'R' N
+,Path O
+ from opicm.trsNetterPass2 N
+where       sessionid = :SessionID AND
+                Enterprise = :Enterprise AND EntityType <> 'NOOP'  and
+                0 < (Select count(linktype2) from opicm.metalinkattr 
+                            where enterprise = :Enterprise and
+                                        rtrim(linktype) = 'Entity/Attribute' and 
+                                        linktype1 = N.EntityType and
+                                        linkcode = 'EntityAttribute' and
+                                        valto = :forever and
+                                        effto > current timestamp)
+;                                       
+                
+
+EXEC SQL COMMIT WORK;
+
+// send the final result set back to the caller
+
+EXEC SQL OPEN NavCur;
+
+EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+// fprintf(t,"GBL8102:%s <--end of stored procedure GBL8102\n",tstamp);
+//fclose(t);
+
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in TargetEntityType varchar(32)
+in ActionType varchar(32)
+in RoleCode varchar(32)
+in StartDate varchar(26)
+in EndDate varchar(26)
+in iPass int
+@end
+
+
+

@@ -1,0 +1,6 @@
+#OPICM Middleware Client Properties
+
+database_object_name=OPICM-Middleware
+client_connect_ip_address=192.168.0.20
+client_connect_port=1099
+ssl_truststore=eatruststore

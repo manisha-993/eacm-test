@@ -1,0 +1,57 @@
+@name=GBL2260
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------
+-- Removes all Softlocks for a given OPWGID
+--------------------------------------------
+$Log: gbl2260.txt,v $
+Revision 1.10  2010/06/21 15:42:44  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.9  2004/10/20 21:01:39  dave
+changes to gen parm
+
+Revision 1.8  2004/02/20 20:21:48  roger
+Must be @t_schema
+
+Revision 1.7  2004/02/20 18:09:29  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.6  2003/09/08 16:31:10  roger
+Enterprise was changed to 16 char length
+
+Revision 1.5  2002/11/18 22:10:24  joan
+adjust according to new softlock table
+
+Revision 1.4  2001/03/16 18:27:51  roger
+Added branding feature to stored procedures
+
+Revision 1.3  2001/03/16 03:38:56  roger
+Added Log keyword
+
+@desc=Delete all Soft Lock for user
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2260.txt,v 1.10 2010/06/21 15:42:44 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL
+DELETE
+FROM @t_schema.Softlock
+WHERE
+Enterprise = :Enterprise AND
+OPWGID = :OPWGID
+;
+@execute
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPWGID int
+@end
+
+

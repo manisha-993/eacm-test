@@ -1,0 +1,85 @@
+@name=GBL2998
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------
+--  This will delete all SoftLock records for the Operator
+--  associated with the connection id
+----------------------------------------------------------------
+$Log: gbl2998.txt,v $
+Revision 1.14  2010/06/21 15:43:17  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.13  2004/10/20 21:01:41  dave
+changes to gen parm
+
+Revision 1.12  2004/02/20 20:21:51  roger
+Must be @t_schema
+
+Revision 1.11  2004/02/20 18:09:31  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.10  2003/09/08 16:31:12  roger
+Enterprise was changed to 16 char length
+
+Revision 1.9  2002/11/18 22:10:24  joan
+adjust according to new softlock table
+
+Revision 1.8  2002/04/08 23:30:23  joan
+working on OPWG
+
+Revision 1.7  2001/09/21 17:27:49  dave
+fixed up some NE stuff
+
+Revision 1.6  2001/04/05 20:37:57  dave
+change for clearAllSoftLocksbyOperator
+
+Revision 1.5  2001/03/17 04:47:11  roger
+Misc clean up
+
+Revision 1.4  2001/03/16 18:27:55  roger
+Added branding feature to stored procedures
+
+Revision 1.3  2001/03/16 15:28:06  roger
+Restore gbl2998
+
+Revision 1.1  2001/03/16 05:30:10  roger
+Renamed GBL2998 to gbl2998
+
+Revision 1.3  2001/03/16 03:38:51  roger
+Added Log keyword
+
+@desc=Delete all Soft Locks for the Operator ID associated with the specified OPENID
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2998.txt,v 1.14 2010/06/21 15:43:17 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+// Now delete all rows for the specified OperatorID
+EXEC SQL
+DELETE
+FROM @t_schema.Softlock
+WHERE
+OPWGID IN
+(
+SELECT
+  DISTINCT EntityID
+FROM @t_schema.RELATOR
+WHERE
+Enterprise = :Enterprise AND
+EntityType = 'OPWG' AND
+Entity2Type = 'OP' AND
+Entity2ID = :OperatorID
+)
+;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OperatorID int
+@end
+
+

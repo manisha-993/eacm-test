@@ -1,0 +1,23 @@
+#!/bin/ksh 
+
+. ~/storedp/vars
+
+date
+
+db2 connect to $DBASE in shared mode user $USER using $PASSWD
+db2 "select creator,name from sysibm.systables \
+where creator = 'OPICM' order by creator,name" |
+awk 'NR > 3 && NF == 2 {print $1"."$2}' |
+while read TABLE
+  do
+  date
+  db2 connect to $DBASE in shared mode user $USER using $PASSWD
+  echo reorg table $TABLE
+  db2 reorg table $TABLE index $TABLE"_pk"
+  db2 terminate
+  date
+  done
+db2 terminate 
+
+date
+

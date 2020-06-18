@@ -1,0 +1,133 @@
+@name=GBL8707
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+$Log: gbl8707.txt,v $
+Revision 1.10  2010/06/21 15:42:35  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.9  2004/10/20 21:01:49  dave
+changes to gen parm
+
+Revision 1.8  2004/02/20 20:21:58  roger
+Must be @t_schema
+
+Revision 1.7  2004/02/20 18:09:38  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.6  2003/09/08 16:31:22  roger
+Enterprise was changed to 16 char length
+
+Revision 1.5  2002/10/16 19:43:46  joan
+fix sp
+
+Revision 1.4  2002/10/14 17:31:24  joan
+fix error
+
+Revision 1.3  2002/10/14 17:28:28  joan
+fix error
+
+Revision 1.2  2002/10/14 17:19:20  joan
+fix error
+
+Revision 1.1  2002/10/14 17:06:54  joan
+add sp
+
+@desc=Get All ORDEROFs that have matching classifications, MachType, Model and link to the COFOOFMGMTGRP
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8707.txt,v 1.10 2010/06/21 15:42:35 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT R.entity2type, R.entity2id, T3.attributecode, T3.attributevalue
+FROM @t_schema.Relator R
+
+inner join @t_schema.flag F1 on
+F1.enterprise = :Enterprise and
+F1.entitytype = R.Entity2Type and
+F1.entityid = R.Entity2ID and
+F1.attributecode = 'ORDEROFCAT' and
+F1.attributevalue = :Cat and
+F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+inner join @t_schema.flag F2 on
+F2.enterprise = :Enterprise and
+F2.entitytype = R.Entity2Type and
+F2.entityid = R.Entity2ID and
+F2.attributecode = 'ORDEROFSUBCAT' and
+F2.attributevalue = :SubCat and
+F2.ValFrom <= :ValOn AND :ValOn < F2.ValTo AND F2.EffFrom <= :EffOn AND :EffOn < F2.EffTo
+
+inner join @t_schema.flag F3 on
+F3.enterprise = :Enterprise and
+F3.entitytype = R.Entity2Type and
+F3.entityid = R.Entity2ID and
+F3.attributecode = 'ORDEROFGRP' and
+F3.attributevalue = :Group and
+F3.ValFrom <= :ValOn AND :ValOn < F3.ValTo AND F3.EffFrom <= :EffOn AND :EffOn < F3.EffTo
+
+inner join @t_schema.flag F4 on
+F4.enterprise = :Enterprise and
+F4.entitytype = R.Entity2Type and
+F4.entityid = R.Entity2ID and
+F4.attributecode = 'ORDEROFSUBGRP' and
+F4.attributevalue = :SubGroup and
+F4.ValFrom <= :ValOn AND :ValOn < F4.ValTo AND F4.EffFrom <= :EffOn AND :EffOn < F4.EffTo
+
+inner join @t_schema.text T1 on
+T1.enterprise = :Enterprise and
+T1.entitytype = R.Entity2Type and
+T1.entityid = R.Entity2ID and
+T1.attributecode = 'MACHTYPE' and
+T1.attributevalue = :MachType and
+T1.ValFrom <= :ValOn AND :ValOn < T1.ValTo AND T1.EffFrom <= :EffOn AND :EffOn < T1.EffTo
+
+inner join @t_schema.text T2 on
+T2.enterprise = :Enterprise and
+T2.entitytype = R.Entity2Type and
+T2.entityid = R.Entity2ID and
+T2.attributecode = 'MODEL' and
+T2.attributevalue = :Model and
+T2.ValFrom <= :ValOn AND :ValOn < T2.ValTo AND T2.EffFrom <= :EffOn AND :EffOn < T2.EffTo
+
+left outer join @t_schema.text T3 on
+T3.enterprise = 'L4' and
+T3.entitytype = R.Entity2Type and
+T3.entityid = R.Entity2ID and
+T3.attributecode = 'FEATURECODE' and
+T3.ValFrom <= :ValOn AND :ValOn < T3.ValTo AND T3.EffFrom <= :EffOn AND :EffOn < T3.EffTo
+
+WHERE
+R.Enterprise = :Enterprise AND
+R.EntityType = 'OOFMEMBERCOFOMG' AND
+R.Entity1Type = :Entity1Type AND
+R.Entity1ID = :Entity1ID AND
+R.ValFrom <= :ValOn AND :ValOn < R.ValTo AND R.EffFrom <= :EffOn AND :EffOn < R.EffTo
+;
+
+@execute
+  EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in Entity1Type varchar(32)
+in Entity1ID int
+in Cat varchar(32)
+in SubCat varchar(32)
+in Group varchar(32)
+in SubGroup varchar(32)
+in MachType varchar(254)
+in Model varchar(254)
+in OPENID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

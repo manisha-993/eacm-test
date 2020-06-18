@@ -1,0 +1,25 @@
+#!/bin/sh
+
+DBASE=opicmpdh
+USER=opicmadm
+PASSWD=cat9tail
+
+WHERE="WHERE 1=1"
+DIR="/mnt/gis80/"
+BLOB_DIR="/mnt/gis80/blobfiles/"
+NAME="ALL"
+
+set DB2CODEPAGE 1208
+export DB2CODEPAGE=1208
+
+db2 connect to $DBASE user $USER using $PASSWD
+echo "Export Name         : $NAME">$DIR$NAME.EXPORT.OUT
+echo "Export directory    : $DIR">>$DIR$NAME.EXPORT.OUT
+echo "Export WHERE clause : $WHERE">>$DIR$NAME.EXPORT.OUT
+echo " ">>$DIR$NAME.EXPORT.OUT
+
+echo Exporting OPICM.BLOB to $DIR$NAME.BLOB.IXF blobfiles to $DIR/blobfiles
+mkdir -p $BLOB_DIR
+db2 "export to $DIR$NAME.OPICM.BLOB.IXF OF IXF LOBS TO $BLOB_DIR LOBFILE blobA,blobB,blobC,blobD MODIFIED BY LOBSINFILE SELECT * from opicm.blob $WHERE"
+db2 terminate
+

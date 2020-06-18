@@ -1,0 +1,66 @@
+<!-- PMComparisonReport.txt Template File -->
+<HEAD>
+<TITLE>PMComparisonReport.html</TITLE>
+<style type="text/css">
+<!--
+.white {background-color: #FFFFFF}
+.gray {background-color: #CCCCCC}
+.btn-66f {FONT-WEIGHT: bold; COLOR: #6666ff; TEXT-DECORATION: none}
+.page-title {FONT-SIZE: 13pt; FONT-WEIGHT: bold; FONT-FAMILY: verdana,helvetica,arial,sans-serif;}
+.table-title1 {FONT-SIZE: 11pt; FONT-WEIGHT: bold; FONT-FAMILY: verdana,helvetica,arial,sans-serif;}
+.table-title1 {FONT-SIZE: 12pt; FONT-WEIGHT: bold; FONT-FAMILY: verdana,helvetica,arial,sans-serif;}
+.dotted-right {border-right: dotted black 1px;}
+.dotted-bottom {border-bottom: dotted black 1px;}
+.solid-bottom {border-bottom: solid black 1px;}
+.solid-top {border-top: solid black 1px;}
+.solid-border-all {border: black solid 1px;}
+//-->
+</style>
+</HEAD>
+
+<BODY>
+
+    <SPAN class="page-title">
+    PM Comparison Report For EC: <I><!-- Start ECReportTitle -->$ECReportTitle$<!-- End ECReportTitle --></I>
+    </SPAN>
+
+    <BR><BR>
+    
+    <TABLE width="100%" cellpadding="2" cellspacing="2" border="0">
+      <TR width="100%">
+        <TD>
+     
+        <!-- Start PMComparisonTables -->
+        $PMComparisonTables$
+        <!-- End PMComparisonTables -->
+
+        </TD>
+      </TR>
+    </TABLE>
+
+<CENTER>
+<A href="javascript:window.close();">[Close Window]</A>
+</CENTER>    
+    
+</BODY>
+</HTML>
+
+<!--
+$Log: PMComparisonReport.txt,v $
+Revision 1.5  2003/07/14 21:36:06  gregg
+remove (TEST) from title
+
+Revision 1.4  2003/05/29 22:40:48  gregg
+update
+
+Revision 1.3  2003/05/28 19:27:41  gregg
+update
+
+Revision 1.2  2003/05/23 23:25:43  gregg
+update
+
+Revision 1.1  2003/05/23 23:15:15  gregg
+initial load -testing
+
+-->
+

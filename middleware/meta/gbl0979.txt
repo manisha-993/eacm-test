@@ -1,0 +1,216 @@
+@name=GBL0979
+@type=basic
+@noremote=true
+@dbase=opicmpdh
+@narrative
+
+Manages the update of a Collateral Relator record
+
+// $Log: gbl0979.txt,v $
+// Revision 1.6  2010/07/21 19:57:03  praveen
+// Change Long data type to Sqlint32 in support for db2 9.5
+//
+// Revision 1.5  2008/11/17 17:05:45  praveen
+// minor changes
+//
+// Revision 1.4  2008/11/15 04:13:23  praveen
+// Supporting dual catdb schema
+//
+// Revision 1.3  2006/04/24 22:51:49  dave
+// sp fixes
+//
+// Revision 1.2  2006/03/04 22:42:29  dave
+// fixed internal name
+//
+// Revision 1.1  2006/03/04 22:16:58  dave
+// another SP for simp
+//
+//
+
+@desc= Manages the update of a Collateral Relator record
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0979.txt,v 1.6 2010/07/21 19:57:03 praveen Exp $";
+sqlint32 count = 0;
+EXEC SQL END DECLARE SECTION;
+@execute
+
+
+if (strcmp(schema,"BIGCAT") == 0) {
+
+	EXEC SQL
+	Select count(*) into :count
+	from bigcat.collateral
+	where
+	enterprise = :enterprise and
+	parententitytype = :parententitytype and
+	parententityid = :parententityid and
+	collentitytype = :collentitytype and
+	collentityid = :collentityid
+	;
+
+	if (count == 0 && isactive == 0) {
+
+	    // do nothing
+
+	} else if (count == 0 && isactive == 1) {
+
+	    // insert this guy
+	    EXEC SQL
+	    insert into bigcat.collateral
+	    (
+	      enterprise
+	    , collentitytype
+	    , collentityid
+	    , parententitytype
+	    , parententityid
+	    , valfrom
+	    , valto
+	    , isactive
+	    )
+	    values (
+	      :enterprise
+	    , :collentitytype
+	    , :collentityid
+	    , :parententitytype
+	    , :parententityid
+	    , current timestamp
+	    , :forever
+	    , 1
+	    )
+	    ;
+
+	} else if (count != 0 && isactive == 1) {
+
+	    // update this guy
+	    EXEC SQL
+	    update bigcat.collateral
+	    set
+	      valfrom = current timestamp
+	    , valto = :forever
+	    , isactive = 1
+	    where
+	    enterprise = :enterprise and
+	    parententitytype = :parententitytype and
+	    parententityid = :parententityid and
+	    collentitytype = :collentitytype and
+	    collentityid = :collentityid
+	    ;
+
+	} else {
+
+	    // turn it off
+	    EXEC SQL
+	    update bigcat.collateral
+	    set
+	    valfrom = current timestamp,
+	    valto  =  current timestamp,
+	    isactive = 0
+	    where
+	    enterprise = :enterprise and
+	    parententitytype = :parententitytype and
+	    parententityid = :parententityid and
+	    collentitytype = :collentitytype and
+	    collentityid = :collentityid
+	    ;
+
+	}
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+
+	EXEC SQL
+	Select count(*) into :count
+	from ibmcat.collateral
+	where
+	enterprise = :enterprise and
+	parententitytype = :parententitytype and
+	parententityid = :parententityid and
+	collentitytype = :collentitytype and
+	collentityid = :collentityid
+	;
+
+	if (count == 0 && isactive == 0) {
+
+	    // do nothing
+
+	} else if (count == 0 && isactive == 1) {
+
+	    // insert this guy
+	    EXEC SQL
+	    insert into ibmcat.collateral
+	    (
+	      enterprise
+	    , collentitytype
+	    , collentityid
+	    , parententitytype
+	    , parententityid
+	    , valfrom
+	    , valto
+	    , isactive
+	    )
+	    values (
+	      :enterprise
+	    , :collentitytype
+	    , :collentityid
+	    , :parententitytype
+	    , :parententityid
+	    , current timestamp
+	    , :forever
+	    , 1
+	    )
+	    ;
+
+	} else if (count != 0 && isactive == 1) {
+
+	    // update this guy
+	    EXEC SQL
+	    update ibmcat.collateral
+	    set
+	      valfrom = current timestamp
+	    , valto = :forever
+	    , isactive = 1
+	    where
+	    enterprise = :enterprise and
+	    parententitytype = :parententitytype and
+	    parententityid = :parententityid and
+	    collentitytype = :collentitytype and
+	    collentityid = :collentityid
+	    ;
+
+	} else {
+
+	    // turn it off
+	    EXEC SQL
+	    update ibmcat.collateral
+	    set
+	    valfrom = current timestamp,
+	    valto  =  current timestamp,
+	    isactive = 0
+	    where
+	    enterprise = :enterprise and
+	    parententitytype = :parententitytype and
+	    parententityid = :parententityid and
+	    collentitytype = :collentitytype and
+	    collentityid = :collentityid
+	    ;
+
+	}
+}
+
+
+//EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in enterprise varchar(8)
+in parententitytype varchar(32)
+in parententityid int
+in collentitytype varchar(32)
+in collentityid int
+in isactive int
+in schema varchar(8)
+@end

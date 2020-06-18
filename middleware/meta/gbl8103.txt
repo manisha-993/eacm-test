@@ -1,0 +1,119 @@
+@name=GBL8103
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+//
+// $Log: gbl8103.txt,v $
+// Revision 1.11  2010/06/21 15:43:15  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.10  2004/10/20 21:01:47  dave
+// changes to gen parm
+//
+// Revision 1.9  2004/10/05 22:00:39  dave
+// fixed Forever to forver
+//
+// Revision 1.8  2004/09/21 16:52:02  dave
+// one more minor change
+//
+// Revision 1.7  2004/09/21 16:49:24  dave
+// fixes for Wendy on Change Group API
+//
+//
+
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8103.txt,v 1.11 2010/06/21 15:43:15 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+// O.K.. lets insert the final answer into the trsNavigate Table
+
+EXEC SQL INSERT INTO @t_schema.trsNavigate
+SELECT DISTINCT
+ :Enterprise
+,:SessionID
+,'CHANGEGROUP'
+,'TRANID'
+,0
+,0
+,'X'
+,'X'
+,COALESCE(R.Entity1Type,'NOOP')
+,COALESCE(R.Entity1ID,0)
+,E.EntityType
+,E.EntityID
+,COALESCE(R.Entity2Type,E.EntityType)
+,COALESCE(R.Entity2ID,E.EntityID)
+,:now
+,:now
+FROM @t_schema.Entity E
+LEFT JOIN @t_schema.Relator R ON
+    R.Enterprise = :Enterprise 
+AND R.EntityType = E.EntityType
+AND R.EntityID = E.EntityID
+AND R.Valto = :forever 
+AND R.Effto > :now
+WHERE
+        E.Enterprise = :Enterprise
+AND E.EntityType = :TargetEntityType
+AND E.TRANID = :TranID
+AND E.VALFROM BETWEEN :StartDate AND :EndDate
+UNION ALL
+SELECT DISTINCT
+ :Enterprise
+,:SessionID
+,'CHANGEGROUP'
+,'TRANID'
+,0
+,0
+,'X'
+,'X'
+,R.Entity1Type
+,R.Entity1ID
+,R.EntityType
+,R.Entityid
+,R.Entity2Type
+,R.entity2id
+,:now
+,:now
+FROM @t_schema.Relator R
+WHERE
+        R.Enterprise = :Enterprise
+AND R.EntityType = :TargetEntityType
+AND R.TRANID = :TranID
+AND R.VALFROM BETWEEN :StartDate AND :EndDate
+;
+
+EXEC SQL COMMIT WORK;
+
+EXEC SQL DECLARE NavCur CURSOR FOR
+SELECT DISTINCT
+  ENTITYID
+FROM @t_schema.trsNavigate N
+WHERE
+    N.SessionID = :SessionID and
+    N.Enterprise = :Enterprise
+ORDER BY
+   1
+;
+
+@execute
+
+EXEC SQL OPEN NavCur;
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in TranID int
+in Enterprise varchar(16)
+in TargetEntityType varchar(32)
+in StartDate varchar(26)
+in EndDate varchar(26)
+@end
+
+

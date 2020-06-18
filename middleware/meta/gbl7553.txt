@@ -1,0 +1,350 @@
+@name=GBL7553
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+For PDH research (Admin UI)
+
+$Log: gbl7553.txt,v $
+Revision 1.19  2010/06/21 15:42:44  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.18  2004/11/10 17:49:07  dave
+miminzing file writes in SPs and pulling in all variable to
+sp innards to isolate SP4 db2 8.1 Dari fall over
+
+Revision 1.17  2004/10/20 21:01:46  dave
+changes to gen parm
+
+Revision 1.16  2004/02/20 20:21:56  roger
+Must be @t_schema
+
+Revision 1.15  2004/02/20 18:09:35  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.14  2004/01/19 17:31:51  gregg
+remove debugging to splog
+
+Revision 1.13  2004/01/14 19:18:07  steve
+syntax
+
+Revision 1.12  2004/01/14 19:09:19  steve
+syntax
+
+Revision 1.11  2004/01/14 19:00:01  steve
+syntax
+
+Revision 1.10  2004/01/14 18:57:09  steve
+added queries for flag and longtext tables
+
+Revision 1.9  2004/01/13 23:24:25  steve
+syntax
+
+Revision 1.8  2004/01/13 22:40:36  steve
+syntax
+
+Revision 1.7  2004/01/13 22:11:14  steve
+changed equals to LIKE in text table query for attribute code parm
+
+Revision 1.6  2004/01/13 22:02:07  steve
+syntax
+
+Revision 1.5  2004/01/13 21:46:52  steve
+added queries for blob table with and w/o attribute code
+
+Revision 1.4  2004/01/13 21:23:16  steve
+removed dummy column outputs
+
+Revision 1.3  2004/01/13 01:01:52  gregg
+some strncmps
+
+Revision 1.2  2004/01/13 00:36:01  gregg
+add Table as an input parm
+
+Revision 1.1  2004/01/13 00:32:57  gregg
+initial load
+
+
+@desc=For PDH research (Admin UI)
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7553.txt,v 1.19 2010/06/21 15:42:44 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+
+// LongText Table w/ Attribute
+EXEC SQL DECLARE curLongText CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,NLSID
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM @t_schema.LongText where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND AttributeCode LIKE rtrim(:AttributeCode) || '%'
+AND EntityID = :EntityID
+AND NLSID IN (1,:NLSID)
+order by valfrom
+;
+
+// longtext Table w/ NO Attribute
+EXEC SQL DECLARE curLongTextNoAtt CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,NLSID
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM @t_schema.LongText where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND EntityID = :EntityID
+AND NLSID IN (1,:NLSID)
+order by valfrom
+;
+
+
+// flag Table w/ Attribute
+EXEC SQL DECLARE curFlag CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM @t_schema.Flag where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND AttributeCode LIKE rtrim(:AttributeCode) || '%'
+AND EntityID = :EntityID
+order by valfrom
+;
+
+// flag Table w/ NO Attribute
+EXEC SQL DECLARE curFlagNoAtt CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM @t_schema.Flag where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND EntityID = :EntityID
+order by valfrom
+;
+
+
+// blob Table w/ Attribute
+EXEC SQL DECLARE curBlob CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,NLSID
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM @t_schema.Blob where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND AttributeCode LIKE rtrim(:AttributeCode) || '%'
+AND EntityID = :EntityID
+AND NLSID IN (1,:NLSID)
+order by valfrom
+;
+
+// blob Table w/ NO Attribute
+EXEC SQL DECLARE curBlobNoAtt CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,NLSID
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM @t_schema.Blob where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND EntityID = :EntityID
+AND NLSID IN (1,:NLSID)
+order by valfrom
+;
+
+// entity table
+EXEC SQL DECLARE curEntity CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM @t_schema.Entity where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND EntityID = :EntityID
+order by valfrom
+;
+
+// Text Table w/ Attribute
+EXEC SQL DECLARE curText CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,NLSID
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM @t_schema.Text where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND AttributeCode LIKE rtrim(:AttributeCode) || '%'
+AND EntityID = :EntityID
+AND NLSID IN (1,:NLSID)
+order by valfrom
+;
+
+// Text Table w/ NO Attribute
+EXEC SQL DECLARE curTextNoAtt CURSOR FOR
+SELECT 
+ Enterprise 
+,EntityType
+,EntityID
+,AttributeCode
+,AttributeValue
+,NLSID
+,ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,OpenID
+,TranId
+FROM @t_schema.Text where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND EntityID = :EntityID
+AND NLSID IN (1,:NLSID)
+order by valfrom
+;
+
+// Now Execute the Corresponding Table's SQL. 
+if (strncmp(Table,"entity",6) == 0) {
+    // fprintf(f,"executing curEntity\n");
+    EXEC SQL OPEN curEntity;
+
+} else if(strncmp(Table,"text",4) == 0) {
+    // No Attribute Case
+    if(strncmp(AttributeCode," ",1) == 0) {
+        // fprintf(f,"executing curTextNoAtt\n");
+        EXEC SQL OPEN curTextNoAtt;
+    } else {
+        // fprintf(f,"executing curText\n");
+        EXEC SQL OPEN curText;
+    }
+} else if(strncmp(Table,"blob",4) == 0) {
+    // No Attribute Case
+    if(strncmp(AttributeCode," ",1) == 0) {
+        // fprintf(f,"executing curBlobNoAtt\n");
+        EXEC SQL OPEN curBlobNoAtt;
+    } else {
+        // fprintf(f,"executing curBlob\n");
+        EXEC SQL OPEN curBlob;
+    }
+
+} else if(strncmp(Table,"flag",4) == 0) {
+    // No Attribute Case
+    if(strncmp(AttributeCode," ",1) == 0) {
+        // fprintf(f,"executing curFlagNoAtt\n");
+        EXEC SQL OPEN curFlagNoAtt;
+    } else {
+        // fprintf(f,"executing curFlag\n");
+        EXEC SQL OPEN curFlag;
+    }
+
+} else if(strncmp(Table,"longtext",4) == 0) {
+    // No Attribute Case
+    if(strncmp(AttributeCode," ",1) == 0) {
+        // fprintf(f,"executing curLongTextNoAtt\n");
+        EXEC SQL OPEN curLongTextNoAtt;
+    } else {
+        // fprintf(f,"executing curLongText\n");
+        EXEC SQL OPEN curLongText;
+    }
+
+
+} else {
+  // fprintf(f,"executing NONE\n");
+  // do nothing
+}
+
+
+@parameters
+inout ReturnStatus int
+in Table varchar(9)
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in AttributeCode varchar(32)
+in NLSID int
+@end
+
+
+
+
+

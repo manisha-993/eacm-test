@@ -1,0 +1,105 @@
+@name=GBL7501
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7501.txt,v $
+Revision 1.24  2010/06/21 15:42:45  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.23  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.22  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.21  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.20  2003/09/08 16:31:16  roger
+Enterprise was changed to 16 char length
+
+Revision 1.19  2003/08/21 21:09:50  gregg
+add NLSID to result set
+
+Revision 1.18  2003/07/07 21:56:24  gregg
+update - remove unecessary JOIN
+
+Revision 1.17  2003/04/28 22:33:03  gregg
+making everything 'W'
+
+Revision 1.16  2002/12/05 18:09:21  gregg
+use linkcode, not linkvalue for entClass
+
+Revision 1.15  2002/12/05 18:00:37  gregg
+add relator/assoc lt1, lt2 if applicable
+
+Revision 1.14  2002/12/05 17:52:56  gregg
+Now get EntityClass from MLA for Relators, Assoc's
+
+Revision 1.13  2002/11/21 23:00:15  gregg
+added capability
+
+Revision 1.12  2002/11/20 23:58:32  gregg
+sintacks ficks
+
+Revision 1.11  2002/11/20 23:15:17  gregg
+now retreive SHORTDESCRIPTION, LONGDESCRIPTION
+
+Revision 1.10  2002/11/07 21:54:50  gregg
+add ENTITYCLASS to result set
+
+Revision 1.9  2002/07/17 17:33:19  roger
+Ensured Log was in @narrative
+
+@desc=Simple little buddy that retreives all entityTypes based on role code
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7501.txt,v 1.24 2010/06/21 15:42:45 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT DISTINCT
+ MD.DESCRIPTIONTYPE
+,COALESCE(RELASSOC.LINKCODE,'Entity')
+,MD.SHORTDESCRIPTION
+,MD.LONGDESCRIPTION
+,'W'
+,COALESCE(RELASSOC.LINKTYPE1,'NONE')
+,COALESCE(RELASSOC.LINKTYPE2,'NONE')
+,MD.NLSID
+from 
+opicm.METADESCRIPTION MD
+
+LEFT JOIN @t_schema.METALINKATTR RELASSOC ON
+    RELASSOC.enterprise = :Enterprise 
+AND RELASSOC.linkType = MD.DescriptionType
+AND RELASSOC.valto > :ValOn 
+AND RELASSOC.valfrom <= :ValOn 
+AND RELASSOC.effto > :EffOn 
+AND RELASSOC.efffrom <= :EffOn
+
+where
+    MD.enterprise = :Enterprise 
+AND MD.descriptionClass IN('Entity','Relator','Assoc')
+AND MD.valto > :ValOn 
+AND MD.valfrom <= :ValOn 
+AND MD.effto > :EffOn 
+AND MD.efffrom <= :EffOn
+Order by MD.DescriptionType
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in RoleCode varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

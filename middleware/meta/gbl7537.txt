@@ -1,0 +1,63 @@
+@name=GBL7537
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7537.txt,v $
+Revision 1.8  2010/06/21 15:43:13  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2004/10/20 21:01:45  dave
+changes to gen parm
+
+Revision 1.6  2004/02/20 20:21:55  roger
+Must be @t_schema
+
+Revision 1.5  2004/02/20 18:09:35  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.4  2003/09/22 19:07:08  dave
+sp change to make distinct
+
+Revision 1.3  2003/02/06 18:52:02  gregg
+add check for status = 0
+
+Revision 1.2  2003/02/04 00:37:34  gregg
+initial load to v11
+
+
+
+@desc=Retrieve all distinct 'ready status' intervals in queue table w/ opwg+queue and is encompassed by passed start/end dates
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7537.txt,v 1.8 2010/06/21 15:43:13 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT DISTINCT
+ INTERVALSTARTDATE
+,INTERVALENDDATE
+from @t_schema.QUEUE where
+    OPWGID = :OPWGID
+AND QUEUE = :Queue
+AND STATUS = 0
+AND INTERVALSTARTDATE >= :StartDate 
+AND INTERVALENDDATE <= :EndDate;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in OPWGID int
+in Queue varchar(32)
+in StartDate varchar(26)
+in EndDate varchar(26)
+@end
+
+
+
+
+

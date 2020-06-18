@@ -1,0 +1,665 @@
+@name=GBL0982
+@type=basic
+@noremote=true
+@dbase=opicmpdh
+@narrative
+
+Manages the update of an WWProduct Reocrd
+
+//
+// $Log: gbl0982.txt,v $
+// Revision 1.20  2010/07/21 19:57:30  praveen
+// Change Long data type to Sqlint32 in support for db2 9.5
+//
+// Revision 1.19  2009/01/27 16:44:58  praveen
+// *** empty log message ***
+//
+// Revision 1.18  2009/01/23 00:07:45  praveen
+// Supporting dual catdb schema
+//
+// Revision 1.17  2006/05/13 04:18:23  dave
+// fix
+//
+// Revision 1.16  2006/05/13 04:16:53  dave
+// new sp changes
+//
+// Revision 1.15  2006/05/13 02:15:07  dave
+// new sp work
+//
+// Revision 1.14  2006/05/06 16:00:14  dave
+// new sp columns for simp
+//
+// Revision 1.13  2006/04/27 16:42:08  gregg
+// priced width 8
+//
+// Revision 1.12  2006/04/27 16:17:03  gregg
+// planrelevent
+//
+// Revision 1.11  2006/04/27 16:07:55  gregg
+// add PLANRELEVENT, PLANRELEVENT_FC
+//
+// Revision 1.10  2006/04/24 22:51:49  dave
+// sp fixes
+//
+// Revision 1.9  2006/03/25 19:53:20  dave
+// new columns for SImplification
+//
+// Revision 1.8  2006/03/05 03:02:28  dave
+// one more change
+//
+// Revision 1.7  2006/03/05 02:40:19  dave
+// need to make them wide enough for null
+//
+// Revision 1.6  2006/03/05 02:26:45  dave
+// fixing hanging ..
+//
+// Revision 1.5  2006/03/05 02:19:26  dave
+// need to manage nulls better in
+// Simplification
+//
+// Revision 1.4  2006/03/05 00:25:09  dave
+// closing file
+//
+// Revision 1.3  2006/03/05 00:23:35  dave
+// adding trace
+//
+// Revision 1.2  2006/03/04 22:34:20  dave
+// removed PREntityType
+//
+// Revision 1.1  2006/03/04 22:13:36  dave
+// adding new Simp SP's
+//
+//
+
+@desc= Manages the update of an WWProduct Record
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@nulls_ok=true
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0982.txt,v 1.20 2010/07/21 19:57:30 praveen Exp $";
+sqlint32 count = 0;
+EXEC SQL END DECLARE SECTION;
+@execute
+
+//
+// BEGIN ERROR CHECK DECLARE SECTION
+//
+const int SQLERROR = -1;
+const int SQLCOMPLETE = 1;
+//set this to SQLCOMPLETE when finished!
+int m_iSQLState = SQLERROR;
+EXEC SQL WHENEVER SQLERROR GOTO error_exit;
+EXEC SQL WHENEVER SQLWARNING CONTINUE;
+//
+// END ERROR CHECK DECLARE SECTION
+//
+
+if (strcmp(schema,"BIGCAT") == 0) {
+
+	EXEC SQL
+
+	Select count(*) into :count
+	from bigcat.WWProduct where
+	enterprise = :enterprise and
+	WWEntityType = :wwentitytype and
+	WWEntityID = :wwentityid and
+	countrycode = :countrycode and
+	languagecode = :languagecode and
+	nlsid = :nlsid
+	;
+
+	if (count == 0 && isactive == 0) {
+
+	  // do nothing
+
+	} else if (count == 0 && isactive == 1) {
+
+	    // insert this guy
+	    EXEC SQL
+	    insert into bigcat.wwproduct
+	    (
+	    enterprise,
+	    countrycode,
+	    languagecode,
+	    nlsid,
+	    countrylist,
+	    wwentitytype,
+	    wwentityid,
+	    status,
+	    status_fc,
+	    prentityid,
+	    projectname,
+	    wwpartnumber,
+	    specialbid,
+	    specialbid_fc,
+	    category,
+	    category_fc,
+	    subcategory,
+	    subcategory_fc,
+	    group,
+	    group_fc,
+	    subgroup,
+	    subgroup_fc,
+	    ordercode,
+	    ordercode_fc,
+	    sarindc,
+	    sarindc_fc,
+	    serviceindicator,
+	    division,
+	    division_fc,
+	    ratecardcode,
+	    ratecardcode_fc,
+	    mktname,
+	    anndate,
+	    availdate,
+	    withdrawdate,
+	    standalone,
+	    standalone_fc,
+	    unitclass,
+	    unitclass_fc,
+	    unspsc,
+	    unspsc_fc,
+	    unspscsec,
+	    unspscsec_fc,
+	    unuom,
+	    unuom_fc,
+	    unuomsec,
+	    unuomsec_fc,
+	    applicationtype,
+	    applicationtype_fc,
+	    planrelevent,
+	    planrelevent_fc,
+	    processortype,
+	    processortype_fc,
+	    processortype_jsp,
+	    famnameassoc,
+	    famnameassoc_fc,
+	    senameassoc,
+	    senameassoc_fc,
+	    attrvalfrom,
+	    valfrom,
+	    valto,
+	    isactive
+	    )
+	    values (
+	    :enterprise,
+	    :countrycode,
+	    :languagecode,
+	    :nlsid,
+	    :countrylist,
+	    :wwentitytype,
+	    :wwentityid,
+	    :status,
+	    :status_fc,
+	    :prentityid,
+	    case WHEN :projectname = 'null' THEN NULL ELSE :projectname END ,
+	    :wwpartnumber,
+	    case WHEN :specialbid = 'null' THEN NULL ELSE :specialbid END ,
+	    case WHEN :specialbid_fc = 'null' THEN NULL ELSE :specialbid_fc END,
+	    case WHEN :category = 'null' THEN NULL ELSE :category END,
+	    case WHEN :category_fc = 'null' THEN NULL ELSE :category_fc END ,
+	    case WHEN :subcategory = 'null' THEN NULL ELSE :subcategory END ,
+	    case WHEN :subcategory_fc = 'null' THEN NULL ELSE :subcategory_fc END ,
+	    case WHEN :group = 'null' THEN NULL ELSE :group END ,
+	    case WHEN :group_fc = 'null' THEN NULL ELSE :group_fc END,
+	    case WHEN :subgroup = 'null' THEN NULL ELSE :subgroup END,
+	    case WHEN :subgroup_fc = 'null' THEN NULL ELSE :subgroup_fc END,
+	    case WHEN :ordercode = 'null' THEN NULL ELSE  :ordercode  END,
+	    case WHEN :ordercode_fc = 'null' THEN NULL ELSE :ordercode_fc END,
+	    case WHEN :sarindc = 'null' THEN NULL ELSE  :sarindc END,
+	    case WHEN :sarindc_fc = 'null' THEN NULL ELSE :sarindc_fc  END,
+	    case WHEN :serviceindicator = 'null' THEN NULL ELSE :serviceindicator  END,
+	    case WHEN :division = 'null' THEN NULL ELSE  :division END,
+	    case WHEN :division_fc = 'null' THEN NULL ELSE :division_fc END,
+	    case WHEN :ratecardcode = 'null' THEN NULL ELSE :ratecardcode END,
+	    case WHEN :ratecardcode_fc = 'null' THEN NULL ELSE :ratecardcode_fc  END,
+	    case WHEN :mktname= 'null' THEN NULL ELSE :mktname END,
+	    case WHEN :anndate= 'null' THEN NULL ELSE :anndate END,
+	    case WHEN :availdate= 'null' THEN NULL ELSE :availdate END,
+	    case WHEN :withdrawdate= 'null' THEN NULL ELSE :withdrawdate END,
+	    case WHEN :standalone= 'null' THEN NULL ELSE :standalone END,
+	    case WHEN :standalone_fc= 'null' THEN NULL ELSE :standalone_fc END,
+	    case WHEN :unitclass= 'null' THEN NULL ELSE :unitclass END,
+	    case WHEN :unitclass_fc= 'null' THEN NULL ELSE :unitclass_fc END,
+	    case WHEN :unspsc= 'null' THEN NULL ELSE  :unspsc END,
+	    case WHEN :unspsc_fc= 'null' THEN NULL ELSE :unspsc_fc END,
+	    case WHEN :unspscsec= 'null' THEN NULL ELSE  :unspscsec END,
+	    case WHEN :unspscsec_fc= 'null' THEN NULL ELSE :unspscsec_fc END,
+	    case WHEN :unuom= 'null' THEN NULL ELSE :unuom END,
+	    case WHEN :unuom_fc= 'null' THEN NULL ELSE :unuom_fc END,
+	    case WHEN :unuomsec= 'null' THEN NULL ELSE :unuomsec END,
+	    case WHEN :unuomsec_fc= 'null' THEN NULL ELSE :unuomsec_fc END,
+	    case WHEN :applicationtype= 'null' THEN NULL ELSE :applicationtype END,
+	    case WHEN :applicationtype_fc = 'null' THEN NULL ELSE :applicationtype_fc END,
+	    case WHEN :planrelevent= 'null' THEN NULL ELSE :planrelevent END,
+	    case WHEN :planrelevent_fc = 'null' THEN NULL ELSE :planrelevent_fc END,
+	    case WHEN :processortype = 'null' THEN NULL ELSE :processortype END,
+	    case WHEN :processortype_fc = 'null' THEN NULL ELSE :processortype_fc END,
+	    case WHEN :processortype_jsp = 'null' THEN NULL ELSE :processortype_jsp END,
+	    case WHEN :famnameassoc= 'null' THEN NULL ELSE :famnameassoc END,
+	    case WHEN :famnameassoc_fc = 'null' THEN NULL ELSE :famnameassoc_fc END,
+	    case WHEN :senameassoc = 'null' THEN NULL ELSE :senameassoc END,
+	    case WHEN :senameassoc_fc= 'null' THEN NULL ELSE :senameassoc_fc END,
+	    :attrvalfrom,
+	    current timestamp,
+	    '9999-12-31-00.00.00.000000',
+	    1
+	    );
+	} else if (count != 0 && isactive == 1) {
+
+	    // update this guy
+	    EXEC SQL
+	    update bigcat.wwproduct
+	    set
+	    enterprise = :enterprise,
+	    countrycode = :countrycode,
+	    languagecode = :languagecode,
+	    nlsid = :nlsid,
+	    countrylist = :countrylist,
+	    wwentitytype = :wwentitytype,
+	    wwentityid = :wwentityid,
+	    status = :status,
+	    status_fc = :status_fc,
+	    prentityid = :prentityid,
+	    projectname = case WHEN :projectname = 'null' THEN NULL ELSE :projectname END ,
+	    wwpartnumber = :wwpartnumber,
+	    specialbid = case WHEN :specialbid = 'null' THEN NULL ELSE :specialbid END ,
+	    specialbid_fc = case WHEN :specialbid_fc = 'null' THEN NULL ELSE :specialbid_fc END,
+	    category = case WHEN :category = 'null' THEN NULL ELSE :category END,
+	    category_fc = case WHEN :category_fc = 'null' THEN NULL ELSE :category_fc END ,
+	    subcategory = case WHEN :subcategory = 'null' THEN NULL ELSE :subcategory END ,
+	    subcategory_fc =case WHEN :subcategory_fc = 'null' THEN NULL ELSE :subcategory_fc END ,
+	    group = case WHEN :group = 'null' THEN NULL ELSE :group END ,
+	    group_fc = case WHEN :group_fc = 'null' THEN NULL ELSE :group_fc END,
+	    subgroup = case WHEN :subgroup = 'null' THEN NULL ELSE :subgroup END,
+	    subgroup_fc = case WHEN :subgroup_fc = 'null' THEN NULL ELSE :subgroup_fc END,
+	    ordercode = case WHEN :ordercode = 'null' THEN NULL ELSE  :ordercode  END,
+	    ordercode_fc = case WHEN :ordercode_fc = 'null' THEN NULL ELSE :ordercode_fc END,
+	    sarindc = case WHEN :sarindc = 'null' THEN NULL ELSE  :sarindc END,
+	    sarindc_fc = case WHEN :sarindc_fc = 'null' THEN NULL ELSE :sarindc_fc  END,
+	    serviceindicator =case WHEN :serviceindicator = 'null' THEN NULL ELSE :serviceindicator  END,
+	    division = case WHEN :division = 'null' THEN NULL ELSE  :division END,
+	    division_fc = case WHEN :division_fc = 'null' THEN NULL ELSE :division_fc END,
+	    ratecardcode = case WHEN :ratecardcode = 'null' THEN NULL ELSE :ratecardcode END,
+	    ratecardcode_fc = case WHEN :ratecardcode_fc = 'null' THEN NULL ELSE :ratecardcode_fc  END,
+	    mktname =  case WHEN :mktname= 'null' THEN NULL ELSE :mktname END,
+	    anndate = case WHEN :anndate= 'null' THEN NULL ELSE :anndate END,
+	    availdate = case WHEN :availdate= 'null' THEN NULL ELSE :availdate END,
+	    withdrawdate = case WHEN :withdrawdate= 'null' THEN NULL ELSE :withdrawdate END,
+	    standalone =  case WHEN :standalone= 'null' THEN NULL ELSE :standalone END,
+	    standalone_fc = case WHEN :standalone_fc= 'null' THEN NULL ELSE :standalone_fc END,
+	    unitclass = case WHEN :unitclass= 'null' THEN NULL ELSE :unitclass END,
+	    unitclass_fc = case WHEN :unitclass_fc= 'null' THEN NULL ELSE :unitclass_fc END,
+	    unspsc = case WHEN :unspsc= 'null' THEN NULL ELSE  :unspsc END,
+	    unspsc_fc = case WHEN :unspsc_fc= 'null' THEN NULL ELSE :unspsc_fc END,
+	    unspscsec = case WHEN :unspscsec= 'null' THEN NULL ELSE  :unspscsec END,
+	    unspscsec_fc = case WHEN :unspscsec_fc= 'null' THEN NULL ELSE :unspscsec_fc END,
+	    unuom = case WHEN :unuom= 'null' THEN NULL ELSE :unuom END,
+	    unuom_fc = case WHEN :unuom_fc= 'null' THEN NULL ELSE :unuom_fc END,
+	    unuomsec = case WHEN :unuomsec= 'null' THEN NULL ELSE :unuomsec END,
+	    unuomsec_fc =case WHEN :unuomsec_fc= 'null' THEN NULL ELSE :unuomsec_fc END,
+	    applicationtype = case WHEN :applicationtype= 'null' THEN NULL ELSE :applicationtype END,
+	    applicationtype_fc = case WHEN :applicationtype_fc = 'null' THEN NULL ELSE :applicationtype_fc END,
+	    planrelevent = case WHEN :planrelevent= 'null' THEN NULL ELSE :planrelevent END,
+	    planrelevent_fc = case WHEN :planrelevent_fc = 'null' THEN NULL ELSE :planrelevent_fc END,
+	    processortype = case WHEN :processortype = 'null' THEN NULL ELSE :processortype END,
+	    processortype_fc= case WHEN :processortype_fc= 'null' THEN NULL ELSE :processortype_fc END,
+	    processortype_jsp= case WHEN :processortype_jsp= 'null' THEN NULL ELSE :processortype_jsp END,
+	    famnameassoc = case WHEN :famnameassoc= 'null' THEN NULL ELSE :famnameassoc END,
+	    famnameassoc_fc = case WHEN :famnameassoc_fc = 'null' THEN NULL ELSE :famnameassoc_fc END,
+	    senameassoc = case WHEN :senameassoc = 'null' THEN NULL ELSE :senameassoc END,
+	    senameassoc_fc= case WHEN :senameassoc_fc= 'null' THEN NULL ELSE :senameassoc_fc END,
+	    attrvalfrom = :attrvalfrom,
+	    valfrom = current timestamp,
+	    valto = '9999-12-31-00.00.00.000000',
+	    isactive = 1
+	    where
+	    enterprise = :enterprise and
+	    wwentitytype = :wwentitytype and
+	    wwentityid = :wwentityid and
+	    countrycode = :countrycode and
+	    languagecode = :languagecode and
+	    nlsid = :nlsid
+	    ;
+	} else {
+
+	    // turn it off
+	    EXEC SQL
+	    update bigcat.wwproduct
+	    set
+	    valfrom = current timestamp,
+	    valto  =  current timestamp,
+	    isactive = 0
+	    where
+	    enterprise = :enterprise and
+	    wwentitytype = :wwentitytype and
+	    wwentityid = :wwentityid and
+	    countrycode = :countrycode and
+	    languagecode = :languagecode and
+	    nlsid = :nlsid
+	    ;
+
+	}
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+
+	EXEC SQL
+
+	Select count(*) into :count
+	from ibmcat.WWProduct where
+	enterprise = :enterprise and
+	WWEntityType = :wwentitytype and
+	WWEntityID = :wwentityid and
+	countrycode = :countrycode and
+	languagecode = :languagecode and
+	nlsid = :nlsid
+	;
+
+	if (count == 0 && isactive == 0) {
+
+	  // do nothing
+
+	} else if (count == 0 && isactive == 1) {
+
+	    // insert this guy
+	    EXEC SQL
+	    insert into ibmcat.wwproduct
+	    (
+	    enterprise,
+	    countrycode,
+	    languagecode,
+	    nlsid,
+	    countrylist,
+	    wwentitytype,
+	    wwentityid,
+	    status,
+	    status_fc,
+	    prentityid,
+	    projectname,
+	    wwpartnumber,
+	    specialbid,
+	    specialbid_fc,
+	    category,
+	    category_fc,
+	    subcategory,
+	    subcategory_fc,
+	    group,
+	    group_fc,
+	    subgroup,
+	    subgroup_fc,
+	    ordercode,
+	    ordercode_fc,
+	    sarindc,
+	    sarindc_fc,
+	    serviceindicator,
+	    division,
+	    division_fc,
+	    ratecardcode,
+	    ratecardcode_fc,
+	    mktname,
+	    anndate,
+	    availdate,
+	    withdrawdate,
+	    standalone,
+	    standalone_fc,
+	    unitclass,
+	    unitclass_fc,
+	    unspsc,
+	    unspsc_fc,
+	    unspscsec,
+	    unspscsec_fc,
+	    unuom,
+	    unuom_fc,
+	    unuomsec,
+	    unuomsec_fc,
+	    applicationtype,
+	    applicationtype_fc,
+	    planrelevent,
+	    planrelevent_fc,
+	    processortype,
+	    processortype_fc,
+	    processortype_jsp,
+	    famnameassoc,
+	    famnameassoc_fc,
+	    senameassoc,
+	    senameassoc_fc,
+	    attrvalfrom,
+	    valfrom,
+	    valto,
+	    isactive
+	    )
+	    values (
+	    :enterprise,
+	    :countrycode,
+	    :languagecode,
+	    :nlsid,
+	    :countrylist,
+	    :wwentitytype,
+	    :wwentityid,
+	    :status,
+	    :status_fc,
+	    :prentityid,
+	    case WHEN :projectname = 'null' THEN NULL ELSE :projectname END ,
+	    :wwpartnumber,
+	    case WHEN :specialbid = 'null' THEN NULL ELSE :specialbid END ,
+	    case WHEN :specialbid_fc = 'null' THEN NULL ELSE :specialbid_fc END,
+	    case WHEN :category = 'null' THEN NULL ELSE :category END,
+	    case WHEN :category_fc = 'null' THEN NULL ELSE :category_fc END ,
+	    case WHEN :subcategory = 'null' THEN NULL ELSE :subcategory END ,
+	    case WHEN :subcategory_fc = 'null' THEN NULL ELSE :subcategory_fc END ,
+	    case WHEN :group = 'null' THEN NULL ELSE :group END ,
+	    case WHEN :group_fc = 'null' THEN NULL ELSE :group_fc END,
+	    case WHEN :subgroup = 'null' THEN NULL ELSE :subgroup END,
+	    case WHEN :subgroup_fc = 'null' THEN NULL ELSE :subgroup_fc END,
+	    case WHEN :ordercode = 'null' THEN NULL ELSE  :ordercode  END,
+	    case WHEN :ordercode_fc = 'null' THEN NULL ELSE :ordercode_fc END,
+	    case WHEN :sarindc = 'null' THEN NULL ELSE  :sarindc END,
+	    case WHEN :sarindc_fc = 'null' THEN NULL ELSE :sarindc_fc  END,
+	    case WHEN :serviceindicator = 'null' THEN NULL ELSE :serviceindicator  END,
+	    case WHEN :division = 'null' THEN NULL ELSE  :division END,
+	    case WHEN :division_fc = 'null' THEN NULL ELSE :division_fc END,
+	    case WHEN :ratecardcode = 'null' THEN NULL ELSE :ratecardcode END,
+	    case WHEN :ratecardcode_fc = 'null' THEN NULL ELSE :ratecardcode_fc  END,
+	    case WHEN :mktname= 'null' THEN NULL ELSE :mktname END,
+	    case WHEN :anndate= 'null' THEN NULL ELSE :anndate END,
+	    case WHEN :availdate= 'null' THEN NULL ELSE :availdate END,
+	    case WHEN :withdrawdate= 'null' THEN NULL ELSE :withdrawdate END,
+	    case WHEN :standalone= 'null' THEN NULL ELSE :standalone END,
+	    case WHEN :standalone_fc= 'null' THEN NULL ELSE :standalone_fc END,
+	    case WHEN :unitclass= 'null' THEN NULL ELSE :unitclass END,
+	    case WHEN :unitclass_fc= 'null' THEN NULL ELSE :unitclass_fc END,
+	    case WHEN :unspsc= 'null' THEN NULL ELSE  :unspsc END,
+	    case WHEN :unspsc_fc= 'null' THEN NULL ELSE :unspsc_fc END,
+	    case WHEN :unspscsec= 'null' THEN NULL ELSE  :unspscsec END,
+	    case WHEN :unspscsec_fc= 'null' THEN NULL ELSE :unspscsec_fc END,
+	    case WHEN :unuom= 'null' THEN NULL ELSE :unuom END,
+	    case WHEN :unuom_fc= 'null' THEN NULL ELSE :unuom_fc END,
+	    case WHEN :unuomsec= 'null' THEN NULL ELSE :unuomsec END,
+	    case WHEN :unuomsec_fc= 'null' THEN NULL ELSE :unuomsec_fc END,
+	    case WHEN :applicationtype= 'null' THEN NULL ELSE :applicationtype END,
+	    case WHEN :applicationtype_fc = 'null' THEN NULL ELSE :applicationtype_fc END,
+	    case WHEN :planrelevent= 'null' THEN NULL ELSE :planrelevent END,
+	    case WHEN :planrelevent_fc = 'null' THEN NULL ELSE :planrelevent_fc END,
+	    case WHEN :processortype = 'null' THEN NULL ELSE :processortype END,
+	    case WHEN :processortype_fc = 'null' THEN NULL ELSE :processortype_fc END,
+	    case WHEN :processortype_jsp = 'null' THEN NULL ELSE :processortype_jsp END,
+	    case WHEN :famnameassoc= 'null' THEN NULL ELSE :famnameassoc END,
+	    case WHEN :famnameassoc_fc = 'null' THEN NULL ELSE :famnameassoc_fc END,
+	    case WHEN :senameassoc = 'null' THEN NULL ELSE :senameassoc END,
+	    case WHEN :senameassoc_fc= 'null' THEN NULL ELSE :senameassoc_fc END,
+	    :attrvalfrom,
+	    current timestamp,
+	    '9999-12-31-00.00.00.000000',
+	    1
+	    );
+	} else if (count != 0 && isactive == 1) {
+
+	    // update this guy
+	    EXEC SQL
+	    update ibmcat.wwproduct
+	    set
+	    enterprise = :enterprise,
+	    countrycode = :countrycode,
+	    languagecode = :languagecode,
+	    nlsid = :nlsid,
+	    countrylist = :countrylist,
+	    wwentitytype = :wwentitytype,
+	    wwentityid = :wwentityid,
+	    status = :status,
+	    status_fc = :status_fc,
+	    prentityid = :prentityid,
+	    projectname = case WHEN :projectname = 'null' THEN NULL ELSE :projectname END ,
+	    wwpartnumber = :wwpartnumber,
+	    specialbid = case WHEN :specialbid = 'null' THEN NULL ELSE :specialbid END ,
+	    specialbid_fc = case WHEN :specialbid_fc = 'null' THEN NULL ELSE :specialbid_fc END,
+	    category = case WHEN :category = 'null' THEN NULL ELSE :category END,
+	    category_fc = case WHEN :category_fc = 'null' THEN NULL ELSE :category_fc END ,
+	    subcategory = case WHEN :subcategory = 'null' THEN NULL ELSE :subcategory END ,
+	    subcategory_fc =case WHEN :subcategory_fc = 'null' THEN NULL ELSE :subcategory_fc END ,
+	    group = case WHEN :group = 'null' THEN NULL ELSE :group END ,
+	    group_fc = case WHEN :group_fc = 'null' THEN NULL ELSE :group_fc END,
+	    subgroup = case WHEN :subgroup = 'null' THEN NULL ELSE :subgroup END,
+	    subgroup_fc = case WHEN :subgroup_fc = 'null' THEN NULL ELSE :subgroup_fc END,
+	    ordercode = case WHEN :ordercode = 'null' THEN NULL ELSE  :ordercode  END,
+	    ordercode_fc = case WHEN :ordercode_fc = 'null' THEN NULL ELSE :ordercode_fc END,
+	    sarindc = case WHEN :sarindc = 'null' THEN NULL ELSE  :sarindc END,
+	    sarindc_fc = case WHEN :sarindc_fc = 'null' THEN NULL ELSE :sarindc_fc  END,
+	    serviceindicator =case WHEN :serviceindicator = 'null' THEN NULL ELSE :serviceindicator  END,
+	    division = case WHEN :division = 'null' THEN NULL ELSE  :division END,
+	    division_fc = case WHEN :division_fc = 'null' THEN NULL ELSE :division_fc END,
+	    ratecardcode = case WHEN :ratecardcode = 'null' THEN NULL ELSE :ratecardcode END,
+	    ratecardcode_fc = case WHEN :ratecardcode_fc = 'null' THEN NULL ELSE :ratecardcode_fc  END,
+	    mktname =  case WHEN :mktname= 'null' THEN NULL ELSE :mktname END,
+	    anndate = case WHEN :anndate= 'null' THEN NULL ELSE :anndate END,
+	    availdate = case WHEN :availdate= 'null' THEN NULL ELSE :availdate END,
+	    withdrawdate = case WHEN :withdrawdate= 'null' THEN NULL ELSE :withdrawdate END,
+	    standalone =  case WHEN :standalone= 'null' THEN NULL ELSE :standalone END,
+	    standalone_fc = case WHEN :standalone_fc= 'null' THEN NULL ELSE :standalone_fc END,
+	    unitclass = case WHEN :unitclass= 'null' THEN NULL ELSE :unitclass END,
+	    unitclass_fc = case WHEN :unitclass_fc= 'null' THEN NULL ELSE :unitclass_fc END,
+	    unspsc = case WHEN :unspsc= 'null' THEN NULL ELSE  :unspsc END,
+	    unspsc_fc = case WHEN :unspsc_fc= 'null' THEN NULL ELSE :unspsc_fc END,
+	    unspscsec = case WHEN :unspscsec= 'null' THEN NULL ELSE  :unspscsec END,
+	    unspscsec_fc = case WHEN :unspscsec_fc= 'null' THEN NULL ELSE :unspscsec_fc END,
+	    unuom = case WHEN :unuom= 'null' THEN NULL ELSE :unuom END,
+	    unuom_fc = case WHEN :unuom_fc= 'null' THEN NULL ELSE :unuom_fc END,
+	    unuomsec = case WHEN :unuomsec= 'null' THEN NULL ELSE :unuomsec END,
+	    unuomsec_fc =case WHEN :unuomsec_fc= 'null' THEN NULL ELSE :unuomsec_fc END,
+	    applicationtype = case WHEN :applicationtype= 'null' THEN NULL ELSE :applicationtype END,
+	    applicationtype_fc = case WHEN :applicationtype_fc = 'null' THEN NULL ELSE :applicationtype_fc END,
+	    planrelevent = case WHEN :planrelevent= 'null' THEN NULL ELSE :planrelevent END,
+	    planrelevent_fc = case WHEN :planrelevent_fc = 'null' THEN NULL ELSE :planrelevent_fc END,
+	    processortype = case WHEN :processortype = 'null' THEN NULL ELSE :processortype END,
+	    processortype_fc= case WHEN :processortype_fc= 'null' THEN NULL ELSE :processortype_fc END,
+	    processortype_jsp= case WHEN :processortype_jsp= 'null' THEN NULL ELSE :processortype_jsp END,
+	    famnameassoc = case WHEN :famnameassoc= 'null' THEN NULL ELSE :famnameassoc END,
+	    famnameassoc_fc = case WHEN :famnameassoc_fc = 'null' THEN NULL ELSE :famnameassoc_fc END,
+	    senameassoc = case WHEN :senameassoc = 'null' THEN NULL ELSE :senameassoc END,
+	    senameassoc_fc= case WHEN :senameassoc_fc= 'null' THEN NULL ELSE :senameassoc_fc END,
+	    attrvalfrom = :attrvalfrom,
+	    valfrom = current timestamp,
+	    valto = '9999-12-31-00.00.00.000000',
+	    isactive = 1
+	    where
+	    enterprise = :enterprise and
+	    wwentitytype = :wwentitytype and
+	    wwentityid = :wwentityid and
+	    countrycode = :countrycode and
+	    languagecode = :languagecode and
+	    nlsid = :nlsid
+	    ;
+	} else {
+
+	    // turn it off
+	    EXEC SQL
+	    update ibmcat.wwproduct
+	    set
+	    valfrom = current timestamp,
+	    valto  =  current timestamp,
+	    isactive = 0
+	    where
+	    enterprise = :enterprise and
+	    wwentitytype = :wwentitytype and
+	    wwentityid = :wwentityid and
+	    countrycode = :countrycode and
+	    languagecode = :languagecode and
+	    nlsid = :nlsid
+	    ;
+
+	}
+}
+
+//
+// BEGIN ERROR CHECK SECTION
+//
+
+error_exit:
+
+
+@parameters
+inout ReturnStatus int
+in enterprise varchar(8)
+in countrycode varchar(2)
+in languagecode varchar(2)
+in nlsid int
+in countrylist varchar(8)
+in wwentitytype varchar(32)
+in wwentityid int
+in status varchar(25)
+in status_fc varchar(8)
+in prentityid int
+in projectname varchar(50)
+in wwpartnumber varchar(7)
+in specialbid varchar(10)
+in specialbid_fc varchar(8)
+in category varchar(128)
+in category_fc varchar(8)
+in subcategory varchar(128)
+in subcategory_fc varchar(8)
+in group varchar(128)
+in group_fc varchar(8)
+in subgroup varchar(128)
+in subgroup_fc varchar(8)
+in ordercode varchar(4)
+in ordercode_fc varchar(4)
+in sarindc varchar(10)
+in sarindc_fc varchar(8)
+in serviceindicator varchar(10)
+in division varchar(8)
+in division_fc varchar(8)
+in ratecardcode varchar(10)
+in ratecardcode_fc varchar(8)
+in mktname varchar(254)
+in anndate varchar(10)
+in availdate varchar(10)
+in withdrawdate varchar(10)
+in standalone varchar(10)
+in standalone_fc varchar(8)
+in unitclass varchar(10)
+in unitclass_fc varchar(8)
+in unspsc varchar(254)
+in unspsc_fc varchar(8)
+in unspscsec varchar(254)
+in unspscsec_fc varchar(8)
+in unuom varchar(32)
+in unuom_fc varchar(8)
+in unuomsec varchar(15)
+in unuomsec_fc varchar(8)
+in applicationtype varchar(15)
+in applicationtype_fc varchar(8)
+in attrvalfrom varchar(27)
+in planrelevent varchar(12)
+in planrelevent_fc varchar(8)
+in processortype varchar(50)
+in processortype_fc varchar(8)
+in processortype_jsp varchar(25)
+in famnameassoc varchar(50)
+in famnameassoc_fc varchar(8)
+in senameassoc varchar(50)
+in senameassoc_fc varchar(8)
+in isactive int
+in schema varchar(8)
+@end

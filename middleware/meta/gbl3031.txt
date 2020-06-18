@@ -1,0 +1,206 @@
+@name=GBL3031
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=true
+@narrative
+// $Log: gbl3031.txt,v $
+// Revision 1.34  2010/06/21 15:42:44  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.33  2004/10/20 21:01:42  dave
+// changes to gen parm
+//
+// Revision 1.32  2004/02/20 20:21:52  roger
+// Must be @t_schema
+//
+// Revision 1.31  2004/02/20 18:09:32  roger
+// ALL table names must now be prefixed w/ @t_schema in
+// order to support multiple schemas in SPs.
+//
+// Revision 1.30  2004/01/06 18:46:49  gregg
+// add column for ordering by INT
+//
+// Revision 1.29  2004/01/06 18:34:41  gregg
+// include default column order as fallback
+//
+// Revision 1.28  2003/12/23 17:43:58  gregg
+// add column orders
+//
+// Revision 1.27  2003/09/08 16:31:13  roger
+// Enterprise was changed to 16 char length
+//
+// Revision 1.26  2003/04/28 21:10:01  dave
+// more Entity/Role removal logic
+//
+// Revision 1.25  2002/12/05 19:36:56  gregg
+// use MLA table for entityclass
+//
+// Revision 1.24  2002/01/28 20:53:22  dave
+// merging 1.0 maint into 1.1
+//
+// Revision 1.23  2001/12/12 17:24:44  dave
+// tweeks to sync 1.0 and 1.1 for all the maintenance mods
+//
+// Revision 1.22  2001/12/11 22:23:53  minhthy
+// changed MRA.linkcode = 'EntityAttribute'
+//
+// Revision 1.21  2001/12/10 23:19:28  minhthy
+// Added 'A' to the mix and reset MRA.linkcode = 'Copy'
+//
+// Revision 1.20  2001/10/10 17:57:24  dave
+// added 'X' to the mix
+//
+// Revision 1.19  2001/07/25 17:12:22  roger
+// Change Attribute to Attr in description
+//
+// Revision 1.18  2001/07/21 04:02:14  roger
+// Change MetaLinkAttribute to MetaLinkAttr
+// Change "opicm" to @t_schema in some
+//
+// Revision 1.17  2001/06/28 23:30:07  dana
+// modified sql
+//
+// Revision 1.16  2001/06/28 22:38:11  dana
+// added more columns
+//
+// Revision 1.15  2001/06/22 00:22:29  dana
+// change sort sequence
+//
+// Revision 1.14  2001/06/20 21:42:27  dana
+// chane order by  MA1.LONGDESCRIPTION
+// ,MA.LONGDESCRIPTION
+//
+// Revision 1.13  2001/06/18 21:24:12  dana
+// change order by items
+//
+// Revision 1.12  2001/06/15 23:54:53  dana
+// bypass flags description
+//
+// Revision 1.11  2001/06/15 23:02:52  dana
+// bypass flags desc
+//
+// Revision 1.10  2001/06/15 17:29:33  dana
+// change sort sequence
+//
+// Revision 1.9  2001/06/13 00:20:09  dana
+// no need desc for linktype
+//
+// Revision 1.8  2001/06/12 22:28:00  dave
+// tagging
+//
+//
+@desc=build a list of Attributes from MetaLinkAttr based upon enterprise, linktype, and linkcode
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl3031.txt,v 1.34 2010/06/21 15:42:44 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL BEGIN DECLARE SECTION;
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+ MRA.ENTERPRISE
+,MRA.LINKTYPE
+,MRA.LINKTYPE1
+,MRA.LINKTYPE2
+,ML2.linkcode
+,COALESCE(ML2.LINKVALUE, ' ') as LinkValue
+,COALESCE(MA.LONGDESCRIPTION, ' ') as linktype1_desc
+,COALESCE(MA1.LONGDESCRIPTION, ' ') as linktype2_desc
+,COALESCE(MA.SHORTDESCRIPTION, ' ') as linktype1_stdesc
+,COALESCE(MA1.SHORTDESCRIPTION, ' ') as linktype2_stdesc
+,COALESCE(ISREL.LINKCODE,'Entity')       as entity_class
+,COALESCE(MA1.DescriptionClass, ' ') as attribute_type
+,COALESCE(MA2.LONGDESCRIPTION, ' ')  as attribute_type_desc
+,COALESCE(COALESCE(RTRIM(CHAR(COLS.ORDER)),RTRIM(CHAR(COLSDEFAULT.ORDER))),'None') as column_order
+,COALESCE(COALESCE(INT(COLS.ORDER),INT(COLSDEFAULT.ORDER)),99999) as column_order_int
+FROM @t_schema.MetaLinkAttr MRA
+
+inner join @t_schema.MetaLinkAttr ML2 on
+ML2.enterprise =  MRA.Enterprise and
+ML2.linktype = 'Entity/Attribute' and
+ML2.linkcode = :LinkCode and
+ML2.linktype1 = MRA.linktype1 and
+ML2.linktype2 = MRA.linktype2 and
+ML2.ValFrom <= :ValOn AND :ValOn < ML2.ValTo AND
+ML2.EffFrom <= :EffOn AND :EffOn < ML2.EffTo
+INNER JOIN @t_schema.MetaLinkAttr MLAR ON
+    MLAR.Enterprise = ML2.Enterprise 
+AND MLAR.LinkType = 'Role/Attribute'
+AND MLAR.LinkType1 = :RoleCode
+AND MLAR.LinkType2 = ML2.Linktype2
+AND MLAR.LinkCode = 'Capability'
+AND MLAR.ValFrom <= :ValOn AND :ValOn < MLAR.ValTo AND MLAR.EffFrom <= :EffOn AND :EffOn < MLAR.EffTo
+
+INNER JOIN @t_schema.MetaDescription MA ON
+MA.Enterprise      = MRA.Enterprise AND
+MA.DescriptionType = MRA.LinkType1 AND
+MA.Descriptionclass in ('Entity', 'Relator') AND
+MA.NLSID in (1, :NLSID)  AND
+MA.ValFrom <= :ValOn AND :ValOn < MA.ValTo AND
+MA.EffFrom <= :EffOn AND :EffOn < MA.EffTo
+
+LEFT JOIN @t_schema.METALINKATTR ISREL ON
+    ISREL.enterprise = :Enterprise 
+AND ISREL.linkType = MA.DescriptionType
+AND ISREL.valto > :ValOn 
+AND ISREL.valfrom <= :ValOn 
+AND ISREL.effto > :EffOn 
+AND ISREL.efffrom <= :EffOn
+
+LEFT JOIN @t_schema.MetaDescription MA1 ON
+MA1.Enterprise = MRA.Enterprise AND
+-- DO NOT Pick 'A' TYPE ????
+MA1.DescriptionClass in ('B','D','F','I','L','X','P','S','T','U','A') AND
+MA1.DescriptionType = MRA.LinkType2 AND
+MA1.NLSID in (1, :NLSID) AND
+MA1.ValFrom <= :ValOn AND :ValOn < MA1.ValTo AND
+MA1.EffFrom <= :EffOn AND :EffOn < MA1.EffTo
+
+LEFT JOIN @t_schema.MetaDescription MA2 ON
+MA2.Enterprise = 'NE' AND
+MA2.DescriptionType = MA1.DescriptionClass AND
+MA2.DescriptionClass = 'AttType'  AND
+MA2.NLSID in (1, :NLSID) AND
+MA2.ValFrom <= :ValOn AND :ValOn < MA2.ValTo AND
+MA2.EffFrom <= :EffOn AND :EffOn < MA2.EffTo
+
+LEFT JOIN @t_schema.MetaColOrder COLS ON
+COLS.Enterprise = MRA.Enterprise AND
+COLS.OPWGID = :OPENID AND
+COLS.EntityType = MA.DescriptionType AND
+COLS.AttributeCode = MA1.DescriptionType
+
+LEFT JOIN @t_schema.MetaColOrder COLSDEFAULT ON
+COLSDEFAULT.Enterprise = MRA.Enterprise AND
+COLSDEFAULT.OPWGID = 0 AND
+COLSDEFAULT.EntityType = MA.DescriptionType AND
+COLSDEFAULT.AttributeCode = MA1.DescriptionType
+
+WHERE
+MRA.Enterprise = :Enterprise
+AND MRA.LinkType = :LinkType
+AND MRA.linkcode = 'EntityAttribute'
+AND MRA.Valfrom <= :ValOn AND :ValOn < MRA.ValTo AND
+MRA.EffFrom <= :EffOn AND :EffOn < MRA.EffTo
+ORDER BY
+ linktype1_desc
+,column_order_int
+,linktype2_desc
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in LinkType varchar(32)
+in LinkCode varchar(32)
+in OPENID int
+in NLSID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

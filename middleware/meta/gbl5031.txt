@@ -1,0 +1,64 @@
+@name=GBL5031
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+---------------------------------------------------------
+--  Upgrades the persistent field of an existing softlock
+---------------------------------------------------------
+$Log: gbl5031.txt,v $
+Revision 1.9  2010/06/21 15:42:49  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.8  2004/10/20 21:01:42  dave
+changes to gen parm
+
+Revision 1.7  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.6  2004/02/20 18:09:32  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.5  2003/09/08 16:31:14  roger
+Enterprise was changed to 16 char length
+
+Revision 1.4  2002/11/18 22:03:23  joan
+fixing softlock
+
+Revision 1.3  2001/09/21 17:27:50  dave
+fixed up some NE stuff
+
+Revision 1.2  2001/07/27 00:36:11  roger
+Add Log keyword and/or branding as needed
+
+Revision 1.1  2001/04/10 04:28:15  dave
+First Pass at adding persistence to the create softlock process
+
+@desc=Insert Soft Lock
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl5031.txt,v 1.9 2010/06/21 15:42:49 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+@execute
+EXEC SQL
+UPDATE @t_schema.Softlock SET LockLevel = :LockLevel
+WHERE
+    Enterprise = :Enterprise
+AND EntityType = :EntityType
+AND EntityID = :EntityID
+AND OPWGID = :OPWGID
+;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in OPWGID int
+in LockLevel int
+@end
+
+

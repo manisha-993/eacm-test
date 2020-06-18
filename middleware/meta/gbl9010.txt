@@ -1,0 +1,151 @@
+@name=GBL9010
+@type=basic
+@dbase=opicmpdh
+@noremote=true
+@addperm=false
+@narrative
+
+Better EntityId Blocking for CatIDL Load
+
+$Log: gbl9010.txt,v $
+Revision 1.7  2010/06/21 15:43:25  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2005/10/27 17:40:32  dave
+remapping
+
+Revision 1.5  2005/10/25 07:05:51  dave
+memory cleanup
+
+Revision 1.4  2005/10/25 00:37:54  dave
+syntax fixes
+
+Revision 1.3  2005/10/25 00:15:59  dave
+adding filters to SP for certain
+root nodes
+
+Revision 1.2  2005/10/03 13:40:29  dave
+sp syntax error
+
+Revision 1.1  2005/10/03 13:06:19  dave
+better catdb idl chunking
+
+
+@desc=This returns a list of blocks that have entityid's for a given type
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9010.txt,v 1.7 2010/06/21 15:43:25 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE entity_cursor CURSOR FOR
+WITH mymax(MaxEntityId,MinEntityId) AS (
+SELECT
+  MAX(E.EntityID),Min(E.EntityID)
+FROM  opicm.ENTITY E
+WHERE
+    E.Enterprise = :Enterprise
+AND E.EntityType = :EntityType
+AND E.Valto = :forever AND CURRENT TIMESTAMP BETWEEN E.EffFrom AND E.EffTo
+)
+, myinterm(minentityid, maxentityid, start, end, hitcounter) as
+(
+  SELECT minentityid, maxentityid,  minentityid-1, minentityid, 1 FROM mymax
+  UNION ALL
+  SELECT ROOT.minentityid, ROOT.maxentityid, ROOT.end+1, ROOT.end+:Chunk,
+(
+    Select
+    case
+        when count(distinct e.entityid) > 0 then 1
+        else 0
+    end
+    mycount
+    from opicm.entity e
+        LEFT JOIN @t_schema.MetaLinkAttr M1 ON
+        M1.Enterprise = :Enterprise
+            AND M1.LinkType = 'Entity/Status/ODSFilter'
+            AND M1.LinkType1 = :EntityType
+            AND M1.Linktype2 = 'GBLI'
+            AND M1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN M1.EffFrom AND M1.EffTo
+            LEFT JOIN @t_schema.Flag F1 ON
+        F1.Enterprise = :Enterprise
+            AND F1.EntityType = e.EntityType
+            AND F1.EntityID = e.EntityID
+            AND F1.AttributeCode = M1.LinkCode
+            AND F1.AttributeValue = M1.LinkValue
+            AND F1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN F1.EffFrom AND F1.EffTo
+    where
+        e.enterprise = :Enterprise
+    and e.entityid between ROOT.end and ROOT.END+:Chunk
+    and e.entitytype = :EntityType
+    and e.valto > current timestamp and e.effto >  current timestamp
+         AND 1 = (CASE
+    WHEN M1.Enterprise IS NOT NULL AND F1.Enterprise IS NULL THEN 0
+    ELSE 1 END)
+)
+from myinterm ROOT
+  WHERE ROOT.end between ROOT.minentityid and ROOT.maxentityid or root.end = 0
+)
+,mymaxr(MaxEntityId,MinEntityId) AS (
+SELECT
+  MAX(R.EntityID),Min(r.EntityID)
+FROM  opicm.Relator R
+WHERE
+    R.Enterprise = :Enterprise
+AND R.EntityType = :EntityType
+AND R.Valto = :forever AND CURRENT TIMESTAMP BETWEEN R.EffFrom AND R.EffTo
+)
+, myintermr(minentityid, maxentityid, start, end, hitcounter) as
+(
+  SELECT minentityid, maxentityid,  minentityid-1, minentityid, 1 FROM mymaxr
+  UNION ALL
+  SELECT ROOT.minentityid, ROOT.maxentityid, ROOT.end+1, ROOT.end+:Chunk,
+(
+    Select
+    case
+        when count(distinct r.entityid) > 0 then 1
+        else 0 end
+    mycount
+    from opicm.relator r
+        LEFT JOIN @t_schema.MetaLinkAttr M1 ON
+                        M1.Enterprise = :Enterprise
+        AND M1.LinkType = 'Entity/Status/ODSFilter'
+        AND M1.LinkType1 = :EntityType
+        AND M1.Linktype2 = 'GBLI'
+        AND M1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN M1.EffFrom AND M1.EffTo
+        LEFT JOIN @t_schema.Flag F1 ON
+                        F1.Enterprise = :Enterprise
+        AND F1.EntityType = R.EntityType
+        AND F1.EntityID = R.EntityID
+        AND F1.AttributeCode = M1.LinkCode
+        AND F1.AttributeValue = M1.LinkValue
+        AND F1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN F1.EffFrom AND F1.EffTo
+        where
+            R.Enterprise = :Enterprise
+    and r.entityid between ROOT.end and ROOT.END+:Chunk
+        AND R.EntityType = :EntityType
+        AND R.Valto = :forever AND CURRENT TIMESTAMP BETWEEN R.EffFrom AND R.EffTo
+        AND 1 = (CASE
+              WHEN M1.Enterprise IS NOT NULL AND F1.Enterprise IS NULL THEN 0
+              ELSE 1 END)
+)
+from myintermr ROOT
+  WHERE ROOT.end between ROOT.minentityid and ROOT.maxentityid or root.end = 0
+)
+select * from myinterm where hitcounter > 0 and minentityid is not null
+union
+select * from myintermr where hitcounter > 0 and minentityid is not null
+;
+
+@execute
+
+// Now open the cursor
+EXEC SQL OPEN entity_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in Chunk int
+@end

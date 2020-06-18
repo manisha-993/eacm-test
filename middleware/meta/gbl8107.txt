@@ -1,0 +1,199 @@
+@name=GBL8107
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------
+--  
+----------------------------------------------------------------
+$Log: gbl8107.txt,v $
+Revision 1.5  2010/06/21 15:43:13  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.4  2010/01/18 18:11:17  rick
+update for entity delete restriction.
+allows checked entity to be relator when parent or child of
+relator is the deleted entityi.
+
+Revision 1.3  2005/08/22 18:13:46  joan
+fixes
+
+Revision 1.2  2005/04/20 17:43:13  joan
+fixes
+
+Revision 1.1  2005/04/20 17:33:06  joan
+work on CR
+
+
+
+@desc=
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8107.txt,v 1.5 2010/06/21 15:43:13 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT
+  DISTINCT R1.Entity2Type, R1.Entity2ID
+FROM @t_schema.RELATOR R1
+
+JOIN @t_schema.flag F1 ON
+    F1.Enterprise = :Enterprise
+AND F1.Entitytype = R1.Entity2Type
+AND F1.EntityID = R1.Entity2ID
+AND F1.AttributeCode = :AttributeCode
+AND F1.AttributeValue = :AttributeValue
+AND F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+WHERE
+R1.Enterprise = :Enterprise AND
+R1.Entity1Type = :DeleteEntityType AND
+R1.Entity1ID = :DeleteEntityID AND
+R1.Entity2Type = :CheckEntityType AND
+R1.ValFrom <= :ValOn AND :ValOn < R1.ValTo AND R1.EffFrom <= :EffOn AND :EffOn < R1.EffTo
+
+UNION
+SELECT
+  DISTINCT R2.Entity1Type, R2.Entity1ID
+FROM @t_schema.RELATOR R2
+
+JOIN @t_schema.flag F1 ON
+    F1.Enterprise = :Enterprise
+AND F1.Entitytype = R2.Entity1Type
+AND F1.EntityID = R2.Entity1ID
+AND F1.AttributeCode = :AttributeCode
+AND F1.AttributeValue = :AttributeValue
+AND F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+WHERE
+R2.Enterprise = :Enterprise AND
+R2.Entity2Type = :DeleteEntityType AND
+R2.Entity2ID = :DeleteEntityID AND
+R2.Entity1Type = :CheckEntityType AND
+R2.ValFrom <= :ValOn AND :ValOn < R2.ValTo AND R2.EffFrom <= :EffOn AND :EffOn < R2.EffTo
+
+UNION
+SELECT
+DISTINCT R3.EntityType, R3.EntityID
+FROM @t_schema.RELATOR R3
+
+JOIN @t_schema.flag F1 ON
+F1.Enterprise = :Enterprise
+AND F1.Entitytype = R3.EntityType
+AND F1.EntityID = R3.EntityID
+AND F1.AttributeCode = :AttributeCode
+AND F1.AttributeValue = :AttributeValue
+AND F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+WHERE
+R3.Enterprise = :Enterprise AND
+R3.Entity1Type = :DeleteEntityType AND
+R3.Entity1ID = :DeleteEntityID AND
+R3.EntityType = :CheckEntityType AND
+R3.ValFrom <= :ValOn AND :ValOn < R3.ValTo AND R3.EffFrom <= :EffOn AND :EffOn < R3.EffTo
+
+UNION
+SELECT
+DISTINCT R4.EntityType, R4.EntityID
+FROM @t_schema.RELATOR R4
+
+JOIN @t_schema.flag F1 ON
+F1.Enterprise = :Enterprise
+AND F1.Entitytype = R4.EntityType
+AND F1.EntityID = R4.EntityID
+AND F1.AttributeCode = :AttributeCode
+AND F1.AttributeValue = :AttributeValue
+AND F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+WHERE
+R4.Enterprise = :Enterprise AND
+R4.Entity2Type = :DeleteEntityType AND
+R4.Entity2ID = :DeleteEntityID AND
+R4.EntityType = :CheckEntityType AND
+R4.ValFrom <= :ValOn AND :ValOn < R4.ValTo AND R4.EffFrom <= :EffOn AND :EffOn < R4.EffTo
+;
+EXEC SQL DECLARE sp_cursor2 CURSOR FOR
+SELECT
+  DISTINCT Entity2Type, Entity2ID
+FROM @t_schema.RELATOR R1
+
+JOIN @t_schema.flag F1 ON
+    F1.Enterprise = :Enterprise
+AND F1.Entitytype = R1.Entity2Type
+AND F1.EntityID = R1.Entity2ID
+AND F1.AttributeCode = :AttributeCode
+AND F1.AttributeValue = :AttributeValue
+AND F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+WHERE
+R1.Enterprise = :Enterprise AND
+R1.EntityType = :DeleteEntityType AND
+R1.EntityID = :DeleteEntityID AND
+R1.Entity2Type = :CheckEntityType AND
+R1.ValFrom <= :ValOn AND :ValOn < R1.ValTo AND R1.EffFrom <= :EffOn AND :EffOn < R1.EffTo
+
+UNION
+SELECT
+  DISTINCT Entity1Type, Entity1ID
+FROM @t_schema.RELATOR R2
+
+JOIN @t_schema.flag F1 ON
+    F1.Enterprise = :Enterprise
+AND F1.Entitytype = R2.Entity1Type
+AND F1.EntityID = R2.Entity1ID
+AND F1.AttributeCode = :AttributeCode
+AND F1.AttributeValue = :AttributeValue
+AND F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+WHERE
+R2.Enterprise = :Enterprise AND
+R2.EntityType = :DeleteEntityType AND
+R2.EntityID = :DeleteEntityID AND
+R2.Entity1Type = :CheckEntityType AND
+R2.ValFrom <= :ValOn AND :ValOn < R2.ValTo AND R2.EffFrom <= :EffOn AND :EffOn < R2.EffTo
+;
+EXEC SQL DECLARE sp_cursor3 CURSOR FOR
+SELECT
+  DISTINCT F1.EntityType, F1.EntityID
+FROM @t_schema.ENTITY E1
+
+JOIN @t_schema.flag F1 ON
+    F1.Enterprise = :Enterprise
+AND F1.Entitytype = E1.EntityType
+AND F1.EntityID = E1.EntityID
+AND F1.AttributeCode = :AttributeCode
+AND F1.AttributeValue = :AttributeValue
+AND F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+WHERE
+E1.Enterprise = :Enterprise AND
+E1.EntityType = :DeleteEntityType AND
+E1.EntityID = :DeleteEntityID AND
+E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND :EffOn < E1.EffTo
+;
+
+@execute
+if (iCase == 2) {
+  EXEC SQL OPEN sp_cursor2;
+} else if (iCase == 1) {
+  EXEC SQL OPEN sp_cursor1;
+} else {
+  EXEC SQL OPEN sp_cursor3;
+}
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in DeleteEntityType varchar(32)
+in DeleteEntityID int
+in CheckEntityType varchar(32)
+in AttributeCode varchar(32)
+in AttributeValue varchar(32)
+in iCase int
+in ValOn varchar(27)
+in EffOn varchar(27)
+@end
+
+

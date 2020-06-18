@@ -1,0 +1,86 @@
+@name=GBL7514
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7514.txt,v $
+Revision 1.11  2010/06/21 15:43:06  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.10  2004/10/20 21:01:44  dave
+changes to gen parm
+
+Revision 1.9  2004/02/20 20:21:54  roger
+Must be @t_schema
+
+Revision 1.8  2004/02/20 18:09:34  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.7  2003/09/08 16:31:17  roger
+Enterprise was changed to 16 char length
+
+Revision 1.6  2002/07/17 17:33:21  roger
+Ensured Log was in @narrative
+
+@desc=retreive All current attributes ,descriptions, capabilities based on role, enterprise
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7514.txt,v 1.11 2010/06/21 15:43:06 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+
+select distinct
+
+ ATT.descriptiontype
+,ATT.descriptionclass
+,ATT.shortdescription
+,ATT.longdescription
+,CAP.linktype1
+,CAP.linkvalue
+,ATT.ValFrom
+,ATT.ValTo
+,(CASE WHEN PARENT.enterprise IS NOT NULL THEN 'Owned' ELSE 'Orphan' END)
+
+from @t_schema.metadescription ATT 
+
+join @t_schema.metalinkattr CAP on
+CAP.enterprise = ATT.enterprise
+and CAP.effto > current timestamp and CAP.valto > current timestamp 
+and CAP.efffrom <= current timestamp and CAP.valfrom <= current timestamp
+and CAP.linktype = 'Role/Attribute' 
+and CAP.linkcode = 'Capability' 
+and CAP.linktype1 = :RoleCode 
+and CAP.linktype2 = ATT.descriptiontype
+
+left join @t_schema.metalinkattr PARENT on
+PARENT.enterprise = ATT.enterprise
+and PARENT.effto > current timestamp and PARENT.valto > current timestamp 
+and PARENT.efffrom <= current timestamp and PARENT.valfrom <= current timestamp
+and PARENT.linktype = 'Entity/Attribute' 
+and PARENT.linkcode = 'EntityAttribute' 
+and PARENT.linktype2 = ATT.descriptiontype
+
+where
+ATT.enterprise = :Enterprise 
+and ATT.effto > current timestamp and ATT.valto > current timestamp 
+and ATT.efffrom <= current timestamp and ATT.valfrom <= current timestamp
+and ATT.descriptionClass in ('A','B','D','F','I','L','P','S','T','U','X')
+and ATT.nlsid = :NLSID
+
+order by ATT.descriptiontype
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in RoleCode varchar(32)
+in NLSID int
+@end
+
+

@@ -1,0 +1,148 @@
+@name=GBL9669
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+$Log: gbl9669.txt,v $
+Revision 1.5  2010/06/21 15:43:19  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.4  2005/05/10 19:31:45  steve
+changed the Length of Enterprise
+
+Revision 1.3  2005/04/20 16:56:05  steve
+*** empty log message ***
+
+Revision 1.2  2005/04/14 16:54:32  steve
+*** empty log message ***
+
+Revision 1.1  2005/04/13 19:15:05  steve
+new
+Action SS
+
+Revision 1.9  2004/10/20 21:01:39  dave
+changes to gen parm
+
+@desc=Used to load Actions by levels 
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9669.txt,v 1.5 2010/06/21 15:43:19 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+with myAct1(level,ParentEntityType,ParentAction,  ChildEntityType, ChildGroup, ChildAction,Corder)  AS (
+ SELECT
+  INT(0)
+,CHAR('EP',16) as PentityType
+,CHAR(G.linktype2,24)  as PAction
+,CHAR(G.linkcode,24)  as EntityType
+,CHAR(G.linkvalue,24)  as CGroup
+,CHAR(I.linktype2,32)   as CActionItem
+,CHAR(I.linkvalue,8) as Corder
+from opicm.MetaLinkAttr G 
+join opicm.MetaLinkattr  I on
+ I.enterprise = :Enterprise  
+AND I.linktype = 'Group/Action'
+AND I.linktype1 = G.linkvalue
+AND I.valto > current timestamp
+AND I.effto > current timestamp
+join opicm.metaentity me on 
+me.enterprise = :Enterprise  
+and me.entitytype = i.linktype2 
+WHERE
+G.enterprise = :Enterprise 
+AND G.linktype = 'Role/Action/Entity/Group'
+AND G.linktype1 = :Role
+AND G.linktype2 = 'EntryPoint'
+AND G.valto > current timestamp
+AND G.effto > current timestamp
+UNION ALL
+select 
+  P.level +1
+, P.ChildEntityType
+, P.ChildAction
+, C.LinkCode
+, C.LinkValue 
+,ci.linktype2
+,ci.linkvalue
+from myAct1 P,
+opicm.metalinkattr c,
+opicm.metalinkattr ci,
+opicm.metaentity me
+where
+C.enterprise = :Enterprise  and 
+P.ChildAction  =  C.linktype2 and
+C.Linktype = 'Role/Action/Entity/Group' and
+C.Linktype1 = :Role and 
+ci.enterprise = :Enterprise  and
+ci.linktype = 'Group/Action' and
+ci.linktype1 = c.linkvalue and 
+me.enterprise = :Enterprise  and
+me.entitytype = ci.linktype2 and 
+--P.ParentEntityType <> c.LinkCode and 
+P.level < 5
+UNION ALL
+select 
+  P.level +1
+, P.ChildEntityType
+, P.ChildAction
+, C.LinkCode
+, 'TYPE2GROUP'
+, ':' || C.LinkValue 
+,'N/A'
+from myAct1 P,
+opicm.metalinkattr c,
+opicm.metaentity me
+where
+C.enterprise = :Enterprise  and 
+P.ChildAction  =  C.linktype1 and
+me.enterprise = :Enterprise  and
+me.entitytype = P.ChildAction and
+me.entityclass in ( 'WhereUsed', 'Matrix') and
+C.Linktype = 'Action/Attribute' and
+C.Linktype2 in ('PICK','DELETE','CREATE') and 
+C.Linktype1 = P.ChildAction and 
+P.level < 5
+
+)
+, myAct2 (level, parentEntityType, ParentAction, ChildEntityType, ChildGroup, ChildAction, ChildOrder) as (
+select min(level),  parententitytype, parentaction,childentitytype, childgroup, childaction, corder from myAct1 
+group by parententitytype, parentaction, childentitytype, childgroup, childaction, corder 
+--order by parententitytype, parentaction, childgroup, corder
+)
+select  
+' ' Action,
+level LEVEL, 
+ParentEntityType PAR_ET, 
+ParentAction PAR_ACTION , 
+(Select  distinct longdescription from opicm.metadescription where enterprise = :Enterprise  and descriptiontype = ParentAction  and valto > current timestamp and nlsid = 1 and effto > current timestamp)  as PAR_ACTION_DESC,
+ChildOrder CHD_ORDER,
+case WHEN LEFT(ChildAction,1) = ':' THEN 
+(Select  distinct EntityClass from opicm.metaEntity where enterprise = :Enterprise  and  ':' || Entitytype = ChildAction  and valto > current timestamp and effto > current timestamp)
+ELSE  
+(Select distinct EntityClass from opicm.metaEntity where enterprise = :Enterprise  and Entitytype = ChildAction  and valto > current timestamp and effto > current timestamp) END
+as CHD_CAT ,
+ChildEntityType as CHD_ET,
+ChildAction as CHD_ACTION,
+case WHEN LEFT(ChildAction,1) = ':' THEN 
+(Select distinct longdescription from opicm.metadescription where enterprise = :Enterprise  and ':' || descriptiontype = ChildAction and valto > current timestamp and nlsid = 1 and effto > current timestamp)  
+ELSE 
+(Select distinct longdescription from opicm.metadescription where enterprise = :Enterprise  and descriptiontype = ChildAction and valto > current timestamp and nlsid = 1 and effto > current timestamp)  
+END 
+as CHD_ACTION_DESC,
+ChildGroup as CHD_GROUP,
+(Select  distinct EntityClass from opicm.metaEntity where enterprise = :Enterprise  and Entitytype = ParentAction  and valto > current timestamp and effto > current timestamp) as PAR_CAT
+from myAct2
+order by LEVEL,PAR_ET, PAR_ACTION, CHD_ORDER;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(24)
+in Role varchar(24)
+@end
+
+
+

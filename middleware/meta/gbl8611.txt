@@ -1,0 +1,62 @@
+@name=GBL8611
+@type=basic
+@dbase=opicmpdh
+@noremote=true
+@results=1
+@fenced=true
+@narrative
+
+    This guy retrieves a set of field validation rules for a given Attribute Code. (was 6011)
+
+$Log: gbl8611.txt,v $
+Revision 1.6  2010/06/21 15:43:19  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.5  2004/10/20 21:01:49  dave
+changes to gen parm
+
+Revision 1.4  2004/02/20 20:21:58  roger
+Must be @t_schema
+
+Revision 1.3  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.2  2003/09/08 16:31:21  roger
+Enterprise was changed to 16 char length
+
+Revision 1.1  2002/05/03 18:17:19  gregg
+moved from gbl6011
+
+Revision 1.1  2001/10/04 22:09:28  dave
+more constructor cool stuff
+
+@desc=Get all Field Level Rule for a given Attribute
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8611.txt,v 1.6 2010/06/21 15:43:19 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+ RTRIM(mla.linktype2)
+,RTRIM(mla.linkcode)
+,RTRIM(mla.linkvalue)
+FROM @t_schema.MetaLinkAttr  MLA
+WHERE
+    MLA.Enterprise = :Enterprise
+AND MLA.LinkType = 'Attribute/Test'
+AND MLA.LinkType1 = :AttributeCode
+AND MLA.ValFrom <= :ValOn AND :ValOn  < MLA.ValTo AND MLA.EffFrom <= :EffOn AND :EffOn  < MLA.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in AttributeCode varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

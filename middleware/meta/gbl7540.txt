@@ -1,0 +1,192 @@
+@name=GBL7540
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+get Attribute Change info for the indicated attribute (Flag, Text, LongText, Blob (blob ext.) tables).
+
+//
+//$Log: gbl7540.txt,v $
+//Revision 1.36  2010/06/21 15:43:10  wendy
+//Exceeded RMI 64k static block limit, not needed for RMI
+//
+//Revision 1.35  2004/10/20 21:01:45  dave
+//changes to gen parm
+//
+//Revision 1.34  2004/09/28 22:14:12  dave
+//final fix
+//
+//Revision 1.33  2004/09/28 21:16:35  dave
+//more change history stuff
+//
+//Revision 1.32  2004/09/21 16:27:57  dave
+//trapping sp gen issue
+//
+//
+
+@desc=Gets Attribute Change info for the indicated attribute (Flag, Text, LongText, Blob (blob ext.) tables).
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char AttributeType;
+char brand[80] = "$Id: gbl7540.txt,v 1.36 2010/06/21 15:43:10 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+// First lets get the AttributeType so we can determine the table we want 
+EXEC SQL DECLARE AttTypeCursor CURSOR FOR 
+SELECT 
+ME.EntityClass
+from @t_schema.metaentity ME where
+    ME.enterprise = :Enterprise
+AND ME.entityType = :AttributeCode
+AND ME.valto > current timestamp 
+AND ME.effto > current timestamp 
+AND ME.valfrom <= current timestamp 
+AND ME.efffrom <= current timestamp
+;
+
+EXEC SQL DECLARE TextCursor CURSOR FOR
+SELECT 
+ ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,INT(OPENID)
+,INT(TRANID)
+,CASE WHEN (ValTo > current timestamp AND EffTo > current timestamp) THEN 'CURRENT' ELSE 'EXPIRED' END AS STATUS
+,CASE WHEN (EffTo <= Valfrom) THEN 'INACTIVE' ELSE 'ACTIVE' END
+,AttributeValue
+,'N/A'
+FROM @t_schema.Text where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND AttributeCode = :AttributeCode
+AND EntityID = :EntityID
+AND NLSID in (1,:NLSID)
+order by valto
+;
+
+EXEC SQL DECLARE LongTextCursor CURSOR FOR
+SELECT 
+ ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,INT(OPENID)
+,INT(TRANID)
+,CASE WHEN (ValTo > current timestamp AND EffTo > current timestamp) THEN 'CURRENT' ELSE 'EXPIRED' END AS STATUS
+,CASE WHEN (EffTo <= Valfrom) THEN 'INACTIVE' ELSE 'ACTIVE' END
+,SUBSTR(AttributeValue,1,200)
+,'N/A'
+FROM @t_schema.LongText where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND AttributeCode = :AttributeCode
+AND EntityID = :EntityID
+AND NLSID in (1,:NLSID)
+order by valto
+;
+
+EXEC SQL DECLARE BlobCursor CURSOR FOR
+SELECT 
+ ValFrom
+,ValTo
+,EffFrom
+,EffTo
+,INT(OPENID)
+,INT(TRANID)
+,CASE WHEN (ValTo > current timestamp AND EffTo > current timestamp) THEN 'CURRENT' ELSE 'EXPIRED' END AS STATUS
+,CASE WHEN (EffTo <= Valfrom) THEN 'INACTIVE' ELSE 'ACTIVE' END
+,BlobExtension
+,'N/A'
+FROM @t_schema.Blob where
+    Enterprise = :Enterprise 
+AND EntityType = :EntityType 
+AND AttributeCode = :AttributeCode
+AND EntityID = :EntityID
+AND NLSID in (1,:NLSID)
+order by valto
+;
+
+EXEC SQL DECLARE FlagCursor CURSOR FOR
+SELECT 
+ F.ValFrom
+,F.ValTo
+,F.EffFrom
+,F.EffTo
+,INT(F.OPENID)
+,INT(F.TRANID)
+,CASE WHEN (F.ValTo > current timestamp AND F.EffTo > current timestamp) THEN 'CURRENT' ELSE 'EXPIRED' END AS STATUS
+,CASE WHEN (F.EffTo <= F.Valfrom) THEN 'INACTIVE' ELSE 'ACTIVE' END
+,Coalesce(RTRIM(MD.LongDescription),F.AttributeValue)
+,F.AttributeValue
+FROM @t_schema.Flag F 
+LEFT JOIN @t_schema.MetaDescription MD on 
+    MD.enterprise = F.enterprise
+AND MD.descriptionType = F.attributeCode
+AND MD.descriptionclass = F.attributeValue
+AND MD.valto > current timestamp
+AND MD.effto > current timestamp
+AND MD.valfrom <= current timestamp
+AND MD.efffrom <= current timestamp
+AND MD.NLSID in (1,:NLSID)
+where
+    F.Enterprise = :Enterprise 
+AND F.EntityType = :EntityType 
+AND F.AttributeCode = :AttributeCode
+AND F.EntityID = :EntityID
+order by F.valto
+
+;
+
+
+// Fetch the AttributeType of the passed AttributeCode and place it in AttributeType var
+EXEC SQL OPEN AttTypeCursor;
+do {
+  EXEC SQL FETCH AttTypeCursor INTO :AttributeType;
+  if (SQLCODE != 0) 
+      break;  
+} while (1);
+// Close and release resources
+EXEC SQL CLOSE AttTypeCursor WITH RELEASE;
+
+// Now Execute the Corresponding Table's SQL. 
+switch(AttributeType) {
+    case 'T':
+    case 'I':
+        EXEC SQL OPEN TextCursor;
+        break;
+    case 'L':
+    case 'X':
+        EXEC SQL OPEN LongTextCursor;
+        break;
+    case 'F':
+    case 'U':
+    case 'S':
+    case 'A':
+        EXEC SQL OPEN FlagCursor;
+        break;
+    case 'B':
+        EXEC SQL OPEN BlobCursor;
+        break;
+    default:
+        //do nothing
+        break;
+}
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in AttributeCode varchar(32)
+in NLSID int
+@end
+
+
+
+

@@ -1,0 +1,157 @@
+@name=GBL8114
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+-----------------------------------------------------------------------------------------
+-- This guy inserts a new record into the trsNavigateTable from the QUEUE table
+-- Given an interval
+-----------------------------------------------------------------------------------------
+$Log: gbl8114.txt,v $
+Revision 1.11  2014/11/05 17:23:29  rick
+Updating the limit to 10000 as the 2500 limit is being reached for reports in the in-basket.
+
+Revision 1.10  2010/06/21 15:43:10  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.9  2009/10/20 00:22:00  rick
+update to change long datatype to sqlint32
+
+Revision 1.8  2004/10/20 21:01:48  dave
+changes to gen parm
+
+Revision 1.7  2004/02/20 20:21:56  roger
+Must be @t_schema
+
+Revision 1.6  2004/02/20 18:09:36  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.5  2003/09/04 18:55:12  dave
+adding Enterprise and OPID negativity
+
+Revision 1.4  2003/03/14 20:31:32  dave
+setting block size to 2500
+
+Revision 1.3  2003/03/14 18:09:13  dave
+added chunking
+
+Revision 1.2  2003/03/07 21:53:37  dave
+typo
+
+Revision 1.1  2003/03/07 21:00:50  dave
+making interval used for GBL8116, GBL8114 to
+only pull an interval's worth of data from the Queue
+table to the Navigate table
+
+
+@desc=insert a record into the trsnavigateTable from queue table given an interval
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8114.txt,v 1.11 2014/11/05 17:23:29 rick Exp $";
+EXEC SQL END DECLARE SECTION;
+@execute
+
+EXEC SQL BEGIN DECLARE SECTION;
+sqlint32 iCount = 0;
+sqlint32 blocksize = 10000;
+sqlint32 MinEntityID = 0;
+sqlint32 MaxEntityID = 10000000;
+EXEC SQL END DECLARE SECTION;
+// end sql tag
+
+
+do {
+
+    // Back off entityid's in some chunk
+    if (iCount > blocksize) {
+        MaxEntityID = MaxEntityID - (iCount - blocksize);
+    }
+
+    EXEC SQL 
+    SELECT 
+    MIN(DISTINCT EntityID)
+    ,MAX(DISTINCT ENTITYID) 
+    INTO 
+    :MinEntityID
+    ,:MaxEntityID 
+    FROM @t_schema.QUEUE
+    WHERE
+    (OPWGID = :OPWGID OR OPWGID = (:OPID * -1))
+    AND QUEUE = :QUEUE
+    AND STATUS <> 1
+    AND INTERVALSTARTDATE = :STARTDATE
+    AND INTERVALENDDATE = :ENDDATE
+    AND ENTITYID BETWEEN :MinEntityID and :MaxEntityID
+    ;
+
+    EXEC SQL COMMIT WORK;
+
+    EXEC SQL
+    SELECT 
+    COUNT(DISTINCT ENTITYID) 
+    INTO
+    :iCount
+    FROM @t_schema.QUEUE
+    WHERE
+    (OPWGID = :OPWGID OR OPWGID = (:OPID * -1))
+    AND QUEUE = :QUEUE
+    AND STATUS <> 1
+    AND ENTITYID BETWEEN :MinEntityID AND :MaxEntityID
+    AND INTERVALSTARTDATE = :STARTDATE
+    AND INTERVALENDDATE = :ENDDATE
+    ;
+
+    EXEC SQL COMMIT WORK;
+    
+} while (iCount > blocksize);
+
+ 
+EXEC SQL INSERT INTO @t_schema.trsNavigate 
+SELECT
+ DISTINCT
+ :Enterprise
+,:SessionID
+,'Entity'
+,'List'
+,-1
+,0
+,'X'
+,'X'
+,'NOOP'
+,0
+,'NOOP'
+,0
+,EntityType
+,EntityID
+,:now
+,:now
+FROM @t_schema.QUEUE 
+WHERE
+   (OPWGID = :OPWGID OR OPWGID = (:OPID * -1))
+AND QUEUE = :QUEUE
+AND STATUS <> 1
+AND ENTITYID BETWEEN :MinEntityID AND :MaxEntityID
+AND INTERVALSTARTDATE = :STARTDATE
+AND INTERVALENDDATE = :ENDDATE
+;
+
+EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in OPWGID int
+in OPID int
+in QUEUE varchar(32)
+in STARTDATE varchar(27)
+in ENDDATE varchar(27)
+@end
+
+
+

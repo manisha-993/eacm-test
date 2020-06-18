@@ -1,0 +1,157 @@
+@name=GBL3100
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=true
+@fenced=true
+@narrative
+---------------------------------------------------------------------------------
+--Select a role and show workflow path/action
+---------------------------------------------------------------------------------
+$Log: gbl3100.txt,v $
+Revision 1.16  2010/06/21 15:42:45  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.15  2004/10/20 21:01:42  dave
+changes to gen parm
+
+Revision 1.14  2004/02/20 20:21:52  roger
+Must be @t_schema
+
+Revision 1.13  2004/02/20 18:09:32  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.12  2003/09/08 16:31:14  roger
+Enterprise was changed to 16 char length
+
+Revision 1.11  2002/07/23 22:27:43  vlasta
+*** empty log message ***
+
+Revision 1.10  2002/07/23 22:14:01  vlasta
+*** empty log message ***
+
+Revision 1.9  2002/07/23 22:05:18  gregg
+opicmpdh param
+
+Revision 1.8  2002/07/23 00:01:37  vlasta
+*** empty log message ***
+
+Revision 1.7  2002/07/22 23:54:51  vlasta
+*** empty log message ***
+
+Revision 1.6  2002/07/22 20:29:25  vlasta
+*** empty log message ***
+
+Revision 1.5  2002/07/17 17:33:18  roger
+Ensured Log was in @narrative
+
+@desc=show workflow path/action based upon a given role
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE NavCur CURSOR FOR
+With myPath (Level,FromGroup, FromEntity, Role, Action, ToEntity, ToGroup)
+AS 
+(SELECT  
+    0, 
+    'Start' AS FromGroup, 
+    'Login' AS FromEntity, 
+    ROOT.LinkType1 AS Role, 
+    ROOT.LinkType2 AS Action, 
+    ROOT.LinkCode AS ToEntity, 
+    ROOT.LinkValue AS ToGroup
+FROM @t_schema.MetaLinkAttr ROOT
+WHERE
+    ROOT.Enterprise = :Enterprise 
+AND ROOT.LinkType = 'Role/Action/Entity/Group' 
+AND ROOT.LinkType1 = :Role
+AND ROOT.LinkType2 = 'EntryPoint' 
+AND ROOT.LinkCode = 'WG' 
+AND ROOT.Valfrom <= :ValOn AND :ValOn < ROOT.ValTo AND ROOT.EffFrom <= :EffOn AND :EffOn < ROOT.EffTo
+UNION ALL   
+SELECT 
+    PARENT.Level + 1, 
+    PARENT.ToGroup, 
+    PARENT.ToEntity, 
+    CHILD.Role, 
+    CHILD.Action, 
+    CHILD.Entity, 
+    CHILD.GrouP2
+FROM myPath PARENT,
+(SELECT     
+    ROOT.LinkType1 AS GrouP1,
+    ML.LinkType1 AS Role,
+    ROOT.LinkType2 AS Action,
+    ML.LinkCode  AS Entity,
+    ML.LinkValue AS GrouP2
+FROM @t_schema.MetaLinkAttr ROOT 
+LEFT JOIN @t_schema.MetaLinkAttr ML ON
+    ML.Enterprise = :Enterprise 
+AND ML.LinkType = 'Role/Action/Entity/Group' 
+AND ML.LinkType1 = :Role 
+AND ML.LinkType2 = ROOT.LinkType2 
+AND ML.Valfrom <= :ValOn AND :ValOn < ML.ValTo AND ML.EffFrom <= :EffOn AND :EffOn < ML.EffTo
+WHERE
+    ROOT.Enterprise = :Enterprise 
+AND ROOT.LinkType = 'Group/Action' 
+AND ROOT.Valfrom <= :ValOn AND :ValOn < ROOT.ValTo AND ROOT.EffFrom <= :EffOn AND :EffOn < ROOT.EffTo)
+AS CHILD
+WHERE
+    PARENT.ToGroup = CHILD.GrouP1 
+AND PARENT.Level < 10)
+,
+myPath2 (LinkType, Action, Direction, LinkValue)
+AS 
+(SELECT 
+    LinkType,  
+    LinkType1, 
+    LinkCode, 
+    Max(LinkValue)
+FROM @t_schema.MetaLinkAttr ML
+WHERE   
+    ML.Enterprise = :Enterprise 
+AND ML.LinkType = 'Action/Entity' 
+AND ML.Valfrom <= :ValOn AND :ValOn < ML.ValTo AND ML.EffFrom <= :EffOn AND :EffOn < ML.EffTo
+Group by LinkType, LinkType1, LinkCode)
+
+SELECT DISTINCT
+    MD.LongDescription,
+    MD.DescriptionClass,
+    P1.Level, 
+    SUBSTR(P1.FromGroup,1,20) AS FromGroup, 
+    P1.FromEntity,
+    P1.Action, 
+    P1.ToEntity, 
+    SUBSTR(P1.ToGroup,1,20) AS ToGroup, 
+    MD.ShortDescription,
+    MD.NLSID
+FROM myPath P1
+
+-- Show Description and DescriptionClass of Action
+LEFT JOIN myPath2 P2 ON 
+    P1.Action = P2.Action 
+LEFT JOIN @t_schema.MetaDescription MD ON
+    MD.Enterprise = :Enterprise
+AND MD.DescriptionType = P1.Action
+AND MD.NLSID IN (1, :NLSID)
+AND MD.Valfrom <= :ValOn AND :ValOn < MD.ValTo AND MD.EffFrom <= :EffOn AND :EffOn < MD.EffTo
+ORDER BY Level, Action, FromGroup, FromEntity, ToGroup
+;
+@execute
+EXEC SQL OPEN NavCur;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in NLSID int
+in Role varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+
+

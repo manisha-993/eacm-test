@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="middleware.makeJar" default="jar" basedir=".">
+	
+	<!-- set global properties for this build -->
+	
+	<property name="src" location="source"/>
+	<property name="build" location="bin"/>
+    <property name="sgcat.location" value="../sgcat"/>
+	
+    <path id="sgcat.classpath">
+        <pathelement location="${sgcat.location}/bin"/>
+        <path refid="middleware.classpath"/>
+    </path>
+    <path id="middleware.classpath">
+        <pathelement location="${src}/activation.jar"/>
+        <pathelement location="${src}/cwa.jar"/>
+        <pathelement location="${DB2_JDBC_DRIVER_PATH}/db2java.zip"/>
+        <pathelement location="${src}/ibmjndi.jar"/>
+        <pathelement location="${src}/jcert.jar"/>
+        <pathelement location="${src}/jndi.jar"/>
+        <pathelement location="${src}/jnet.jar"/>
+        <pathelement location="${src}/jsse.jar"/>
+        <pathelement location="${src}/mail.jar"/>
+        <pathelement location="${src}/servlet.jar"/>
+        <pathelement location="${src}/smtp.jar"/>
+<!--        <path refid="sgcat.classpath"/> -->
+        <pathelement location="${WAS_50_PLUGINDIR}/mqjms/Java/lib/com.ibm.mq.jar"/>
+    </path>
+
+    <property name="middleware.include" 
+        value="COM\ibm\eannounce\hula\*.class 
+        COM\ibm\eannounce\objects\*.class 
+        COM\ibm\eannounce\ods\*.class 
+        COM\ibm\eannounce\pmsync\*.class 
+        COM\ibm\eannounce\report\*.class 
+        COM\ibm\eannounce\was\*.class 
+        COM\ibm\opicmpdh\containers\*.class 
+        COM\ibm\opicmpdh\middleware\*.class 
+        COM\ibm\opicmpdh\middleware\taskmaster\*.class 
+        COM\ibm\opicmpdh\objects\*.class 
+        COM\ibm\opicmpdh\transactions\*.class 
+        COM\ibm\opicmpdh\translation\*.class 
+        COM\ibm\eannounce\pmsync\PMComparisonReport.txt 
+        COM\ibm\eannounce\pmsync\PMSyncFeed.meta.properties 
+        COM\ibm\eannounce\pmsync\PMSyncFeed.rmi.login.properties 
+        COM\ibm\opicmpdh\middleware\taskmaster\chktm-aix 
+        COM\ibm\opicmpdh\middleware\taskmaster\killtm-aix 
+        COM\ibm\opicmpdh\middleware\taskmaster\lsof 
+        COM\ibm\opicmpdh\middleware\taskmaster\ping-aix 
+        COM\ibm\opicmpdh\middleware\taskmaster\pingall-aix 
+        COM\ibm\opicmpdh\middleware\taskmaster\policy 
+        COM\ibm\opicmpdh\middleware\taskmaster\starttm-aix 
+        COM\ibm\opicmpdh\middleware\taskmaster\stoptm-aix 
+        COM\ibm\opicmpdh\middleware\taskmaster\watchtm-aix 
+        cktime 
+        cons 
+        ea.cert 
+        eakeystore 
+        eatruststore 
+        logins 
+        logwatch-aix 
+        middleware.client.properties.sample 
+        middleware.server.properties.sample 
+        net 
+        run.mwcp 
+        runmw-aix 
+        slow 
+        t 
+        testldap-aix 
+        testmw-aix 
+        whatrun"/>
+   
+    <target name="init">
+        <tstamp>
+            <!-- Use Eastern Standard Time -->
+              <format property="jar.date" pattern="EEE MM/dd/yyyy" timezone="America/New_York"/>
+        </tstamp>
+        <tstamp>
+              <format property="jar.time" pattern="hh:mm:ss.SS" timezone="America/New_York"/>
+        </tstamp>
+        <tstamp>
+            <!-- Use local System time in message -->
+            <format property="start.ts" pattern="EEE MM/dd/yyyy hh:mm:ss.SS"/>
+        </tstamp>
+        <echo message="Init: ${start.ts}" />   
+        <echo message="Ant JVM version: ${ant.java.version}"/>
+        <echo message="${ant.version}"/>
+    </target>
+   
+	<target name="clean" description="Cleans the destination folder" depends="init">
+		<delete file="${build}/jar/middleware.jar"/>
+	</target>
+
+    <target name="build" depends="init,clean">
+        <!-- Build is done by the IDE -->
+        <echo message="Build previously done by the IDE"/>
+<!--        <javac srcdir="${src}" destdir="${build}"/>    -->
+    </target>
+   
+    <target name="rmic" depends="build" description="Runs rmic for the appropriate classes">
+        <echo message="rmic = COM.ibm.opicmpdh.middleware.RemoteDatabase COM.ibm.opicmpdh.middleware.taskmaster.TaskMaster COM.ibm.opicmpdh.middleware.taskmaster.Idler"/>
+<!--    Couldn't comment out the sourcebase="keepgenerated" parameter alone. So I kept the complete lines
+        <rmic base="${build}" classpathref="middleware.classpath" classname="COM.ibm.opicmpdh.middleware.RemoteDatabase" stubversion="1.2" sourcebase="keepgenerated"/>
+        <rmic base="${build}" classpathref="middleware.classpath" classname="COM.ibm.opicmpdh.middleware.taskmaster.TaskMaster" stubversion="1.2" sourcebase="keepgenerated"/>
+        <rmic base="${build}" classpathref="middleware.classpath" classname="COM.ibm.opicmpdh.middleware.taskmaster.Idler" stubversion="1.2" sourcebase="keepgenerated"/>
+-->
+        <rmic base="${build}" classpathref="middleware.classpath" classname="COM.ibm.opicmpdh.middleware.RemoteDatabase" stubversion="1.2"/>
+        <rmic base="${build}" classpathref="middleware.classpath" classname="COM.ibm.opicmpdh.middleware.taskmaster.TaskMaster" stubversion="1.2"/>
+        <rmic base="${build}" classpathref="middleware.classpath" classname="COM.ibm.opicmpdh.middleware.taskmaster.Idler" stubversion="1.2"/>
+    </target>
+	
+    <target name="jar" depends="rmic,build" description="Builds the jar">
+        <mkdir dir="${build}/jar"/>
+        <echo message="includes = ${middleware.include}"/>   
+        <jar destfile="${build}/jar/middleware.jar" basedir="bin" includes="${middleware.include}">
+            <manifest>
+                <section name="Build Information">
+                    <attribute name="Built-By" value="${user.name}"/>
+                    <attribute name="Build-Version" value="Built on ${jar.date} at ${jar.time}"/> 
+                    <attribute name="Build-Date" value="${jar.date}${jar.time}"/>
+                    <attribute name="Version-Timezone" value="Eastern Standard Time: America/New_York"/>  
+                </section>
+                <attribute name="Main-Class" value="COM.ibm.opicmpdh.middleware.RemoteDatabase"/>      
+            </manifest>
+        </jar>
+        <tstamp>
+            <!-- Use local System time in message -->
+            <format property="finish.timestamp" pattern="EEE MM/dd/yyyy HH:mm:ss.SS"/>
+        </tstamp>
+        <echo message="Finished: ${finish.timestamp}"/>   
+    </target>   
+</project>

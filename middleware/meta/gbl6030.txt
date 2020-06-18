@@ -1,0 +1,99 @@
+@name=GBL6030
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+@addperm=true
+--------------------------------------------------------------------------------------------------
+-- This guy will pull all entities attributes based upon two dates and
+-- a possible status value
+--------------------------------------------------------------------------------------------------
+$Log: gbl6030.txt,v $
+Revision 1.14  2010/06/21 15:43:05  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.13  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.12  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.11  2004/02/20 18:09:32  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.10  2003/12/15 19:29:05  dave
+fixed sp on ordering issue
+
+Revision 1.9  2003/12/02 17:59:26  dave
+changed per IBM TT
+
+Revision 1.8  2001/10/15 22:30:47  dave
+fix
+
+Revision 1.7  2001/10/15 20:47:01  dave
+added a new method to get a NavigateObject
+
+Revision 1.6  2001/10/15 20:12:33  dave
+forgot alias E
+
+Revision 1.5  2001/10/15 20:03:05  dave
+more fixes
+
+Revision 1.4  2001/10/15 19:56:57  dave
+more minor fixes
+
+Revision 1.3  2001/10/15 19:50:49  dave
+fixes to SP code.. bad form
+
+Revision 1.2  2001/10/15 18:31:27  dave
+enhancement to GBL6030
+
+Revision 1.1  2001/10/15 18:27:24  dave
+new SP to pick up all Entity Churn between two dates for a given
+status
+
+
+@desc=Get Entities between a given time and status
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl6030.txt,v 1.14 2010/06/21 15:43:05 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT DISTINCT
+ E.EntityID
+FROM @t_schema.Entity E
+LEFT JOIN @t_schema.Flag F ON
+    F.Enterprise = :Enterprise
+AND F.EntityType = E.EntityType
+AND F.EntityID = E.EntityID
+AND F.AttributeCode = :AttributeCode
+AND F.AttributeValue = :AttributeValue
+AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo
+WHERE
+    E.Enterprise = :Enterprise
+AND E.EntityType = :EntityType
+AND (E.ValFrom BETWEEN :FromDate AND :ToDate)
+AND 1 = (CASE WHEN :StatusFilter = 'Y' AND F.Enterprise IS NULL THEN 0 ELSE 1 END)
+ORDER BY 1
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in StatusFilter varChar(2)
+in AttributeCode varchar(32)
+in AttributeValue varchar(32)
+in FromDate varchar(26)
+in ToDate varChar(26)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

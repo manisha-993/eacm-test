@@ -1,0 +1,90 @@
+@name=GBL9206
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+This will return the entity items that have attribute value within date range 
+
+$Log: gbl9206.txt,v $
+Revision 1.4  2010/06/21 15:42:57  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.3  2005/07/18 23:10:45  joan
+fixes
+
+Revision 1.2  2005/05/11 16:42:21  joan
+fixes
+
+Revision 1.1  2005/05/09 19:33:55  joan
+intial load
+
+
+
+@desc=Get All ProdStruct that have ann date attribute value within date range.  This sp is used by RFAProfile Best Guess reports
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9206.txt,v 1.4 2010/06/21 15:42:57 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT 
+    R.ENTITYID
+    , CASE WHEN T1.AttributeValue IS NULL THEN '' ELSE T1.AttributeValue END
+    , R.ENTITY1ID
+    , CASE WHEN T2.AttributeValue IS NULL THEN '' ELSE T2.AttributeValue END
+    , R.ENTITY2ID
+    , CASE WHEN T3.AttributeValue IS NULL THEN '' ELSE T3.AttributeValue END
+FROM opicm.relator R
+
+LEFT JOIN opicm.Text T1 ON
+T1.Enterprise = :Enterprise
+AND T1.EntityType = R.EntityType 
+AND T1.EntityID = R.EntityID
+AND T1.AttributeCode = :AttributeCode
+AND T1.ValFrom <= :ValOn AND :ValOn < T1.ValTo AND T1.EffFrom <= :EffOn AND :EffOn < T1.EffTo
+
+LEFT JOIN opicm.Text T2 ON
+T2.Enterprise = :Enterprise
+AND T2.EntityType = R.Entity1Type 
+AND T2.EntityID = R.Entity1ID
+AND T2.AttributeCode = :Attribute1Code
+AND T2.ValFrom <= :ValOn AND :ValOn < T2.ValTo AND T2.EffFrom <= :EffOn AND :EffOn < T2.EffTo
+
+LEFT JOIN opicm.Text T3 ON
+T3.Enterprise = :Enterprise
+AND T3.EntityType = R.Entity2Type 
+AND T3.EntityID = R.Entity2ID
+AND T3.AttributeCode = :Attribute2Code
+AND T3.ValFrom <= :ValOn AND :ValOn < T3.ValTo AND T3.EffFrom <= :EffOn AND :EffOn < T3.EffTo
+
+WHERE R.Enterprise = :Enterprise
+AND R.EntityType = :EntityType
+AND R.Entity1Type = :Entity1Type
+AND R.Entity2Type = :Entity2Type
+AND R.ValFrom <= :ValOn AND :ValOn < R.ValTo AND R.EffFrom <= :EffOn AND :EffOn < R.EffTo
+ORDER BY R.ENTITYID
+;
+
+@execute
+
+EXEC SQL OPEN sp_cursor;
+  
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in Entity1Type varchar(32)
+in Entity2Type varchar(32)
+in AttributeCode varchar(32)
+in Attribute1Code varchar(32)
+in Attribute2Code varchar(32)
+in ValOn varchar(27)
+in EffOn varchar(27)
+@end
+
+

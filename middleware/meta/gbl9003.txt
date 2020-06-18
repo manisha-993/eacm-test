@@ -1,0 +1,133 @@
+@name=GBL9003
+@type=basic
+@dbase=opicmpdh
+@noremote=true
+@addperm=false
+@narrative
+
+  This returns HighID,lowid and rows to process for a given EntityType (NetChanges)
+
+$Log: gbl9003.txt,v $
+Revision 1.12  2010/06/21 15:43:27  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.11  2004/10/20 21:01:50  dave
+changes to gen parm
+
+Revision 1.10  2004/08/17 21:57:34  dave
+minor change
+
+Revision 1.9  2004/08/17 21:13:59  dave
+SP fixes
+
+Revision 1.8  2004/05/20 21:16:13  dave
+index guidance fixes
+
+Revision 1.7  2004/02/20 20:21:58  roger
+Must be @t_schema
+
+Revision 1.6  2004/02/20 18:09:38  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.5  2003/10/06 05:03:04  dave
+converting to spew
+
+Revision 1.4  2003/10/06 03:19:32  dave
+sp fix
+
+Revision 1.3  2003/10/06 03:05:03  dave
+ODSNet II
+
+Revision 1.2  2003/09/08 16:31:22  roger
+Enterprise was changed to 16 char length
+
+Revision 1.1  2003/02/28 00:01:19  bala
+NetChanges sp for ODS
+
+
+@desc=This returns The High ID ,lowid and rows to process for a given EntityType (NetChanges)
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9003.txt,v 1.12 2010/06/21 15:43:27 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE entity_cursor CURSOR FOR
+
+
+WITH mymax(MaxEntityId,MinEntityId,EntityRows) AS (
+SELECT
+  MAX(E.EntityID),Min(E.EntityID),Count(*)
+FROM  @t_schema.ENTITYX E
+LEFT JOIN @t_schema.MetaLinkAttr M1 ON
+    M1.Enterprise = :Enterprise
+AND M1.LinkType = 'Entity/Status/ODSFilter'
+AND M1.LinkType1 = :EntityType
+AND M1.Linktype2 = :ODSSchema
+AND M1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN M1.EffFrom AND M1.EffTo
+LEFT JOIN @t_schema.Flag F1 ON
+    F1.Enterprise = :Enterprise
+AND F1.EntityType = E.EntityType
+AND F1.EntityID = E.EntityID
+AND RTRIM(F1.AttributeCode) = M1.LinkCode
+AND RTRIM(F1.AttributeValue) = M1.LinkValue
+--AND F1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN F1.EffFrom AND F1.EffTo
+-- Get me the last known record.. turned on or off
+AND F1.Valto = :forever
+WHERE
+    E.Enterprise = :Enterprise
+AND E.EntityType = :EntityType
+AND E.Valto = :forever
+AND E.Valfrom BETWEEN :LastRun AND :Now
+AND 1 = (CASE
+  WHEN M1.Enterprise IS NOT NULL AND F1.Enterprise IS NULL THEN 0
+  ELSE 1 END)
+UNION ALL
+SELECT
+  MAX(R.EntityID),Min(r.EntityID),Count(*)
+FROM  @t_schema.Relatorx R
+LEFT JOIN @t_schema.MetaLinkAttr M1 ON
+    M1.Enterprise = :Enterprise
+AND M1.LinkType = 'Entity/Status/ODSFilter'
+AND M1.LinkType1 = :EntityType
+AND M1.Linktype2 = :ODSSchema
+AND M1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN M1.EffFrom AND M1.EffTo
+LEFT JOIN @t_schema.Flag F1 ON
+    F1.Enterprise = :Enterprise
+AND F1.EntityType = R.EntityType
+AND F1.EntityID = R.EntityID
+AND rtrim(F1.AttributeCode) = M1.LinkCode
+AND rtrim(F1.AttributeValue) = M1.LinkValue
+--AND F1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN F1.EffFrom AND F1.EffTo
+-- Get me the last known record.. turned on or off
+AND F1.Valto = :forever
+WHERE
+    R.Enterprise = :Enterprise
+AND R.EntityType = :EntityType
+AND R.Valfrom BETWEEN :LastRun AND :Now
+AND R.Valto = :forever
+AND 1 = (CASE
+  WHEN M1.Enterprise IS NOT NULL AND F1.Enterprise IS NULL THEN 0
+  ELSE 1 END)
+)
+SELECT MAX(MaxEntityID),MIN(MinEntityId),MAX(EntityRows) FROM myMax
+;
+
+
+@execute
+
+// Now open the cursor
+EXEC SQL OPEN entity_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in ODSSchema varchar(16)
+in LastRun varchar(27)
+in Now varchar(27)
+@end
+
+

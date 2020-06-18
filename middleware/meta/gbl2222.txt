@@ -1,0 +1,59 @@
+@name=GBL2222
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+  Get record(s) from trsnavigate
+
+ $Log: gbl2222.txt,v $
+ Revision 1.2  2010/06/21 15:43:22  wendy
+ Exceeded RMI 64k static block limit, not needed for RMI
+
+ Revision 1.1  2006/03/17 19:10:29  gregg
+ initial load - Tony's first SP!! Yay!
+
+
+
+@desc=Get record(s) from trsnavigate
+@results=1
+@parmstyle=GENERAL
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2222.txt,v 1.2 2010/06/21 15:43:22 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+
+EXEC SQL DECLARE NavCur CURSOR FOR
+SELECT DISTINCT
+  Level
+ ,RTRIM(Entity1Type)
+ ,Entity1ID
+ ,RTRIM(EntityType)
+ ,EntityID
+ ,RTRIM(Entity2Type)
+ ,Entity2ID
+ ,Leaf
+ ,ValOn
+ ,EffOn
+FROM @t_schema.trsNavigate
+WHERE
+    SessionID = :SessionID
+AND ENTERPRISE = :Enterprise
+ORDER BY
+   1,2,3,4,5,6,7
+;
+
+EXEC SQL OPEN NavCur;
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

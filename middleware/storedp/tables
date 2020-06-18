@@ -1,0 +1,8 @@
+#
+# tables
+#
+# format TABLE_NAME
+# eg) ENTITY
+nextid
+tcount
+

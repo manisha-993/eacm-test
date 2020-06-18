@@ -1,0 +1,66 @@
+@name=GBL9004
+@type=basic
+@dbase=opicmpdh
+@noremote=true
+@addperm=false
+@narrative
+
+  This returns all the deactivated entities for a given entitytype (NetChanges)
+ 
+$Log: gbl9004.txt,v $
+Revision 1.6  2010/06/21 15:42:46  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.5  2004/10/20 21:01:50  dave
+changes to gen parm
+
+Revision 1.4  2004/02/20 20:21:58  roger
+Must be @t_schema
+
+Revision 1.3  2004/02/20 18:09:38  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.2  2003/09/08 16:31:22  roger
+Enterprise was changed to 16 char length
+
+Revision 1.1  2003/04/15 17:24:32  bala
+Initial Checkin
+
+
+@desc=This returns all the deactivated entities for a given entitytype (NetChanges) given the id range and date range
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9004.txt,v 1.6 2010/06/21 15:42:46 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE entity_cursor CURSOR FOR
+
+SELECT  DISTINCT ENTITYID
+  FROM @t_schema.ENTITYX E
+WHERE
+    E.Enterprise = :Enterprise
+AND E.EntityType = :EntityType 
+AND VALFROM BETWEEN :LastRun AND :Now
+AND EFFFROM BETWEEN :LastRun AND :Now
+AND (valto >= :Now AND   EFFTO <= :Now)
+ORDER BY ENTITYID;
+
+;
+
+@execute
+
+// Now open the cursor
+EXEC SQL OPEN entity_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in LastRun varchar(27)
+in Now varchar(27)
+@end
+
+

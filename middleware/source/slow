@@ -1,0 +1,1 @@
+./t|head -n 10|cut -d" " -f1|sort|uniq

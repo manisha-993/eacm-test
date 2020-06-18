@@ -1,0 +1,66 @@
+@name=GBL9205
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+This will return the entity items that have attribute value within date range 
+
+
+$Log: gbl9205.txt,v $
+Revision 1.3  2010/06/21 15:42:45  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.2  2004/11/19 17:13:37  joan
+fix compile
+
+Revision 1.1  2004/11/19 17:04:41  joan
+initial load
+
+
+@desc=Get All EntityItems that have date attribute value within date range.  This sp is used by RFAProfile Best Guess reports
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9205.txt,v 1.3 2010/06/21 15:42:45 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+ T.EntityType  as EntityType
+,T.EntityID  as EntityID
+FROM @t_schema.Text T 
+INNER JOIN @t_schema.Entity E ON
+    E.Enterprise = :Enterprise
+AND E.EntityType = T.EntityType
+AND E.EntityID = T.EntityID
+AND E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+
+
+WHERE T.Enterprise = :Enterprise
+AND T.EntityType = :EntityType
+AND T.AttributeCode = :AttributeCode
+AND (T.AttributeValue >= :FromDate AND T.AttributeValue <= :ToDate)
+AND T.ValFrom <= :ValOn AND :ValOn < T.ValTo AND T.EffFrom <= :EffOn AND :EffOn < T.EffTo
+;
+
+@execute
+
+
+EXEC SQL OPEN sp_cursor;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in AttributeCode varchar(32)
+in FromDate varchar(32)
+in ToDate varchar(32)
+in ValOn varchar(27)
+in EffOn varchar(27)
+@end
+
+

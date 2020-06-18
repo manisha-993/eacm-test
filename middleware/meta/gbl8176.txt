@@ -1,0 +1,104 @@
+@name=GBL8176
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--  This guy retrieves a set of field Restriction Groups for a given entity type.
+--  Roles sensitivity not needed here (was 1076)
+$Log: gbl8176.txt,v $
+Revision 1.12  2010/06/21 15:42:52  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.11  2005/02/18 21:50:35  gregg
+LocalRule
+
+Revision 1.10  2005/01/28 23:09:06  gregg
+add DependentValue
+
+Revision 1.9  2005/01/17 17:11:19  gregg
+rule51
+
+Revision 1.8  2005/01/06 18:06:50  gregg
+UniqueAttribute
+
+Revision 1.7  2004/10/20 21:01:48  dave
+changes to gen parm
+
+Revision 1.6  2004/02/20 20:21:57  roger
+Must be @t_schema
+
+Revision 1.5  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.4  2003/12/02 18:53:08  dave
+fixed 8176 to recognise RestrictionDeferred
+
+Revision 1.3  2003/09/08 16:31:20  roger
+Enterprise was changed to 16 char length
+
+Revision 1.2  2002/09/23 15:32:15  dave
+more changes for Classify
+
+Revision 1.1  2002/05/07 21:36:00  gregg
+was 1076
+
+Revision 1.5  2002/02/27 23:10:44  dave
+added reset, restriction
+
+Revision 1.4  2001/08/21 21:33:36  dave
+misc changes
+
+Revision 1.3  2001/08/21 17:59:54  dave
+more restriction preping
+
+Revision 1.2  2001/08/21 17:49:23  dave
+preping for general groups for restriction and required control
+points for an entity
+
+Revision 1.1  2001/08/19 21:20:24  dave
+RestrictionGroup attempt #1
+
+
+@desc=get a set of groups related to their entities and their attributes / function
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8176.txt,v 1.12 2010/06/21 15:42:52 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+ RTRIM(mla1.linktype2)
+,RTRIM(mla1.linkcode)
+,RTRIM(mla1.linkvalue)
+,RTRIM(mla.linktype2)
+,RTRIM(mla.linkcode)
+,RTRIM(mla.linkvalue)
+FROM @t_schema.MetaLinkAttr  MLA1
+INNER JOIN @t_schema.MetaLinkAttr MLA ON
+    MLA.Enterprise = :Enterprise
+AND MLA.LinkType = 'Group/Attribute'
+AND MLA.LinkType1 = MLA1.LinkType2
+AND MLA.ValFrom <= :ValOn AND  :ValOn  < MLA.ValTo AND MLA.EffFrom <= :EffOn AND  :EffOn  < MLA.EffTo
+WHERE
+    MLA1.Enterprise = :Enterprise
+AND MLA1.LinkType = 'Entity/Group'
+AND MLA1.LinkType1 = :EntityType
+AND MLA1.LinkCode in ('Required','Restriction','Reset','Classify','RestrictionDeferred','UniqueAttribute','Rule51','DependentValue','LocalRule')
+AND MLA1.ValFrom <= :ValOn AND :ValOn  < MLA1.ValTo AND MLA1.EffFrom <= :EffOn AND :EffOn  < MLA1.EffTo
+ORDER BY
+MLA.LinkType1
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

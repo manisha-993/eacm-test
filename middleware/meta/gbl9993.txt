@@ -1,0 +1,54 @@
+@name=GBL9993
+@noremote=true
+@type=basic
+@dbase=opicmods
+@narrative
+----------------------------------------------------------------------
+-- Pulling out Price for a given product / countrycode combo
+----------------------------------------------------------------------
+$Log: gbl9993.txt,v $
+Revision 1.5  2010/06/21 15:43:01  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.4  2004/10/20 21:01:50  dave
+changes to gen parm
+
+Revision 1.3  2004/08/19 19:35:22  dave
+sp fix
+
+Revision 1.2  2004/08/19 18:43:21  dave
+parm change
+
+Revision 1.1  2004/08/19 18:30:47  dave
+commit new Pricing Stuff from ODS
+
+
+
+@desc=Pulling out Price for a given product / countrycode combo
+@fenced=true
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9993.txt,v 1.5 2010/06/21 15:43:01 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE Cur CURSOR FOR
+
+SELECT
+ CURRENCYCODE 
+,PRICEVALIDFROMDATE 
+,PRICEVALIDTODATE 
+,PRICEAMOUNT 
+
+FROM ECCM.PRODUCT_PRICE WHERE PARTNUMBER = :PartNumber and COUNTRYCODE = :CountryCode AND
+DISTRIBUTIONCHANNEL = '00'
+;
+
+@execute
+
+EXEC SQL OPEN Cur;
+
+@parameters
+inout ReturnStatus int
+in PartNumber varchar(18)
+in CountryCode varchar(8)
+@end

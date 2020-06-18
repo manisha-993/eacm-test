@@ -1,0 +1,80 @@
+@name=GBL7777
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+----------------------------------------------------------------------
+--  This is insert for 
+----------------------------------------------------------------------
+$Log: gbl7777.txt,v $
+Revision 1.3  2007/09/26 09:00:08  liubdl
+fix bugs
+
+Revision 1.2  2007/09/26 08:46:15  liubdl
+fix bugs
+
+Revision 1.1  2007/09/26 15:38:34  houjie
+no message
+
+@desc=storedp for WWTECHCOMPATGEN
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char Updated[27];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :Updated;
+
+FILE *t;
+mode_t Mode2;
+Mode2 = 0777;
+chmod("/tmp/7777.log",Mode2);
+t=fopen("/tmp/7777.log","a+");
+fprintf(t,"-->start of stored procedure GBL7777\n");
+fprintf(t,"Activity is : %s\n",Activity);
+fprintf(t,"Updated is : %s\n",Updated);
+fprintf(t,"TimeOfChange is : %s\n",TimeOfChange);
+fprintf(t,"SystemEntityType is : %s\n",SystemEntityType);
+fprintf(t,"SystemEntityId is : %ld\n",SystemEntityId);
+fprintf(t,"GroupEntityType is : %s\n",GroupEntityType);
+fprintf(t,"GroupEntityId is : %ld\n",GroupEntityId);
+fprintf(t,"OSEntityType is : %s\n",OSEntityType);
+fprintf(t,"OSEntityId is : %ld\n",OSEntityId);
+fprintf(t,"OS is : %s\n",OS);
+fprintf(t,"OptionEntityType is : %s\n",OptionEntityType);
+fprintf(t,"OptionEntityId is : %ld\n",OptionEntityId);
+//fprintf(t,"CompatibilityPublishingFlag is : %s\n",CompatibilityPublishingFlag);
+//fprintf(t,"RelationshipType is : %s\n",RelationshipType);
+//fprintf(t,"PublishFrom is : %s\n",PublishFrom);
+//fprintf(t,"PublishTo is : %s\n",PublishTo);
+
+EXEC SQL insert into gbli.WWTECHCOMPAT values(
+:Activity,:Updated,:TimeOfChange,:SystemEntityType,:SystemEntityId,:GroupEntityType,:GroupEntityId,:OSEntityType,
+:OSEntityId,:OS,:OptionEntityType,:OptionEntityId,:CompatibilityPublishingFlag,:RelationshipType,:PublishFrom,:PublishTo,null
+);
+EXEC SQL COMMIT WORK;
+
+//fprintf(t,"GBL7777 finished!\n");
+fclose(t);
+
+@parameters
+inout ReturnStatus int,
+in Activity varchar(1),
+in TimeOfChange varchar(26),
+in SystemEntityType varchar(32),
+in SystemEntityId int,
+in GroupEntityType varchar(32),
+in GroupEntityId int,
+in OSEntityType varchar(32),
+in OSEntityId int,
+in OS varchar(32),
+in OptionEntityType varchar(32),
+in OptionEntityId int,
+in CompatibilityPublishingFlag varchar(3),
+in RelationshipType varchar(1),
+in PublishFrom varchar(10),
+in PublishTo varchar(10)
+@end

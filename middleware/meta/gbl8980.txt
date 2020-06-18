@@ -1,0 +1,338 @@
+@name=GBL8980
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Manages the update of an Feature Record
+
+// $Log: gbl8980.txt,v $
+// Revision 1.34  2015/02/24 21:43:13  ptatinen
+// Add INVNAME as per Lenovo CQ
+//
+// Revision 1.33  2010/06/21 15:43:01  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.32  2009/10/20 00:22:01  rick
+// update to change long datatype to sqlint32
+//
+// Revision 1.31  2008/05/09 05:10:31  yang
+// CONFIGURATORFLAG for DNL
+//
+// Revision 1.2  2008/05/09 04:24:13  yang
+// *** empty log message ***
+//
+// Revision 1.1.1.1  2007/10/17 13:35:47  jingb
+// no message
+//
+// Revision 1.1.1.1  2007/10/10 11:06:00  sulin
+// no message
+//
+// Revision 1.1  2007/10/10 03:28:07  sulin
+// no message
+//
+// Revision 1.29  2006/09/15 17:51:50  gregg
+// backing out configurator flag
+//
+// Revision 1.28  2006/09/11 20:33:11  gregg
+// configuratorflag_fc
+//
+// Revision 1.27  2006/06/06 01:25:58  dave
+// redressing widths
+//
+// Revision 1.26  2006/06/05 20:46:20  dave
+// widening OSLevel
+//
+// Revision 1.25  2006/04/28 20:57:36  gregg
+// add in nlsid to where clauses
+//
+// Revision 1.24  2006/02/28 00:00:24  dave
+// fixing primary key for counts
+//
+// Revision 1.23  2006/02/22 00:31:58  gregg
+// nlsid in count query
+//
+// Revision 1.22  2006/01/28 18:56:23  joan
+// increase featurecode column
+//
+// Revision 1.21  2005/11/11 20:02:26  joan
+// change status to 32
+//
+// Revision 1.20  2005/11/07 22:16:57  joan
+// change COMPTYPE to CGTYPE for feature
+//
+// Revision 1.19  2005/10/25 20:37:59  joan
+// fixes
+//
+// Revision 1.18  2005/10/25 18:09:03  joan
+// fixes
+//
+// Revision 1.17  2005/10/25 18:02:18  joan
+// fixes
+//
+// Revision 1.16  2005/10/25 17:26:57  joan
+// FIXES
+//
+// Revision 1.15  2005/10/24 19:28:48  joan
+// fixes
+//
+// Revision 1.14  2005/10/24 19:15:49  joan
+// FIXES
+//
+// Revision 1.13  2005/10/24 18:58:23  joan
+// fixes
+//
+// Revision 1.12  2005/09/12 22:28:30  joan
+// fixes for change of columns
+//
+// Revision 1.11  2005/09/12 22:06:44  joan
+// add printf
+//
+// Revision 1.10  2005/08/17 21:00:11  joan
+// fix
+//
+// Revision 1.9  2005/08/17 19:53:42  joan
+// fixes
+//
+// Revision 1.8  2005/08/11 20:37:34  joan
+// fixes
+//
+// Revision 1.7  2005/06/23 19:16:35  joan
+// adjust for countrylist
+//
+// Revision 1.6  2005/06/20 18:14:06  joan
+// fixes
+//
+// Revision 1.5  2005/06/07 04:34:50  dave
+// working on commit control
+//
+// Revision 1.4  2005/06/05 21:13:22  dave
+// type in sp template
+//
+// Revision 1.3  2005/06/05 21:06:00  dave
+// standardizing on some field sizes
+//
+// Revision 1.2  2005/06/05 20:49:45  dave
+// de nulling getters...
+//
+// Revision 1.1  2005/06/05 20:33:55  dave
+// going for the Feature Update to the CatDB
+//
+
+@desc= Manages the update of an WWProduct Reocrd
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8980.txt,v 1.34 2015/02/24 21:43:13 ptatinen Exp $";
+sqlint32 count = 0;
+EXEC SQL END DECLARE SECTION;
+@execute
+
+FILE *t;
+mode_t Mode2;
+Mode2 = 0777;
+chmod("/tmp/8980.log",Mode2);
+t=fopen("/tmp/8980.log","a");
+t=fopen("/tmp/8980.log","w");
+fprintf(t,"-->start of stored procedure GBL8980\n");
+
+fprintf(t,"isactive:%d\n",isactive);
+
+EXEC SQL
+
+Select count(*) into :count
+from gbli.feature
+where
+enterprise = :enterprise and
+featEntityType = :featentitytype and
+featEntityID = :featentityid and
+countrycode = :countrycode and
+languagecode = :languagecode and
+nlsid = :nlsid
+;
+
+if (count == 0 && isactive == 0) {
+// do nothing
+fprintf(t,"count == 0 && isactive == 0\n");
+} else if (count == 0 && isactive == 1) {
+// insert this guy
+fprintf(t,"count == 0 && isactive == 1\n");
+EXEC SQL
+insert into gbli.feature
+(
+  enterprise
+, countrycode
+, languagecode
+, nlsid
+, countrylist
+, featentitytype
+, featentityid
+, featurecode
+, fcmktgname
+, fctype
+, fctype_fc
+, anndate
+, withdrawdate
+, pricedfeature
+, pricedfeature_fc
+, tandc
+, category
+, category_fc
+, subcategory
+, subcategory_fc
+, group
+, group_fc
+, cgtype
+, cgtype_fc
+, oslevel
+, oslevel_fc
+, status
+, status_fc
+, configuratorflag
+, configuratorflag_fc
+, valfrom
+, valto
+, isactive
+, invname
+)
+values (
+  :enterprise
+, :countrycode
+, :languagecode
+, :nlsid
+, :countrylist
+, :featentitytype
+, :featentityid
+, :featurecode
+, :fcmktgname
+, :fctype
+, :fctype_fc
+,  case :anndate when '' then NULL else :anndate end
+,  case :withdrawdate when '' then NULL else :withdrawdate end
+, :pricedfeature
+, :pricedfeature_fc
+, :tandc
+, :category
+, :category_fc
+, :subcategory
+, :subcategory_fc
+, :group
+, :group_fc
+, :cgtype
+, :cgtype_fc
+, :oslevel
+, :oslevel_fc
+, :status
+, :status_fc
+, :configuratorflag
+, :configuratorflag_fc
+, current timestamp
+, :forever
+, 1
+, :invname
+)
+;
+} else if (count != 0 && isactive == 1) {
+// update this guy
+fprintf(t,"count != 0 && isactive == 1\n");
+EXEC SQL
+update gbli.feature
+set
+  featurecode  =  :featurecode
+, fcmktgname  = :fcmktgname
+, fctype = :fctype
+, fctype_fc = :fctype_fc
+, anndate = case :anndate when '' then NULL else :anndate end
+, withdrawdate = case :withdrawdate when '' then NULL else :withdrawdate end
+, pricedfeature = :pricedfeature
+, pricedfeature_fc = :pricedfeature_fc
+, tandc = :tandc
+, category = :category
+, category_fc = :category_fc
+, subcategory = :subcategory
+, subcategory_fc = :subcategory_fc
+, group = :group
+, group_fc = :group_fc
+, cgtype = :cgtype
+, cgtype_fc = :cgtype_fc
+, oslevel = :oslevel
+, oslevel_fc = :oslevel_fc
+, status = :status
+, status_fc = :status_fc
+, configuratorflag = :configuratorflag
+, configuratorflag_fc = :configuratorflag_fc
+, valfrom = current timestamp
+, valto = :forever
+, isactive = 1
+, invname = :invname
+where
+enterprise = :enterprise and
+featEntityType = :featentitytype and
+featEntityID = :featentityid and
+countrylist = :countrylist and
+nlsid = :nlsid
+;
+
+} else {
+// turn it off
+fprintf(t,"else...\n");
+EXEC SQL
+update gbli.feature
+set
+valfrom = current timestamp,
+valto  =  current timestamp,
+isactive = 0
+where
+enterprise = :enterprise and
+featEntityType = :featentitytype and
+featEntityID = :featentityid and
+countrylist = :countrylist and
+nlsid = :nlsid
+;
+
+}
+
+ fprintf(t,"end of GBL8980\n");
+fclose(t);
+
+//EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in enterprise varchar(8)
+in countrycode varchar(2)
+in languagecode varchar(2)
+in nlsid int
+in countrylist varchar(8)
+in featentitytype varchar(32)
+in featentityid int
+in featurecode varchar(8)
+in fcmktgname varchar(254)
+in fctype varchar(32)
+in fctype_fc varchar(8)
+in anndate varchar(10)
+in withdrawdate varchar(10)
+in pricedfeature varchar(32)
+in pricedfeature_fc varchar(8)
+in tandc varchar(128)
+in category varchar(32)
+in category_fc varchar(8)
+in subcategory varchar(64)
+in subcategory_fc varchar(8)
+in group varchar(32)
+in group_fc varchar(8)
+in cgtype varchar(128)
+in cgtype_fc varchar(8)
+in oslevel varchar(2056)
+in oslevel_fc varchar(512)
+in status varchar(32)
+in status_fc varchar(8)
+in configuratorflag varchar(128)
+in configuratorflag_fc varchar(8)
+in isactive int
+in invname varchar(90)
+@end
+

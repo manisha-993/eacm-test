@@ -1,0 +1,10 @@
+db2stop
+db2admin stop
+rmuser db2as
+rmuser opicmdb2
+/usr/lpp/db2_06_01/bin/dasilist
+/usr/lpp/db2_06_01/instance/dasidrop db2as
+/usr/lpp/db2_06_01/bin/db2ilist
+/usr/lpp/db2_06_01/instance/db2idrop opicmdb2
+installp -u db2_06_01
+

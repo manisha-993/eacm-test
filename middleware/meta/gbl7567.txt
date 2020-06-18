@@ -1,0 +1,60 @@
+@name=GBL7567
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7567.txt,v $
+Revision 1.5  2006/02/27 19:36:47  gregg
+duh
+
+Revision 1.4  2006/02/27 19:26:59  gregg
+bleh
+
+Revision 1.3  2006/02/27 19:20:39  gregg
+once more..
+
+Revision 1.2  2006/02/27 19:15:33  gregg
+fix
+
+Revision 1.1  2006/02/27 18:56:50  gregg
+initial load
+
+
+@desc=Grab a specific error message from the MetaDescription table
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7567.txt,v 1.5 2006/02/27 19:36:47 gregg Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT DISTINCT
+ LONGDESCRIPTION
+,INT(NLSID) AS NLSID
+from 
+@t_schema.METADESCRIPTION
+
+where
+    enterprise = :Enterprise 
+AND descriptionType = :DescriptionType
+AND descriptionClass = 'ErrorMessage'
+AND NLSID in (1,:NLSID)
+AND valto > current timestamp
+AND valfrom <= current timestamp
+AND effto > current timestamp
+AND efffrom <= current timestamp
+ORDER BY NLSID DESC
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in DescriptionType varchar(32)
+in NLSID int
+@end
+
+
+
+

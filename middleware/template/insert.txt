@@ -1,0 +1,228 @@
+//
+// TEMPLATE: INSERT.TXT (@date)
+//
+// $Log: insert.txt,v $
+// Revision 1.43  2009/10/23 14:22:16  rick
+// change long to sqlint32 for db2 9.5
+//
+// Revision 1.42  2004/05/06 20:04:58  dave
+// template change
+//
+// Revision 1.41  2004/05/06 19:50:13  dave
+// sp speed updates
+//
+// Revision 1.40  2003/07/11 22:42:56  dave
+// fixing a template
+//
+// Revision 1.39  2003/06/30 20:02:09  dave
+// minor changes
+//
+// Revision 1.38  2003/06/30 19:56:09  dave
+// syntax
+//
+// Revision 1.37  2003/06/30 19:44:31  dave
+// syntax on insert.txt
+//
+// Revision 1.36  2003/06/30 19:27:46  dave
+// ok. lets see if this change messes up the insert template
+//
+// Revision 1.35  2003/05/19 22:04:22  dave
+// fixing the insert template
+//
+// Revision 1.34  2003/03/17 21:31:43  dave
+// template fix
+//
+// Revision 1.33  2003/03/17 21:24:07  dave
+// final sp Changes to get Tagging I
+//
+// Revision 1.32  2003/03/17 21:12:56  dave
+// AND AND fix
+//
+// Revision 1.31  2003/03/17 21:05:58  dave
+// getting very close
+//
+// Revision 1.30  2003/03/17 20:26:41  dave
+// getting close
+//
+// Revision 1.29  2003/03/17 20:08:18  dave
+// almost there for Tagging in Entity Table
+//
+// Revision 1.28  2003/03/17 20:00:23  dave
+// extra }
+//
+// Revision 1.27  2003/03/17 19:45:30  dave
+// fixing GBL2092
+//
+// Revision 1.26  2003/03/17 19:12:32  dave
+// Tagging
+//
+// Revision 1.25  2003/03/13 22:57:04  dave
+// getting GBL2092 to compile
+//
+// Revision 1.24  2003/03/13 01:27:32  dave
+// fixing tags
+//
+// Revision 1.23  2003/03/13 01:07:11  dave
+// trying to tighten up insert for tagging excercise
+//
+// Revision 1.22  2003/03/13 00:33:34  dave
+// trying to fix genid in insert template
+//
+// Revision 1.21  2003/03/12 18:24:18  dave
+// simplifying and preparing for the Tagging requirement
+//
+// Revision 1.20  2001/10/23 20:30:35  roger
+// Can't do case insensitive string compare on AIX?
+//
+// Revision 1.19  2001/10/23 20:22:12  roger
+// Fix references to C library routines for AIX
+//
+// Revision 1.18  2001/10/23 16:17:16  roger
+// Nasty kludge, but does it work?
+//
+// Revision 1.17  2001/10/23 16:06:00  roger
+// Make certain nothing broken
+//
+// Revision 1.16  2001/10/23 15:47:40  roger
+// Need logic change to ignore request to change to current values
+//
+// Revision 1.15  2001/10/22 21:25:16  roger
+// Change logic - ignore changes where values would be unchanged
+//
+// Revision 1.14  2001/06/01 16:35:33  roger
+// Removed shadow table checking - wrong approach!
+//
+// Revision 1.13  2001/06/01 03:34:55  dave
+// temp comment out for regen
+//
+// Revision 1.12  2001/06/01 03:19:07  roger
+// Try to get the tableX check working
+//
+// Revision 1.11  2001/06/01 01:16:34  dave
+// tablex statement not compiling.. commented out for now
+//
+// Revision 1.10  2001/06/01 00:44:58  dave
+// changed @table to @tableX on table presence check
+//
+// Revision 1.9  2001/05/31 23:24:14  roger
+// Make template smarter - do shadow iff shadow table exists
+//
+// Revision 1.8  2001/04/18 19:59:53  roger
+// Make the entire update/insert a logical transaction
+//
+// Revision 1.7  2001/04/03 15:38:56  roger
+// Include table and shadow table name in comment
+//
+// Revision 1.6  2001/04/03 14:55:05  roger
+// No need to generate id twice - removed genid from shadow table
+//
+// Revision 1.5  2001/04/03 14:52:37  roger
+// Enable a shadow table "tableX" for insert/updates
+//
+// Revision 1.4  2001/03/17 03:11:50  roger
+// brand was defined multiple times - renamed to x_brand
+//
+// Revision 1.3  2001/03/16 19:10:40  roger
+// More branding code
+//
+// Revision 1.2  2001/03/16 03:18:48  roger
+// Added Log keyword
+//
+
+EXEC SQL BEGIN DECLARE SECTION;
+char d_brand[80] = "$Id: insert.txt,v 1.43 2009/10/23 14:22:16 rick Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL BEGIN DECLARE SECTION;
+sqlint32 check_x = 0;
+sqlint32 NewEntityID = 0;
+EXEC SQL END DECLARE SECTION;
+
+// We only Gen a new ID for This Relator Table
+if (EntityID <= 0 && (strcmp("opicm.Entity","@table") == 0 || strcmp("opicm.Relator","@table") == 0))  {
+  EXEC SQL DECLARE C1 CURSOR FOR
+  SELECT NextID FROM opicm.NextID WHERE Enterprise = :Enterprise and EntityType = :EntityType FOR UPDATE OF NEXTID;
+  EXEC SQL OPEN C1;
+  EXEC SQL FETCH C1 INTO :NewEntityID ;
+  if (NewEntityID > 0) {
+    EXEC SQL UPDATE opicm.NextID SET NextID = :NewEntityID + 1 WHERE CURRENT OF C1;
+    EXEC SQL CLOSE C1 WITH RELEASE;
+    EntityID = NewEntityID;
+  }else {
+    // If no value exists, "prime the pump" with ID = 1
+    EXEC SQL CLOSE C1 WITH RELEASE;
+    EntityID = 1;
+    EXEC SQL INSERT INTO opicm.NEXTID (Enterprise, EntityType, NextID) Values (:Enterprise, :EntityType, 2);
+  }
+  EXEC SQL COMMIT WORK;
+}else {
+// Try to close out an existing records
+check_x = 1;
+EXEC SQL
+UPDATE @table
+SET ValTo = :now
+WHERE
+@update_where
+rtrim(char(ValTo)) = :forever
+  ;
+}
+EXEC SQL
+INSERT
+INTO @table
+(
+@insert_cols
+, ValFrom
+, ValTo
+, EffFrom
+, EffTo
+, OPENID
+, TRANID
+)
+VALUES
+(
+@insert_values
+, :now
+, :forever
+, :EffFrom
+, :EffTo
+, :OPENID
+, :TranID
+)
+;
+if (check_x == 1) {
+// XTable
+EXEC SQL
+UPDATE @tableX
+SET
+   ValTo = :now
+WHERE
+@update_where
+rtrim(char(ValTo)) = :forever
+;
+}
+EXEC SQL
+INSERT
+INTO @tableX
+(
+@insert_cols
+, ValFrom
+, ValTo
+, EffFrom
+, EffTo
+, OPENID
+, TRANID
+)
+VALUES
+(
+@insert_values
+, :now
+, :forever
+, :EffFrom
+, :EffTo
+, :OPENID
+, :TranID
+)
+;
+
+EXEC SQL COMMIT WORK;
+

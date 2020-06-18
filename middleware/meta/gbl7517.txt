@@ -1,0 +1,74 @@
+@name=GBL7517
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+$Log: gbl7517.txt,v $
+Revision 1.8  2010/06/21 15:42:52  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2004/10/20 21:01:44  dave
+changes to gen parm
+
+Revision 1.6  2004/02/20 20:21:54  roger
+Must be @t_schema
+
+Revision 1.5  2004/02/20 18:09:34  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.4  2003/09/08 16:31:17  roger
+Enterprise was changed to 16 char length
+
+Revision 1.3  2002/07/17 17:33:21  roger
+Ensured Log was in @narrative
+
+@desc=Get Attribute Value - use RoleCode, not OPENID
+@fenced=true
+@results=1
+@addperm=false
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7517.txt,v 1.8 2010/06/21 15:42:52 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT
+ T.AttributeValue
+FROM @t_schema.Text T
+INNER JOIN @t_schema.MetaEntity MA ON
+MA.Enterprise = :Enterprise AND
+MA.ENTITYTYPE = T.AttributeCode AND
+MA.ValFrom <= :ValOn AND :ValOn < MA.ValTo AND MA.EffFrom <= :EffOn AND :EffOn < MA.EffTo
+INNER JOIN @t_schema.MetaLinkAttr ML ON
+ML.Enterprise = :Enterprise AND
+ML.LINKCODE = 'Capability' AND
+ML.LinkType = 'Role/Entity' AND
+ML.LinkType1 = :RoleCode AND
+ML.LinkType2 = :EntityType AND
+ML.ValFrom <= :ValOn AND :ValOn < ML.ValTo AND ML.EffFrom <= :EffOn AND :EffOn < ML.EffTo
+WHERE
+T.ATTRIBUTECODE = :AttributeCode AND
+T.Enterprise = :Enterprise AND
+T.EntityType = :EntityType AND
+T.EntityID = :EntityID AND
+T.NLSID IN (1, :NLSID) AND
+T.ValFrom <= :ValOn AND :ValOn < T.ValTo AND T.EffFrom <= :EffOn AND :EffOn < T.EffTo
+ORDER BY T.AttributeValue, T.NLSID
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in AttributeCode varchar(32)
+in RoleCode varchar(32)
+in NLSID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+
+

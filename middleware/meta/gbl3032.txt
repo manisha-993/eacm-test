@@ -1,0 +1,90 @@
+@name=GBL3032
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=true
+@fenced=true
+@narrative
+// $Log: gbl3032.txt,v $
+// Revision 1.29  2010/06/21 15:42:54  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.28  2004/10/20 21:01:42  dave
+// changes to gen parm
+//
+// Revision 1.27  2004/02/20 20:21:52  roger
+// Must be @t_schema
+//
+// Revision 1.26  2004/02/20 18:09:32  roger
+// ALL table names must now be prefixed w/ @t_schema in
+// order to support multiple schemas in SPs.
+//
+// Revision 1.25  2003/09/08 16:31:13  roger
+// Enterprise was changed to 16 char length
+//
+// Revision 1.24  2002/09/13 21:20:55  gregg
+// order by LONG1DESCRIPTION
+//
+// Revision 1.23  2002/01/28 20:53:22  dave
+// merging 1.0 maint into 1.1
+//
+// Revision 1.22  2001/10/10 17:57:24  dave
+// added 'X' to the mix
+//
+// Revision 1.21  2001/07/25 17:12:22  roger
+// Change Attribute to Attr in description
+//
+// Revision 1.20  2001/07/21 04:02:14  roger
+// Change MetaLinkAttribute to MetaLinkAttr
+// Change "opicm" to @t_schema in some
+//
+// Revision 1.19  2001/06/28 23:20:21  ching
+// modify SP to report ODSConfiguration
+//
+// Revision 1.18  2001/06/27 02:48:02  dave
+// remove hard coded enterprise 'L2' to Enterprise
+//
+@desc=build a list of Attributes/Entity from MetaLinkAttr based upon enterprise,linktype
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl3032.txt,v 1.29 2010/06/21 15:42:54 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE NavCur CURSOR FOR
+SELECT DISTINCT
+ COALESCE(MDD.LONGDESCRIPTION, ' ') as LONG1DESCRIPTION
+,COALESCE(MDD.SHORTDESCRIPTION, ' ') as SHORT1DESCRIPTION
+,MRA.LINKTYPE2
+,MRA.LINKCODE
+,MRA.LINKVALUE
+,MRA.ENTERPRISE
+
+FROM @t_schema.MetaLinkAttr MRA
+
+INNER JOIN @t_schema.MetaDescription MDD ON
+MDD.Enterprise      = :Enterprise AND
+MDD.DescriptionType = MRA.LinkType2 AND
+MDD.DescriptionClass in ('B','D','F','I','L','X','P','S','T','U','A','Entity','Relator') AND 
+MDD.NLSID = 1 AND
+MDD.ValFrom <= :ValOn AND :ValOn < MDD.ValTo AND MDD.EffFrom <= :EffOn AND :EffOn < MDD.EffTo
+ 
+WHERE
+    MRA.Enterprise = :Enterprise
+AND MRA.LinkType = :LinkType
+AND MRA.Valfrom <= :ValOn AND :ValOn < MRA.ValTo AND MRA.EffFrom <= :EffOn AND :EffOn < MRA.EffTo
+ORDER BY
+ LONG1DESCRIPTION
+;
+@execute
+EXEC SQL OPEN NavCur;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in LinkType varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

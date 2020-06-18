@@ -1,0 +1,141 @@
+@name=GBL4024
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+-- Unpublish category record by enterprise/entitytype/entityid/countrycode/languagecode/nlsid
+--------------------------------------------------------------------------------------------
+
+$Log: gbl4024.txt,v $
+Revision 1.7  2010/06/21 15:43:14  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2006/07/13 21:33:10  gregg
+update valfrom to current timestamp on expire.
+
+Revision 1.5  2005/12/09 22:06:53  gregg
+logging
+
+Revision 1.4  2005/12/09 21:39:04  gregg
+fix
+
+Revision 1.3  2005/12/02 00:20:50  gregg
+fix
+
+Revision 1.2  2005/12/02 00:04:36  gregg
+compile fix
+
+Revision 1.1  2005/12/01 23:22:59  gregg
+initial load
+
+
+
+@desc=Unpublish category record by enterprise/entitytype/entityid/countrycode/languagecode/nlsid
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@nulls_ok=true
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl4024.txt,v 1.7 2010/06/21 15:43:14 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+//
+// BEGIN ERROR CHECK DECLARE SECTION
+//
+const int SQLERROR = -1;
+const int SQLCOMPLETE = 1;
+//set this to SQLCOMPLETE when finished!
+int m_iSQLState = SQLERROR;
+EXEC SQL WHENEVER SQLERROR GOTO error_exit;
+EXEC SQL WHENEVER SQLWARNING CONTINUE;
+//
+// END ERROR CHECK DECLARE SECTION
+//
+
+FILE *t;
+mode_t Mode2;
+Mode2 = 0777;
+chmod("/tmp/4024.log",Mode2);
+t=fopen("/tmp/4024.log","a");
+t=fopen("/tmp/4024.log","w");
+fprintf(t,"-->start of stored procedure GBL4024\n"); 
+
+@execute
+
+EXEC SQL 
+
+UPDATE gbli.CATEGORY
+SET
+valfrom = current timestamp, 
+valto = current timestamp,
+isactive = 0
+
+WHERE
+    Enterprise = :enterprise
+AND EntityType = :entitytype
+AND EntityID = :entityid
+AND COUNTRYCODE = :countrycode
+AND LANGUAGECODE = :languagecode
+AND NLSID = :NLSID
+;
+
+
+//
+// BEGIN ERROR CHECK SECTION
+//
+
+// this won't get executed if sql error occurs
+m_iSQLState = SQLCOMPLETE;
+
+error_exit:
+
+if(m_iSQLState == SQLERROR) {
+
+    // ensure no infinite loops in the case that a failed SQL connection is used past this point...
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+
+    
+    fprintf(t,"********************  GBL8983 SQLCA DUMP  ********************\n");
+    char msg[1025];
+    sqlaintp(msg, 1024, 0, &sqlca);
+    fprintf(t,"msg:%s\n",msg);      
+    fprintf(t,"SQLCAID: %s\n", sqlca.sqlcaid);                                  
+    fprintf(t,"SQLCABC: %d\n", sqlca.sqlcabc);                                  
+    fprintf(t,"SQLCODE: %d\n", sqlca.sqlcode);                                  
+    fprintf(t,"SQLERRML: %d\n", sqlca.sqlerrml);                                
+    fprintf(t,"SQLERRMC: %s\n", sqlca.sqlerrmc);                                
+    fprintf(t,"SQLERRP: %s\n", sqlca.sqlerrp);                                  
+    fprintf(t,"SQLERRD[0]: %d\n", sqlca.sqlerrd[0]);                            
+    fprintf(t,"SQLERRD[1]: %d\n", sqlca.sqlerrd[1]);                            
+    fprintf(t,"SQLERRD[2]: %d\n", sqlca.sqlerrd[2]);                            
+    fprintf(t,"SQLERRD[3]: %d\n", sqlca.sqlerrd[3]);                            
+    fprintf(t,"SQLERRD[4]: %d\n", sqlca.sqlerrd[4]);                            
+    fprintf(t,"SQLERRD[5]: %d\n", sqlca.sqlerrd[5]);                            
+    fprintf(t,"SQLWARN: %s\n", sqlca.sqlwarn);                                  
+    fprintf(t,"SQLSTATE: %s\n", sqlca.sqlstate);         
+
+    // End dump params
+    fprintf(t,"******************  END OF GBL8983 SQLCA DUMP  *******************\n"); 
+    fclose(t);
+}
+//
+// END ERROR CHECK SECTION
+//
+
+ fprintf(t,"end of GBL4024\n");
+fclose(t);
+
+
+//EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in enterprise varchar(16)
+in entitytype varchar(32)
+in entityid int
+in countrycode varchar(2)
+in languagecode varchar(2)
+in NLSID int
+@end

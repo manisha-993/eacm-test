@@ -1,0 +1,625 @@
+@name=GBL01F0
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+Run at the end of all Collections 
+To update the attrvalfrom timestamp of all products 
+in the bigcat.wwproduct and bigcat. product tables 
+that are related directly or through a SBB to the feature
+It uses the start time of the last feature collection run.
+--------------------------------------------------------------------------------------------
+$Log: gbl01F0.txt,v $
+Revision 1.9  2010/07/21 19:56:06  praveen
+Change Long data type to Sqlint32 in support for db2 9.5
+
+Revision 1.8  2010/06/21 15:43:08  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2009/01/23 16:23:28  praveen
+fix EXEC SQL
+
+Revision 1.6  2009/01/23 00:07:09  praveen
+Supporting dual catdb schema
+
+Revision 1.5  2007/06/05 17:55:22  chris
+fixes
+
+Revision 1.4  2007/06/05 15:16:50  chris
+changed to base update on feature table an prodstruct table not trsnetterfinal
+
+Revision 1.3  2007/04/26 13:17:12  chris
+Look for SessionID >= what was passed since The SyncMapCollection sometimes uses a new session is
+
+Revision 1.2  2007/04/25 20:05:04  chris
+specified OF and VAR for WWPRODUCT updates
+specified CVAR and CSOL for PRODUCT updates
+
+Revision 1.1  2007/04/25 18:16:13  chris
+new function
+
+
+
+@desc=Product impacted by feature change
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl01F0.txt,v 1.9 2010/07/21 19:56:06 praveen Exp $";
+sqlint32 nWWPRODUCTRowsUpdated = 0;
+sqlint32 nPRODUCTRowsUpdated = 0;
+sqlint32 nRowsUpdated = 0;
+char start[27];
+EXEC SQL END DECLARE SECTION;
+
+@execute
+
+if (strcmp(schema,"BIGCAT") == 0) {
+    EXEC SQL VALUES (
+        select max(runtime) 
+        from bigcat.runtime 
+        where object_key='COM.ibm.lenovo.catalog.FeatureCollection' 
+        and runtime < (
+            select max(runtime) 
+            from bigcat.runtime 
+            where object_key='COM.ibm.lenovo.catalog.FeatureCollection'
+        )
+    )
+    INTO :start;
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+    EXEC SQL VALUES (
+        select max(runtime) 
+        from ibmcat.runtime 
+        where object_key='COM.ibm.lenovo.catalog.FeatureCollection' 
+        and runtime < (
+            select max(runtime) 
+            from ibmcat.runtime 
+            where object_key='COM.ibm.lenovo.catalog.FeatureCollection'
+        )
+    )
+    INTO :start;
+}
+
+if (strcmp(schema,"BIGCAT") == 0) {
+    EXEC SQL
+    update bigcat.wwproduct as wwprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and wwentitytype = 'OF' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from bigcat.prodstruct as prod 
+        where 
+        prod.enterprise = wwprod.enterprise
+        and prod.prodentitytype=wwprod.wwentitytype
+        and prod.prodentityid=wwprod.wwentityid
+        and featentitytype <> 'SBB'
+        and exists (
+            select 1 
+            from bigcat.feature as feat
+            where 
+            feat.enterprise=prod.enterprise
+            and feat.valfrom > :start 
+            and feat.featentitytype=prod.featentitytype 
+            and feat.featentityid=prod.featentityid
+        )
+);
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+    EXEC SQL
+    update ibmcat.wwproduct as wwprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and wwentitytype = 'OF' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from ibmcat.prodstruct as prod 
+        where 
+        prod.enterprise = wwprod.enterprise
+        and prod.prodentitytype=wwprod.wwentitytype
+        and prod.prodentityid=wwprod.wwentityid
+        and featentitytype <> 'SBB'
+        and exists (
+            select 1 
+            from ibmcat.feature as feat
+            where 
+            feat.enterprise=prod.enterprise
+            and feat.valfrom > :start 
+            and feat.featentitytype=prod.featentitytype 
+            and feat.featentityid=prod.featentityid
+        )
+);
+}
+nWWPRODUCTRowsUpdated += sqlca.sqlerrd[5];
+
+EXEC SQL commit;
+
+if (strcmp(schema,"BIGCAT") == 0) {
+    EXEC SQL
+    update bigcat.wwproduct as wwprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and wwentitytype = 'VAR' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from bigcat.prodstruct as prod 
+        where 
+        prod.enterprise = wwprod.enterprise
+        and prod.prodentitytype=wwprod.wwentitytype
+        and prod.prodentityid=wwprod.wwentityid
+        and featentitytype <> 'SBB'
+        and exists (
+            select 1 
+            from bigcat.feature as feat
+            where 
+            feat.enterprise=prod.enterprise
+            and feat.valfrom > :start 
+            and feat.featentitytype=prod.featentitytype 
+            and feat.featentityid=prod.featentityid
+        )
+);
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+    EXEC SQL
+    update ibmcat.wwproduct as wwprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and wwentitytype = 'VAR' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from ibmcat.prodstruct as prod 
+        where 
+        prod.enterprise = wwprod.enterprise
+        and prod.prodentitytype=wwprod.wwentitytype
+        and prod.prodentityid=wwprod.wwentityid
+        and featentitytype <> 'SBB'
+        and exists (
+            select 1 
+            from ibmcat.feature as feat
+            where 
+            feat.enterprise=prod.enterprise
+            and feat.valfrom > :start 
+            and feat.featentitytype=prod.featentitytype 
+            and feat.featentityid=prod.featentityid
+        )
+);
+}
+nWWPRODUCTRowsUpdated += sqlca.sqlerrd[5];
+
+EXEC SQL commit;
+
+if (strcmp(schema,"BIGCAT") == 0) {
+    EXEC SQL
+    update bigcat.wwproduct as wwprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and wwentitytype = 'OF' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from bigcat.prodstruct as prod 
+        where 
+        prod.enterprise = wwprod.enterprise
+        and prod.prodentitytype=wwprod.wwentitytype
+        and prod.prodentityid=wwprod.wwentityid
+        and featentitytype = 'SBB'
+        and exists (
+            select 1
+            from bigcat.prodstruct as prodsbb
+            where 
+            prodsbb.enterprise=prod.enterprise
+            and prodsbb.prodentitytype=prod.featentitytype
+            and prodsbb.prodentityid=prod.featentityid
+            and exists (
+                select 1 
+                from bigcat.feature as feat
+                where 
+                feat.enterprise = prodsbb.enterprise
+                and feat.valfrom > :start 
+                and feat.featentitytype=prodsbb.featentitytype 
+                and feat.featentityid=prodsbb.featentityid
+            )
+        )
+);
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+    EXEC SQL
+    update ibmcat.wwproduct as wwprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and wwentitytype = 'OF' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from ibmcat.prodstruct as prod 
+        where 
+        prod.enterprise = wwprod.enterprise
+        and prod.prodentitytype=wwprod.wwentitytype
+        and prod.prodentityid=wwprod.wwentityid
+        and featentitytype = 'SBB'
+        and exists (
+            select 1
+            from ibmcat.prodstruct as prodsbb
+            where 
+            prodsbb.enterprise=prod.enterprise
+            and prodsbb.prodentitytype=prod.featentitytype
+            and prodsbb.prodentityid=prod.featentityid
+            and exists (
+                select 1 
+                from ibmcat.feature as feat
+                where 
+                feat.enterprise = prodsbb.enterprise
+                and feat.valfrom > :start 
+                and feat.featentitytype=prodsbb.featentitytype 
+                and feat.featentityid=prodsbb.featentityid
+            )
+        )
+);
+}
+nWWPRODUCTRowsUpdated += sqlca.sqlerrd[5];
+
+EXEC SQL commit;
+
+if (strcmp(schema,"BIGCAT") == 0) {
+    EXEC SQL
+    update bigcat.wwproduct as wwprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and wwentitytype = 'VAR' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from bigcat.prodstruct as prod 
+        where 
+        prod.enterprise = wwprod.enterprise
+        and prod.prodentitytype=wwprod.wwentitytype
+        and prod.prodentityid=wwprod.wwentityid
+        and featentitytype = 'SBB'
+        and exists (
+            select 1
+            from bigcat.prodstruct as prodsbb
+            where 
+            prodsbb.enterprise=prod.enterprise
+            and prodsbb.prodentitytype=prod.featentitytype
+            and prodsbb.prodentityid=prod.featentityid
+            and exists (
+                select 1 
+                from bigcat.feature as feat
+                where 
+                feat.enterprise = prodsbb.enterprise
+                and feat.valfrom > :start 
+                and feat.featentitytype=prodsbb.featentitytype 
+                and feat.featentityid=prodsbb.featentityid
+            )
+        )
+    );
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+    EXEC SQL
+    update ibmcat.wwproduct as wwprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and wwentitytype = 'VAR' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from ibmcat.prodstruct as prod 
+        where 
+        prod.enterprise = wwprod.enterprise
+        and prod.prodentitytype=wwprod.wwentitytype
+        and prod.prodentityid=wwprod.wwentityid
+        and featentitytype = 'SBB'
+        and exists (
+            select 1
+            from ibmcat.prodstruct as prodsbb
+            where 
+            prodsbb.enterprise=prod.enterprise
+            and prodsbb.prodentitytype=prod.featentitytype
+            and prodsbb.prodentityid=prod.featentityid
+            and exists (
+                select 1 
+                from ibmcat.feature as feat
+                where 
+                feat.enterprise = prodsbb.enterprise
+                and feat.valfrom > :start 
+                and feat.featentitytype=prodsbb.featentitytype 
+                and feat.featentityid=prodsbb.featentityid
+            )
+        )
+    );
+}
+nWWPRODUCTRowsUpdated += sqlca.sqlerrd[5];
+
+EXEC SQL commit;
+
+if (strcmp(schema,"BIGCAT") == 0) {
+    EXEC SQL
+    update bigcat.product as locprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and locentitytype = 'CSOL' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from bigcat.prodstruct as prod 
+        where 
+        prod.enterprise = locprod.enterprise
+        and prod.prodentitytype=locprod.locentitytype
+        and prod.prodentityid=locprod.locentityid
+        and featentitytype <> 'SBB'
+        and exists (
+            select 1 
+            from bigcat.feature as feat
+            where 
+            feat.enterprise=prod.enterprise
+            and feat.valfrom > :start 
+            and feat.featentitytype=prod.featentitytype 
+            and feat.featentityid=prod.featentityid
+        )
+    );
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+    EXEC SQL
+    update ibmcat.product as locprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and locentitytype = 'CSOL' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from ibmcat.prodstruct as prod 
+        where 
+        prod.enterprise = locprod.enterprise
+        and prod.prodentitytype=locprod.locentitytype
+        and prod.prodentityid=locprod.locentityid
+        and featentitytype <> 'SBB'
+        and exists (
+            select 1 
+            from ibmcat.feature as feat
+            where 
+            feat.enterprise=prod.enterprise
+            and feat.valfrom > :start 
+            and feat.featentitytype=prod.featentitytype 
+            and feat.featentityid=prod.featentityid
+        )
+    );
+}
+nPRODUCTRowsUpdated += sqlca.sqlerrd[5];
+
+EXEC SQL commit;
+
+if (strcmp(schema,"BIGCAT") == 0) {
+    EXEC SQL
+    update bigcat.product as locprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and locentitytype = 'CVAR' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from bigcat.prodstruct as prod 
+        where 
+        prod.enterprise = locprod.enterprise
+        and prod.prodentitytype=locprod.locentitytype
+        and prod.prodentityid=locprod.locentityid
+        and featentitytype <> 'SBB'
+        and exists (
+            select 1 
+            from bigcat.feature as feat
+            where 
+            feat.enterprise=prod.enterprise
+            and feat.valfrom > :start 
+            and feat.featentitytype=prod.featentitytype 
+            and feat.featentityid=prod.featentityid
+        )
+    );
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+    EXEC SQL
+    update ibmcat.product as locprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and locentitytype = 'CVAR' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from ibmcat.prodstruct as prod 
+        where 
+        prod.enterprise = locprod.enterprise
+        and prod.prodentitytype=locprod.locentitytype
+        and prod.prodentityid=locprod.locentityid
+        and featentitytype <> 'SBB'
+        and exists (
+            select 1 
+            from ibmcat.feature as feat
+            where 
+            feat.enterprise=prod.enterprise
+            and feat.valfrom > :start 
+            and feat.featentitytype=prod.featentitytype 
+            and feat.featentityid=prod.featentityid
+        )
+    );
+}
+nPRODUCTRowsUpdated += sqlca.sqlerrd[5];
+
+EXEC SQL commit;
+
+if (strcmp(schema,"BIGCAT") == 0) {
+    EXEC SQL
+    update bigcat.product as locprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and locentitytype = 'CSOL' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from bigcat.prodstruct as prod 
+        where 
+        prod.enterprise = locprod.enterprise
+        and prod.prodentitytype=locprod.locentitytype
+        and prod.prodentityid=locprod.locentityid
+        and featentitytype = 'SBB'
+        and exists (
+            select 1
+            from bigcat.prodstruct as prodsbb
+            where 
+            prodsbb.enterprise=prod.enterprise
+            and prodsbb.prodentitytype=prod.featentitytype
+            and prodsbb.prodentityid=prod.featentityid
+            and exists (
+                select 1 
+                from bigcat.feature as feat
+                where 
+                feat.enterprise = prodsbb.enterprise
+                and feat.valfrom > :start 
+                and feat.featentitytype=prodsbb.featentitytype 
+                and feat.featentityid=prodsbb.featentityid
+            )
+        )
+    );
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+    EXEC SQL
+    update ibmcat.product as locprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and locentitytype = 'CSOL' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from ibmcat.prodstruct as prod 
+        where 
+        prod.enterprise = locprod.enterprise
+        and prod.prodentitytype=locprod.locentitytype
+        and prod.prodentityid=locprod.locentityid
+        and featentitytype = 'SBB'
+        and exists (
+            select 1
+            from ibmcat.prodstruct as prodsbb
+            where 
+            prodsbb.enterprise=prod.enterprise
+            and prodsbb.prodentitytype=prod.featentitytype
+            and prodsbb.prodentityid=prod.featentityid
+            and exists (
+                select 1 
+                from ibmcat.feature as feat
+                where 
+                feat.enterprise = prodsbb.enterprise
+                and feat.valfrom > :start 
+                and feat.featentitytype=prodsbb.featentitytype 
+                and feat.featentityid=prodsbb.featentityid
+            )
+        )
+    );
+}
+nPRODUCTRowsUpdated += sqlca.sqlerrd[5];
+
+EXEC SQL commit;
+
+if (strcmp(schema,"BIGCAT") == 0) {
+    EXEC SQL
+    update bigcat.product as locprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and locentitytype = 'CVAR' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from bigcat.prodstruct as prod 
+        where 
+        prod.enterprise = locprod.enterprise
+        and prod.prodentitytype=locprod.locentitytype
+        and prod.prodentityid=locprod.locentityid
+        and featentitytype = 'SBB'
+        and exists (
+            select 1
+            from bigcat.prodstruct as prodsbb
+            where 
+            prodsbb.enterprise=prod.enterprise
+            and prodsbb.prodentitytype=prod.featentitytype
+            and prodsbb.prodentityid=prod.featentityid
+            and exists (
+                select 1 
+                from bigcat.feature as feat
+                where 
+                feat.enterprise = prodsbb.enterprise
+                and feat.valfrom > :start 
+                and feat.featentitytype=prodsbb.featentitytype 
+                and feat.featentityid=prodsbb.featentityid
+            )
+        )
+    );
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+    EXEC SQL
+    update ibmcat.product as locprod
+    set attrvalfrom = :now
+    where 
+    enterprise = :Enterprise
+    and locentitytype = 'CVAR' 
+    and attrvalfrom < :start
+    and exists (
+        select 1 
+        from ibmcat.prodstruct as prod 
+        where 
+        prod.enterprise = locprod.enterprise
+        and prod.prodentitytype=locprod.locentitytype
+        and prod.prodentityid=locprod.locentityid
+        and featentitytype = 'SBB'
+        and exists (
+            select 1
+            from ibmcat.prodstruct as prodsbb
+            where 
+            prodsbb.enterprise=prod.enterprise
+            and prodsbb.prodentitytype=prod.featentitytype
+            and prodsbb.prodentityid=prod.featentityid
+            and exists (
+                select 1 
+                from ibmcat.feature as feat
+                where 
+                feat.enterprise = prodsbb.enterprise
+                and feat.valfrom > :start 
+                and feat.featentitytype=prodsbb.featentitytype 
+                and feat.featentityid=prodsbb.featentityid
+            )
+        )
+    );
+}
+nPRODUCTRowsUpdated += sqlca.sqlerrd[5];
+
+EXEC SQL commit;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+with rowcount(tablename,updatecount,valfrom,now) as (
+    select * from (values ('PRODUCT',:nPRODUCTRowsUpdated,:start,:now),('WWPRODUCT',:nWWPRODUCTRowsUpdated,:start,:now)) as rowcnt
+) 
+select * from rowcount
+;
+EXEC SQL OPEN sp_cursor;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in schema varchar(8)
+@end

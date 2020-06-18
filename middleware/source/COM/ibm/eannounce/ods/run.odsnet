@@ -1,0 +1,66 @@
+#
+#
+#$Log: run.odsnet,v $
+#Revision 1.4  2004/03/12 23:04:10  bala
+#refresh tables only if java command exited without error
+#
+#
+#
+
+WHO_AM_I=`whoami`
+
+TestRunning=`ps -ef|grep "run.odsnet"|grep "$WHO_AM_I"|wc -l`
+if [ TestRunning -gt 2 ];
+then
+#ps -ef|grep odsnet
+exit
+fi
+
+
+DB2CODEPAGE=1208
+export DB2CODEPAGE
+
+#/bin/sh
+cd /home/opica12/eccmods 
+
+#
+# set up the environment
+#
+PATH=/usr/lpp/internet/server_root/java/bin:/usr/bin:/etc:/usr/sbin:$HOME/bin:/sbin:.
+export PATH
+
+SQLLIB=/home/opicmdb2/sqllib
+JAVA=$SQLLIB/java
+CLASSPATH=.:$JAVA/db2java.zip
+LD_LIBRARY_PATH=/home/opicmdb2/sqllib/lib
+export LD_LIBRARY_PATH
+MAIL_ADDRESS="opica12@localhost, v2ueh21@us.ibm.com, marmstro@us.ibm.com, rpotter@us.ibm.com"
+
+. $SQLLIB/db2profile
+
+rptdate=`date +%Y%m%d%H%M`
+RPTNAME='/home/opica12/eccmods/rpt/ods.net.log.'$rptdate
+
+SOFT_UPDATE_SWITCH=$1
+
+#
+# run the job
+#
+if java -ms128M -mx512M -ss4M -oss4M -classpath /usr/java131/jre/lib/rt.jar:/home/opicmdb2/sqllib/java/sqlj.zip:/home/opicmdb2/sqllib/function:/home/opicmdb2/sqllib/java/db2java.zip:/home/opicmdb2/sqllib/java/runtime.zip:./middleware.jar:. COM.ibm.eannounce.ods.ODSNet $SOFT_UPDATE_SWITCH >$RPTNAME 2>$RPTNAME.err; then
+ ./run.refreshTables;
+fi
+
+# 
+# mail the error report if it contains anything, else delete it
+#
+if [ -s $RPTNAME.err ]; then 
+  mail -s "ODSNET Error from `hostname`" $MAIL_ADDRESS <$RPTNAME.err
+else
+  rm $RPTNAME.err
+fi
+
+#
+# delete stuff more than 1 week old
+#
+find /home/opica12/eccmods/rpt/* -prune -type f -mtime +7 -exec rm {} \;
+

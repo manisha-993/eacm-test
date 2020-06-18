@@ -1,0 +1,68 @@
+@name=GBL9975
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=0
+@narrative 
+$Log: gbl9975.txt,v $
+Revision 1.8  2010/06/21 15:43:07  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2006/03/09 17:29:52  roger
+Restore it
+
+Revision 1.6  2006/03/09 17:14:27  roger
+Needs equals for value
+
+Revision 1.5  2006/03/09 17:06:14  roger
+Needs a value
+
+Revision 1.4  2006/03/09 16:56:43  roger
+Test @noremote
+
+Revision 1.3  2006/03/06 22:44:11  roger
+Fix SQL
+
+Revision 1.2  2006/03/06 21:45:10  roger
+For recurring ABRs
+
+Revision 1.1  2006/03/02 16:26:08  roger
+For recurring ABRs
+
+@desc=Changes the status of SCHEDABRs to queued
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9975.txt,v 1.8 2010/06/21 15:43:07 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+@execute
+EXEC SQL 
+INSERT
+INTO @t_schema.FlagX
+SELECT
+  Enterprise
+, EntityType
+, EntityID
+, AttributeCode
+, '0020'
+, :now
+, :forever
+, :now
+, :now
+, OpenID
+, TranID
+, Ref_NLSID
+FROM @t_schema.FlagX F
+WHERE
+enterprise = 'SG13'
+AND entitytype = 'SCHEDABR'
+AND attributevalue='0030'
+;
+EXEC SQL COMMIT WORK;
+@parameters
+inout ReturnStatus int
+@end
+
+

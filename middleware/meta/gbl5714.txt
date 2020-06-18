@@ -1,0 +1,65 @@
+@name=GBL5714
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl5714.txt,v $
+Revision 1.5  2010/06/21 15:42:47  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.4  2004/10/20 21:01:42  dave
+changes to gen parm
+
+Revision 1.3  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.2  2004/02/20 18:09:32  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.1  2003/09/12 01:45:02  dave
+new sp
+
+
+@desc=retrieve all flag attributecodes for the give role
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl5714.txt,v 1.5 2010/06/21 15:42:47 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+
+select distinct
+ ATT.EntityType
+,ATT.EntityCLass
+from @t_schema.MetaEntity ATT
+
+join @t_schema.metalinkattr CAP on
+    CAP.enterprise = :Enterprise
+and CAP.linktype = 'Role/Attribute'
+and CAP.linkcode = 'Capability'
+and CAP.linktype1 = :RoleCode
+and CAP.linktype2 = ATT.EntityType
+and CAP.valto = :forever
+and CAP.effto > :now
+
+where
+    ATT.Enterprise = :Enterprise
+and ATT.EntityClass in ('S','F','U')
+and ATT.valto = :forever
+and ATT.effto > :now
+
+order by ATT.EntityType
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in RoleCode varchar(32)
+@end
+
+

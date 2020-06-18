@@ -1,0 +1,114 @@
+@name=GBL7545
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+This guy will be soley responsible for returning all the Attributes for a given entity type, ID
+$Log: gbl7545.txt,v $
+Revision 1.6  2010/06/21 15:43:26  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.5  2006/03/12 01:13:59  dave
+removing RTRIM on LTEXT
+
+Revision 1.4  2004/10/20 21:01:45  dave
+changes to gen parm
+
+Revision 1.3  2004/02/20 20:21:55  roger
+Must be @t_schema
+
+Revision 1.2  2004/02/20 18:09:35  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.1  2003/04/01 00:36:23  dave
+Stand Alone Entity Item Constructor
+
+
+@desc=Get All Attributes for a given EntityType, Entityid
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7545.txt,v 1.6 2010/06/21 15:43:26 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT
+ RTRIM(T.AttributeCode) as AttributeCode
+,T.NLSID as NLSID
+,RTRIM(T.AttributeValue) as AttributeValue
+,T.ValFrom as ValFrom
+,T.ValTo as ValTo
+,T.EffFrom as EffFrom
+,T.EffTo as EffTo
+FROM @t_schema.Text T
+WHERE
+    T.Enterprise = :Enterprise
+AND T.EntityType = :EntityType
+AND T.EntityID = :EntityID
+AND T.ValFrom <= :ValOn AND :ValOn <= T.ValTo AND T.EffFrom <= :EffOn AND :EffOn <= T.EffTo
+UNION ALL
+SELECT
+ RTRIM(F.AttributeCode)
+,1
+,RTRIM(F.AttributeValue)
+,F.ValFrom as ValFrom
+,F.ValTo as ValTo
+,F.EffFrom
+,F.EffTo
+FROM @t_schema.Flag F
+WHERE
+    F.Enterprise = :Enterprise
+AND F.EntityType = :EntityType
+AND F.EntityID = :EntityID
+AND F.ValFrom <= :ValOn AND :ValOn <= F.ValTo AND F.EffFrom <= :EffOn AND :EffOn <= F.EffTo
+UNION ALL
+SELECT
+ RTRIM(T.AttributeCode)
+,T.NLSID
+,T.AttributeValue
+,T.ValFrom as ValFrom
+,T.ValTo as ValTo
+,T.EffFrom
+,T.EffTo
+FROM @t_schema.LongText T
+WHERE
+    T.Enterprise = :Enterprise
+AND T.EntityType = :EntityType
+AND T.EntityID = :EntityID
+AND T.ValFrom <= :ValOn AND :ValOn <= T.ValTo AND T.EffFrom <= :EffOn AND :EffOn <= T.EffTo
+UNION ALL
+SELECT
+ RTRIM(B.AttributeCode)
+,B.NLSID
+,B.BlobExtension
+,B.ValFrom as ValFrom
+,B.ValTo as ValTo
+,B.EffFrom
+,B.EffTo
+FROM @t_schema.Blob B
+WHERE
+    B.Enterprise = :Enterprise
+AND B.EntityType = :EntityType
+AND B.EntityID = :EntityID
+AND B.ValFrom <= :ValOn AND :ValOn <= B.ValTo AND B.EffFrom <= :EffOn AND :EffOn <= B.EffTo
+;
+
+@execute
+
+EXEC SQL OPEN sp_cursor1;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in ValOn varchar(27)
+in EffOn varchar(27)
+@end
+
+

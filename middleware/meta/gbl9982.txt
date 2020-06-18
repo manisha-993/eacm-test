@@ -1,0 +1,70 @@
+@name=GBL9982
+@noremote=true
+@type=basic
+@dbase=opicmods
+@narrative
+
+Updates  a record in the ECCMODS product Detail Record - non-multi-flag flavor
+
+//
+// $Log: gbl9982.txt,v $
+// Revision 1.4  2010/06/21 15:43:04  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.3  2004/12/01 21:48:17  gregg
+// changing SPs for use of ProductDetailRec
+//
+// Revision 1.2  2004/10/20 21:01:50  dave
+// changes to gen parm
+//
+// Revision 1.1  2004/09/30 17:06:44  gregg
+// initial load - sp for productdetail update for non-multi-flags
+//
+//
+//
+
+@desc=Updates A Product Detail - non-multi flag flavor
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9982.txt,v 1.4 2010/06/21 15:43:04 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+@execute
+
+EXEC SQL 
+UPDATE GBLI.PRODUCTDETAIL SET 
+COUNTRYCODE = :COUNTRYCODE,
+GSEQUENCE = :GSEQUENCE,
+GVISIBLE = :GVISIBLE,
+ISEQUENCE = :ISEQUENCE,
+IVISIBLE = :IVISIBLE,
+ATTRIBUTEVALUE = :ATTRIBUTEVALUE,
+PUBLISHFLAG = :PUBLISHFLAG,
+VALFROM = :VALFROM,
+FLAGCODE = :FLAGCODE
+
+WHERE 
+    ENTERPRISE = :ENTERPRISE
+AND RECID = :RECID
+;
+
+@parameters
+inout ReturnStatus int
+in ENTERPRISE varchar(16)
+in FLAGCODE varchar(16)
+in COUNTRYCODE varchar(8)
+in GSEQUENCE int
+in GVISIBLE int
+in ISEQUENCE int
+in IVISIBLE int
+in ATTRIBUTEVALUE varchar(255)
+in PUBLISHFLAG varchar(1)
+in VALFROM varchar(27)
+in RECID int
+@end
+
+                                                              
+                                                              

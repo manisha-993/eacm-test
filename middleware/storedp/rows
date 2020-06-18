@@ -1,0 +1,21 @@
+#!/bin/ksh 
+
+. ~/storedp/vars
+
+WHERE="WHERE 1=1" 
+
+echo "row count: " $WHERE
+db2 connect to $DBASE user $USER using $PASSWD 
+db2 "select creator,name from sysibm.systables \
+where creator = 'OPICM' order by creator,name" |
+awk 'NR > 3 && NF == 2 {print $1"."$2}' |
+while read TABLE
+  do
+    db2 connect to $DBASE user $USER using $PASSWD 
+    db2 "select '$TABLE',count(*) from $TABLE $WHERE"|grep OPICM
+    echo $TABLE >>tabdefs
+    #db2 "describe select * from $TABLE" >>tabdefs
+    db2 terminate
+  done
+db2 terminate 
+

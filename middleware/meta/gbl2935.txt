@@ -1,0 +1,211 @@
+@name=GBL2935
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------
+-- Provide a listing of all deactivated entites between a given
+-- time period.
+-- It is a listing for a given user.. and time period
+--------------------------------------------------------------------
+$Log: gbl2935.txt,v $
+Revision 1.25  2010/06/21 15:43:25  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.24  2004/10/20 21:01:40  dave
+changes to gen parm
+
+Revision 1.23  2004/03/26 22:19:15  joan
+change to left join
+
+Revision 1.22  2004/02/20 20:21:50  roger
+Must be @t_schema
+
+Revision 1.21  2004/02/20 18:09:30  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.20  2003/09/08 16:31:12  roger
+Enterprise was changed to 16 char length
+
+Revision 1.19  2003/08/20 21:58:57  joan
+debug
+
+Revision 1.18  2003/08/20 21:44:21  joan
+debug
+
+Revision 1.17  2003/07/23 21:21:16  joan
+change NAME to USERNAME for OP
+
+Revision 1.16  2003/04/07 21:30:39  roger
+Fixed :Forever to be :forever
+
+Revision 1.15  2002/08/02 20:16:26  dave
+small change for restore
+
+Revision 1.14  2002/08/02 18:50:04  dave
+fixes for restore SP's
+
+Revision 1.13  2002/04/08 23:30:23  joan
+working on OPWG
+
+Revision 1.12  2001/12/12 17:24:44  dave
+tweeks to sync 1.0 and 1.1 for all the maintenance mods
+
+Revision 1.11  2001/12/05 17:23:41  joan
+17452 -- change 'NE' to :Enterprise, Entity table to EntityX, and put COALESCE for I2.AttributeValue
+
+Revision 1.10  2001/09/21 17:27:48  dave
+fixed up some NE stuff
+
+Revision 1.9  2001/06/07 05:51:25  dave
+restore Unrestricted to use XTables
+
+Revision 1.8  2001/06/03 22:26:02  dave
+Added Unrestricted Case for retore
+
+Revision 1.7  2001/04/30 20:23:32  dave
+Made SP a RESTRICTED only CASE
+
+Revision 1.6  2001/03/22 06:34:18  dave
+More SQL syntax errors
+
+Revision 1.5  2001/03/22 06:16:05  dave
+More Syntax Fixes
+
+Revision 1.4  2001/03/22 05:40:23  dave
+Added EntityClass to the selection statement
+
+@desc=Lists Deactivated entities for a given user and time period)
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2935.txt,v 1.25 2010/06/21 15:43:25 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT
+  'Entity'
+, E.EntityType AS Entity_Type
+, E.EntityID AS Entity_ID
+, E.ValFrom AS Deactivate_Date
+, RTRIM(MD2.LongDescription) AS Entity_Description
+, RTRIM(COALESCE(I2.AttributeValue, 'NO NAME')) as Entity_Display_Name
+, I1.AttributeValue AS User_Name
+, CONCAT(CONCAT(CONCAT(RTRIM(COALESCE(MD.LongDescription,'No Role Description')), '('),RTRIM(T1.AttributeValue)),')') AS Role_Information
+, 'sp_cursor1'
+FROM @t_schema.Relator R
+INNER JOIN @t_schema.TEXT I1 ON
+I1.Enterprise = R.Enterprise AND
+I1.EntityType = R.Entity2Type AND
+I1.EntityID = R.Entity2ID AND
+I1.AttributeCode = 'USERNAME' AND
+I1.ValTo = :forever
+INNER JOIN @t_schema.Text T1 ON
+T1.Enterprise = :Enterprise AND
+T1.EntityType = R.EntityType AND
+T1.EntityID = R.EntityID AND
+T1.AttributeCode = 'ROLECODE' AND
+T1.ValTo = :forever
+INNER JOIN @t_schema.EntityX E ON
+    E.Enterprise = :Enterprise
+AND E.OPENID = R.EntityID
+AND E.ValFrom BETWEEN :StartDate AND :EndDate
+AND E.Valto = :forever
+AND E.EffTo < :EndDate
+LEFT JOIN @t_schema.TEXT I2 ON
+I2.Enterprise = E.Enterprise AND
+I2.EntityType = E.EntityType AND
+I2.EntityID = E.EntityID AND
+I2.AttributeCode = 'NAME' AND
+I2.ValTo = :forever
+INNER JOIN @t_schema.MetaDescription MD2 ON
+MD2.Enterprise = E.Enterprise AND
+MD2.DescriptionType = E.EntityType AND
+MD2.DescriptionClass = 'Entity' AND
+MD2.NLSID = 1 AND
+MD2.ValTo = :forever
+LEFT JOIN @t_schema.MetaDescription MD ON
+MD.Enterprise = :Enterprise  AND
+MD.DescriptionType = T1.AttributeValue AND
+MD.DescriptionClass = 'Role' AND
+MD.NLSID = 1 AND
+MD.ValTo = :forever
+WHERE
+R.Enterprise = :Enterprise AND
+R.EntityType = 'OPWG' AND
+R.EntityID = :OPWGID AND
+R.ValFrom <= :ValOn AND :ValOn < R.ValTo AND R.EffFrom <= :EffOn AND :EffOn < R.EffTo
+;
+EXEC SQL DECLARE sp_cursor2 CURSOR FOR
+SELECT
+  'Entity'
+, E.EntityType AS Entity_Type
+, E.EntityID AS Entity_ID
+, E.ValFrom AS Deactivate_Date
+, RTRIM(MD2.LongDescription) AS Entity_Description
+, RTRIM(COALESCE(I2.AttributeValue, 'NO NAME')) as Entity_Display_Name
+, I1.AttributeValue AS User_Name
+, CONCAT(CONCAT(CONCAT(RTRIM(COALESCE(MD.LongDescription,'No Role Description')), '('),RTRIM(T1.AttributeValue)),')') AS Role_Information
+, 'sp_cursor2'
+FROM @t_schema.Relator R
+INNER JOIN @t_schema.TEXT I1 ON
+I1.Enterprise = R.Enterprise AND
+I1.EntityType = R.Entity2Type AND
+I1.EntityID = R.Entity2ID AND
+I1.AttributeCode = 'USERNAME' AND
+I1.ValTo = :forever
+INNER JOIN @t_schema.Text T1 ON
+T1.Enterprise = :Enterprise AND
+T1.EntityType = R.EntityType AND
+T1.EntityID = R.EntityID AND
+T1.AttributeCode = 'ROLECODE' AND
+T1.ValTo = :forever
+INNER JOIN @t_schema.EntityX E ON
+    E.Enterprise = :Enterprise
+AND E.OPENID = R.EntityID
+AND E.ValFrom BETWEEN :StartDate AND :EndDate
+AND E.Valto = :forever
+AND E.EffTo < :EndDate
+LEFT JOIN @t_schema.TEXT I2 ON
+I2.Enterprise = E.Enterprise AND
+I2.EntityType = E.EntityType AND
+I2.EntityID = E.EntityID AND
+I2.AttributeCode = 'NAME' AND
+I2.ValTo = :forever
+INNER JOIN @t_schema.MetaDescription MD2 ON
+MD2.Enterprise = E.Enterprise AND
+MD2.DescriptionType = E.EntityType AND
+MD2.DescriptionClass = 'Entity' AND
+MD2.NLSID = 1 AND
+MD2.ValTo = :forever
+LEFT JOIN @t_schema.MetaDescription MD ON
+MD.Enterprise = :Enterprise  AND
+MD.DescriptionType = T1.AttributeValue AND
+MD.DescriptionClass = 'Role' AND
+MD.NLSID = 1 AND
+MD.ValTo = :forever
+WHERE
+R.Enterprise = :Enterprise AND
+R.EntityType = 'OPWG' AND
+R.ValFrom <= :ValOn AND :ValOn < R.ValTo AND R.EffFrom <= :EffOn AND :EffOn < R.EffTo
+;
+@execute
+if (iCase == 2) {
+  EXEC SQL OPEN sp_cursor2;
+} else {
+  EXEC SQL OPEN sp_cursor1;
+}
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in iCase int
+in OPWGID int
+in StartDate varchar(26)
+in EndDate varchar(26)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

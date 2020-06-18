@@ -1,0 +1,47 @@
+@name=GBL9998
+@noremote=true
+@parmstyle=GENERAL
+@type=basic
+@dbase=opicmods
+@narrative
+----------------------------------------------------------------------
+--  This is a test SP
+----------------------------------------------------------------------
+$Log: gbl9998.txt,v $
+Revision 1.6  2010/06/21 15:43:13  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.5  2004/10/20 21:01:51  dave
+changes to gen parm
+
+Revision 1.4  2004/02/20 20:21:58  roger
+Must be @t_schema
+
+Revision 1.3  2004/02/20 18:09:38  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.2  2003/06/06 21:43:04  roger
+Useless anyway
+
+Revision 1.1  2003/06/02 22:06:17  roger
+New SP for testing SPs in ODS
+
+@desc=Return the contents of SG.OPWG
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9998.txt,v 1.6 2010/06/21 15:43:13 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT * FROM SG.OPWG;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+@end
+
+

@@ -1,0 +1,536 @@
+@name=GBL8127
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@results=1
+@narrative
+
+ This guy inserts a new record into the trsNavigateTable based
+ upon information in the DynaSearch Table
+
+$Log: gbl8127.txt,v $
+Revision 1.11  2010/06/21 15:42:43  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.10  2009/10/20 00:22:00  rick
+update to change long datatype to sqlint32
+
+Revision 1.9  2004/10/20 21:01:48  dave
+changes to gen parm
+
+Revision 1.8  2004/02/20 20:21:57  roger
+Must be @t_schema
+
+Revision 1.7  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.6  2003/08/19 23:08:24  joan
+change order to 2,1
+
+Revision 1.5  2003/08/12 19:50:43  dave
+rtriming stuff
+
+Revision 1.4  2003/06/27 21:51:50  dave
+making sure q status is zero on the compares
+
+Revision 1.3  2003/06/25 22:53:50  dave
+minor changes
+
+Revision 1.2  2003/06/25 00:10:07  dave
+adding parm
+
+Revision 1.1  2003/06/24 23:58:41  dave
+Translation I
+
+Revision 1.10  2003/05/27 19:58:47  dave
+more Tracking on the trsNavigateTable
+
+Revision 1.9  2003/05/10 05:54:57  dave
+more GBL8117, GBL8119 streamlining
+
+Revision 1.8  2003/05/10 05:33:30  dave
+optional likes processing
+
+Revision 1.7  2003/04/14 18:03:43  dave
+added starts w/ function
+
+Revision 1.6  2003/04/14 17:45:18  dave
+attempting to apply like
+
+Revision 1.5  2003/02/07 21:21:12  dave
+new DynaSearch SP's for searching trickery
+
+Revision 1.4  2002/11/11 20:47:59  dave
+misc fixes
+
+Revision 1.3  2002/10/10 17:00:26  dave
+Final Search II changes
+
+Revision 1.2  2002/10/09 22:18:39  dave
+meta file fix
+
+Revision 1.1  2002/10/09 22:02:30  dave
+new DynaSearch SP
+
+@desc=insert a record into the trsnavigateTable from DynaSearch
+@parmstyle=GENERAL
+@sql
+// begin sql tag
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8127.txt,v 1.11 2010/06/21 15:42:43 wendy Exp $";
+sqlint32 iCount;
+sqlint32 ii;
+sqlint32 iStepCount;
+sqlint32 iStop;
+sqlint32 lCount;
+sqlint32 lStep;
+char tmpEntityType[33];
+char tmpAttCode[33];
+char tmpAttType[1];
+char tmpAttValue[255];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE NavCur CURSOR FOR
+SELECT
+ Entity2Type
+,Entity2ID
+FROM @t_schema.trsNavigate
+WHERE
+    Level = 0
+AND SessionID = :SessionID
+;
+
+@execute
+
+// OK.. first we want to get a count of how many search
+// records are in the dyna search
+
+iCount = 0;
+
+EXEC SQL SELECT MAX(Step) INTO :iCount
+FROM @t_schema.DynaSearch
+WHERE
+    Enterprise = :Enterprise
+AND SessionID = :SessionID
+;
+
+EXEC SQL COMMIT WORK;
+
+// OK.. Lets loop and insert total counts here
+
+// Now process the data
+iStop = 0;  // Lets assume we keep going!
+for (ii = 1; ii <= iCount ;ii++) {
+  iStepCount = 0;
+
+  // Lets pull the record in first
+
+  EXEC SQL SELECT
+    EntityType
+  , AttributeCode
+  , AttributeType
+  , AttributeValue
+  INTO
+    :tmpEntityType
+  , :tmpAttCode
+  , :tmpAttType
+  , :tmpAttValue
+  FROM @t_schema.DynaSearch
+  WHERE
+      SessionID = :SessionID
+  AND Enterprise = :Enterprise
+  AND Step = :ii;
+
+  if (tmpAttType[0] == 'F') {
+
+    EXEC SQL SELECT COUNT(F.EntityID)  INTO :iStepCount
+    FROM @t_schema.Flag F
+    INNER JOIN @t_schema.Queue Q ON
+        Q.Enterprise = :Enterprise
+    AND Q.SessionID = 0
+    AND Q.OPWGID = 0
+    AND Q.Queue = :Queue
+    AND Q.EntityType = F.EntityType
+    AND Q.EntityID = F.EntityID
+    AND Q.Status = 0
+    WHERE
+        F.Enterprise = :Enterprise
+    AND F.AttributeCode = :tmpAttCode
+    AND F.AttributeValue = :tmpAttValue
+    AND F.EntityType = :tmpEntityType
+    AND F.Valto = :forever
+    AND CURRENT TIMESTAMP BETWEEN F.EffFrom and F.EffTo
+    ;
+
+  } else {
+
+    if (iLike == 1) {
+
+      EXEC SQL SELECT COUNT(T.EntityID)  INTO :iStepCount
+      FROM @t_schema.Text T
+      INNER JOIN @t_schema.Queue Q ON
+          Q.Enterprise = :Enterprise
+      AND Q.SessionID = 0
+      AND Q.OPWGID = 0
+      AND Q.Queue = :Queue
+      AND Q.EntityType = T.EntityType
+      AND Q.EntityID = T.EntityID
+      AND Q.Status = 0
+      WHERE
+          T.Enterprise = :Enterprise
+      AND T.AttributeCode = :tmpAttCode
+      AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+      AND T.EntityType = :tmpEntityType
+      AND T.Valto = :forever
+      AND CURRENT TIMESTAMP BETWEEN T.EffFrom and T.EffTo
+      ;
+
+    } else {
+
+      EXEC SQL SELECT COUNT(T.EntityID)  INTO :iStepCount
+      FROM @t_schema.Text T
+      INNER JOIN @t_schema.Queue Q ON
+          Q.Enterprise = :Enterprise
+      AND Q.SessionID = 0
+      AND Q.OPWGID = 0
+      AND Q.Queue = :Queue
+      AND Q.EntityType = T.EntityType
+      AND Q.EntityID = T.EntityID
+      AND Q.Status = 0
+      WHERE
+          T.Enterprise = :Enterprise
+      AND T.AttributeCode = :tmpAttCode
+      AND T.AttributeValue = :tmpAttValue
+      AND T.EntityType = :tmpEntityType
+      AND T.Valto = :forever
+      AND CURRENT TIMESTAMP BETWEEN T.EffFrom and T.EffTo
+      ;
+    }
+  }
+
+  if (iStepCount == 0) {
+    break;
+    iStop = 1;
+  } else {
+
+    EXEC SQL UPDATE @t_schema.DynaSearch SET SEARCHCOUNT = :iStepCount
+    WHERE
+       Step = :ii
+    AND SessionID = :SessionID
+    AND Enterprise = :Enterprise
+    ;
+
+    // Good enough .. if you find 50 or less in the count .. then we can stop
+    // GBL8119 defaults counts to 99
+    if (iStepCount < 51) {
+      break;
+    }
+  }
+
+}
+
+EXEC SQL COMMIT WORK;
+
+if (iStop == 0) {
+
+  EXEC SQL DECLARE StepTemplate CURSOR FOR
+  SELECT DISTINCT SEARCHCOUNT, STEP
+  FROM OPICM.DYNASEARCH
+  WHERE
+      SESSIONID = :SessionID
+  AND ENTERPRISE = :Enterprise
+  ORDER BY 2,1
+  ;
+
+  // Provide some temp place holders for the information so we do not have nested SQL statements open.. etc.
+  sqlint32 alStep[300];
+  sqlint32 alCount[300];
+
+  EXEC SQL OPEN StepTemplate;
+  iCount = 1;
+  do {
+
+    EXEC SQL FETCH StepTemplate INTO :lCount,:lStep ;
+    if (SQLCODE != 0) break;
+    alCount[iCount] = lCount;
+    alStep[iCount] = lStep;
+    iCount++;
+
+  } while (1);
+
+  // Close and release resources
+  EXEC SQL CLOSE StepTemplate WITH RELEASE;
+  EXEC SQL COMMIT WORK;
+  // Now we have them all loaded
+
+  for (ii = 1; ii < iCount ;ii++) {
+
+    lStep = alStep[ii];
+    lCount = alCount[ii];
+
+    EXEC SQL UPDATE @t_schema.DynaSearch SET Step = :ii
+    WHERE
+        Step = :lStep
+    AND SearchCount = :lCount
+
+    ;
+
+    EXEC SQL COMMIT WORK;
+  }
+
+  // O.K.  lets do the inserts
+  //
+
+  for (ii = 1; ii < iCount ;ii++) {
+
+    // Lets pull the record in first
+
+    EXEC SQL SELECT
+      EntityType
+    , AttributeCode
+    , AttributeType
+    , AttributeValue
+    INTO
+      :tmpEntityType
+    , :tmpAttCode
+    , :tmpAttType
+    , :tmpAttValue
+    FROM @t_schema.DynaSearch
+    WHERE
+        SessionID = :SessionID
+    AND Enterprise = :Enterprise
+    AND Step = :ii
+    ;
+
+    EXEC SQL COMMIT WORK;
+
+
+    if (ii == 1) {
+
+      if (tmpAttType[0] == 'F') {
+
+        EXEC SQL INSERT INTO @t_schema.trsEntities
+        SELECT
+         :Enterprise
+        ,:ii
+        ,:SessionID
+        , F.ENTITYID
+        , F.EntityType
+        FROM @t_schema.Flag F
+          INNER JOIN @t_schema.Queue Q ON
+              Q.Enterprise = :Enterprise
+          AND Q.SessionID = 0
+          AND Q.OPWGID = 0
+          AND Q.Queue = :Queue
+          AND Q.EntityType = F.EntityType
+          AND Q.EntityID = F.EntityID
+          AND Q.Status = 0
+        WHERE
+            F.Enterprise = :Enterprise
+        AND F.AttributeCode = :tmpAttCode
+        AND F.AttributeValue = :tmpAttValue
+        AND F.EntityType = :tmpEntityType
+        AND F.Valto = :forever
+        AND CURRENT TIMESTAMP BETWEEN F.EffFrom and F.EffTo
+        ;
+
+      } else {
+
+        if (iLike == 1) {
+          EXEC SQL INSERT INTO @t_schema.trsEntities
+          SELECT
+           :Enterprise
+          ,:ii
+          ,:SessionID
+          , T.ENTITYID
+          , T.EntityType
+          FROM @t_schema.Text T
+          INNER JOIN @t_schema.Queue Q ON
+              Q.Enterprise = :Enterprise
+          AND Q.SessionID = 0
+          AND Q.OPWGID = 0
+          AND Q.Queue = :Queue
+          AND Q.EntityType = T.EntityType
+          AND Q.EntityID = T.EntityID
+          AND Q.Status = 0
+          WHERE
+              T.Enterprise = :Enterprise
+          AND T.AttributeCode = :tmpAttCode
+          AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+          AND T.EntityType = :tmpEntityType
+          AND T.Valto = :forever
+          AND CURRENT TIMESTAMP BETWEEN T.EffFrom and T.EffTo
+          ;
+        } else {
+          EXEC SQL INSERT INTO @t_schema.trsEntities
+          SELECT
+           :Enterprise
+          ,:ii
+          ,:SessionID
+          , T.ENTITYID
+          , T.EntityType
+          FROM @t_schema.Text T
+          INNER JOIN @t_schema.Queue Q ON
+              Q.Enterprise = :Enterprise
+          AND Q.SessionID = 0
+          AND Q.OPWGID = 0
+          AND Q.Queue = :Queue
+          AND Q.EntityType = T.EntityType
+          AND Q.EntityID = T.EntityID
+          AND Q.Status = 0
+          WHERE
+              T.Enterprise = :Enterprise
+          AND T.AttributeCode = :tmpAttCode
+          AND T.AttributeValue = :tmpAttValue
+          AND T.EntityType = :tmpEntityType
+          AND T.Valto = :forever
+          AND CURRENT TIMESTAMP BETWEEN T.EffFrom and T.EffTo
+          ;
+        }
+      }
+
+      EXEC SQL COMMIT WORK;
+
+    } else {
+
+      if (tmpAttType[0] == 'F') {
+
+        EXEC SQL INSERT INTO @t_schema.trsEntities
+        SELECT
+         :Enterprise
+        ,:ii
+        ,:SessionID
+        ,F.ENTITYID
+        ,F.EntityType
+        FROM @t_schema.Flag F
+        INNER JOIN @t_schema.trsEntities E ON
+            E.level = :ii - 1
+        AND E.EntityType = F.EntityType
+        AND E.EntityID = F.EntityID
+        AND E.SessionID = :SessionID
+        WHERE
+            F.Enterprise = :Enterprise
+        AND F.AttributeCode = :tmpAttCode
+        AND F.AttributeValue = :tmpAttValue
+        AND F.EntityType = :tmpEntityType
+        AND F.Valto = :forever
+        AND CURRENT TIMESTAMP BETWEEN F.EffFrom and F.EffTo
+        ;
+     } else {
+
+        if (iLike == 1) {
+          EXEC SQL INSERT INTO @t_schema.trsEntities
+          SELECT
+          :Enterprise
+          ,:ii
+          ,:SessionID
+          ,T.ENTITYID
+          ,T.EntityType
+          FROM @t_schema.Text T
+          INNER JOIN @t_schema.trsEntities E ON
+              E.level = :ii - 1
+          AND E.EntityType = T.EntityType
+          AND E.EntityID = T.EntityID
+          AND E.SessionID = :SessionID
+          WHERE
+              T.Enterprise = :Enterprise
+          AND T.AttributeCode = :tmpAttCode
+          AND T.AttributeValue LIKE rtrim(:tmpAttValue) || '%'
+          AND T.EntityType = :tmpEntityType
+          AND T.Valto = :forever
+          AND CURRENT TIMESTAMP BETWEEN T.EffFrom and T.EffTo
+          ;
+        } else {
+          EXEC SQL INSERT INTO @t_schema.trsEntities
+          SELECT
+           :Enterprise
+          ,:ii
+          ,:SessionID
+          ,T.ENTITYID
+          ,T.EntityType
+          FROM @t_schema.Text T
+          INNER JOIN @t_schema.trsEntities E ON
+              E.level = :ii - 1
+          AND E.EntityType = T.EntityType
+          AND E.EntityID = T.EntityID
+          AND E.SessionID = :SessionID
+          WHERE
+              T.Enterprise = :Enterprise
+          AND T.AttributeCode = :tmpAttCode
+          AND T.AttributeValue = :tmpAttValue
+          AND T.EntityType = :tmpEntityType
+          AND T.Valto = :forever
+          AND CURRENT TIMESTAMP BETWEEN T.EffFrom and T.EffTo
+          ;
+        }
+      }
+
+      EXEC SQL COMMIT WORK;
+    }
+
+  }
+
+  // O.K.. lets insert the final answer into the trsNavigate Table
+
+  EXEC SQL INSERT INTO @t_schema.trsNavigate
+  SELECT
+   :Enterprise
+  ,:SessionID
+  ,:ActionType
+  ,'Search'
+  ,0
+  ,0
+  ,'X'
+  ,'X'
+  ,'NOOP'
+  ,0
+  ,'NOOP'
+  ,0
+  ,E.EntityType
+  ,E.EntityID
+  ,:now
+  ,:now
+  FROM @t_schema.trsEntities T
+  INNER JOIN @t_schema.Entity E ON
+      E.Enterprise = :Enterprise
+  AND E.EntityType = T.EntityType
+  AND E.EntityID = T.EntityID
+  AND E.Valto = :forever
+  AND CURRENT TIMESTAMP BETWEEN E.EffFrom and E.EffTo
+  WHERE
+      T.Enterprise = :Enterprise
+  AND T.SessionID = :SessionID
+  AND T.Level = :ii - 1
+  ;
+
+  EXEC SQL COMMIT WORK;
+
+
+  // Clean  Up
+//  EXEC SQL
+//  DELETE FROM @t_schema.DynaSearch WHERE SESSIONID = :SessionID
+//  ;
+//  EXEC SQL COMMIT WORK;
+
+//  EXEC SQL
+//  DELETE FROM @t_schema.trsEntities WHERE SESSIONID = :SessionID
+//  ;
+//  EXEC SQL COMMIT WORK;
+
+}
+
+EXEC SQL OPEN NavCur;
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in ActionType varchar(32)
+in iLike int
+in Queue varchar(33)
+@end
+
+
+

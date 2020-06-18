@@ -1,0 +1,469 @@
+@name=GBL8123
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+Sets up new Translation Flags
+
+$Log: gbl8123.txt,v $
+Revision 1.37  2010/06/21 15:42:44  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.36  2009/10/20 00:22:00  rick
+update to change long datatype to sqlint32
+
+Revision 1.35  2007/10/17 08:56:34  yang
+RQ0225074339 changes for SWFEATURE
+
+Revision 1.34  2006/04/25 20:30:21  yang
+translationwatch needs to be OFF(TWOFF)
+
+Revision 1.33  2006/04/25 20:14:33  yang
+needs to be left join
+
+Revision 1.32  2006/04/19 17:04:24  yang
+more logic changes
+
+Revision 1.31  2006/04/17 21:58:49  yang
+cAttributeCode must be a CHAR attribute
+
+Revision 1.30  2006/03/08 20:27:46  yang
+should be not null
+
+Revision 1.29  2006/02/09 04:26:55  yang
+finally this should work
+
+Revision 1.28  2006/02/09 03:01:13  yang
+more changes
+
+Revision 1.27  2006/02/08 23:38:31  yang
+more fixes
+
+Revision 1.26  2006/02/08 23:30:55  yang
+more fixes
+
+Revision 1.25  2006/02/08 22:55:29  yang
+more logs
+
+Revision 1.24  2006/02/08 22:42:39  yang
+deleting extras
+
+Revision 1.23  2006/02/08 21:04:57  yang
+making the resultset smaller
+
+Revision 1.22  2006/02/08 21:00:03  yang
+removing the fprintf()
+
+Revision 1.21  2006/02/08 19:50:02  yang
+adding logs to debug
+
+Revision 1.20  2006/02/08 18:23:36  yang
+minor change
+
+Revision 1.19  2006/02/08 18:21:55  yang
+this will compile now
+
+Revision 1.18  2006/02/08 18:14:46  dave
+parmstyle=GENERAL
+
+Revision 1.17  2006/02/08 17:48:18  yang
+quick fixes
+
+Revision 1.16  2006/02/08 01:21:38  yang
+lets see if it compiles now
+
+Revision 1.15  2006/02/08 01:12:29  yang
+more changes
+
+Revision 1.14  2006/02/08 01:00:58  yang
+one more try removing SQLCA;
+
+Revision 1.13  2006/02/08 00:54:57  yang
+more changes to SQLCA
+
+Revision 1.12  2006/02/08 00:44:12  yang
+removing sqlca
+
+Revision 1.11  2006/02/08 00:34:54  yang
+deleting extra {
+
+Revision 1.10  2006/02/08 00:24:58  yang
+more changes
+
+Revision 1.9  2006/02/08 00:14:56  yang
+more syntax
+
+Revision 1.8  2006/02/08 00:01:40  yang
+minor fixes
+
+Revision 1.4  2006/02/07 22:21:41  yang
+fixes
+
+Revision 1.3  2006/02/07 21:40:48  joan
+fixes
+
+Revision 1.2  2006/02/07 21:16:59  yang
+minor changes
+
+@desc= Looks to set TRANSLATIONWATCH to ON
+@results=0
+@parmstyle=GENERAL
+@sql
+
+// File logging stuff
+FILE *t;
+mode_t Mode2;
+Mode2 = 0777;
+chmod("/tmp/omiglog8123",Mode2);
+
+t=fopen("/tmp/omiglog8123","a");
+fprintf(t,"-->start of stored procedure GBL8123\n");
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8123.txt,v 1.37 2010/06/21 15:42:44 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL BEGIN DECLARE SECTION;
+sqlint32 iEntityID;
+char cEntityType [33];
+char cAttributeCode [33];
+char tstamp [27];
+EXEC SQL END DECLARE SECTION;
+
+sqlint32 iEntityTypeCount;
+sqlint32 iEntityCount;
+char acEntityType[25] [33];
+char acAttributeCode[25] [33];
+sqlint32 aiEntityID[250000];
+
+
+strcpy(acEntityType[0],"MODEL");
+strcpy(acAttributeCode[0],"WITHDRAWDATE");
+strcpy(acEntityType[1],"LSEO");
+strcpy(acAttributeCode[1],"LSEOUNPUBDATEMTRGT");
+strcpy(acEntityType[2],"LSEOBUNDLE");
+strcpy(acAttributeCode[2],"BUNDLUNPUBDATEMTRGT");
+strcpy(acEntityType[3],"FEATURE");
+strcpy(acAttributeCode[3],"WITHDRAWDATEEFF_T");
+strcpy(acEntityType[4],"FB");
+strcpy(acAttributeCode[4],"PUBTO");
+strcpy(acEntityType[5],"MM");
+strcpy(acAttributeCode[5],"PUBTO");
+strcpy(acEntityType[6],"SWFEATURE");
+strcpy(acAttributeCode[6],"WITHDRAWDATEEFF_T");
+
+
+
+iEntityTypeCount = 7;
+
+//
+//  This is the Generic Cursor
+//
+EXEC SQL DECLARE curGEN CURSOR FOR
+SELECT
+DISTINCT
+E1.EntityID
+FROM OPICM.ENTITY E1
+LEFT JOIN OPICM.TEXT T1 ON
+    T1.ENTERPRISE = :Enterprise
+AND T1.ENTITYTYPE = E1.ENTITYTYPE
+AND T1.ENTITYID = E1.ENTITYID
+AND T1.ATTRIBUTECODE = :cAttributeCode
+AND T1.NLSID = 1
+AND T1.ATTRIBUTEVALUE
+> (Date(CURRENT TIMESTAMP))
+AND T1.VALTO = :forever
+AND CURRENT TIMESTAMP < T1.EFFTO
+INNER JOIN OPICM.FLAG F3 ON
+    F3.ENTERPRISE = :Enterprise
+AND F3.ENTITYTYPE = E1.ENTITYTYPE
+AND F3.ENTITYID = E1.ENTITYID
+AND F3.ATTRIBUTECODE IN (
+    'MMSTATUS', 
+    'STATUS', 
+    'FBSTATUS')
+AND RTRIM(F3.ATTRIBUTEVALUE) IN (
+    '0020',
+    '0040')
+AND F3.VALTO = :forever
+AND CURRENT TIMESTAMP < F3.EFFTO
+LEFT JOIN OPICM.FLAG F2 ON
+    F2.ENTERPRISE = :Enterprise
+AND F2.ENTITYTYPE = E1.ENTITYTYPE
+AND F2.ENTITYID = E1.ENTITYID
+AND F2.ATTRIBUTECODE = 'TRANSLATIONWATCH'
+AND F2.ATTRIBUTEVALUE = 'TWOFF'
+AND F2.VALTO = :forever
+AND CURRENT TIMESTAMP < F2.EFFTO
+WHERE
+    E1.ENTERPRISE = :Enterprise
+AND E1.ENTITYTYPE = :cEntityType
+AND E1.VALTO = :forever
+AND CURRENT TIMESTAMP < E1.EFFTO
+AND F2.ENTERPRISE IS NOT NULL
+AND (T1.enterprise is null or t1.attributevalue > (Date(CURRENT TIMESTAMP)))
+;
+
+// end sql tag
+
+// begin execute tag
+
+
+for (sqlint32 ii = 0;ii < iEntityTypeCount;ii++) {
+
+  strcpy(cEntityType, acEntityType[ii]);
+  strcpy(cAttributeCode, acAttributeCode[ii]);
+
+  EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+    fprintf(t,"GBL8123:Using iEntityTypeCount:%s,%s,%s,%s\n", cEntityType,cAttributeCode,Enterprise,tstamp);
+
+
+  iEntityCount = 0;
+  EXEC SQL OPEN curGEN;
+    fprintf(t,"GBL8123:Using here before the do SQLCODE:%ld\n", SQLCODE);
+
+  do {
+    EXEC SQL FETCH curGEN INTO :iEntityID;
+    fprintf(t,"GBL8123:Using SQLCODE:%ld,%ld\n", SQLCODE,iEntityID);
+    if (SQLCODE != 0) break;
+    aiEntityID[iEntityCount++] =  iEntityID;
+    fprintf(t,"GBL8123:Using iEntityID:%ld\n", iEntityID);
+  } while (1);
+
+  EXEC SQL CLOSE curGEN WITH RELEASE;
+
+    fprintf(t,"GBL8123:Using iEntityCount:%ld\n", iEntityCount);
+  for (sqlint32 iy=0;iy<iEntityCount;iy++) {
+
+
+    iEntityID = aiEntityID[iy];
+    EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :now;
+    EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+    fprintf(t,"GBL8123:Using Enterprise, cEntityType, iEntityID, iy, iEntityCount: %s,%s,%ld,%ld,%ld\n", Enterprise, cEntityType, iEntityID, iy, iEntityCount);
+
+    // Here is where we turn off
+    EXEC SQL
+      UPDATE opicm.Flag
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = :cEntityType
+      AND EntityID = :iEntityID
+      AND AttributeCode IN ('TRANSLATIONWATCH','TRANSLATIONLANGUAGES')
+      AND ValTo = :forever
+    ;
+    // Here is where we turn off
+    EXEC SQL
+      UPDATE opicm.FlagX
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = :cEntityType
+      AND EntityID = :iEntityID
+      AND AttributeCode IN ('TRANSLATIONWATCH','TRANSLATIONLANGUAGES')
+      AND RTRIM(CHAR(ValTo)) = :forever
+    ;
+
+    // Here is where we insert new records
+    // We must do it for the FlagX recoreds also
+
+    EXEC SQL
+      INSERT
+      INTO opicm.Flag
+      (
+      Enterprise
+      ,EntityType
+      ,EntityID
+      ,AttributeCode
+      ,AttributeValue
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+      :Enterprise
+      ,:cEntityType
+      ,:iEntityID
+      ,'TRANSLATIONWATCH'
+      ,'TWON'
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+    EXEC SQL
+      INSERT
+      INTO opicm.FlagX
+      (
+      Enterprise
+      ,EntityType
+      ,EntityID
+      ,AttributeCode
+      ,AttributeValue
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+      :Enterprise
+      ,:cEntityType
+      ,:iEntityID
+      ,'TRANSLATIONWATCH'
+      ,'TWON'
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+
+    EXEC SQL
+      UPDATE opicm.Entity
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = :cEntityType
+      AND EntityID = :iEntityID
+      AND ValTo = :forever
+    ;
+    EXEC SQL
+      UPDATE opicm.EntityX
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = :cEntityType
+      AND EntityID = :iEntityID
+      AND RTRIM(CHAR(ValTo)) = :forever
+    ;
+
+    // Now insert the new entity rec
+    EXEC SQL
+      INSERT
+      INTO opicm.Entity
+      (
+       Enterprise
+      ,EntityType
+      ,EntityID
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+       :Enterprise
+      ,:cEntityType
+      ,:iEntityID
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+    // Now insert the new entity rec
+    EXEC SQL
+      INSERT
+      INTO opicm.EntityX
+      (
+       Enterprise
+      ,EntityType
+      ,EntityID
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+       :Enterprise
+      ,:cEntityType
+      ,:iEntityID
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+  
+
+  // Now.. we have to insert this into the TRANSINIT + EntityType queue under opwgid = 0.
+  // This is a group queue.
+    fprintf(t,"GBL8123:Queue table insert: %s,%s,%ld\n", Enterprise, cEntityType, iEntityID);
+  EXEC SQL INSERT INTO OPICM.Queue SELECT
+  :Enterprise
+  ,0
+  ,0
+  ,'TRANSLATIONINIT' || RTRIM(:cEntityType)
+  ,0
+  ,:cEntityType
+  ,:iEntityID
+  ,:now
+  ,'1980-01-01-00.00.00.000000'
+  ,:now
+  ,:now
+  FROM opicm.Entity E
+  LEFT JOIN opicm.Queue Q ON
+      Q.Enterprise = :Enterprise
+  AND Q.SessionID = 0
+  AND Q.OPWGID = 0
+  AND Q.Queue = 'TRANSLATIONINIT' || RTRIM(:cEntityType)
+  AND Q.EntityType = E.EntityType
+  AND Q.EntityID = E.EntityID
+  AND Q.status = 0
+  WHERE
+      E.Enterprise = :Enterprise
+  AND E.EntityType = :cEntityType
+  AND E.EntityID = :iEntityID
+  AND E.ValTo = :forever
+  AND E.EffTo > Current Timestamp
+  AND Q.Enterprise is NULL
+  ;
+ 
+ }
+  EXEC SQL COMMIT WORK;
+}
+
+exit_sp1:
+// 
+// File Closing
+//
+EXEC SQL COMMIT WORK;
+fprintf(t,"<--end of stored procedure GBL8123\n");
+fclose(t);
+
+
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+@end
+
+
+

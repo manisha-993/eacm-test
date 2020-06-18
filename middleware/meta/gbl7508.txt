@@ -1,0 +1,64 @@
+@name=GBL7508
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7508.txt,v $
+Revision 1.7  2010/06/21 15:43:25  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2004/10/20 21:01:44  dave
+changes to gen parm
+
+Revision 1.5  2004/02/20 20:21:54  roger
+Must be @t_schema
+
+Revision 1.4  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.3  2003/09/08 16:31:17  roger
+Enterprise was changed to 16 char length
+
+Revision 1.2  2002/07/17 17:33:19  roger
+Ensured Log was in @narrative
+
+@desc=retreive linktype2, linkvalue from MetaLinkAttr based on Enterprise, linkType, linkType1, linkCode, valOn, effOn.
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7508.txt,v 1.7 2010/06/21 15:43:25 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+
+SELECT 
+ CAP.LINKTYPE2
+,CAP.LINKVALUE
+from @t_schema.METALINKATTR CAP
+where
+    CAP.enterprise = :Enterprise 
+AND CAP.linktype = :LinkType
+AND CAP.linktype1 = :LinkType1
+AND CAP.linkcode = :LinkCode
+AND CAP.valfrom <= :ValOn 
+AND CAP.valto > :ValOn
+AND CAP.efffrom <= :EffOn
+AND CAP.effto > :EffOn  
+
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in LinkType varchar(32)
+in LinkType1 varchar(32)
+in LinkCode varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

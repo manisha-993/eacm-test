@@ -1,0 +1,168 @@
+@name=GBL7536
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7536.txt,v $
+Revision 1.11  2010/06/21 15:43:00  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.10  2004/10/20 21:01:45  dave
+changes to gen parm
+
+Revision 1.9  2004/02/20 20:21:55  roger
+Must be @t_schema
+
+Revision 1.8  2004/02/20 18:09:35  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.7  2003/09/08 16:31:19  roger
+Enterprise was changed to 16 char length
+
+Revision 1.6  2003/02/14 00:38:53  gregg
+use @t_schema
+
+Revision 1.5  2003/02/14 00:13:15  gregg
+add more to this guy (still lots left...)
+
+Revision 1.4  2003/02/13 22:50:07  gregg
+more actionsList2
+
+Revision 1.3  2003/02/13 22:47:18  gregg
+add actionsList 2 logic
+
+Revision 1.2  2003/01/31 23:34:26  gregg
+removed valon,effon from input params
+
+Revision 1.1  2003/01/31 23:26:24  gregg
+initial load
+
+@desc=Retrieve a list of ActionItem-related MetaLinkAttribute rows relevant to a given EntityType; non-role-sensitive.
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7536.txt,v 1.11 2010/06/21 15:43:00 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+with actionsList(LINKTYPE,LINKTYPE1,LINKTYPE2,LINKCODE,LINKVALUE,VALFROM,VALTO,EFFFROM,EFFTO,OPENID,TRANID,ACTIONKEY) AS 
+(select 
+ MLA1.linktype
+,MLA1.linktype1
+,MLA1.linktype2
+,MLA1.linkcode
+,MLA1.linkvalue
+,MLA1.valfrom
+,MLA1.valto
+,MLA1.efffrom
+,MLA1.effto
+,INT(MLA1.openid) as OPENID
+,INT(MLA1.tranid) as TRANID
+,MLA1.linktype2 as ACTIONKEY
+from @t_schema.metalinkattr MLA1
+where
+MLA1.enterprise = :Enterprise and
+MLA1.valto > current timestamp and MLA1.effto > current timestamp and MLA1.valfrom <= current timestamp and MLA1.efffrom <= current timestamp and
+MLA1.linktype = 'Role/Action/Entity/Group' and MLA1.linkcode = :EntityType
+UNION
+select 
+ MLA0.linktype
+,MLA0.linktype1
+,MLA0.linktype2
+,MLA0.linkcode
+,MLA0.linkvalue
+,MLA0.valfrom
+,MLA0.valto
+,MLA0.efffrom
+,MLA0.effto
+,INT(MLA0.openid) as OPENID
+,INT(MLA0.tranid) as TRANID
+,MLA0.linktype1 as ACTIONKEY
+from @t_schema.metalinkattr MLA0
+where
+MLA0.enterprise = :Enterprise and
+MLA0.valto > current timestamp and MLA0.effto > current timestamp and MLA0.valfrom <= current timestamp and MLA0.efffrom <= current timestamp and
+MLA0.linktype = 'Action/Attribute' and 
+MLA0.linktype2 = 'ENTITYTYPE' and 
+MLA0.linkcode = 'Link' and 
+MLA0.linkvalue = :EntityType)
+select * from actionsList
+UNION
+select distinct
+ MLA2.linktype
+,MLA2.linktype1
+,MLA2.linktype2
+,MLA2.linkcode
+,MLA2.linkvalue
+,MLA2.valfrom
+,MLA2.valto
+,MLA2.efffrom
+,MLA2.effto
+,INT(MLA2.openid) as OPENID
+,INT(MLA2.tranid) as TRANID
+,MLA2.linktype1 as ACTIONKEY
+from @t_schema.metalinkattr MLA2
+inner join actionsList ALIST on 1=1
+where
+MLA2.enterprise = :Enterprise and
+MLA2.valto > current timestamp and MLA2.effto > current timestamp and MLA2.valfrom <= current timestamp and MLA2.efffrom <= current timestamp and
+MLA2.linktype = 'Action/Attribute' and
+MLA2.linktype1 = (CASE WHEN ALIST.linktype = 'Role/Action/Entity/List' THEN ALIST.LINKTYPE2 ELSE ALIST.LINKTYPE1 END)
+UNION
+select distinct
+ MLA3.linktype
+,MLA3.linktype1
+,MLA3.linktype2
+,MLA3.linkcode
+,MLA3.linkvalue
+,MLA3.valfrom
+,MLA3.valto
+,MLA3.efffrom
+,MLA3.effto
+,INT(MLA3.openid) as OPENID
+,INT(MLA3.tranid) as TRANID
+,MLA3.linktype1 as ACTIONKEY
+from @t_schema.metalinkattr MLA3
+inner join actionsList ALIST on 1=1
+where
+MLA3.enterprise = :Enterprise and
+MLA3.valto > current timestamp and MLA3.effto > current timestamp and MLA3.valfrom <= current timestamp and MLA3.efffrom <= current timestamp and
+MLA3.linktype = 'Action/Category' and
+MLA3.linktype1 = (CASE WHEN ALIST.linktype = 'Role/Action/Entity/List' THEN ALIST.LINKTYPE2 ELSE ALIST.LINKTYPE1 END) and
+MLA3.linkcode = 'Link'
+UNION
+select distinct
+ MLA4.linktype
+,MLA4.linktype1
+,MLA4.linktype2
+,MLA4.linkcode
+,MLA4.linkvalue
+,MLA4.valfrom
+,MLA4.valto
+,MLA4.efffrom
+,MLA4.effto
+,INT(MLA4.openid) as OPENID
+,INT(MLA4.tranid) as TRANID
+,MLA4.linktype2 as ACTIONKEY
+from @t_schema.metalinkattr MLA4
+inner join actionsList ALIST on 1=1
+where
+MLA4.enterprise = :Enterprise and
+MLA4.valto > current timestamp and MLA4.effto > current timestamp and MLA4.valfrom <= current timestamp and MLA4.efffrom <= current timestamp and
+MLA4.linktype = 'Group/Action' and
+MLA4.linktype2 = (CASE WHEN ALIST.linktype = 'Role/Action/Entity/List' THEN ALIST.LINKTYPE2 ELSE ALIST.LINKTYPE1 END) and
+MLA4.linkcode = 'Link'
+ORDER BY ACTIONKEY,linktype,linktype1,linktype2,linkcode,linkvalue;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+@end
+
+
+

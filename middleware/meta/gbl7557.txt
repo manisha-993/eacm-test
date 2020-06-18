@@ -1,0 +1,63 @@
+@name=GBL7557
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------------------------------------
+--  Grab a list of all OPWGID's which share rolecodes w/ the passed _OPWGID.
+----------------------------------------------------------------------------------------------------
+$Log: gbl7557.txt,v $
+Revision 1.2  2010/06/21 15:42:43  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.1  2006/03/13 17:58:46  gregg
+oops- re adding to module
+
+Revision 1.3  2004/10/20 21:01:46  dave
+changes to gen parm
+
+Revision 1.2  2004/03/12 19:41:19  gregg
+guts of sql
+
+Revision 1.1  2004/03/12 19:00:05  gregg
+initial load - justa shell sp
+
+
+
+@desc=Grab a list of all OPWGID's which share rolecodes w/ the passed _OPWGID.
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7557.txt,v 1.2 2010/06/21 15:42:43 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT 
+  Distinct T2.EntityID as OPWGID
+from opicm.Text T1
+INNER JOIN opicm.Text T2 ON
+    T2.Enterprise = :Enterprise
+AND T2.valto > current timestamp
+AND T2.effto > current timestamp 
+AND T2.EntityType = 'OPWG'
+AND T2.nlsid = 1
+AND T2.AttributeCode = 'ROLECODE'
+AND T2.AttributeValue = RTRIM(T1.AttributeValue)
+where
+    T1.Enterprise = T2.Enterprise
+AND T1.valto > current timestamp
+AND T1.effto > current timestamp 
+AND T1.EntityType = T2.EntityType
+AND T1.nlsid = 1
+AND T1.EntityID = :OPWGID
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(8)
+in OPWGID int
+@end
+
+

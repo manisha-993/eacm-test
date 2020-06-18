@@ -1,0 +1,129 @@
+@name=GBL7538
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+Grab any EntityTypes + EntityID for deleted attributes occurring between a defined interval
+
+$Log: gbl7538.txt,v $
+Revision 1.12  2010/06/21 15:42:36  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.11  2004/10/20 21:01:45  dave
+changes to gen parm
+
+Revision 1.10  2004/02/20 20:21:55  roger
+Must be @t_schema
+
+Revision 1.9  2004/02/20 18:09:35  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.8  2003/03/31 23:51:52  dave
+tagging and passthru logic I
+
+Revision 1.7  2003/02/06 22:31:46  gregg
+compile fix
+
+Revision 1.1.2.5  2003/02/06 22:23:32  gregg
+int() in entityid
+
+Revision 1.5  2003/02/06 22:18:31  gregg
+some cleanup
+
+Revision 1.4  2003/02/06 21:34:58  gregg
+varchary typo
+
+Revision 1.3  2003/02/06 21:29:13  gregg
+rearranging some col orders
+
+Revision 1.2  2003/02/06 20:59:03  gregg
+initial load
+
+
+
+@desc=Grab any EntityTypes + EntityID for deleted attributes occurring between a defined interval
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+
+char brand[80] = "$Id: gbl7538.txt,v 1.12 2010/06/21 15:42:36 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR 
+With Entities(EntityType, EntityID) AS
+(SELECT DISTINCT Entity1Type,Entity1ID from @t_schema.trsNavigate WHERE SESSIONID = :SessionID 
+UNION 
+SELECT DISTINCT Entity2Type,Entity2ID from @t_schema.trsNavigate WHERE SESSIONID = :SessionID 
+UNION
+SELECT DISTINCT EntityType,EntityID from @t_schema.trsNavigate WHERE SESSIONID = :SessionID 
+)
+SELECT
+ RTRIM(T.EntityType)  as EntityType
+,INT(T.EntityID)  as EntityID
+FROM Entities N
+INNER JOIN @t_schema.TextX T ON
+    T.Enterprise = :Enterprise
+AND T.EntityType = N.EntityType
+AND T.EntityID = N.EntityID
+AND T.ValFrom BETWEEN :IntervalStartDate AND :IntervalEndDate
+AND T.EffTo <= :IntervalEndDate
+
+UNION
+SELECT
+ RTRIM(F.EntityType)
+,INT(F.EntityID)
+FROM Entities N
+INNER JOIN @t_schema.FlagX F ON
+    F.Enterprise = :Enterprise
+AND F.EntityType = N.EntityType
+AND F.EntityID = N.EntityID
+AND F.ValFrom BETWEEN :IntervalStartDate AND :IntervalEndDate
+AND F.EffTo <= :IntervalEndDate
+UNION
+SELECT
+ RTRIM(T.EntityType)
+,INT(T.EntityID)
+FROM Entities N
+INNER JOIN @t_schema.LongTextX T ON
+    T.Enterprise = :Enterprise
+AND T.EntityType = N.EntityType
+AND T.EntityID = N.EntityID
+AND T.ValFrom BETWEEN :IntervalStartDate AND :IntervalEndDate
+AND T.EffTo <= :IntervalEndDate
+UNION
+SELECT
+ RTRIM(B.EntityType)
+,INT(B.EntityID)
+FROM Entities N
+INNER JOIN @t_schema.BlobX B ON
+    B.Enterprise = :Enterprise
+AND B.EntityType = N.EntityType
+AND B.EntityID = N.EntityID
+AND B.ValFrom BETWEEN :IntervalStartDate AND :IntervalEndDate
+AND B.EffTo <= :IntervalEndDate
+;
+
+@execute
+
+//
+// Insert the records here...
+//
+
+EXEC SQL OPEN sp_cursor1;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in SessionID int
+in RoleCode varchar(33)
+in IntervalStartDate varchar(27)
+in IntervalEndDate varchar(27)
+@end
+
+
+

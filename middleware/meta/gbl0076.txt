@@ -1,0 +1,70 @@
+@name=GBL0076
+@type=basic
+@noremote=true
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+-- Retrieve entire contents of bigcat.gamap table
+--------------------------------------------------------------------------------------------
+$Log: gbl0076.txt,v $
+Revision 1.4  2009/01/23 16:42:15  praveen
+fix if else syntax
+
+Revision 1.3  2009/01/23 16:29:05  praveen
+fix cursor problem
+
+Revision 1.2  2009/01/23 00:06:53  praveen
+Supporting dual catdb schema
+
+Revision 1.1  2006/04/29 17:48:17  dave
+new sp
+
+
+@desc=Retrieve gamap
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0076.txt,v 1.4 2009/01/23 16:42:15 praveen Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp1_cursor CURSOR FOR
+SELECT
+  GENERAL_AREA
+, COUNTRY
+, LANGUAGE
+, NLSID
+, COUNTRYLIST
+FROM bigcat.gamap
+WHERE Enterprise = :Enterprise
+ORDER BY GENERAL_AREA, COUNTRY
+;
+
+
+EXEC SQL DECLARE sp2_cursor CURSOR FOR
+SELECT
+  GENERAL_AREA
+, COUNTRY
+, LANGUAGE
+, NLSID
+, COUNTRYLIST
+FROM ibmcat.gamap
+WHERE Enterprise = :Enterprise
+ORDER BY GENERAL_AREA, COUNTRY
+;
+
+
+@execute
+if (strcmp(schema,"BIGCAT") == 0) {
+	EXEC SQL OPEN sp1_cursor;
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+	EXEC SQL OPEN sp2_cursor;
+}
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in schema varchar(8)
+@end

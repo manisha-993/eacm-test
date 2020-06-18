@@ -1,0 +1,446 @@
+@name=GBL8985
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Manages the update of a Category Record
+
+//
+// $Log: gbl8985.txt,v $
+// Revision 1.17  2010/06/21 15:43:14  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.16  2009/10/20 00:22:01  rick
+// update to change long datatype to sqlint32
+//
+// Revision 1.15  2006/05/04 15:35:53  gregg
+// extending some col widths
+//
+// Revision 1.14  2006/03/08 18:07:00  gregg
+// pricedisclaimer = longvarchar
+//
+// Revision 1.13  2006/03/03 18:03:49  gregg
+// long varchar catbulletpoints = 32671
+//
+// Revision 1.12  2005/10/13 20:34:19  gregg
+// add cataudience to pk
+//
+// Revision 1.11  2005/10/11 20:07:13  gregg
+// use projcdnam instead of projcdnam_fc in pk
+//
+// Revision 1.10  2005/10/11 19:53:09  gregg
+// fix
+//
+// Revision 1.9  2005/10/11 19:42:51  gregg
+// fix
+//
+// Revision 1.8  2005/10/11 19:42:36  gregg
+// add projcdnam_fc to pk
+//
+// Revision 1.7  2005/10/10 21:20:44  gregg
+// PROJCDNAM_MFC --> PROJDCDNAME_FC
+//
+// Revision 1.6  2005/10/07 21:20:00  gregg
+// three new category cols
+//
+// Revision 1.5  2005/10/07 17:55:07  gregg
+// adding CATEGORY.CATAUDIENCE
+//
+// Revision 1.4  2005/10/06 20:32:45  gregg
+// attempting to append to log
+//
+// Revision 1.3  2005/10/06 20:27:52  gregg
+// compile fix
+//
+// Revision 1.2  2005/10/04 21:23:03  gregg
+// change pk
+//
+// Revision 1.1  2005/10/04 21:17:07  gregg
+// initial load
+//
+//
+//
+
+@desc= Manages the update of a Category Reocrd
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8985.txt,v 1.17 2010/06/21 15:43:14 wendy Exp $";
+sqlint32 count = 0;
+EXEC SQL END DECLARE SECTION;
+@execute
+
+//
+// BEGIN ERROR CHECK DECLARE SECTION
+//
+const int SQLERROR = -1;
+const int SQLCOMPLETE = 1;
+//set this to SQLCOMPLETE when finished!
+int m_iSQLState = SQLERROR;
+EXEC SQL WHENEVER SQLERROR GOTO error_exit;
+EXEC SQL WHENEVER SQLWARNING CONTINUE;
+//
+// END ERROR CHECK DECLARE SECTION
+//
+
+FILE *t;
+mode_t Mode2;
+Mode2 = 0777;
+chmod("/tmp/8985.log",Mode2);
+t=fopen("/tmp/8985.log","a");
+//t=fopen("/tmp/8985.log","w");
+fprintf(t,"-->start of stored procedure GBL8985\n"); 
+
+EXEC SQL 
+
+Select count(*) into :count 
+from gbli.Category where 
+    Enterprise = :enterprise
+AND EntityType = :entitytype
+AND EntityID = :entityid
+AND COUNTRYCODE = :countrycode
+AND LANGUAGECODE = :languagecode
+AND PROJCDNAM = :projcdnam
+AND cataudience = :cataudience
+AND nlsid = :nlsid
+;
+
+if (count == 0 && isactive == 0) {
+// do nothing
+} else if (count == 0 && isactive == 1) {
+// insert this guy
+EXEC SQL
+insert into gbli.category
+(
+enterprise,
+entitytype,
+entityid,
+countrycode,
+languagecode,
+nlsid,
+countrylist,
+catnavtype,
+catnavtype_fc,
+catname,
+cceidentifier,
+catbr,
+catfmly,
+catser,
+catoptgrpnam,
+catfamdesc,
+catserdesc,
+catserhead,
+cataudience,
+cataudience_fc,
+catpartnumber_e,
+catpartnumber_v,
+catpartnumber_p,
+cceidentifier1,
+cceidentifier2,
+cceidentifier3,
+cceidentifier4,
+projcdnam,
+projcdnam_fc,
+fmlyid,
+serid,
+catbulletpoints,
+imgdisclaimer,
+pricedisclaimer,
+srchtitle,
+srchkeyword,
+srchabstract,
+srchdesc,
+srchcatg,
+srchdoctype,
+publishflag,
+level1valfrom,
+level2valfrom,
+level3valfrom,
+level4valfrom,
+valfrom,
+valto,
+isactive
+)
+values (
+:enterprise,
+:entitytype,
+:entityid,
+:countrycode,
+:languagecode,
+:nlsid,
+:countrylist,
+:catnavtype,
+:catnavtype_fc,
+:catname,
+:cceidentifier,
+:catbr,
+:catfmly,
+:catser,
+:catoptgrpnam,
+:catfamdesc,
+:catserdesc,
+:catserhead,
+:cataudience,
+:cataudience_fc,
+:catpartnumber_e,
+:catpartnumber_v,
+:catpartnumber_p,
+:cceidentifier1,
+:cceidentifier2,
+:cceidentifier3,
+:cceidentifier4,
+:projcdnam,
+:projcdnam_fc,
+:fmlyid,
+:serid,
+:catbulletpoints,
+:imgdisclaimer,
+:pricedisclaimer,
+:srchtitle,
+:srchkeyword,
+:srchabstract,
+:srchdesc,
+:srchcatg,
+:srchdoctype,
+:publishflag,
+:level1valfrom,
+:level2valfrom,
+:level3valfrom,
+:level4valfrom,
+current timestamp,
+'9999-12-31-00.00.00.000000',
+1
+);
+} else if (count != 0 && isactive == 1) {
+// update this guy
+EXEC SQL
+update gbli.category
+set
+enterprise = :enterprise,
+entitytype = :entitytype,
+entityid = :entityid,
+countrycode = :countrycode,
+languagecode = :languagecode,
+nlsid = :nlsid,
+countrylist = :countrylist,
+catnavtype = :catnavtype,
+catnavtype_fc = :catnavtype_fc,
+catname = :catname,
+cceidentifier = :cceidentifier,
+catbr = :catbr,
+catfmly = :catfmly,
+catser = :catser,
+catoptgrpnam = :catoptgrpnam,
+catfamdesc = :catfamdesc,
+catserdesc = :catserdesc,
+catserhead = :catserhead,
+cataudience = :cataudience,
+cataudience_fc = :cataudience_fc,
+catpartnumber_e = :catpartnumber_e,
+catpartnumber_v = :catpartnumber_v,
+catpartnumber_p = :catpartnumber_p,
+cceidentifier1 = :cceidentifier1,
+cceidentifier2 = :cceidentifier2,
+cceidentifier3 = :cceidentifier3,
+cceidentifier4 = :cceidentifier4,
+projcdnam = :projcdnam,
+projcdnam_fc = :projcdnam_fc,
+fmlyid = :fmlyid,
+serid = :serid,
+catbulletpoints = :catbulletpoints,
+imgdisclaimer = :imgdisclaimer,
+pricedisclaimer = :pricedisclaimer,
+srchtitle = :srchtitle,
+srchkeyword = :srchkeyword,
+srchabstract = :srchabstract,
+srchdesc = :srchdesc,
+srchcatg = :srchcatg,
+srchdoctype = :srchdoctype,
+publishflag = :publishflag,
+level1valfrom = :level1valfrom,
+level2valfrom = :level2valfrom,
+level3valfrom = :level3valfrom,
+level4valfrom = :level4valfrom,
+valfrom = current timestamp,
+valto = '9999-12-31-00.00.00.000000',
+isactive = 1
+where 
+    Enterprise = :enterprise
+AND EntityType = :entitytype
+AND EntityID = :entityid
+AND COUNTRYCODE = :countrycode
+AND LANGUAGECODE = :languagecode
+AND PROJCDNAM = :projcdnam
+AND CATAUDIENCE = :cataudience
+AND nlsid = :nlsid
+;
+} else {
+// turn it off
+EXEC SQL
+update gbli.Category 
+set  
+valfrom = current timestamp, 
+valto  =  current timestamp, 
+isactive = 0 
+where 
+    Enterprise = :enterprise
+AND EntityType = :entitytype
+AND EntityID = :entityid
+AND COUNTRYCODE = :countrycode
+AND LANGUAGECODE = :languagecode
+AND PROJCDNAM = :projcdnam
+AND CATAUDIENCE = :cataudience
+AND nlsid = :nlsid
+;
+}
+
+
+//
+// BEGIN ERROR CHECK SECTION
+//
+
+// this won't get executed if sql error occurs
+m_iSQLState = SQLCOMPLETE;
+
+error_exit:
+
+if(m_iSQLState == SQLERROR) {
+
+    // ensure no infinite loops in the case that a failed SQL connection is used past this point...
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+
+    
+    fprintf(t,"********************  GBL8985 SQLCA DUMP  ********************\n");
+    char msg[1025];
+    sqlaintp(msg, 1024, 0, &sqlca);
+    fprintf(t,"msg:%s\n",msg);      
+    fprintf(t,"SQLCAID: %s\n", sqlca.sqlcaid);                                  
+    fprintf(t,"SQLCABC: %d\n", sqlca.sqlcabc);                                  
+    fprintf(t,"SQLCODE: %d\n", sqlca.sqlcode);                                  
+    fprintf(t,"SQLERRML: %d\n", sqlca.sqlerrml);                                
+    fprintf(t,"SQLERRMC: %s\n", sqlca.sqlerrmc);                                
+    fprintf(t,"SQLERRP: %s\n", sqlca.sqlerrp);                                  
+    fprintf(t,"SQLERRD[0]: %d\n", sqlca.sqlerrd[0]);                            
+    fprintf(t,"SQLERRD[1]: %d\n", sqlca.sqlerrd[1]);                            
+    fprintf(t,"SQLERRD[2]: %d\n", sqlca.sqlerrd[2]);                            
+    fprintf(t,"SQLERRD[3]: %d\n", sqlca.sqlerrd[3]);                            
+    fprintf(t,"SQLERRD[4]: %d\n", sqlca.sqlerrd[4]);                            
+    fprintf(t,"SQLERRD[5]: %d\n", sqlca.sqlerrd[5]);                            
+    fprintf(t,"SQLWARN: %s\n", sqlca.sqlwarn);                                  
+    fprintf(t,"SQLSTATE: %s\n", sqlca.sqlstate);         
+    //
+    // Dumping Input params:
+    fprintf(t,"enterprise:\"%s\"\n",enterprise);
+    fprintf(t,"entitytype:\"%s\"\n",entitytype);
+    fprintf(t,"entityid:\"%d\"\n",entityid);
+    fprintf(t,"countrycode:\"%s\"\n",countrycode);
+    fprintf(t,"languagecode:\"%s\"\n",languagecode);
+    fprintf(t,"nlsid:\"%d\"\n",nlsid);
+    fprintf(t,"countrylist:\"%s\"\n",countrylist);
+    fprintf(t,"catnavtype:\"%s\"\n",catnavtype);
+    fprintf(t,"catnavtype_fc:\"%s\"\n",catnavtype_fc);
+    fprintf(t,"catname:\"%s\"\n",catname);
+    fprintf(t,"cceidentifier:\"%s\"\n",cceidentifier);
+    fprintf(t,"catbr:\"%s\"\n",catbr);
+    fprintf(t,"catfmly:\"%s\"\n",catfmly);
+    fprintf(t,"catser:\"%s\"\n",catser);
+    fprintf(t,"catoptgrpnam:\"%s\"\n",catoptgrpnam);
+    fprintf(t,"catfamdesc:\"%s\"\n",catfamdesc);
+    fprintf(t,"catserdesc:\"%s\"\n",catserdesc);
+    fprintf(t,"catserhead:\"%s\"\n",catserhead);
+    fprintf(t,"cataudience:\"%s\"\n",cataudience);
+    fprintf(t,"cataudience_fc:\"%s\"\n",cataudience_fc);
+    fprintf(t,"catpartnumber_e:\"%s\"\n",catpartnumber_e);
+    fprintf(t,"catpartnumber_v:\"%s\"\n",catpartnumber_v);
+    fprintf(t,"catpartnumber_p:\"%s\"\n",catpartnumber_p);
+    fprintf(t,"cceidentifier1:\"%s\"\n",cceidentifier1);
+    fprintf(t,"cceidentifier2:\"%s\"\n",cceidentifier2);
+    fprintf(t,"cceidentifier3:\"%s\"\n",cceidentifier3);
+    fprintf(t,"cceidentifier4:\"%s\"\n",cceidentifier4);
+    fprintf(t,"projcdnam:\"%s\"\n",projcdnam);
+    fprintf(t,"projcdnam_fc:\"%s\"\n",projcdnam_fc);
+    fprintf(t,"fmlyid:\"%d\"\n",fmlyid);
+    fprintf(t,"serid:\"%d\"\n",serid);
+    fprintf(t,"catbulletpoints:\"%s\"\n",catbulletpoints);
+    fprintf(t,"imgdisclaimer:\"%s\"\n",imgdisclaimer);
+    fprintf(t,"pricedisclaimer:\"%s\"\n",pricedisclaimer);
+    fprintf(t,"srchtitle:\"%s\"\n",srchtitle);
+    fprintf(t,"srchkeyword:\"%s\"\n",srchkeyword);
+    fprintf(t,"srchabstract:\"%s\"\n",srchabstract);
+    fprintf(t,"srchdesc:\"%s\"\n",srchdesc);
+    fprintf(t,"srchcatg:\"%s\"\n",srchcatg);
+    fprintf(t,"srchdoctype:\"%s\"\n",srchdoctype);
+    fprintf(t,"publishflag:\"%d\"\n",publishflag);
+    fprintf(t,"level1valfrom:\"%s\"\n",level1valfrom);
+    fprintf(t,"level2valfrom:\"%s\"\n",level2valfrom);
+    fprintf(t,"level3valfrom:\"%s\"\n",level3valfrom);
+    fprintf(t,"level4valfrom:\"%s\"\n",level4valfrom);
+    fprintf(t,"isactive:\"%d\"\n",isactive);
+    // End dump params
+    fprintf(t,"******************  END OF GBL8985 SQLCA DUMP  *******************\n"); 
+    fclose(t);
+}
+//
+// END ERROR CHECK SECTION
+//
+
+ fprintf(t,"end of GBL8985\n");
+fclose(t);
+
+
+//EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in enterprise varchar(8)
+in entitytype varchar(32)
+in entityid int
+in countrycode varchar(2)
+in languagecode varchar(2)
+in nlsid int
+in countrylist varchar(8)
+in catnavtype varchar(15)
+in catnavtype_fc varchar(4)
+in catname varchar(25)
+in cceidentifier varchar(254)
+in catbr varchar(50)
+in catfmly varchar(50)
+in catser varchar(50)
+in catoptgrpnam varchar(50)
+in catfamdesc varchar(128)
+in catserdesc varchar(128)
+in catserhead varchar(128)
+in cataudience varchar(128)
+in cataudience_fc varchar(8)
+in catpartnumber_e varchar(128)
+in catpartnumber_v varchar(128)
+in catpartnumber_p varchar(128)
+in cceidentifier1 varchar(254)
+in cceidentifier2 varchar(254)
+in cceidentifier3 varchar(254)
+in cceidentifier4 varchar(254)
+in projcdnam varchar(254)
+in projcdnam_fc varchar(128)
+in fmlyid int
+in serid int
+in catbulletpoints varchar(32671)
+in imgdisclaimer varchar(128)
+in pricedisclaimer varchar(32671)
+in srchtitle varchar(128)
+in srchkeyword varchar(128)
+in srchabstract varchar(128)
+in srchdesc varchar(128)
+in srchcatg varchar(128)
+in srchdoctype varchar(128)
+in publishflag int
+in level1valfrom varchar(26)
+in level2valfrom varchar(26)
+in level3valfrom varchar(26)
+in level4valfrom varchar(26)
+in isactive int
+@end
+

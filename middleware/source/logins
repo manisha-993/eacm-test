@@ -1,0 +1,1 @@
+grep "login\:User" *out|cut -d" " -f5|sort|uniq -c|sort -nr

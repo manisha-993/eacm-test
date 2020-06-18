@@ -1,0 +1,58 @@
+@name=GBL5555A
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+give a rootentity, ruturn all the child entities or parent entities 
+--------------------------------------------------------------------------------------------
+$Log: gbl5555A.txt,v $
+Revision 1.4  2010/06/21 15:43:16  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.3  2009/07/15 08:25:21  yang
+*** empty log message ***
+
+Revision 1.1  2009/07/15 06:39:11  yang
+*** empty log message ***
+
+Revision 1.1  2009/07/15 19:10:28  Yang
+initial load
+
+
+
+
+@desc=Unique one-off sibling check part 1
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl5555A.txt,v 1.4 2010/06/21 15:43:16 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+with mine(entitytype) as
+(select entity2type from @schema.relator where
+              entity1id = :EntityID  
+          and entity1type = :EntityType
+          and enterprise = :Enterprise 
+          and ValFrom <= :now AND :now < ValTo AND EffFrom <= :now AND :now < EffTo
+union all
+select entity1type from  @schema.relator where
+              entity1id = :EntityID  
+          and entity2type = :EntityType
+          and enterprise = :Enterprise 
+          and ValFrom <= :now AND :now < ValTo AND EffFrom <= :now AND :now < EffTo)
+
+select entitytype, count(entitytype)
+from mine group by entitytype
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+@end

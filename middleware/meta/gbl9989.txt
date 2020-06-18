@@ -1,0 +1,70 @@
+@name=GBL9989
+@noremote=true
+@type=basic
+@dbase=opicmods
+@narrative
+----------------------------------------------------------------------
+-- Pulling out ProductDetail info
+----------------------------------------------------------------------
+$Log: gbl9989.txt,v $
+Revision 1.7  2010/06/21 15:42:50  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2004/10/20 21:01:50  dave
+changes to gen parm
+
+Revision 1.5  2004/09/22 15:48:42  gregg
+add back in nlsid
+
+Revision 1.4  2004/09/21 21:39:01  gregg
+remove NLS constraint on gbl9989
+
+Revision 1.3  2004/09/15 23:39:10  dave
+fixing change group and sp's
+
+Revision 1.2  2004/09/14 23:41:29  dave
+some small adjustments
+
+Revision 1.1  2004/09/14 21:25:26  gregg
+initial load
+
+
+
+
+@desc=Pulling out ProductDetail info
+@fenced=true
+@parmstyle=GENERAL
+@sql
+@results=1
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9989.txt,v 1.7 2010/06/21 15:42:50 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE Cur CURSOR FOR
+
+SELECT * FROM GBLI.PRODUCTDETAIL
+ WHERE 
+ENTERPRISE = :Enterprise AND
+ROOTTYPE = :RootType AND
+ROOTID = :RootID AND
+NLSID = :NLSID
+-- ORDER BY 
+-- CHILDTYPE 
+--,CHILDID 
+--,ATTRIBUTECODE 
+--,FLAGCODE 
+--,NLSID 
+--,PUBLISHFLAG
+;
+                                         
+
+@execute
+
+EXEC SQL OPEN Cur;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(8)
+in RootType varchar(32)
+in RootID int
+in NLSID int
+@end

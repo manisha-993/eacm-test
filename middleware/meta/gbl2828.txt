@@ -1,0 +1,44 @@
+@name=GBL2828
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@noremote=true
+@narrative
+----------------------------------------------------------------------
+--  This replaces WHY2028
+----------------------------------------------------------------------
+$Log: gbl2828.txt,v $
+Revision 1.5  2010/06/21 15:43:05  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.4  2006/06/24 03:30:55  dave
+some out .. trickery
+
+Revision 1.3  2006/06/24 03:22:35  dave
+out only
+
+Revision 1.2  2006/06/24 02:56:01  dave
+ok ..lets try a new way to get Now
+
+@desc=Return the current server time values Now/
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2828.txt,v 1.5 2010/06/21 15:43:05 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+now[10] = '-';
+now[13] = '.';
+now[16] = '.';
+
+//
+// ok.. lets copy back to mynow
+//
+strcpy(outmynow,now);
+
+@parameters
+inout ReturnStatus int
+out mynow varchar(27)
+@end

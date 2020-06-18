@@ -1,0 +1,80 @@
+@name=GBL9304
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------
+-- Pulling out info from sales_status and salesorg_country tables
+----------------------------------------------------------------------
+$Log: gbl9304.txt,v $
+Revision 1.7  2010/06/21 15:42:51  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2006/03/01 21:33:22  joan
+fixes
+
+Revision 1.5  2006/03/01 16:56:04  joan
+change on Sales_status
+
+Revision 1.4  2005/10/26 18:43:40  joan
+fixes
+
+Revision 1.3  2005/10/26 18:11:18  joan
+fixes
+
+Revision 1.2  2005/10/21 19:56:49  joan
+fixes
+
+Revision 1.1  2005/10/21 19:37:20  joan
+add file
+
+
+@desc=Pulling out info from sales_status and salesorg_country tables
+@fenced=true
+@parmstyle=GENERAL
+@sql
+@results=1
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9304.txt,v 1.7 2010/06/21 15:42:51 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE Cur1 CURSOR FOR
+
+SELECT SS.MATERIALSTATUS
+
+FROM EACM.SALESORG_COUNTRY SC
+
+INNER JOIN EACM.SALES_STATUS SS ON
+    SS.MATNR = :matnr
+AND SS.VARCONDTYPE in ('MODEL', 'SWMODEL')
+AND SS.SALESORG = SC.SALESORG
+
+WHERE SC.COUNTRYCODE = :countrycode
+;
+
+EXEC SQL DECLARE Cur2 CURSOR FOR
+
+SELECT SS.MATERIALSTATUS
+
+FROM EACM.SALESORG_COUNTRY SC
+
+INNER JOIN EACM.SALES_STATUS SS ON
+    SS.MATNR = :matnr
+AND SS.VARCONDTYPE in ('SEO')
+AND SS.SALESORG = SC.SALESORG
+
+WHERE SC.COUNTRYCODE = :countrycode
+;
+
+@execute
+if (strcmp(condtype, "MODEL") == 0) {
+    EXEC SQL OPEN Cur1;
+} else {
+    EXEC SQL OPEN Cur2;
+}
+
+@parameters
+inout ReturnStatus int
+in countrycode varchar(8)
+in matnr varchar(18)
+in condtype varchar(20)
+@end

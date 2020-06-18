@@ -1,0 +1,94 @@
+@name=GBL4026
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+-- Get Language Mappings
+--------------------------------------------------------------------------------------------
+$Log: gbl4026.txt,v $
+Revision 1.5  2010/06/21 15:42:48  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.4  2006/02/02 19:07:04  gregg
+fix metadescription block
+
+Revision 1.3  2006/01/20 19:25:38  gregg
+fix
+
+Revision 1.2  2006/01/16 22:06:13  gregg
+fix
+
+Revision 1.1  2006/01/16 21:54:05  gregg
+innitial load
+
+Revision 1.1  2006/01/16 21:52:48  gregg
+initial load
+
+
+
+
+
+@desc=Get Language Mappings
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl4026.txt,v 1.5 2010/06/21 15:42:48 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+ from.attributevalue
+,mdTo.longdescription
+,to.attributevalue
+
+from opicm.flag from
+
+inner join opicm.entity as entity on
+    entity.Enterprise = :enterprise
+AND entity.EntityType = :entitytype
+AND entity.valto > current timestamp
+AND entity.effto > current timestamp
+AND entity.valfrom <= current timestamp
+AND entity.efffrom <= current timestamp
+
+inner join opicm.flag as to on
+    to.Enterprise = :enterprise
+AND to.EntityType = :entitytype
+AND to.EntityID = entity.entityid
+AND to.attributecode = :attTo
+AND to.valto > current timestamp
+AND to.effto > current timestamp
+AND to.valfrom <= current timestamp
+AND to.efffrom <= current timestamp
+
+inner join opicm.metadescription as mdTo on
+    mdTo.Enterprise = :enterprise
+AND mdTo.DescriptionType = :attTo
+AND mdTo.descriptionclass = to.attributevalue
+AND mdTo.valto > current timestamp
+AND mdTo.effto > current timestamp
+AND mdTo.valfrom <= current timestamp
+AND mdTo.efffrom <= current timestamp
+AND nlsid = 1
+
+WHERE
+    from.Enterprise = :enterprise
+AND from.EntityType = :entitytype
+AND from.EntityID = entity.entityid
+AND from.attributecode = :attFrom
+AND from.valto > current timestamp
+AND from.effto > current timestamp
+AND from.valfrom <= current timestamp
+AND from.efffrom <= current timestamp
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in enterprise varchar(16)
+in entitytype varchar(32)
+in attFrom varchar(32)
+in attTo varchar(32)
+@end

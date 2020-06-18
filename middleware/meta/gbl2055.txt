@@ -1,0 +1,44 @@
+@name=GBL2055
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+
+@desc=Return all parent entity ids related to the passed entity through the relatortype for the given Enterprise.
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2055.txt,v 1.1 2010/06/15 15:40:30 praveen Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT DISTINCT
+  R.Entity1Type AS EntityType
+, R.Entity1ID AS EntityID
+FROM @t_schema.Relator R
+INNER JOIN @t_schema.Entity E ON
+E.Enterprise = :Enterprise AND
+E.EntityType = R.Entity1Type AND
+E.EntityID = R.Entity1ID AND
+E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+WHERE
+R.Enterprise = :Enterprise AND
+R.EntityType = :RelatorType AND
+R.Entity2Type = :Entity2Type AND
+R.Entity2ID = :Entity2ID AND
+R.ValFrom <= :ValOn AND :ValOn < R.ValTo AND R.EffFrom <= :EffOn AND :EffOn < R.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in RelatorType varchar(32)
+in Entity2Type varchar(32)
+in Entity2ID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

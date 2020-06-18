@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd /var/tmp
+ls WHY* PSG* GBL*

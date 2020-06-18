@@ -1,0 +1,63 @@
+@name=GBL7560
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------------------------------------
+--  grab a transition code for a given att1, att2, entitytype (there should be only one but this is unpredicatable)
+----------------------------------------------------------------------------------------------------
+$Log: gbl7560.txt,v $
+Revision 1.3  2010/06/21 15:42:42  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.2  2004/10/20 21:01:46  dave
+changes to gen parm
+
+Revision 1.1  2004/05/13 18:20:13  gregg
+initial load
+
+
+
+@desc=grab a transition code for a given att1, att2, entitytype (there should be only one but this is unpredicatable)
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7560.txt,v 1.3 2010/06/21 15:42:42 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+with mylist(transitioncode,count) as
+(
+select 
+ distinct MT.transitioncode 
+,count(MT.transitioncode)
+from opicm.metalinkattr MLA1
+
+INNER JOIN opicm.metatransition MT ON
+MT.enterprise = :Enterprise and
+MT.valto > current timestamp and MT.effto > current timestamp and
+MT.attributecode1 = :AttributeCode1 and
+MT.attributecode2 = :AttributeCode2
+
+where
+MLA1.enterprise = MT.enterprise and
+MLA1.valto > current timestamp and MLA1.effto > current timestamp and
+MLA1.linktype = 'Trans/Attribute' and
+MLA1.linktype2 = :EntityType
+
+group by MT.transitioncode
+)
+select transitioncode from mylist
+where count = (select max(count) from mylist)
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(8)
+in EntityType varchar(32)
+in AttributeCode1 varchar(32)
+in AttributeCode2 varchar(32)
+@end
+

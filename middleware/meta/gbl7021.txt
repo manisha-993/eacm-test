@@ -1,0 +1,103 @@
+@name=GBL7021
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+  This returns all the meta attributesCodes and their
+  capability for the given role for the purpose of Navigation
+
+$Log: gbl7021.txt,v $
+Revision 1.5  2010/06/21 15:43:11  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.4  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.3  2004/06/22 20:49:41  joan
+fix error
+
+Revision 1.2  2004/06/22 19:43:17  joan
+fix compile
+
+Revision 1.1  2004/06/22 19:36:47  joan
+initial load
+
+
+@desc=Get Navigation + ABR Status Meta AttributeCodes for a Given EntityType
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7021.txt,v 1.5 2010/06/21 15:43:11 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  COALESCE(INT(RTRIM(ML1.LinkValue)),999)
+, RTRIM(ME.EntityType)
+, RTRIM(ME.EntityClass)
+FROM @t_schema.MetaLinkAttr ML1
+INNER JOIN @t_schema.MetaEntity ME ON
+    ME.Enterprise = :Enterprise
+AND ME.EntityType = ML1.LinkType2
+AND ME.EntityClass IN ('T','I','U','S','A','L','F','X')
+AND ME.ValFrom <= :ValOn AND :ValOn < ME.ValTo AND ME.EffFrom <= :EffOn AND :EffOn < ME.EffTo
+WHERE
+    ML1.Enterprise = :Enterprise
+AND ML1.LinkType = 'Entity/Attribute'
+AND ML1.LinkType1 = :EntityType
+AND ML1.LinkCode = 'Navigate'
+AND ML1.ValFrom <= :ValOn AND :ValOn < ML1.ValTo AND ML1.EffFrom <= :EffOn AND :EffOn < ML1.EffTo
+UNION ALL
+SELECT
+ 999
+, RTRIM(ME.EntityType)
+, RTRIM(ME.EntityClass)
+FROM @t_schema.MetaLinkAttr ML1
+INNER JOIN @t_schema.MetaEntity ME ON
+    ME.Enterprise = :Enterprise
+AND ME.EntityType = ML1.LinkType2
+AND ME.EntityClass IN ('A')
+AND ME.ValFrom <= :ValOn AND :ValOn < ME.ValTo AND ME.EffFrom <= :EffOn AND :EffOn < ME.EffTo
+WHERE
+    ML1.Enterprise = :Enterprise
+AND ML1.LinkType = 'Entity/Attribute'
+AND ML1.LinkType1 = :EntityType
+AND ML1.ValFrom <= :ValOn AND :ValOn < ML1.ValTo AND ML1.EffFrom <= :EffOn AND :EffOn < ML1.EffTo
+UNION ALL
+SELECT 
+ 999
+,RTRIM(MLADERIVED.LinkType2)
+,'DT'
+FROM @t_schema.METALINKATTR MLADERIVED 
+
+INNER JOIN @t_schema.MetaEntity ME ON
+    ME.Enterprise = :Enterprise
+AND ME.EntityType = MLADERIVED.LinkType2
+AND ME.EntityClass = 'DT'
+AND ME.ValFrom <= :ValOn AND :ValOn < ME.ValTo AND ME.EffFrom <= :EffOn AND :EffOn < ME.EffTo
+
+WHERE
+    MLADERIVED.enterprise = :Enterprise
+AND MLADERIVED.linktype = 'Entity/Attribute'
+AND MLADERIVED.linktype1 = :EntityType
+AND MLADERIVED.linkcode = 'Derived'
+AND MLADERIVED.valfrom <= :ValOn
+AND MLADERIVED.valto > :ValOn
+AND MLADERIVED.efffrom <= :EffOn
+AND MLADERIVED.effto > :EffOn
+order by 1
+;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

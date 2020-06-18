@@ -1,0 +1,84 @@
+@name=GBL7506
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7506.txt,v $
+Revision 1.13  2010/06/21 15:42:56  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.12  2004/10/20 21:01:44  dave
+changes to gen parm
+
+Revision 1.11  2004/02/20 20:21:54  roger
+Must be @t_schema
+
+Revision 1.10  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.9  2003/09/08 16:31:17  roger
+Enterprise was changed to 16 char length
+
+Revision 1.8  2003/02/19 19:35:22  dave
+remove the , after the select
+
+Revision 1.7  2003/02/19 18:49:38  joan
+fix make error
+
+Revision 1.6  2003/02/14 00:51:11  gregg
+int openid, tranid
+
+Revision 1.5  2003/02/14 00:41:26  gregg
+get all cols back for the entitytype+enterprise combination
+
+Revision 1.4  2003/01/14 00:14:22  gregg
+removed entityClass parameter
+
+Revision 1.3  2003/01/13 22:28:18  gregg
+extra EntityClass param passed into GBL7506
+
+Revision 1.2  2002/07/17 17:33:19  roger
+Ensured Log was in @narrative
+
+@desc=Used to check existence of a valid record in MetaEntity table
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7506.txt,v 1.13 2010/06/21 15:42:56 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT 
+ ME.ENTERPRISE
+,ME.ENTITYTYPE
+,ME.ENTITYCLASS
+,ME.VALFROM
+,ME.VALTO
+,ME.EFFFROM
+,ME.EFFTO
+,INT(ME.OPENID) as OPENID
+,INT(ME.TRANID) as TRANID
+from @t_schema.MetaEntity ME 
+where
+    ME.enterprise = :Enterprise 
+AND ME.entityType = :EntityType
+AND ME.valto > :ValOn 
+AND ME.valfrom <= :ValOn 
+AND ME.effto > :EffOn 
+AND ME.efffrom <= :EffOn
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

@@ -1,0 +1,48 @@
+@name=GBL99992
+@parmstyle=GENERAL
+@type=basic
+@dbase=opicmods2
+@narrative
+----------------------------------------------------------------------
+--  This is the GetNow for ODS2 RTC1119727
+----------------------------------------------------------------------
+$Log: gbl99992.txt,v $
+Revision 1.1  2015/03/11 15:49:27  stimpsow
+RTC1119727 - add support for second ods
+
+
+
+@desc=Return the current server time values Now/Forever/Epoch
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl99992.txt,v 1.1 2015/03/11 15:49:27 stimpsow Exp $";
+EXEC SQL END DECLARE SECTION;
+now[10] = '-';
+now[13] = '.';
+now[16] = '.';
+
+forever[10] = '-';
+forever[13] = '.';
+forever[16] = '.';
+
+epoch[10] = '-';
+epoch[13] = '.';
+epoch[16] = '.';
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  DISTINCT :now AS Now
+, :forever AS Forever
+, :epoch AS Epoch
+FROM SYSCAT.SCHEMAAUTH
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+@end
+
+

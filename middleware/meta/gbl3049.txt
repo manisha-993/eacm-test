@@ -1,0 +1,79 @@
+@name=GBL3049
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=true
+@fenced=true
+@results=1
+@narrative
+--------------------------------------------------------------------------------------  
+-- Select Association and Show Details (Picklist Characteristic and Filter)
+--------------------------------------------------------------------------------------
+$Log: gbl3049.txt,v $
+Revision 1.9  2010/06/21 15:43:18  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.8  2004/10/20 21:01:42  dave
+changes to gen parm
+
+Revision 1.7  2004/02/20 20:21:52  roger
+Must be @t_schema
+
+Revision 1.6  2004/02/20 18:09:32  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.5  2003/09/08 16:31:14  roger
+Enterprise was changed to 16 char length
+
+Revision 1.4  2003/06/03 18:37:43  roger
+Needed valid @dbase tag
+
+Revision 1.3  2002/07/17 17:33:18  roger
+Ensured Log was in @narrative
+
+@desc= Select Associations and Show Details (Picklist Characteristic and Filter)
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT                                             
+ME.entitytype,
+MLA.linktype1,
+MLA.linktype,
+MLA.linkcode,
+ATT.descriptionclass,
+ATT.LongDescription
+FROM @t_schema.metaentity  ME 
+join @t_schema.metalinkattr as MLA on
+MLA.Enterprise = :Enterprise and
+MLA.linktype = 'Action/Entity' and
+MLA.linktype2 = ME.entitytype and 
+MLA.ValFrom <= :ValOn AND :ValOn < MLA.ValTo AND MLA.EffFrom <= :EffOn AND :EffOn < MLA.EffTo 
+join @t_schema.metadescription as ATT on
+ATT.Enterprise = :Enterprise and
+ATT.Descriptiontype = MLA.linktype1 and
+ATT.Descriptionclass = 'Navigate' and
+ATT.NLSID IN (1,:NLSID) and
+ATT.ValFrom <= :ValOn AND :ValOn < ATT.ValTo AND ATT.EffFrom <= :EffOn AND :EffOn < ATT.EffTo 
+WHERE
+ME.enterprise= :Enterprise and
+ME.entityclass = 'Assoc' and
+ME.entitytype = :AssocType AND
+ME.ValFrom <= :ValOn AND :ValOn < ME.ValTo AND ME.EffFrom <= :EffOn AND :EffOn < ME.EffTo 
+ORDER BY
+ME.entitytype;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in AssocType varchar(32)
+in NLSID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

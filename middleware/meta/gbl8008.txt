@@ -1,0 +1,97 @@
+@name=GBL8008
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+Returns a complete list of meta descripion changes
+  
+$Log: gbl8008.txt,v $
+Revision 1.8  2010/06/21 15:43:07  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2004/10/20 21:01:47  dave
+changes to gen parm
+
+Revision 1.6  2004/02/20 20:21:56  roger
+Must be @t_schema
+
+Revision 1.5  2004/02/20 18:09:36  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.4  2002/09/13 18:10:59  dave
+corrected description
+
+Revision 1.3  2002/09/11 17:21:29  dave
+coalesce
+
+Revision 1.2  2002/09/11 17:16:28  dave
+adding the 'A' to the descriptionchange 8008 sp
+
+Revision 1.1  2002/09/05 22:59:34  dave
+new SP for finding all Flag Value Changes
+
+
+@desc= Returns a complete list of meta descripion changes
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8008.txt,v 1.8 2010/06/21 15:43:07 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+ CASE
+   WHEN MD2.Enterprise IS NULL THEN 'A'
+   WHEN MD1.EffTo < CURRENT TIMESTAMP THEN 'D'
+   WHEN MD2.EffTo < CURRENT TIMESTAMP AND MD1.EffTo > :EndDate THEN 'R'
+   WHEN MD1.LongDescription <> MD2.LongDescription  OR MD1.ShortDescription <> MD2.ShortDescription THEN 'C'
+   ELSE 'U'
+ END
+,MLA1.LinkType1
+,MD1.DescriptionType
+,MD1.DescriptionClass
+,MD1.NLSID
+,MD1.ValFrom
+,MD1.ShortDescription NewSD
+,MD1.LongDescription NewLD
+,COALESCE(MD2.ShortDescription,'') OldSD
+,COALESCE(MD2.LongDescription,'') OldLD
+FROM @t_schema.metaDescription  MD1
+LEFT JOIN @t_schema.MetaDescription MD2 ON
+    MD2.Enterprise = 'L2'
+AND MD2.DescriptionType = MD1.DescriptionType
+AND MD2.DescriptionClass = MD1.DescriptionClass
+AND MD2.NLSID = MD1.NLSID
+AND MD2.ValTo = MD1.ValFrom
+INNER JOIN @t_schema.MetaEntity ME ON
+    ME.Enterprise = 'L2'
+AND ME.EntityType = MD1.DescriptionType
+AND ME.EntityClass in ('F','S','U','A')
+AND ME.Valfrom <= :now AND :now < ME.ValTo AND ME.Efffrom <= :now AND :now < ME.EffTo
+INNER JOIN @t_schema.MetaLinkAttr MLA1 ON
+    MLA1.Enterprise = :Enterprise
+AND MLA1.LinkType = 'Entity/Attribute'
+AND MLA1.LinkType2 = MD1.DescriptionType
+AND MLA1.LInkCode = 'EntityAttribute'
+AND MLA1.Valfrom <= :now AND :now  < MLA1.ValTo AND MLA1.Efffrom <= :now AND :now  < MLA1.EffTo
+WHERE
+    MD1.Enterprise = :Enterprise
+AND MD1.DescriptionClass NOT IN ('F','S','U','A')
+AND MD1.ValFrom Between :StartDate AND :EndDate
+ORDER BY 3,4,5,6,1
+;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in StartDate varchar(27)
+in EndDate varchar(27)
+@end
+
+

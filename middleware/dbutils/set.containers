@@ -1,0 +1,109 @@
+TMP_FILE=/tmp/set.tablespace.temp.file
+TMP_FILE2=/tmp/set.tablespace.temp.file2
+
+db2 connect to $1 user opicmadm using cat9tail
+db2 list tablespaces|grep ID|awk '{print $4}'|
+while read TS_ID
+
+do
+
+#
+# Get number of containers for this tablespace...
+#
+db2 list tablespace containers for $TS_ID|grep "ID"|wc -l|read CONT_QUANTITY
+
+if [ "$CONT_QUANTITY" -eq 1 ];
+then
+
+db2 list tablespace containers for $TS_ID|grep "Type"|awk '{print $3}'|tr 'A-Z' 'a-z'|read CONT_TYPE
+
+if [ "$CONT_TYPE" = "disk" ];
+then
+CONT_TYPE="device"
+fi
+
+db2 list tablespace containers for $TS_ID|grep "Name"|awk '{print $3}'|read CONT_PATH
+
+if [ "$CONT_TYPE" = "path" ];
+then
+
+echo "set tablespace containers for $TS_ID using ( \\"
+echo "$CONT_TYPE '$CONT_PATH' \\"
+echo ")"
+
+else
+db2 list tablespace containers for $TS_ID show detail|grep "Total pages"|awk '{print $4}'|read CONT_PAGES
+
+echo "set tablespace containers for $TS_ID using ( \\"
+echo "$CONT_TYPE '$CONT_PATH' $CONT_PAGES \\"
+echo ")"
+
+fi
+
+echo
+
+else
+#
+# There are multiple containers for this tablespace...assemble the string here...
+
+COUNTER=1
+CONT_PATH_STRING=""
+0>$TMP_FILE2
+
+db2 list tablespace containers for $TS_ID show detail|egrep "Name|Type|Total pages" > $TMP_FILE
+
+while [ "$COUNTER" -le "$CONT_QUANTITY" ]
+do
+
+let "CONT_PATH_LN = (COUNTER * 3) - 2"
+let "CONT_TYPE_LN = (COUNTER * 3) - 1"
+let "CONT_PAGES_LN = COUNTER * 3"
+
+cat $TMP_FILE|head -$CONT_PATH_LN|tail -1|awk '{print $3}'|read CONT_PATH
+cat $TMP_FILE|head -$CONT_TYPE_LN|tail -1|awk '{print $3}'|tr 'A-Z' 'a-z'|read CONT_TYPE
+
+if [ "$CONT_TYPE" = "disk" ];
+then
+CONT_TYPE="device"
+fi
+
+cat $TMP_FILE|head -$CONT_PAGES_LN|tail -1|awk '{print $4}'|read CONT_PAGES
+
+
+if [ "$CONT_TYPE" = "path" ];
+then
+CONT_PATH_STRING="$CONT_TYPE '$CONT_PATH'"
+else
+CONT_PATH_STRING="$CONT_TYPE '$CONT_PATH' $CONT_PAGES"
+fi
+
+if [ "$COUNTER" -lt "$CONT_QUANTITY" ];
+then
+CONT_PATH_STRING="$CONT_PATH_STRING,"
+fi
+
+echo "$CONT_PATH_STRING \\" >> $TMP_FILE2
+
+((COUNTER += 1))
+
+done # read next CONTAINER
+
+echo "set tablespace containers for $TS_ID using ( \\"
+cat $TMP_FILE2
+echo ")"
+echo
+fi
+
+done # read next TS_ID
+
+echo
+db2 terminate
+if [ -f "$TMP_FILE" ];
+then
+rm $TMP_FILE
+fi
+
+if [ -f "$TMP_FILE2" ];
+then
+rm $TMP_FILE2
+fi

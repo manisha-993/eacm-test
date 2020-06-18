@@ -1,0 +1,140 @@
+@name=GBL7020
+@noremote=true
+@parmstyle=GENERAL
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+  This returns all the meta attributesCodes and their
+  capability for the given role for the purpose of Navigation
+
+$Log: gbl7020.txt,v $
+Revision 1.21  2010/06/21 15:42:58  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.20  2006/04/28 19:19:23  tony
+added NonNavigate function
+
+Revision 1.19  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.18  2004/10/20 19:57:51  roger
+Make parm style GENERAL
+
+Revision 1.17  2004/10/20 18:51:29  roger
+Didn't want to change this - back out
+
+Revision 1.16  2004/10/20 18:50:49  roger
+Changes for GENERAL parm style
+
+Revision 1.15  2004/04/30 17:54:25  gregg
+compile fix
+
+Revision 1.14  2004/04/29 16:52:37  gregg
+more on Derived attributes
+
+Revision 1.13  2004/04/29 16:41:16  gregg
+include 'Derived' attributes
+
+Revision 1.12  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.11  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.10  2003/09/08 16:31:16  roger
+Enterprise was changed to 16 char length
+
+Revision 1.9  2003/07/23 17:11:10  joan
+adjust for XML attributes
+
+Revision 1.8  2003/04/12 22:31:37  dave
+clean up and reformatting.
+Search Lite weight II
+
+Revision 1.7  2003/03/27 01:29:00  dave
+simplifying navigate column order
+
+Revision 1.6  2002/09/12 16:37:54  dave
+adding multi valued flag to navigate stuff
+
+Revision 1.5  2002/04/19 16:37:51  dave
+fixing merge conflict
+
+Revision 1.4  2002/02/28 19:09:22  dave
+adding 7502 and adding navflag to denote nav attributes
+
+Revision 1.3  2002/02/10 01:03:28  dave
+mass sp fixes for compile
+
+Revision 1.2  2002/02/06 00:42:39  dave
+more fixes to base code
+
+Revision 1.1  2002/02/05 23:27:10  dave
+added GBL7020 for EntityGroup
+
+
+@desc=Get Navigation Meta AttributeCodes for a Given EntityType
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7020.txt,v 1.21 2010/06/21 15:42:58 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  COALESCE(INT(RTRIM(ML1.LinkValue)),999)
+, RTRIM(ME.EntityType)
+, RTRIM(ME.EntityClass)
+FROM @t_schema.MetaLinkAttr ML1
+INNER JOIN @t_schema.MetaEntity ME ON
+    ME.Enterprise = :Enterprise
+AND ME.EntityType = ML1.LinkType2
+AND ME.EntityClass IN ('T','I','U','S','A','L','F','X')
+AND ME.ValFrom <= :ValOn AND :ValOn < ME.ValTo AND ME.EffFrom <= :EffOn AND :EffOn < ME.EffTo
+WHERE
+    ML1.Enterprise = :Enterprise
+AND ML1.LinkType = 'Entity/Attribute'
+AND ML1.LinkType1 = :EntityType
+AND ML1.LinkCode in ('Navigate','NonNavigate')
+AND ML1.ValFrom <= :ValOn AND :ValOn < ML1.ValTo AND ML1.EffFrom <= :EffOn AND :EffOn < ML1.EffTo
+
+UNION ALL
+SELECT 
+ 999
+,RTRIM(MLADERIVED.LinkType2)
+,'DT'
+FROM @t_schema.METALINKATTR MLADERIVED 
+
+INNER JOIN @t_schema.MetaEntity ME ON
+    ME.Enterprise = :Enterprise
+AND ME.EntityType = MLADERIVED.LinkType2
+AND ME.EntityClass = 'DT'
+AND ME.ValFrom <= :ValOn AND :ValOn < ME.ValTo AND ME.EffFrom <= :EffOn AND :EffOn < ME.EffTo
+
+WHERE
+    MLADERIVED.enterprise = :Enterprise
+AND MLADERIVED.linktype = 'Entity/Attribute'
+AND MLADERIVED.linktype1 = :EntityType
+AND MLADERIVED.linkcode = 'Derived'
+AND MLADERIVED.valfrom <= :ValOn
+AND MLADERIVED.valto > :ValOn
+AND MLADERIVED.efffrom <= :EffOn
+AND MLADERIVED.effto > :EffOn
+order by 1
+;
+
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

@@ -1,0 +1,104 @@
+#!/bin/sh
+
+#
+# $Log: watchtm-aix,v $
+# Revision 1.16  2004/09/15 20:22:04  roger
+# Record stop/kill/DIE in log
+#
+# Revision 1.15  2003/12/11 17:45:52  roger
+# Issue msg to show watchtm is running
+#
+# Revision 1.14  2003/12/01 20:39:14  roger
+# Send mail command output to /dev/null
+#
+# Revision 1.13  2003/11/21 17:29:13  roger
+# Report when this script shuts down
+#
+# Revision 1.12  2003/11/20 16:58:38  roger
+# Report the trouble by mail
+#
+# Revision 1.11  2003/11/19 20:05:52  roger
+# Clean up
+#
+#
+
+#
+# Script to monitor taskmaster
+#
+
+(
+
+CURRENT_REPORT="./taskmaster.out"
+DIR=`basename $PWD`
+DO_PING=1
+HOSTNAME=`hostname -s`
+INSTANCE="$HOSTNAME@$DIR"
+MAILTO="roger.mccarty@gbli.com"
+PAUSE=60
+
+#
+# record this execution in logfile 
+#
+echo "+++ TaskMaster instance $INSTANCE has used ./watchtm-aix" >>$CURRENT_REPORT
+
+mail -s "TaskMaster instance $INSTANCE watchtm-aix now monitoring" "$MAILTO" < /dev/null > /dev/null
+
+while [ ! -f tmshut ]; do
+  echo "Inspecting TaskMaster ..." | awk '{print "'`date +%Y-%m-%d-%H.%M.%S.000000`'"" "$0}' >>$CURRENT_REPORT
+  #
+  # let's check the rmi daemons
+  #
+  if [ -f rmiregistry.pid ]; then
+    ps `cat rmiregistry.pid` >>/dev/null
+  fi
+  if [ $? = 0 ]; then
+    echo "RMIREGISTRY is ALIVE" | awk '{print "'`date +%Y-%m-%d-%H.%M.%S.000000`'"" "$0}' >>$CURRENT_REPORT
+    # show OUR processes
+    echo "OUR RMIREGISTRY process tree" >>$CURRENT_REPORT
+    ./pstree `cat rmiregistry.pid` | awk '{print "'`date +%Y-%m-%d-%H.%M.%S.000000`'"" "$0}' >>$CURRENT_REPORT
+  else
+    echo "RMIREGISTRY is DEAD" | awk '{print "'`date +%Y-%m-%d-%H.%M.%S.000000`'"" "$0}' >>$CURRENT_REPORT
+    DO_PING=0
+  fi
+  
+  if [ -f rmid.pid ]; then
+    ps `cat rmid.pid` >>/dev/null
+  fi
+  if [ $? = 0 ]; then
+    echo "RMID is ALIVE" | awk '{print "'`date +%Y-%m-%d-%H.%M.%S.000000`'"" "$0}' >>$CURRENT_REPORT
+    # show OUR processes
+    echo "OUR RMID process tree" >>$CURRENT_REPORT
+    ./pstree `cat rmid.pid` | awk '{print "'`date +%Y-%m-%d-%H.%M.%S.000000`'"" "$0}' >>$CURRENT_REPORT
+  else
+    echo "RMID is DEAD" | awk '{print "'`date +%Y-%m-%d-%H.%M.%S.000000`'"" "$0}' >>$CURRENT_REPORT
+    DO_PING=0
+  fi
+
+  #
+  # ping taskmaster and report result
+  #
+  if [ DO_PING -eq 1 ]; then
+   ./ping-aix TaskMaster | awk '{print "'`date +%Y-%m-%d-%H.%M.%S.000000`'"" "$0}' >>$CURRENT_REPORT
+  else
+    echo "NO reason to ping -- RMID or RMIREGISTY is DEAD"  | awk '{print "'`date +%Y-%m-%d-%H.%M.%S.000000`'"" "$0}' >>$CURRENT_REPORT
+    # let's try to shut everything -- we are not at all well
+    touch tmshut
+    touch taskmaster.out
+    # report the trouble
+    echo "+++ TaskMaster instance $INSTANCE has DIED" >>$CURRENT_REPORT
+    tail -n 500 taskmaster.out > last500
+    mail -s "TaskMaster instance $INSTANCE has DIED" "$MAILTO" < last500 > /dev/null
+    rm last500
+  fi
+
+  # show OTHER processes (potential interference)
+  echo "OTHER java and RMI processes" | awk '{print "'`date +%Y-%m-%d-%H.%M.%S.000000`'"" "$0}' >>$CURRENT_REPORT
+  ps -o ppid,pid,comm -u$USER | sort -n | egrep "java|rmi" | awk '{print "'`date +%Y-%m-%d-%H.%M.%S.000000`'"" "$1" "$2" "$3}' >>$CURRENT_REPORT
+
+  sleep $PAUSE
+done
+
+echo "tmshut file was detected -- watchtm-aix exiting" | awk '{print "'`date +%Y-%m-%d-%H.%M.%S.000000`'"" "$0}' >>$CURRENT_REPORT
+mail -s "TaskMaster instance $INSTANCE watchtm-aix has detected tmshut file" "$MAILTO" < /dev/null > /dev/null
+
+) &

@@ -1,0 +1,127 @@
+@name=GBL3010
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+$Log: gbl3010.txt,v $
+Revision 1.16  2010/06/21 15:43:01  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.15  2004/10/20 21:01:41  dave
+changes to gen parm
+
+Revision 1.14  2004/02/20 20:21:51  roger
+Must be @t_schema
+
+Revision 1.13  2004/02/20 18:09:32  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.12  2003/09/08 16:31:13  roger
+Enterprise was changed to 16 char length
+
+Revision 1.11  2002/07/17 17:33:18  roger
+Ensured Log was in @narrative
+
+@desc=Return All Roles for Operator
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT DISTINCT                                                        
+                    'R' AS COL0,              
+                    SUBSTR(OPNAME.ATTRIBUTEVALUE,1,20) AS COL1,        
+                    OPENNAME.ATTRIBUTEVALUE AS COL2,      
+                    SUBSTR(OPENRC.ATTRIBUTEVALUE,1,30) AS COL3,        
+                    SUBSTR(EN.ATTRIBUTEVALUE,1,30) AS COL4,            
+                    OPENSUF.LONGDESCRIPTION AS COL5,                     
+                    SUBSTR(ED.ATTRIBUTEVALUE,1,20) AS COL6                      
+                FROM   @t_schema.TEXT AS OPNAME        
+                LEFT JOIN   @t_schema.RELATOR AS OPEN ON 
+                    OPEN.ENTERPRISE = OPNAME.ENTERPRISE AND           
+                    OPEN.ENTITY1TYPE = OPNAME.ENTITYTYPE AND                      
+                    OPEN.ENTITY1ID  = OPNAME.ENTITYID   AND              
+                    :ValOn>= OPEN.VALFrom  AND            
+                    :ValOn< OPEN.VALTo     AND            
+                    :EffOn >= OPEN.EffFrom  AND            
+                    :EffOn < OPEN.EffTo                    
+                LEFT JOIN   @t_schema.TEXT AS ED ON         
+                    ED.ENTERPRISE = OPNAME.ENTERPRISE AND             
+                    ED.ENTITYTYPE = OPEN.ENTITYTYPE AND                          
+                    ED.ENTITYID = OPEN.ENTITYID AND                  
+                    ED.ATTRIBUTECODE = 'ID' AND                       
+                    :ValOn>= ED.VALFrom    AND            
+                    :ValOn< ED.VALTo       AND            
+                    :EffOn >= ED.EffFrom    AND            
+                    :EffOn < ED.EffTo                      
+                LEFT JOIN   @t_schema.TEXT AS OPENNAME ON       
+                    OPENNAME.ENTERPRISE = OPNAME.ENTERPRISE AND           
+                    OPENNAME.ENTITYTYPE = OPEN.ENTITYTYPE AND                        
+                    OPENNAME.ENTITYID   = OPEN.ENTITYID AND                
+                    OPENNAME.ATTRIBUTECODE = 'NAME' AND                     
+                    :ValOn>= OPENNAME.VALFrom  AND            
+                    :ValOn< OPENNAME.VALTo     AND            
+                    :EffOn >= OPENNAME.EffFrom  AND            
+                    :EffOn < OPENNAME.EffTo                    
+                LEFT JOIN   @t_schema.TEXT AS OPENRC ON   
+                    OPENRC.ENTERPRISE = OPNAME.ENTERPRISE AND         
+                    OPENRC.ENTITYTYPE = OPEN.ENTITYTYPE AND                    
+                    OPENRC.ENTITYID   = OPEN.ENTITYID AND               
+                    OPENRC.ATTRIBUTECODE = 'ROLECODE' AND             
+                    :ValOn>= OPENRC.VALFrom    AND        
+                    :ValOn< OPENRC.VALTo       AND        
+                    :EffOn >= OPENRC.EffFrom    AND        
+                    :EffOn < OPENRC.EffTo                  
+               LEFT JOIN   @t_schema.FLAG AS OPENSU ON  
+                    OPENSU.ENTERPRISE = OPNAME.ENTERPRISE  AND         
+                    OPENSU.ENTITYTYPE = OPEN.ENTITYTYPE AND                    
+                    OPENSU.ENTITYID   = OPEN.ENTITYID AND               
+                    OPENSU.ATTRIBUTECODE IN ('ROLEFUNCTION') AND     
+                    :ValOn>= OPENSU.VALFrom    AND        
+                    :ValOn< OPENSU.VALTo       AND        
+                    :EffOn >= OPENSU.EffFrom    AND        
+                    :EffOn < OPENSU.EffTo                  
+                LEFT JOIN   @t_schema.METADESCRIPTION AS OPENSUF ON    
+                    OPENSUF.ENTERPRISE       = OPNAME.ENTERPRISE  AND        
+                    OPENSUF.NLSID = 1                       AND        
+                    OPENSUF.DESCRIPTIONTYPE IN ('ROLEFUNCTION')    AND  
+                    OPENSUF.DESCRIPTIONCLASS = OPENSU.ATTRIBUTEVALUE AND    
+                    :ValOn>= OPENSUF.VALFrom   AND        
+                    :ValOn< OPENSUF.VALTo      AND        
+                    :EffOn >= OPENSUF.EffFrom   AND        
+                    :EffOn < OPENSUF.EffTo                 
+                LEFT JOIN   @t_schema.TEXT AS EN ON             
+            EN.ENTERPRISE    = OPNAME.ENTERPRISE AND             
+            EN.ENTITYTYPE    = OPEN.ENTITY2TYPE AND              
+            EN.ENTITYID      = OPEN.ENTITY2ID AND                  
+            EN.ATTRIBUTECODE = 'NAME' AND                     
+            :ValOn>= EN.VALFrom    AND        
+            :ValOn<  EN.VALTo       AND        
+            :EffOn >= EN.EffFrom    AND        
+                    :EffOn <  EN.EffTo                  
+                    WHERE                                                 
+                    OPNAME.ENTERPRISE    = :Enterprise AND                      
+                    OPNAME.ENTITYTYPE    = 'OP' AND                      
+                    OPNAME.ATTRIBUTECODE = 'NAME' AND                 
+                    OPNAME.ENTITYID = :Operator AND    
+                    :ValOn>= OPNAME.VALFrom    AND        
+                    :ValOn< OPNAME.VALTo       AND        
+                    :EffOn >= OPNAME.EffFrom    AND        
+                    :EffOn < OPNAME.EffTo                  
+               ORDER BY  COL1,                
+                COL2, COL3, COL4, COL5 ;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in Operator int
+in OPENID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

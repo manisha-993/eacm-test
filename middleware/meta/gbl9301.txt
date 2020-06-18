@@ -1,0 +1,85 @@
+@name=GBL9301
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------
+-- Pulling out FEATUREDetail info for FeatureDetail
+----------------------------------------------------------------------
+$Log: gbl9301.txt,v $
+Revision 1.10  2010/06/21 15:43:04  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.9  2005/09/13 20:59:00  joan
+change for column
+
+Revision 1.8  2005/06/23 21:20:45  joan
+adjust for countrylist
+
+Revision 1.7  2005/06/15 21:33:17  joan
+add code
+
+Revision 1.6  2005/05/24 19:39:52  joan
+fixes
+
+Revision 1.5  2005/05/20 19:45:38  joan
+fixes
+
+Revision 1.4  2005/05/16 21:42:32  joan
+change table
+
+Revision 1.3  2005/05/13 16:04:49  joan
+initial load
+
+Revision 1.2  2005/05/02 21:25:08  joan
+fix compile
+
+Revision 1.1  2005/05/02 21:03:31  joan
+work on comp
+
+
+
+@desc=Pulling out FEATUREDetail info
+@fenced=true
+@parmstyle=GENERAL
+@sql
+@results=1
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9301.txt,v 1.10 2010/06/21 15:43:04 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE Cur CURSOR FOR
+
+SELECT 
+  ATTCODE
+, EXTERNALATTCODE
+, ATTVALUE 
+, ATTUNITOFMEASURE
+, ISDERIVED
+, VALFROM
+, VALTO
+, ISACTIVE
+
+FROM GBLI.FEATUREDETAIL
+ WHERE 
+ENTERPRISE = :Enterprise 
+AND FEATENTITYTYPE = :FeatEntityType
+AND FEATENTITYID = :FeatEntityID
+AND ITEMENTITYTYPE = :ItemEntityType
+AND ITEMENTITYID = :ItemEntityID
+AND COUNTRYLIST = :CountryList
+;
+                                         
+
+@execute
+
+EXEC SQL OPEN Cur;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(8)
+in CountryList varchar(8)
+in FeatEntityType varchar(32)
+in FeatEntityID int
+in ItemEntityType varchar(32)
+in ItemEntityID int
+@end

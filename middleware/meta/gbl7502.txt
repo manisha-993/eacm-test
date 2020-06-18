@@ -1,0 +1,178 @@
+@name=GBL7502
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@results=1
+@narrative
+
+$Log: gbl7502.txt,v $
+Revision 1.24  2010/06/21 15:42:57  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.23  2006/02/17 23:35:57  yang
+should compile now
+
+Revision 1.22  2006/02/17 22:38:57  yang
+more changes
+
+Revision 1.21  2006/02/17 21:52:12  yang
+minor fixes
+
+Revision 1.20  2006/02/17 00:20:48  yang
+adding SetAttributeType capability
+
+Revision 1.19  2004/10/20 21:01:44  dave
+changes to gen parm
+
+Revision 1.18  2004/04/30 20:03:57  gregg
+more fix
+
+Revision 1.17  2004/04/30 19:40:35  gregg
+compile fix
+
+Revision 1.16  2004/04/29 16:52:37  gregg
+more on Derived attributes
+
+Revision 1.15  2004/03/31 00:35:19  gregg
+derived attribtues
+
+Revision 1.14  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.13  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.12  2003/09/08 16:31:16  roger
+Enterprise was changed to 16 char length
+
+Revision 1.11  2003/04/12 22:31:38  dave
+clean up and reformatting.
+Search Lite weight II
+
+Revision 1.10  2003/04/02 21:01:01  dave
+removing setperm in GBL7502
+
+Revision 1.9  2003/02/25 22:48:21  dave
+do not need column order any more.  Will be imposed by
+a new column order object during navigates and
+edits
+
+Revision 1.8  2002/04/09 01:08:52  dave
+do not forget to convert L to A --- > single to multi
+
+Revision 1.7  2002/03/05 02:47:30  dave
+missing ;
+
+Revision 1.6  2002/02/28 19:30:14  dave
+simpified the Pulling of data for Attributes
+
+
+@desc=retreive all AttributeCodes including AttType and DisplayOrder for a given entity based on Role
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7502.txt,v 1.24 2010/06/21 15:42:57 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+
+SELECT
+ 1
+,RTRIM(EA.LINKTYPE2)
+,(CASE WHEN MLA.LINKVALUE IS NOT NULL THEN RTRIM(MLA.LINKVALUE) ELSE RTRIM(ME.ENTITYCLASS) END)
+FROM  @t_schema.METALINKATTR EA
+
+JOIN @t_schema.METALINKATTR CAP on
+    CAP.enterprise = EA.enterprise
+AND CAP.linktype = 'Role/Attribute'
+AND CAP.linktype1 = :RoleCode
+AND CAP.linktype2 = EA.linktype2
+AND CAP.linkcode = 'Capability'
+AND CAP.valfrom <= :ValOn
+AND CAP.valto > :ValOn
+AND CAP.efffrom <= :EffOn
+AND CAP.effto > :EffOn
+
+JOIN @t_schema.METAENTITY ME ON
+    ME.enterprise = EA.enterprise
+AND ME.entitytype = EA.linktype2
+AND ME.entityclass IN ('T', 'I', 'L', 'F', 'U', 'S', 'A','X','B')
+AND ME.valfrom <= :ValOn
+AND ME.valto > :ValOn
+AND ME.efffrom <= :EffOn
+AND ME.effto > :EffOn
+
+LEFT JOIN @t_schema.METALINKATTR MLA on
+    MLA.enterprise = EA.enterprise
+AND MLA.linktype = 'Entity/Attribute'
+AND MLA.linktype1 = EA.linktype1
+AND MLA.linktype2 = EA.linktype2
+AND MLA.linkcode = 'SetAttributeType'
+AND MLA.valfrom <= :ValOn
+AND MLA.valto > :ValOn
+AND MLA.efffrom <= :EffOn
+AND MLA.effto > :EffOn
+
+
+WHERE
+
+    EA.enterprise = :Enterprise
+AND EA.linktype = 'Entity/Attribute'
+AND EA.linktype1 = :EntityType
+AND EA.linkcode = 'EntityAttribute'
+AND EA.valfrom <= :ValOn
+AND EA.valto > :ValOn
+AND EA.efffrom <= :EffOn
+AND EA.effto > :EffOn
+
+UNION ALL
+SELECT
+ 999
+,RTRIM(MLADERIVED.LinkType2)
+,'DT'
+FROM @t_schema.METALINKATTR MLADERIVED
+
+JOIN @t_schema.METALINKATTR CAP on
+    CAP.enterprise = MLADERIVED.enterprise
+AND CAP.linktype = 'Role/Attribute'
+AND CAP.linktype1 = :RoleCode
+AND CAP.linktype2 = MLADERIVED.linktype2
+AND CAP.linkcode = 'Capability'
+AND CAP.valfrom <= :ValOn
+AND CAP.valto > :ValOn
+AND CAP.efffrom <= :EffOn
+AND CAP.effto > :EffOn
+
+JOIN @t_schema.METAENTITY ME ON
+    ME.enterprise = MLADERIVED.enterprise
+AND ME.entitytype = MLADERIVED.linktype2
+AND ME.entityclass = 'DT'
+AND ME.valfrom <= :ValOn
+AND ME.valto > :ValOn
+AND ME.efffrom <= :EffOn
+AND ME.effto > :EffOn
+
+WHERE
+    MLADERIVED.enterprise = :Enterprise
+AND MLADERIVED.linktype = 'Entity/Attribute'
+AND MLADERIVED.linktype1 = :EntityType
+AND MLADERIVED.linkcode = 'Derived'
+AND MLADERIVED.valfrom <= :ValOn
+AND MLADERIVED.valto > :ValOn
+AND MLADERIVED.efffrom <= :EffOn
+AND MLADERIVED.effto > :EffOn
+;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in RoleCode varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

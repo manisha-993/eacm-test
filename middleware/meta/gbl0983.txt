@@ -1,0 +1,643 @@
+@name=GBL0983
+@type=basic
+@dbase=opicmpdh
+@noremote=true
+@narrative
+@nulls_ok=true
+
+Manages the update of an Product Reocrd
+
+//
+// $Log: gbl0983.txt,v $
+// Revision 1.29  2010/09/23 15:12:15  praveen
+// Change the sequence of argument list
+//
+// Revision 1.28  2010/09/23 00:15:54  praveen
+// Add SPECMODDESIGN as part of Lenovo PCE sunset release
+//
+// Revision 1.27  2010/07/21 19:57:38  praveen
+// Change Long data type to Sqlint32 in support for db2 9.5
+//
+// Revision 1.26  2009/01/27 16:45:04  praveen
+// *** empty log message ***
+//
+// Revision 1.25  2009/01/23 00:07:58  praveen
+// Supporting dual catdb schema
+//
+// Revision 1.24  2006/05/06 16:25:38  dave
+// <No Comment Entered>
+//
+// Revision 1.23  2006/05/06 16:16:59  dave
+// spfix
+//
+// Revision 1.22  2006/05/06 16:00:14  dave
+// new sp columns for simp
+//
+// Revision 1.21  2006/05/01 16:12:31  gregg
+// add nlsid into where clause
+//
+// Revision 1.20  2006/04/27 20:53:33  gregg
+// more dayte type-O's.
+//
+// Revision 1.19  2006/04/27 20:52:41  gregg
+// anndate typo fix
+//
+// Revision 1.18  2006/04/27 17:02:22  gregg
+// packagevalfrom
+//
+// Revision 1.17  2006/04/24 22:51:49  dave
+// sp fixes
+//
+// Revision 1.16  2006/03/27 06:30:47  dave
+// parm len
+//
+// Revision 1.15  2006/03/27 04:44:08  dave
+// making 3
+//
+// Revision 1.14  2006/03/27 03:55:08  dave
+// minor changes
+//
+// Revision 1.13  2006/03/25 19:53:20  dave
+// new columns for SImplification
+//
+// Revision 1.12  2006/03/06 02:46:46  dave
+// more trace
+//
+// Revision 1.11  2006/03/06 02:29:49  dave
+// more trace
+//
+// Revision 1.10  2006/03/06 02:19:38  dave
+// fixing trace
+//
+// Revision 1.9  2006/03/05 18:13:32  dave
+// another parm fix
+//
+// Revision 1.8  2006/03/05 18:05:03  dave
+// final fix
+//
+// Revision 1.7  2006/03/05 17:57:25  dave
+// fix to parm
+//
+// Revision 1.6  2006/03/05 17:48:12  dave
+// more fixes
+//
+// Revision 1.3  2006/03/05 17:07:31  dave
+// added nulls
+//
+// Revision 1.2  2006/03/04 22:52:21  dave
+// gbli to bigcat
+//
+// Revision 1.1  2006/03/04 22:13:39  dave
+// adding new Simp SP's
+//
+//
+@desc= Manages the update of a Product Reocrd
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0983.txt,v 1.29 2010/09/23 15:12:15 praveen Exp $";
+sqlint32 count = 0;
+char tstamp[27];
+EXEC SQL END DECLARE SECTION;
+
+
+//
+// BEGIN ERROR CHECK DECLARE SECTION
+//
+const int SQLERROR = -1;
+const int SQLCOMPLETE = 1;
+//set this to SQLCOMPLETE when finished!
+int m_iSQLState = SQLERROR;
+EXEC SQL WHENEVER SQLERROR GOTO error_exit;
+EXEC SQL WHENEVER SQLWARNING CONTINUE;
+//
+// END ERROR CHECK DECLARE SECTION
+//
+
+
+@execute
+
+if (strcmp(schema,"BIGCAT") == 0) {
+
+	EXEC SQL
+
+	Select count(*) into :count
+	from bigcat.Product where
+	enterprise = :enterprise and
+	LOCEntityType = :locentitytype and
+	LOCEntityID = :locentityid and
+	countrycode = :countrycode and
+	languagecode = :languagecode and
+	nlsid = :nlsid
+	;
+
+	if (count == 0 && isactive == 0) {
+
+	  // do nothing
+
+	} else if (count == 0 && isactive == 1) {
+
+	    // insert this guy
+	    EXEC SQL
+	    insert into bigcat.product
+	    (
+	    enterprise,
+	    countrycode,
+	    languagecode,
+	    nlsid,
+	    countrylist,
+	    wwentitytype,
+	    wwentityid,
+	    locentitytype,
+	    locentityid,
+	    modelname,
+	    wwpartnumber,
+	    partnumber,
+	    marketingdesc,
+	    anndate,
+	    withdrawldate,
+	    fotdate,
+	    planavaildate,
+	    pubfromdate,
+	    pubtodate,
+	    flfilsysindc,
+	    flfilsysindc_fc,
+	    mktgname,
+	    shortdesc,
+	    warrtype,
+	    warrtype_fc,
+	    warrpriod,
+	    warrpriod_fc,
+	    installable,
+	    installable_fc,
+	    configuratorname,
+	    navbarfilename,
+	    auxdesc1,
+	    publishflag,
+	    fotpublishflag,
+	    status,
+	    status_fc,
+            specmoddesign,
+            specmoddesign_fc,	    
+	    featuredescs,
+	    attrvalfrom,
+	    packagevalfrom,
+	    valfrom,
+	    valto,
+	    isactive
+	    )
+	    values (
+	    :enterprise,
+	    :countrycode,
+	    :languagecode,
+	    :nlsid,
+	    :countrylist,
+	    :wwentitytype,
+	    :wwentityid,
+	    :locentitytype,
+	    :locentityid,
+	    CASE :modelname WHEN 'null' then NULL else :modelname END,
+	    CASE :wwpartnumber WHEN 'null' then NULL else :wwpartnumber END,
+	    CASE :partnumber WHEN 'null' then NULL else :partnumber END,
+	    CASE :marketingdesc WHEN 'null' then NULL else :marketingdesc END,
+	    CASE :anndate WHEN 'null' THEN NULL ELSE :anndate END ,
+	    CASE :withdrawldate WHEN 'null' THEN NULL ELSE :withdrawldate END ,
+	    CASE :fotdate WHEN 'null' THEN NULL ELSE :fotdate END ,
+	    CASE :planavaildate WHEN 'null' THEN NULL ELSE :planavaildate END ,
+	    CASE :pubfromdate WHEN 'null' THEN NULL ELSE :pubfromdate END ,
+	    CASE :pubtodate WHEN 'null' THEN NULL ELSE :pubtodate END ,
+	    CASE :flfilsysindc WHEN 'null' THEN NULL ELSE :flfilsysindc END,
+	    CASE :flfilsysindc_fc WHEN 'null' THEN NULL ELSE :flfilsysindc_fc END,
+	    CASE :mktgname WHEN 'null' THEN NULL ELSE :mktgname END,
+	    CASE :shortdesc WHEN 'null' THEN NULL ELSE :shortdesc END,
+	    CASE :warrtype WHEN 'null' THEN NULL ELSE :warrtype END,
+	    CASE :warrtype_fc WHEN 'null' THEN NULL ELSE :warrtype_fc END,
+	    CASE :warrpriod WHEN 'null' THEN NULL ELSE :warrpriod END,
+	    CASE :warrpriod_fc WHEN 'null' THEN NULL ELSE :warrpriod_fc END,
+	    CASE :installable WHEN 'null' THEN NULL ELSE :installable END,
+	    CASE :installable_fc WHEN 'null' THEN NULL ELSE :installable_fc END,
+	    CASE :configuratorname WHEN 'null' THEN NULL ELSE :configuratorname END,
+	    CASE :navbarfilename WHEN 'null' THEN NULL ELSE :navbarfilename END,
+	    CASE :auxdesc1 WHEN 'null' THEN NULL ELSE :auxdesc1 END,
+	    CASE :publishflag WHEN 'null' THEN NULL ELSE :publishflag END,
+	    CASE :fotpublishflag WHEN 'null' THEN NULL ELSE :fotpublishflag END,
+	    CASE :status WHEN 'null' THEN NULL ELSE :status END,
+	    CASE :status_fc WHEN 'null' THEN NULL ELSE :status_fc END,
+            CASE :specmoddesign WHEN 'null' THEN NULL ELSE :specmoddesign END,
+            CASE :specmoddesign_fc WHEN 'null' THEN NULL ELSE :specmoddesign_fc END,	    
+	    CASE :featuredescs WHEN 'null' THEN NULL ELSE :featuredescs END,
+	    :attrvalfrom,
+	    :packagevalfrom,
+	    current timestamp,
+	    '9999-12-31-00.00.00.000000',
+	    1
+	    );
+
+	} else if (count != 0 && isactive == 1) {
+
+	    // update this guy
+	    EXEC SQL
+	    update bigcat.product
+	    set
+	    enterprise = :enterprise,
+	    countrycode = :countrycode,
+	    languagecode = :languagecode,
+	    nlsid = :nlsid,
+	    countrylist = :countrylist,
+	    wwentitytype = :wwentitytype,
+	    wwentityid = :wwentityid,
+	    locentitytype = :locentitytype,
+	    locentityid = :locentityid,
+	    modelname = CASE :modelname WHEN 'null' then NULL else :modelname END,
+	    wwpartnumber = CASE :wwpartnumber WHEN 'null' then NULL else :wwpartnumber END,
+	    partnumber = CASE :partnumber WHEN 'null' then NULL else :partnumber END,
+	    marketingdesc = CASE :marketingdesc WHEN 'null' then NULL else :marketingdesc END,
+	    anndate = CASE :anndate WHEN 'null' THEN NULL ELSE :anndate END ,
+	    withdrawldate = CASE :withdrawldate WHEN 'null' THEN NULL ELSE :withdrawldate END ,
+	    fotdate = CASE :fotdate WHEN 'null' THEN NULL ELSE :fotdate END ,
+	    planavaildate = CASE :planavaildate WHEN 'null' THEN NULL ELSE :planavaildate END ,
+	    pubfromdate = CASE :pubfromdate WHEN 'null' THEN NULL ELSE :pubfromdate END ,
+	    pubtodate = CASE :pubtodate WHEN 'null' THEN NULL ELSE :pubtodate END ,
+	    flfilsysindc = CASE :flfilsysindc WHEN 'null' THEN NULL ELSE :flfilsysindc END,
+	    flfilsysindc_fc = CASE :flfilsysindc_fc WHEN 'null' THEN NULL ELSE :flfilsysindc_fc END,
+	    mktgname = CASE :mktgname WHEN 'null' THEN NULL ELSE :mktgname END,
+	    shortdesc = CASE :shortdesc WHEN 'null' THEN NULL ELSE :shortdesc END,
+	    warrtype = CASE :warrtype WHEN 'null' THEN NULL ELSE :warrtype END,
+	    warrtype_fc = CASE :warrtype_fc WHEN 'null' THEN NULL ELSE :warrtype_fc END,
+	    warrpriod = CASE :warrpriod WHEN 'null' THEN NULL ELSE :warrpriod END,
+	    warrpriod_fc = CASE :warrpriod_fc WHEN 'null' THEN NULL ELSE :warrpriod_fc END,
+	    installable = CASE :installable WHEN 'null' THEN NULL ELSE :installable END,
+	    installable_fc = CASE :installable_fc WHEN 'null' THEN NULL ELSE :installable_fc END,
+	    configuratorname = CASE :configuratorname WHEN 'null' THEN NULL ELSE :configuratorname END,
+	    navbarfilename = CASE :navbarfilename WHEN 'null' THEN NULL ELSE :navbarfilename END,
+	    auxdesc1 = CASE :auxdesc1 WHEN 'null' THEN NULL ELSE :auxdesc1 END,
+	    publishflag = CASE :publishflag WHEN 'null' THEN NULL ELSE :publishflag END,
+	    fotpublishflag = CASE :fotpublishflag WHEN 'null' THEN NULL ELSE :fotpublishflag END,
+	    status = CASE :status WHEN 'null' THEN NULL ELSE :status END,
+	    status_fc = CASE :status_fc WHEN 'null' THEN NULL ELSE :status_fc END,
+            specmoddesign = CASE :specmoddesign WHEN 'null' THEN NULL ELSE :specmoddesign END,
+            specmoddesign_fc = CASE :specmoddesign_fc WHEN 'null' THEN NULL ELSE :specmoddesign_fc END,	    
+	    featuredescs = CASE :featuredescs WHEN 'null' THEN NULL ELSE :featuredescs END,
+	    attrvalfrom = :attrvalfrom,
+	    packagevalfrom = :packagevalfrom,
+	    valfrom = current timestamp,
+	    valto = '9999-12-31-00.00.00.000000',
+	    isactive = 1
+	    where
+	    enterprise = :enterprise and
+	    locentitytype = :locentitytype and
+	    locentityid = :locentityid and
+	    countrylist = :countrylist and
+	    nlsid = :nlsid
+	  ;
+
+	} else {
+
+	    // turn it off
+	    EXEC SQL
+	    update bigcat.product
+	    set
+	    valfrom = current timestamp,
+	    valto  =  current timestamp,
+	    isactive = 0
+	    where
+	    enterprise = :enterprise and
+	    locentitytype = :locentitytype and
+	    locentityid = :locentityid and
+	    countrylist = :countrylist and
+	    nlsid = :nlsid
+	    ;
+
+	}
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+
+
+	EXEC SQL
+
+	Select count(*) into :count
+	from ibmcat.Product where
+	enterprise = :enterprise and
+	LOCEntityType = :locentitytype and
+	LOCEntityID = :locentityid and
+	countrycode = :countrycode and
+	languagecode = :languagecode and
+	nlsid = :nlsid
+	;
+
+	if (count == 0 && isactive == 0) {
+
+	  // do nothing
+
+	} else if (count == 0 && isactive == 1) {
+
+	    // insert this guy
+	    EXEC SQL
+	    insert into ibmcat.product
+	    (
+	    enterprise,
+	    countrycode,
+	    languagecode,
+	    nlsid,
+	    countrylist,
+	    wwentitytype,
+	    wwentityid,
+	    locentitytype,
+	    locentityid,
+	    modelname,
+	    wwpartnumber,
+	    partnumber,
+	    marketingdesc,
+	    anndate,
+	    withdrawldate,
+	    fotdate,
+	    planavaildate,
+	    pubfromdate,
+	    pubtodate,
+	    flfilsysindc,
+	    flfilsysindc_fc,
+	    mktgname,
+	    shortdesc,
+	    warrtype,
+	    warrtype_fc,
+	    warrpriod,
+	    warrpriod_fc,
+	    installable,
+	    installable_fc,
+	    configuratorname,
+	    navbarfilename,
+	    auxdesc1,
+	    publishflag,
+	    fotpublishflag,
+	    status,
+	    status_fc,
+	    featuredescs,
+	    attrvalfrom,
+	    packagevalfrom,
+	    valfrom,
+	    valto,
+	    isactive
+	    )
+	    values (
+	    :enterprise,
+	    :countrycode,
+	    :languagecode,
+	    :nlsid,
+	    :countrylist,
+	    :wwentitytype,
+	    :wwentityid,
+	    :locentitytype,
+	    :locentityid,
+	    CASE :modelname WHEN 'null' then NULL else :modelname END,
+	    CASE :wwpartnumber WHEN 'null' then NULL else :wwpartnumber END,
+	    CASE :partnumber WHEN 'null' then NULL else :partnumber END,
+	    CASE :marketingdesc WHEN 'null' then NULL else :marketingdesc END,
+	    CASE :anndate WHEN 'null' THEN NULL ELSE :anndate END ,
+	    CASE :withdrawldate WHEN 'null' THEN NULL ELSE :withdrawldate END ,
+	    CASE :fotdate WHEN 'null' THEN NULL ELSE :fotdate END ,
+	    CASE :planavaildate WHEN 'null' THEN NULL ELSE :planavaildate END ,
+	    CASE :pubfromdate WHEN 'null' THEN NULL ELSE :pubfromdate END ,
+	    CASE :pubtodate WHEN 'null' THEN NULL ELSE :pubtodate END ,
+	    CASE :flfilsysindc WHEN 'null' THEN NULL ELSE :flfilsysindc END,
+	    CASE :flfilsysindc_fc WHEN 'null' THEN NULL ELSE :flfilsysindc_fc END,
+	    CASE :mktgname WHEN 'null' THEN NULL ELSE :mktgname END,
+	    CASE :shortdesc WHEN 'null' THEN NULL ELSE :shortdesc END,
+	    CASE :warrtype WHEN 'null' THEN NULL ELSE :warrtype END,
+	    CASE :warrtype_fc WHEN 'null' THEN NULL ELSE :warrtype_fc END,
+	    CASE :warrpriod WHEN 'null' THEN NULL ELSE :warrpriod END,
+	    CASE :warrpriod_fc WHEN 'null' THEN NULL ELSE :warrpriod_fc END,
+	    CASE :installable WHEN 'null' THEN NULL ELSE :installable END,
+	    CASE :installable_fc WHEN 'null' THEN NULL ELSE :installable_fc END,
+	    CASE :configuratorname WHEN 'null' THEN NULL ELSE :configuratorname END,
+	    CASE :navbarfilename WHEN 'null' THEN NULL ELSE :navbarfilename END,
+	    CASE :auxdesc1 WHEN 'null' THEN NULL ELSE :auxdesc1 END,
+	    CASE :publishflag WHEN 'null' THEN NULL ELSE :publishflag END,
+	    CASE :fotpublishflag WHEN 'null' THEN NULL ELSE :fotpublishflag END,
+	    CASE :status WHEN 'null' THEN NULL ELSE :status END,
+	    CASE :status_fc WHEN 'null' THEN NULL ELSE :status_fc END,
+	    CASE :featuredescs WHEN 'null' THEN NULL ELSE :featuredescs END,
+	    :attrvalfrom,
+	    :packagevalfrom,
+	    current timestamp,
+	    '9999-12-31-00.00.00.000000',
+	    1
+	    );
+
+	} else if (count != 0 && isactive == 1) {
+
+	    // update this guy
+	    EXEC SQL
+	    update ibmcat.product
+	    set
+	    enterprise = :enterprise,
+	    countrycode = :countrycode,
+	    languagecode = :languagecode,
+	    nlsid = :nlsid,
+	    countrylist = :countrylist,
+	    wwentitytype = :wwentitytype,
+	    wwentityid = :wwentityid,
+	    locentitytype = :locentitytype,
+	    locentityid = :locentityid,
+	    modelname = CASE :modelname WHEN 'null' then NULL else :modelname END,
+	    wwpartnumber = CASE :wwpartnumber WHEN 'null' then NULL else :wwpartnumber END,
+	    partnumber = CASE :partnumber WHEN 'null' then NULL else :partnumber END,
+	    marketingdesc = CASE :marketingdesc WHEN 'null' then NULL else :marketingdesc END,
+	    anndate = CASE :anndate WHEN 'null' THEN NULL ELSE :anndate END ,
+	    withdrawldate = CASE :withdrawldate WHEN 'null' THEN NULL ELSE :withdrawldate END ,
+	    fotdate = CASE :fotdate WHEN 'null' THEN NULL ELSE :fotdate END ,
+	    planavaildate = CASE :planavaildate WHEN 'null' THEN NULL ELSE :planavaildate END ,
+	    pubfromdate = CASE :pubfromdate WHEN 'null' THEN NULL ELSE :pubfromdate END ,
+	    pubtodate = CASE :pubtodate WHEN 'null' THEN NULL ELSE :pubtodate END ,
+	    flfilsysindc = CASE :flfilsysindc WHEN 'null' THEN NULL ELSE :flfilsysindc END,
+	    flfilsysindc_fc = CASE :flfilsysindc_fc WHEN 'null' THEN NULL ELSE :flfilsysindc_fc END,
+	    mktgname = CASE :mktgname WHEN 'null' THEN NULL ELSE :mktgname END,
+	    shortdesc = CASE :shortdesc WHEN 'null' THEN NULL ELSE :shortdesc END,
+	    warrtype = CASE :warrtype WHEN 'null' THEN NULL ELSE :warrtype END,
+	    warrtype_fc = CASE :warrtype_fc WHEN 'null' THEN NULL ELSE :warrtype_fc END,
+	    warrpriod = CASE :warrpriod WHEN 'null' THEN NULL ELSE :warrpriod END,
+	    warrpriod_fc = CASE :warrpriod_fc WHEN 'null' THEN NULL ELSE :warrpriod_fc END,
+	    installable = CASE :installable WHEN 'null' THEN NULL ELSE :installable END,
+	    installable_fc = CASE :installable_fc WHEN 'null' THEN NULL ELSE :installable_fc END,
+	    configuratorname = CASE :configuratorname WHEN 'null' THEN NULL ELSE :configuratorname END,
+	    navbarfilename = CASE :navbarfilename WHEN 'null' THEN NULL ELSE :navbarfilename END,
+	    auxdesc1 = CASE :auxdesc1 WHEN 'null' THEN NULL ELSE :auxdesc1 END,
+	    publishflag = CASE :publishflag WHEN 'null' THEN NULL ELSE :publishflag END,
+	    fotpublishflag = CASE :fotpublishflag WHEN 'null' THEN NULL ELSE :fotpublishflag END,
+	    status = CASE :status WHEN 'null' THEN NULL ELSE :status END,
+	    status_fc = CASE :status_fc WHEN 'null' THEN NULL ELSE :status_fc END,
+	    featuredescs = CASE :featuredescs WHEN 'null' THEN NULL ELSE :featuredescs END,
+	    attrvalfrom = :attrvalfrom,
+	    packagevalfrom = :packagevalfrom,
+	    valfrom = current timestamp,
+	    valto = '9999-12-31-00.00.00.000000',
+	    isactive = 1
+	    where
+	    enterprise = :enterprise and
+	    locentitytype = :locentitytype and
+	    locentityid = :locentityid and
+	    countrylist = :countrylist and
+	    nlsid = :nlsid
+	  ;
+
+	} else {
+
+	    // turn it off
+	    EXEC SQL
+	    update ibmcat.product
+	    set
+	    valfrom = current timestamp,
+	    valto  =  current timestamp,
+	    isactive = 0
+	    where
+	    enterprise = :enterprise and
+	    locentitytype = :locentitytype and
+	    locentityid = :locentityid and
+	    countrylist = :countrylist and
+	    nlsid = :nlsid
+	    ;
+
+	}
+}
+
+//
+// BEGIN ERROR CHECK SECTION
+//
+
+  // this won't get executed if sql error occurs
+m_iSQLState = SQLCOMPLETE;
+
+error_exit:
+
+if(m_iSQLState == SQLERROR) {
+
+    // ensure no infinite loops in the case that a failed SQL connection is used past this point...
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+
+    FILE *t;
+    mode_t Mode2;
+    Mode2 = 0777;
+    chmod("/tmp/0983.log",Mode2);
+    // append...
+    t=fopen("/tmp/0983.log","w");
+
+
+    fprintf(t,"********************  GBL0983 SQLCA DUMP  ********************\n");
+    char msg[1025];
+    sqlaintp(msg, 1024, 0, &sqlca);
+    fprintf(t,"msg:%s\n",msg);
+    fprintf(t,"SQLCAID: %s\n", sqlca.sqlcaid);
+    fprintf(t,"SQLCABC: %d\n", sqlca.sqlcabc);
+    fprintf(t,"SQLCODE: %d\n", sqlca.sqlcode);
+    fprintf(t,"SQLERRML: %d\n", sqlca.sqlerrml);
+    fprintf(t,"SQLERRMC: %s\n", sqlca.sqlerrmc);
+    fprintf(t,"SQLERRP: %s\n", sqlca.sqlerrp);
+    fprintf(t,"SQLERRD[0]: %d\n", sqlca.sqlerrd[0]);
+    fprintf(t,"SQLERRD[1]: %d\n", sqlca.sqlerrd[1]);
+    fprintf(t,"SQLERRD[2]: %d\n", sqlca.sqlerrd[2]);
+    fprintf(t,"SQLERRD[3]: %d\n", sqlca.sqlerrd[3]);
+    fprintf(t,"SQLERRD[4]: %d\n", sqlca.sqlerrd[4]);
+    fprintf(t,"SQLERRD[5]: %d\n", sqlca.sqlerrd[5]);
+    fprintf(t,"SQLWARN: %s\n", sqlca.sqlwarn);
+    fprintf(t,"SQLSTATE: %s\n", sqlca.sqlstate);
+    //
+    // Dumping Input params:
+    fprintf(t,"enterprise:\"%s\"\n",enterprise);
+    fprintf(t,"countrycode:\"%s\"\n",countrycode);
+    fprintf(t,"languagecode:\"%s\"\n",languagecode);
+    fprintf(t,"nlsid:\"%d\"\n",nlsid);
+    fprintf(t,"countrylist:\"%s\"\n",countrylist);
+    fprintf(t,"wwentitytype:\"%s\"\n",wwentitytype);
+    fprintf(t,"wwentityid:\"%d\"\n",wwentityid);
+    fprintf(t,"locentitytype:\"%s\"\n",locentitytype);
+    fprintf(t,"locentityid:\"%d\"\n",locentityid);
+    fprintf(t,"modelname:\"%s\"\n",modelname);
+    fprintf(t,"wwpartnumber:\"%s\"\n",wwpartnumber);
+    fprintf(t,"partnumber:\"%s\"\n",partnumber);
+    fprintf(t,"marketingdesc:\"%s\"\n",marketingdesc);
+    fprintf(t,"anndate:\"%s\"\n",anndate);
+    fprintf(t,"withdrawldate:\"%s\"\n",withdrawldate);
+    fprintf(t,"fotdate:\"%s\"\n",fotdate);
+    fprintf(t,"planavaildate:\"%s\"\n",planavaildate);
+    fprintf(t,"pubfromdate:\"%s\"\n",pubfromdate);
+    fprintf(t,"pubtodate:\"%s\"\n",pubtodate);
+    fprintf(t,"flfilsysindc:\"%s\"\n",flfilsysindc);
+    fprintf(t,"flfilsysindc_fc:\"%s\"\n",flfilsysindc_fc);
+    fprintf(t,"mktgname:\"%s\"\n",mktgname);
+    fprintf(t,"shortdesc:\"%s\"\n",shortdesc);
+    fprintf(t,"warrtype:\"%s\"\n",warrtype);
+    fprintf(t,"warrtype_fc:\"%s\"\n",warrtype_fc);
+    fprintf(t,"warrpriod:\"%s\"\n",warrpriod);
+    fprintf(t,"warrpriod_fc:\"%s\"\n",warrpriod_fc);
+    fprintf(t,"installable:\"%s\"\n",installable);
+    fprintf(t,"installable_fc:\"%s\"\n",installable_fc);
+    fprintf(t,"configuratorname:\"%s\"\n",configuratorname);
+    fprintf(t,"navbarfilename:\"%s\"\n",navbarfilename);
+    fprintf(t,"auxdesc1:\"%s\"\n",auxdesc1);
+    fprintf(t,"publishflag:\"%s\"\n",publishflag);
+    fprintf(t,"fotpublishflag:\"%s\"\n",fotpublishflag);
+    fprintf(t,"status:\"%s\"\n",status);
+    fprintf(t,"status_fc:\"%s\"\n",status_fc);
+    fprintf(t,"attrvalfrom:\"%s\"\n",attrvalfrom);
+    fprintf(t,"packagevalfrom:\"%s\"\n",packagevalfrom);
+    fprintf(t,"isactive:\"%d\"\n",isactive);
+    // End dump params
+    fprintf(t,"******************  END OF GBL0983 SQLCA DUMP  *******************\n");
+    fclose(t);
+
+}
+//
+// END ERROR CHECK SECTION
+//
+
+
+//EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in enterprise varchar(8)
+in countrycode varchar(2)
+in languagecode varchar(2)
+in nlsid int
+in countrylist varchar(8)
+in wwentitytype varchar(32)
+in wwentityid int
+in locentitytype varchar(32)
+in locentityid int
+in modelname varchar(12)
+in wwpartnumber varchar(12)
+in partnumber varchar(7)
+in marketingdesc varchar(254)
+in anndate varchar(10)
+in withdrawldate varchar(10)
+in fotdate varchar(10)
+in planavaildate varchar(10)
+in pubfromdate varchar(10)
+in pubtodate varchar(10)
+in flfilsysindc varchar(32)
+in flfilsysindc_fc varchar(8)
+in mktgname varchar(254)
+in shortdesc varchar(254)
+in warrtype varchar(128)
+in warrtype_fc varchar(8)
+in warrpriod varchar(128)
+in warrpriod_fc varchar(8)
+in installable varchar(4)
+in installable_fc varchar(8)
+in configuratorname varchar(64)
+in navbarfilename varchar(64)
+in auxdesc1 varchar(254)
+in publishflag varchar(4)
+in fotpublishflag varchar(4)
+in status varchar(16)
+in status_fc varchar(8)
+in featuredescs varchar(10001)
+in attrvalfrom varchar(27)
+in packagevalfrom varchar(27)
+in isactive int
+in schema varchar(8)
+in specmoddesign varchar(64)
+in specmoddesign_fc varchar(8)
+@end

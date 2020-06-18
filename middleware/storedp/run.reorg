@@ -1,0 +1,9 @@
+#!/bin/ksh
+
+. ~/storedp/vars
+
+date
+db2 list applications
+~/storedp/reorg.all
+~/storedp/runstats.all
+date

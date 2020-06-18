@@ -1,0 +1,138 @@
+#!/bin/sh
+
+#
+# $Id: run.shadow,v 1.1 2006/01/17 17:04:05 roger Exp $
+#
+
+#
+# settings
+#
+
+DATABASE="opicmpdh"
+USER_PW="opicmadm/cat9tail"
+SOURCE_SCHEMA="opicm"
+JOB="/tmp/jobfile"
+NOW=`date +"%Y-%m-%d-%H.%M.%S.000000"`
+OUTPUT="rpt/out.shadow."`date +"%Y%m%d%H%M%S"`
+SHADOW_SCHEMA="opicmst"
+SHADOW_TSPACE="TSPACE01"
+SHADOW_OPTIONS="data initially deferred refresh deferred not logged initially in $SHADOW_TSPACE"
+
+define()
+{
+if [ ! -e tables ]; then
+  echo "file 'tables' does not exist!"
+  exit 1
+fi
+
+cat tables | grep -v "#" |
+awk 'NR > 0 && NF > 0 {print $1}' |
+while read TABLE
+  do
+  echo "drop table $SHADOW_SCHEMA.$TABLE;" >>$JOB
+  echo "create summary table $SHADOW_SCHEMA.$TABLE as (select * from $SOURCE_SCHEMA.$TABLE) $SHADOW_OPTIONS;" >>$JOB
+  done
+}
+
+refresh()
+{
+if [ ! -e tables ]; then
+  echo "file 'tables' does not exist!"
+  exit 1
+fi
+
+cat tables | grep -v "#" |
+awk 'NR > 0 && NF > 0 {print $1}' |
+while read TABLE
+  do
+  echo "refresh table $SHADOW_SCHEMA.$TABLE;" >> $JOB
+  done
+}
+
+index()
+{
+if [ ! -e indexes ]; then
+  echo "file 'indexes' does not exist!"
+  exit 1
+fi
+
+cat indexes | grep -v "#" |
+awk 'NR > 0 && NF > 2 {print $1, $2, $3, $4}' |
+while read NAME TABLE COLS TYPE
+  do
+  echo "drop index $SHADOW_SCHEMA.$NAME;" >>$JOB
+  echo "create $TYPE index $SHADOW_SCHEMA.$NAME on $SHADOW_SCHEMA.$TABLE $COLS;" >>$JOB
+  done
+}
+
+drop()
+{
+if [ ! -e tables ]; then
+  echo "file 'tables' does not exist!"
+  exit 1
+fi
+
+cat tables |
+awk 'NR > 0 && NF > 0 {print $1}' |
+while read TABLE
+  do
+  echo "drop table $SHADOW_SCHEMA.$TABLE;" >>$JOB
+  done
+}
+
+clean()
+{
+db2 connect to opicmpdh > /dev/null
+db2 -x "select name from sysibm.systables where creator=upper('$SHADOW_SCHEMA')" | 
+awk 'NR > 0 && NF > 0 {print $1}' |
+while read TABLE
+  do
+  echo "drop table $SHADOW_SCHEMA.$TABLE;" >>$JOB
+  done
+db2 terminate > /dev/null
+}
+
+# 
+# main script
+#
+if [ ! $# = 1 ]; then
+  echo "You must provide exactly one parameter define|refresh|index|drop|clean"
+  exit 1
+fi
+
+if [ -e $JOB ]; then
+  rm $JOB
+fi
+
+case "$1" in
+define)
+  echo DEFINE
+  define
+  ;;
+refresh)
+  echo REFRESH
+  refresh
+  ;;
+index)
+  echo INDEX
+  index
+  ;;
+drop)
+  echo DROP
+  drop
+  ;;
+clean)
+  echo CLEAN
+  clean
+  ;;
+*)
+  echo "Invalid parameter!"
+  ;;
+esac
+
+if [ -e $JOB ]; then
+  cat $JOB
+  db2batch -d $DATABASE -a $USER_PW -f $JOB -r $OUTPUT
+  rm $JOB
+fi
+

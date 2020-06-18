@@ -1,0 +1,61 @@
+//
+// TEMPLATE: SHADOW.TXT (@date)
+//
+// $Log: shadow.txt,v $
+// Revision 1.1  2001/06/01 16:36:38  roger
+// New template which will be used by generator for table shadowing
+//
+//
+
+EXEC SQL BEGIN DECLARE SECTION;
+char e_brand[80] = "$Id: shadow.txt,v 1.1 2001/06/01 16:36:38 roger Exp $";
+EXEC SQL END DECLARE SECTION;
+
+// Shadow the changes to the shadow table
+
+// 1. Check for an existing row
+EXEC SQL
+SELECT
+  COUNT(*)
+INTO :row_count
+FROM @tableX
+WHERE
+@change_where
+ValTo = :forever
+;
+// If a row exists, then this is UPDATE mode
+if (row_count > 0)
+{
+// 2. Deactivate the currently active row(s)
+EXEC SQL
+UPDATE @tableX
+SET
+   ValTo = :now
+WHERE
+@update_where
+ValTo = :forever
+;
+}
+
+// 3. Insert the new row
+EXEC SQL
+INSERT
+INTO @tableX
+(
+@insert_cols
+, ValFrom
+, ValTo
+, EffFrom
+, EffTo
+, OPENID
+)
+VALUES
+(
+@insert_values
+, :now
+, :forever
+, :EffFrom
+, :EffTo
+, :OPENID
+)
+;

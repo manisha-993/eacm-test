@@ -1,0 +1,127 @@
+#!/bin/sh
+
+#
+# $Log: killtm-aix,v $
+# Revision 1.12  2004/09/15 20:22:04  roger
+# Record stop/kill/DIE in log
+#
+# Revision 1.11  2003/12/01 20:39:14  roger
+# Send mail command output to /dev/null
+#
+# Revision 1.10  2003/11/25 23:18:54  roger
+# Report home when called
+#
+# Revision 1.9  2002/10/16 19:37:01  roger
+# Support multiple instances
+#
+# Revision 1.8  2002/10/15 16:42:25  roger
+# Parameterize port settings to allow multiple instances of TM
+#
+#
+
+#
+# This script kills (with extreme prejudice) the TaskMaster under Linux or AIX
+#
+
+#
+# determine if we are AIX or Linux
+#
+OS=`uname | cut -f1`
+LINUX=`expr "Linux" = "$OS"`
+CURRENT_REPORT="./taskmaster.out"
+DIR=`basename $PWD`
+HOSTNAME=`hostname -s`
+INSTANCE="$HOSTNAME@$DIR"
+MAILTO="roger.mccarty@gbli.com"
+
+#
+# if we are Linux
+#
+if [ $LINUX -eq 1 ]; then
+  FUSER="/sbin/fuser"
+else
+  FUSER="/usr/sbin/fuser"
+fi
+
+#
+# record this execution in logfile 
+#
+echo "+++ TaskMaster instance $INSTANCE has used ./killtm-aix" >>$CURRENT_REPORT
+
+if [ ! -f taskmaster.out ]; then
+  echo "taskmaster.out does not exist -- can't determine TaskMaster processes"
+fi
+
+pid=`$FUSER taskmaster.out`
+
+#
+# log that we are killing
+#
+now=`date +%Y-%m-%d-%H.%M.%S.000000`
+echo $now KILLING TaskMaster >>$CURRENT_REPORT
+
+#
+# kill the processes which have the output file open (s/b java only)
+#
+if [ "" = "$pid" ]; then
+  echo "NO TaskMaster processes found"
+else
+  echo The following TaskMaster processes will be killed: $pid
+  kill $pid
+fi
+
+#
+# kill the RMI activation daemon
+#
+echo " "
+#pid=`ps x | grep [r]mid | awk '{print $1}'`
+#if [ "" != "$pid" ]; then
+#  echo killing RMID process $pid
+#  ps  -o "%p %a" -p "$pid"
+#  kill $pid
+#else
+#  echo "RMID is not running"
+#fi
+if [ -f rmid.pid ]; then
+  echo killing RMID
+  kill `cat rmid.pid`
+fi
+
+#
+# remove the rmid persistent info
+#
+rm -Rf log
+
+#
+# kill the rmiregistry process
+#
+echo " "
+#pid=`ps x | grep [r]miregistry | awk '{print $1}'`
+#if [ "" != "$pid" ]; then
+#  echo killing RMIREGISTRY process $pid
+#  ps  -o "%p %a" -p "$pid"
+#  kill $pid
+#else
+#  echo "RMIREGISTRY is not running"
+#fi
+if [ -f rmiregistry.pid ]; then
+  echo killing RMIREGISTRY
+  kill `cat rmiregistry.pid`
+fi
+
+#
+# remove any semaphore files
+#
+if [ -f tmrunning ]; then
+  rm tmrunning
+fi
+
+#
+# show if any process is still using the output file
+#
+$FUSER *out
+
+mail -s "TaskMaster instance $INSTANCE has used ./killtm-aix" "$MAILTO" < /dev/null > /dev/null
+
+echo " "
+echo TaskMaster is either dead, or will be very soon ...

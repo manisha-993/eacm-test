@@ -1,0 +1,61 @@
+@name=GBL0028
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+-- Cludge to get LS into production
+--------------------------------------------------------------------------------------------
+$Log: gbl0028.txt,v $
+Revision 1.5  2015/04/16 16:08:35  ptatinen
+Change results to 0 as this SP doesn't return anything
+
+Revision 1.4  2010/06/21 15:42:59  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.3  2004/10/20 21:01:38  dave
+changes to gen parm
+
+Revision 1.2  2004/04/01 18:21:45  dave
+new SP's
+
+
+@desc=PDG Kludge
+
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0028.txt,v 1.5 2015/04/16 16:08:35 ptatinen Exp $";
+EXEC SQL END DECLARE SECTION;
+@execute
+EXEC SQL UPDATE @schema.Text
+SET EFFTO = (CASE WHEN :iSwitch = 0 THEN :now ELSE :forever END), openid = :OPWGID
+WHERE
+    Enterprise =  :Enterprise
+AND EntityType = :EntityType
+AND EntityID = :EntityID
+AND AttributeCode = :AttributeCode
+AND Valto = :forever
+;
+
+EXEC SQL UPDATE @schema.Textx
+SET EFFTO = (CASE WHEN :iSwitch = 0 THEN :now ELSE :forever END), openid = :OPWGID
+WHERE
+    Enterprise =  :Enterprise
+AND EntityType = :EntityType
+AND EntityID = :EntityID
+AND AttributeCode = :AttributeCode
+AND Valto = :forever
+;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPWGID int
+in EntityType varchar(32)
+in EntityID int
+in AttributeCode varchar(32)
+in iSwitch int
+@end

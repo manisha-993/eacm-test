@@ -1,0 +1,135 @@
+@name=GBL2965
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=true
+@narrative
+---------------------------------------------------------------------------------------------
+--  This replaces WHY2965
+---------------------------------------------------------------------------------------------
+$Log: gbl2965.txt,v $
+Revision 1.14  2010/06/21 15:42:36  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.13  2004/10/20 21:01:41  dave
+changes to gen parm
+
+Revision 1.12  2004/02/20 20:21:50  roger
+Must be @t_schema
+
+Revision 1.11  2004/02/20 18:09:31  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.10  2003/04/30 22:00:09  gregg
+more Role/Entity
+
+Revision 1.9  2002/12/05 19:33:52  gregg
+get entityclass from MLA table
+
+Revision 1.8  2002/01/28 20:53:21  dave
+merging 1.0 maint into 1.1
+
+Revision 1.7  2001/10/10 17:57:23  dave
+added 'X' to the mix
+
+Revision 1.6  2001/07/21 04:02:13  roger
+Change MetaLinkAttribute to MetaLinkAttr
+Change "opicm" to @t_schema in some
+
+Revision 1.5  2001/05/30 19:29:53  dana
+add  'A' to DescriptionClass for ABR selection
+
+Revision 1.4  2001/03/16 18:27:54  roger
+Added branding feature to stored procedures
+
+Revision 1.3  2001/03/16 03:38:59  roger
+Added Log keyword
+
+@desc=
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2965.txt,v 1.14 2010/06/21 15:42:36 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  MD.Enterprise
+, MD.DescriptionType
+, COALESCE(ISREL.LINKCODE,'Entity')
+, MD.NLSID
+, MD.ShortDescription
+, MA.DescriptionType
+, (SELECT ShortDescription
+FROM @t_schema.MetaDescription MAD
+WHERE
+MAD.Enterprise = 'NE' AND
+MAD.NLSID IN (1, :NLSID)  AND
+MAD.DescriptionClass = 'AttType' AND
+MAD.DescriptionType = MA.DescriptionClass AND
+MAD.ValFrom <= :ValOn AND :ValOn < MAD.ValTo AND MAD.EffFrom <= :EffOn AND :EffOn < MAD.EffTo
+) AS AttributeType
+, MA.NLSID
+, MA.LongDescription
+, MA.ShortDescription
+FROM @t_schema.MetaEntity R
+
+INNER JOIN @t_schema.MetaDescription MD ON
+MD.Enterprise = :Enterprise AND
+MD.DescriptionClass IN ('Entity','Relator') AND
+MD.NLSID IN (1, :NLSID)  AND
+MD.ValFrom <= :ValOn AND :ValOn < MD.ValTo AND MD.EffFrom <= :EffOn AND :EffOn < MD.EffTo
+
+LEFT JOIN @t_schema.METALINKATTR ISREL ON
+    ISREL.enterprise = :Enterprise 
+AND ISREL.linkType = MD.DescriptionType
+AND ISREL.valto > :ValOn 
+AND ISREL.valfrom <= :ValOn 
+AND ISREL.effto > :EffOn 
+AND ISREL.efffrom <= :EffOn
+
+INNER JOIN @t_schema.MetaLinkAttr MRA ON
+MRA.Enterprise = :Enterprise AND
+MRA.LinkType = 'Role/Attribute' AND
+MRA.LinkType1 = R.EntityType AND
+MRA.LinkCode = 'Capability' AND
+MRA.ValFrom <= :ValOn AND :ValOn < MRA.ValTo AND MRA.EffFrom <= :EffOn AND :EffOn < MRA.EffTo
+
+INNER JOIN @t_schema.MetaDescription MA ON
+MA.Enterprise = R.Enterprise AND
+MA.DescriptionType = MRA.LinkType2 AND
+MA.DescriptionClass IN ('T','B','I','L','X','P','F','U','D','S','A') AND
+MA.NLSID IN (1, :NLSID)  AND
+MA.ValFrom <= :ValOn AND :ValOn < MA.ValTo AND MA.EffFrom <= :EffOn AND :EffOn < MA.EffTo
+
+INNER JOIN @t_schema.MetaLinkAttr MEA ON
+MEA.Enterprise = :Enterprise AND
+MEA.LinkType = 'Entity/Attribute' AND
+MEA.LinkType1 = MD.DescriptionType AND
+MEA.LinkType2 = MA.DescriptionType AND
+MEA.LinkCode = 'EntityAttribute' AND
+MEA.ValFrom <= :ValOn AND :ValOn < MEA.ValTo AND MEA.EffFrom <= :EffOn AND :EffOn < MEA.EffTo
+
+WHERE
+R.Enterprise = :Enterprise AND
+R.EntityClass = 'Role' AND
+R.EntityType = :RoleCode AND
+R.ValFrom <= :ValOn AND :ValOn < R.ValTo AND R.EffFrom <= :EffOn AND :EffOn < R.EffTo
+ORDER BY
+  MA.DescriptionType
+, MD.DescriptionType
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPENID int
+in NLSID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

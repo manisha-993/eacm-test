@@ -1,0 +1,110 @@
+@name=GBL0010
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+@addperm=false
+@narrative
+
+Better EntityId Blocking for CatIDL Load
+
+$Log: gbl0010.txt,v $
+Revision 1.45  2006/04/27 01:26:43  dave
+sp fix
+
+Revision 1.44  2006/04/27 00:13:53  dave
+Adding stuff for better entityid control
+
+Revision 1.43  2006/03/21 17:32:26  dave
+ok.. new sps for Simplification specific neesds
+
+
+@desc=This returns a list of blocks that have entityid's for a given type
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0010.txt,v 1.45 2006/04/27 01:26:43 dave Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE entity_cursor CURSOR FOR
+WITH mymax(MaxEntityId,MinEntityId) AS (
+SELECT
+  MAX(E.EntityID),
+  MIN(CASE WHEN :StartID > 0 THEN :StartID ELSE E.EntityID END)
+FROM  opicm.ENTITY E
+WHERE
+    E.Enterprise = :Enterprise
+AND E.EntityType = :EntityType
+AND E.Valto = :forever AND CURRENT TIMESTAMP BETWEEN E.EffFrom AND E.EffTo
+)
+, myinterm(minentityid, maxentityid, start, end, hitcounter) as
+(
+  SELECT minentityid, maxentityid,  minentityid-1, minentityid, 1 FROM mymax
+  UNION ALL
+  SELECT ROOT.minentityid, ROOT.maxentityid, ROOT.end+1, ROOT.end+:Chunk,
+(
+	Select
+	case
+		when count(distinct e.entityid) > 0 then 1
+		else 0
+	end
+	mycount
+	from opicm.entity e
+	where
+		e.enterprise = :Enterprise
+	and e.entityid between ROOT.end and ROOT.END+:Chunk
+	and e.entitytype = :EntityType
+	and e.valto > current timestamp and e.effto >  current timestamp
+)
+from myinterm ROOT
+  WHERE ROOT.end between ROOT.minentityid and ROOT.maxentityid or root.end = 0
+)
+,mymaxr(MaxEntityId,MinEntityId) AS (
+SELECT
+  MAX(R.EntityID),
+  MIN(CASE WHEN :StartID > 0 THEN :StartID ELSE R.EntityID END)
+FROM  opicm.Relator R
+WHERE
+    R.Enterprise = :Enterprise
+AND R.EntityType = :EntityType
+AND R.Valto = :forever AND CURRENT TIMESTAMP BETWEEN R.EffFrom AND R.EffTo
+)
+, myintermr(minentityid, maxentityid, start, end, hitcounter) as
+(
+  SELECT minentityid, maxentityid,  minentityid-1, minentityid, 1 FROM mymaxr
+  UNION ALL
+  SELECT ROOT.minentityid, ROOT.maxentityid, ROOT.end+1, ROOT.end+:Chunk,
+(
+	Select
+	case
+		when count(distinct r.entityid) > 0 then 1
+		else 0 end
+	mycount
+	from opicm.relator r
+        where
+            R.Enterprise = :Enterprise
+	and r.entityid between ROOT.end and ROOT.END+:Chunk
+        AND R.EntityType = :EntityType
+        AND R.Valto = :forever AND CURRENT TIMESTAMP BETWEEN R.EffFrom AND R.EffTo
+)
+from myintermr ROOT
+  WHERE ROOT.end between ROOT.minentityid and ROOT.maxentityid or root.end = 0
+)
+select * from myinterm where hitcounter > 0 and minentityid is not null
+union
+select * from myintermr where hitcounter > 0 and minentityid is not null
+;
+
+@execute
+
+// Now open the cursor
+EXEC SQL OPEN entity_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in StartID int
+in Chunk int
+@end

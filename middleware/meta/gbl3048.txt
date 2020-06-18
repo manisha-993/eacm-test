@@ -1,0 +1,89 @@
+@name=GBL3048
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=true
+@fenced=true
+@results=1
+@narrative
+$Log: gbl3048.txt,v $
+Revision 1.11  2010/06/21 15:43:02  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.10  2004/10/20 21:01:42  dave
+changes to gen parm
+
+Revision 1.9  2004/02/20 20:21:52  roger
+Must be @t_schema
+
+Revision 1.8  2004/02/20 18:09:32  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.7  2003/09/08 16:31:13  roger
+Enterprise was changed to 16 char length
+
+Revision 1.6  2003/06/03 18:37:43  roger
+Needed valid @dbase tag
+
+Revision 1.5  2002/07/17 17:33:18  roger
+Ensured Log was in @narrative
+
+@desc= Select Assoc and show details  V1.1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT                                             
+ME.entitytype,
+MEDESC.shortdescription as description,
+ME.entityclass,
+ATT.Descriptiontype as ATTRIBUTECODE ,
+ATT.descriptionclass as Attributetype,
+ATT.LongDescription,
+ATT.ShortDescription
+FROM @t_schema.metaentity  ME 
+join @t_schema.metalinkattr as MLA on
+MLA.Enterprise = :Enterprise and
+MLA.linktype = 'Assoc/Attribute' and
+MLA.linktype1 = ME.entitytype and 
+MLA.linkcode = 'Transform' and
+MLA.ValFrom <= :ValOn AND :ValOn < MLA.ValTo AND MLA.EffFrom <= :EffOn AND :EffOn < MLA.EffTo 
+join @t_schema.metalinkattr as MLAR on
+MLAR.Enterprise = :Enterprise and
+MLAR.linktype = 'Role/Assoc' and
+MLAR.linktype1 = :RoleCode and 
+MLAR.linktype2 = ME.entitytype and
+MLAR.ValFrom <= :ValOn AND :ValOn < MLAR.ValTo AND MLAR.EffFrom <= :EffOn AND :EffOn < MLAR.EffTo 
+join @t_schema.metadescription as ATT on
+ATT.Enterprise = :Enterprise and
+ATT.Descriptiontype = MLA.linktype2 and
+ATT.Descriptionclass in ('T', 'L', 'I', 'S', 'A', 'B', 'P', 'D', 'U', 'F') and 
+ATT.NLSID IN (1,1) and
+ATT.ValFrom <= :ValOn AND :ValOn < ATT.ValTo AND ATT.EffFrom <= :EffOn AND :EffOn < ATT.EffTo 
+join @t_schema.metadescription as MEDESC on
+MEDESC.Enterprise = :Enterprise and
+MEDESC.Descriptiontype = ME.entitytype and
+MEDESC.DESCRIPTIONCLASS = 'Assoc' AND 
+MEDESC.ValFrom <= :ValOn AND :ValOn < MEDESC.ValTo AND MEDESC.EffFrom <= :EffOn AND :EffOn < MEDESC.EffTo 
+WHERE
+ME.enterprise= :Enterprise and
+ME.entityclass = 'Assoc' and
+ME.entitytype = :AssocType AND
+ME.ValFrom <= :ValOn AND :ValOn < ME.ValTo AND ME.EffFrom <= :EffOn AND :EffOn < ME.EffTo
+ORDER BY
+ME.entitytype;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in AssocType varchar(32)
+in NLSID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

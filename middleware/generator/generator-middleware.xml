@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="middleware.generator" default="execute" basedir=".">
+
+    <!-- set global properties for this build -->
+    
+    <property name="src" location="source"/>
+    <property name="generated.sqcDir" location="../storedp"/>
+    <property name="generated.javaDir" location="../source/COM/ibm/opicmpdh/middleware"/>
+    
+    <target name="init">
+        <tstamp>
+            <!-- Use local System time in message -->
+            <format property="start.ts" pattern="EEE MM/dd/yyyy hh:mm:ss.SS"/>
+        </tstamp>
+        <echo message="Init: ${start.ts}" />   
+        <echo message="Ant JVM version: ${ant.java.version}"/>
+        <echo message="${ant.version}"/>
+    </target>
+
+    <target name="clean" description="Cleans the destination folders" depends="init">
+        <delete>
+            <fileset dir="${generated.sqcDir}">
+                <include name="*.sqC"/>
+                <include name="Makefile"/>
+                <include name="status.h"/>
+            </fileset>
+            <fileset dir="${generated.javaDir}">
+                <include name="Database.java"/>
+                <include name="Middleware.java"/>
+                <include name="RemoteDatabase.java"/>
+                <include name="RemoteDatabaseInterface.java"/>   
+            </fileset>   
+        </delete>
+    </target>
+
+    <target name="execute" depends="init,clean" description="Executes the jar">
+	    <java jar="generator.jar" fork="true">
+	    </java>
+        <tstamp>
+            <!-- Use local System time in message -->
+            <format property="finish.timestamp" pattern="EEE MM/dd/yyyy HH:mm:ss.SS"/>
+        </tstamp>
+        <echo message="Finished: ${finish.timestamp}"/>      
+	</target>
+
+</project>

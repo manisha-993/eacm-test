@@ -1,0 +1,154 @@
+# $Log: run.purge.temptables,v $
+# Revision 1.4  2014/12/19 08:12:14  wangyul
+# update the password in the script
+#
+# Revision 1.3  2007/04/26 23:14:04  bala
+# comment out a few since Eric is concerned
+#
+# Revision 1.2  2007/04/04 19:06:06  bala
+# dont purge navigate
+#
+# Revision 1.1  2007/04/03 17:49:03  bala
+# Need this one for drop
+#
+
+db2 connect to opicmpdh user opicmadm using mice8chs;
+db2 "import from /dev/null of del replace into opicm.TRSENTITIES";
+db2 "import from /dev/null of del replace into opicm.TRSENTITY";
+db2 "import from /dev/null of del replace into opicm.TRSFILTER";
+db2 "import from /dev/null of del replace into opicm.TRSNAVIGATE";
+db2 "import from /dev/null of del replace into opicm.TRSNETTERATTS";
+db2 "import from /dev/null of del replace into opicm.TRSNETTERFINAL";
+db2 "import from /dev/null of del replace into opicm.TRSNETTERPASS1";
+db2 "import from /dev/null of del replace into opicm.TRSNETTERPASS2";
+db2 "import from /dev/null of del replace into opicm.TRSPARTNO";
+db2 "import from /dev/null of del replace into opicm.TRSQ";
+db2 "import from /dev/null of del replace into opicm.TRSWATCHDOG";
+#db2 "import from /dev/null of del replace into opicm.SOFTLOCK";
+#db2 "import from /dev/null of del replace into opicm.SESSIONTAGS";
+#db2 "import from /dev/null of del replace into opicm.BOOKMARK";
+#db2 "import from /dev/null of del replace into opicm.DYNASEARCH";
+#db2 "import from /dev/null of del replace into opicm.TCOUNT";
+
+db2 "import from /dev/null of del replace into bigcata.TRSNETTERATTS
+db2 "import from /dev/null of del replace into bigcata.TRSNETTERFINAL
+db2 "import from /dev/null of del replace into bigcata.TRSNETTERPASS1
+db2 "import from /dev/null of del replace into bigcata.TRSNETTERPASS2
+
+db2 "import from /dev/null of del replace into bigcatb.TRSNETTERATTS
+db2 "import from /dev/null of del replace into bigcatb.TRSNETTERFINAL
+db2 "import from /dev/null of del replace into bigcatb.TRSNETTERPASS1
+db2 "import from /dev/null of del replace into bigcatb.TRSNETTERPASS2
+
+db2 "import from /dev/null of del replace into bigcatc.TRSNETTERATTS
+db2 "import from /dev/null of del replace into bigcatc.TRSNETTERFINAL
+db2 "import from /dev/null of del replace into bigcatc.TRSNETTERPASS1
+db2 "import from /dev/null of del replace into bigcatc.TRSNETTERPASS2
+
+db2 "import from /dev/null of del replace into bigcatd.TRSNETTERATTS
+db2 "import from /dev/null of del replace into bigcatd.TRSNETTERFINAL
+db2 "import from /dev/null of del replace into bigcatd.TRSNETTERPASS1
+db2 "import from /dev/null of del replace into bigcatd.TRSNETTERPASS2
+
+db2 "import from /dev/null of del replace into bigcate.TRSNETTERATTS
+db2 "import from /dev/null of del replace into bigcate.TRSNETTERFINAL
+db2 "import from /dev/null of del replace into bigcate.TRSNETTERPASS1
+db2 "import from /dev/null of del replace into bigcate.TRSNETTERPASS2
+
+db2 reorg table opicm.TRSENTITIES index TRSENTITIES_PK;
+db2 reorg table opicm.TRSENTITY index TRSENTITY_PK;
+db2 reorg table opicm.TRSFILTER index TRSFILTER_PK;
+db2 reorg table opicm.TRSNAVIGATE index TRSNAVIGATE_PK;
+db2 reorg table opicm.TRSNETTERATTS index TRSNETTERATTS_PK;
+db2 reorg table opicm.TRSNETTERFINAL index TRSNETTERFINAL_PK;
+db2 reorg table opicm.TRSNETTERPASS1 index TRSNETTERPASS1_PK;
+db2 reorg table opicm.TRSNETTERPASS2 index TRSNETTERPASS2_PK;
+db2 reorg table opicm.TRSPARTNO index TRSPARTNO_PK;
+db2 reorg table opicm.TRSQ index TRSQ_PK;
+db2 reorg table opicm.TRSWATCHDOG index TRSWATCHDOG_PK;
+db2 reorg table opicm.SOFTLOCK index SOFTLOCK_PK;
+db2 reorg table opicm.SESSIONTAGS index SESSIONTAGS_PK;
+db2 reorg table opicm.NAVIGATE index NAVIGATE_PK;
+db2 reorg table opicm.BOOKMARK index BOOKMARK_PK;
+db2 reorg table opicm.DYNASEARCH index DYNASEARCH_PK;
+db2 reorg table opicm.TCOUNT index TCOUNT_pk;
+
+
+db2 reorg table bigcata.TRSNETTERATTS index TRSNETTERATTS_PK;
+db2 reorg table bigcata.TRSNETTERFINAL index TRSNETTERFINAL_PK;
+db2 reorg table bigcata.TRSNETTERPASS1 index TRSNETTERPASS1_PK;
+db2 reorg table bigcata.TRSNETTERPASS2 index TRSNETTERPASS2_PK;
+
+db2 reorg table bigcatb.TRSNETTERATTS index TRSNETTERATTS_PK;
+db2 reorg table bigcatb.TRSNETTERFINAL index TRSNETTERFINAL_PK;
+db2 reorg table bigcatb.TRSNETTERPASS1 index TRSNETTERPASS1_PK;
+db2 reorg table bigcatb.TRSNETTERPASS2 index TRSNETTERPASS2_PK;
+
+db2 reorg table bigcatc.TRSNETTERATTS index TRSNETTERATTS_PK;
+db2 reorg table bigcatc.TRSNETTERFINAL index TRSNETTERFINAL_PK;
+db2 reorg table bigcatc.TRSNETTERPASS1 index TRSNETTERPASS1_PK;
+db2 reorg table bigcatc.TRSNETTERPASS2 index TRSNETTERPASS2_PK;
+
+db2 reorg table bigcatd.TRSNETTERATTS index TRSNETTERATTS_PK;
+db2 reorg table bigcatd.TRSNETTERFINAL index TRSNETTERFINAL_PK;
+db2 reorg table bigcatd.TRSNETTERPASS1 index TRSNETTERPASS1_PK;
+db2 reorg table bigcatd.TRSNETTERPASS2 index TRSNETTERPASS2_PK;
+
+db2 reorg table bigcate.TRSNETTERATTS index TRSNETTERATTS_PK;
+db2 reorg table bigcate.TRSNETTERFINAL index TRSNETTERFINAL_PK;
+db2 reorg table bigcate.TRSNETTERPASS1 index TRSNETTERPASS1_PK;
+db2 reorg table bigcate.TRSNETTERPASS2 index TRSNETTERPASS2_PK;
+
+
+
+db2 runstats on table opicm.TRSENTITIES with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.TRSENTITY with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.TRSFILTER with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.TRSNAVIGATE with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.TRSNETTERATTS with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.TRSNETTERFINAL with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.TRSNETTERPASS1 with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.TRSNETTERPASS2 with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.TRSPARTNO with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.TRSQ with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.TRSWATCHDOG with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.SOFTLOCK with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.SESSIONTAGS with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.NAVIGATE with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.BOOKMARK with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.DYNASEARCH with distribution and detailed indexes all shrlevel change;
+db2 runstats on table opicm.TCOUNT with distribution and detailed indexes all shrlevel change;
+
+
+
+db2 runstats on table bigcata.TRSNETTERATTS with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcata.TRSNETTERFINAL with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcata.TRSNETTERPASS1 with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcata.TRSNETTERPASS2 with distribution and detailed indexes all shrlevel change;
+
+db2 runstats on table bigcatb.TRSNETTERATTS with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcatb.TRSNETTERFINAL with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcatb.TRSNETTERPASS1 with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcatb.TRSNETTERPASS2 with distribution and detailed indexes all shrlevel change;
+
+db2 runstats on table bigcatc.TRSNETTERATTS with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcatc.TRSNETTERFINAL with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcatc.TRSNETTERPASS1 with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcatc.TRSNETTERPASS2 with distribution and detailed indexes all shrlevel change;
+
+db2 runstats on table bigcatd.TRSNETTERATTS with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcatd.TRSNETTERFINAL with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcatd.TRSNETTERPASS1 with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcatd.TRSNETTERPASS2 with distribution and detailed indexes all shrlevel change;
+
+db2 runstats on table bigcate.TRSNETTERATTS with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcate.TRSNETTERFINAL with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcate.TRSNETTERPASS1 with distribution and detailed indexes all shrlevel change;
+db2 runstats on table bigcate.TRSNETTERPASS2 with distribution and detailed indexes all shrlevel change;
+
+
+
+
+db2 terminate;
+
+

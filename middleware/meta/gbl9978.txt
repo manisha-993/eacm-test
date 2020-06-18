@@ -1,0 +1,47 @@
+@name=GBL9978
+@noremote=true
+@type=basic
+@dbase=opicmods
+@narrative
+
+Unpublish a PRODUCTDETAIL record
+
+//
+// $Log: gbl9978.txt,v $
+// Revision 1.2  2010/06/21 15:42:52  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.1  2004/12/02 19:10:00  gregg
+// initial load
+//
+// Revision 1.1  2004/12/01 20:04:57  gregg
+// initial load
+//
+//
+
+@desc= Unpublish a PRODUCTDETAIL record
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9978.txt,v 1.2 2010/06/21 15:42:52 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+@execute
+
+EXEC SQL 
+UPDATE GBLI.PRODUCTDETAIL
+SET PUBLISHFLAG = 'N'
+WHERE 
+        ENTERPRISE = :ENTERPRISE
+AND RECID = :RECID
+;
+@parameters
+inout ReturnStatus int
+in ENTERPRISE varchar(16)
+in RECID int
+@end
+
+                                                              
+                                                              

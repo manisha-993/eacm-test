@@ -1,0 +1,107 @@
+#
+# $Log: run.dmi.passii,v $
+# Revision 1.4  2004/01/16 19:32:59  dave
+# added CODEPAGE for pre-prod clean up
+#
+# Revision 1.3  2003/12/31 19:53:19  dave
+# more script refinements
+#
+# Revision 1.2  2003/12/16 22:44:19  dave
+# new script for reference tables CR1121034237
+#
+# Revision 1.1  2003/12/10 21:00:43  dave
+# added script files and tagging to eccmods
+#
+#
+WHO_AM_I=`whoami`
+
+#
+# this tells the DB2 client that we want NO codepage conversion from database (1208 = UTF8)
+#
+export DB2CODEPAGE=1208
+
+ECCMODS=eccmbrio
+export ECCMODS
+USERCODE=opicmadm
+export USERCODE
+PASSWORD=cat9tail
+export PASSWORD
+
+#/bin/sh
+cd /home/opicmadm/eccmbrio
+
+#
+# set up the environment
+#
+PATH=/usr/lpp/internet/server_root/java/bin:/usr/bin:/etc:/usr/sbin:$HOME/bin:/sbin:.
+export PATH
+
+SQLLIB=/home/opicmdb2/sqllib
+JAVA=$SQLLIB/java
+CLASSPATH=.:$JAVA/db2java.zip
+LD_LIBRARY_PATH=/home/opicmdb2/sqllib/lib
+export LD_LIBRARY_PATH
+MAIL_ADDRESS="opicmadm@localhost, v2ueh21@us.ibm.com, marmstro@us.ibm.com, rpotter@us.ibm.com"
+
+. $SQLLIB/db2profile
+
+rptdate=`date +%Y%m%d%H%M`
+RPTNAME='/home/opicmadm/eccmbrio/rpt/dmi.passii.log.'$rptdate
+
+run.dmi.blob > $RPTNAME
+
+
+#
+# here we want to create all simple reference tables
+#
+db2batch -d $ECCMODS -a $USERCODE/$PASSWORD -f ./eccm.refload.sql >> $RPTNAME
+
+#
+# First we want to create all the extra incides
+#
+db2batch -d $ECCMODS -a $USERCODE/$PASSWORD -f ./eccm.indices.sql >> $RPTNAME
+
+#
+# Next we reorg a bunch of stuff
+#
+./eccm.reorgrunstats.sql >> $RPTNAME
+
+#
+# Now ..create the software table
+#
+run.dmi.software >> $RPTNAME
+
+#
+# Now. lets reorg the software tables
+#
+db2batch -d $ECCMODS -a $USERCODE/$PASSWORD -f ./eccm.software.sql >> $RPTNAME
+
+#
+# Now. lets create the summary tables
+#
+db2batch -d $ECCMODS -a $USERCODE/$PASSWORD -f ./eccm.sumtables.sql >> $RPTNAME
+
+#
+# Now. lets create the views
+#
+db2batch -d $ECCMODS -a $USERCODE/$PASSWORD -f ./eccm.views.sql >> $RPTNAME
+
+#
+# Now. lets finish it up 
+#
+db2batch -d $ECCMODS -a $USERCODE/$PASSWORD -f ./eccm.misc.sql >> $RPTNAME
+
+# mail the error report if it contains anything, else delete it
+#
+if [ -s $RPTNAME.err ]; then 
+  mail -s "ODSNET Error from `hostname`" $MAIL_ADDRESS <$RPTNAME.err
+else
+  rm $RPTNAME.err
+fi
+
+#
+# delete stuff more than 1 week old
+#
+find /home/opicmadm/eccmbrio/rpt/* -prune -type f -mtime +7 -exec rm {} \;
+
+

@@ -1,0 +1,54 @@
+@name=GBL9976
+@type=basic
+@noremote=true
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+-- Retrieve entire contents of gamap table
+--------------------------------------------------------------------------------------------
+$Log: gbl9976.txt,v $
+Revision 1.7  2006/04/29 17:48:23  dave
+new sp
+
+Revision 1.6  2006/02/27 23:38:06  dave
+back it out
+
+Revision 1.4  2005/06/21 17:58:50  joan
+add CountryList in gamap table
+
+Revision 1.3  2005/05/22 23:04:36  dave
+Added CollectionId
+addind Catalog Interval
+Placed enterprise in the Gami
+
+Revision 1.2  2005/03/24 18:19:02  roger
+Changes
+
+Revision 1.1  2005/03/23 16:02:51  roger
+New SP for gamap table
+
+@desc=Retrieve gamap
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9976.txt,v 1.7 2006/04/29 17:48:23 dave Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  GENERAL_AREA
+, COUNTRY
+, LANGUAGE
+, NLSID
+, COUNTRYLIST
+FROM gbli.gamap
+WHERE Enterprise = :Enterprise
+ORDER BY GENERAL_AREA, COUNTRY
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+@end

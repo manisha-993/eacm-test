@@ -1,0 +1,77 @@
+@name=GBL7065
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Get all Allowable Flag Values for the given Workgroup
+
+$Log: gbl7065.txt,v $
+Revision 1.8  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.7  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.6  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.5  2003/09/18 21:45:41  joan
+return attribute type
+
+Revision 1.4  2003/09/08 16:31:16  roger
+Enterprise was changed to 16 char length
+
+Revision 1.3  2003/04/01 21:10:18  dave
+simply and speed
+
+Revision 1.2  2002/03/08 00:52:03  dave
+fixed the tag in to 7065 Sp
+
+Revision 1.1  2002/03/08 00:40:31  dave
+new sp for flag retardation
+
+
+@desc=Get all Allowable Flag Values for the given Workgroup
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7065.txt,v 1.8 2004/10/20 21:01:43 dave Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  RTRIM(F.AttributeCode)
+, RTRIM(F.AttributeValue)
+, RTRIM(MA.EntityClass)
+FROM @t_schema.MetaLinkAttr ML1
+INNER JOIN @t_schema.MetaEntity MA ON
+    MA.Enterprise = :Enterprise
+AND MA.EntityType = ML1.LinkType2
+AND MA.EntityClass in ('F','S','U','A')
+AND MA.ValFrom <= :ValOn AND :ValOn < MA.ValTo AND MA.EffFrom <= :EffOn AND :EffOn < MA.EffTo
+INNER JOIN @t_schema.Flag F ON
+    F.Enterprise = :Enterprise
+AND F.EntityType = 'WG'
+AND F.EntityID = :WGID
+AND F.AttributeCode = MA.EntityType
+AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo
+WHERE
+    ML1.Enterprise = :Enterprise
+AND ML1.LinkType = 'Entity/Attribute'
+AND ML1.LinkType1 ='WG'
+AND ML1.LinkCode = 'EntityAttribute'
+AND ML1.ValFrom <= :ValOn AND :ValOn < ML1.ValTo AND ML1.EffFrom <= :EffOn AND :EffOn < ML1.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in WGID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

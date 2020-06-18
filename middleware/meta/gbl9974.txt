@@ -1,0 +1,44 @@
+@name=GBL9974
+@noremote=true
+@parmstyle=GENERAL
+@type=basic
+@dbase=opicmpdh
+@narrative
+---------------------------------------------------------------------------------------------
+--  This is insert for TCOUNT table for tracking putBlob calls for creation of cached objects
+---------------------------------------------------------------------------------------------
+$Log: gbl9974.txt,v $
+Revision 1.2  2010/06/21 15:42:54  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.1  2006/10/05 15:44:43  roger
+Log putBlob calls for caching into TCOUNT table
+
+@desc=Insert TCOUNT table
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9974.txt,v 1.2 2010/06/21 15:42:54 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+@execute
+EXEC SQL
+INSERT INTO @t_schema.TCOUNT
+VALUES
+(
+  timestamp_iso(CURRENT TIMESTAMP)
+, :Instance
+, :Transaction
+, 0
+)        
+;
+
+EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in Instance varchar(32)
+in Transaction varchar(16)
+@end

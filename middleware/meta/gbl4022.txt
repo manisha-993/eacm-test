@@ -1,0 +1,80 @@
+@name=GBL4022
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+-- Retrieve a collection of BasicRules based on a generalarea
+--------------------------------------------------------------------------------------------
+$Log: gbl4022.txt,v $
+Revision 1.9  2010/06/21 15:42:49  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.8  2007/05/15 19:23:54  rick
+changed to return entityid and catbrlifecycle_fc.
+
+Revision 1.7  2006/11/01 17:52:14  gregg
+ruletrigger_fc
+
+Revision 1.6  2005/11/29 18:31:40  gregg
+basic rule fix to include proper item entity type
+
+Revision 1.5  2005/11/23 17:37:07  gregg
+parm fix
+
+Revision 1.4  2005/11/22 22:48:21  gregg
+add cattable name to params
+
+Revision 1.3  2005/11/22 22:33:58  gregg
+filter by inbound rule triggers only
+
+Revision 1.2  2005/11/18 19:05:47  gregg
+fix
+
+Revision 1.1  2005/11/16 22:21:16  gregg
+initial load
+
+
+
+
+@desc=Retrieve a collection of BasicRules based on a generalarea
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl4022.txt,v 1.9 2010/06/21 15:42:49 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  CATENTITYTYPE
+ ,CATITEMTYPE
+ ,CATATTRIBUTECODE
+ ,RULETYPE_FC
+ ,RTRIM(RULETEST)
+ ,RTRIM(RULEFAIL)
+ ,RTRIM(RULEPASS)
+ ,ENTITYID
+ ,CATBRLIFECYCLE_FC
+FROM gbli.BASICRULE
+WHERE
+    countrycode = :CountryCode
+and languagecode = :LanguageCode
+and nlsid = :NLSID
+and isactive = 1
+and upper(ruletrigger_fc) = 'INBOUND'
+and CATTABLENAME = :CatTableName
+and valfrom < current timestamp
+and valto = '9999-12-31-00.00.00.000000'
+  ORDER BY
+catentitytype,catattributecode
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in CountryCode varchar(2)
+in LanguageCode varchar(2)
+in NLSID int
+in CatTableName varchar(25)
+@end

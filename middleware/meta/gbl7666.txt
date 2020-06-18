@@ -1,0 +1,110 @@
+@name=GBL7666
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+For PDH research Flag Value(Admin UI)
+$Log: gbl7666.txt,v $
+Revision 1.21  2010/06/21 15:43:26  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.20  2004/10/20 21:01:46  dave
+changes to gen parm
+
+Revision 1.19  2004/04/15 18:22:08  steve
+*** empty log message ***
+
+Revision 1.18  2004/04/15 18:13:58  steve
+*** empty log message ***
+
+Revision 1.17  2004/04/15 18:07:59  steve
+*** empty log message ***
+
+Revision 1.16  2004/04/14 23:07:11  joan
+fix error
+
+Revision 1.15  2004/04/14 22:55:23  joan
+fix error
+
+Revision 1.14  2004/04/14 22:49:52  joan
+fix compile
+
+Revision 1.13  2004/04/14 22:42:34  joan
+fix error
+
+
+@desc=For PDH research Flag Value(Admin UI)
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7666.txt,v 1.21 2010/06/21 15:43:26 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE NavCur CURSOR FOR
+SELECT
+ EntityType
+,EntityID
+,Level
+FROM @t_schema.trsNavigate 
+WHERE
+   SessionID = :SessionID
+order by entitytype, entityid;
+
+@execute
+
+EXEC SQL INSERT INTO @t_schema.trsNavigate
+SELECT DISTINCT 
+:Enterprise
+,:SessionID
+,:ActionType
+,'Navigate'
+,me.OpenID
+,0
+,'X'
+,'X'
+,'X'
+,-1
+,flg.EntityType
+,flg.EntityID
+,'X'
+,-1
+,:ValOn
+,:EffOn
+
+FROM opicm.Flag as flg
+INNER JOIN @t_schema.Entity me ON
+    me.Enterprise = :Enterprise
+AND me.EntityType  = flg.Entitytype
+And me.EntityID = flg.EntityID
+AND me.ValFrom <= :ValOn AND :ValOn < me.ValTo AND me.EffFrom <= :EffOn AND :EffOn < me.EffTo
+
+where
+    flg.Enterprise = :Enterprise 
+AND flg.AttributeCode  LIKE rtrim(:AttributeCode) || '%'
+AND flg.AttributeValue = :AttributeValue
+AND flg.ValFrom <= :ValOn AND flg.ValTo > :ValOn
+AND flg.EffFrom <= :EffOn AND flg.EffTo  > :EffOn
+;
+
+EXEC SQL COMMIT WORK;
+
+// send the final result set back to the caller
+EXEC SQL OPEN NavCur;
+
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in ActionType varchar(32)
+in Enterprise varchar(16)
+in AttributeCode varchar(32)
+in AttributeValue varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+
+

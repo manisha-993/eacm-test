@@ -1,0 +1,80 @@
+@name=GBL8010
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+This guy inserts a new record into the DynaSearch
+
+$Log: gbl8010.txt,v $
+Revision 1.8  2010/06/21 15:42:52  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2004/10/20 21:01:47  dave
+changes to gen parm
+
+Revision 1.6  2004/02/20 20:21:56  roger
+Must be @t_schema
+
+Revision 1.5  2004/02/20 18:09:36  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.4  2003/09/03 21:47:01  joan
+look at relator also
+
+Revision 1.3  2003/08/21 18:36:02  joan
+fix return
+
+Revision 1.2  2003/08/21 17:46:57  joan
+fix error
+
+Revision 1.1  2003/08/21 17:31:49  joan
+initial load
+
+
+@desc=get description of entitytype and attributecode for general search
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8010.txt,v 1.8 2010/06/21 15:42:52 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT ML.linktype2 AS ENTITYTYPE
+, COALESCE (RTRIM(MD1.LongDescription),'No Entity Description') AS ENTITYDESC
+, ML.linkcode AS ATTRIBUTECODE
+, COALESCE (RTRIM(MD2.LongDescription),'No Attribute Description') AS ATTRDESC 
+FROM @t_schema.metalinkattr ML
+
+LEFT JOIN @t_schema.metadescription MD1 ON
+    MD1.Enterprise = ML.enterprise
+AND MD1.DescriptionType = ML.linktype2
+AND MD1.DescriptionClass in ('Entity', 'Relator')
+AND MD1.ValFrom <= :ValOn AND :ValOn < MD1.ValTo AND MD1.EffFrom <= :EffOn AND :EffOn < MD1.EffTo
+
+LEFT JOIN @t_schema.metadescription MD2 ON
+    MD2.Enterprise = ML.enterprise
+AND MD2.DescriptionType = ML.linkcode
+AND MD2.DescriptionClass in ('U', 'S', 'A', 'F', 'T')
+AND MD2.ValFrom <= :ValOn AND :ValOn < MD2.ValTo AND MD2.EffFrom <= :EffOn AND :EffOn < MD2.EffTo
+
+WHERE ML.enterprise = :Enterprise
+and ML.linktype = 'Action/Entity'
+and ML.linktype1 = :ActionType
+and ML.linkvalue = 'Target'
+AND ML.ValFrom <= :ValOn AND :ValOn < ML.ValTo AND ML.EffFrom <= :EffOn AND :EffOn < ML.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in ActionType varchar(32)
+in ValOn varchar(27)
+in EffOn varchar(27)
+@end
+
+

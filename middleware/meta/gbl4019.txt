@@ -1,0 +1,53 @@
+@name=GBL4019
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+-- Get catnav attributes for an object
+--------------------------------------------------------------------------------------------
+$Log: gbl4019.txt,v $
+Revision 1.6  2010/06/21 15:42:50  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.5  2005/10/12 21:45:43  gregg
+fix
+
+Revision 1.4  2005/10/12 21:23:50  gregg
+change table name CATNAV-->MULTIROWATTR
+
+Revision 1.3  2005/10/04 19:57:02  gregg
+fix
+
+Revision 1.2  2005/10/04 19:40:49  gregg
+order by
+
+Revision 1.1  2005/10/04 19:25:42  gregg
+initial load
+
+
+
+@desc=Get catnav attributes for an object
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl4019.txt,v 1.6 2010/06/21 15:42:50 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+   column_key
+FROM gbli.multirowattr
+WHERE
+    Enterprise = :Enterprise
+AND OBJECT_KEY = :objectkey
+order by column_key
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in objectkey varchar(128)
+@end

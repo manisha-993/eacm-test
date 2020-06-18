@@ -1,0 +1,336 @@
+#!/bin/sh
+
+#
+# $Log: starttm-aix,v $
+# Revision 1.20  2004/05/06 21:52:20  roger
+# Change netstat
+#
+# Revision 1.19  2003/12/01 20:39:14  roger
+# Send mail command output to /dev/null
+#
+# Revision 1.18  2003/12/01 17:00:35  roger
+# Start the watchtm script
+#
+# Revision 1.17  2003/11/26 21:02:03  roger
+# If these class files are needed, put them in the script!
+#
+# Revision 1.16  2003/11/21 17:33:15  roger
+# Report home when called
+#
+# Revision 1.15  2003/04/30 20:16:09  roger
+# Needed new jars for mail
+#
+# Revision 1.14  2003/04/09 21:11:10  roger
+# Needed jars in CLASSPATH
+#
+# Revision 1.13  2003/03/31 16:52:46  roger
+# Make TM work with Java versions above 1.2.2
+#
+# Revision 1.12  2002/10/17 18:35:13  roger
+# Support for multiple instances of TM
+#
+# Revision 1.11  2002/10/16 19:37:01  roger
+# Support multiple instances
+#
+# Revision 1.10  2002/10/15 17:00:26  roger
+# Change variable name
+#
+# Revision 1.9  2002/10/15 16:42:25  roger
+# Parameterize port settings to allow multiple instances of TM
+#
+#
+
+#
+# This script starts the TaskMaster under Linux or AIX
+#
+
+DIRECTORY=`pwd`
+CURRENT_REPORT="./taskmaster.out"
+DB2_JAVA_CLASSES=""
+JAR_FILE="middleware.jar"
+ABR_JAR_FILE="abr.jar"
+JAVA_COMMAND="java"
+JAVA_OPTIONS="-ms128M -mx256M -Xss32M"
+JDK_CLASSES=""
+OTHER_CLASSES="$ABR_JAR_FILE:activation.jar:smtp.jar:mail.jar:/usr/WebSphere/AppServer/lib/xalan.jar:/usr/WebSphere/AppServer/lib/xerces.jar:./xercesImpl.jar:./xml-apis.jar:/usr/WebSphere/AppServer/lib/j2ee.jar"
+SECURITY_POLICY_FILE=$DIRECTORY"/policy"
+TM_PROPERTY_FILE="taskmaster.properties"
+DIR=`basename $PWD`
+HOSTNAME=`hostname -s`
+INSTANCE="$HOSTNAME@$DIR"
+MAILTO="roger.mccarty@gbli.com"
+
+CLASSPATH=$CLASSPATH:$ABR_JAR_FILE:$JAR_FILE:$OTHER_CLASSES
+
+REG_PORT=`grep rmiregistry_port $TM_PROPERTY_FILE|cut -d"=" -f2`
+ACT_PORT=`grep rmid_port $TM_PROPERTY_FILE|cut -d"=" -f2`
+
+#
+# determine if we are AIX or Linux
+#
+OS=`uname | cut -f1`
+LINUX=`expr "Linux" = "$OS"`
+
+#
+# if we are Linux
+#
+if [ $LINUX -eq 1 ]; then
+  LSOF="/usr/sbin/fuser"
+else
+  LSOF="/usr/local/bin/lsof"
+fi
+
+#
+# these directories store prior copies of TaskMaster software and reports (make sure they exist and are secure)
+#
+if [ ! -d rpt ]; then
+  mkdir rpt
+  chmod 700 rpt
+fi
+if [ ! -d archive ]; then
+  mkdir archive
+  chmod 700 archive
+fi
+
+#
+# if we are already running in this directory, bail out
+#
+if [ -f tmrunning ]; then
+  now=`date +%Y-%m-%d-%H.%M.%S.000000`
+  echo TaskMaster ABORT - already running
+  echo $now TaskMaster ABORT - already running >>$CURRENT_REPORT
+  exit
+fi
+
+#
+# save the output of the prior execution
+#
+rptdate=`date +%Y%m%d%H%M%S`
+rptname='./rpt/taskmaster.log.'$rptdate
+touch javacore
+touch java.prof
+touch core
+touch $CURRENT_REPORT
+cat $CURRENT_REPORT javacore* java.prof >$rptname
+rm javacore*
+rm java.prof
+rm core
+rm $CURRENT_REPORT
+
+#
+# flag that we are running
+#
+touch tmrunning
+
+#
+# Build the contents of the dynamic property file
+#
+PROPERTY_FILE=middleware.server.dynamic.properties
+
+cat > $PROPERTY_FILE << EOF
+#OPICM Middleware Server Dynamic Properties
+EOF
+
+HOSTNAME=`hostname -s`
+echo "hostname=$HOSTNAME" >> $PROPERTY_FILE
+
+IP=`host $HOSTNAME|cut -f3 -d" "`
+echo "actual_ip_address=$IP" >> $PROPERTY_FILE
+
+DIR=`basename $PWD`
+echo "directory=$DIR" >> $PROPERTY_FILE
+
+INSTANCE="$HOSTNAME@$DIR"
+echo "instance=$INSTANCE" >> $PROPERTY_FILE
+
+#
+# OK, lets get ready by creating some empty output files (avoid conditionality)
+#
+touch javacore
+touch java.prof
+touch core
+
+#
+# who are we?
+#
+echo "TaskMaster running as user: " `whoami` >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# save the middleware config file to this output
+#
+cat middleware.server.properties >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# save the middleware dynamic config file to this output
+#
+cat middleware.server.dynamic.properties >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# save the TaskMaster config file to this output
+#
+cat taskmaster.properties >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# lets also record this value for help trouble shooting
+#
+set >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# do a netstat to see if anything bound to "our" ports
+#
+netstat -an -f inet >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# verify that we have some TaskMaster code to run
+#
+if [ ! -f $JAR_FILE ]; then
+  if [ ! -f $JAR_FILE.new ]; then
+    now=`date +%Y-%m-%d-%H.%M.%S.000000`
+    echo TaskMaster ABORT - no jar file to execute or install
+    echo $now TaskMaster ABORT - no jar file to execute or install >>$CURRENT_REPORT
+    exit
+  fi
+fi
+
+#
+# assign the output file name
+#
+rptdate=`date +%Y%m%d%H%M%S`
+now=`date +%Y-%m-%d-%H.%M.%S.000000`
+rptname='./rpt/taskmaster.log.'$rptdate
+
+#
+# remove any semaphore files
+#
+if [ -f tmshut ]; then
+  rm tmshut
+fi
+
+#
+# remove any pid files
+#
+rm -Rf *pid
+
+#
+# check if we should run rmiregistry
+#
+grep launch_rmiregistry $TM_PROPERTY_FILE | egrep "YES|Yes|yes|Y|TRUE|True|true|T" >/dev/null
+
+if [ $? = 0 ]; then
+  #
+  # start rmiregistry
+  #
+  echo Launch RMIREGISTRY
+  echo "rmiregistry $REG_PORT &"
+  rmiregistry $REG_PORT &
+  # write the pid to a file (for killing later)
+  echo $! > rmiregistry.pid
+
+  #
+  # let rmiregistry get started
+  #
+  echo Wait for RMIREGISTRY to launch
+  sleep 3
+else
+  #
+  # property file says do not run rmiregistry
+  #
+  echo RMIREGISTRY should not be launched
+fi
+
+#
+# remove rmid's persistent state information and start rmid
+#
+echo Launch RMID
+rm -Rf log
+echo "rmid -port $ACT_PORT -J-Dsun.rmi.activation.execPolicy=none -C-Djava.security.policy=$SECURITY_POLICY_FILE &"
+rmid -port $ACT_PORT -J-Dsun.rmi.activation.execPolicy=none -C-Djava.security.policy=$SECURITY_POLICY_FILE &
+# write the pid to a file (for killing later)
+echo $! > rmid.pid
+
+#
+# let rmid get started
+#
+echo Wait for RMID to launch
+sleep 3
+
+#
+# moved here so installed abr.jar and middleware.jar have same time in archive
+#
+now=`date +%Y-%m-%d-%H.%M.%S.000000`
+
+#
+# if there is a 'abr.jar.new' file, install it!
+#
+if [ -s $ABR_JAR_FILE.new ]; then
+  echo $now TaskMaster UPDATING ABR JAR>>$CURRENT_REPORT
+  ls -al >>$CURRENT_REPORT
+  cp $ABR_JAR_FILE.new ./archive/$ABR_JAR_FILE.$rptdate
+  mv $ABR_JAR_FILE.new $ABR_JAR_FILE
+  ls -al >>$CURRENT_REPORT
+  chmod -R 770 *
+fi
+
+#
+# if there is a 'middleware.jar.new' file, install it!
+#
+if [ -s $JAR_FILE.new ]; then
+  echo $now TaskMaster UPDATING >>$CURRENT_REPORT
+  ls -al >>$CURRENT_REPORT
+  cp $JAR_FILE.new ./archive/$JAR_FILE.$rptdate
+  mv $JAR_FILE.new $JAR_FILE
+  # extract only *tm-aix from the distribution jar - tm runs from jar
+  # jar xf $JAR_FILE *tm-aix // doesn't happen cause of location of scripts
+  ls -al >>$CURRENT_REPORT
+  chmod -R 770 *
+fi
+
+ls -alR >>$CURRENT_REPORT
+
+#
+# register the TaskMaster objects which rmid should activate
+#
+now=`date +%Y-%m-%d-%H.%M.%S.000000`
+echo $now TaskMaster REGISTER begin >>$CURRENT_REPORT
+echo Registering TaskMaster and Idlers
+echo Registering TaskMaster and Idlers >>$CURRENT_REPORT
+echo "*** command ***"
+echo "$JAVA_COMMAND $1 $2 $3 $4 $5 $JAVA_OPTIONS -classpath $JAR_FILE:$DB2_JAVA_CLASSES:$OTHER_CLASSES:$JDK_CLASSES -Djava.rmi.activation.port=$ACT_PORT -Djava.security.policy=policy -Djava.rmi.server.codebase=file:$JAR_FILE COM.ibm.opicmpdh.middleware.taskmaster.TaskMaster register 1>>$CURRENT_REPORT"
+$JAVA_COMMAND $1 $2 $3 $4 $5 $JAVA_OPTIONS -classpath $JAR_FILE:$DB2_JAVA_CLASSES:$OTHER_CLASSES:$JDK_CLASSES -Djava.rmi.activation.port=$ACT_PORT -Djava.security.policy=policy -Djava.rmi.server.codebase=file:$JAR_FILE COM.ibm.opicmpdh.middleware.taskmaster.TaskMaster register 1>>$CURRENT_REPORT 2>>$CURRENT_REPORT
+now=`date +%Y-%m-%d-%H.%M.%S.000000`
+echo $now TaskMaster REGISTER complete >>$CURRENT_REPORT
+
+#
+# launch the TaskMaster (which will in turn launch the Idlers)
+#
+now=`date +%Y-%m-%d-%H.%M.%S.000000`
+echo $now TaskMaster INITIALIZE begin >>$CURRENT_REPORT
+echo Initializing TaskMaster
+echo Initializing TaskMaster >>$CURRENT_REPORT
+echo "*** command ***"
+echo "$JAVA_COMMAND $1 $2 $3 $4 $5 $JAVA_OPTIONS -classpath $JAR_FILE:$DB2_JAVA_CLASSES:$OTHER_CLASSES:$JDK_CLASSES -Djava.rmi.activation.port=$ACT_PORT -Djava.security.policy=policy -Djava.rmi.server.codebase=file:$JAR_FILE COM.ibm.opicmpdh.middleware.taskmaster.TaskMaster start 1>>$CURRENT_REPORT"
+$JAVA_COMMAND $1 $2 $3 $4 $5 $JAVA_OPTIONS -classpath $JAR_FILE:$DB2_JAVA_CLASSES:$OTHER_CLASSES:$JDK_CLASSES -Djava.rmi.activation.port=$ACT_PORT -Djava.security.policy=policy -Djava.rmi.server.codebase=file:$JAR_FILE COM.ibm.opicmpdh.middleware.taskmaster.TaskMaster start 1>>$CURRENT_REPORT 2>>$CURRENT_REPORT
+now=`date +%Y-%m-%d-%H.%M.%S.000000`
+echo $now TaskMaster INITIALIZE complete >>$CURRENT_REPORT
+
+echo "*** TaskMaster and Idlers will now be launched by RMID as needed ***"
+echo "$now *** TaskMaster and Idlers will now be launched by RMID as needed ***" >>$CURRENT_REPORT
+
+mail -s "TaskMaster instance $INSTANCE has used ./starttm-aix" "$MAILTO" < /dev/null > /dev/null
+./watchtm-aix
+
+#
+# end of script
+#
+
+# lsof -i tcp:1399
+#COMMAND    PID    USER   FD   TYPE     DEVICE SIZE/OFF NODE NAME
+#rmid    162434 opica11    5u  IPv4 0x744a96dc      0t0  TCP *:1399 (LISTEN)
+# ps ax|grep [1]62434
+# 162434  pts/3 A     0:02 /usr/java_dev2/jre/sh/../bin/rmid -port 1399 -C-Djava

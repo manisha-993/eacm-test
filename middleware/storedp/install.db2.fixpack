@@ -1,0 +1,65 @@
+#
+# need a filesystem with approx. 3,000,000 512 byte sectors
+#
+# this "script" (actually a collection of commands) was used for db2 7.1 fixpack 3
+#
+
+su - opici11
+db2 force applications all
+db2 terminate
+db2stop
+db2licd end
+exit
+
+#su - db2as
+#. /home/opicmdb2/sqllib/db2profile
+#db2admin stop
+#exit
+
+/usr/sbin/slibclean
+
+cd /big/db2-71/fp6
+#gzip -d FP*
+#tar xf FP*tar
+#cd delta_install
+
+smitty install_all
+
+/usr/lpp/db2_07_01/instance/db2iupdt opici11
+
+#/usr/lpp/db2_07_01/instance/db2iupdt opicmdb2
+#/usr/lpp/db2_07_01/instance/db2iupdt opicd2
+#/usr/lpp/db2_07_01/instance/dasiupdt db2as
+
+
+#
+# this was needed for db2 7.1 transition from fixpack1 to above ~i think~
+#
+su - opicmdb2
+db2updv7 -d opicmpdh
+exit
+
+su - opici11
+db2start
+cd /home/opici11/sqllib/bnd
+
+db2 CONNECT TO pdh11
+db2 BIND @db2ubind.lst BLOCKING ALL GRANT PUBLIC
+db2 BIND @db2cli.lst BLOCKING ALL GRANT PUBLIC
+db2 terminate
+
+db2 CONNECT TO was11
+db2 BIND @db2ubind.lst BLOCKING ALL GRANT PUBLIC
+db2 BIND @db2cli.lst BLOCKING ALL GRANT PUBLIC
+db2 terminate
+
+db2 CONNECT TO ods11
+db2 BIND @db2ubind.lst BLOCKING ALL GRANT PUBLIC
+db2 BIND @db2cli.lst BLOCKING ALL GRANT PUBLIC
+db2 terminate
+
+exit
+
+echo ""
+echo "done"
+echo ""

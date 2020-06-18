@@ -1,0 +1,74 @@
+@name=GBL2909
+@noremote=true
+@dbase=opicmpdh
+@narrative
+$Log: gbl2909.txt,v $
+Revision 1.17  2010/06/21 15:43:21  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.16  2004/10/20 21:01:39  dave
+changes to gen parm
+
+Revision 1.15  2004/02/20 20:21:49  roger
+Must be @t_schema
+
+Revision 1.14  2004/02/20 18:09:29  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.13  2004/01/28 00:07:28  gregg
+back to old way aargh
+
+Revision 1.12  2004/01/28 00:00:20  gregg
+trying to rtrim
+
+Revision 1.11  2003/09/08 16:31:11  roger
+Enterprise was changed to 16 char length
+
+Revision 1.10  2003/04/16 23:09:07  gregg
+remove tranid
+
+Revision 1.9  2002/12/26 17:16:51  gregg
+extendended descriptionclass to 32 chars to be consistent w/ column in database (was 8).
+
+Revision 1.8  2001/06/11 16:54:28  roger
+Needed ShortDescription and TranID
+
+Revision 1.7  2001/06/11 16:28:59  roger
+Template s/b metainsert
+
+Revision 1.6  2001/06/11 15:43:07  roger
+MetaDescription has no ShortDescription - removed
+
+Revision 1.5  2001/06/08 20:26:03  roger
+Added branding
+
+@addperm=true
+@type=metainsert
+@table=@t_schema.MetaDescription
+@desc=Insert/Update a row in @table
+@fenced=true
+@results=0
+@change_cols=Enterprise DescriptionType DescriptionClass NLSID
+@update_cols=Enterprise DescriptionType DescriptionClass NLSID
+@insert_cols=Enterprise DescriptionType DescriptionClass ShortDescription LongDescription NLSID
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2909.txt,v 1.17 2010/06/21 15:43:21 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in DescriptionType varchar(32)
+in DescriptionClass varchar(32)
+in ShortDescription varchar(64)
+in LongDescription varchar(128)
+in NLSID int
+in TranID int
+in EffFrom varchar(26)
+in EffTo varchar(26)
+@end
+
+

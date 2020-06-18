@@ -1,0 +1,110 @@
+@name=GBL8180
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+
+FEEDING THE TRSNETTERPASS2 table with all matches in a select insert statement for
+a given range of entityid's
+
+$Log: gbl8180.txt,v $
+Revision 1.3  2010/06/21 15:43:02  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.2  2009/05/01 19:16:49  rick
+Added filter for pdhdomain.
+
+Revision 1.1.1.1  2007/10/17 13:35:11  jingb
+no message
+
+Revision 1.1.1.1  2007/10/10 11:05:21  sulin
+no message
+
+Revision 1.1  2007/10/10 03:28:06  sulin
+no message
+
+Revision 1.1  2006/07/04 18:42:07  dave
+new SP to put into gbli schema table
+
+
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+
+char brand[80] = "$Id: gbl8180.txt,v 1.3 2010/06/21 15:43:02 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+// O.K. Lets seed the Explosion table with all the relator churn.
+
+EXEC SQL insert into gbli.trsNetterPass2
+SELECT
+ :enterprise
+,:sessionid
+,:actiontype
+,-1
+,'X'
+,'X'
+,'NOOP'
+,0
+,'NOOP'
+,0
+,E.EntityType
+,E.EntityID
+,'I'
+,current timestamp
+,E.EntityType
+,E.EntityID
+,'E'
+,''
+FROM opicm.entity E
+LEFT JOIN @t_schema.MetaLinkAttr M1 ON
+        M1.Enterprise = :enterprise
+AND M1.LinkType = 'Entity/Status/ODSFilter'
+AND M1.LinkType1 = :entitytype
+AND M1.Linktype2 = 'GBLI'
+AND M1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN M1.EffFrom AND M1.EffTo
+LEFT JOIN @t_schema.Flag F1 ON
+        F1.Enterprise = :enterprise
+AND F1.EntityType = E.EntityType
+AND F1.EntityID = E.EntityID
+AND F1.AttributeCode = M1.LinkCode
+AND F1.AttributeValue = M1.LinkValue
+AND F1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN F1.EffFrom AND F1.EffTo
+LEFT JOIN @t_schema.MetaLinkAttr M2 ON
+    M2.Enterprise = :enterprise
+AND M2.LinkType = 'Entity/PDHDOMAIN/ODSFilter'
+AND M2.LinkType1 = :entitytype
+AND M2.Linktype2 = 'GBLI'
+AND M2.Valto = :forever AND CURRENT TIMESTAMP BETWEEN M2.EffFrom AND M2.EffTo
+LEFT JOIN @t_schema.Flag F2 ON
+    F2.Enterprise = :enterprise
+AND F2.EntityType = E.EntityType
+AND F2.EntityID = E.EntityID
+AND rtrim(F2.AttributeCode || ' ') = M2.LinkCode
+AND rtrim(F2.AttributeValue || ' ')  = M2.LinkValue
+AND F2.Valto = :forever AND CURRENT TIMESTAMP BETWEEN F2.EffFrom AND F2.EffTo
+where
+    e.enterprise = :enterprise
+and e.entitytype = :entitytype
+and e.valto = :forever and e.effto > current timestamp
+and e.entityid*1 between :startentityid and :endentityid
+AND 1 = (CASE
+  WHEN M1.Enterprise IS NOT NULL AND F1.Enterprise IS NULL THEN 0
+  WHEN M2.Enterprise IS NOT NULL AND F2.Enterprise IS NULL THEN 0
+  ELSE 1 END)
+;
+
+EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in sessionid int
+in enterprise varchar(16)
+in actiontype varchar(32)
+in entitytype varchar(32)
+in startentityid int
+in endentityid int
+@end

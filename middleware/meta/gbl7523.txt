@@ -1,0 +1,113 @@
+@name=GBL7523
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7523.txt,v $
+Revision 1.12  2010/06/21 15:42:41  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.11  2004/10/20 21:01:44  dave
+changes to gen parm
+
+Revision 1.10  2004/02/20 20:21:54  roger
+Must be @t_schema
+
+Revision 1.9  2004/02/20 18:09:34  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.8  2003/02/05 01:08:20  gregg
+interval start/end dates logic added
+
+Revision 1.7  2002/08/06 00:17:15  gregg
+retrieve status val + status desc
+
+Revision 1.6  2002/08/05 23:57:32  gregg
+get status description
+
+Revision 1.5  2002/08/05 17:50:19  gregg
+added pulldate
+
+Revision 1.1.2.4  2002/08/05 17:34:10  gregg
+fconvert to ints...
+
+Revision 1.1.2.3  2002/08/05 17:22:15  gregg
+sql fix
+
+Revision 1.1.2.2  2002/08/05 17:11:08  gregg
+added status col
+
+Revision 1.1.2.1  2002/08/05 17:03:13  gregg
+initial load - from v11 to v10
+
+Revision 1.1  2002/08/05 17:01:38  gregg
+initial load
+
+
+@desc=get the OPWGID+QueueType+EntityType+EntityID with the latest pushdate for a given Queue - by OPWGID 
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7523.txt,v 1.12 2010/06/21 15:42:41 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+
+with myQueueList(opwgid,queue,status,entitytype,entityid) AS
+(SELECT DISTINCT 
+  INT(OPWGID)
+, QUEUE
+, INT(STATUS)
+, ENTITYTYPE
+, INT(ENTITYID) 
+from @t_schema.QUEUE 
+WHERE
+    OPWGID = :OPWGID
+AND QUEUE = :Queue
+AND INTERVALSTARTDATE >= :IntervalStartDate
+AND INTERVALENDDATE <= :IntervalEndDate
+)
+SELECT 
+  INT(Q.OPWGID) AS OPWGID
+, Q.QUEUE
+, INT(Q.STATUS) AS STATUS
+, (SELECT LONGDESCRIPTION from @t_schema.METADESCRIPTION
+   WHERE
+       ENTERPRISE = 'NE'
+   AND NLSID = 1
+   AND DESCRIPTIONTYPE = 'QUEUESTATUS'
+   AND DESCRIPTIONCLASS = CHAR(Q.STATUS)) AS STATUSDESC
+, Q.ENTITYTYPE
+, INT(Q.ENTITYID) AS ENTITYID
+, (SELECT MAX(pushdate) from @t_schema.QUEUE PUSH
+   WHERE 
+       PUSH.OPWGID = Q.OPWGID 
+   AND PUSH.QUEUE = Q.QUEUE 
+   AND PUSH.STATUS = Q.STATUS
+   AND PUSH.ENTITYTYPE = Q.ENTITYTYPE
+   AND PUSH.ENTITYID = Q.ENTITYID) as PUSHDATE
+, (SELECT MAX(pulldate) from @t_schema.QUEUE PULL
+   WHERE
+       PULL.OPWGID = Q.OPWGID 
+   AND PULL.QUEUE = Q.QUEUE 
+   AND PULL.STATUS = Q.STATUS
+   AND PULL.ENTITYTYPE = Q.ENTITYTYPE
+   AND PULL.ENTITYID = Q.ENTITYID
+   AND PULL.PUSHDATE = PUSHDATE)     
+from myQueueList Q
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in OPWGID int
+in Queue varchar(32)
+in IntervalStartDate varchar(32)
+in IntervalEndDate varchar(32)
+@end
+
+
+

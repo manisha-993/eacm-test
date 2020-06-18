@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--xtools2_universal_type_manager-->
+<?com.ibm.xtools.emf.core.signature <signature id="com.ibm.xtools.mmi.ui.signatures.diagram" version="7.0.0"><feature description="" name="Rational Modeling Platform (com.ibm.xtools.rmp)" url="" version="7.0.0"/></signature>?>
+<notation:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:notation="http://www.eclipse.org/gmf/runtime/1.0.0/notation" xmlns:uml="http://www.eclipse.org/uml2/2.0.0/UML" xmlns:umlnotation="http://www.ibm.com/xtools/1.5.2/Umlnotation" xmi:id="_5PSXIEAjEdy1ht3N5-0bSQ" type="Class" name="overview.dnx">
+  <children xmi:id="_5PSXIUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXIkAjEdy1ht3N5-0bSQ" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_5PSXI0AjEdy1ht3N5-0bSQ" width="1320" height="1320"/>
+    </children>
+    <children xmi:id="_5PSXJEAjEdy1ht3N5-0bSQ" type="Stereotype"/>
+    <children xmi:id="_5PSXJUAjEdy1ht3N5-0bSQ" type="Name"/>
+    <children xmi:id="_5PSXJkAjEdy1ht3N5-0bSQ" type="Parent"/>
+    <children xmi:id="_5PSXJ0AjEdy1ht3N5-0bSQ" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_5PSXKEAjEdy1ht3N5-0bSQ" collapsed="true"/>
+    </children>
+    <children xmi:id="_5PSXKUAjEdy1ht3N5-0bSQ" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_5PSXKkAjEdy1ht3N5-0bSQ" collapsed="true"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_5PSXK0AjEdy1ht3N5-0bSQ" showStereotype="Label"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=EntityItem%5Bjcu%5Ename=EntityItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D$uml.Class"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXLEAjEdy1ht3N5-0bSQ" x="22731" y="13631"/>
+  </children>
+  <children xmi:id="_5PSXLUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXLkAjEdy1ht3N5-0bSQ" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_5PSXL0AjEdy1ht3N5-0bSQ" width="1320" height="1320"/>
+    </children>
+    <children xmi:id="_5PSXMEAjEdy1ht3N5-0bSQ" type="Stereotype"/>
+    <children xmi:id="_5PSXMUAjEdy1ht3N5-0bSQ" type="Name"/>
+    <children xmi:id="_5PSXMkAjEdy1ht3N5-0bSQ" type="Parent"/>
+    <children xmi:id="_5PSXM0AjEdy1ht3N5-0bSQ" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_5PSXNEAjEdy1ht3N5-0bSQ" collapsed="true"/>
+    </children>
+    <children xmi:id="_5PSXNUAjEdy1ht3N5-0bSQ" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_5PSXNkAjEdy1ht3N5-0bSQ" collapsed="true"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_5PSXN0AjEdy1ht3N5-0bSQ" showStereotype="Label"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=EntityGroup%5Bjcu%5Ename=EntityGroup.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D$uml.Class"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXOEAjEdy1ht3N5-0bSQ" x="12997" y="6974"/>
+  </children>
+  <children xmi:id="_5PSXOUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXOkAjEdy1ht3N5-0bSQ" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_5PSXO0AjEdy1ht3N5-0bSQ" width="1320" height="1320"/>
+    </children>
+    <children xmi:id="_5PSXPEAjEdy1ht3N5-0bSQ" type="Stereotype"/>
+    <children xmi:id="_5PSXPUAjEdy1ht3N5-0bSQ" type="Name"/>
+    <children xmi:id="_5PSXPkAjEdy1ht3N5-0bSQ" type="Parent"/>
+    <children xmi:id="_5PSXP0AjEdy1ht3N5-0bSQ" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_5PSXQEAjEdy1ht3N5-0bSQ" collapsed="true"/>
+    </children>
+    <children xmi:id="_5PSXQUAjEdy1ht3N5-0bSQ" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_5PSXQkAjEdy1ht3N5-0bSQ" collapsed="true"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_5PSXQ0AjEdy1ht3N5-0bSQ" showStereotype="Label"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=TransitionItem%5Bjsrctype%5Ename=EntityGroup%5Bjcu%5Ename=EntityGroup.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Class"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXREAjEdy1ht3N5-0bSQ" x="6974" y="6974"/>
+  </children>
+  <children xmi:id="_5PSXRUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXRkAjEdy1ht3N5-0bSQ" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_5PSXR0AjEdy1ht3N5-0bSQ" width="1320" height="1320"/>
+    </children>
+    <children xmi:id="_5PSXSEAjEdy1ht3N5-0bSQ" type="Stereotype"/>
+    <children xmi:id="_5PSXSUAjEdy1ht3N5-0bSQ" type="Name"/>
+    <children xmi:id="_5PSXSkAjEdy1ht3N5-0bSQ" type="Parent"/>
+    <children xmi:id="_5PSXS0AjEdy1ht3N5-0bSQ" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_5PSXTEAjEdy1ht3N5-0bSQ" collapsed="true"/>
+    </children>
+    <children xmi:id="_5PSXTUAjEdy1ht3N5-0bSQ" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_5PSXTkAjEdy1ht3N5-0bSQ" collapsed="true"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_5PSXT0AjEdy1ht3N5-0bSQ" showStereotype="Label"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=EANAttribute%5Bjcu%5Ename=EANAttribute.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D$uml.Class"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXUEAjEdy1ht3N5-0bSQ" x="12891" y="13631"/>
+  </children>
+  <children xmi:id="_5PSXUUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXUkAjEdy1ht3N5-0bSQ" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_5PSXU0AjEdy1ht3N5-0bSQ" width="1320" height="1320"/>
+    </children>
+    <children xmi:id="_5PSXVEAjEdy1ht3N5-0bSQ" type="Stereotype"/>
+    <children xmi:id="_5PSXVUAjEdy1ht3N5-0bSQ" type="Name"/>
+    <children xmi:id="_5PSXVkAjEdy1ht3N5-0bSQ" type="Parent"/>
+    <children xmi:id="_5PSXV0AjEdy1ht3N5-0bSQ" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_5PSXWEAjEdy1ht3N5-0bSQ" collapsed="true"/>
+    </children>
+    <children xmi:id="_5PSXWUAjEdy1ht3N5-0bSQ" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_5PSXWkAjEdy1ht3N5-0bSQ" collapsed="true"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_5PSXW0AjEdy1ht3N5-0bSQ" showStereotype="Label"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=EntityList%5Bjcu%5Ename=EntityList.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D$uml.Class"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXXEAjEdy1ht3N5-0bSQ" x="22824" y="2219"/>
+  </children>
+  <children xmi:id="_5PSXXUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXXkAjEdy1ht3N5-0bSQ" type="ImageCompartment">
+      <layoutConstraint xmi:type="notation:Size" xmi:id="_5PSXX0AjEdy1ht3N5-0bSQ" width="1320" height="1320"/>
+    </children>
+    <children xmi:id="_5PSXYEAjEdy1ht3N5-0bSQ" type="Stereotype"/>
+    <children xmi:id="_5PSXYUAjEdy1ht3N5-0bSQ" type="Name"/>
+    <children xmi:id="_5PSXYkAjEdy1ht3N5-0bSQ" type="Parent"/>
+    <children xmi:id="_5PSXY0AjEdy1ht3N5-0bSQ" type="AttributeCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_5PSXZEAjEdy1ht3N5-0bSQ" collapsed="true"/>
+    </children>
+    <children xmi:id="_5PSXZUAjEdy1ht3N5-0bSQ" type="OperationCompartment">
+      <styles xmi:type="umlnotation:UMLListCompartmentStyle" xmi:id="_5PSXZkAjEdy1ht3N5-0bSQ" collapsed="true"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLShapeStyle" xmi:id="_5PSXZ0AjEdy1ht3N5-0bSQ" showStereotype="Label"/>
+    <element xmi:type="uml:Class" href="mmi:///#jsrctype%5Ename=EANActionItem%5Bjcu%5Ename=EANActionItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D$uml.Class"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXaEAjEdy1ht3N5-0bSQ" x="29481" y="6974"/>
+  </children>
+  <children xmi:id="_nXIyYEA6Edy1ht3N5-0bSQ" type="Note">
+    <children xmi:id="_nXIyY0A6Edy1ht3N5-0bSQ" type="DiagramName">
+      <element xsi:nil="true"/>
+    </children>
+    <children xmi:id="_nXIyZEA6Edy1ht3N5-0bSQ" type="Description">
+      <element xsi:nil="true"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_nXIyYUA6Edy1ht3N5-0bSQ" description="Typically the product of a action item." fillColor="13369343" lineColor="6737151"/>
+    <element xsi:nil="true"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_nXIyYkA6Edy1ht3N5-0bSQ" x="24182" y="-477" height="762"/>
+  </children>
+  <children xmi:id="_HSdfgEA7Edy1ht3N5-0bSQ" type="Note">
+    <children xmi:id="_HSdfg0A7Edy1ht3N5-0bSQ" type="DiagramName">
+      <element xsi:nil="true"/>
+    </children>
+    <children xmi:id="_HSdfhEA7Edy1ht3N5-0bSQ" type="Description">
+      <element xsi:nil="true"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_HSdfgUA7Edy1ht3N5-0bSQ" description="The meta and instances for a specific entity type." fillColor="13369343" lineColor="6737151"/>
+    <element xsi:nil="true"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_HSdfgkA7Edy1ht3N5-0bSQ" x="11412" y="3170" width="4134" height="1404"/>
+  </children>
+  <children xmi:id="_TbxasEA7Edy1ht3N5-0bSQ" type="Note">
+    <children xmi:id="_Tbxas0A7Edy1ht3N5-0bSQ" type="DiagramName">
+      <element xsi:nil="true"/>
+    </children>
+    <children xmi:id="_TbxatEA7Edy1ht3N5-0bSQ" type="Description">
+      <element xsi:nil="true"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_TbxasUA7Edy1ht3N5-0bSQ" description="A specific instance of a specific type" fillColor="13369343" lineColor="6737151"/>
+    <element xsi:nil="true"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_TbxaskA7Edy1ht3N5-0bSQ" x="26628" y="16167"/>
+  </children>
+  <children xmi:id="_ZIBy4EA7Edy1ht3N5-0bSQ" type="Note">
+    <children xmi:id="_ZIBy40A7Edy1ht3N5-0bSQ" type="DiagramName">
+      <element xsi:nil="true"/>
+    </children>
+    <children xmi:id="_ZIBy5EA7Edy1ht3N5-0bSQ" type="Description">
+      <element xsi:nil="true"/>
+    </children>
+    <styles xmi:type="notation:ShapeStyle" xmi:id="_ZIBy4UA7Edy1ht3N5-0bSQ" description="A populated attribute on a specific entity type" fillColor="13369343" lineColor="6737151"/>
+    <element xsi:nil="true"/>
+    <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ZIBy4kA7Edy1ht3N5-0bSQ" x="7608" y="10778" width="5093" height="2010"/>
+  </children>
+  <styles xmi:type="umlnotation:UMLDiagramStyle" xmi:id="_5PSXaUAjEdy1ht3N5-0bSQ"/>
+  <element xsi:nil="true"/>
+  <edges xmi:id="_5PSXakAjEdy1ht3N5-0bSQ" source="_5PSXIUAjEdy1ht3N5-0bSQ" target="_5PSXLUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXa0AjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSXbEAjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSXbUAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSXbkAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXb0AjEdy1ht3N5-0bSQ" y="-530"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSXcEAjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EntityItem%5Bjcu%5Ename=EntityItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EntityGroup%5Bjcu%5Ename=EntityGroup.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSXcUAjEdy1ht3N5-0bSQ" points="[-14, 846, -278, -5716]$[264, 3281, 0, -3281]$[251, 5715, -13, -847]"/>
+  </edges>
+  <edges xmi:id="_5PSXckAjEdy1ht3N5-0bSQ" type="OwnedElement" source="_5PSXLUAjEdy1ht3N5-0bSQ" target="_5PSXOUAjEdy1ht3N5-0bSQ">
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSXc0AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xsi:nil="true"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSXdEAjEdy1ht3N5-0bSQ" points="[-13, 846, -13, -2434]$[-13, 2433, -13, -847]"/>
+  </edges>
+  <edges xmi:id="_5PSXdUAjEdy1ht3N5-0bSQ" source="_5PSXLUAjEdy1ht3N5-0bSQ" target="_5PSXOUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXdkAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSXd0AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSXeEAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSXeUAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXekAjEdy1ht3N5-0bSQ" y="-530"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSXe0AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EntityGroup%5Bjcu%5Ename=EntityGroup.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=TransitionItem%5Bjsrctype%5Ename=EntityGroup%5Bjcu%5Ename=EntityGroup.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSXfEAjEdy1ht3N5-0bSQ" points="[-13, 846, -13, -2434]$[-13, 2433, -13, -847]"/>
+  </edges>
+  <edges xmi:id="_5PSXfUAjEdy1ht3N5-0bSQ" source="_5PSXLUAjEdy1ht3N5-0bSQ" target="_5PSXIUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXfkAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSXf0AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSXgEAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSXgUAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXgkAjEdy1ht3N5-0bSQ" y="-530"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSXg0AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EntityGroup%5Bjcu%5Ename=EntityGroup.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EntityItem%5Bjcu%5Ename=EntityItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSXhEAjEdy1ht3N5-0bSQ" points="[1640, 556, -7991, -6085]$[5926, 2011, -3705, -4630]$[8969, 5821, -662, -820]"/>
+  </edges>
+  <edges xmi:id="_5PSXhUAjEdy1ht3N5-0bSQ" source="_5PSXIUAjEdy1ht3N5-0bSQ" target="_5PSXRUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXhkAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSXh0AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSXiEAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSXiUAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXikAjEdy1ht3N5-0bSQ" y="-530"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSXi0AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EntityItem%5Bjcu%5Ename=EntityItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EANAttribute%5Bjcu%5Ename=EANAttribute.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSXjEAjEdy1ht3N5-0bSQ" points="[-14, -847, 5529, 2434]$[-5544, -2435, -1, 846]"/>
+  </edges>
+  <edges xmi:id="_5PSXjUAjEdy1ht3N5-0bSQ" source="_5PSXRUAjEdy1ht3N5-0bSQ" target="_5PSXIUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXjkAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSXj0AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSXkEAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSXkUAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXkkAjEdy1ht3N5-0bSQ" y="-530"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSXk0AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EANAttribute%5Bjcu%5Ename=EANAttribute.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EntityItem%5Bjcu%5Ename=EntityItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSXlEAjEdy1ht3N5-0bSQ" points="[1746, 662, -7885, 662]$[4868, 1852, -4763, 1852]$[8202, 582, -1429, 582]"/>
+  </edges>
+  <edges xmi:id="_5PSXlUAjEdy1ht3N5-0bSQ" source="_5PSXRUAjEdy1ht3N5-0bSQ" target="_5PSXLUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXlkAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSXl0AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSXmEAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSXmUAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXmkAjEdy1ht3N5-0bSQ" y="-530"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSXm0AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EANAttribute%5Bjcu%5Ename=EANAttribute.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EntityGroup%5Bjcu%5Ename=EntityGroup.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSXnEAjEdy1ht3N5-0bSQ" points="[0, -820, 0, 5821]$[0, -5821, 0, 820]"/>
+  </edges>
+  <edges xmi:id="_5PSXnUAjEdy1ht3N5-0bSQ" source="_5PSXIUAjEdy1ht3N5-0bSQ" target="_5PSXUUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXnkAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSXn0AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSXoEAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSXoUAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXokAjEdy1ht3N5-0bSQ" y="-530"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSXo0AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EntityItem%5Bjcu%5Ename=EntityItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EntityList%5Bjcu%5Ename=EntityList.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSXpEAjEdy1ht3N5-0bSQ" points="[-1058, -847, 4921, 8811]$[-4736, -3757, 1243, 5901]$[-5794, -8811, 185, 847]"/>
+  </edges>
+  <edges xmi:id="_5PSXpUAjEdy1ht3N5-0bSQ" source="_5PSXLUAjEdy1ht3N5-0bSQ" target="_5PSXUUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXpkAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSXp0AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSXqEAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSXqUAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXqkAjEdy1ht3N5-0bSQ" y="-530"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSXq0AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EntityGroup%5Bjcu%5Ename=EntityGroup.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EntityList%5Bjcu%5Ename=EntityList.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSXrEAjEdy1ht3N5-0bSQ" points="[-1058, -820, 4736, 3758]$[-4736, -3731, 1058, 847]"/>
+  </edges>
+  <edges xmi:id="_5PSXrUAjEdy1ht3N5-0bSQ" source="_5PSXUUAjEdy1ht3N5-0bSQ" target="_5PSXLUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXrkAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSXr0AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSXsEAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSXsUAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXskAjEdy1ht3N5-0bSQ" y="-530"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSXs0AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EntityList%5Bjcu%5Ename=EntityList.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EntityGroup%5Bjcu%5Ename=EntityGroup.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSXtEAjEdy1ht3N5-0bSQ" points="[-1350, -53, 8281, -4815]$[-5927, -53, 3704, -4815]$[-8996, 3916, 635, -846]"/>
+  </edges>
+  <edges xmi:id="_5PSXtUAjEdy1ht3N5-0bSQ" source="_5PSXUUAjEdy1ht3N5-0bSQ" target="_5PSXIUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXtkAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSXt0AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSXuEAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSXuUAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXukAjEdy1ht3N5-0bSQ" y="-530"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSXu0AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EntityList%5Bjcu%5Ename=EntityList.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EntityItem%5Bjcu%5Ename=EntityItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSXvEAjEdy1ht3N5-0bSQ" points="[529, 847, -5450, -8811]$[5450, 8811, -529, -847]"/>
+  </edges>
+  <edges xmi:id="_5PSXvUAjEdy1ht3N5-0bSQ" source="_5PSXUUAjEdy1ht3N5-0bSQ" target="_5PSXRUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXvkAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSXv0AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSXwEAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSXwUAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXwkAjEdy1ht3N5-0bSQ" y="-530"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSXw0AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EntityList%5Bjcu%5Ename=EntityList.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EANAttribute%5Bjcu%5Ename=EANAttribute.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSXxEAjEdy1ht3N5-0bSQ" points="[0, 847, 6482, -2434]$[-6483, 2434, -1, -847]"/>
+  </edges>
+  <edges xmi:id="_5PSXxUAjEdy1ht3N5-0bSQ" source="_5PSXIUAjEdy1ht3N5-0bSQ" target="_5PSXXUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXxkAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSXx0AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSXyEAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSXyUAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSXykAjEdy1ht3N5-0bSQ" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSXy0AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EntityItem%5Bjcu%5Ename=EntityItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EANActionItem%5Bjcu%5Ename=EANActionItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSXzEAjEdy1ht3N5-0bSQ" points="[1534, -26, -5583, 6615]$[4762, -26, -2355, 6615]$[6826, -5821, -291, 820]"/>
+  </edges>
+  <edges xmi:id="_5PSXzUAjEdy1ht3N5-0bSQ" source="_5PSXLUAjEdy1ht3N5-0bSQ" target="_5PSXXUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSXzkAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSXz0AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSX0EAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSX0UAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSX0kAjEdy1ht3N5-0bSQ" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSX00AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EntityGroup%5Bjcu%5Ename=EntityGroup.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EANActionItem%5Bjcu%5Ename=EANActionItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSX1EAjEdy1ht3N5-0bSQ" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:id="_5PSX1UAjEdy1ht3N5-0bSQ" source="_5PSXUUAjEdy1ht3N5-0bSQ" target="_5PSXXUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSX1kAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSX10AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSX2EAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSX2UAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSX2kAjEdy1ht3N5-0bSQ" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSX20AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EntityList%5Bjcu%5Ename=EntityList.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EANActionItem%5Bjcu%5Ename=EANActionItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSX3EAjEdy1ht3N5-0bSQ" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:id="_5PSX3UAjEdy1ht3N5-0bSQ" source="_5PSXXUAjEdy1ht3N5-0bSQ" target="_5PSXIUAjEdy1ht3N5-0bSQ">
+    <children xmi:id="_5PSX3kAjEdy1ht3N5-0bSQ" type="KindLabel">
+      <children xmi:id="_5PSX30AjEdy1ht3N5-0bSQ" type="Stereotype"/>
+      <children xmi:id="_5PSX4EAjEdy1ht3N5-0bSQ" type="Kind"/>
+      <children xmi:id="_5PSX4UAjEdy1ht3N5-0bSQ" type="Name"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_5PSX4kAjEdy1ht3N5-0bSQ" y="-186"/>
+    </children>
+    <styles xmi:type="umlnotation:UMLConnectorStyle" xmi:id="_5PSX40AjEdy1ht3N5-0bSQ" showStereotype="Text"/>
+    <element xmi:type="uml:Usage" href="mmi:///#jdep%5Bjsrctype%5Ename=EANActionItem%5Bjcu%5Ename=EANActionItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D%5Bjsrctype%5Ename=EntityItem%5Bjcu%5Ename=EntityItem.java%5Bjpack%5Ename=COM.ibm.eannounce.objects%5Bjsrcroot%5Esrcfolder=source%5Bproject%5Eid=middleware%5D%5D%5D%5D%5D$uml.Usage"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_5PSX5EAjEdy1ht3N5-0bSQ" points="[0, 0, 0, 0]$[0, 0, 0, 0]"/>
+  </edges>
+  <edges xmi:id="_nXO5AEA6Edy1ht3N5-0bSQ" type="NoteAttachment" source="_nXIyYEA6Edy1ht3N5-0bSQ" target="_5PSXUUAjEdy1ht3N5-0bSQ">
+    <styles xmi:type="notation:ConnectorStyle" xmi:id="_nXO5AUA6Edy1ht3N5-0bSQ"/>
+    <element xsi:nil="true"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_nXO5AkA6Edy1ht3N5-0bSQ" points="[0, 0, -639, -80]$[603, 75, -36, -5]"/>
+  </edges>
+  <edges xmi:id="_HSdfhUA7Edy1ht3N5-0bSQ" type="NoteAttachment" source="_HSdfgEA7Edy1ht3N5-0bSQ" target="_5PSXLUAjEdy1ht3N5-0bSQ">
+    <styles xmi:type="notation:ConnectorStyle" xmi:id="_HSdfhkA7Edy1ht3N5-0bSQ"/>
+    <element xsi:nil="true"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_HSdfh0A7Edy1ht3N5-0bSQ" points="[0, 0, -384, -206]$[343, 184, -41, -22]"/>
+  </edges>
+  <edges xmi:id="_TbxatUA7Edy1ht3N5-0bSQ" type="NoteAttachment" source="_TbxasEA7Edy1ht3N5-0bSQ" target="_5PSXIUAjEdy1ht3N5-0bSQ">
+    <styles xmi:type="notation:ConnectorStyle" xmi:id="_TbxatkA7Edy1ht3N5-0bSQ"/>
+    <element xsi:nil="true"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Tbxat0A7Edy1ht3N5-0bSQ" points="[0, 0, -639, -382]$[602, 360, -37, -22]"/>
+  </edges>
+  <edges xmi:id="_ZIBy5UA7Edy1ht3N5-0bSQ" type="NoteAttachment" source="_ZIBy4EA7Edy1ht3N5-0bSQ" target="_5PSXRUAjEdy1ht3N5-0bSQ">
+    <styles xmi:type="notation:ConnectorStyle" xmi:id="_ZIBy5kA7Edy1ht3N5-0bSQ"/>
+    <element xsi:nil="true"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_ZIBy50A7Edy1ht3N5-0bSQ" points="[0, 0, -384, -382]$[362, 360, -22, -22]"/>
+  </edges>
+</notation:Diagram>

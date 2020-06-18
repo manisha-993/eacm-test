@@ -1,0 +1,309 @@
+* ============================================================================
+*
+* Sample response file for IBM DB2 Universal Database
+* ---------------------------------------------------
+*
+* Comments are made by placing a * at the start of a line
+*
+* For a description of valid profile variables, please see Appendix E in the
+* "Administration Guide".
+*
+* For a description of valid configuration parameters, please see
+* Chapter 19 in the "Administration Guide".
+*
+* ============================================================================
+
+
+* Product Installation
+* --------------------
+*INSTALL_SOURCE_PATH       = /cdrom/db2
+
+PROD                      = UDB_ENTERPRISE
+PROD                      = SDK
+COMP                      = JAVA_SUPPORT 
+*COMP                      = DIRECTORY_ACCESS_PROTOCOL 
+*COMP                      = DISTRIBUTED_JOIN_FOR_DB2 
+*COMP                      = WAREHOUSE_CONTROL_DATABASE 
+*COMP                      = GETTING_STARTED 
+*COMP                      = REPLICATION 
+*COMP                      = JAPANESE_CONVERSION 
+*COMP                      = KOREAN_CONVERSION 
+*COMP                      = TRADITIONAL_CHINESE_CONVERSION 
+*COMP                      = SIMPLIFIED_CHINESE_CONVERSION 
+*COMP                      = DB2_CONTROL_SERVER 
+*COMP                     = DFS_CLIENT_ENABLER 
+*COMP                     = DB2_CONTROL_CENTER 
+*COMP                     = INFORMATION_CATALOG_MANAGER_WEB 
+*COMP                     = DB2_PRODUCT_MESSAGES_ENGLISH 
+*COMP                     = DB2_PRODUCT_MESSAGES_GERMAN 
+*COMP                     = DB2_PRODUCT_MESSAGES_GERMAN_ISO 
+*COMP                     = DB2_PRODUCT_MESSAGES_SPANISH 
+*COMP                     = DB2_PRODUCT_MESSAGES_SPANISH_ISO 
+*COMP                     = DB2_PRODUCT_MESSAGES_FRENCH 
+*COMP                     = DB2_PRODUCT_MESSAGES_FRENCH_ISO 
+*COMP                     = DB2_PRODUCT_MESSAGES_ITALIAN 
+*COMP                     = DB2_PRODUCT_MESSAGES_ITALIAN_ISO 
+*COMP                     = DB2_PRODUCT_MESSAGES_BRAZILIAN_PORTUGUESE 
+*COMP                     = DB2_CONTROL_CENTER_GERMAN 
+*COMP                     = DB2_CONTROL_CENTER_SPANISH 
+*COMP                     = DB2_CONTROL_CENTER_FRENCH 
+*COMP                     = DB2_CONTROL_CENTER_ITALIAN 
+*COMP                     = DB2_CONTROL_CENTER_BRAZILIAN_PORTUGUESE 
+*COMP                     = DB2_PRODUCT_LIBRARY_ENGLISH 
+*COMP                     = DB2_PRODUCT_LIBRARY_GERMAN 
+*COMP                     = DB2_PRODUCT_LIBRARY_SPANISH 
+*COMP                     = DB2_PRODUCT_LIBRARY_FRENCH 
+*COMP                     = DB2_PRODUCT_LIBRARY_ITALIAN 
+*COMP                     = DB2_PRODUCT_LIBRARY_BRAZILIAN_PORTUGUESE 
+
+* Instance Creation Settings
+* --------------------------
+DB2.USER_NAME                          = opici11
+DB2.GROUP_NAME                         = opici11g
+DB2.HOME_DIRECTORY                     = /home/opici11
+DB2.PASSWORD                           = cat9tail
+DB2.AUTHENTICATION                     = SERVER
+
+DB2.SAMPLE                             = NO
+DB2.AUTOSTART                          = YES
+DB2.SVCENAME                           = opici11
+DB2.PORT_NUMBER                        = 50011
+
+*DB2.CDB_DATABASE                       = dwcntrl
+
+*DB2.DJ_SETUP                           = YES
+
+*DB2.USER_NAME                           = char(8)  no spaces
+*DB2.UID                                 = 100 - 65535
+*DB2.GROUP_NAME                          = char(8) no spaces
+*DB2.GID                                 = 100 - 65535
+*DB2.HOME_DIRECTORY                      = char(64) no spaces
+*DB2.PASSWORD                            = char(8)
+*DB2.SAMPLE                              = YES or NO
+*DB2.CDB_DATABASE                        = char(8)
+*DB2.DJ_SETUP                            = YES or NO
+*DB2.AUTOSTART                           = YES or NO
+*DB2.PORT_NUMBER                         = 1024 - 65535
+*DB2.NETWARE_ID                          = char(48)
+*DB2.NETWARE_PWD                         = char(128)
+*DB2.AUTHENTICATION                      = CLIENT, DCS, DCS_ENCRYPT, DCE, DCE_SERVER_ENCRYPT, SERVER, or SERVER_ENCRYPT
+*DB2.SVCENAME                            = BLANK or char(14)
+*DB2.FILESERVER                          = BLANK or char(48)
+*DB2.IPX_SOCKET                          = BLANK or 0000 - FFFF
+*DB2.OBJECTNAME                          = BLANK or char(48)
+
+* Fenced User Creation Settings
+* -----------------------------
+UDF.USER_NAME                          = opicf11
+UDF.GROUP_NAME                         = opicf11g
+UDF.HOME_DIRECTORY                     = /home/opicf11
+UDF.PASSWORD                           = cat9tail
+
+*UDF.USER_NAME                           = char(8)  no spaces
+*UDF.UID                                 = 100 - 65535
+*UDF.GROUP_NAME                          = char(8)  no spaces
+*UDF.GID                                 = 100 - 65535
+*UDF.HOME_DIRECTORY                      = char(64) no spaces
+*UDF.PASSWORD                            = char(14)
+
+* Instance DBM CFG Settings
+* -------------------------
+DB2.DFTDBPATH                           = /db2
+*DB2.DIR_TYPE                            = DCE or NONE
+DB2.DISCOVER_COMM                       = TCPIP
+*DB2.ROUTE_OBJ_NAME                      = BLANK or char(255)
+*DB2.ASLHEAPSZ                           = 1 - 524288
+*DB2.AUDIT_BUF_SZ                        = 0 - 65000
+*DB2.BACKBUFSZ                           = 16 - 524288
+*DB2.CATALOG_NOAUTH                      = 0, 1, YES or NO
+*DB2.CPUSPEED                            = -1 or 1e-10 - 1
+*DB2.DATALINKS                           = YES or NO
+*DB2.DFT_ACCOUNT_STR                     = BLANK or char(25)
+*DB2.DFT_MON_BUFPOOL                     = ON or OFF
+*DB2.DFT_MON_LOCK                        = ON or OFF
+*DB2.DFT_MON_SORT                        = ON or OFF
+*DB2.DFT_MON_STMT                        = ON or OFF
+*DB2.DFT_MON_TABLE                       = ON or OFF
+*DB2.DFT_MON_UOW                         = ON or OFF
+*DB2.DIAGLEVEL                           = 0 - 4
+*DB2.DIAGPATH                            = BLANK or char(215)
+*DB2.DIR_CACHE                           = YES or NO
+*DB2.DIR_OBJ_NAME                        = BLANK or char(255) (length of DIR_OBJ_NAME + DIR_PATH_NAME <= 255)
+*DB2.DIR_PATH_NAME                       = BLANK or char(255) (length of DIR_OBJ_NAME + DIR_PATH_NAME <= 255)
+*DB2.DISCOVER                            = DISABLE, KNOWN or SEARCH
+*DB2.DISCOVER_INST                       = ENABLE or DISABLE
+*DB2.DRDA_HEAP_SZ                        = 16 - 60000
+*DB2.FCM_NUM_ANCHORS                     = -1 or 128 - FCM_NUM_RQB
+*DB2.FCM_NUM_BUFFERS                     = 128 - 65300
+*DB2.FCM_NUM_CONNECT                     = -1 or 128 - FCM_NUM_RQB
+*DB2.FCM_NUM_RQB                         = 128 - 120000
+*DB2.INDEXREC                            = ACCESS or RESTART
+*DB2.INITDARI_JVM                        = YES or NO
+*DB2.INTRA_PARALLEL                      = SYSTEM, YES, NO
+*DB2.JAVA_HEAP_SZ                        = 0 - 4096
+*DB2.JDK11_PATH                          = BLANK or char(255)
+DB2.KEEPDARI                            = YES 
+*DB2.MAXAGENTS                           = 1 - 64000
+*DB2.MAXCAGENTS                          = -1 or 1 - MAX_COORDAGENTS
+*DB2.MAXDARI                             = -1 or 1 - MAX_COORDAGENTS
+*DB2.MAX_COORDAGENTS                     = -1 or 1 - MAXAGENTS (MAX_COORDAGENTS + NUM_INITAGENTS <= MAXAGENTS)
+*DB2.MAX_QUERYDEGREE                     = ANY, -1 or 1 - 32767
+*DB2.MON_HEAP_SZ                         = 0 - 60000
+*DB2.NUMDB                               = 1 - 256
+*DB2.NUM_INITAGENTS                      = 1 - NUM_POOLAGENTS (MAX_COORDAGENTS + NUM_INITAGENTS <= MAXAGENTS)
+*DB2.NUM_INITDARIS                       = 0 - MAXDARI
+*DB2.NUM_POOLAGENTS                      = -1 or 1 - MAXAGENTS
+DB2.QUERY_HEAP_SZ                       = 16384
+*DB2.RESTBUFSZ                           = 16 - 524288
+*DB2.RESYNC_INTERVAL                     = 1 - 60000
+*DB2.RQRIOBLK                            = 4096 - 65535
+*DB2.SHEAPTHRES                          = 250 - 2097152
+*DB2.SPM_LOG_FILE_SZ                     = 4 - 1000
+*DB2.SPM_LOG_PATH                        = BLANK or char(226)
+*DB2.SPM_MAX_RESYNC                      = 10 - 256
+*DB2.SPM_NAME                            = BLANK or char(8)
+*DB2.SYSADM_GROUP                        = BLANK or char(8)
+*DB2.SYSCTRL_GROUP                       = BLANK or char(8)
+*DB2.SYSMAINT_GROUP                      = BLANK or char(8)
+*DB2.TM_DATABASE                         = BLANK or char(8)
+*DB2.TPNAME                              = BLANK or char(64)
+*DB2.TP_MON_NAME                         = BLANK or char(19)
+*DB2.TRUST_ALLCLNTS                      = YES, NO or DRDAONLY
+*DB2.TRUST_CLNTAUTH                      = CLIENT or SERVER
+*DB2.UDF_MEM_SZ                          = 128 - 60000
+*DB2.AGENTPRI                            = SYSTEM, -1 or 41-125
+*DB2.DFT_CLIENT_COMM                     = BLANK or APPC, TCPIP
+
+* Instance Profile Registry Settings
+* ----------------------------------
+*DB2.DB2COMM                             = BLANK or APPC, IPXSPX, TCPIP
+*DB2.DB2ENVLIST                          = BLANK or char()
+*DB2.DB2LIBPATH                          = BLANK or char()
+*DB2.DB2_FORCE_NLS_CACHE                 = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2ACCOUNT                          = BLANK or char(199)
+*DB2.DB2BIDI                             = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2BQTIME                           = BLANK or 1 - MAX
+*DB2.DB2BQTRY                            = BLANK or 0 - MAX
+*DB2.DB2CHKPTR                           = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2CLIINIPATH                       = BLANK or char(260)
+*DB2.DB2CODEPAGE                         = BLANK or 0 - MAX
+*DB2.DB2CONNECT_IN_APP_PROCESS           = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2COUNTRY                          = BLANK or 1 - 999
+*DB2.DB2DBDFT                            = BLANK or char(8)
+*DB2.DB2DEFPREP                          = BLANK, ALL, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2IQTIME                           = BLANK or 1 - MAX
+*DB2.DB2LOADREC                          = BLANK or char(260)
+*DB2.DB2LOCK_TO_RB                       = BLANK or STATEMENT
+*DB2.DB2NOEXITLIST                       = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2OLDEVMON                         = BLANK or char()
+*DB2.DB2OPTIONS                          = BLANK or -/+[a,c,e[c,s],n,o,p,s,t,v,w,x] and/or -[f,l,r,z]filename
+*DB2.DB2PRIORITIES                       = BLANK or char()
+*DB2.DB2RQTIME                           = BLANK or 1 - MAX
+*DB2.DB2SORT                             = BLANK or char(260)
+*DB2.DB2SYSPLEX_SERVER                   = BLANK, 0 or 1
+*DB2.DB2_AVOID_PREFETCH                  = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2_CORRELATED_PREDICATES           = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2_FORCE_TRUNCATION                = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2_HASH_JOIN                       = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2_INDEX_FREE                      = BLANK or 0 - 60
+*DB2.DB2_LIKE_VARCHAR                    = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T, F or 0.0 - 5.0 (exclusive)
+*DB2.DB2_LOADSORT_STACKSZ                = BLANK or 1 - MAX
+*DB2.DB2_NO_PKG_LOCK                     = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2_PARALLEL_IO                     = BLANK, * or 0-4095,0-4095,...
+*DB2.DB2_PRED_FACTORIZE                  = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2_RR_TO_RS                        = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2_STRIPED_CONTAINERS              = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2CHECKCLIENTINTERVAL              = BLANK, 0 - MAX
+*DB2.DB2ROUTINE_DEBUG                    = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2_MMAP_READ                       = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2.DB2_MMAP_WRITE                      = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+
+* Administration Server Creation Settings
+* ---------------------------------------
+*ADMIN.USER_NAME           = db2as
+*ADMIN.GROUP_NAME          = db2asgrp
+*ADMIN.HOME_DIRECTORY      = /home/db2as
+*ADMIN.PASSWORD            = cat9tail
+*ADMIN.USER_NAME                         = char(8)  no spaces
+*ADMIN.UID                               = 100 - 65535
+*ADMIN.GROUP_NAME                        = char(8)  no spaces
+*ADMIN.GID                               = 100 - 65535
+*ADMIN.HOME_DIRECTORY                    = char(64) no spaces
+*ADMIN.PASSWORD                          = char(8)
+*ADMIN.NETWARE_ID                        = char(48)
+*ADMIN.NETWARE_PWD                       = char(128)
+*ADMIN.FILESERVER                        = BLANK or char(48)
+*ADMIN.OBJECTNAME                        = BLANK or char(48)
+
+* Administration Server ADMIN CFG Settings
+* ----------------------------------------
+*ADMIN.DISCOVER_COMM                     = BLANK or TCPIP
+*ADMIN.AUTHENTICATION                    = CLIENT, DCS, DCS_ENCRYPT, DCE, DCE_SERVER_ENCRYPT, SERVER, or SERVER_ENCRYPT
+*ADMIN.DIAGLEVEL                         = 0 - 4
+*ADMIN.DIAGPATH                          = BLANK or char(215)
+*ADMIN.DISCOVER                          = DISABLE, KNOWN or SEARCH
+*ADMIN.QUERY_HEAP_SZ                     = 2 - 524288
+*ADMIN.SYSADM_GROUP                      = BLANK or char(8)
+*ADMIN.SYSCTRL_GROUP                     = BLANK or char(8)
+*ADMIN.SYSMAINT_GROUP                    = BLANK or char(8)
+*ADMIN.TPNAME                            = BLANK or char(64)
+*ADMIN.TRUST_ALLCLNTS                    = YES, NO or DRDAONLY
+*ADMIN.TRUST_CLNTAUTH                    = CLIENT or SERVER
+
+* Administration Server Profile Registry Settings
+* -----------------------------------------------
+*ADMIN.DB2COMM                           = BLANK or APPC, IPXSPX, TCPIP
+*ADMIN.DB2CHKPTR                         = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*ADMIN.DB2CODEPAGE                       = BLANK or 0 - MAX
+*ADMIN.DB2COUNTRY                        = BLANK or 1 - 999
+*ADMIN.DB2PRIORITIES                     = BLANK or char()
+
+* Global Profile Registry Settings
+* --------------------------------
+*DB2COMM                                 = BLANK or APPC, IPXSPX, TCPIP
+*DB2ENVLIST                              = BLANK or char()
+*DB2LIBPATH                              = BLANK or char()
+*DB2SYSTEM                               = char(64)
+*DB2_FORCE_NLS_CACHE                     = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2ACCOUNT                              = BLANK or char(199)
+*DB2BIDI                                 = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2BQTIME                               = BLANK or 1 - MAX
+*DB2BQTRY                                = BLANK or 0 - MAX
+*DB2CHKPTR                               = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2CLIINIPATH                           = BLANK or char(260)
+*DB2CODEPAGE                             = BLANK or 0 - MAX
+*DB2CONNECT_IN_APP_PROCESS               = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2COUNTRY                              = BLANK or 1 - 999
+*DB2DBDFT                                = BLANK or char(8)
+*DB2DEFPREP                              = BLANK, ALL, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2IQTIME                               = BLANK or 1 - MAX
+*DB2LOADREC                              = BLANK or char(260)
+*DB2LOCK_TO_RB                           = BLANK or STATEMENT
+*DB2NOEXITLIST                           = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2OLDEVMON                             = BLANK or char()
+*DB2OPTIONS                              = BLANK or -/+[a,c,e[c,s],n,o,p,s,t,v,w,x] and/or -[f,l,r,z]filename
+*DB2PRIORITIES                           = BLANK or char()
+*DB2RQTIME                               = BLANK or 1 - MAX
+*DB2SORT                                 = BLANK or char(260)
+*DB2SYSPLEX_SERVER                       = BLANK, 0 or 1
+*DB2_AVOID_PREFETCH                      = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2_CORRELATED_PREDICATES               = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2_FORCE_TRUNCATION                    = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2_HASH_JOIN                           = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2_INDEX_FREE                          = BLANK or 0 - 60
+*DB2_LIKE_VARCHAR                        = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T, F or 0.0 - 5.0 (exclusive)
+*DB2_LOADSORT_STACKSZ                    = BLANK or 1 - MAX
+*DB2_NEW_CORR_SQ_FF                      = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2_NO_PKG_LOCK                         = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2_PARALLEL_IO                         = BLANK, * or 0-4095,0-4095,...
+*DB2_PRED_FACTORIZE                      = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2_RR_TO_RS                            = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2_STPROC_ALLOW_LOCAL_FENCED           = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2_STPROC_LOOKUP_FIRST                 = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2_STRIPED_CONTAINERS                  = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2CHECKCLIENTINTERVAL                  = BLANK, 0 - MAX
+*DB2ROUTINE_DEBUG                        = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2_MMAP_READ                           = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+*DB2_MMAP_WRITE                          = BLANK, 0, 1, YES, NO, ON, OFF, Y, N, TRUE, FALSE, T or F
+
+

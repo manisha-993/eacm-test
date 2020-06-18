@@ -1,0 +1,835 @@
+@name=GBL2266
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+---------------------------------------------------------------------------------
+-- Very dangerous..
+-- we need to take a closer look at how this should work
+-- These relators may have relators pointing to it
+-- These relators may also have attributes that will not be deactivated this way
+---------------------------------------------------------------------------------
+$Log: gbl2266.txt,v $
+Revision 1.29  2010/06/21 15:43:07  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.28  2009/10/20 00:21:59  rick
+update to change long datatype to sqlint32
+
+Revision 1.27  2006/04/06 21:34:59  joan
+add for QueueABR
+
+Revision 1.26  2005/05/25 23:33:56  dave
+adding feature no not redeacivate stuff that has
+been deactivated
+
+Revision 1.25  2005/03/29 21:39:51  gregg
+back in with ref_nls lets see what happens
+
+Revision 1.24  2005/03/29 20:37:25  gregg
+coment out REF_NLS for compile
+
+Revision 1.23  2005/03/25 19:02:13  dave
+minor sp compile adjust ments
+
+Revision 1.22  2005/03/25 18:29:01  roger
+Reinstate RefNLSID
+
+Revision 1.21  2005/03/24 17:39:56  gregg
+ensure relCur is going after only relevant entities
+
+Revision 1.20  2005/03/24 00:32:09  gregg
+sin-tacks
+
+Revision 1.19  2005/03/24 00:21:32  gregg
+relCur for giving us back the relators we expired
+
+Revision 1.18  2005/03/23 21:59:30  dave
+more flag stuff
+
+Revision 1.17  2004/10/20 21:01:39  dave
+changes to gen parm
+
+Revision 1.16  2004/03/19 21:19:07  joan
+remove relators in entity table
+
+Revision 1.15  2004/02/20 20:21:48  roger
+Must be @t_schema
+
+Revision 1.14  2004/02/20 18:09:29  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.13  2003/09/08 16:31:11  roger
+Enterprise was changed to 16 char length
+
+Revision 1.12  2003/08/28 20:39:04  joan
+fb51972, change select from relatorX to relator when inserting to relatorX table b/c relators might not exist in relatorX table
+
+Revision 1.11  2003/05/19 17:49:44  dave
+new Migration SP
+
+Revision 1.10  2003/04/17 17:56:14  dave
+clean up link,deactivate, tagging
+
+Revision 1.9  2001/06/13 21:33:17  dave
+minor fixes in prep for drop
+
+Revision 1.8  2001/06/03 23:54:28  dave
+syntax (Double WHERE clause)
+
+Revision 1.7  2001/06/03 23:26:36  dave
+XTable fixes on deactivate/relators .. etc
+
+Revision 1.6  2001/05/02 04:07:42  dave
+more xtable follow through stuff
+
+Revision 1.5  2001/05/02 03:52:10  dave
+Added X table updates for all update/insert info in SP's
+Activate/Deactivate. copy
+
+Revision 1.4  2001/03/16 18:27:51  roger
+Added branding feature to stored procedures
+
+Revision 1.3  2001/03/16 03:38:56  roger
+Added Log keyword
+
+@desc=Deactivate all relators pointing to this entity, and all relators this entity points to for a given enterprise
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2266.txt,v 1.29 2010/06/21 15:43:07 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL BEGIN DECLARE SECTION;
+char cRelatorType[32];
+sqlint32 iRelatorID;
+sqlint32 iCount;
+char cQueueName [33];
+char tmpEntityType [32];
+char cDirection [32];
+sqlint32 iQCount;
+EXEC SQL END DECLARE SECTION;
+
+// Lets make room for 250000 mill
+char acRelatorType[250000][32];
+sqlint32 aiRelatorID[250000];
+
+// for queueABR
+char acQueueName[100][33];
+char atmpEntityType[100][32];
+char acDirection[100][32];
+sqlint32 iCQueue;
+sqlint32 i;
+
+EXEC SQL DECLARE  queueGroupABR CURSOR FOR
+SELECT RTRIM(ml1.LinkCode), RTRIM(COALESCE(ML2.linkcode,'NONE')), RTRIM(COALESCE(ML2.linkvalue,'NA'))
+from @t_schema.MetaLinkAttr ml1
+
+left join @t_schema.metalinkattr ml2 on
+   ml2.enterprise = :Enterprise
+   and ml2.linktype = 'GroupABR/Relator/Entity'
+   and ml2.linktype1 = RTRIM(ml1.linkcode)
+   and ml2.linktype2 = :cRelatorType
+   and ml2.valto > current timestamp and ml2.effto > current timestamp
+    
+WHERE
+   ml1.Enterprise = :Enterprise
+   AND ml1.LinkType = 'Status/Trigger/GroupABR'
+   AND ml1.LinkType1 in ('REL')
+   AND ml1.LinkType2 in ('DEL')
+   AND ml1.LinkValue = :cRelatorType
+   AND ml1.ValTo = :forever
+   AND ml1.EffTo > CURRENT TIMESTAMP
+;
+
+EXEC SQL DECLARE curFROM CURSOR FOR
+SELECT
+R1.ENTITYTYPE,
+R1.ENTITYID
+FROM OPICM.RELATOR R1
+WHERE
+    R1.ENTERPRISE = :Enterprise
+AND R1.ENTITY1TYPE = :EntityType
+AND R1.Entity1ID = :EntityID
+AND :now BETWEEN R1.ValFrom and R1.ValTo
+AND :now BETWEEN R1.EffFrom and R1.EffTo
+; 
+
+EXEC SQL DECLARE curTO CURSOR FOR
+SELECT
+R2.ENTITYTYPE,
+R2.ENTITYID
+FROM OPICM.RELATOR R2
+WHERE
+    R2.ENTERPRISE = :Enterprise
+AND R2.ENTITY2TYPE = :EntityType
+AND R2.Entity2ID = :EntityID
+AND :now BETWEEN R2.ValFrom and R2.ValTo
+AND :now BETWEEN R2.EffFrom and R2.EffTo
+; 
+
+EXEC SQL DECLARE relCur CURSOR FOR
+SELECT
+  EntityType
+, EntityID
+, :now
+FROM @t_schema.RelatorX R
+WHERE
+    R.ENTERPRISE = :Enterprise
+AND R.ValFrom = :now
+AND R.Entity1Type = :EntityType
+AND R.Entity1ID = :EntityID
+UNION ALL
+SELECT
+  EntityType
+, EntityID
+, :now
+FROM @t_schema.RelatorX R
+WHERE
+    R.ENTERPRISE = :Enterprise
+AND R.ValFrom = :now
+AND R.Entity2Type = :EntityType
+AND R.Entity2ID = :EntityID
+;
+
+// first remove the relators from entity table, and their attributes
+iCount=0;
+EXEC SQL OPEN curFROM;
+do {
+    EXEC SQL FETCH curFROM INTO :cRelatorType, :iRelatorID;
+    if (SQLCODE != 0) break;
+    strcpy(acRelatorType[iCount],cRelatorType);
+    aiRelatorID[iCount++] = iRelatorID;
+} while (1);
+EXEC SQL CLOSE curFROM WITH RELEASE;
+
+EXEC SQL OPEN curTO;
+do {
+    EXEC SQL FETCH curTO INTO :cRelatorType, :iRelatorID;
+    if (SQLCODE != 0) break;
+    strcpy(acRelatorType[iCount],cRelatorType);
+    aiRelatorID[iCount++] = iRelatorID;
+} while (1);
+EXEC SQL CLOSE curTO WITH RELEASE;
+
+for (sqlint32 y=0;y<iCount;y++) {
+    iRelatorID = aiRelatorID[y];
+    strcpy(cRelatorType, acRelatorType[y]);
+    
+    strcpy(cQueueName, "NONE");
+    
+    iCQueue = 1;
+    EXEC SQL OPEN queueGroupABR;
+    do {
+       EXEC SQL FETCH queueGroupABR INTO :cQueueName, :tmpEntityType, :cDirection;
+       if (SQLCODE != 0) break;
+
+       strcpy(acQueueName[iCQueue],cQueueName);
+       strcpy(atmpEntityType[iCQueue],tmpEntityType);
+       strcpy(acDirection[iCQueue++],cDirection);
+   }   while (1);
+   EXEC SQL CLOSE queueGroupABR WITH RELEASE;
+   EXEC SQL COMMIT WORK;
+    
+   // Do you have a hit?
+   for (i=1; i < iCQueue; i++) {
+       strcpy(cQueueName, acQueueName[i]);
+       strcpy(tmpEntityType, atmpEntityType[i]);
+       strcpy(cDirection, acDirection[i]);
+                
+       if (strcmp(cQueueName,"NONE") != 0) {
+       iCount =0;
+       if (strcmp(tmpEntityType,"NONE") == 0) {
+        EXEC SQL select count(*) INTO :iQCount from opicm.queue
+        where enterprise = :Enterprise
+        and queue = :cQueueName
+        and entitytype = :EntityType
+        and entityid = :EntityID
+        and status in (20, 50);
+        
+        if (iQCount <= 0) {
+            EXEC SQL INSERT INTO @t_schema.QUEUE VALUES 
+            (   
+            :Enterprise
+            ,:OPENID
+            ,0
+            ,:cQueueName
+            ,20
+            ,:cRelatorType
+            ,:iRelatorID
+            ,CURRENT TIMESTAMP
+            ,'1980-01-01-00.00.00.000000'
+            ,'1980-01-01-00.00.00.000000'
+            ,'9999-12-31-00.00.00.000000'
+            );
+        }
+    
+       }
+       }
+    }
+    
+
+    // deactivate relators' attributes
+    // Deactivate the Text
+    EXEC SQL
+    UPDATE @t_schema.Text T
+    SET
+      ValTo = :now
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :forever
+    ;
+    EXEC SQL
+    INSERT
+    INTO @t_schema.Text
+    SELECT
+      Enterprise
+    , EntityType
+    , EntityID
+    , AttributeCode
+    , AttributeValue
+    , NLSID
+    , :now
+    , :forever
+    , :now
+    , :now
+    , :OPENID
+    , :TRANID
+    FROM @t_schema.Text
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :now
+    ;
+
+    // Deactivate the TextX
+    EXEC SQL
+    UPDATE @t_schema.TextX T
+    SET
+      ValTo = :now
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :forever
+    ;
+    EXEC SQL
+    INSERT
+    INTO @t_schema.TextX
+    SELECT
+      Enterprise
+    , EntityType
+    , EntityID
+    , AttributeCode
+    , AttributeValue
+    , NLSID
+    , :now
+    , :forever
+    , :now
+    , :now
+    , :OPENID
+    , :TRANID
+    FROM @t_schema.Text
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :now
+    ;
+
+    EXEC SQL COMMIT WORK
+    ;
+
+    // Deactivate the LongText
+    EXEC SQL
+    UPDATE @t_schema.LongText LT
+    SET
+      ValTo = :now
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :forever
+    ;
+    EXEC SQL
+    INSERT
+    INTO @t_schema.LongText
+    SELECT
+      Enterprise
+    , EntityType
+    , EntityID
+    , AttributeCode
+    , NLSID
+    , :now
+    , :forever
+    , :now
+    , :now
+    , :OPENID
+    , :TRANID
+    , AttributeValue
+    FROM @t_schema.LongText
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :now
+    ;
+
+    // Deactivate the LongTextX
+    EXEC SQL
+    UPDATE @t_schema.LongTextX LT
+    SET
+      ValTo = :now
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :forever
+    ;
+    EXEC SQL
+    INSERT
+    INTO @t_schema.LongTextX
+    SELECT
+      Enterprise
+    , EntityType
+    , EntityID
+    , AttributeCode
+    , NLSID
+    , :now
+    , :forever
+    , :now
+    , :now
+    , :OPENID
+    , :TRANID
+    , AttributeValue
+    FROM @t_schema.LongText
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :now
+    ;
+
+    EXEC SQL COMMIT WORK
+    ;
+
+    // Deactivate the Flag
+    EXEC SQL
+    UPDATE @t_schema.Flag F
+    SET
+      ValTo = :now
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :forever
+    ;
+    EXEC SQL
+    INSERT
+    INTO @t_schema.Flag
+    (
+      Enterprise
+    , EntityType
+    , EntityID
+    , AttributeCode
+    , AttributeValue
+    , Valfrom
+    , Valto
+    , EffFrom
+    , Effto
+    , OPENID
+    , TranID
+    , Ref_NLSID   
+    )SELECT
+      Enterprise
+    , EntityType
+    , EntityID
+    , AttributeCode
+    , AttributeValue
+    , :now
+    , :forever
+    , :now
+    , :now
+    , :OPENID
+    , :TRANID
+    , Ref_NLSID
+    FROM @t_schema.Flag
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :now
+    ;
+
+    // Deactivate the FlagX
+    EXEC SQL
+    UPDATE @t_schema.FlagX F
+    SET
+      ValTo = :now
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :forever
+    ;
+    EXEC SQL
+    INSERT
+    INTO @t_schema.FlagX
+    (
+      Enterprise
+    , EntityType
+    , EntityID
+    , AttributeCode
+    , AttributeValue
+    , Valfrom
+    , Valto
+    , EffFrom
+    , Effto
+    , OPENID
+    , TranID
+    , Ref_NLSID   
+    )
+    SELECT
+      Enterprise
+    , EntityType
+    , EntityID
+    , AttributeCode
+    , AttributeValue
+    , :now
+    , :forever
+    , :now
+    , :now
+    , :OPENID
+    , :TRANID
+    , REF_NLSID
+    FROM @t_schema.Flag
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :now
+    ;
+
+    EXEC SQL COMMIT WORK
+    ;
+
+    // Deactivate the Blob
+    EXEC SQL
+    UPDATE @t_schema.Blob B
+    SET
+      ValTo = :now
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :forever
+    ;
+
+    EXEC SQL
+    INSERT
+    INTO @t_schema.Blob
+    SELECT
+      Enterprise
+    , EntityType
+    , EntityID
+    , AttributeCode
+    , BlobExtension
+    , NLSID
+    , :now
+    , :forever
+    , :now
+    , :now
+    , :OPENID
+    , :TRANID
+    , AttributeValue
+    FROM @t_schema.Blob
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :now
+    ;
+    // Deactivate the BlobX
+    EXEC SQL
+    UPDATE @t_schema.BlobX B
+    SET
+      ValTo = :now
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :forever
+    ;
+
+    EXEC SQL
+    INSERT
+    INTO @t_schema.BlobX
+    SELECT
+      Enterprise
+    , EntityType
+    , EntityID
+    , AttributeCode
+    , BlobExtension
+    , NLSID
+    , :now
+    , :forever
+    , :now
+    , :now
+    , :OPENID
+    , :TRANID
+    , AttributeValue
+    FROM @t_schema.Blob
+    WHERE
+    Enterprise = :Enterprise AND
+    EntityType = :cRelatorType AND
+    EntityID = :iRelatorID AND
+    ValTo = :now
+    ;
+    EXEC SQL COMMIT WORK;
+    
+    // update the entity table to deactivate qualifying rows
+    EXEC SQL
+    UPDATE @t_schema.entity R
+    SET
+      ValTo = :now
+    WHERE
+        Enterprise = :Enterprise 
+    AND EntityType = :cRelatorType 
+    AND EntityID = :iRelatorID
+    AND ValTo = :forever
+    ;
+    
+    // update the entityX table to deactivate qualifying rows
+    EXEC SQL
+    UPDATE @t_schema.EntityX R
+    SET
+      ValTo = :now
+    WHERE
+        Enterprise = :Enterprise 
+    AND EntityType = :cRelatorType 
+    AND EntityID = :iRelatorID
+    AND ValTo = :forever
+    ;
+    
+    // insert the updated rows back into the entity table AS new ones (E1Type)
+    EXEC SQL
+    INSERT
+    INTO @t_schema.Entity
+    SELECT
+      Enterprise
+    , EntityType
+    , EntityID
+    , :now
+    , :forever
+    , :now
+    , :now
+    , :OPENID
+    , :TRANID
+    FROM @t_schema.Entity E
+    WHERE
+        Enterprise = :Enterprise 
+    AND EntityType = :cRelatorType 
+    AND EntityID = :iRelatorID
+    AND ValTo = :now
+    ;
+    
+    // Shadow Table
+    // insert the updated rows back into the entity table AS new ones (E1Type)
+    EXEC SQL
+    INSERT
+    INTO @t_schema.Entityx
+    SELECT
+      Enterprise
+    , EntityType
+    , EntityID
+    , :now
+    , :forever
+    , :now
+    , :now
+    , :OPENID
+    , :TRANID
+    FROM @t_schema.Entity R
+    WHERE
+        Enterprise = :Enterprise 
+    AND EntityType = :cRelatorType 
+    AND EntityID = :iRelatorID
+    AND ValTo = :now;
+    
+    EXEC SQL COMMIT WORK;
+}
+
+// update the relator table to deactivate qualifying rows
+EXEC SQL
+UPDATE @t_schema.Relator R
+SET
+  ValTo = :now
+WHERE
+    Enterprise = :Enterprise 
+AND Entity1Type = :EntityType 
+AND Entity1ID = :EntityID
+AND ValTo = :forever 
+AND :now between EffFrom AND EffTo
+;
+
+EXEC SQL
+UPDATE @t_schema.Relator R
+SET
+  ValTo = :now
+WHERE
+    Enterprise = :Enterprise 
+AND Entity2Type = :EntityType 
+AND Entity2ID = :EntityID
+AND ValTo = :forever
+AND :now between EffFrom AND EffTo
+;
+
+// update the relatorX table to deactivate qualifying rows
+EXEC SQL
+UPDATE @t_schema.RelatorX R
+SET
+  ValTo = :now
+WHERE
+    Enterprise = :Enterprise 
+AND Entity1Type = :EntityType 
+AND Entity1ID = :EntityID
+AND ValTo = :forever
+AND :now between EffFrom AND EffTo
+;
+
+EXEC SQL
+UPDATE @t_schema.RelatorX R
+SET
+  ValTo = :now
+WHERE
+    Enterprise = :Enterprise 
+AND Entity2Type = :EntityType 
+AND Entity2ID = :EntityID
+AND ValTo = :forever
+AND :now between EffFrom AND EffTo
+;
+
+// insert the updated rows back into the relator table AS new ones (E1Type)
+EXEC SQL
+INSERT
+INTO @t_schema.Relator
+SELECT
+  Enterprise
+, EntityType
+, EntityID
+, Entity1Type
+, Entity1ID
+, Entity2Type
+, Entity2ID
+, :now
+, :forever
+, :now
+, :now
+, :OPENID
+, :TRANID
+FROM @t_schema.Relator R
+WHERE
+    Enterprise = :Enterprise 
+AND Entity1Type = :EntityType 
+AND Entity1ID = :EntityID
+AND ValTo = :now
+;
+// insert the updated rows back into the relator table AS new ones (E2Type)
+EXEC SQL
+INSERT
+INTO @t_schema.Relator
+SELECT
+  Enterprise
+, EntityType
+, EntityID
+, Entity1Type
+, Entity1ID
+, Entity2Type
+, Entity2ID
+, :now
+, :forever
+, :now
+, :now
+, :OPENID
+, :TRANID
+FROM @t_schema.Relator R
+WHERE
+    Enterprise = :Enterprise 
+AND Entity2Type = :EntityType 
+AND Entity2ID = :EntityID
+AND ValTo = :now
+;
+
+// Shadow Table
+// insert the updated rows back into the relator table AS new ones (E1Type)
+EXEC SQL
+INSERT
+INTO @t_schema.Relatorx
+SELECT
+  Enterprise
+, EntityType
+, EntityID
+, Entity1Type
+, Entity1ID
+, Entity2Type
+, Entity2ID
+, :now
+, :forever
+, :now
+, :now
+, :OPENID
+, :TRANID
+FROM @t_schema.Relator R
+WHERE
+    Enterprise = :Enterprise 
+AND Entity1Type = :EntityType 
+AND Entity1ID = :EntityID
+AND ValTo = :now
+;
+// insert the updated rows back into the relator table AS new ones (E2Type)
+EXEC SQL
+INSERT
+INTO @t_schema.RelatorX
+SELECT
+  Enterprise
+, EntityType
+, EntityID
+, Entity1Type
+, Entity1ID
+, Entity2Type
+, Entity2ID
+, :now
+, :forever
+, :now
+, :now
+, :OPENID
+, :TRANID
+FROM @t_schema.Relator R
+WHERE
+    Enterprise = :Enterprise 
+AND Entity2Type = :EntityType 
+AND Entity2ID = :EntityID
+AND ValTo = :now
+;
+
+EXEC SQL COMMIT WORK;
+
+@execute
+EXEC SQL OPEN relCur;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPENID int
+in EntityType varchar(32)
+in EntityID int
+in TRANID int
+@end
+
+
+

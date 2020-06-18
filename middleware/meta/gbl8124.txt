@@ -1,0 +1,115 @@
+@name=GBL8124
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+  Returns all the raw data to create a ReportItem
+  Given an Action Code and the RPT EntityType
+
+$Log: gbl8124.txt,v $
+Revision 1.7  2010/06/21 15:42:54  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2004/10/20 21:01:48  dave
+changes to gen parm
+
+Revision 1.5  2004/02/20 20:21:57  roger
+Must be @t_schema
+
+Revision 1.4  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.3  2003/09/08 16:31:20  roger
+Enterprise was changed to 16 char length
+
+Revision 1.2  2002/05/07 17:18:15  dave
+final changes for SP Syntax
+
+Revision 1.1  2002/05/07 16:56:32  dave
+sp to provide a new way to instantiate report item
+vi sp and constructor
+
+
+@desc=Returns all the Data to create a ReportItem
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8124.txt,v 1.7 2010/06/21 15:42:54 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+WITH myEntityID(RT, RID) AS 
+(SELECT DISTINCT
+  T.EntityType
+ ,T.EntityID
+ FROM @t_schema.Text T
+ INNER JOIN @t_schema.Entity E ON
+     E.Enterprise = :Enterprise
+ AND E.EntityType = 'RPT'
+ AND E.EntityID = T.EntityID
+ AND E.ValFrom <= :now AND :now < E.ValTo AND E.EffFrom <= :now AND :now < E.EffTo
+ WHERE
+     T.Enterprise = :Enterprise
+ AND T.EntityType = 'RPT'
+ AND T.AttributeCode = 'RPTID'
+ AND T.AttributeValue = :RPTID
+ AND T.NLSID = 1
+ AND T.ValFrom <= :now AND :now < T.ValTo AND T.EffFrom <= :now AND :now < T.EffTo
+)
+SELECT
+ RTRIM(T.AttributeCode)
+,RTRIM(T.AttributeValue)
+,LONG_VARCHAR('N/A')
+,T.NLSID
+FROM myEntityID
+INNER JOIN @t_schema.Text T ON
+    T.Enterprise = :Enterprise
+AND T.EntityType = RT
+AND T.EntityID = RID
+AND T.NLSID in (:NLSID,1)
+AND T.ValFrom <= :now AND :now < T.ValTo AND T.EffFrom <= :now AND :now < T.EffTo
+UNION  ALL
+SELECT
+ RTRIM(F.AttributeCode)
+,RTRIM(F.AttributeValue)
+,LONG_VARCHAR('N/A')
+,1
+FROM myEntityID
+INNER JOIN @t_schema.Flag F ON
+    F.Enterprise = :Enterprise
+AND F.EntityType = RT
+AND F.EntityID = RID
+AND F.ValFrom <= :now AND :now < F.ValTo AND F.EffFrom <= :now AND :now < F.EffTo
+INNER JOIN @t_schema.MetaDescription MD ON
+    MD.Enterprise = :Enterprise
+AND MD.DescriptionType = F.AttributeCode
+AND MD.DescriptionClass = F.AttributeValue
+AND MD.NLSID IN (1, :NLSID)
+AND MD.ValFrom <= :now AND :now < MD.ValTo AND MD.EffFrom <= :now AND :now < MD.EffTo
+UNION  ALL
+SELECT
+ RTRIM(T.AttributeCode)
+,''
+,RTRIM(T.AttributeValue)
+,T.NLSID
+FROM myEntityID
+INNER JOIN @t_schema.LongText T ON
+    T.Enterprise = :Enterprise
+AND T.EntityType = RT
+AND T.EntityID = RID
+AND T.NLSID in (:NLSID,1)
+AND T.ValFrom <= :now AND :now < T.ValTo AND T.EffFrom <= :now AND :now < T.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in RPTID varchar(33)
+in NLSID int
+@end
+
+

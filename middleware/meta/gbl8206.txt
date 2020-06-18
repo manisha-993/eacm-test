@@ -1,0 +1,58 @@
+@name=GBL8206
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+$Log: gbl8206.txt,v $
+Revision 1.6  2010/06/21 15:43:22  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.5  2004/10/20 21:01:49  dave
+changes to gen parm
+
+Revision 1.4  2004/02/20 20:21:57  roger
+Must be @t_schema
+
+Revision 1.3  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.2  2003/09/08 16:31:21  roger
+Enterprise was changed to 16 char length
+
+Revision 1.1  2003/01/17 00:57:21  joan
+initial load
+
+
+@desc=Get VELock/Entity/Relator info, giving EntityType
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8206.txt,v 1.6 2010/06/21 15:43:22 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  Linktype1, Linktype2, Linkcode
+FROM @t_schema.metalinkattr mla
+WHERE
+    mla.Enterprise = :Enterprise
+AND mla.linktype = 'VELock/Entity/Relator'
+AND mla.linktype2 = :EntityType
+AND mla.ValFrom <= :ValOn AND :ValOn < mla.ValTo AND mla.EffFrom <= :EffOn AND :EffOn < mla.EffTo
+;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

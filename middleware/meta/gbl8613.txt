@@ -1,0 +1,168 @@
+@name=GBL8613
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+ This guy retrieves the set of cascading dependent choice fields given an
+ attributecode starting point (was 6013)
+ 
+$Log: gbl8613.txt,v $
+Revision 1.11  2012/05/21 02:47:45  praveen
+Fix cursor error
+
+Revision 1.10  2012/05/21 02:33:41  praveen
+Fix LS LSCRSMKTCHAPPRIM perf issue
+
+Revision 1.9  2010/06/21 15:42:50  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.8  2004/10/20 21:01:49  dave
+changes to gen parm
+
+Revision 1.7  2004/02/20 20:21:58  roger
+Must be @t_schema
+
+Revision 1.6  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.5  2003/09/08 16:31:21  roger
+Enterprise was changed to 16 char length
+
+Revision 1.4  2003/04/28 18:01:16  gregg
+move 'AutoSelect' tag to linkvalue where linkcode = 'Entity'
+
+Revision 1.3  2003/04/28 17:45:17  gregg
+use @t_schema
+
+Revision 1.2  2003/04/28 17:29:16  gregg
+inner join on MLA for linktype='Tran/Attribute', linktype = 'Entity' for restricting pull from MT to ONLY DepFlags. (ignore AutoSelect flags).
+
+Revision 1.1  2002/05/03 18:17:45  gregg
+moved from gbl6013
+
+Revision 1.4  2001/10/20 18:06:27  roger
+Change @t_schema. to @t_schema.
+
+Revision 1.3  2001/10/08 20:53:50  dave
+added final touch to MetaFlagAttributeList
+
+Revision 1.2  2001/10/08 19:40:56  dave
+fixes and integrity checks
+
+Revision 1.1  2001/10/08 19:23:37  dave
+new SP for cascading flags for a given attributecode
+
+
+@desc=retrieves the set of cascading dependent choice fields given an attributecode starting point
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8613.txt,v 1.11 2012/05/21 02:47:45 praveen Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+WITH myflags (Level,AttributeCode1,Flag1,AttributeCode2,Flag2) AS
+(SELECT DISTINCT
+ 0
+,MT.AttributeCode1
+,MT.Flag1
+,MT.AttributeCode2
+,MT.Flag2
+FROM opicm.MetaTransition MT
+
+INNER JOIN opicm.metalinkattr MLA ON
+    MLA.Enterprise = :Enterprise
+AND MLA.ValFrom <= :ValOn AND :ValOn < MLA.ValTo AND MLA.EffFrom <= :EffOn AND :EffOn < MLA.EffTo
+AND MLA.LINKTYPE = 'Trans/Attribute'
+AND MLA.LINKCODE = 'Entity'
+AND MLA.LINKVALUE <> 'AutoSelect'
+AND MLA.LINKTYPE1 = MT.TRANSITIONCODE
+
+INNER JOIN opicm.MetaEntity ME ON
+    ME.Enterprise = :Enterprise
+AND ME.EntityType = MT.AttributeCode1
+AND ME.EntityClass in ('F','U','S','A')
+WHERE
+    MT.Enterprise = :Enterprise
+AND MT.AttributeCode1 = :AttributeCode
+AND MT.ValFrom <= :ValOn AND :ValOn < MT.ValTo AND MT.EffFrom <= :EffOn AND :EffOn < MT.EffTo)
+
+SELECT DISTINCT
+ Level
+,RTRIM(AttributeCode1)
+,RTRIM(Flag1)
+,RTRIM(AttributeCode2)
+,RTRIM(Flag2)
+FROM myflags
+ORDER BY 1,2,3
+;
+// end sql tag
+
+EXEC SQL DECLARE sp_cursor2 CURSOR FOR
+WITH myflags (Level,AttributeCode1,Flag1,AttributeCode2,Flag2) AS
+(SELECT DISTINCT
+ 0
+,MT.AttributeCode1
+,MT.Flag1
+,MT.AttributeCode2
+,MT.Flag2
+FROM @t_schema.MetaTransition MT
+
+INNER JOIN @t_schema.metalinkattr MLA ON
+    MLA.Enterprise = :Enterprise
+AND MLA.ValFrom <= :ValOn AND :ValOn < MLA.ValTo AND MLA.EffFrom <= :EffOn AND :EffOn < MLA.EffTo
+AND MLA.LINKTYPE = 'Trans/Attribute' 
+AND MLA.LINKCODE = 'Entity'
+AND MLA.LINKVALUE <> 'AutoSelect'
+AND MLA.LINKTYPE1 = MT.TRANSITIONCODE
+
+INNER JOIN @t_schema.MetaEntity ME ON
+    ME.Enterprise = :Enterprise
+AND ME.EntityType = MT.AttributeCode1
+AND ME.EntityClass in ('F','U','S','A')
+WHERE
+    MT.Enterprise = :Enterprise
+AND MT.AttributeCode1 = :AttributeCode
+AND MT.ValFrom <= :ValOn AND :ValOn < MT.ValTo AND MT.EffFrom <= :EffOn AND :EffOn < MT.EffTo
+UNION ALL
+SELECT
+ PARENT.Level +1
+,CHILD.AttributeCode1
+,CHILD.Flag1
+,CHILD.AttributeCode2
+,CHILD.Flag2
+FROM myflags PARENT, @t_schema.metaTransition CHILD
+WHERE
+    CHILD.Enterprise = :Enterprise
+AND PARENT.AttributeCode2 = Child.AttributeCode1
+AND PARENT.Flag2 = Child.Flag1
+AND CHILD.ValFrom <= :ValOn AND :ValOn < CHILD.ValTo AND CHILD.EffFrom <= :EffOn AND :EffOn < CHILD.EffTo
+AND PARENT.Level <= 5)
+SELECT DISTINCT
+ Level
+,RTRIM(AttributeCode1)
+,RTRIM(Flag1)
+,RTRIM(AttributeCode2)
+,RTRIM(Flag2)
+FROM myflags
+ORDER BY 1,2,3
+;
+@execute
+if (strcmp(AttributeCode,"LSCRSMKTCHAPPRIM") == 0) {
+    EXEC SQL OPEN sp_cursor1;
+} else {
+    EXEC SQL OPEN sp_cursor2;
+}
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in AttributeCode varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

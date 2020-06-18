@@ -1,0 +1,50 @@
+@name=GBL9983
+@noremote=true
+@type=basic
+@dbase=opicmods
+@narrative
+
+Unpublish all records for a given Header Record ID
+
+//
+// $Log: gbl9983.txt,v $
+// Revision 1.4  2010/06/21 15:43:20  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.3  2004/12/01 21:48:17  gregg
+// changing SPs for use of ProductDetailRec
+//
+// Revision 1.2  2004/10/20 21:01:50  dave
+// changes to gen parm
+//
+// Revision 1.1  2004/09/30 00:02:20  dave
+// new SP's for performance run testing
+//
+//
+
+@desc= Unpublish all records for a given Header Record ID
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9983.txt,v 1.4 2010/06/21 15:43:20 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+@execute
+
+EXEC SQL 
+UPDATE GBLI.PRODDETAILREL
+SET PUBLISHFLAG = 'N'
+WHERE 
+        ENTERPRISE = :ENTERPRISE
+AND HEADERID = :HEADERID
+;
+@parameters
+inout ReturnStatus int
+in ENTERPRISE varchar(16)
+in HEADERID int
+@end
+
+                                                              
+                                                              

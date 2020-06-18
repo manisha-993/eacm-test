@@ -1,0 +1,90 @@
+@name=GBL9012
+@type=basic
+@dbase=opicmpdh
+@noremote=true
+@addperm=false
+@narrative
+
+EntityId Blocking for CatNet Load
+
+$Log: gbl9012.txt,v $
+Revision 1.7  2010/06/21 15:42:55  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2006/08/10 20:37:11  gregg
+more compile fix
+
+Revision 1.5  2006/08/10 20:21:03  gregg
+changing criteria for what it means to be a root entity.
+
+Revision 1.4  2006/08/07 21:32:47  gregg
+initial load
+
+Revision 1.3  2006/08/07 20:50:35  gregg
+compile
+
+Revision 1.2  2006/08/07 20:42:10  gregg
+pass in correct parms
+
+Revision 1.1  2006/08/07 20:30:25  gregg
+initial load
+
+
+@desc=This returns a list of blocks that have entityid's for a given type (based on GBL9010)
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9012.txt,v 1.7 2010/06/21 15:42:55 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE entity_cursor CURSOR FOR
+WITH mymax(MaxEntityId,MinEntityId) AS (
+SELECT
+  MAX(E.EntityID),Min(E.EntityID)
+FROM  gbli.trsnetterpass1 E
+WHERE
+    E.level = 0
+and E.Enterprise = :Enterprise
+and E.SessionID = :SessionID
+and :RootType in (E.Entity1Type, E.EntityType, E.Entity2Type)
+)
+, myinterm(minentityid, maxentityid, start, end, hitcounter) as
+(
+  SELECT minentityid, maxentityid,  minentityid-1, minentityid, 1 FROM mymax
+  UNION ALL
+  SELECT ROOT.minentityid, ROOT.maxentityid, ROOT.end+1, ROOT.end+:Chunk,
+(
+    Select
+    case
+        when count(distinct e.entityid) > 0 then 1
+        else 0
+    end
+    mycount
+    from gbli.trsnetterpass1 e
+    where
+    e.entityid between ROOT.end and ROOT.END+:Chunk
+        and e.level = 0
+    and e.Enterprise = :Enterprise
+    and e.SessionID = :SessionID
+    and :RootType in (e.Entity1Type, e.EntityType, e.Entity2Type)
+)
+from myinterm ROOT
+  WHERE ROOT.end between ROOT.minentityid and ROOT.maxentityid or root.end = 0
+)
+
+select * from myinterm where hitcounter > 0 and minentityid is not null
+;
+
+@execute
+
+// Now open the cursor
+EXEC SQL OPEN entity_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in RootType varchar(32)
+in SessionID int
+in Chunk int
+@end

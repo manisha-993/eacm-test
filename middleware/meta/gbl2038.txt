@@ -1,0 +1,54 @@
+@name=GBL2038
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+-------------------------------------------------------
+-- This procedure removes a softlock for a
+-- given enterprise entitytype, entityid, LOCKLEVEL, lockEntityType, and LockEntityID, and ActionType
+-------------------------------------------------------
+$Log: gbl2038.txt,v $
+Revision 1.7  2010/06/21 15:42:50  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2004/10/20 21:01:38  dave
+changes to gen parm
+
+Revision 1.5  2004/07/26 22:08:53  joan
+add unlockEntityItems
+
+
+
+@desc=Delete a Soft Lock For LockEntityType, Lock
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2038.txt,v 1.7 2010/06/21 15:42:50 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL
+DELETE
+FROM @t_schema.Softlock
+WHERE
+Enterprise = :Enterprise AND
+EntityType = :EntityType AND
+EntityID = :EntityID AND
+LockLevel = :LockLevel AND
+LockEntityType = :LockEntityType AND
+LockEntityID = :LockEntityID AND
+LockOwner = :LockOwner
+;
+@execute
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in LockLevel int
+in LockEntityType varchar(32)
+in LockEntityID int
+in LockOwner varchar(32)
+@end
+
+

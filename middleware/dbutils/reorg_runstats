@@ -1,0 +1,132 @@
+SCHEMA="OPICM"
+DB=$1
+. $HOME/.profile > /dev/null
+
+cd $HOME/mike/dbutils
+
+db2 connect to $DB user opicmadm using cat9tail
+
+#
+# To reorg only certain tables, comment out next line and create a file names "tables" that contains
+# the name of the tables to be reorged.
+#
+db2 "select tabschema, tabname from syscat.tables where tabschema='$SCHEMA' and type='T'"|grep $SCHEMA|awk '{print $2}'|sort > tables
+
+
+#
+# Define Functions...
+#
+
+GetTablespace ()
+{
+db2 "select tbspace from syscat.tablespaces \
+where datatype='T' \
+and pagesize= \
+CASE WHEN \
+	( \
+		select long_tbspace from syscat.tables \
+		where tabschema='$1' \
+		and tabname='$2' \
+	) IS NULL \
+THEN \
+	( \
+	select pagesize from syscat.tablespaces \
+	where tbspace= \
+		( \
+		select tbspace from syscat.tables \
+		where tabschema='$1' \
+		and tabname='$2' \
+		) \
+	) \
+ELSE \
+	( \
+	select pagesize from syscat.tablespaces \
+	where tbspace= \
+		( \
+		select tbspace from syscat.tables \
+		where tabschema='$1' \
+		and tabname='$2' \
+		) \
+	INTERSECT \
+	select pagesize from syscat.tablespaces \
+	where tbspace= \
+		( \
+		select long_tbspace from syscat.tables \
+		where tabschema='$1' \
+		and tabname='$2' \
+		) \
+	) \
+END \
+fetch first 1 row only"|
+head -4|tail -1|read TBSPC
+}
+
+GetUniqueIndex ()
+{
+db2 "select INDNAME from syscat.indexes \
+where INDSCHEMA='$SCHEMA' \
+and UNIQUERULE='U' \
+and TABNAME='$1' \
+fetch first 1 row only"|
+head -4|tail -1|read UNIQIX
+}
+
+ReorgTable ()
+{
+if [ -z "$3" ];
+then
+
+	if [ -z "$UNIQIX" ];
+	then
+	echo "db2 reorg table $1.$2"
+	db2 "reorg table $1.$2";
+	else
+	echo "db2 reorg table $1.$2 index $1.$UNIQIX"
+	db2 "reorg table $1.$2 index $1.$UNIQIX";
+	fi
+else
+	if [ -z "$UNIQIX" ];
+        then
+	echo "db2 reorg table $1.$2 use $3"
+	db2 "reorg table $1.$2 use $3";
+	else
+	echo "db2 reorg table $1.$2 index $1.$UNIQIX use $3"
+	db2 "reorg table $1.$2 index $1.$UNIQIX use $3";
+	fi
+fi
+}
+
+RunstatsTable ()
+{
+echo "db2 runstats on table $1.$2 with distribution and detailed indexes all"
+db2 "runstats on table $1.$2 with distribution and detailed indexes all";
+}
+
+
+#
+# End of Function definition
+#
+
+
+for TABLE in `cat ./tables`
+do
+
+# TBSPC will be set to usable tempspace, if any exists for the table
+
+
+GetTablespace $SCHEMA $TABLE
+GetUniqueIndex $TABLE
+
+date
+ReorgTable $SCHEMA $TABLE $TBSPC
+date
+RunstatsTable $SCHEMA $TABLE
+
+
+done
+date
+
+db2 terminate
+
+./rebind $DB
+

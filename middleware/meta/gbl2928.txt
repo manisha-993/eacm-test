@@ -1,0 +1,61 @@
+@name=GBL2928
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative  checks for combo uniqueness- specific ONLY to one Entity
+$Log: gbl2928.txt,v $
+Revision 1.22  2010/06/21 16:39:54  rick
+adding noremote=true option
+
+Revision 1.21  2010/06/21 16:25:44  rick
+adding SP back.
+
+Revision 1.19  2010/06/18 18:50:41  rick
+adding SP to help check for uniqueness across flag attrs.
+
+
+
+@desc=checks for combo uniqueness- specific ONLY to one Entity
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2928.txt,v 1.22 2010/06/21 16:39:54 rick Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT F1.EntityID
+FROM @t_schema.flag F1
+INNER JOIN @t_schema.Flag F2 ON
+    F2.Enterprise = :Enterprise
+AND F2.EntityType = F1.EntityType
+AND F2.EntityID = F1.EntityID
+AND rtrim(F2.AttributeCode) = :FlagAttributeCode2
+AND F2.AttributeValue in (:FlagAttributeValue2)
+AND F2.ValFrom <= :now AND :now < F2.ValTo AND F2.EffFrom <= :now AND :now < F2.EffTo
+INNER JOIN @t_schema.Entity E ON
+    E.Enterprise = :Enterprise
+AND E.EntityType = F1.EntityType
+AND E.EntityID = F1.EntityID
+AND E.EntityType = :EntityType
+AND E.ValFrom <=  :now AND :now < E.ValTo AND E.EffFrom <= :now AND :now < E.EffTo
+WHERE
+    F1.Enterprise =  :Enterprise
+AND rtrim(F1.AttributeCode) = :FlagAttributeCode1
+AND F1.AttributeValue in (:FlagAttributeValue1)
+AND F1.ValFrom <= :now  AND :now < F1.ValTo AND F1.EffFrom <= :now AND :now < F1.EffTo
+;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in FlagAttributeCode1 varchar(33)
+in FlagAttributeValue1 varchar(33)
+in FlagAttributeCode2 varchar(33)
+in FlagAttributeValue2 varchar(33)
+in EntityType varchar(33)
+@end
+
+

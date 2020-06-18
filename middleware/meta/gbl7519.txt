@@ -1,0 +1,60 @@
+@name=GBL7519
+@noremote=true
+@dbase=opicmpdh
+@narrative
+This procedure is used to insert/update rows in @table
+$Log: gbl7519.txt,v $
+Revision 1.9  2010/06/21 15:43:21  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.8  2004/10/22 17:12:09  dave
+removing inouts and tmp fix for update
+
+Revision 1.7  2004/10/20 21:01:44  dave
+changes to gen parm
+
+Revision 1.6  2004/02/20 20:21:54  roger
+Must be @t_schema
+
+Revision 1.5  2004/02/20 18:09:34  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.4  2003/09/08 16:31:18  roger
+Enterprise was changed to 16 char length
+
+Revision 1.3  2003/04/16 23:13:40  gregg
+remove tranid from insert
+
+Revision 1.2  2002/06/19 16:48:21  gregg
+dbase=opicmpdh
+
+Revision 1.1  2002/04/12 17:40:48  gregg
+initial load
+
+fixed typeO
+
+
+@parmstyle=GENERAL
+@type=metainsert
+@table=@t_schema.MetaTransition
+@desc=Insert/Update a row in @table
+@results=0
+@change_cols=Enterprise TransitionCode AttributeCode1 Flag1 AttributeCode2 Flag2
+@update_cols=Enterprise TransitionCode AttributeCode1 Flag1 AttributeCode2 Flag2
+@insert_cols=Enterprise TransitionCode AttributeCode1 Flag1 AttributeCode2 Flag2
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in TransitionCode varchar(32)
+in AttributeCode1 varchar(32)
+in Flag1 varchar(32)
+in AttributeCode2 varchar(32)
+in Flag2 varchar(32)
+in TranID int
+in EffFrom varchar(26)
+in EffTo varchar(26)
+@end
+
+

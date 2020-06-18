@@ -1,0 +1,344 @@
+#!/bin/sh
+
+#
+# $Log: runmw-aix,v $
+# Revision 1.35  2015/03/06 07:20:34  wangyul
+# jdbc change to supprot type2 and type4
+#
+# Revision 1.34  2010/01/17 02:10:15  wendy
+# do not extract from mw jar and overwrite files
+#
+# Revision 1.33  2008/11/19 13:20:05  wendy
+# Prevent looping when mw has exception during init
+#
+# Revision 1.32  2003/08/19 19:34:02  dave
+# fixing ^m
+#
+# Revision 1.31  2003/08/14 21:46:58  joan
+# add j2ee.jar, xalan.jar, xerces.jar in extract
+#
+# Revision 1.30  2003/05/30 17:06:45  roger
+# comment out the not needed thingie
+#
+# Revision 1.29  2003/05/13 21:53:46  dave
+# if the row is an implicator.. the return the parent
+#
+# Revision 1.28  2003/05/09 23:51:37  joan
+# change classpath to include j2ee.jar, xalan.jar, xerces.jar
+#
+# Revision 1.27  2003/04/30 19:11:07  dave
+# adding index + 1
+#
+# Revision 1.26  2003/04/07 17:08:13  roger
+# Clean-up for newer Java version
+#
+# Revision 1.25  2002/08/01 16:44:45  roger
+# Fix location of db2java.zip
+#
+# Revision 1.24  2002/07/31 19:35:31  roger
+# Point to db2java.zip in db2 instance home directory
+#
+# Revision 1.23  2002/03/13 18:59:06  roger
+# Show dynamic property file contents
+#
+# Revision 1.22  2001/11/28 16:51:48  roger
+# Show stdout -and- stderr to output log file
+#
+# Revision 1.21  2001/11/09 23:54:25  roger
+# Clean up
+#
+# Revision 1.20  2001/11/02 21:11:57  roger
+# Allow add'l parm passing
+#
+# Revision 1.19  2001/10/31 19:18:23  roger
+# Need to extract SSL jar files
+#
+# Revision 1.18  2001/10/30 02:29:47  roger
+# Small steps toward SSL support
+#
+# Revision 1.17  2001/08/29 23:25:37  roger
+# Changes for LDAP
+#
+# Revision 1.16  2001/08/29 22:07:39  roger
+# Need property setup for LDAP
+#
+# Revision 1.15  2001/08/24 16:41:06  roger
+# Need to extract the LDAP jars
+#
+# Revision 1.14  2001/08/01 17:20:10  roger
+# Needed permission change
+#
+# Revision 1.13  2001/07/23 18:19:57  roger
+# Reference jar file for SSL classes
+#
+# Revision 1.12  2001/06/29 15:52:16  roger
+# Comment was misleading
+#
+# Revision 1.11  2001/06/29 15:50:34  roger
+# Remove java_options
+#
+# Revision 1.10  2001/06/27 21:38:26  roger
+# Missed another file
+#
+# Revision 1.9  2001/06/27 21:37:40  roger
+# Need to extract some other files
+#
+# Revision 1.8  2001/06/27 15:57:37  roger
+# Extract runmw-aix from the jar for update feature
+#
+# Revision 1.7  2001/06/27 03:11:45  roger
+# Meg to M
+#
+# Revision 1.6  2001/06/27 03:10:41  roger
+# Fixed log
+#
+# Revision 1.5  2001/06/27 03:10:21  roger
+# Added Log
+#
+
+#
+# This batch file starts the Middleware server under Linux or AIX
+#
+
+DIRECTORY=`pwd`
+
+
+#JDK_CLASSES="/usr/java_dev2/jre/lib/rt.jar"
+JDK_CLASSES=""
+#DB2_JAVA_CLASSES="/home/opicmdb2/sqllib/java/db2java.zip"
+#DB2_JAVA_CLASSES=""
+DB2_JAVA_CLASSES="/home/$DB2INSTANCE/sqllib/java/db2java.zip:/home/$DB2INSTANCE/sqllib/java/db2jcc.jar:/home/$DB2INSTANCE/sqllib/java/db2jcc_license_cu.jar"
+OTHER_CLASSES="./cwa.jar:./ibmjndi.jar:./jndi.jar:./jcert.jar:./jnet.jar:./jsse.jar:./smtp.jar:./activation.jar:./mail.jar:./j2ee.jar:./xalan.jar:./xerces.jar"
+JAVA_OPTIONS="-ms128M -mx256M -Xss32M -D\"java.naming.factory.initial=com.ibm.jndi.LDAPCtxFactory\""
+JAVA_COMMAND="java"
+CURRENT_REPORT="./middleware.out"
+MAIN_CLASS="COM/ibm/opicmpdh/middleware/RemoteDatabase"
+JAR_FILE="middleware.jar"
+
+#
+# if we are already running in this directory, bail out
+#
+if [ -f mwrunning ]; then
+  now=`date +%Y-%m-%d-%H.%M.%S.000000`
+  echo $now middleware ABORT - already running >>$CURRENT_REPORT
+  exit
+fi
+
+#
+# Build the contents of the dynamic property file
+#
+PROPERTY_FILE=middleware.server.dynamic.properties
+
+cat > $PROPERTY_FILE << EOF
+#OPICM Middleware Server Dynamic Properties
+EOF
+
+HOSTNAME=`hostname -s`
+echo "hostname=$HOSTNAME" >> $PROPERTY_FILE
+
+IP=`host $HOSTNAME|cut -f3 -d" "`
+echo "actual_ip_address=$IP" >> $PROPERTY_FILE
+
+DIR=`basename $PWD`
+echo "directory=$DIR" >> $PROPERTY_FILE
+
+INSTANCE="$HOSTNAME@$DIR"
+echo "instance=$INSTANCE" >> $PROPERTY_FILE
+
+#
+# flag that we are running
+#
+touch mwrunning
+
+#
+# this tells the DB2 client that we want NO codepage conversion from database (1208 = UTF8)
+#
+export DB2CODEPAGE=1208
+
+#
+# OK, lets get ready by creating some empty output files (avoid conditionality)
+#
+touch javacore
+touch java.prof
+touch core
+
+#
+# who are we?
+#
+echo "Middleware running as user: " `whoami` >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# save the middleware config file to this output
+#
+cat middleware.server.properties >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# save the middleware dynamic config file to this output
+#
+cat middleware.server.dynamic.properties >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# lets also record this value for help trouble shooting
+#
+set >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# these directories store prior copies of middleware software and reports (make sure they exist and are secure)
+#
+if [ ! -d rpt ]; then
+  mkdir rpt
+  chmod 700 rpt
+fi
+if [ ! -d archive ]; then
+  mkdir archive
+  chmod 700 archive
+fi
+
+#
+# verify that we have some middleware code to run
+#
+if [ ! -f middleware.jar ]; then
+  if [ ! -f middleware.jar.new ]; then
+    now=`date +%Y-%m-%d-%H.%M.%S.000000`
+    echo $now middleware ABORT - no jar file to execute or install >>$CURRENT_REPORT
+    touch mwshut
+  fi
+fi
+
+#
+# remove any semaphore files
+#
+if [ -f mwshut ]; then
+  rm mwshut
+fi
+if [ -f mwcycle ]; then
+  rm mwcycle
+fi
+if [ -f mwreset ]; then
+  rm mwreset
+fi
+
+#
+# remove any lingering blob files
+#
+if [ -f *blob ]; then
+  ls -al *blob
+  rm -Rf *blob
+fi
+
+#
+# while not exists a file named 'mwshut', loop
+#
+while [ ! -f mwshut ]
+do
+  rptdate=`date +%Y%m%d%H%M%S`
+  now=`date +%Y-%m-%d-%H.%M.%S.000000`
+  rptname='./rpt/middleware.log.'$rptdate
+
+  #
+  # remove any semaphore files
+  #
+  if [ -f mwshut ]; then
+    rm mwshut
+  fi
+  if [ -f mwcycle ]; then
+    rm mwcycle
+  fi
+  if [ -f mwreset ]; then
+    rm mwreset
+  fi
+
+  #
+  # if there is a 'middleware.jar.new' file, install it!
+  #
+  if [ -s middleware.jar.new ]; then
+    now=`date +%Y-%m-%d-%H.%M.%S.000000`
+    echo $now middleware UPDATING >>$CURRENT_REPORT
+    ls -al >>$CURRENT_REPORT
+    cp middleware.jar.new ./archive/middleware.jar.$rptdate
+    mv middleware.jar.new middleware.jar
+    # extract only *mw-aix and jar files from the distribution jar - mw runs from jar
+    # jar xf middleware.jar cwa.jar ibmjndi.jar jndi.jar jcert.jar jnet.jar jsse.jar runmw-aix testmw-aix j2ee.jar xalan.jar xerces.jar
+    ls -al >>$CURRENT_REPORT
+    chmod -R 770 *
+  fi
+
+  ls -alR >>$CURRENT_REPORT
+
+  #
+  # show what is running
+  #
+  ps -ef >>$CURRENT_REPORT
+  if [ -f /usr/bin/db2ppdh ]; then
+    db2ppdh list applications >>$CURRENT_REPORT
+    db2ppdh get snapshot for locks on opicmpdh >>$CURRENT_REPORT
+  fi
+
+  #
+  # run the middleware (if mwshut or mwcycle is created, mw will exit)
+  #
+  now=`date +%Y-%m-%d-%H.%M.%S.000000`
+  echo $now middleware STARTING >>$CURRENT_REPORT
+  echo "*** command ***" >>$CURRENT_REPORT
+  echo $JAVA_COMMAND $JAVA_OPTIONS -classpath $JAR_FILE:$DB2_JAVA_CLASSES:$OTHER_CLASSES:$JDK_CLASSES $MAIN_CLASS >>$CURRENT_REPORT
+  $JAVA_COMMAND $1 $2 $3 $4 $5 $JAVA_OPTIONS -classpath $JAR_FILE:$DB2_JAVA_CLASSES:$OTHER_CLASSES:$JDK_CLASSES $MAIN_CLASS 1>>$CURRENT_REPORT 2>>$CURRENT_REPORT
+
+STATUS=$?
+mwStatus="Success"
+if [  STATUS -ne 0 ]; then
+mwStatus="Failure"
+#break the loop
+touch mwshut
+fi
+echo middleware $mwStatus exitStatus is $STATUS  >>$CURRENT_REPORT
+
+  echo "*** command ***" >>$CURRENT_REPORT
+  now=`date +%Y-%m-%d-%H.%M.%S.000000`
+  echo $now middleware EXITED >>$CURRENT_REPORT
+
+done
+
+#
+# presence of the semaphore file 'mwshut' means it is time to shut down
+#
+now=`date +%Y-%m-%d-%H.%M.%S.000000`
+echo $now middleware STOPPING >>$CURRENT_REPORT
+
+#
+# save the output of this execution
+#
+rptdate=`date +%Y%m%d%H%M%S`
+rptname='./rpt/middleware.log.'$rptdate
+cat $CURRENT_REPORT javacore* java.prof nohup.out >$rptname
+rm javacore*
+rm java.prof
+rm core
+rm nohup.out
+rm $CURRENT_REPORT
+
+#
+# delete reports more than 30 days old
+#
+echo deleting the following reports:
+find ./rpt -mtime +30 -print -exec rm -Rf {} \;
+echo "*** end ***"
+
+#
+# delete jar files more than 360 days old
+#
+echo deleting the following archives:
+find ./archive -mtime +360 -print -exec rm -Rf {} \;
+echo "*** end ***"
+
+#
+# we are not running, delete the semaphore file
+#
+rm mwrunning
+
+#
+# end of script
+#

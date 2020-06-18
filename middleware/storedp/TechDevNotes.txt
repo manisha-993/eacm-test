@@ -1,0 +1,86 @@
+#
+#  Rolling implementation / Technical Notes
+#
+
+#1
+---------------------------------------------------
+Change EntityGroup Cache to be non role sensitive.
+When dealing editiing, we load the Column Order for the profile
+which pulls column order and hide info which is a
+cobmination of the MetaColumnOrder table, and what the role cannot
+see (in terms of attributes).. They simply get hidden
+(permenently from any user views)
+
+We need to move towards this.. generic object that sees all
+but maskes info from user based upon a 'profile filter'
+
+This applies to entityGroups, this means that the data/ columns are
+still there.. and that formulas will work for everything..
+its just the user will never see the columns that the role says they
+can never see.
+
+
+#2  Data Modeling Concepts
+-------------------------------------------------------------------------------------
+
+An announcements specifies the geographies it is announcing in
+Availability is a geographical statement about the availability of an order offering
+
+What are the announcement types?
+
+They next pick the projects they are working with for the announcement.
+This is a descrete test
+
+
+Make an announcement (from a Workgroup)
+Select the projects that apply to this project.
+
+#3  Not a great idea.. but I had to write it down
+-------------------------------------------------------------------------------------
+You need to be able to derive a new profile from an existing profile a new workgroup
+Indicator
+
+Embedded workgroups
+
++-------------------------
+ALERT:  Interval in the GBL8116 will have to be done.
++-------------------------
+Need to test when multiple intervals go over..
+
++-------------------------
++ Tagging happen
++-------------------------
+
+Each Profile gets a session id that is unique to the world
+we tie this to the opwgid to uniquly identify a true session
+We will need a tagging table that has profile/sessionid  attrubutecode, attributevalue.
+These are SessionTags used for all updates.. we always have to add tags to entities
+that we change or create...
+
+Tagging is controlled by the parent Entity Items that come through a
+parent.
+
+This implies that tagging is a function of an overt management that provides a list
+of action items  (Tag Navigation) (To Identify).
+
+
+This will be the basis
++------------------------
++ Dave's rolling topics"
++-------------------------
+
+3-10 Meeting (App Developer)
+
+  Review Create From Peer Meta and Test - Ching, Tony
+  Review Multiple Navigate Tabs for the same role - Tony
+  Review Where Used in BUI - Ted
+  Classification Report API - Ted
+  Review Preview DG Launch Requirements - Steve
+  Do an Action Item equivelency check (So we do not get multiple tabs for the same Action Item answer in the J/ui)
+
+
+  Actions:
+
+    Entity History on Nav Panel in B/UI
+    Entity History on Edit screen in addition to attribute history.
+

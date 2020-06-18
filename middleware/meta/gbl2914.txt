@@ -1,0 +1,120 @@
+@name=GBL2914
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------
+-- Gets list of valid flag code values for like longdescription
+--------------------------------------------------------------------
+$Log: gbl2914.txt,v $
+Revision 1.8  2010/06/21 15:42:50  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2006/07/15 16:35:51  joan
+fix
+
+Revision 1.6  2006/07/15 15:14:38  joan
+check for expired flags
+
+Revision 1.5  2006/04/21 16:55:41  joan
+fixes
+
+Revision 1.4  2006/04/21 16:49:38  joan
+changes
+
+Revision 1.3  2005/12/19 20:27:54  joan
+fixes
+
+Revision 1.2  2004/11/30 21:22:16  joan
+add not in ('T','B','I','L','X','P','F','U','D','S','A')
+
+Revision 1.1  2004/11/19 22:30:58  joan
+initial load
+
+
+@desc=Gets list of valid flag code values for like longdescription
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2914.txt,v 1.8 2010/06/21 15:42:50 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT
+  MD.DescriptionClass
+, MD.LongDescription
+, CASE
+      WHEN (ML2.Enterprise IS NOT NULL) THEN 'Y'
+      ELSE 'N'
+  END
+FROM @t_schema.MetaDescription MD
+
+LEFT JOIN @t_schema.MetaLinkAttr ML2 ON
+      ML2.Enterprise = 'SG'
+AND ML2.LinkType = 'Attribute/Flag'
+AND ML2.LinkType1 = MD.DescriptionType
+AND ML2.LinkType2 = MD.DescriptionClass
+AND ML2.LinkCode  = 'Expired'
+AND ML2.LinkValue = 'Y'
+AND ML2.ValFrom <= :ValOn AND :ValOn < ML2.ValTo AND ML2.EffFrom <= :EffOn AND :EffOn < ML2.EffTo
+
+WHERE
+MD.Enterprise = :Enterprise
+AND MD.DESCRIPTIONTYPE = :DescType
+AND MD.DESCRIPTIONCLASS NOT IN ('T','B','I','L','X','P','F','U','D','S','A')
+AND MD.LONGDESCRIPTION LIKE rtrim(:LongDesc) || '%'
+AND MD.NLSID = :NLSID
+AND MD.ValFrom <= :ValOn AND :ValOn < MD.ValTo AND MD.EffFrom <= :EffOn AND :EffOn < MD.EffTo
+ORDER BY
+  MD.DescriptionClass
+;
+
+EXEC SQL DECLARE sp_cursor2 CURSOR FOR
+SELECT
+  MD.DescriptionClass
+, MD.LongDescription
+, CASE
+      WHEN (ML2.Enterprise IS NOT NULL) THEN 'Y'
+      ELSE 'N'
+  END
+FROM @t_schema.MetaDescription MD
+
+LEFT JOIN @t_schema.MetaLinkAttr ML2 ON
+      ML2.Enterprise = 'SG'
+AND ML2.LinkType = 'Attribute/Flag'
+AND ML2.LinkType1 = MD.DescriptionType
+AND ML2.LinkType2 = MD.DescriptionClass
+AND ML2.LinkCode  = 'Expired'
+AND ML2.LinkValue = 'Y'
+AND ML2.ValFrom <= :ValOn AND :ValOn < ML2.ValTo AND ML2.EffFrom <= :EffOn AND :EffOn < ML2.EffTo
+
+WHERE
+MD.Enterprise = :Enterprise
+AND MD.DESCRIPTIONTYPE = :DescType
+AND MD.DESCRIPTIONCLASS NOT IN ('T','B','I','L','X','P','F','U','D','S','A')
+AND MD.LONGDESCRIPTION = :LongDesc
+AND MD.NLSID = :NLSID
+AND MD.ValFrom <= :ValOn AND :ValOn < MD.ValTo AND MD.EffFrom <= :EffOn AND :EffOn < MD.EffTo
+ORDER BY
+  MD.DescriptionClass
+;
+
+@execute
+if (iExactMatch == 2) {
+  EXEC SQL OPEN sp_cursor2;
+} else {
+  EXEC SQL OPEN sp_cursor1;
+}
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in DescType varchar(32)
+in LongDesc varchar(128)
+in ValOn varchar(26)
+in EffOn varchar(26)
+in NLSID int
+in iExactMatch int
+@end
+
+

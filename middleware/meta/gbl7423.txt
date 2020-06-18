@@ -1,0 +1,64 @@
+@name=GBL7423
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative 
+$Log: gbl7423.txt,v $
+Revision 1.7  2010/06/21 15:43:09  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.5  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.4  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.3  2003/06/28 00:00:51  dave
+fixing syntax
+
+Revision 1.2  2003/06/27 23:21:56  dave
+fixed comments
+
+Revision 1.1  2003/06/27 22:56:52  dave
+new sps for translation
+
+@desc=Finds a record in a current state in the queue table
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7423.txt,v 1.7 2010/06/21 15:43:09 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+@execute
+EXEC SQL DECLARE spcur CURSOR FOR
+SELECT COUNT(DISTINCT ENTITYID) FROM @t_schema.QUEUE
+where
+        Enterprise = :Enterprise
+AND OPWGID = 0 
+AND SESSIONID = 0
+AND STATUS = :CurrentStatus
+AND QUEUE = :Queue
+AND ENTITYTYPE = :EntityType
+AND ENTITYID = :EntityID
+;
+
+@execute
+
+EXEC SQL OPEN spcur;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(32)
+in Queue varchar(32)
+in EntityType varchar(32)
+in EntityID int
+in CurrentStatus int
+@end
+
+

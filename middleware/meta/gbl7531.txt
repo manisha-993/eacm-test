@@ -1,0 +1,78 @@
+@name=GBL7531
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7531.txt,v $
+Revision 1.7  2010/06/21 15:42:49  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.6  2004/10/20 21:01:45  dave
+changes to gen parm
+
+Revision 1.5  2004/02/20 20:21:55  roger
+Must be @t_schema
+
+Revision 1.4  2004/02/20 18:09:34  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.3  2003/09/08 16:31:18  roger
+Enterprise was changed to 16 char length
+
+Revision 1.2  2002/10/09 23:03:38  gregg
+slight fix to logic (opwg is entityid, not entity1id)
+
+Revision 1.1  2002/10/09 21:39:20  gregg
+initial load
+
+Revision 1.6  2002/07/17 17:33:21  roger
+Ensured Log was in @narrative
+
+@desc=get user token for a given opwgid
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7531.txt,v 1.7 2010/06/21 15:42:49 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+
+SELECT DISTINCT 
+ T.attributevalue
+from @t_schema.relator R
+inner join @t_schema.text T ON
+    T.enterprise = :Enterprise
+AND T.entitytype = 'OP'
+AND T.entityid = R.entity2id
+AND T.attributecode = 'USERTOKEN'
+AND T.ValFrom <= :ValOn 
+AND :ValOn < T.ValTo 
+AND T.EffFrom <= :EffOn 
+AND :EffOn < T.EffTo
+where
+    R.enterprise = T.ENTERPRISE
+AND R.entitytype = 'OPWG'
+AND R.entity1type = 'WG'
+AND R.entity2type = 'OP'
+AND R.entityid = :OPWGID
+AND R.ValFrom <= :ValOn 
+AND :ValOn < R.ValTo 
+AND R.EffFrom <= :EffOn 
+AND :EffOn < R.EffTo
+
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPWGID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+
+

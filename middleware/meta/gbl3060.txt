@@ -1,0 +1,95 @@
+@name=GBL3060
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=true
+@fenced=true
+@results=1
+@narrative
+$Log: gbl3060.txt,v $
+Revision 1.12  2010/06/21 15:43:28  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.11  2004/10/20 21:01:42  dave
+changes to gen parm
+
+Revision 1.10  2004/02/20 20:21:52  roger
+Must be @t_schema
+
+Revision 1.9  2004/02/20 18:09:32  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.8  2003/09/08 16:31:14  roger
+Enterprise was changed to 16 char length
+
+Revision 1.7  2003/06/03 18:37:43  roger
+Needed valid @dbase tag
+
+Revision 1.6  2003/04/07 17:43:23  dave
+syntax fix
+
+Revision 1.5  2002/11/22 17:23:56  gregg
+INT on nlsid
+
+Revision 1.4  2002/11/22 17:18:32  gregg
+removed entityType from input params
+
+Revision 1.3  2002/11/22 17:17:05  gregg
+more changes
+
+Revision 1.2  2002/11/22 00:53:55  gregg
+revised to use in MetaAssociationList constructor to build stubs
+
+--------------------------------------------------------------------------------------
+-- List of Associations for Selected FromEntity
+--------------------------------------------------------------------------------------
+@desc= Select Associations and Show Details (Picklist Characteristic and Filter)
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+ MD1.DESCRIPTIONTYPE  AS ASSOCIATIONCODE
+,MD1.SHORTDESCRIPTION AS SHORTDESC
+,MD1.LONGDESCRIPTION  AS LONGDESC
+,ML1.LINKTYPE1        AS FROMENTITY
+,ML1.LINKTYPE2        AS TOENTITY
+,INT(MD1.NLSID)            AS MD1NLSID
+
+FROM @t_schema.METALINKATTR  ML1
+
+INNER JOIN @t_schema.METALINKATTR ML2 ON
+ML2.ENTERPRISE = :Enterprise AND
+ML2.LINKTYPE = 'Role/Assoc' AND
+ML2.LINKTYPE1  = :RoleCode AND
+ML2.LINKTYPE2  =  ML1.LINKTYPE AND
+ML2.LINKCODE   = 'Capability' AND
+ML2.ValFrom <= :ValOn AND :ValOn < ML2.Valto AND ML2.EffFrom <= :EffOn AND :EffOn < ML2.EffTo
+
+INNER JOIN @t_schema.METADESCRIPTION MD1 ON
+MD1.ENTERPRISE      = :Enterprise AND
+MD1.DESCRIPTIONTYPE = ML2.LINKTYPE2 AND
+MD1.DESCRIPTIONCLASS = 'Assoc' AND
+MD1.ValFrom <= :ValOn AND :ValOn < MD1.Valto AND MD1.EffFrom <= :EffOn AND :EffOn < MD1.EffTo
+
+WHERE
+ML1.ENTERPRISE = :Enterprise AND
+ML1.LINKCODE   = 'Assoc' AND
+ML1.LINKTYPE1 = AND
+ML1.ValFrom <= :ValOn AND :ValOn < ML1.Valto AND ML1.EffFrom <= :EffOn AND :EffOn < ML1.EffTo
+ORDER BY
+MD1.DESCRIPTIONTYPE
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

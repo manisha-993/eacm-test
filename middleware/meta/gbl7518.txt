@@ -1,0 +1,179 @@
+@name=GBL7518
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+$Log: gbl7518.txt,v $
+Revision 1.17  2010/06/21 15:43:06  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.16  2004/10/20 21:01:44  dave
+changes to gen parm
+
+Revision 1.15  2004/02/20 20:21:54  roger
+Must be @t_schema
+
+Revision 1.14  2004/02/20 18:09:34  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.13  2003/09/08 16:31:17  roger
+Enterprise was changed to 16 char length
+
+Revision 1.12  2003/08/21 20:51:55  gregg
+more nls stuff
+
+Revision 1.11  2003/08/21 19:16:19  gregg
+check for NLSID IN (1,:NLSID).
+also add NLSID column to result set.
+
+Revision 1.10  2003/08/01 00:14:22  gregg
+remove Role/Entity
+
+Revision 1.9  2002/12/26 18:20:49  gregg
+change to retired flag part of query -- use valdates relative to this record
+
+Revision 1.8  2002/12/10 18:06:53  gregg
+added flag short description, out of circulation
+
+Revision 1.7  2002/10/01 20:56:56  gregg
+add retired flag column at end
+
+Revision 1.6  2002/07/17 17:33:21  roger
+Ensured Log was in @narrative
+
+@desc=For Allowed Values Changes Report
+@fenced=true
+@results=1
+@addperm=true
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7518.txt,v 1.17 2010/06/21 15:43:06 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT  
+    ENT.DESCRIPTIONTYPE,    
+    COALESCE(ENT_NLS.LONGDESCRIPTION,ENT.LONGDESCRIPTION),    
+    ATT.DESCRIPTIONTYPE,    
+    COALESCE(ATT_NLS.LONGDESCRIPTION,ATT.LONGDESCRIPTION),    
+    ATT.SHORTDESCRIPTION,   
+    FLG.DESCRIPTIONCLASS,   
+    FLG.LONGDESCRIPTION, 
+    FLG.SHORTDESCRIPTION,
+    FLG.VALFROM,
+    COALESCE((SELECT distinct linkvalue from @t_schema.METALINKATTR where
+                    ENTERPRISE = ATT.ENTERPRISE AND
+                    LINKTYPE = 'Attribute/Flag' AND
+                    LINKTYPE1 = ATT.DESCRIPTIONTYPE AND
+                    LINKTYPE2 = FLG.DESCRIPTIONCLASS AND
+                    LINKCODE = 'Expired' AND
+                    :ValOn >= VALFrom   AND          
+                    :ValOn < VALTo      AND          
+                    :EffOn >= EffFrom   AND          
+                    :EffOn < EffTo),'N'),
+    COALESCE(OOC.LINKVALUE,'N'),
+    FLG.NLSID
+          
+FROM    @t_schema.METADESCRIPTION AS FLG      
+
+JOIN    @t_schema.METADESCRIPTION AS ATT ON   
+    ATT.ENTERPRISE = FLG.ENTERPRISE AND              
+    ATT.DESCRIPTIONTYPE = FLG.DESCRIPTIONTYPE AND   
+    ATT.DESCRIPTIONCLASS in ('U','S','F', 'A') AND  
+    ATT.NLSID = 1 AND
+    :ValOn >= ATT.VALFrom   AND          
+    :ValOn < ATT.VALTo      AND          
+    :EffOn >= ATT.EffFrom   AND          
+    :EffOn < ATT.EffTo      
+LEFT JOIN    @t_schema.METADESCRIPTION AS ATT_NLS ON   
+    ATT_NLS.ENTERPRISE = ATT.ENTERPRISE AND              
+    ATT_NLS.DESCRIPTIONTYPE = ATT.DESCRIPTIONTYPE AND   
+    ATT_NLS.DESCRIPTIONCLASS = ATT.DESCRIPTIONCLASS AND 
+    ATT_NLS.NLSID = :NLSID AND
+    :ValOn >= ATT_NLS.VALFrom   AND          
+    :ValOn < ATT_NLS.VALTo      AND          
+    :EffOn >= ATT_NLS.EffFrom   AND          
+    :EffOn < ATT_NLS.EffTo     
+             
+JOIN    @t_schema.METALINKATTR as ATTCAP ON   
+    ATTCAP.ENTERPRISE = :Enterprise AND    
+    ATTCAP.LINKTYPE = 'Role/Attribute' AND      
+    ATTCAP.LINKTYPE1 = :RoleCode AND   
+    ATTCAP.LINKTYPE2 = ATT.DESCRIPTIONTYPE AND  
+    ATTCAP.LINKCODE = 'Capability' AND          
+    ATTCAP.LINKVALUE IN ( 'W', 'R', 'S') AND    
+    :ValOn >= ATTCAP.VALFrom    AND  
+    :ValOn < ATTCAP.VALTo       AND  
+    :EffOn >= ATTCAP.EffFrom    AND  
+    :EffOn < ATTCAP.EffTo            
+JOIN    @t_schema.METALINKATTR AS ML ON   
+    ML.ENTERPRISE = FLG.ENTERPRISE AND          
+    ML.LINKTYPE2 = FLG.DESCRIPTIONTYPE AND      
+    ML.LINKTYPE = 'Entity/Attribute' AND        
+    ML.LINKCODE = 'EntityAttribute' AND          
+    :ValOn >= ML.VALFrom    AND      
+    :ValOn < ML.VALTo       AND      
+    :EffOn >= ML.EffFrom    AND      
+    :EffOn < ML.EffTo                
+
+JOIN    @t_schema.METADESCRIPTION AS ENT ON   
+    ENT.ENTERPRISE = FLG.ENTERPRISE AND         
+    ENT.DESCRIPTIONTYPE = ML.LINKTYPE1 AND       
+    ENT.DESCRIPTIONCLASS IN ('Entity', 'Relator') AND  
+    ENT.NLSID = 1 AND
+    :ValOn >= ENT.VALFrom   AND      
+    :ValOn < ENT.VALTo      AND      
+    :EffOn >= ENT.EffFrom   AND      
+    :EffOn < ENT.EffTo        
+LEFT JOIN    @t_schema.METADESCRIPTION AS ENT_NLS ON   
+    ENT_NLS.ENTERPRISE = ENT.ENTERPRISE AND         
+    ENT_NLS.DESCRIPTIONTYPE = ENT.DESCRIPTIONTYPE AND    
+    ENT_NLS.DESCRIPTIONCLASS = ENT.DESCRIPTIONCLASS AND  
+    ENT_NLS.NLSID = :NLSID AND
+    :ValOn >= ENT_NLS.VALFrom   AND      
+    :ValOn < ENT_NLS.VALTo      AND      
+    :EffOn >= ENT_NLS.EffFrom   AND      
+    :EffOn < ENT_NLS.EffTo     
+    
+       
+LEFT JOIN    @t_schema.METALINKATTR as OOC ON   
+    OOC.ENTERPRISE = :Enterprise AND  
+    OOC.LINKTYPE = 'DynaRule' AND         
+    OOC.LINKTYPE1 = ATT.DESCRIPTIONTYPE AND   
+    OOC.LINKTYPE2 = FLG.DESCRIPTIONCLASS AND  
+    OOC.LINKCODE = 'OutOfCirculation' AND          
+    OOC.LINKVALUE = 'NOOP' AND    
+    :ValOn >= OOC.VALFrom    AND  
+    :ValOn < OOC.VALTo       AND  
+    :EffOn >= OOC.EffFrom    AND  
+    :EffOn < OOC.EffTo          
+WHERE   
+    FLG.ENTERPRISE = :Enterprise AND   
+    FLG.DESCRIPTIONCLASS NOT IN ('S', 'U' ,'F', 'A') AND  
+    FLG.VALFROM >= :FirstDate AND     
+    FLG.VALFROM <= :LastDate AND      
+    FLG.NLSID = :NLSID  AND                               
+    :ValOn >= FLG.VALFrom   AND           
+    :ValOn < FLG.VALTo      AND           
+    :EffOn >= FLG.EffFrom   AND           
+    :EffOn < FLG.EffTo                    
+ORDER BY   
+    ENT.DESCRIPTIONTYPE, ATT.DESCRIPTIONTYPE,  
+    FLG.DESCRIPTIONCLASS, FLG.NLSID  
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPENID int
+in NLSID int
+in FirstDate varchar(26)
+in LastDate varchar(26)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+
+

@@ -1,0 +1,2410 @@
+@name=GBL8000
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+  This guy says there is only one way to navigate
+  It is based off the VE technology
+
+ $Log: gbl8000.txt,v $
+ Revision 1.83  2013/08/26 15:05:41  praveen
+ Added "with ur" clauses to all queries & added WARR filters for EPIMS VE
+
+ Revision 1.82  2009/10/23 16:10:54  rick
+ change to fix mysterious prob with INT function ... changing to substr
+
+ Revision 1.81  2009/10/20 00:21:59  rick
+ update to change long datatype to sqlint32
+
+ Revision 1.80  2008/09/18 16:03:10  yang
+ MN35768150 fixes
+
+ Revision 1.79  2007/07/11 20:25:50  bala
+ take out isolation statement
+
+ Revision 1.78  2007/05/29 21:37:34  bala
+ <No Comment Entered>
+
+ Revision 1.77  2007/04/23 17:08:32  bala
+ one more
+
+ Revision 1.76  2007/04/23 17:00:31  bala
+ typo fix
+
+ Revision 1.75  2007/04/23 16:48:57  bala
+ add DebugMode parm
+
+ Revision 1.74  2007/04/23 16:48:10  bala
+ add Debug Hooks
+
+ Revision 1.73  2007/03/23 20:13:48  joan
+ update change
+
+ Revision 1.72  2007/03/12 21:47:37  joan
+ fix compile
+
+ Revision 1.71  2007/03/12 21:24:10  joan
+ fix compile
+
+ Revision 1.70  2007/03/12 21:12:24  joan
+ use filter
+
+ Revision 1.69  2007/03/09 00:05:59  dave
+ syntax fix
+
+ Revision 1.68  2007/03/08 22:12:39  dave
+ ok..lets try to make this thing run faster
+
+ Revision 1.67  2006/11/10 19:49:36  joan
+ changes to address relator
+
+ Revision 1.66  2006/06/17 00:05:14  dave
+ syntax
+
+ Revision 1.65  2006/06/15 20:59:46  dave
+ tracing
+
+ Revision 1.64  2006/04/07 16:56:30  joan
+ add noremote
+
+ Revision 1.63  2006/03/17 17:55:50  dave
+ messing with GBL8000
+
+ Revision 1.62  2006/02/22 19:35:37  joan
+ add for association
+
+ Revision 1.61  2005/04/06 23:06:54  dave
+ found the filter problem
+
+ Revision 1.60  2005/04/06 22:42:37  dave
+ more changes to GBL8000
+
+ Revision 1.59  2005/04/06 17:47:05  dave
+ updating gbl8000 more advanced sql on the U-D leg
+
+ Revision 1.58  2004/11/11 19:25:34  dave
+ more syntax
+
+ Revision 1.57  2004/11/11 18:49:45  dave
+ gbl8000 minor changes for comp/ and speed
+
+ Revision 1.56  2004/11/11 17:03:35  dave
+ new gbl8000 for filtering
+
+ Revision 1.55  2004/11/10 17:59:49  dave
+ more commenting out for testing
+
+ Revision 1.54  2004/11/10 17:49:07  dave
+ miminzing file writes in SPs and pulling in all variable to
+ sp innards to isolate SP4 db2 8.1 Dari fall over
+
+ Revision 1.53  2004/10/26 20:20:42  dave
+ making a small fix
+
+ Revision 1.52  2004/10/26 20:01:36  dave
+ performance change for association
+
+ Revision 1.51  2004/10/20 21:01:47  dave
+ changes to gen parm
+
+ Revision 1.50  2004/10/20 20:26:14  dave
+ more parmstyle
+
+ Revision 1.49  2004/07/20 20:19:06  dave
+ getting the distinct in the select
+
+ Revision 1.48  2004/07/20 16:39:16  dave
+ Attempting to do the trickey T think to pick up both ends of
+ the relator on a Nav.. or extract
+
+ Revision 1.47  2004/03/25 19:59:08  joan
+ fix error
+
+ Revision 1.46  2004/03/25 19:52:12  joan
+ fixes for pulling EntityID > 0 only
+
+ Revision 1.45  2004/02/20 20:21:56  roger
+ Must be @t_schema
+
+ Revision 1.44  2004/02/20 18:09:36  roger
+ ALL table names must now be prefixed w/ @t_schema in
+ order to support multiple schemas in SPs.
+
+ Revision 1.43  2004/01/20 20:10:11  dave
+ fixing more filters on U cases
+
+ Revision 1.42  2003/12/18 17:48:48  dave
+ small syntax fix
+
+ Revision 1.41  2003/12/18 17:19:03  dave
+ more performance
+
+ Revision 1.40  2003/12/09 18:54:41  dave
+ more speed for GBL8000
+
+ Revision 1.39  2003/11/25 20:57:51  dave
+ changed filter technology for speed
+
+ Revision 1.38  2003/11/11 21:29:58  joan
+ syntax
+
+ Revision 1.37  2003/11/11 21:12:13  joan
+ fix fb 52908
+
+ Revision 1.36  2003/10/28 19:23:05  dave
+ speed
+
+ Revision 1.35  2003/09/08 16:31:19  roger
+ Enterprise was changed to 16 char length
+
+ Revision 1.34  2003/08/27 18:02:17  dave
+ removed the deletion of seed recs in GBL8000
+
+ Revision 1.33  2003/04/25 22:59:45  dave
+ fixing association two Up Down
+
+ Revision 1.32  2003/04/25 20:27:27  dave
+ fix on parent Up and child Down association
+
+ Revision 1.31  2003/04/17 23:37:42  gregg
+ remove F3. line for compile
+
+ Revision 1.30  2003/04/12 23:21:56  dave
+ removed extra filtering per IBM spec
+
+ Revision 1.29  2003/02/06 00:56:23  gregg
+ attempting to place Relator valfrom into ValOn column in trsnavigate
+
+ Revision 1.28  2002/10/14 18:47:00  dave
+ upped the anti from 10 to 20 on recusrive navigate
+
+ Revision 1.27  2002/07/30 18:05:46  dave
+ QUEUE II logic
+
+ Revision 1.26  2002/07/25 20:14:58  dave
+ sp fix F2 and F1
+
+ Revision 1.25  2002/06/10 19:26:09  dave
+ GBL8000 cleanup
+
+ Revision 1.24  2002/06/07 23:28:16  dave
+ 8000 fix
+
+ Revision 1.23  2002/05/29 22:15:51  dave
+ fix for root when going up from root entity
+
+ Revision 1.22  2002/05/02 17:10:39  dave
+ using date offset in GBL8000
+
+ Revision 1.21  2002/05/01 23:31:15  dave
+ adding cases to the GBL8000 (Reverse T)
+
+ Revision 1.20  2002/04/15 23:57:14  dave
+ GBL8000 fix on Date filters
+
+ Revision 1.19  2002/02/12 21:01:58  dave
+ added toString methods for diplay help
+
+ Revision 1.18  2002/02/08 01:07:37  dave
+ gbl8000 assoc fix
+
+ Revision 1.17  2002/02/08 00:23:59  dave
+ more stuff here
+
+ Revision 1.16  2002/02/07 23:55:24  dave
+ gbl8000 association trick to use two similiar attributecodes
+
+ Revision 1.15  2002/01/30 02:07:52  dave
+ file name fixes and WHERE block fix for 7005 (Up case not working)
+
+ Revision 1.14  2002/01/30 01:50:52  dave
+ minor syntax error
+
+ Revision 1.13  2002/01/30 01:42:25  dave
+ introduced levels into navigation
+
+ Revision 1.12  2002/01/30 00:48:04  dave
+ added new SP and moded gbl8000 to avoid loopbacks
+
+ Revision 1.11  2002/01/29 00:33:34  dave
+ minor SP mods for the new navigation for1.1
+
+
+
+@desc=build a common list of entities in the trsNavigation table for a given navigation request
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8000.txt,v 1.83 2013/08/26 15:05:41 praveen Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL BEGIN DECLARE SECTION;
+sqlint32 Level;
+sqlint32 LeafLevel;
+char FromEntity[34];
+char ToEntity[34];
+char RelatorType[34];
+char PDirection[2];
+char Direction[2];
+char Category[2];
+char RClass[34];
+sqlint32 NavClassCount;
+sqlint32 track;
+sqlint32 i;
+sqlint32 iFilter1;
+sqlint32 iFilter2;
+sqlint32 iDate1;
+char cFilter1[33];
+char cFilter2[33];
+char cDate1[33];
+char cFilterEntity[33];
+
+// ok here is the new stuff
+//
+char FromAttCode[34];
+char ToAttCode[34];
+char FlagFilter1[34];
+char FlagFilter2[34];
+char DateFilter1[34];
+
+EXEC SQL END DECLARE SECTION;
+
+FILE *t;
+t=NULL;
+mode_t Mode2;
+Mode2 = 0777;
+chmod("/tmp/8000.log",Mode2);
+
+//Open debug file if its debug mode
+if (DebugMode == 1) {
+  // Append...
+  t=fopen("/tmp/8000.log","a");
+}
+
+//
+// BEGIN ERROR CHECK DECLARE SECTION
+//
+const int SQLERROR = -1;
+const int SQLCOMPLETE = 1;
+//set this to SQLCOMPLETE when finished!
+int m_iSQLState = SQLERROR;
+EXEC SQL WHENEVER SQLERROR GOTO error_exit;
+EXEC SQL WHENEVER SQLWARNING CONTINUE;
+//
+// END ERROR CHECK DECLARE SECTION
+//
+
+//==================================================================
+// This Guy Returns the entire Nav structure to the caller.
+//==================================================================
+//EXEC SQL SET CURRENT ISOLATION = UR;
+EXEC SQL DECLARE NavCur CURSOR FOR
+SELECT DISTINCT
+  Level
+ ,RTRIM(Entity1Type)
+ ,Entity1ID
+ ,RTRIM(EntityType)
+ ,EntityID
+ ,RTRIM(Entity2Type)
+ ,Entity2ID
+ ,Leaf
+ ,ValOn
+ ,EffOn
+FROM @t_schema.trsNavigate
+WHERE
+    SessionID = :SessionID
+ORDER BY
+   1,2,3,4,5,6,7
+with ur;
+
+// ===================================================================
+// This guy Generates a Navigation Template based upon the Navigation
+// Type and the EntityType
+// This guy is the big kahuna that replaces  all previous Navigation
+// ===================================================================
+EXEC SQL DECLARE ActionTemplate CURSOR FOR
+WITH myWire
+  (Level
+  ,FromEntity
+  ,ToEntity
+  ,RelatorType
+  ,ParentDirection
+  ,ChildDirection
+  ,Category
+  ,RClass)
+AS
+(SELECT DISTINCT
+  INT(ROOT.LinkValue)
+, E.LinkType1
+, E.LinkType2
+, ROOT.LinkType2
+--, CHAR(ROOT.LinkCode,1)
+,'D'
+, CHAR(ROOT.LinkCode,1)
+, 'E'
+, E.LinkCode
+FROM @t_schema.MetaLinkAttr ROOT
+INNER JOIN @t_schema.MetaLinkAttr E ON
+   E.Enterprise = :Enterprise
+AND E.LinkCode in ('Relator','Assoc')
+AND E.LinkType = ROOT.LinkType2
+AND CASE ROOT.LinkCode
+     WHEN 'D' THEN E.LinkType1
+     WHEN 'U' THEN E.LinkType2
+   END = :EntityType
+AND E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+WHERE
+    ROOT.Enterprise = :Enterprise
+AND ROOT.LinkType in ('Action/Entity')
+AND ROOT.LinkType1= :ActionType
+AND ROOT.LinkCode IN ('D','U')
+and substr(root.linkvalue,1,1) in ('0','1','2','3','4','5','6','7','8','9')
+AND ROOT.ValFrom <= :ValOn AND :ValOn < ROOT.ValTo AND ROOT.EffFrom <= :EffOn AND :EffOn < ROOT.EffTo
+UNION ALL
+-- CASE I   Parent Direction is Down .. and Child Direction is Down
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+  WHERE
+     E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'D'
+  and substr(E1.linkvalue,1,1) in ('0','1','2','3','4','5','6','7','8','9')
+  AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND  :EffOn < E1.EffTo) CHILD
+WHERE
+    PARENT.ToEntity  = CHILD.FromEntity
+AND PARENT.ChildDirection = 'D'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'U'
+  and substr(E1.linkvalue,1,1) in ('0','1','2','3','4','5','6','7','8','9')
+  AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND  :EffOn < E1.EffTo) CHILD
+WHERE
+PARENT.FromEntity =  CHILD.ToEntity
+AND PARENT.ChildDirection = 'U'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'D'
+  and substr(E1.linkvalue,1,1) in ('0','1','2','3','4','5','6','7','8','9')
+  AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND  :EffOn < E1.EffTo) CHILD
+WHERE
+    PARENT.FromEntity =  CHILD.FromEntity
+AND PARENT.ChildDirection = 'U'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+   INT(E1.LinkValue) AS Level
+  ,E.LinkType1 AS FromEntity
+  ,E.LinkType2 AS ToEntity
+  ,E1.LinkType2 AS RelatorType
+  ,E1.LinkCode AS Direction
+  ,E.LinkCode AS RCLASS
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType IN ('Action/Entity')
+  AND E1.LinkCode = 'U'
+  and substr(E1.linkvalue,1,1) in ('0','1','2','3','4','5','6','7','8','9')
+  AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND  :EffOn < E1.EffTo) CHILD
+WHERE
+    PARENT.ToEntity =  CHILD.ToEntity
+AND PARENT.ChildDirection = 'D'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'R'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+   INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+     E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'U'
+  and substr(E1.linkvalue,1,1) in ('0','1','2','3','4','5','6','7','8','9')
+  AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND  :EffOn < E1.EffTo) CHILD
+WHERE
+    PARENT.RelatorType =  CHILD.ToEntity
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'R'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType IN ('Action/Entity')
+  AND E1.LinkCode = 'D'
+  and substr(E1.linkvalue,1,1) in ('0','1','2','3','4','5','6','7','8','9')
+  AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND  :EffOn < E1.EffTo) CHILD
+WHERE
+    PARENT.RelatorType = CHILD.FromEntity
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'T'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+   INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+     E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode in ('U','D')
+  and substr(E1.linkvalue,1,1) in ('0','1','2','3','4','5','6','7','8','9')
+  AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND  :EffOn < E1.EffTo) CHILD
+WHERE
+    PARENT.ToEntity =  CHILD.RelatorType
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'T'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :ValOn AND :ValOn < E.ValTo AND E.EffFrom <= :EffOn AND :EffOn < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType IN ('Action/Entity')
+  AND E1.LinkCode in ('U','D')
+  and substr(E1.linkvalue,1,1) in ('0','1','2','3','4','5','6','7','8','9')
+  AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND  :EffOn < E1.EffTo) CHILD
+WHERE
+    PARENT.FromEntity = CHILD.RelatorType
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 20
+
+)
+SELECT DISTINCT
+  Level
+, CASE(Select Max(Level) from myWire) WHEN Level THEN 1 ELSE 0 END
+, RTRIM(FromEntity)
+, RTRIM(ToEntity)
+, RTRIM(RelatorType)
+, RTRIM(ParentDirection)
+, RTRIM(ChildDirection)
+, RTRIM(Category)
+, RTRIM(RClass)
+FROM myWire
+ORDER BY Level
+with ur;
+
+@execute
+
+// Provide some temp place holders for the information so we do not have nested SQL statements open.. etc.
+// here we will add some more local variables to reduce he join times in the SQL
+// specifically, we are going after Associations here
+//
+sqlint32 alLevel[300];
+sqlint32 alLeafLevel[300];
+char acFromEntity[300][34];
+char acToEntity[300][34];
+char acRelatorType[300][34];
+char acPDirection[300][2];
+char acDirection[300][2];
+char acCategory[300][2];
+char acRClass[300][34];
+char acFromAttCode[300][34];
+char acToAttCode[300][34];
+
+EXEC SQL OPEN ActionTemplate;
+track = 0;
+do {
+
+  EXEC SQL FETCH ActionTemplate INTO :Level, :LeafLevel, :FromEntity, :ToEntity, :RelatorType, :PDirection, :Direction, :Category, :RClass;
+
+  if (SQLCODE != 0) break;
+
+  alLevel[track] = Level;
+  alLeafLevel[track] = LeafLevel;
+  strcpy(acFromEntity[track],FromEntity);
+  strcpy(acToEntity[track], ToEntity);
+  strcpy(acRelatorType[track], RelatorType);
+  strcpy(acPDirection[track], PDirection);
+  strcpy(acDirection[track], Direction);
+  strcpy(acCategory[track], Category);
+  strcpy(acRClass[track], RClass);
+
+  if (RClass[0] == 'A') {
+      //
+      // ok.. lets go get the Association Data right here !!!
+      //
+      EXEC SQL
+      SELECT MT.LinkType2, MT.LinkValue into :FromAttCode, :ToAttCode from opicm.metalinkattr MT
+      WHERE
+          MT.Enterprise = :Enterprise
+      AND MT.LinkType =  'Assoc/Attribute'
+      AND MT.LinkType1 = :RelatorType
+      AND MT.LinkCode = 'Transform'
+      AND MT.ValFrom <= :ValOn AND :ValOn < MT.ValTo AND MT.EffFrom <= :EffOn AND :EffOn < MT.EffTo
+      with ur;
+
+      strcpy(acFromAttCode[track], FromAttCode);
+      strcpy(acToAttCode[track], ToAttCode);
+  } else {
+      FromAttCode[0] = '\0';
+      ToAttCode[0] = '\0';
+  }
+
+  track = track + 1;
+
+} while (1);
+
+// Close and release resources
+EXEC SQL CLOSE ActionTemplate WITH RELEASE;
+EXEC SQL COMMIT WORK;
+
+// get the filter info in the trsFilter table
+EXEC SQL
+   INSERT INTO opicm.trsFilter
+   select
+   :Enterprise
+   , :SessionID
+   , M1.linktype1
+   , M1.linktype2
+   , M1.linkcode
+   , M2.linktype2
+   , M2.linkcode
+   , 'NA'
+   from opicm.metalinkattr M1
+
+   inner join opicm.metalinkattr M2 on
+   M2.enterprise=:Enterprise
+   and M2.linktype='Group/Attribute/Filter'
+   and M2.linktype1=M1.linkvalue
+   AND M2.ValFrom <= :ValOn AND :ValOn < M2.ValTo
+   AND M2.EffFrom <= :EffOn AND :EffOn < M2.EffTo
+
+   where M1.enterprise=:Enterprise
+   and M1.linktype='Action/Entity'
+   and M1.linktype1=:ActionType
+   and (M1.linkcode='Filter1' or M1.linkcode='Filter2')
+   AND M1.ValFrom <= :ValOn AND :ValOn < M1.ValTo
+   AND M1.EffFrom <= :EffOn AND :EffOn < M1.EffTo
+with ur;
+EXEC SQL COMMIT WORK;
+
+EXEC SQL
+   INSERT INTO opicm.trsFilter
+   select
+   :Enterprise
+   , :SessionID
+   , M1.linktype1
+   , M1.linktype2
+   , M1.linkcode
+   , M2.linktype2
+   , M2.linkvalue
+   , M2.linkcode
+   from opicm.metalinkattr M1
+
+   inner join opicm.metalinkattr M2 on
+   M2.enterprise=:Enterprise
+   and M2.linktype='Group/Attribute/Filter'
+   and M2.linktype1= M1.linkvalue
+   AND M2.ValFrom <= :ValOn AND :ValOn < M2.ValTo
+   AND M2.EffFrom <= :EffOn AND :EffOn < M2.EffTo
+
+   where M1.enterprise=:Enterprise
+   and M1.linktype='Action/Entity'
+   and M1.linktype1=:ActionType
+   and M1.linkcode='Date1'
+   AND M1.ValFrom <= :ValOn AND :ValOn < M1.ValTo
+   AND M1.EffFrom <= :EffOn AND :EffOn < M1.EffTo
+with ur;
+EXEC SQL COMMIT WORK;
+
+// Now process the data
+for (i = 0; i < track;i++) {
+
+  // Pull all the attributes in
+  Level = alLevel[i];
+  LeafLevel = alLeafLevel[i];
+  strcpy(FromEntity,acFromEntity[i]);
+  strcpy(ToEntity,acToEntity[i]);
+  strcpy(RelatorType,acRelatorType[i]);
+  strcpy(PDirection,acPDirection[i]);
+  strcpy(Direction,acDirection[i]);
+  strcpy(Category,acCategory[i]);
+  strcpy(RClass,acRClass[i]);
+
+  strcpy(FromAttCode,acFromAttCode[i]);
+  strcpy(ToAttCode,acToAttCode[i]);
+
+  //
+  //  Lets look for filters
+  //
+  iFilter1 = 0;
+  iFilter2 = 0;
+  iDate1 = 0;
+
+  if (Direction [0] == 'D') {
+    strcpy(cFilterEntity,ToEntity);
+  } else {
+    strcpy(cFilterEntity,FromEntity);
+  }
+
+  EXEC SQL
+    SELECT LinkValue, 1 into :cFilter1, :iFilter1
+    FROM @t_schema.MetaLinkAttr
+    WHERE
+        Enterprise = :Enterprise
+    AND LinkType = 'Action/Entity'
+    AND LinkType1 = :ActionType
+    AND LinkCode in ('Filter1')
+    AND LinkType2 = :cFilterEntity
+    AND ValFrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+  with ur;
+
+  EXEC SQL
+    SELECT LinkValue, 1 into :cFilter2, :iFilter2
+    FROM @t_schema.MetaLinkAttr
+    WHERE
+        Enterprise = :Enterprise
+    AND LinkType = 'Action/Entity'
+    AND LinkType1 = :ActionType
+    AND LinkCode in ('Filter2')
+    AND LinkType2 = :cFilterEntity
+    AND ValFrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+  with ur;
+
+  EXEC SQL
+    SELECT LinkValue, 1 into :cDate1, :iDate1
+    FROM @t_schema.MetaLinkAttr
+    WHERE
+        Enterprise = :Enterprise
+    AND LinkType = 'Action/Entity'
+    AND LinkType1 = :ActionType
+    AND LinkCode in ('Date1')
+    AND LinkType2 = :cFilterEntity
+    AND ValFrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+  with ur;
+
+  if (PDirection [0] == 'D' && Direction [0] == 'D' && Category [0] == 'E') {
+
+  if (RClass[0] == 'R') {
+
+    //
+    // do we have a filter to worry about??
+    //
+    if (iFilter1 > 0 || iFilter2 > 0 || iDate1 > 0) {
+      EXEC SQL
+        INSERT INTO opicm.trsNavigate
+
+        SELECT DISTINCT
+        :Enterprise
+        ,:SessionID
+        ,:ActionType
+        ,'Navigate'
+        ,:Level
+        ,:LeafLevel
+        ,:PDirection
+        ,:Direction
+        ,R.Entity1Type
+        ,R.Entity1ID
+        ,R.EntityType
+        ,R.EntityID
+        ,R.Entity2Type
+        ,R.Entity2ID
+        ,R.ValFrom
+        ,:EffOn
+        FROM opicm.trsNavigate N
+        INNER JOIN opicm.Relator R ON
+            R.Enterprise = :Enterprise
+        AND R.EntityType = :RelatorType
+        AND R.EntityID > 0
+        AND R.Entity1Type = N.Entity2Type
+        AND (R.Entity1ID = N.Entity2ID AND R.Entity1ID > 0)
+        AND R.Entity2ID > 0
+        AND R.ValFrom <= :ValOn and :ValOn < R.ValTo AND R.EffFrom <= :EffOn and :EffOn < R.EffTo
+        LEFT JOIN opicm.trsFilter M1 ON
+            M1.Enterprise = :Enterprise
+        AND M1.Sessionid = :SessionID
+        AND M1.FilterType = 'Filter1'
+        AND M1.EntityType = R.Entity2Type
+        LEFT JOIN opicm.trsFilter M3 ON
+            M3.Enterprise = :Enterprise
+        AND M3.Sessionid = :SessionID
+        AND M3.FilterType = 'Filter2'
+        AND M3.EntityType = R.Entity2Type
+        LEFT JOIN opicm.trsFilter M5 ON
+            M5.Enterprise = :Enterprise
+        AND M5.Sessionid = :SessionID
+        AND M5.FilterType = 'Date1'
+        AND M5.EntityType = R.Entity2Type
+        WHERE
+            N.SessionID = :SessionID
+        AND N.Level = :Level -1
+        AND N.DIRECTION2 =
+          (CASE
+            WHEN N.DIRECTION2 = 'X' THEN 'X'
+            ELSE :PDirection END
+           )
+        AND N.Entity2Type = :FromEntity
+        AND 1 = (CASE
+                  WHEN :iFilter1 = 1 AND
+                          0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+                          F.Enterprise = :Enterprise
+                          AND F.EntityType = R.Entity2Type
+                          AND F.EntityID = R.Entity2ID
+                          AND F.EntityID > 0
+                          AND RTRIM(F.AttributeCode) = M1.AttributeCode
+                          AND RTRIM(F.AttributeValue) = M1.Attributevalue
+                          AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+                  WHEN :iFilter2 = 1 AND
+                          0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+                          F.Enterprise = :Enterprise
+                          AND F.EntityType = R.Entity2Type
+                          AND F.EntityID = R.Entity2ID
+                          AND F.EntityID > 0
+                          AND RTRIM(F.AttributeCode) = M3.AttributeCode
+                          AND RTRIM(F.AttributeValue) = M3.Attributevalue
+                          AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+                  WHEN :iDate1 = 1 AND
+                          0 = (SELECT COUNT(T1.ENTERPRISE) FROM opicm.text T1 WHERE
+                          T1.Enterprise = :Enterprise
+                          AND T1.EntityType = R.Entity2Type
+                          AND T1.EntityID = R.Entity2ID
+                          AND T1.AttributeCode = M5.AttributeCode
+                          AND T1.NLSID = 1
+                          AND RTRIM(T1.AttributeValue) <> ''
+                          AND 1 = (CASE
+                                  WHEN M5.Operator = 'LE' AND DATE(RTRIM(T1.AttributeValue)) <= DATE(current timestamp) + (INT(M5.Attributevalue)) DAYS  THEN 1
+                                  WHEN M5.Operator = 'GE' AND DATE(RTRIM(T1.AttributeValue)) >= DATE(current timestamp) + (INT(M5.Attributevalue)) DAYS  THEN 1
+                                  WHEN M5.Operator = 'EQ' AND DATE(RTRIM(T1.AttributeValue))  = DATE(current timestamp) + (INT(M5.Attributevalue)) DAYS  THEN 1
+                                                  ELSE 0 END)
+                                  AND T1.ValFrom <= :ValOn AND :ValOn < T1.ValTo AND T1.EffFrom <= :EffOn AND :EffOn < T1.EffTo) THEN 0
+                          ELSE 1 END
+                  )
+          with ur;
+
+    } else { // No filter
+
+      EXEC SQL
+        INSERT INTO @t_schema.trsNavigate
+        SELECT DISTINCT
+        :Enterprise
+        ,:SessionID
+        ,:ActionType
+        ,'Navigate'
+        ,:Level
+        ,:LeafLevel
+        ,:PDirection
+        ,:Direction
+        ,R.Entity1Type
+        ,R.Entity1ID
+        ,R.EntityType
+        ,R.EntityID
+        ,R.Entity2Type
+        ,R.Entity2ID
+        ,R.ValFrom
+        ,:EffOn
+        FROM @t_schema.trsNavigate N
+        INNER JOIN @t_schema.Relator R ON
+            R.Enterprise = :Enterprise
+        AND R.EntityType = :RelatorType
+        AND R.EntityID > 0
+        AND R.Entity1Type = N.Entity2Type
+        AND (R.Entity1ID = N.Entity2ID AND R.Entity1ID > 0)
+        AND R.Entity2ID > 0
+        AND R.ValFrom <= :ValOn and :ValOn < R.ValTo AND R.EffFrom <= :EffOn and :EffOn < R.EffTo
+        WHERE
+            N.SessionID = :SessionID
+        AND N.Level = :Level -1
+        AND N.DIRECTION2 = (CASE
+                WHEN N.DIRECTION2 = 'X' THEN 'X'
+                ELSE :PDirection END)
+        AND N.Entity2Type = :FromEntity
+        with ur;
+    }
+
+  } else {    // It an association...
+
+    if (iFilter1 > 0 || iFilter2 > 0 || iDate1 > 0) {
+
+      EXEC SQL
+        INSERT INTO opicm.trsNavigate
+        SELECT DISTINCT
+           :Enterprise
+          ,:SessionID
+          ,:ActionType
+          ,'Navigate'
+          ,:Level
+          ,:LeafLevel
+          ,:PDirection
+          ,:Direction
+          ,E1.EntityType
+          ,E1.EntityID
+          ,:RelatorType
+          ,E2.EntityID
+          ,E2.EntityType
+          ,E2.EntityID
+          ,:ValOn
+          ,:EffOn
+          FROM opicm.trsNavigate N
+          INNER JOIN opicm.Flag E1 ON
+              E1.Enterprise = :Enterprise
+          AND E1.EntityType = :FromEntity
+          AND E1.EntityID = N.Entity2ID
+          AND E1.EntityID > 0
+          AND RTRIM( '' || E1.AttributeCode) = :FromAttCode
+          AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND :EffOn < E1.EffTo
+          INNER JOIN opicm.Flag E2 ON
+              E2.Enterprise = :Enterprise
+          AND E2.AttributeCode = :ToAttCode
+          AND E2.AttributeValue = E1.AttributeValue
+          AND E2.EntityType = :ToEntity
+          AND E2.EntityID > 0
+          AND E2.ValFrom <= :ValOn AND :ValOn < E2.ValTo AND E2.EffFrom <= :EffOn AND :EffOn < E2.EffTo
+          -- TAKE CARE OF ENTITY2TYPE FOR THREE FILTERS AND TWO DATES
+          LEFT JOIN opicm.trsFilter M1 ON
+              M1.Enterprise = :Enterprise
+          AND M1.Sessionid = :SessionID
+          AND M1.FilterType = 'Filter1'
+          AND M1.EntityType = E2.EntityType
+          LEFT JOIN opicm.trsFilter M3 ON
+              M3.Enterprise = :Enterprise
+          AND M3.Sessionid = :SessionID
+          AND M3.FilterType = 'Filter2'
+          AND M3.EntityType = E2.EntityType
+          LEFT JOIN opicm.trsFilter M5 ON
+              M5.Enterprise = :Enterprise
+          AND M5.Sessionid = :SessionID
+          AND M5.FilterType = 'Date1'
+          AND M5.EntityType = E2.EntityType
+          WHERE
+              N.SessionID = :SessionID
+          AND N.Level = :Level -1
+          AND N.DIRECTION2 =
+              (CASE
+                WHEN N.DIRECTION2 = 'X' THEN 'X'
+                ELSE :PDirection
+              END)
+          AND N.Entity2Type = :FromEntity
+          AND 1 = (CASE
+                  WHEN :iFilter1 = 1 AND
+                          0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+                          F.Enterprise = :Enterprise
+                          AND F.EntityType = E2.EntityType
+                          AND F.EntityID = E2.EntityID
+                          AND F.EntityID > 0
+                          AND RTRIM(F.AttributeCode) = M1.AttributeCode
+                          AND RTRIM(F.AttributeValue) = M1.Attributevalue
+                          AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+                  WHEN :iFilter2 = 1 AND
+                          0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+                          F.Enterprise = :Enterprise
+                          AND F.EntityType = E2.EntityType
+                          AND F.EntityID = E2.EntityID
+                          AND F.EntityID > 0
+                          AND RTRIM(F.AttributeCode) = M3.AttributeCode
+                          AND RTRIM(F.AttributeValue)  = M3.Attributevalue
+                          AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+                  WHEN :iDate1 = 1 AND
+                          0 = (SELECT COUNT(T1.ENTERPRISE) FROM opicm.text T1 WHERE
+                          T1.Enterprise = :Enterprise
+                          AND T1.EntityType = E2.EntityType
+                          AND T1.EntityID = E2.EntityID
+                          AND T1.AttributeCode = M5.AttributeCode
+                          AND T1.NLSID = 1
+                          AND RTRIM(T1.AttributeValue) <> ''
+                          AND 1 = (CASE
+                                  WHEN M5.Operator = 'LE' AND DATE(RTRIM(T1.AttributeValue)) <= DATE(current timestamp) + (INT(M5.Attributevalue)) DAYS  THEN 1
+                                  WHEN M5.Operator = 'GE' AND DATE(RTRIM(T1.AttributeValue)) >= DATE(current timestamp) + (INT(M5.Attributevalue)) DAYS  THEN 1
+                                  WHEN M5.Operator = 'EQ' AND DATE(RTRIM(T1.AttributeValue))  = DATE(current timestamp) + (INT(M5.Attributevalue)) DAYS  THEN 1
+                                                  ELSE 0 END)
+                                  AND T1.ValFrom <= :ValOn AND :ValOn < T1.ValTo AND T1.EffFrom <= :EffOn AND :EffOn < T1.EffTo) THEN 0
+                          ELSE 1 END
+                    )
+          with ur;
+
+      } else {
+
+          EXEC SQL INSERT INTO opicm.trsNavigate
+          SELECT DISTINCT
+          :Enterprise
+          ,:SessionID
+          ,:ActionType
+          ,'Navigate'
+          ,:Level
+          ,:LeafLevel
+          ,:PDirection
+          ,:Direction
+          ,E1.EntityType
+          ,E1.EntityID
+          ,:RelatorType
+          ,E2.EntityID
+          ,E2.EntityType
+          ,E2.EntityID
+          ,:ValOn
+          ,:EffOn
+          FROM opicm.trsNavigate N
+          Inner JOIN opicm.Flag E1 ON
+              E1.Enterprise = :Enterprise
+          AND E1.EntityID = N.Entity2ID
+          AND E1.EntityID > 0
+          AND E1.EntityType  = N.Entity2Type
+          AND 'A:' || E1.AttributeCode =  rtrim('A:' || :FromAttCode)
+          AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND :EffOn < E1.EffTo
+          inner JOIN opicm.Flag E2 ON
+              E2.Enterprise = :Enterprise
+          AND E2.AttributeCode = :ToAttCode
+          AND E2.AttributeValue = rtrim(E1.AttributeValue)
+          AND E2.EntityType = :ToEntity
+          AND E2.EntityID > 0
+          AND E2.ValFrom <= :ValOn AND :ValOn < E2.ValTo AND E2.EffFrom <= :EffOn AND :EffOn < E2.EffTo
+          WHERE
+              N.SessionID = :SessionID
+          AND N.Level = :Level -1
+          AND N.DIRECTION2 =
+                  (CASE
+                    WHEN N.DIRECTION2 = 'X' THEN 'X'
+                    ELSE :PDirection
+                  END)
+          AND N.Entity2Type = :FromEntity
+          --AND E2.Enterprise is NOt null
+with ur;
+
+      }
+
+    }
+
+  } else if (PDirection [0] == 'U' && Direction [0] == 'U' && Category[0] == 'E') {
+
+    if (RClass[0] == 'R') {
+
+     EXEC SQL INSERT INTO opicm.trsNavigate
+      SELECT DISTINCT
+      :Enterprise
+      ,:SessionID
+      ,:ActionType
+      ,'Navigate'
+      ,:Level
+      ,:LeafLevel
+      ,:PDirection
+      ,:Direction
+      ,R.Entity1Type
+      ,R.Entity1ID
+      ,R.EntityType
+      ,R.EntityID
+      ,R.Entity2Type
+      ,R.Entity2ID
+      ,R.ValFrom
+      ,:EffOn
+      FROM opicm.trsNavigate N
+      INNER JOIN opicm.Relator R ON
+          R.Enterprise = :Enterprise
+      AND R.EntityType = :RelatorType
+      AND R.EntityID > 0
+      AND R.Entity1ID > 0
+      AND R.Entity2Type = N.Entity1Type
+      AND (R.Entity2ID = N.Entity1ID AND R.Entity2ID > 0)
+      AND R.ValFrom <= :ValOn and :ValOn < R.ValTo AND R.EffFrom <= :EffOn and :EffOn < R.EffTo
+      -- TAKE CARE OF ENTITY1TYPE FOR THREE FILTERS AND TWO DATES
+      LEFT JOIN opicm.trsFilter M1 ON
+          M1.Enterprise = :Enterprise
+      AND M1.Sessionid = :SessionID
+      AND M1.FilterType = 'Filter1'
+      AND M1.EntityType = R.Entity1Type
+      LEFT JOIN opicm.trsFilter M3 ON
+          M3.Enterprise = :Enterprise
+      AND M3.Sessionid = :SessionID
+      AND M3.FilterType = 'Filter2'
+      AND M3.EntityType = R.Entity1Type
+      LEFT JOIN opicm.trsFilter M8 ON
+          M8.Enterprise = :Enterprise
+      AND M8.Sessionid = :SessionID
+      AND M8.FilterType = 'Date1'
+      AND M8.EntityType = R.Entity1Type
+
+      LEFT JOIN opicm.Text T1 ON
+          T1.Enterprise = :Enterprise
+      AND T1.EntityType = R.Entity1Type
+      AND T1.EntityID = R.Entity1ID
+      AND T1.AttributeCode = M8.attributecode
+      AND T1.NLSID = 1
+      AND RTRIM(T1.AttributeValue) <> ''
+      AND 1 = (CASE
+        WHEN M8.Operator = 'LE' AND DATE(RTRIM(T1.AttributeValue)) <= DATE(current timestamp) + (INT(M8.AttributeValue)) DAYS  THEN 1
+        WHEN M8.Operator = 'GE' AND DATE(RTRIM(T1.AttributeValue)) >= DATE(current timestamp) + (INT(M8.AttributeValue)) DAYS  THEN 1
+        WHEN M8.Operator = 'EQ' AND DATE(RTRIM(T1.AttributeValue))  = DATE(current timestamp) + (INT(M8.AttributeValue)) DAYS  THEN 1
+      ELSE 0 END)
+      AND T1.ValFrom <= :ValOn AND :ValOn < T1.ValTo AND T1.EffFrom <= :EffOn AND :EffOn < T1.EffTo
+      WHERE
+          N.SessionID = :SessionID
+      AND N.Level = :Level -1
+      AND N.DIRECTION2 = (
+          CASE
+            WHEN N.DIRECTION2 = 'X' THEN 'X'
+          ELSE :PDirection END)
+      AND N.Entity1Type = :ToEntity
+      AND 1 = (CASE
+         WHEN M1.EntityType IS NOT NULL AND
+           0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+           F.Enterprise = :Enterprise
+           AND F.EntityType = R.Entity1Type
+           AND F.EntityID = R.Entity1ID
+           AND F.EntityID > 0
+           AND F.AttributeCode in (M1.AttributeCode)
+           AND F.AttributeValue in (M1.attributevalue)
+           AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+         WHEN M3.EntityType IS NOT NULL AND
+           0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+           F.Enterprise = :Enterprise
+           AND F.EntityType = R.Entity1Type
+           AND F.EntityID = R.Entity1ID
+           AND F.EntityID > 0
+           AND F.AttributeCode in (M3.AttributeCode)
+           AND F.AttributeValue in (M3.attributevalue)
+           AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+         WHEN M8.Enterprise IS NOT NULL AND T1.Enterprise IS NULL THEN 0
+      ELSE 1 END)
+      with ur;
+   }
+
+} else if (PDirection [0] == 'U' && Direction [0] == 'D'  && Category[0] == 'E') {
+
+    if (RClass [0] == 'R') {
+
+        if (iFilter1 > 0 || iFilter2 > 0 || iDate1 > 0) {
+
+            EXEC SQL INSERT INTO opicm.trsNavigate
+	    SELECT DISTINCT
+  	    	:Enterprise
+  	    	,:SessionID
+	    	,:ActionType
+	    	,'Navigate'
+	    	,:Level
+	    	,:LeafLevel
+	    	,:PDirection
+	    	,:Direction
+	    	,R.Entity1Type
+	    	,R.Entity1ID
+	    	,R.EntityType
+	    	,R.EntityID
+	    	,R.Entity2Type
+	    	,R.Entity2ID
+	    	,R.ValFrom
+	    	,:EffOn
+		FROM opicm.trsNavigate N
+		INNER JOIN opicm.Relator R ON
+		    R.Enterprise = :Enterprise
+		AND R.EntityType = :RelatorType
+		AND R.EntityID > 0
+		AND R.Entity1Type = N.Entity1Type
+		AND (R.Entity1ID = N.Entity1ID AND R.Entity1ID > 0)
+		AND R.Entity2ID > 0
+		AND R.ValFrom <= :ValOn and :ValOn < R.ValTo AND R.EffFrom <= :EffOn and :EffOn < R.EffTo
+                LEFT JOIN opicm.trsFilter M1 ON
+                    M1.Enterprise = :Enterprise
+		AND M1.Sessionid = :SessionID
+          	AND M1.FilterType = 'Filter1'
+		AND M1.EntityType = R.Entity2Type
+		LEFT JOIN opicm.trsFilter M3 ON
+		    M3.Enterprise = :Enterprise
+		AND M3.Sessionid = :SessionID
+		AND M3.FilterType = 'Filter2'
+		AND M3.EntityType = R.Entity2Type
+		LEFT JOIN opicm.trsFilter M5 ON
+              	    M5.Enterprise = :Enterprise
+          	AND M5.Sessionid = :SessionID
+	        AND M5.FilterType = 'Date1'
+		AND M5.EntityType = R.Entity2Type
+		WHERE
+		    N.SessionID = :SessionID
+		AND N.Level = :Level -1
+		AND N.DIRECTION2 = (
+                    CASE
+			WHEN N.DIRECTION2 = 'X' THEN 'X'
+			ELSE :PDirection END)
+		AND N.Entity1Type = :FromEntity
+		AND 1 = (
+                    CASE
+		        WHEN :iFilter1 = 1 AND
+	  		    	0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+   			    	F.Enterprise = :Enterprise
+				AND F.EntityType = R.Entity2Type
+				AND F.EntityID = R.Entity2ID
+				AND F.EntityID > 0
+				AND F.AttributeCode in (M1.AttributeCode)
+				AND F.AttributeValue in (M1.AttributeValue)
+				AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+			WHEN :iFilter2 = 1 AND
+				0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+				F.Enterprise = :Enterprise
+				AND F.EntityType = R.Entity2Type
+				AND F.EntityID = R.Entity2ID
+				AND F.EntityID > 0
+				AND F.AttributeCode in (M3.AttributeCode)
+				AND F.AttributeValue in (M3.AttributeValue)
+				AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+			WHEN :iDate1 = 1 AND
+				0 = (SELECT COUNT(T1.ENTERPRISE) FROM opicm.text T1 WHERE
+				T1.Enterprise = :Enterprise
+				AND T1.EntityType = R.Entity2Type
+				AND T1.EntityID = R.Entity2ID
+				AND T1.AttributeCode = M5.AttributeCode
+				AND T1.NLSID = 1
+				AND RTRIM(T1.AttributeValue) <> ''
+				AND 1 = (CASE
+					WHEN M5.Operator = 'LE' AND DATE(RTRIM(T1.AttributeValue)) <= DATE(current timestamp) + (INT(M5.AttributeValue)) DAYS  THEN 1
+					WHEN M5.Operator = 'GE' AND DATE(RTRIM(T1.AttributeValue)) >= DATE(current timestamp) + (INT(M5.AttributeValue)) DAYS  THEN 1
+					WHEN M5.Operator = 'EQ' AND DATE(RTRIM(T1.AttributeValue))  = DATE(current timestamp) + (INT(M5.AttributeValue)) DAYS  THEN 1
+					ELSE 0 END)
+				AND T1.ValFrom <= :ValOn AND :ValOn < T1.ValTo AND T1.EffFrom <= :EffOn AND :EffOn < T1.EffTo) THEN 0
+				ELSE 1 END)
+				with ur;
+
+	} else { // No filter
+
+    	        EXEC SQL INSERT INTO @t_schema.trsNavigate
+
+		        SELECT DISTINCT
+                :Enterprise
+                ,:SessionID
+                ,:ActionType
+                ,'Navigate'
+                ,:Level
+                ,:LeafLevel
+                ,:PDirection
+                ,:Direction
+                ,R.Entity1Type
+                ,R.Entity1ID
+                ,R.EntityType
+                ,R.EntityID
+                ,R.Entity2Type
+                ,R.Entity2ID
+                ,R.ValFrom
+                ,:EffOn
+                FROM @t_schema.trsNavigate N
+                INNER JOIN @t_schema.Relator R ON
+		    		R.Enterprise = :Enterprise
+				AND R.EntityType = :RelatorType
+				AND R.EntityID > 0
+				AND R.Entity1Type = N.Entity1Type
+				AND (R.Entity1ID = N.Entity1ID AND R.Entity1ID > 0)
+				AND R.Entity2ID > 0
+				AND R.ValFrom <= :ValOn and :ValOn < R.ValTo AND R.EffFrom <= :EffOn and :EffOn < R.EffTo
+				WHERE
+					N.SessionID = :SessionID
+				AND N.Level = :Level -1
+				AND N.DIRECTION2 = (CASE
+					WHEN N.DIRECTION2 = 'X' THEN 'X'
+					ELSE :PDirection END)
+				AND N.Entity1Type = :FromEntity
+				with ur;
+			}
+
+    } else {   // Association
+
+        if (iFilter1 > 0 || iFilter2 > 0 || iDate1 > 0) {
+
+            EXEC SQL INSERT INTO opicm.trsNavigate
+            SELECT DISTINCT
+               :Enterprise
+              ,:SessionID
+              ,:ActionType
+              ,'Navigate'
+              ,:Level
+              ,:LeafLevel
+              ,:PDirection
+              ,:Direction
+              ,E1.EntityType
+              ,E1.EntityID
+              ,:RelatorType
+              ,E2.EntityID
+              ,E2.EntityType
+              ,E2.EntityID
+              ,:ValOn
+              ,:EffOn
+            FROM opicm.trsNavigate N
+            INNER JOIN opicm.Flag E1 ON
+                    E1.Enterprise = :Enterprise
+            AND E1.EntityType = :FromEntity
+            AND E1.EntityID = N.Entity1ID
+            AND E1.EntityID > 0
+            AND rtrim('' || E1.AttributeCode) =  :FromAttCode
+            AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND :EffOn < E1.EffTo
+            INNER JOIN opicm.Flag E2 ON
+                    E2.Enterprise = :Enterprise
+            AND E2.AttributeCode = :ToAttCode
+            AND E2.AttributeValue = E1.AttributeValue
+            AND E2.EntityType = :ToEntity
+            AND E2.EntityID > 0
+            AND E2.ValFrom <= :ValOn AND :ValOn < E2.ValTo AND E2.EffFrom <= :EffOn AND :EffOn < E2.EffTo
+            LEFT JOIN opicm.trsFilter M1 ON
+                M1.Enterprise = :Enterprise
+            AND M1.Sessionid = :SessionID
+            AND M1.FilterType = 'Filter1'
+            AND M1.EntityType = E2.EntityType
+            LEFT JOIN opicm.trsFilter M3 ON
+                M3.Enterprise = :Enterprise
+            AND M3.Sessionid = :SessionID
+            AND M3.FilterType = 'Filter2'
+            AND M3.EntityType = E2.EntityType
+            LEFT JOIN opicm.trsFilter M5 ON
+                M5.Enterprise = :Enterprise
+            AND M5.Sessionid = :SessionID
+            AND M5.FilterType = 'Date1'
+            AND M5.EntityType = E2.EntityType
+            WHERE
+                N.SessionID = :SessionID
+            AND N.Level = :Level -1
+            AND N.DIRECTION2 = (CASE
+                    WHEN N.DIRECTION2 = 'X' THEN 'X'
+                    ELSE :PDirection END)
+            AND N.Entity1Type = :FromEntity
+            AND 1 = (CASE
+                    WHEN :iFilter1 = 1 AND
+                        0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+                        F.Enterprise = :Enterprise
+                        AND F.EntityType = E2.EntityType
+                        AND F.EntityID = E2.EntityID
+                        AND F.EntityID > 0
+                        AND F.AttributeCode in (M1.AttributeCode)
+                        AND F.AttributeValue in (M1.AttributeValue)
+                        AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+                    WHEN :iFilter2 = 1 AND
+                        0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+                        F.Enterprise = :Enterprise
+                        AND F.EntityType = E2.EntityType
+                        AND F.EntityID = E2.EntityID
+                        AND F.EntityID > 0
+                        AND F.AttributeCode in (M3.AttributeCode)
+                        AND F.AttributeValue in (M3.AttributeValue)
+                        AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+                    WHEN :iDate1 = 1 AND
+                        0 = (SELECT COUNT(T1.ENTERPRISE) FROM opicm.text T1 WHERE
+                        T1.Enterprise = :Enterprise
+                        AND T1.EntityType = E2.EntityType
+                        AND T1.EntityID = E2.EntityID
+                        AND T1.AttributeCode = M5.AttributeCode
+                        AND T1.NLSID = 1
+                        AND RTRIM(T1.AttributeValue) <> ''
+                        AND 1 = (CASE
+                            WHEN M5.Operator = 'LE' AND DATE(RTRIM(T1.AttributeValue)) <= DATE(current timestamp) + (INT(M5.AttributeValue)) DAYS  THEN 1
+                            WHEN M5.Operator = 'GE' AND DATE(RTRIM(T1.AttributeValue)) >= DATE(current timestamp) + (INT(M5.AttributeValue)) DAYS  THEN 1
+                            WHEN M5.Operator = 'EQ' AND DATE(RTRIM(T1.AttributeValue))  = DATE(current timestamp) + (INT(M5.AttributeValue)) DAYS  THEN 1
+                                    ELSE 0 END)
+                            AND T1.ValFrom <= :ValOn AND :ValOn < T1.ValTo AND T1.EffFrom <= :EffOn AND :EffOn < T1.EffTo) THEN 0
+                        ELSE 1 END)
+                    with ur;
+
+        } else {
+
+                EXEC SQL INSERT INTO opicm.trsNavigate
+                SELECT DISTINCT
+                :Enterprise
+                ,:SessionID
+                ,:ActionType
+                ,'Navigate'
+                ,:Level
+                ,:LeafLevel
+                ,:PDirection
+                ,:Direction
+                ,E1.EntityType
+                ,E1.EntityID
+                ,:RelatorType
+                ,E2.EntityID
+                ,E2.EntityType
+                ,E2.EntityID
+                ,:ValOn
+                ,:EffOn
+                FROM opicm.trsNavigate N
+                INNER JOIN opicm.Flag E1 ON
+                        E1.Enterprise = :Enterprise
+                AND E1.EntityType = :FromEntity
+                AND E1.EntityID = N.Entity1ID
+                AND E1.EntityID > 0
+                AND rtrim('' || E1.AttributeCode) = :FromAttCode
+                AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND :EffOn < E1.EffTo
+                INNER JOIN opicm.Flag E2 ON
+                        E2.Enterprise = :Enterprise
+                AND E2.AttributeCode = :ToAttCode
+                AND E2.AttributeValue = E1.AttributeValue
+                AND E2.EntityType = :ToEntity
+                AND E2.ValFrom <= :ValOn AND :ValOn < E2.ValTo AND E2.EffFrom <= :EffOn AND :EffOn < E2.EffTo
+                WHERE
+                        N.SessionID = :SessionID
+                AND N.Level = :Level -1
+                AND N.DIRECTION2 =
+                    (CASE
+                        WHEN N.DIRECTION2 = 'X' THEN 'X'
+                        ELSE :PDirection END)
+                AND N.Entity1Type = :FromEntity
+                with ur;
+
+            }
+
+        }
+
+  } else if (PDirection [0] == 'D' && Direction [0] == 'U' && Category[0] == 'E') {
+
+    if (RClass [0] == 'R') {
+
+        if (iFilter1 > 0 || iFilter2 > 0 || iDate1 > 0) {
+
+            EXEC SQL INSERT INTO opicm.trsNavigate
+            SELECT DISTINCT
+              :Enterprise
+              ,:SessionID
+              ,:ActionType
+                ,'Navigate'
+                ,:Level
+                ,:LeafLevel
+                ,:PDirection
+                ,:Direction
+                ,R.Entity1Type
+                ,R.Entity1ID
+                ,R.EntityType
+                ,R.EntityID
+                ,R.Entity2Type
+                ,R.Entity2ID
+                ,R.ValFrom
+                ,:EffOn
+                FROM opicm.trsNavigate N
+                INNER JOIN opicm.Relator R ON
+                        R.Enterprise = :Enterprise
+                AND R.EntityType = :RelatorType
+                AND R.EntityID > 0
+                AND R.Entity2Type = N.Entity2Type
+                AND (R.Entity2ID = N.Entity2ID AND R.Entity2ID > 0)
+                AND R.Entity1ID > 0
+                AND R.ValFrom <= :ValOn and :ValOn < R.ValTo AND R.EffFrom <= :EffOn and :EffOn < R.EffTo
+                LEFT JOIN opicm.trsFilter M1 ON
+                    M1.Enterprise = :Enterprise
+          	AND M1.Sessionid = :SessionID
+          	AND M1.FilterType = 'Filter1'
+                AND M1.EntityType = R.Entity1Type
+                LEFT JOIN opicm.trsFilter M3 ON
+              	    M3.Enterprise = :Enterprise
+            	AND M3.Sessionid = :SessionID
+          	AND M3.FilterType = 'Filter2'
+                AND M3.EntityType = R.Entity1Type
+                LEFT JOIN opicm.trsFilter M5 ON
+              	    M5.Enterprise = :Enterprise
+          	AND M5.Sessionid = :SessionID
+          	AND M5.FilterType = 'Date1'
+                AND M5.EntityType = R.Entity1Type
+                WHERE
+                    N.SessionID = :SessionID
+                AND N.Level = :Level -1
+
+                AND N.DIRECTION2 = (
+                    CASE
+                        WHEN N.DIRECTION2 = 'X' THEN 'X'
+                        ELSE :PDirection END)
+
+                AND N.Entity2Type = :ToEntity
+                AND 1 = (
+                    CASE
+                        WHEN :iFilter1 = 1 AND
+                            0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+                            F.Enterprise = :Enterprise
+                            AND F.EntityType = R.Entity1Type
+                            AND F.EntityID = R.Entity1ID
+                            AND F.EntityID > 0
+                            AND F.AttributeCode in (M1.AttributeCode)
+                            AND F.AttributeValue in (M1.AttributeValue)
+                            AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+                        WHEN :iFilter2 = 1 AND
+                            0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+                            F.Enterprise = :Enterprise
+                            AND F.EntityType = R.Entity1Type
+                            AND F.EntityID = R.Entity1ID
+                            AND F.EntityID > 0 
+                            AND F.AttributeCode in (M3.AttributeCode)
+                            AND F.AttributeValue in (M3.AttributeValue)
+                            AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+                        WHEN :iDate1 = 1 AND
+                            0 = (SELECT COUNT(T1.ENTERPRISE) FROM opicm.text T1 WHERE
+                            T1.Enterprise = :Enterprise
+                            AND T1.EntityType = R.Entity1Type
+                            AND T1.EntityID = R.Entity1ID
+                            AND T1.AttributeCode = M5.AttributeCode
+                            AND T1.NLSID = 1
+                            AND RTRIM(T1.AttributeValue) <> ''
+                            AND 1 = (CASE
+                                WHEN M5.Operator = 'LE' AND DATE(RTRIM(T1.AttributeValue)) <= DATE(current timestamp) + (INT(M5.AttributeValue)) DAYS  THEN 1
+                                WHEN M5.Operator = 'GE' AND DATE(RTRIM(T1.AttributeValue)) >= DATE(current timestamp) + (INT(M5.AttributeValue)) DAYS  THEN 1
+                                WHEN M5.Operator = 'EQ' AND DATE(RTRIM(T1.AttributeValue))  = DATE(current timestamp) + (INT(M5.AttributeValue)) DAYS  THEN 1
+                                        ELSE 0 END)
+                                AND T1.ValFrom <= :ValOn AND :ValOn < T1.ValTo AND T1.EffFrom <= :EffOn AND :EffOn < T1.EffTo) THEN 0
+                        ELSE 1 END)
+                with ur;
+
+            } else { // No filter
+
+                EXEC SQL INSERT INTO @t_schema.trsNavigate
+
+                SELECT DISTINCT
+                :Enterprise
+                ,:SessionID
+                ,:ActionType
+                ,'Navigate'
+                ,:Level
+                ,:LeafLevel
+                ,:PDirection
+                ,:Direction
+                ,R.Entity1Type
+                ,R.Entity1ID
+                ,R.EntityType
+                ,R.EntityID
+                ,R.Entity2Type
+                ,R.Entity2ID
+                ,R.ValFrom
+                ,:EffOn
+                FROM @t_schema.trsNavigate N
+                INNER JOIN @t_schema.Relator R ON
+                    R.Enterprise = :Enterprise
+                AND R.EntityType = :RelatorType
+                AND R.EntityID > 0
+                AND R.Entity2Type = N.Entity2Type
+                AND (R.Entity2ID = N.Entity2ID AND R.Entity2ID > 0)
+                AND R.Entity1ID > 0
+                AND R.ValFrom <= :ValOn and :ValOn < R.ValTo AND R.EffFrom <= :EffOn and :EffOn < R.EffTo
+                WHERE
+                    N.SessionID = :SessionID
+                AND N.Level = :Level -1
+                AND N.DIRECTION2 = (CASE
+                    WHEN N.DIRECTION2 = 'X' THEN 'X'
+                    ELSE :PDirection END)
+                AND N.Entity2Type = :ToEntity
+                with ur;
+         }
+     } else {
+     // joan added for association
+     	if (iFilter1 > 0 || iFilter2 > 0 || iDate1 > 0) {
+
+ 	    EXEC SQL INSERT INTO opicm.trsNavigate
+ 	    SELECT DISTINCT
+     		:Enterprise
+     		,:SessionID
+     		,:ActionType
+     		,'Navigate'
+     		,:Level
+     		,:LeafLevel
+     		,:PDirection
+     		,:Direction
+     		,E2.EntityType
+     		,E2.EntityID
+     		,:RelatorType
+     		,E1.EntityID
+     		,E1.EntityType
+     		,E1.EntityID
+     		,:ValOn
+     		,:EffOn
+     		FROM opicm.trsNavigate N
+     		INNER JOIN opicm.Flag E1 ON
+                    E1.Enterprise = :Enterprise
+     		AND E1.EntityType = :ToEntity
+     		AND E1.EntityID = N.Entity2ID
+     		AND E1.EntityID > 0
+                AND rtrim('' || E1.AttributeCode) = :FromAttCode
+     		AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND :EffOn < E1.EffTo
+     		INNER JOIN opicm.Flag E2 ON
+                    E2.Enterprise = :Enterprise
+     		AND E2.AttributeCode = :ToAttCode
+     		AND E2.AttributeValue = E1.AttributeValue
+     		AND E2.EntityType = :FromEntity
+     		AND E2.EntityID > 0
+     		AND E2.ValFrom <= :ValOn AND :ValOn < E2.ValTo AND E2.EffFrom <= :EffOn AND :EffOn < E2.EffTo
+                -- TAKE CARE OF ENTITY2TYPE FOR THREE FILTERS AND TWO DATES
+     		LEFT JOIN opicm.trsFilter M1 ON
+              	    M1.Enterprise = :Enterprise
+          	AND M1.Sessionid = :SessionID
+          	AND M1.FilterType = 'Filter1'
+          	AND M1.EntityType = E2.EntityType
+     		LEFT JOIN opicm.trsFilter M3 ON
+              	    M3.Enterprise = :Enterprise
+          	AND M3.Sessionid = :SessionID
+          	AND M3.FilterType = 'Filter2'
+     		AND M3.EntityType = E2.EntityType
+     		LEFT JOIN opicm.trsFilter M5 ON
+                    M5.Enterprise = :Enterprise
+          	AND M5.Sessionid = :SessionID
+          	AND M5.FilterType = 'Date1'
+     		AND M5.EntityType = E2.EntityType
+     		WHERE
+     			N.SessionID = :SessionID
+     		AND N.Level = :Level -1
+     		AND N.DIRECTION2 = (CASE
+     			WHEN N.DIRECTION2 = 'X' THEN 'X'
+     			ELSE :PDirection END)
+     		AND N.Entity2Type = :ToEntity
+     		AND 1 = (CASE
+     			WHEN :iFilter1 = 1 AND
+     			0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+     			F.Enterprise = :Enterprise
+     			AND F.EntityType = E2.EntityType
+     			AND F.EntityID = E2.EntityID
+     			AND F.EntityID > 0
+     			AND F.AttributeCode in (M1.AttributeCode)
+     			AND F.AttributeValue in (M1.AttributeValue)
+     			AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+     			WHEN :iFilter2 = 1 AND
+     			0 = (SELECT COUNT(F.ENTERPRISE) FROM OPICM.Flag F WHERE
+     			F.Enterprise = :Enterprise
+     			AND F.EntityType = E2.EntityType
+     			AND F.EntityID = E2.EntityID
+     			AND F.EntityID > 0
+     			AND F.AttributeCode in (M3.AttributeCode)
+     			AND F.AttributeValue in (M3.AttributeValue)
+     			AND F.ValFrom <= :ValOn AND :ValOn < F.ValTo AND F.EffFrom <= :EffOn AND :EffOn < F.EffTo) THEN 0
+     			WHEN :iDate1 = 1 AND
+     			0 = (SELECT COUNT(T1.ENTERPRISE) FROM opicm.text T1 WHERE
+     			T1.Enterprise = :Enterprise
+     			AND T1.EntityType = E2.EntityType
+     			AND T1.EntityID = E2.EntityID
+     			AND T1.AttributeCode = M5.AttributeCode
+     			AND T1.NLSID = 1
+     			AND RTRIM(T1.AttributeValue) <> ''
+     			AND 1 = (CASE
+     				WHEN M5.Operator = 'LE' AND DATE(RTRIM(T1.AttributeValue)) <= DATE(current timestamp) + (INT(M5.AttributeValue)) DAYS  THEN 1
+     				WHEN M5.Operator = 'GE' AND DATE(RTRIM(T1.AttributeValue)) >= DATE(current timestamp) + (INT(M5.AttributeValue)) DAYS  THEN 1
+     				WHEN M5.Operator = 'EQ' AND DATE(RTRIM(T1.AttributeValue))  = DATE(current timestamp) + (INT(M5.AttributeValue)) DAYS  THEN 1
+     				ELSE 0 END)
+     			AND T1.ValFrom <= :ValOn AND :ValOn < T1.ValTo AND T1.EffFrom <= :EffOn AND :EffOn < T1.EffTo) THEN 0
+     				ELSE 1 END)
+
+     		with ur;
+
+         } else {
+
+
+     		EXEC SQL INSERT INTO opicm.trsNavigate
+     		SELECT DISTINCT
+     		:Enterprise
+     		,:SessionID
+     		,:ActionType
+     		,'Navigate'
+     		,:Level
+     		,:LeafLevel
+     		,:PDirection
+     		,:Direction
+     		,E2.EntityType
+     		,E2.EntityID
+     		,:RelatorType
+     		,E1.EntityID
+     		,E1.EntityType
+     		,E1.EntityID
+     		,:ValOn
+     		,:EffOn
+     		FROM opicm.trsNavigate N
+     		INNER JOIN opicm.Flag E1 ON
+     			E1.Enterprise = :Enterprise
+     		AND E1.EntityType = :ToEntity
+     		AND E1.EntityID = N.Entity2ID
+     		AND E1.EntityID > 0
+                AND rtrim('' || E1.AttributeCode) = :FromAttCode
+     		AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND :EffOn < E1.EffTo
+     		INNER JOIN opicm.Flag E2 ON
+     			E2.Enterprise = :Enterprise
+     		AND E2.AttributeCode = :ToAttCode
+     		AND E2.AttributeValue = E1.AttributeValue
+     		AND E2.EntityType = :FromEntity
+     		AND E2.ValFrom <= :ValOn AND :ValOn < E2.ValTo AND E2.EffFrom <= :EffOn AND :EffOn < E2.EffTo
+     		WHERE
+     			N.SessionID = :SessionID
+     		AND N.Level = :Level -1
+     		AND N.DIRECTION2 =
+     			(CASE
+     			WHEN N.DIRECTION2 = 'X' THEN 'X'
+     			ELSE :PDirection END)
+     			AND N.Entity2Type = :ToEntity
+     			with ur;
+
+     		}
+
+     	}
+
+
+  } else if (Category[0] == 'R' && Direction[0] == 'U') {
+
+    if (RClass [0] == 'R') {
+
+      EXEC SQL INSERT INTO opicm.trsNavigate
+      SELECT DISTINCT
+        :Enterprise
+       ,:SessionID
+       ,:ActionType
+       ,'Navigate'
+       ,:Level
+       ,:LeafLevel
+       ,:PDirection
+       ,:Direction
+       ,R.Entity1Type
+       ,R.Entity1ID
+       ,R.EntityType
+       ,R.EntityID
+       ,R.Entity2Type
+       ,R.Entity2ID
+       ,R.ValFrom
+       ,:EffOn
+       FROM opicm.trsNavigate N
+       INNER JOIN opicm.Relator R ON
+           R.Enterprise = :Enterprise
+       AND R.EntityType = :RelatorType
+       AND R.EntityID > 0
+       AND R.Entity1Type = N.EntityType
+       AND (R.Entity1ID = N.EntityID AND R.Entity1ID > 0)
+       AND R.Entity2ID > 0
+       AND R.ValFrom <= :ValOn and :ValOn < R.ValTo AND R.EffFrom <= :EffOn and :EffOn < R.EffTo
+      -- TAKE CARE OF ENTITY1TYPE FOR THREE FILTERS AND TWO DATES
+      LEFT JOIN opicm.trsFilter M1 ON
+          M1.Enterprise = :Enterprise
+      AND M1.Sessionid = :SessionID
+      AND M1.FilterType = 'Filter1'
+      AND M1.EntityType = R.Entity1Type
+
+      LEFT JOIN opicm.Flag F1 ON
+          F1.Enterprise = :Enterprise
+      AND F1.EntityType = R.Entity1Type
+      AND F1.EntityID = R.Entity1ID
+      AND F1.EntityID > 0
+      AND F1.AttributeCode = M1.AttributeCode
+      AND F1.AttributeValue = M1.AttributeValue
+      AND F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+      LEFT JOIN opicm.trsFilter M3 ON
+          M3.Enterprise = :Enterprise
+      AND M3.Sessionid = :SessionID
+      AND M3.FilterType = 'Filter2'
+      AND M3.EntityType = R.Entity1Type
+
+      LEFT JOIN opicm.Flag F2 ON
+          F2.Enterprise = :Enterprise
+      AND F2.EntityType = R.Entity1Type
+      AND F2.EntityID = R.Entity1ID
+      AND F2.EntityID > 0
+      AND F2.AttributeCode = M3.AttributeCode
+      AND F2.AttributeValue = M3.AttributeValue
+      AND F2.ValFrom <= :ValOn AND :ValOn < F2.ValTo AND F2.EffFrom <= :EffOn AND :EffOn < F2.EffTo
+
+      LEFT JOIN opicm.trsFilter M8 ON
+          M8.Enterprise = :Enterprise
+      AND M8.Sessionid = :SessionID
+      AND M8.FilterType = 'Date1'
+      AND M8.EntityType = R.Entity1Type
+
+      LEFT JOIN opicm.Text T1 ON
+          T1.Enterprise = :Enterprise
+      AND T1.EntityType = R.Entity1Type
+      AND T1.EntityID = R.Entity1ID
+      AND T1.AttributeCode = M8.AttributeCode
+      AND T1.NLSID = 1
+      AND RTRIM(T1.AttributeValue) <> ''
+      AND 1 = (CASE
+        WHEN M8.Operator = 'LE' AND DATE(RTRIM(T1.AttributeValue)) <= DATE(current timestamp) + (INT(M8.AttributeValue)) DAYS THEN 1
+        WHEN M8.Operator = 'GE' AND DATE(RTRIM(T1.AttributeValue)) >= DATE(current timestamp) + (INT(M8.AttributeValue)) DAYS  THEN 1
+        WHEN M8.Operator = 'EQ' AND DATE(RTRIM(T1.AttributeValue))  = DATE(current timestamp) + (INT(M8.AttributeValue)) DAYS  THEN 1
+      ELSE 0 END)
+      AND T1.ValFrom <= :ValOn AND :ValOn < T1.ValTo AND T1.EffFrom <= :EffOn AND :EffOn < T1.EffTo
+      WHERE
+           N.SessionID = :SessionID
+      AND N.Level = :Level -1
+      --AND N.EntityType = :FromEntity-- old
+      AND N.EntityType = :ToEntity
+      AND 1 = (CASE
+          WHEN M1.Enterprise IS NOT NULL AND F1.Enterprise IS NULL THEN 0
+          WHEN M3.Enterprise IS NOT NULL AND F2.Enterprise IS NULL THEN 0
+          WHEN M8.Enterprise IS NOT NULL AND T1.Enterprise IS NULL THEN 0
+          ELSE 1 END)
+      with ur;
+    }
+  } else if (Category[0] == 'R' && Direction[0] == 'D') {
+
+    if (RClass [0] == 'R') {
+
+      EXEC SQL INSERT INTO opicm.trsNavigate
+      SELECT DISTINCT
+       :Enterprise
+      ,:SessionID
+      ,:ActionType
+      ,'Navigate'
+      ,:Level
+      ,:LeafLevel
+      ,:PDirection
+      ,:Direction
+      ,R.Entity1Type
+      ,R.Entity1ID
+      ,R.EntityType
+      ,R.EntityID
+      ,R.Entity2Type
+      ,R.Entity2ID
+      ,R.ValFrom
+      ,:EffOn
+      FROM opicm.trsNavigate N
+      INNER JOIN opicm.Relator R ON
+          R.Enterprise = :Enterprise
+      AND R.EntityType = :RelatorType
+      AND R.EntityID > 0
+      AND R.Entity1Type = N.EntityType
+      AND (R.Entity1ID = N.EntityID AND R.Entity1ID > 0)
+      AND R.Entity2ID > 0
+      AND R.ValFrom <= :ValOn and :ValOn < R.ValTo AND R.EffFrom <= :EffOn and :EffOn < R.EffTo
+      -- TAKE CARE OF ENTITY2TYPE FOR THREE FILTERS AND TWO DATES
+
+      LEFT JOIN opicm.trsFilter M1 ON
+          M1.Enterprise = :Enterprise
+      AND M1.Sessionid = :SessionID
+      AND M1.FilterType = 'Filter1'
+      AND M1.EntityType = R.Entity2Type
+
+      LEFT JOIN opicm.Flag F1 ON
+          F1.Enterprise = :Enterprise
+      AND F1.EntityType = R.Entity2Type
+      AND F1.EntityID = R.Entity2ID
+      AND F1.EntityID > 0
+      AND F1.AttributeCode = M1.AttributeCode
+      AND F1.AttributeValue = M1.AttributeValue
+      AND F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+      LEFT JOIN opicm.trsFilter M3 ON
+          M3.Enterprise = :Enterprise
+      AND M3.Sessionid = :SessionID
+      AND M3.FilterType = 'Filter2'
+      AND M3.EntityType = R.Entity2Type
+
+      LEFT JOIN opicm.Flag F2 ON
+          F2.Enterprise = :Enterprise
+      AND F2.EntityType = R.Entity2Type
+      AND F2.EntityID = R.Entity2ID
+      AND F2.EntityID > 0
+      AND F2.AttributeCode = M3.AttributeCode
+      AND F2.AttributeValue = M3.AttributeValue
+      AND F2.ValFrom <= :ValOn AND :ValOn < F2.ValTo AND F2.EffFrom <= :EffOn AND :EffOn < F2.EffTo
+
+      LEFT JOIN opicm.trsFilter M8 ON
+          M8.Enterprise = :Enterprise
+      AND M8.Sessionid = :SessionID
+      AND M8.FilterType = 'Date1'
+      AND M8.EntityType = R.Entity2Type
+
+      LEFT JOIN opicm.Text T1 ON
+          T1.Enterprise = :Enterprise
+      AND T1.EntityType = R.Entity2Type
+      AND T1.EntityID = R.Entity2ID
+      AND T1.AttributeCode = M8.Attributecode
+      AND T1.NLSID = 1
+      AND RTRIM(T1.AttributeValue) <> ''
+      AND 1 = (CASE
+        WHEN M8.Operator = 'LE' AND DATE(RTRIM(T1.AttributeValue)) <= DATE(current timestamp) + (INT(M8.AttributeValue)) DAYS  THEN 1
+        WHEN M8.Operator = 'GE' AND DATE(RTRIM(T1.AttributeValue)) >= DATE(current timestamp) + (INT(M8.AttributeValue)) DAYS  THEN 1
+        WHEN M8.Operator = 'EQ' AND DATE(RTRIM(T1.AttributeValue))  = DATE(current timestamp) + (INT(M8.AttributeValue)) DAYS  THEN 1
+      ELSE 0 END)
+      AND T1.ValFrom <= :ValOn AND :ValOn < T1.ValTo AND T1.EffFrom <= :EffOn AND :EffOn < T1.EffTo
+      WHERE
+           N.SessionID = :SessionID
+      AND N.Level = :Level -1
+      --AND N.EntityType = :ToEntity--old
+      AND N.EntityType = :FromEntity
+      AND 1 = (CASE
+          WHEN M1.Enterprise IS NOT NULL AND F1.Enterprise IS NULL THEN 0
+          WHEN M3.Enterprise IS NOT NULL AND F2.Enterprise IS NULL THEN 0
+          WHEN M8.Enterprise IS NOT NULL AND T1.Enterprise IS NULL THEN 0
+          ELSE 1 END)
+       with ur;
+    } else {  // Association
+
+      // I do not know if this applys
+      EXEC SQL INSERT INTO opicm.trsNavigate
+      SELECT DISTINCT
+       :Enterprise
+      ,:SessionID
+      ,:ActionType
+      ,'Navigate'
+      ,:Level
+      ,:LeafLevel
+      ,:PDirection
+      ,:Direction
+      ,E1.EntityType
+      ,E1.EntityID
+      ,:RelatorType
+      ,E2.EntityID
+      ,E2.EntityType
+      ,E2.EntityID
+      ,:ValOn
+      ,:EffOn
+      FROM opicm.trsNavigate N
+      INNER JOIN opicm.MetaLinkAttr ML2 ON
+          ML2.Enterprise = :Enterprise
+      AND ML2.LinkType =  'Assoc/Attribute'
+      AND ML2.LinkType1 = :RelatorType
+      AND ML2.LinkCode = 'Transform'
+      AND ML2.ValFrom <= :ValOn AND :ValOn < ML2.ValTo AND ML2.EffFrom <= :EffOn AND :EffOn < ML2.EffTo
+      INNER JOIN opicm.Flag E1 ON
+          E1.Enterprise = :Enterprise
+      AND E1.EntityType = N.EntityType
+      AND E1.EntityID = N.EntityID
+      AND E1.EntityID > 0
+      AND RTRIM(E1.AttributeCode || ' ') = ML2.LinkType2
+      AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND :EffOn < E1.EffTo
+      INNER JOIN opicm.Flag E2 ON
+          E2.Enterprise = :Enterprise
+      AND E2.AttributeCode = ML2.LinkValue
+      AND E2.AttributeValue = E1.AttributeValue
+      AND E2.EntityType = :ToEntity
+      AND E2.ValFrom <= :ValOn AND :ValOn < E2.ValTo AND E2.EffFrom <= :EffOn AND :EffOn < E2.EffTo
+      -- TAKE CARE OF ASSOCIATION FILTER
+
+      LEFT JOIN opicm.trsFilter M1 ON
+          M1.Enterprise = :Enterprise
+      AND M1.Sessionid = :SessionID
+      AND M1.FilterType = 'Filter1'
+      AND M1.EntityType = E2.EntityType
+
+      LEFT JOIN opicm.Flag F1 ON
+          F1.Enterprise = :Enterprise
+      AND F1.EntityType = E2.ENTITYTYPE
+      AND F1.EntityID = E2.ENTITYID
+      AND F1.EntityID > 0
+      AND F1.AttributeCode = M1.AttributeCode
+      AND F1.AttributeValue = M1.AttributeValue
+      AND F1.ValFrom <= :ValOn AND :ValOn < F1.ValTo AND F1.EffFrom <= :EffOn AND :EffOn < F1.EffTo
+
+      LEFT JOIN opicm.trsFilter M3 ON
+          M3.Enterprise = :Enterprise
+      AND M3.Sessionid = :SessionID
+      AND M3.FilterType = 'Filter2'
+      AND M3.EntityType = E2.ENTITYTYPE
+
+      LEFT JOIN opicm.Flag F2 ON
+          F2.Enterprise = :Enterprise
+      AND F2.EntityType = E2.EntityType
+      AND F2.EntityID = E2.ENTITYID
+      AND F2.EntityID > 0
+      AND F2.AttributeCode = M3.AttributeCode
+      AND F2.AttributeValue = M3.AttributeValue
+      AND F2.ValFrom <= :ValOn AND :ValOn < F2.ValTo AND F2.EffFrom <= :EffOn AND :EffOn < F2.EffTo
+
+      LEFT JOIN opicm.trsFilter M8 ON
+          M8.Enterprise = :Enterprise
+      AND M8.Sessionid = :SessionID
+      AND M8.FilterType = 'Date1'
+      AND M8.EntityType = E2.EntityType
+
+      LEFT JOIN opicm.Text T1 ON
+          T1.Enterprise = :Enterprise
+      AND T1.EntityType = E2.EntityType
+      AND T1.EntityID = E2.EntityID
+      AND T1.AttributeCode = M8.AttributeCode
+      AND T1.NLSID = 1
+      AND RTRIM(T1.AttributeValue) <> ''
+      AND 1 = (CASE
+        WHEN M8.Operator = 'LE' AND DATE(RTRIM(T1.AttributeValue)) <= DATE(current timestamp) + (INT(M8.AttributeValue)) DAYS  THEN 1
+        WHEN M8.Operator = 'GE' AND DATE(RTRIM(T1.AttributeValue)) >= DATE(current timestamp) + (INT(M8.AttributeValue)) DAYS  THEN 1
+        WHEN M8.Operator = 'EQ' AND DATE(RTRIM(T1.AttributeValue))  = DATE(current timestamp) + (INT(M8.AttributeValue)) DAYS  THEN 1
+      ELSE 0 END)
+      AND T1.ValFrom <= :ValOn AND :ValOn < T1.ValTo AND T1.EffFrom <= :EffOn AND :EffOn < T1.EffTo
+      WHERE
+        N.SessionID = :SessionID
+        AND N.EntityType = :ToEntity
+        AND N.Level = :Level - 1
+        AND 1 = (CASE
+          WHEN M1.Enterprise IS NOT NULL AND F1.Enterprise IS NULL THEN 0
+          WHEN M3.Enterprise IS NOT NULL AND F2.Enterprise IS NULL THEN 0
+          WHEN M8.Enterprise IS NOT NULL AND T1.Enterprise IS NULL THEN 0
+          ELSE 1 END)
+      with ur;
+    }
+ } else if (Category[0] == 'T' && PDirection[0] == 'U') {
+
+    if (RClass [0] == 'R') {
+
+      EXEC SQL INSERT INTO @t_schema.trsNavigate
+      SELECT DISTINCT
+        :Enterprise
+       ,:SessionID
+       ,:ActionType
+       ,'Navigate'
+       ,:Level
+       ,:LeafLevel
+       ,:PDirection
+       ,:Direction
+       ,R.Entity1Type
+       ,R.Entity1ID
+       ,R.EntityType
+       ,R.EntityID
+       ,R.Entity2Type
+       ,R.Entity2ID
+       ,R.ValFrom
+       ,:EffOn
+       FROM @t_schema.trsNavigate N
+       INNER JOIN @t_schema.Relator R ON
+           R.Enterprise = :Enterprise
+       AND R.EntityType = N.Entity1Type
+       AND (R.EntityID = N.Entity1ID AND R.EntityID > 0)
+       AND R.Entity1ID > 0
+       AND R.Entity2ID > 0
+       AND R.ValFrom <= :ValOn and :ValOn < R.ValTo AND R.EffFrom <= :EffOn and :EffOn < R.EffTo
+       WHERE
+           N.SessionID = :SessionID
+        AND N.Level = :Level -1
+       AND N.Entity1Type = :RelatorType
+      with ur;
+      
+      if (strcmp(ActionType,"EPIMSLSEOVE") == 0) {
+
+         EXEC SQL
+         delete from @t_schema.trsnavigate
+         where sessionid = :SessionID
+         and entitytype='MODELWARR' and entityid
+         in (select n.entityid
+         from @t_schema.trsnavigate n
+         join @t_schema.text t on
+         n.enterprise = :Enterprise
+         and n.sessionid = :SessionID
+         and n.entitytype='MODELWARR'
+         and n.entity2type=t.entitytype
+         and n.entity2id=t.entityid
+         and t.attributecode='WARRID'
+         and t.attributevalue='WTY0000'
+         and t.valto=:forever and current timestamp between t.efffrom and t.effto)
+         with ur;
+
+         EXEC SQL
+         delete from @t_schema.trsnavigate
+         where sessionid = :SessionID
+         and entitytype='PRODSTRUCTWARR' and entityid
+         in (select n.entityid
+         from @t_schema.trsnavigate n
+         join @t_schema.text t on
+         n.enterprise = :Enterprise
+         and n.sessionid = :SessionID
+         and n.entitytype='PRODSTRUCTWARR'
+         and n.entity2type=t.entitytype
+         and n.entity2id=t.entityid
+         and t.attributecode='WARRID'
+         and t.attributevalue='WTY0000'
+         and t.valto=:forever and current timestamp between t.efffrom and t.effto)
+         with ur;
+
+         EXEC SQL
+         delete from @t_schema.trsnavigate
+         where sessionid = :SessionID
+         and entitytype='MODELWARR' and entityid
+         not in (select n.entityid
+         from @t_schema.trsnavigate n
+         join @t_schema.flag f on
+         n.enterprise = :Enterprise
+         and n.sessionid = :SessionID
+         and n.entitytype='MODELWARR'
+         and n.entitytype=f.entitytype
+         and n.entityid=f.entityid
+         and f.attributecode='DEFWARR'
+         and f.attributevalue='Y1'
+         and f.valto=:forever and current timestamp between f.efffrom and f.effto)
+         with ur;
+
+         EXEC SQL
+         delete from @t_schema.trsnavigate
+         where sessionid = :SessionID
+         and entitytype='PRODSTRUCTWARR' and entityid
+         not in (select n.entityid
+         from @t_schema.trsnavigate n
+         join @t_schema.flag f on
+         n.enterprise = :Enterprise
+         and n.sessionid = :SessionID
+         and n.entitytype='PRODSTRUCTWARR'
+         and n.entitytype=f.entitytype
+         and n.entityid=f.entityid
+         and f.attributecode='DEFWARR'
+         and f.attributevalue='Y1'
+         and f.valto=:forever and current timestamp between f.efffrom and f.effto)
+         with ur;
+
+      }
+
+    }
+ } else if (Category[0] == 'T' && PDirection[0] == 'D') {
+
+    if (RClass [0] == 'R') {
+
+      EXEC SQL INSERT INTO @t_schema.trsNavigate
+      SELECT DISTINCT
+        :Enterprise
+       ,:SessionID
+       ,:ActionType
+       ,'Navigate'
+       ,:Level
+       ,:LeafLevel
+       ,:PDirection
+       ,:Direction
+       ,R.Entity1Type
+       ,R.Entity1ID
+       ,R.EntityType
+       ,R.EntityID
+       ,R.Entity2Type
+       ,R.Entity2ID
+       ,R.ValFrom
+       ,:EffOn
+       FROM @t_schema.trsNavigate N
+       INNER JOIN @t_schema.Relator R ON
+           R.Enterprise = :Enterprise
+       AND R.EntityType = N.Entity2Type
+       AND (R.EntityID = N.Entity2ID AND R.EntityID > 0)
+       AND R.Entity1ID > 0
+       AND R.Entity2ID > 0
+       AND R.ValFrom <= :ValOn and :ValOn < R.ValTo AND R.EffFrom <= :EffOn and :EffOn < R.EffTo
+       -- Temporarily remove filter
+       -- for 3.0a
+       WHERE
+            N.SessionID = :SessionID
+        AND N.Level = :Level -1
+        AND N.Entity2Type = :RelatorType
+      with ur;
+    }
+    
+      if (strcmp(ActionType,"EPIMSLSEOVE") == 0) {
+
+         EXEC SQL
+         delete from @t_schema.trsnavigate
+         where sessionid = :SessionID
+         and entitytype='MODELWARR' and entityid
+         in (select n.entityid
+         from @t_schema.trsnavigate n
+         join @t_schema.text t on
+         n.enterprise = :Enterprise
+         and n.sessionid = :SessionID
+         and n.entitytype='MODELWARR'
+         and n.entity2type=t.entitytype
+         and n.entity2id=t.entityid
+         and t.attributecode='WARRID'
+         and t.attributevalue='WTY0000'
+         and t.valto=:forever and current timestamp between t.efffrom and t.effto)
+         with ur;
+
+         EXEC SQL
+         delete from @t_schema.trsnavigate
+         where sessionid = :SessionID
+         and entitytype='PRODSTRUCTWARR' and entityid
+         in (select n.entityid
+         from @t_schema.trsnavigate n
+         join @t_schema.text t on
+         n.enterprise = :Enterprise
+         and n.sessionid = :SessionID
+         and n.entitytype='PRODSTRUCTWARR'
+         and n.entity2type=t.entitytype
+         and n.entity2id=t.entityid
+         and t.attributecode='WARRID'
+         and t.attributevalue='WTY0000'
+         and t.valto=:forever and current timestamp between t.efffrom and t.effto)
+         with ur;
+
+         EXEC SQL
+         delete from @t_schema.trsnavigate
+         where sessionid = :SessionID
+         and entitytype='MODELWARR' and entityid
+         not in (select n.entityid
+         from @t_schema.trsnavigate n
+         join @t_schema.flag f on
+         n.enterprise = :Enterprise
+         and n.sessionid = :SessionID
+         and n.entitytype='MODELWARR'
+         and n.entitytype=f.entitytype
+         and n.entityid=f.entityid
+         and f.attributecode='DEFWARR'
+         and f.attributevalue='Y1'
+         and f.valto=:forever and current timestamp between f.efffrom and f.effto)
+         with ur;
+
+         EXEC SQL
+         delete from @t_schema.trsnavigate
+         where sessionid = :SessionID
+         and entitytype='PRODSTRUCTWARR' and entityid
+         not in (select n.entityid
+         from @t_schema.trsnavigate n
+         join @t_schema.flag f on
+         n.enterprise = :Enterprise
+         and n.sessionid = :SessionID
+         and n.entitytype='PRODSTRUCTWARR'
+         and n.entitytype=f.entitytype
+         and n.entityid=f.entityid
+         and f.attributecode='DEFWARR'
+         and f.attributevalue='Y1'
+         and f.valto=:forever and current timestamp between f.efffrom and f.effto)
+         with ur;
+
+      }
+
+  }
+
+  // Commit the work
+  EXEC SQL COMMIT WORK;
+}
+
+// If this was not a Ventity clear every thing out except the leaf nodes
+
+EXEC SQL COMMIT WORK;
+
+//if (RetainRoot[0] != 'Y') {
+//EXEC SQL
+//DELETE FROM @t_schema.trsNavigate
+//WHERE
+//    SessionID = :SessionID
+//AND LEVEL = -1
+//;
+//}
+
+
+
+
+
+EXEC SQL COMMIT WORK;
+
+// send the final result set back to the caller
+
+EXEC SQL OPEN NavCur;
+
+
+//
+// BEGIN ERROR CHECK SECTION
+//
+
+  // this won't get executed if sql error occurs
+m_iSQLState = SQLCOMPLETE;
+
+error_exit:
+//EXEC SQL SET CURRENT ISOLATION = CS;
+
+if(m_iSQLState == SQLERROR || DebugMode==1) {
+
+    // ensure no infinite loops in the case that a failed SQL connection is used past this point...
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+
+    //Check if file already open
+    if (t != NULL) {
+      // Append...
+      t=fopen("/tmp/8000.log","a");
+    }
+
+
+    fprintf(t,"********************  GBL8000 SQLCA DUMP  ********************\n");
+    fprintf(t,"Started : %s\n",now);
+    fprintf(t,"SessionID : %d\n",SessionID);
+    fprintf(t,"Enterprise : %s\n",Enterprise);
+    fprintf(t,"EntityType : %s\n",EntityType);
+    fprintf(t,"ActionType : %s\n",ActionType);
+    fprintf(t,"RetainRoot : %s\n",RetainRoot);
+    fprintf(t,"ValOn : %s\n",ValOn);
+    fprintf(t,"EffOn : %s\n",EffOn);
+    fprintf(t,brand);
+    char msg[1025];
+    sqlaintp(msg, 1024, 0, &sqlca);
+    fprintf(t,"msg:%s\n",msg);
+    fprintf(t,"SQLCAID: %s\n", sqlca.sqlcaid);
+    fprintf(t,"SQLCABC: %d\n", sqlca.sqlcabc);
+    fprintf(t,"SQLCODE: %d\n", sqlca.sqlcode);
+    fprintf(t,"SQLERRML: %d\n", sqlca.sqlerrml);
+    fprintf(t,"SQLERRMC: %s\n", sqlca.sqlerrmc);
+    fprintf(t,"SQLERRP: %s\n", sqlca.sqlerrp);
+    fprintf(t,"SQLERRD[0]: %d\n", sqlca.sqlerrd[0]);
+    fprintf(t,"SQLERRD[1]: %d\n", sqlca.sqlerrd[1]);
+    fprintf(t,"SQLERRD[2]: %d\n", sqlca.sqlerrd[2]);
+    fprintf(t,"SQLERRD[3]: %d\n", sqlca.sqlerrd[3]);
+    fprintf(t,"SQLERRD[4]: %d\n", sqlca.sqlerrd[4]);
+    fprintf(t,"SQLERRD[5]: %d\n", sqlca.sqlerrd[5]);
+    fprintf(t,"SQLWARN: %s\n", sqlca.sqlwarn);
+    fprintf(t,"SQLSTATE: %s\n", sqlca.sqlstate);
+    fprintf(t,"******************  END OF GBL8000 SQLCA DUMP  *******************\n");
+    fclose(t);
+
+}
+
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in ActionType varchar(32)
+in RetainRoot varchar(2)
+in ValOn varchar(26)
+in EffOn varchar(26)
+in DebugMode int
+@end
+
+
+

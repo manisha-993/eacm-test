@@ -1,0 +1,29 @@
+#!/bin/ksh
+
+cd ~/storedp
+
+. ~/storedp/vars
+
+date
+
+rm -Rf *.bnd 
+rm -Rf *.o
+rm -Rf *.C
+
+~/storedp/drop.all
+
+/usr/bin/make list
+/usr/bin/make clean
+
+echo "DBASE=${DBASE}"
+/usr/bin/make "DBASE=pdh11" pdh
+
+#/usr/bin/make "DBASE=opicmdm" dm
+
+/usr/bin/make showconfig
+
+/usr/bin/make list
+
+df
+
+date

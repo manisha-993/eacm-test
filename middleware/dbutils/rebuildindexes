@@ -1,0 +1,63 @@
+DBNAME=$1
+SCHEMA="OPICM"
+
+. $HOME/.profile > /dev/null
+db2 "connect to $DBNAME user opicmadm using cat9tail"
+
+
+#
+# This will rebuild indexes for ALL tables.
+# To rebuild for specific tables only, comment out the next line
+# and create a file called "tables" that contains a list
+# of the tables to reindex.
+#
+
+db2 "list tables for schema $SCHEMA"|grep $SCHEMA|awk '{print $1}'>tables
+
+
+
+
+
+0>indexes
+
+
+for TABLE in `cat tables`;
+do
+
+db2 "select tabschema, tabname, indschema, indname, uniquerule, translate(substr(colnames,2),',','+') from syscat.indexes \
+where tabschema='$SCHEMA' \
+and tabname='$TABLE'"|grep $SCHEMA|awk '{print $1"."$2"^BREAK^"$3"."$4"^BREAK^"$5"^BREAK^"$6}' >> indexes
+
+done
+
+#rm tables
+
+for LINE_ITEM in `cat indexes`
+do
+
+echo $LINE_ITEM|sed "s/\^BREAK\^/ /g"|awk '{print $1}'|read TABLE
+echo $LINE_ITEM|sed "s/\^BREAK\^/ /g"|awk '{print $2}'|read INDEX
+echo $LINE_ITEM|sed "s/\^BREAK\^/ /g"|awk '{print $3}'|read UNIQUE
+echo $LINE_ITEM|sed "s/\^BREAK\^/ /g"|awk '{print $4}'|read COLUMN
+
+if [ "$UNIQUE" = "U" ];
+then
+echo "db2 \"drop index $INDEX\";"
+#db2 "drop index $INDEX";
+echo "db2 \"create unique index $INDEX on $TABLE ( $COLUMN )\";"
+#db2 "create unique index $INDEX on $TABLE ( $COLUMN )";
+else
+echo "db2 \"drop index $INDEX\";"
+#db2 "drop index $INDEX";
+echo "db2 \"create index $INDEX on $TABLE ( $COLUMN )\";"
+#db2 "create index $INDEX on $TABLE ( $COLUMN )";
+fi
+
+
+
+date
+#rm indexes
+
+done
+
+db2 terminate

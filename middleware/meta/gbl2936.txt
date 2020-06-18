@@ -1,0 +1,246 @@
+@name=GBL2936
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+-----------------------------------------------------------------
+-- Provide a list of deactivated relators for a given user 
+-- and time period
+-----------------------------------------------------------------
+$Log: gbl2936.txt,v $
+Revision 1.22  2010/06/21 15:42:44  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.21  2004/10/20 21:01:40  dave
+changes to gen parm
+
+Revision 1.20  2004/02/20 20:21:50  roger
+Must be @t_schema
+
+Revision 1.19  2004/02/20 18:09:31  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.18  2003/09/08 16:31:12  roger
+Enterprise was changed to 16 char length
+
+Revision 1.17  2003/08/20 22:59:38  joan
+debug
+
+Revision 1.16  2003/08/20 22:17:27  joan
+fb 51812
+
+Revision 1.15  2003/07/23 21:21:16  joan
+change NAME to USERNAME for OP
+
+Revision 1.14  2002/08/02 20:16:26  dave
+small change for restore
+
+Revision 1.13  2002/08/02 18:50:04  dave
+fixes for restore SP's
+
+Revision 1.12  2002/04/08 23:30:23  joan
+working on OPWG
+
+Revision 1.11  2001/10/12 22:46:47  dave
+various fixes
+
+Revision 1.10  2001/09/21 17:27:48  dave
+fixed up some NE stuff
+
+Revision 1.9  2001/06/07 05:51:25  dave
+restore Unrestricted to use XTables
+
+Revision 1.8  2001/06/03 22:26:02  dave
+Added Unrestricted Case for retore
+
+Revision 1.7  2001/04/30 20:23:32  dave
+Made SP a RESTRICTED only CASE
+
+Revision 1.6  2001/03/22 06:34:20  dave
+More SQL syntax errors
+
+Revision 1.5  2001/03/22 06:16:07  dave
+More Syntax Fixes
+
+Revision 1.4  2001/03/22 05:40:25  dave
+Added EntityClass to the selection statement
+
+Revision 1.3  2001/03/22 05:21:44  dave
+Addded Log and ID Tags and fixed a Typo
+
+@desc=Restore (Deactivated relators for a given user and time period)
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2936.txt,v 1.22 2010/06/21 15:42:44 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT
+  'Relator'
+, RX.EntityType AS Relator_Type
+, RX.EntityID AS Relator_ID
+, RX.ValFrom AS DeactivateDate
+, MD2.LONGDESCRIPTION AS Relator_Description
+, CONCAT(CONCAT(RTRIM(COALESCE(I2.AttributeValue,'Name Not Found')),'-->'),RTRIM(COALESCE(I3.AttributeValue,'Name Not Found'))) AS Relator_Display_Name
+, I1.AttributeValue AS User_Name
+, CONCAT(CONCAT(CONCAT(RTRIM(MD.LONGDESCRIPTION),'('),RTRIM(T1.AttributeValue)),')') AS Role_Information
+, RX.Entity2Type
+, RX.Entity2ID
+, RX.Entity1Type
+, RX.Entity1ID
+, 'sp_cursor1'
+FROM @t_schema.Relator R
+INNER JOIN @t_schema.Text I1 ON
+    I1.Enterprise = :Enterprise 
+AND I1.EntityType = R.Entity2Type 
+AND I1.EntityID = R.Entity2ID 
+AND I1.AttributeCode = 'USERNAME' 
+AND I1.ValTo = :forever
+INNER JOIN @t_schema.Text T1 ON
+    T1.Enterprise = :Enterprise
+AND T1.EntityType = R.EntityType 
+AND T1.EntityID = R.EntityID 
+AND T1.AttributeCode = 'ROLECODE' 
+AND T1.ValTo = :forever
+INNER JOIN @t_schema.RelatorX RX ON
+    RX.Enterprise = :Enterprise 
+AND RX.OPENID = R.EntityID 
+AND RX.ValFrom BETWEEN :StartDate AND :EndDate
+AND RX.ValTo = :forever
+AND RX.EffTo < :EndDate
+INNER JOIN @t_schema.Entity E1 ON
+    E1.Enterprise = :Enterprise
+AND E1.EntityType = RX.Entity2Type 
+AND E1.EntityID = RX.Entity2ID 
+AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND :EffOn < E1.EffTo
+LEFT JOIN @t_schema.Text I2 ON
+    I2.Enterprise = :Enterprise
+AND I2.EntityType = E1.EntityType 
+AND I2.EntityID = E1.EntityID 
+AND I2.AttributeCode = 'NAME' 
+AND I2.ValTo = :forever
+INNER JOIN @t_schema.Entity E2 ON
+    E2.Enterprise = :Enterprise 
+AND E2.EntityType = RX.Entity1Type
+AND E2.EntityID = RX.Entity1ID 
+AND E2.ValFrom <= :ValOn AND :ValOn < E2.ValTo AND E2.EffFrom <= :EffOn AND :EffOn < E2.EffTo
+LEFT JOIN @t_schema.Text I3 ON
+    I3.Enterprise = :Enterprise 
+AND I3.EntityType = E2.EntityType 
+AND I3.EntityID = E2.EntityID 
+AND I3.AttributeCode = 'NAME' 
+AND I3.ValTo = :forever
+INNER JOIN @t_schema.MetaDescription MD2 ON
+    MD2.Enterprise = :Enterprise 
+AND MD2.DescriptionType = RX.EntityType 
+AND MD2.DescriptionClass = 'Relator' 
+AND MD2.NLSID = 1 
+AND MD2.ValTo = :forever
+INNER JOIN @t_schema.MetaDescription MD ON
+    MD.Enterprise = :Enterprise 
+AND MD.DescriptionType = T1.AttributeValue 
+AND MD.DescriptionClass = 'Role' 
+AND MD.NLSID = 1 
+AND MD.ValTo = :forever
+WHERE
+    R.Enterprise = :Enterprise 
+AND R.EntityType = 'OPWG' 
+AND R.EntityID = :OPWGID
+AND R.ValFrom <= :ValOn AND :ValOn < R.ValTo AND R.EffFrom <= :EffOn AND :EffOn < R.EffTo
+;
+EXEC SQL DECLARE sp_cursor2 CURSOR FOR
+SELECT
+  'Relator'
+, RX.EntityType AS Relator_Type
+, RX.EntityID AS Relator_ID
+, RX.ValFrom AS DeactivateDate
+, MD2.LONGDESCRIPTION AS Relator_Description
+, CONCAT(CONCAT(RTRIM(COALESCE(I2.AttributeValue,'Name Not Found')),'-->'),RTRIM(COALESCE(I3.AttributeValue,'Name Not Found'))) AS Relator_Display_Name
+, I1.AttributeValue AS User_Name
+, CONCAT(CONCAT(CONCAT(RTRIM(MD.LONGDESCRIPTION),'('),RTRIM(T1.AttributeValue)),')') AS Role_Information
+, RX.Entity2Type
+, RX.Entity2ID
+, RX.Entity1Type
+, RX.Entity1ID
+, 'sp_cursor2'
+FROM @t_schema.Relator R
+INNER JOIN @t_schema.Text I1 ON
+    I1.Enterprise = :Enterprise 
+AND I1.EntityType = R.Entity2Type 
+AND I1.EntityID = R.Entity2ID 
+AND I1.AttributeCode = 'USERNAME' 
+AND I1.ValTo = :forever
+INNER JOIN @t_schema.Text T1 ON
+    T1.Enterprise = :Enterprise
+AND T1.EntityType = R.EntityType 
+AND T1.EntityID = R.EntityID 
+AND T1.AttributeCode = 'ROLECODE' 
+AND T1.ValTo = :forever
+INNER JOIN @t_schema.RelatorX RX ON
+    RX.Enterprise = :Enterprise 
+AND RX.OPENID = R.EntityID 
+AND RX.ValFrom BETWEEN :StartDate AND :EndDate
+AND RX.ValTo = :forever
+AND RX.EffTo < :EndDate
+INNER JOIN @t_schema.Entity E1 ON
+    E1.Enterprise = :Enterprise
+AND E1.EntityType = RX.Entity2Type 
+AND E1.EntityID = RX.Entity2ID 
+AND E1.ValFrom <= :ValOn AND :ValOn < E1.ValTo AND E1.EffFrom <= :EffOn AND :EffOn < E1.EffTo
+LEFT JOIN @t_schema.Text I2 ON
+    I2.Enterprise = :Enterprise
+AND I2.EntityType = E1.EntityType 
+AND I2.EntityID = E1.EntityID 
+AND I2.AttributeCode = 'NAME' 
+AND I2.ValTo = :forever
+INNER JOIN @t_schema.Entity E2 ON
+    E2.Enterprise = :Enterprise 
+AND E2.EntityType = RX.Entity1Type
+AND E2.EntityID = RX.Entity1ID 
+AND E2.ValFrom <= :ValOn AND :ValOn < E2.ValTo AND E2.EffFrom <= :EffOn AND :EffOn < E2.EffTo
+LEFT JOIN @t_schema.Text I3 ON
+    I3.Enterprise = :Enterprise 
+AND I3.EntityType = E2.EntityType 
+AND I3.EntityID = E2.EntityID 
+AND I3.AttributeCode = 'NAME' 
+AND I3.ValTo = :forever
+INNER JOIN @t_schema.MetaDescription MD2 ON
+    MD2.Enterprise = :Enterprise 
+AND MD2.DescriptionType = RX.EntityType 
+AND MD2.DescriptionClass = 'Relator' 
+AND MD2.NLSID = 1 
+AND MD2.ValTo = :forever
+INNER JOIN @t_schema.MetaDescription MD ON
+    MD.Enterprise = :Enterprise 
+AND MD.DescriptionType = T1.AttributeValue 
+AND MD.DescriptionClass = 'Role' 
+AND MD.NLSID = 1 
+AND MD.ValTo = :forever
+WHERE
+    R.Enterprise = :Enterprise 
+AND R.EntityType = 'OPWG' 
+AND R.ValFrom <= :ValOn AND :ValOn < R.ValTo AND R.EffFrom <= :EffOn AND :EffOn < R.EffTo
+;
+@execute
+if (iCase == 2) {
+  EXEC SQL OPEN sp_cursor2;
+} else {
+  EXEC SQL OPEN sp_cursor1;
+}
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in iCase int
+in OPWGID int
+in StartDate varchar(26)
+in EndDate varchar(26)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@xml
+1 1 <attributevalue> </attributevalue>
+@end
+
+

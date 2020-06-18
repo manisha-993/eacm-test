@@ -1,0 +1,20 @@
+DB=$1
+. $HOME/.profile > /dev/null
+
+db2 connect to $DB user opicmadm using cat9tail
+
+#
+# in order to bind specific packages only, create a file called packages that contains schema.packagename
+# and comment out the following line...
+#
+db2 "select pkgschema, pkgname from syscat.packages where pkgschema<>'NULLID'"|awk 'NR > 3 && NF == 2 {print $1"."$2}'|sort > packages
+
+for PACKAGE in `cat packages`
+do
+date
+echo "db2 rebind $PACKAGE;"
+db2 "rebind $PACKAGE";
+done
+date
+
+db2 terminate

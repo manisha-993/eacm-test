@@ -1,0 +1,60 @@
+@name=GBL7030
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Returns Attributes of an Action
+
+$Log: gbl7030.txt,v $
+Revision 1.6  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.5  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.4  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.3  2003/09/08 16:31:16  roger
+Enterprise was changed to 16 char length
+
+Revision 1.2  2002/02/20 18:36:31  dave
+fixed 7030 MetaLinkAttribute to MetaLinkAttr
+
+Revision 1.1  2002/02/20 18:29:04  dave
+new function for LinkActionItem
+
+
+@desc= Returns Attributes of an Action
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7030.txt,v 1.6 2004/10/20 21:01:43 dave Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT
+ RTRIM(MLA.LinkType2)
+,RTRIM(MLA.LinkCode)
+,RTRIM(MLA.LinkValue)
+FROM @t_schema.MetaLinkAttr MLA
+WHERE
+    MLA.Enterprise = :Enterprise
+AND MLA.LinkType = 'Action/Attribute'
+AND MLA.LinkType1 = :ActionType
+AND MLA.ValFrom <= :ValOn and :ValOn < MLA.ValTo AND MLA.EffFrom <= :EffOn and :EffOn < MLA.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in ActionType varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

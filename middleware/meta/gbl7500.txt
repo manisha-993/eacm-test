@@ -1,0 +1,75 @@
+@name=GBL7500
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=true
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7500.txt,v $
+Revision 1.9  2010/06/21 15:43:27  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.8  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.7  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.6  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.5  2003/09/08 16:31:16  roger
+Enterprise was changed to 16 char length
+
+Revision 1.4  2002/07/17 17:33:19  roger
+Ensured Log was in @narrative
+
+@desc=Get Roles that this Role (linkType2) is a Maintainer of - for MetaUI Role Maintenance
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7500.txt,v 1.9 2010/06/21 15:43:27 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT 
+ MD.longDescription
+,MLA.linkType1
+,MD.nlsId
+from 
+@t_schema.METALINKATTR MLA
+
+JOIN
+@t_schema.METADESCRIPTION MD ON
+    MD.enterprise = MLA.enterprise 
+AND MD.descriptiontype = MLA.LinkType1
+AND MD.descriptionclass = 'Role' 
+AND MD.nlsid IN (1,:NLSID)
+AND MD.valto > :ValEffOn 
+AND MD.valfrom <= :ValEffOn 
+AND MD.effto > :ValEffOn 
+AND MD.efffrom <= :ValEffOn
+
+where
+    MLA.enterprise = :Enterprise 
+AND MLA.linkType = 'Role/Maintainer' 
+AND MLA.linkType2 = :LinkType2
+AND MLA.linkcode = 'Capability' 
+AND MLA.valto > :ValEffOn 
+AND MLA.valfrom <= :ValEffOn 
+AND MLA.effto > :ValEffOn 
+AND MLA.efffrom <= :ValEffOn
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in LinkType2 varchar(32)
+in NLSID int
+in OPENID int
+in ValEffOn varchar(26)
+@end
+
+

@@ -1,0 +1,66 @@
+@name=GBL1092
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------------------------------------
+-- Retrieves the Help Text for a gvien Attribute in a Given Enterprise for a given NLSID
+----------------------------------------------------------------------------------------------------
+$Log: gbl1092.txt,v $
+Revision 1.8  2010/06/21 15:42:55  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2004/10/20 21:01:38  dave
+changes to gen parm
+
+Revision 1.6  2004/09/22 22:01:06  dave
+tracking
+
+Revision 1.5  2004/02/20 20:21:47  roger
+Must be @t_schema
+
+Revision 1.4  2004/02/20 18:09:28  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.3  2003/09/08 16:31:09  roger
+Enterprise was changed to 16 char length
+
+Revision 1.2  2001/04/23 01:00:15  dave
+Remove perms for 1092 - no need
+
+Revision 1.1  2001/04/23 00:37:44  dave
+added GBL1092 for retrieving meta help
+
+@desc=Retrieves the Help Text for a gvien Attribute in a Given Enterprise for a given NLSID
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl1092.txt,v 1.8 2010/06/21 15:42:55 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT 
+  MH.NLSID
+ ,RTRIM(MH.HELPVALUE)
+FROM @t_schema.METAHELP MH
+WHERE
+    MH.Enterprise = :Enterprise
+AND MH.AttributeCode = :AttributeCode
+AND MH.NLSID in (1, :NLSID)
+AND MH.ValFrom <= :ValOn AND :ValOn < MH.Valto AND MH.EffFrom <= :EffOn AND :EffOn < MH.EffTo
+ORDER BY NLSID 
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in AttributeCode varchar(32)
+in NLSID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

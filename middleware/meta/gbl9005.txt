@@ -1,0 +1,203 @@
+@name=GBL9005
+@type=basic
+@dbase=opicmpdh
+@noremote=true
+@addperm=false
+@narrative
+
+  This returns all the active Entities in a given EntityID Range and Date-time range for a given EntityType, Enterprise
+
+  This is primarily used in the ODS Netchanges Program
+
+$Log: gbl9005.txt,v $
+Revision 1.13  2010/06/21 15:42:58  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.12  2004/10/20 21:01:50  dave
+changes to gen parm
+
+Revision 1.11  2004/08/05 20:47:57  dave
+GBL9005 change and more ECCM II
+
+Revision 1.10  2004/07/20 14:18:18  dave
+fixes brought forward from 1.2
+
+Revision 1.9  2004/05/20 21:16:13  dave
+index guidance fixes
+
+Revision 1.8  2004/02/20 20:21:58  roger
+Must be @t_schema
+
+Revision 1.7  2004/02/20 18:09:38  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.6  2004/01/17 02:19:08  dave
+fixing dmnet and relator deletes
+
+Revision 1.5  2003/10/06 18:12:16  dave
+adding all the delete controls for a record
+
+Revision 1.4  2003/10/06 05:07:59  dave
+picking up on deletes
+
+Revision 1.3  2003/09/08 16:31:23  roger
+Enterprise was changed to 16 char length
+
+Revision 1.2  2003/04/14 18:00:50  bala
+Change to x tables
+
+Revision 1.1  2003/04/14 17:57:25  bala
+Initial checkin
+
+
+
+@desc=This returns all the active changed Entities for a given EntityType, Enterprise, ID Range and Date range
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9005.txt,v 1.13 2010/06/21 15:42:58 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+// Need to order by time to ensure we apply the correct
+// Sequence of events
+EXEC SQL DECLARE entity_cursor CURSOR FOR
+SELECT    Entity1ID,
+          EntityID,
+          Entity2ID,
+          ValOn,
+          EffOn
+
+FROM      @t_schema.trsNavigate
+
+WHERE     SESSIONID = :SessionID
+
+ORDER BY  4
+;
+@execute
+
+EXEC SQL INSERT INTO @t_schema.trsNavigate
+SELECT DISTINCT
+  :Enterprise
+ ,:SessionID
+ ,'ODSINIT'
+ ,'LIST'
+ ,0
+ ,1
+ ,'D'
+ ,'D'
+ ,CASE WHEN R1.Enterprise IS NULL THEN 'NOOP' ELSE R1.Entity1Type END
+ ,CASE WHEN R1.Enterprise IS NULL THEN 0 ELSE R1.Entity1ID END
+ ,E.EntityType
+ ,E.EntityID
+ ,CASE WHEN R1.Enterprise IS NULL THEN 'NOOP' ELSE R1.Entity2Type END
+ ,CASE WHEN R1.Enterprise IS NULL THEN 0 ELSE R1.Entity2ID END
+ ,E.ValFrom
+ ,E.EffTo
+FROM @t_schema.ENTITYx E
+LEFT JOIN @t_schema.Relator R1 ON
+    R1.Enterprise = :Enterprise
+AND R1.EntityType = E.EntityType
+AND R1.EntityID = E.EntityID
+--AND R1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN R1.EffFrom AND R1.EffTo
+AND R1.Valto = :forever
+LEFT JOIN @t_schema.MetaLinkAttr M1 ON
+    M1.Enterprise = :Enterprise
+AND M1.LinkType = 'Entity/Status/ODSFilter'
+AND M1.LinkType1 = :EntityType
+AND M1.Linktype2 = :ODSSchema
+AND M1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN M1.EffFrom AND M1.EffTo
+LEFT JOIN @t_schema.Flag F1 ON
+    F1.Enterprise = :Enterprise
+AND F1.EntityType = E.EntityType
+AND F1.EntityID = E.EntityID
+AND RTRIM(F1.AttributeCode) = M1.LinkCode
+AND RTRIM(F1.AttributeValue) = M1.LinkValue
+--AND F1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN F1.EffFrom AND F1.EffTo
+-- Get me the last known record.. turned on or off
+AND F1.Valto = :forever
+WHERE
+    rtrim(E.Enterprise) = :Enterprise
+AND E.EntityId BETWEEN :StartID AND :EndID
+AND E.VALFROM BETWEEN :StartTime AND :EndTime
+AND E.EntityType = :EntityType
+AND rtrim(char(E.Valto)) = :forever
+AND 1 = (CASE
+  WHEN M1.Enterprise IS NOT NULL AND F1.Enterprise IS NULL THEN 0
+  ELSE 1 END)
+;
+
+EXEC SQL COMMIT WORK;
+
+// Get all the relator records that were not caught by the Above SQL..
+
+EXEC SQL INSERT INTO @t_schema.trsNavigate
+SELECT DISTINCT
+  :Enterprise
+ ,:SessionID
+ ,'ODSINIT'
+ ,'LIST'
+ ,0
+ ,1
+ ,'D'
+ ,'D'
+ ,R.Entity1Type
+ ,R.Entity1ID
+ ,R.EntityType
+ ,R.EntityID
+ ,R.Entity2Type
+ ,R.Entity2ID
+ ,R.ValFrom
+ ,R.EffTo
+FROM @t_schema.Relatorx R
+LEFT JOIN @t_schema.MetaLinkAttr M1 ON
+    M1.Enterprise = :Enterprise
+AND M1.LinkType = 'Entity/Status/ODSFilter'
+AND M1.LinkType1 = :EntityType
+AND M1.Linktype2 = :ODSSchema
+AND M1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN M1.EffFrom AND M1.EffTo
+LEFT JOIN @t_schema.Flag F1 ON
+    F1.Enterprise = :Enterprise
+AND F1.EntityType = R.EntityType
+AND F1.EntityID = R.EntityID
+AND RTRIM(F1.AttributeCode) = M1.LinkCode
+AND RTRIM(F1.AttributeValue) = M1.LinkValue
+--AND F1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN F1.EffFrom AND F1.EffTo
+-- Get me the last known record.. turned on or off
+AND F1.Valto = :forever
+LEFT JOIN @t_schema.trsNavigate N1 ON
+    N1.SessionID = :SessionID
+AND N1.EntityType = R.EntityType
+AND N1.EntityID = R.EntityID
+WHERE
+    rtrim(R.Enterprise) = :Enterprise
+AND R.EntityId BETWEEN :StartID AND :EndID
+AND R.VALFROM BETWEEN :StartTime AND :EndTime
+AND R.EntityType = :EntityType
+AND rtrim(char(R.Valto)) = :forever
+AND 1 = (CASE
+  WHEN M1.Enterprise IS NOT NULL AND F1.Enterprise IS NULL THEN 0
+  ELSE 1 END)
+AND N1.SessionID IS NULL
+;
+
+EXEC SQL COMMIT WORK;
+
+// Now open the cursor
+
+EXEC SQL OPEN entity_cursor;
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in ODSSchema varchar(16)
+in StartID int
+in EndID int
+in StartTime varchar(27)
+in EndTime varchar(27)
+@end
+
+

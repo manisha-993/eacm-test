@@ -1,0 +1,56 @@
+@name=GBL9999
+@parmstyle=GENERAL
+@type=basic
+@dbase=opicmods
+@narrative
+----------------------------------------------------------------------
+--  This is the GetNow for ODS
+----------------------------------------------------------------------
+$Log: gbl9999.txt,v $
+Revision 1.4  2004/10/20 21:01:51  dave
+changes to gen parm
+
+Revision 1.3  2004/02/20 20:21:58  roger
+Must be @t_schema
+
+Revision 1.2  2004/02/20 18:09:38  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.1  2003/05/30 18:13:51  roger
+The first SP for ODS
+
+@desc=Return the current server time values Now/Forever/Epoch
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9999.txt,v 1.4 2004/10/20 21:01:51 dave Exp $";
+EXEC SQL END DECLARE SECTION;
+now[10] = '-';
+now[13] = '.';
+now[16] = '.';
+
+forever[10] = '-';
+forever[13] = '.';
+forever[16] = '.';
+
+epoch[10] = '-';
+epoch[13] = '.';
+epoch[16] = '.';
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  DISTINCT :now AS Now
+, :forever AS Forever
+, :epoch AS Epoch
+FROM SYSCAT.SCHEMAAUTH
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+@end
+
+

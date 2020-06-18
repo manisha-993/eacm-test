@@ -1,0 +1,35 @@
+@name=GBL0007
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+Get all ids for an entity
+--------------------------------------------------------------------------------------------
+
+@desc=Get all ids for an entity
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0007.txt,v 1.2 2010/06/21 15:43:21 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+
+SELECT entityid FROM
+@schema.entity ET
+WHERE
+ET.Enterprise = :Enterprise
+AND ET.entitytype = :EntityType
+AND ET.ValFrom <= :now AND :now < ET.ValTo AND ET.EffFrom <= :now AND :now < ET.EffTo
+;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+@end

@@ -1,0 +1,89 @@
+<project name="middleware" default="package" basedir="..">
+
+  <!-- set global properties for this project -->
+  <property name="project" value="${ant.project.name}"/>
+  <!-- directories -->
+  <property name="source" value="source"/>
+  <property name="class" value="class"/>
+  <property name="deploy" value="deploy"/>
+  <property name="doc" value="doc"/>
+  <!-- package to document with javadoc -->
+  <property name="packages" value="COM.ibm.*"/>
+
+  <target name="start">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <echo>Initializing build for ${ant.project.name} at ${TSTAMP} on ${TODAY}</echo>
+  </target>
+
+  <target name="init" depends="start">
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}"/>
+  </target>
+
+  <target name="export" depends="init">
+    <!-- Export source needed for compile from CVS -->
+    <echo>Exporting CVS source code for ${ant.project.name}</echo>
+  </target>
+
+  <target name="generate" depends="export">
+    <echo>Running the generator for ${ant.project.name}</echo>
+    <java jar="generator.jar">
+    	<jvmarg value="-ms128m -mx256m -Xss64M -Xoss64M"/>
+    </java>
+  </target>
+
+  <target name="compile" depends="export">
+    <echo>Compiling source code for ${ant.project.name}</echo>
+    <!-- Grab the names of all java source files
+    <exec executable="/usr/bin/sh" output="contents.txt">
+      <arg line="'find . -name "*.java" -type f'"/>
+    </exec>-->
+	<!-- javac srcdir="${source}" destdir="${class}"/ -->
+    <!-- Compile the java code from ${source} into ${build} -->
+    <!-- not using javac cause can't ... -->
+    <exec executable="/usr/bin/sh">
+      <arg line="'javac @contents.txt'"/>
+    </exec>
+    <delete file="contents.txt"/>
+  </target>
+
+  <target name="document">
+    <echo>Generating documentation for ${ant.project.name}</echo>
+    <!-- Create the documentation directory -->
+    <mkdir dir="${build}/doc"/>
+
+    <!-- Run javadoc to generate the documentation -->
+    <javadoc packagenames="${packages}"
+      sourcepath="${basedir}/${source}"
+      destdir="${build}/doc"
+      author="true"
+      version="true"
+      windowtitle="${project} API"
+      doctitle="${project}"
+      bottom="Copyright (c) 2001 IBM Corporation. All Rights Reserved."
+    />
+  </target>
+
+  <target name="package" depends="compile, document">
+    <echo>Generating deployment objects for ${ant.project.name}</echo>
+    <!-- Create the distribution directory -->
+    <mkdir dir="${deploy}/lib"/>
+
+    <!-- Put everything in ${build} into the ${project}.jar.${DSTAMP}${TSTAMP} file -->
+    <jar jarfile="${deploy}/lib/${project}.jar.${DSTAMP}${TSTAMP}" basedir="${build}" manifest="./misc/manifest.txt"/>
+    <copy file="${deploy}/lib/${project}.jar.${DSTAMP}${TSTAMP}" tofile="${deploy}/lib/taskmaster.jar"/>
+    <tstamp/>
+    <echo>Completed build for ${ant.project.name} at ${TSTAMP} on ${TODAY}</echo>
+  </target>
+
+  <target name="clean" depends="start">
+    <echo>Cleaning repository for ${ant.project.name}</echo>
+    <!-- Delete the ${build} and ${deploy} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${deploy}"/>
+    <tstamp/>
+    <echo>Completed build for ${ant.project.name} at ${TSTAMP} on ${TODAY}</echo>
+  </target>
+
+</project>

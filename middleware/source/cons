@@ -1,0 +1,14 @@
+#!/bin/sh
+
+#
+# This batch file launches the Middleware console
+#
+
+JDK_CLASSES="/usr/java_dev2/jre/lib/rt.jar"
+JAVA_COMMAND="java"
+
+$JAVA_COMMAND $1 $2 $3 $4 $5 -classpath .:middleware.jar:$JDK_CLASSES COM.ibm.opicmpdh.middleware.MiddlewareConsole
+
+#
+# end of script
+#

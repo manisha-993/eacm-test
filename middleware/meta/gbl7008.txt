@@ -1,0 +1,59 @@
+@name=GBL7008
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Returns an ActionKey's Class and Description 
+
+$Log: gbl7008.txt,v $
+Revision 1.4  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.3  2004/05/21 20:30:23  joan
+more adjustments
+
+Revision 1.2  2004/05/21 15:45:07  joan
+more adjustment
+
+Revision 1.1  2004/05/20 22:10:43  joan
+initial load
+
+
+@desc= Returns class and NLS Description based upon the given ActionKey NLSID
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7008.txt,v 1.4 2004/10/20 21:01:43 dave Exp $";
+EXEC SQL END DECLARE SECTION;
+ 
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT
+ RTRIM(ME.entityclass)  as ChainActionClass
+,RTRIM(ML.LinkType2)  as ChainActionType
+,RTRIM(ML.LinkValue) as RequireInput
+FROM @t_schema.metaLinkAttr ML
+
+INNER JOIN @t_schema.metaEntity ME ON
+    ME.Enterprise = :Enterprise
+AND ME.entitytype = ML.Linktype2
+AND ME.ValFrom <= :ValOn and :ValOn < ME.ValTo AND ME.EffFrom <= :EffOn and :EffOn < ME.EffTo
+    
+WHERE
+    ML.Enterprise = :Enterprise
+AND ML.LinkType = 'Action/Chain'
+AND ML.LinkType1 = :ActionType
+AND ML.ValFrom <= :ValOn and :ValOn < ML.ValTo AND ML.EffFrom <= :EffOn and :EffOn < ML.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in ActionType varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

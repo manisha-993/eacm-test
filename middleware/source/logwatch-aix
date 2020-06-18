@@ -1,0 +1,15 @@
+#!/bin/sh
+
+#
+# This batch file is used to watch UDP logging
+#
+
+JDK_CLASSES="/usr/java_dev2/jre/lib/rt.jar"
+OTHER_CLASSES=""
+JAVA_COMMAND="java"
+
+$JAVA_COMMAND -classpath .:$JDK_CLASSES:$OTHER_CLASSES:middleware.jar COM.ibm.opicmpdh.middleware.LogWatcher $1
+
+#
+# end of script
+#

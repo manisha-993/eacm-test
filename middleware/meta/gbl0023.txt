@@ -1,0 +1,168 @@
+@name=GBL0023
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Deactivates the  the WWProductCollection Structure
+
+// $Log: gbl0023.txt,v $
+// Revision 1.7  2010/07/21 19:55:34  praveen
+// Change Long data type to Sqlint32 in support for db2 9.5
+//
+// Revision 1.6  2010/06/21 15:42:48  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.5  2009/01/27 16:43:14  praveen
+// *** empty log message ***
+//
+// Revision 1.4  2009/01/23 00:06:27  praveen
+// Supporting dual catdb schema
+//
+// Revision 1.3  2006/05/08 21:16:05  dave
+// syntax WWEntitytType not in FeatureDetail
+//
+// Revision 1.2  2006/05/08 20:53:07  dave
+// minor change to gbl0023
+//
+// Revision 1.1  2006/05/08 17:41:04  gregg
+// cloning deactivate collection records for bigcat
+//
+// Revision 1.4  2005/11/30 22:58:20  bala
+// more generator tag fixes
+//
+// Revision 1.3  2005/11/30 22:31:23  bala
+// fix generator tags
+//
+// Revision 1.2  2005/11/30 22:12:50  bala
+// deactivate prodstructcollection structure
+//
+// Revision 1.1  2005/11/30 21:56:26  bala
+// Check in
+//
+
+
+@desc= Deactivates the  the WWProductCollection Structure
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@nulls_ok=true
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0023.txt,v 1.7 2010/07/21 19:55:34 praveen Exp $";
+sqlint32 count = 0;
+EXEC SQL END DECLARE SECTION;
+@execute
+
+if (strcmp(schema,"BIGCAT") == 0) {
+
+    EXEC SQL
+
+    UPDATE bigcat.FeatureDetail
+    SET
+    valfrom = current timestamp,
+    valto = current timestamp,
+    isactive = 0
+
+    WHERE
+        Enterprise = :Enterprise
+    AND FeatEntityType = :EntityType
+    AND FeatEntityID = :EntityID
+    AND CountryCode = :CountryCode
+    AND LanguageCode = :LanguageCode
+    AND NLSID = :NLSID
+    ;
+    EXEC SQL
+    UPDATE bigcat.WWPRODUCT
+    SET
+      valfrom = current timestamp,
+      valto = current timestamp,
+      isactive = 0
+    WHERE
+        Enterprise = :Enterprise
+    AND WWEntityType = :EntityType
+    AND WWEntityID = :EntityID
+    AND CountryCode = :CountryCode
+    AND LanguageCode = :LanguageCode
+    AND NLSID = :NLSID
+    ;
+
+    EXEC SQL
+
+    UPDATE bigcat.PRODSTRUCT
+    SET
+      valfrom = current timestamp,
+      valto = current timestamp,
+      isactive = 0
+    WHERE
+        Enterprise = :Enterprise
+    AND prodEntityType = :EntityType
+    AND prodEntityID = :EntityID
+    AND CountryCode = :CountryCode
+    AND LanguageCode = :LanguageCode
+    AND NLSID = :NLSID
+    ;
+
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+
+    EXEC SQL
+
+    UPDATE ibmcat.FeatureDetail
+    SET
+    valfrom = current timestamp,
+    valto = current timestamp,
+    isactive = 0
+
+    WHERE
+        Enterprise = :Enterprise
+    AND FeatEntityType = :EntityType
+    AND FeatEntityID = :EntityID
+    AND CountryCode = :CountryCode
+    AND LanguageCode = :LanguageCode
+    AND NLSID = :NLSID
+    ;
+    EXEC SQL
+    UPDATE ibmcat.WWPRODUCT
+    SET
+      valfrom = current timestamp,
+      valto = current timestamp,
+      isactive = 0
+    WHERE
+        Enterprise = :Enterprise
+    AND WWEntityType = :EntityType
+    AND WWEntityID = :EntityID
+    AND CountryCode = :CountryCode
+    AND LanguageCode = :LanguageCode
+    AND NLSID = :NLSID
+    ;
+
+    EXEC SQL
+
+    UPDATE ibmcat.PRODSTRUCT
+    SET
+      valfrom = current timestamp,
+      valto = current timestamp,
+      isactive = 0
+    WHERE
+        Enterprise = :Enterprise
+    AND prodEntityType = :EntityType
+    AND prodEntityID = :EntityID
+    AND CountryCode = :CountryCode
+    AND LanguageCode = :LanguageCode
+    AND NLSID = :NLSID
+    ;
+
+}
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in CountryCode varchar(2)
+in LanguageCode varchar(2)
+in NLSID int
+in schema varchar(8)
+@end

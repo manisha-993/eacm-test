@@ -1,0 +1,278 @@
+@name=GBL7554
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+For PDH research for relator (Admin UI)
+
+$Log: gbl7554.txt,v $
+Revision 1.11  2010/06/21 15:42:54  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.10  2004/11/12 17:22:21  dave
+more fprintf removals
+
+Revision 1.9  2004/10/20 21:01:46  dave
+changes to gen parm
+
+Revision 1.8  2004/02/20 20:21:56  roger
+Must be @t_schema
+
+Revision 1.7  2004/02/20 18:09:35  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.6  2004/01/15 20:51:12  steve
+syntax
+
+Revision 1.4  2004/01/15 19:13:35  steve
+added queries
+
+Revision 1.3  2004/01/15 17:35:00  steve
+syntax
+
+Revision 1.2  2004/01/15 17:15:52  steve
+syntax
+
+Revision 1.1  2004/01/15 00:33:15  steve
+added file
+
+
+
+@desc=For PDH research (Admin UI)
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7554.txt,v 1.11 2010/06/21 15:42:54 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+
+// by entity type
+EXEC SQL DECLARE cur0 CURSOR FOR
+SELECT
+Enterprise
+,Entitytype
+,Entityid
+,Entity1type
+,Entity1id
+,Entity2type
+,Entity2id
+,Valfrom
+,Valto
+,Efffrom
+,Effto
+,Openid
+,Tranid
+FROM @t_schema.Relator where
+    Enterprise = :Enterprise
+AND EntityType = :EntityType
+AND EntityID = :EntityID
+order by valfrom
+;
+
+// by entity1 type
+EXEC SQL DECLARE cur1 CURSOR FOR
+SELECT
+Enterprise
+,Entitytype
+,Entityid
+,Entity1type
+,Entity1id
+,Entity2type
+,Entity2id
+,Valfrom
+,Valto
+,Efffrom
+,Effto
+,Openid
+,Tranid
+FROM @t_schema.Relator where
+    Enterprise = :Enterprise
+AND Entity1Type = :Entity1Type
+AND Entity1ID = :Entity1ID
+order by valfrom
+;
+
+
+// by entity2type
+EXEC SQL DECLARE cur2 CURSOR FOR
+SELECT
+Enterprise
+,Entitytype
+,Entityid
+,Entity1type
+,Entity1id
+,Entity2type
+,Entity2id
+,Valfrom
+,Valto
+,Efffrom
+,Effto
+,Openid
+,Tranid
+FROM @t_schema.Relator where
+    Enterprise = :Enterprise
+AND Entity2Type = :Entity2Type
+AND Entity2ID = :Entity2ID
+order by valfrom
+;
+
+// entitytype, entity1type
+EXEC SQL DECLARE cur01 CURSOR FOR
+SELECT
+Enterprise
+,Entitytype
+,Entityid
+,Entity1type
+,Entity1id
+,Entity2type
+,Entity2id
+,Valfrom
+,Valto
+,Efffrom
+,Effto
+,Openid
+,Tranid
+FROM @t_schema.Relator where
+    Enterprise = :Enterprise
+AND EntityType = :EntityType
+AND EntityID = :EntityID
+AND Entity1Type = :Entity1Type
+AND Entity1ID = :Entity1ID
+order by valfrom
+;
+
+// entitytype, entity1type, entity2type
+EXEC SQL DECLARE cur012 CURSOR FOR
+SELECT
+Enterprise
+,Entitytype
+,Entityid
+,Entity1type
+,Entity1id
+,Entity2type
+,Entity2id
+,Valfrom
+,Valto
+,Efffrom
+,Effto
+,Openid
+,Tranid
+FROM @t_schema.Relator where
+    Enterprise = :Enterprise
+AND EntityType = :EntityType
+AND EntityID = :EntityID
+AND Entity1Type = :Entity1Type
+AND Entity1ID = :Entity1ID
+AND Entity2Type = :Entity2Type
+AND Entity2ID = :Entity2ID
+order by valfrom
+;
+
+// entitytype entity2type
+EXEC SQL DECLARE cur02 CURSOR FOR
+SELECT
+Enterprise
+,Entitytype
+,Entityid
+,Entity1type
+,Entity1id
+,Entity2type
+,Entity2id
+,Valfrom
+,Valto
+,Efffrom
+,Effto
+,Openid
+,Tranid
+FROM @t_schema.Relator where
+    Enterprise = :Enterprise
+AND EntityType = :EntityType
+AND EntityID = :EntityID
+AND Entity2Type = :Entity2Type
+AND Entity2ID = :Entity2ID
+order by valfrom
+;
+
+// entitytype, entity1type, entity2type
+EXEC SQL DECLARE cur12 CURSOR FOR
+SELECT
+Enterprise
+,Entitytype
+,Entityid
+,Entity1type
+,Entity1id
+,Entity2type
+,Entity2id
+,Valfrom
+,Valto
+,Efffrom
+,Effto
+,Openid
+,Tranid
+FROM @t_schema.Relator where
+    Enterprise = :Enterprise
+AND Entity1Type = :Entity1Type
+AND Entity1ID = :Entity1ID
+AND Entity2Type = :Entity2Type
+AND Entity2ID = :Entity2ID
+order by valfrom
+;
+
+if(strncmp(EntityType," ",1) != 0 && strncmp(Entity1Type," ",1) == 0 && strncmp(Entity2Type, " ",1) == 0) {
+    // by entity type
+    //fprintf(f,"executing curEntityType\n");
+    EXEC SQL OPEN cur0;
+
+} else if(strncmp(EntityType," ",1) == 0 && strncmp(Entity1Type," ",1) != 0 && strncmp(Entity2Type, " ",1) == 0) {
+    // by entity1 type
+    //fprintf(f,"executing curEntity1Type\n");
+    EXEC SQL OPEN cur1;
+
+} else if(strncmp(EntityType," ",1) == 0 && strncmp(Entity1Type," ",1) == 0 && strncmp(Entity2Type, " ",1) != 0) {
+    // by entity2 type
+    //fprintf(f,"executing curEntity2Type\n");
+    EXEC SQL OPEN cur2;
+
+} else if(strncmp(EntityType," ",1) != 0 && strncmp(Entity1Type," ",1) != 0 && strncmp(Entity2Type, " ",1) == 0) {
+    // by entity type and entity1type
+    //fprintf(f,"executing curEntityTypeEntity1Type\n");
+    EXEC SQL OPEN cur01;
+
+} else if(strncmp(EntityType," ",1) != 0 && strncmp(Entity1Type," ",1) != 0 && strncmp(Entity2Type, " ",1) != 0) {
+    // by entity type, entity1type, and entity2type
+    //fprintf(f,"executing curEntityTypeEntity1TypeEntity2Type\n");
+    EXEC SQL OPEN cur012;
+
+} else if(strncmp(EntityType," ",1) != 0 && strncmp(Entity1Type," ",1) == 0 && strncmp(Entity2Type, " ",1) != 0) {
+    // by entity type and entity2type
+    //fprintf(f,"executing curEntityTypeEntity2Type\n");
+    EXEC SQL OPEN cur02;
+
+} else if(strncmp(EntityType," ",1) == 0 && strncmp(Entity1Type," ",1) != 0 && strncmp(Entity2Type, " ",1) != 0) {
+    // by entity1type and entity2type
+    //fprintf(f,"executing curEntity1TypeEntity2Type\n");
+    EXEC SQL OPEN cur12;
+
+} else {
+  //fprintf(f,"executing NONE\n");
+  // do nothing
+}
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in Entity1Type varchar(32)
+in Entity1ID int
+in Entity2Type varchar(32)
+in Entity2ID int
+@end
+
+
+

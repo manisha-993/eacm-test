@@ -1,0 +1,163 @@
+@name=GBL7543
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+
+@narrative
+
+Get Bookmark info for a single OPID (no BlobValues)
+
+$Log: gbl7543.txt,v $
+Revision 1.14  2010/06/21 15:42:58  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.13  2004/10/20 21:01:45  dave
+changes to gen parm
+
+Revision 1.12  2004/02/20 20:21:55  roger
+Must be @t_schema
+
+Revision 1.11  2004/02/20 18:09:35  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.10  2003/09/09 23:06:19  gregg
+Bookmark Logic now spans Enterprises!!!
+
+Revision 1.9  2003/09/09 22:51:41  gregg
+Bookmarks now span Enterprises.
+
+Revision 1.8  2003/09/08 16:31:19  roger
+Enterprise was changed to 16 char length
+
+Revision 1.7  2003/04/01 21:52:40  gregg
+more opwg (rolename, not usrtok)
+
+Revision 1.6  2003/04/01 21:47:32  gregg
+grab OPWGID info for ea. bookmark item record
+
+Revision 1.5  2003/03/31 19:47:58  gregg
+update/fix
+
+Revision 1.4  2003/03/29 00:30:19  gregg
+varchar on enterprise
+
+Revision 1.3  2003/03/29 00:20:39  gregg
+fix
+
+Revision 1.2  2003/03/29 00:07:19  gregg
+added metadescription
+
+Revision 1.1  2003/03/18 21:39:09  gregg
+initial load
+
+
+
+@desc=Get Bookmark info for a single OPID (no BlobValues)
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+
+char brand[80] = "$Id: gbl7543.txt,v 1.14 2010/06/21 15:42:58 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR 
+SELECT 
+ B.ActionItemKey
+,B.ActionItemType
+,B.UserDescription
+,MD.LongDescription
+,ROLENAME.attributeValue
+,WGNAME.attributeValue
+,B.Enterprise
+,INT(B.OPWGID)
+
+from @t_schema.BOOKMARK B 
+
+
+INNER JOIN @t_schema.Text USERNAME on
+    USERNAME.enterprise = :Enterprise
+AND USERNAME.entitytype = 'OP'
+AND USERNAME.entityid = :OPID
+AND USERNAME.attributecode = 'USERTOKEN'
+AND USERNAME.nlsid = 1
+AND USERNAME.ValFrom <= current timestamp
+AND current timestamp < USERNAME.ValTo 
+AND USERNAME.EffFrom <= current timestamp 
+AND current timestamp < USERNAME.EffTo
+
+-- Grab the OPID info across Enterprises 
+INNER JOIN @t_schema.Text OPID on
+    OPID.entitytype = 'OP'
+AND OPID.attributecode = 'USERTOKEN'
+AND OPID.nlsid = USERNAME.NLSID
+AND OPID.attributevalue = USERNAME.attributevalue
+AND OPID.ValFrom <= current timestamp
+AND current timestamp < OPID.ValTo 
+AND OPID.EffFrom <= current timestamp 
+AND current timestamp < OPID.EffTo
+
+inner join @t_schema.metadescription MD on
+    MD.enterprise = B.Enterprise
+AND MD.NLSID = USERNAME.NLSID
+AND MD.valto > current timestamp 
+AND MD.valfrom <= current timestamp 
+AND MD.effto > current timestamp 
+AND MD.efffrom <= current timestamp 
+AND MD.descriptionclass = B.ActionItemType
+AND MD.descriptiontype = B.ActionItemKey
+
+INNER JOIN @t_schema.Relator R on
+    R.enterprise = B.ENTERPRISE
+AND R.entitytype = 'OPWG'
+AND R.entity1type = 'WG'
+AND R.entity2type = 'OP'
+AND R.entityid = B.OPWGID
+AND R.ValFrom <= current timestamp
+AND current timestamp < R.ValTo 
+AND R.EffFrom <= current timestamp 
+AND current timestamp < R.EffTo
+
+INNER JOIN @t_schema.Text ROLENAME on
+    ROLENAME.enterprise = B.ENTERPRISE
+AND ROLENAME.entitytype = 'OPWG'
+AND ROLENAME.entityid = B.OPWGID
+AND ROLENAME.attributecode = 'NAME'
+AND ROLENAME.nlsid = USERNAME.NLSID
+AND ROLENAME.ValFrom <= current timestamp
+AND current timestamp < ROLENAME.ValTo 
+AND ROLENAME.EffFrom <= current timestamp 
+AND current timestamp < ROLENAME.EffTo
+
+INNER JOIN @t_schema.Text WGNAME on
+    WGNAME.enterprise = B.ENTERPRISE
+AND WGNAME.entitytype = 'WG'
+AND WGNAME.entityid = R.entity1id
+AND WGNAME.attributecode = 'NAME'
+AND WGNAME.nlsid = USERNAME.NLSID
+AND WGNAME.ValFrom <= current timestamp
+AND current timestamp < WGNAME.ValTo 
+AND WGNAME.EffFrom <= current timestamp 
+AND current timestamp < WGNAME.EffTo
+
+where
+    B.enterprise = OPID.Enterprise
+AND B.OPID = OPID.ENTITYID
+;
+@execute
+
+EXEC SQL OPEN sp_cursor1;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPID int
+in NLSID int
+@end
+
+
+
+
+

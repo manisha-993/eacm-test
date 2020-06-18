@@ -1,0 +1,253 @@
+@name=GBL9118
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+$Log: gbl9118.txt,v $
+Revision 1.12  2010/06/21 15:42:48  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.11  2009/02/26 08:53:37  yang
+*** empty log message ***
+
+Revision 1.10  2004/10/20 21:01:50  dave
+changes to gen parm
+
+
+Revision 1.9  2004/02/20 20:21:58  roger
+Must be @t_schema
+
+Revision 1.8  2004/02/20 18:09:38  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.7  2003/10/30 01:01:30  bala
+remove extra ;
+
+Revision 1.6  2003/10/30 01:00:54  bala
+Add column to check SUBSCRGROUPNOMAIL
+
+Revision 1.5  2003/10/28 18:30:35  bala
+add DISTINCT clause to suppress duplicates
+
+Revision 1.4  2003/09/05 22:12:08  bala
+commit AFTEr save
+
+Revision 1.3  2003/09/05 22:11:19  bala
+Add entityid column to return the operator entityid
+
+Revision 1.2  2003/08/12 16:27:38  dave
+change to the sp9118 to include do not mail join
+
+Revision 1.1  2003/08/12 16:08:10  dave
+new sp to get e-mail addresses starting from a DGEntity
+and following the subscription groups to a list of
+operators
+
+
+@desc=This guy return's email addresses for a dgentity w/ sub cats
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9118.txt,v 1.12 2010/06/21 15:42:48 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+
+WITH mySubs (EntityID, AttributeCode) AS
+(select distinct f2.entityid, 'CAT1' 
+from @t_schema.flag f1
+inner join @t_schema.flag f2 on
+    f2.enterprise = :Enterprise
+and f2.entitytype = 'SUB'
+and f2.attributecode = 'CAT1'
+and f2.attributevalue = f1.attributevalue
+and f2.valto = :forever
+and f2.effto > :now
+where
+    f1.enterprise = :Enterprise
+and f1.entitytype = 'DGENTITY'
+and f1.entityid = :DGEntityID
+and f1.attributecode = 'CAT1'
+and f1.valto = :forever
+and f1.effto > :now
+union
+select distinct f2.entityid, 'CAT2' 
+from @t_schema.flag f1
+inner join @t_schema.flag f2 on
+    f2.enterprise = :Enterprise
+and f2.entitytype = 'SUB'
+and f2.attributecode = 'CAT2'
+and f2.attributevalue = f1.attributevalue
+and f2.valto = :forever
+and f2.effto > :now
+where
+        f1.enterprise = :Enterprise
+and f1.entitytype = 'DGENTITY'
+and f1.entityid = :DGEntityID
+and f1.attributecode = 'CAT2'
+and f1.valto = :forever
+and f1.effto > :now
+union
+select distinct f2.entityid, 'CAT3'
+from @t_schema.flag f1
+inner join @t_schema.flag f2 on
+    f2.enterprise = :Enterprise
+and f2.entitytype = 'SUB'
+and f2.attributecode = 'CAT3'
+and f2.attributevalue = f1.attributevalue
+and f2.valto = :forever
+and f2.effto > :now
+where
+        f1.enterprise = :Enterprise
+and f1.entitytype = 'DGENTITY'
+and f1.entityid = :DGEntityID
+and f1.attributecode = 'CAT3'
+and f1.valto = :forever
+and f1.effto > :now
+union
+select distinct f2.entityid, 'CAT4' 
+from @t_schema.flag f1
+inner join @t_schema.flag f2 on
+    f2.enterprise = :Enterprise
+and f2.entitytype = 'SUB'
+and f2.attributecode = 'CAT4'
+and f2.attributevalue = f1.attributevalue
+and f2.valto = :forever
+and f2.effto > :now
+where
+        f1.enterprise = :Enterprise
+and f1.entitytype = 'DGENTITY'
+and f1.entityid = :DGEntityID
+and f1.attributecode = 'CAT4'
+and f1.valto = :forever
+and f1.effto > :now
+union
+select distinct f2.entityid, 'CAT5'
+from @t_schema.flag f1
+inner join @t_schema.flag f2 on
+    f2.enterprise = :Enterprise
+and f2.entitytype = 'SUB'
+and f2.attributecode = 'CAT5'
+and f2.attributevalue = f1.attributevalue
+and f2.valto = :forever
+and f2.effto > :now
+where
+        f1.enterprise = :Enterprise
+and f1.entitytype = 'DGENTITY'
+and f1.entityid = :DGEntityID
+and f1.attributecode = 'CAT5'
+and f1.valto = :forever
+and f1.effto > :now
+union
+select distinct f2.entityid, 'CAT6'
+from @t_schema.flag f1
+inner join @t_schema.flag f2 on
+    f2.enterprise = :Enterprise
+and f2.entitytype = 'SUB'
+and f2.attributecode = 'CAT6'
+and f2.attributevalue = f1.attributevalue
+and f2.valto = :forever
+and f2.effto > :now
+where
+        f1.enterprise = :Enterprise
+and f1.entitytype = 'DGENTITY'
+and f1.entityid = :DGEntityID
+and f1.attributecode = 'CAT6'
+and f1.valto = :forever
+and f1.effto > :now
+)
+--
+--  Now.. lets pull all the cats that we have for the given subscriptions
+--
+,mySubCats(EntityID, AttributeCode) AS 
+(select distinct f1.entityid, f1.AttributeCode
+from @t_schema.flag f1 
+where 
+    f1.enterprise = :Enterprise 
+and f1.EntityType = 'SUB'
+and f1.entityid in (select entityid from mySubs)
+and f1.attributecode in ('CAT1','CAT2','CAT3','CAT4','CAT5','CAT6')
+and f1.valto = :forever
+and f1.effto > :now
+)
+-- 
+-- o.k. if we have a SUB entityid in mySubCats that is not in mySubs.  That subscription
+-- does not count
+--
+,myOutCasts (EntityID) as 
+(select distinct sc.entityid 
+ from mySubCats sc 
+ left join mySubs s on
+     s.entityid = sc.entityid
+ and s.attributecode = sc.attributecode
+ where 
+     s.entityid is NULL
+ )
+ ,myFinalSubList (entityid) AS 
+ (select distinct s.entityid from mySubs s
+  left join myOutCasts oc on 
+    oc.entityid = s.entityid
+  where
+    oc.entityid is null
+ )
+ --  myFinalSubList now contains all the subs.. we simply join that with the 
+ --  flag table.. to find the operators that have subscribed to that group
+ --  we then look up all usertokens that will be the mail addresses.
+ 
+ select DISTINCT rtrim(t1.attributevalue),t1.entityid,
+ CASE f3.attributecode
+   WHEN 'SUBSCRGROUPNOMAIL'  THEN 'N'
+   ELSE 'Y' END AS SENDMAIL
+ from myFinalSubList sub
+ inner join @t_schema.flag f1 on
+     f1.enterprise = :Enterprise
+ and f1.entitytype = 'SUB'
+ and f1.entityid = sub.entityid
+ and f1.attributecode = 'SUBSCRGROUP'
+ and f1.valto = :forever
+ and f1.effto > :now
+ inner join @t_schema.flag f2 on
+     f2.enterprise = :Enterprise
+ and f2.entitytype = 'OP'
+ and f2.attributecode = 'SUBSCRGROUP'
+ and f2.attributevalue = f1.attributevalue
+ and f2.valto = :forever
+ and f2.effto > :now
+ inner join @t_schema.text t1 on
+     t1.enterprise = :Enterprise
+ and t1.entitytype = 'OP'
+ and t1.entityid = f2.entityid
+ and t1.attributecode = 'USERTOKEN'
+ and t1.nlsid = 1
+ and t1.valto = :forever
+ and t1.effto > :now
+ left join @t_schema.flag f3 on
+     f3.enterprise = :Enterprise
+ and f3.entitytype = 'OP'
+ and f3.entityid = f2.entityid
+ and f3.attributecode = 'SUBSCRGROUPNOMAIL'
+ and f3.attributevalue = f2.attributevalue
+ and f3.valto = '9999-12-31-00.00.00.000000'
+ and f3.effto > current timestamp
+ ;
+
+
+@execute
+
+// Now Send back the answer...
+
+EXEC SQL OPEN sp_cursor1;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in DGEntityID int
+@end
+
+

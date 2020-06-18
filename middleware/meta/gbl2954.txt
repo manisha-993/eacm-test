@@ -1,0 +1,108 @@
+@name=GBL2954
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------
+--  This guy inserts all the low order entities from
+--  the stuff in a Nav table
+--  That are parent entities.. given a Relator Type
+----------------------------------------------------------------------
+$Log: gbl2954.txt,v $
+Revision 1.6  2010/06/21 15:42:39  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.5  2006/06/15 20:59:46  dave
+tracing
+
+Revision 1.4  2004/11/03 18:59:25  dave
+trace for entityitem not found
+
+Revision 1.3  2004/10/29 18:58:06  dave
+closing in
+
+Revision 1.2  2004/10/29 18:29:34  dave
+sp change
+
+Revision 1.1  2004/10/29 17:36:55  dave
+attempting to block move data for relator grabber
+
+
+@desc=Return all entity ids for low order entities related to the passed entity through the relatortype
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2954.txt,v 1.6 2010/06/21 15:42:39 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT DISTINCT
+  Entity2Type
+, Entity2ID
+FROM @t_schema.trsNavigate N
+WHERE
+N.Enterprise = :Enterprise AND
+N.SessionID = :NextSessionID AND
+N.Level = 0
+ORDER BY Entity2ID
+;
+@execute
+//
+// This guy moves the children of the entitie into the queue table
+//
+EXEC SQL
+INSERT INTO @t_schema.trsNavigate
+SELECT DISTINCT
+ :Enterprise
+,:NextSessionID
+,:ActionType
+,'Search'
+,0
+,0
+,'X'
+,'X'
+,R.Entity1Type
+,R.Entity1ID
+,R.EntityType
+,R.EntityID
+,R.Entity2Type
+,R.Entity2ID
+,:now
+,:forever
+FROM opicm.trsNavigate N
+JOIN @t_schema.Relator R ON
+    R.Enterprise = :Enterprise
+AND R.Entity1Type = N.Entity2Type
+AND R.Entity1ID = N.Entity2ID
+AND R.EntityType = :RelatorType
+AND R.Valfrom < :ValOn AND :ValOn < R.ValTo
+AND R.Efffrom < :EffOn AND :EffOn < R.EffTo
+WHERE
+    N.SessionID = :PriorSessionID
+AND N.Level = 0
+AND N.Enterprise = :Enterprise
+;
+
+//
+// Lets remove the old
+EXEC SQL
+DELETE FROM @t_schema.trsNavigate where Enterprise = :Enterprise and SessionID = :PriorSessionID and level > -1;
+
+EXEC SQL COMMIT WORK;
+
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in OPWGID int
+in PriorSessionID int
+in NextSessionID int
+in Enterprise varchar(16)
+in ActionType varchar(32)
+in RelatorType varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

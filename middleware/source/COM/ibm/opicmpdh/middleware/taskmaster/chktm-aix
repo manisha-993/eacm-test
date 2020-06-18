@@ -1,0 +1,26 @@
+#!/bin/sh
+
+#
+# $Log: chktm-aix,v $
+# Revision 1.2  2002/10/17 18:39:04  roger
+# Simplify
+#
+# Revision 1.1  2002/10/17 18:37:06  roger
+# Renamed
+#
+# Revision 1.1  2002/10/15 16:38:10  roger
+# New file
+#
+#
+
+#
+# This script looks at pid files and shows TaskMaster processes
+#
+
+if [ -f rmiregistry.pid ]; then
+  ps `cat rmiregistry.pid`
+fi
+
+if [ -f rmid.pid ]; then
+  ps `cat rmid.pid`
+fi

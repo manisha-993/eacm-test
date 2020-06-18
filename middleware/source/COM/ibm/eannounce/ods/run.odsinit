@@ -1,0 +1,28 @@
+#
+# $Log: run.odsinit,v $
+# Revision 1.2  2003/12/10 21:00:43  dave
+# added script files and tagging to eccmods
+#
+#
+
+#
+# this tells the DB2 client that we want NO codepage conversion from database (1208 = UTF8)
+#
+export DB2CODEPAGE=1208
+
+#JDK_CLASSES="/usr/java_dev2/jre/lib/rt.jar"
+JDK_CLASSES=""
+#DB2_JAVA_CLASSES="/home/opicmdb2/sqllib/java/db2java.zip"
+DB2_JAVA_CLASSES=""
+DB2_JAVA_CLASSES="/home/$DB2INSTANCE/sqllib/java/db2java.zip"
+OTHER_CLASSES="./cwa.jar:./ibmjndi.jar:./jndi.jar:./jcert.jar:./jnet.jar:./jsse.jar"
+JAVA_OPTIONS="-ms128M -mx256M -Xss32M -D\"java.naming.factory.initial=com.ibm.jndi.LDAPCtxFactory\""
+JAVA_COMMAND="java"
+CURRENT_REPORT="./init.out"
+CURRENT_ERROR="./init.err"
+MAIN_CLASS="COM/ibm/eannounce/ods/ODSInit"
+JAR_FILE="middleware.jar"
+echo $JAVA_COMMAND  $JAVA_OPTIONS -classpath $JAR_FILE:$DB2_JAVA_CLASSES:$OTHER_CLASSES:$JDK_CLASSES $MAIN_CLASS $1 $2 $3 $4 $5  1>$CURRENT_REPORT 2>$CURRENT_ERROR 
+$JAVA_COMMAND  $JAVA_OPTIONS -classpath $JAR_FILE:$DB2_JAVA_CLASSES:$OTHER_CLASSES:$JDK_CLASSES $MAIN_CLASS $1 $2 $3 $4 $5  1>>$CURRENT_REPORT 2>>$CURRENT_ERROR
+
+

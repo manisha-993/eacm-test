@@ -1,0 +1,156 @@
+@name=GBL8108
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+This guy tells you all the entityid that changed for a giveni entity and nothing more..
+This is the simple version of GBL8104.  It should work for both entities and relators
+
+This will return.. OFF/ON style answers.
+
+$Log: gbl8108.txt,v $
+Revision 1.4  2010/06/21 15:42:37  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.3  2008/09/19 06:32:48  yang
+*** empty log message ***
+
+Revision 1.2  2005/05/26 07:44:19  dave
+SP cleanup
+
+Revision 1.1  2005/05/26 07:20:10  dave
+new SP and introduction of the Catalog Object
+
+
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8108.txt,v 1.4 2010/06/21 15:42:37 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+// O.K.. lets first see what has changed given a role and a target entityType
+
+EXEC SQL 
+INSERT INTO opicm.trsNetterAtts
+Select  DISTINCT 
+:SessionID, 
+T.EntityID,
+T.EntityType,
+T.Enterprise
+FROM opicm.Textx T
+INNER JOIN opicm.metalinkattr MLA ON
+    MLA.Enterprise  = :Enterprise
+AND RTRIM(MLA.LinkType) = 'Role/Attribute'
+AND RTRIM(MLA.LinkType1) = :RoleCode
+AND MLA.LinkType2 = T.AttributeCode
+AND MLA.ValTo > current timestamp
+AND MLA.EffTo > Current TimeStamp
+WHERE
+    T.Enterprise = :Enterprise
+AND T.EntityType = :EntityType
+AND T.ValFrom Between :StartDate AND :EndDate
+UNION 
+Select  DISTINCT 
+:SessionID, 
+T.EntityID,
+T.EntityType,
+T.Enterprise
+FROM opicm.Flagx T
+INNER JOIN opicm.metalinkattr MLA ON
+    MLA.Enterprise  = :Enterprise
+AND RTRIM(MLA.LinkType) = 'Role/Attribute'
+AND RTRIM(MLA.LinkType1) = :RoleCode
+AND MLA.LinkType2 = T.AttributeCode
+AND MLA.ValTo > current timestamp
+AND MLA.EffTo > Current TimeStamp
+WHERE
+    T.Enterprise = :Enterprise
+AND T.EntityType = :EntityType
+AND T.ValFrom Between :StartDate AND :EndDate
+UNION 
+Select  DISTINCT 
+:SessionID, 
+T.EntityID,
+T.EntityType,
+T.Enterprise
+FROM opicm.LongTextx T
+INNER JOIN opicm.metalinkattr MLA ON
+    MLA.Enterprise  = :Enterprise
+AND RTRIM(MLA.LinkType) = 'Role/Attribute'
+AND RTRIM(MLA.LinkType1) = :RoleCode
+AND MLA.LinkType2 = T.AttributeCode
+AND MLA.ValTo > current timestamp
+AND MLA.EffTo > Current TimeStamp
+WHERE
+    T.Enterprise = :Enterprise
+AND T.EntityType = :EntityType
+AND T.ValFrom Between :StartDate AND :EndDate
+UNION
+Select  DISTINCT 
+:SessionID, 
+T.EntityID,
+T.EntityType,
+T.Enterprise
+FROM opicm.Blobx T
+INNER JOIN opicm.metalinkattr MLA ON
+    MLA.Enterprise  = :Enterprise
+AND RTRIM(MLA.LinkType) = 'Role/Attribute'
+AND RTRIM(MLA.LinkType1) = :RoleCode
+AND MLA.LinkType2 = T.AttributeCode
+AND MLA.ValTo > current timestamp
+AND MLA.EffTo > Current TimeStamp
+WHERE
+    T.Enterprise = :Enterprise
+AND T.EntityType = :EntityType
+AND T.ValFrom Between :StartDate AND :EndDate
+;
+
+EXEC SQL COMMIT WORK;
+
+//
+// O.K.. lets kick back a result set that gives us 
+// a nice laundry list of  entityID
+// changes only
+//
+EXEC SQL DECLARE c1 CURSOR FOR
+SELECT DISTINCT
+EX.EntityID
+,EX.VALFROM
+,CASE WHEN EX.VALTO < :EndDate OR EX.EFFTO < :EndDate THEN 0 ELSE 1 END
+from opicm.trsNetterAtts NA
+INNER JOIN  opicm.EntityX EX ON
+    EX.Enterprise = :Enterprise
+AND EX.EntityType = :EntityType
+AND EX.EntityID = NA.EntityID
+AND EX.Valfrom between :StartDate AND :EndDate
+UNION
+SELECT DISTINCT 
+RX.EntityID
+,RX.VALFROM
+,CASE WHEN RX.VALTO < :EndDate OR RX.EFFTO < :EndDate THEN 0 ELSE 1 END
+from opicm.trsNetterAtts NA
+INNER JOIN opicm.RelatorX RX ON
+    RX.Enterprise = :Enterprise
+AND RX.EntityType = :EntityType
+AND RX.EntityID = NA.EntityID
+AND RX.Valfrom between :StartDate AND :EndDate
+Order by 1,2,3
+;
+
+@execute
+
+EXEC SQL OPEN C1;
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in RoleCode varchar(16)
+in EntityType varchar(32)
+in StartDate varchar(26)
+in EndDate varchar(26)
+@end
+
+

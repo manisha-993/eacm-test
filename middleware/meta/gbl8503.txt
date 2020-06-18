@@ -1,0 +1,57 @@
+@name=GBL8503
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+-- Retrieve a WW Prod Compatibility Record from the CatDB
+--------------------------------------------------------------------------------------------
+$Log: gbl8503.txt,v $
+Revision 1.5  2010/06/21 15:42:48  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.4  2007/01/30 21:39:37  rick
+Adding os_fc to primary key.
+
+Revision 1.3  2005/09/26 20:04:07  joan
+fix compile
+
+Revision 1.2  2005/09/26 18:07:09  joan
+fix compile
+
+Revision 1.1  2005/09/26 16:21:49  joan
+initial load
+
+
+
+@desc=Retrieve a WW Prod Compatibility Record from the CatDB table
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8503.txt,v 1.5 2010/06/21 15:42:48 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+WWPRODENTITYTYPEFROM
+,WWPRODENTITYIDFROM
+,WWPRODENTITYTYPETO
+,WWPRODENTITYIDTO
+,OS_FC
+FROM gbli.WWPRODCOMPAT
+WHERE
+    Enterprise = :Enterprise
+AND WWProdEntityTypeFrom = :ProdEntityTypeFrom
+AND WWProdEntityIDFrom = :ProdEntityIDFrom
+AND COUNTRYLIST = :CountryList
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in ProdEntityTypeFrom varchar(32)
+in ProdEntityIDFrom int
+in CountryList varchar(8)
+@end

@@ -1,0 +1,65 @@
+db2 connect to opicmpdh
+
+db2 "import from /dev/null of del replace into opicm.trsnavigate"
+
+
+########db2 reorg table OPICM.BLOB index OPICM.BLOB_PK use TEMPSPACE1
+db2 runstats on table OPICM.BLOB with distribution and detailed indexes all
+db2 reorg table OPICM.BLOBX index OPICM.BLOBX_PH use TEMPSPACE1
+db2 runstats on table OPICM.BLOBX with distribution and detailed indexes all
+db2 reorg table OPICM.BOOKMARK index OPICM.BOOKMARK_PK use TEMPSPACE1
+db2 runstats on table OPICM.BOOKMARK with distribution and detailed indexes all
+db2 reorg table OPICM.DYNASEARCH index OPICM.DYNASEARCH_PK use TEMPSPACE1
+db2 runstats on table OPICM.DYNASEARCH with distribution and detailed indexes all
+db2 reorg table OPICM.ENTITY index OPICM.ENTITY_PK use TEMPSPACE1
+db2 runstats on table OPICM.ENTITY with distribution and detailed indexes all
+db2 reorg table OPICM.ENTITYX index OPICM.ENTITYX_PK use TEMPSPACE1
+db2 runstats on table OPICM.ENTITYX with distribution and detailed indexes all
+db2 reorg table OPICM.FLAG index OPICM.FLAG_PK use TEMPSPACE1
+db2 runstats on table OPICM.FLAG with distribution and detailed indexes all
+db2 reorg table OPICM.FLAGX index OPICM.FLAGX_PK use TEMPSPACE1
+db2 runstats on table OPICM.FLAGX with distribution and detailed indexes all
+db2 reorg table OPICM.LONGTEXT index OPICM.LONGTEXT_PK use TEMPSPACE1
+db2 runstats on table OPICM.LONGTEXT with distribution and detailed indexes all
+db2 reorg table OPICM.LONGTEXTX index OPICM.LONGTEXTX_PK use TEMPSPACE1
+db2 runstats on table OPICM.LONGTEXTX with distribution and detailed indexes all
+db2 reorg table OPICM.METACOLORDER index OPICM.METACOLORDER_PK use TEMPSPACE1
+db2 runstats on table OPICM.METACOLORDER with distribution and detailed indexes all
+db2 reorg table OPICM.METADESCRIPTION index OPICM.METADESCRIPTION_PK use TEMPSPACE1
+db2 runstats on table OPICM.METADESCRIPTION with distribution and detailed indexes all
+db2 reorg table OPICM.METAENTITY index OPICM.METAENTITY_PK use TEMPSPACE1
+db2 runstats on table OPICM.METAENTITY with distribution and detailed indexes all
+db2 reorg table OPICM.METAHELP index OPICM.METAHELP_PK use TEMPSPACE1
+db2 runstats on table OPICM.METAHELP with distribution and detailed indexes all
+db2 reorg table OPICM.METALINKATTR index OPICM.METALINKATTR_PK use TEMPSPACE1
+db2 runstats on table OPICM.METALINKATTR with distribution and detailed indexes all
+db2 reorg table OPICM.METATRANSITION index OPICM.METATRANSITION_PK use TEMPSPACE1
+db2 runstats on table OPICM.METATRANSITION with distribution and detailed indexes all
+db2 reorg table OPICM.NEXTID index OPICM.NEXTID_PK use TEMPSPACE1
+db2 runstats on table OPICM.NEXTID with distribution and detailed indexes all
+db2 reorg table OPICM.QUEUE index OPICM.QUEUE_PK use TEMPSPACE1
+db2 runstats on table OPICM.QUEUE with distribution and detailed indexes all
+db2 reorg table OPICM.RELATOR index OPICM.RELATOR_PK use TEMPSPACE1
+db2 runstats on table OPICM.RELATOR with distribution and detailed indexes all
+db2 reorg table OPICM.RELATORX index OPICM.RELATORX_PK use TEMPSPACE1
+db2 runstats on table OPICM.RELATORX with distribution and detailed indexes all
+db2 reorg table OPICM.SESSIONTAGS index OPICM.SESSIONTAGS_PK use TEMPSPACE1
+db2 runstats on table OPICM.SESSIONTAGS with distribution and detailed indexes all
+db2 reorg table OPICM.SOFTLOCK index OPICM.SOFTLOCK_PK use TEMPSPACE1
+db2 runstats on table OPICM.SOFTLOCK with distribution and detailed indexes all
+db2 reorg table OPICM.TEXT index OPICM.TEXT_PK use TEMPSPACE1
+db2 runstats on table OPICM.TEXT with distribution and detailed indexes all
+db2 reorg table OPICM.TEXTX index OPICM.TEXTX_PK use TEMPSPACE1
+db2 runstats on table OPICM.TEXTX with distribution and detailed indexes all
+db2 reorg table OPICM.TRSENTITIES index OPICM.TRSENTITIES_PK use TEMPSPACE1
+db2 runstats on table OPICM.TRSENTITIES with distribution and detailed indexes all
+db2 reorg table OPICM.TRSENTITY index OPICM.TRSENTITY_PK use TEMPSPACE1
+db2 runstats on table OPICM.TRSENTITY with distribution and detailed indexes all
+db2 reorg table OPICM.TRSNAVIGATE use TEMPSPACE1
+db2 runstats on table OPICM.TRSNAVIGATE and detailed indexes all
+db2 reorg table OPICM.TRSWATCHDOG use TEMPSPACE1
+db2 runstats on table OPICM.TRSWATCHDOG with distribution and detailed indexes all
+
+./rebind opicmpdh
+
+db2 terminate

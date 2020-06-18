@@ -1,0 +1,94 @@
+echo Starting $0 `date`
+
+#
+# $Id: run.re-name,v 1.5 2003/10/30 17:17:16 roger Exp $
+#
+
+#
+# settings
+#
+DATABASE="idlpdh"
+ENTERPRISE="L2"
+JOB="/tmp/jobfile"
+OUTPUT="out.re-name."`date +"%Y%m%d%H%M%S"`
+RUNDATETIME=`date +"%Y-%m-%d-%H.%M.%S.000000"`
+
+echo Output to $OUTPUT
+
+cat > $JOB << EOF
+--#COMMENT
+--#COMMENT $Id: run.re-name,v 1.5 2003/10/30 17:17:16 roger Exp $
+--#COMMENT
+
+--#COMMENT
+--#COMMENT provide count of text rows which have attributecode = 'NAME' 
+--#COMMENT
+
+select
+count(*) as count
+from opicm.text t
+where
+    t.enterprise = '$ENTERPRISE'
+and t.entitytype in ('LSCC','LSWWCC')
+and t.attributecode = 'NAME'
+and t.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.valto and t.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.effto;
+
+--#COMMENT
+--#COMMENT provide count of text rows which have attributecode = 'LSCRGLOBALREPTITLE'
+--#COMMENT
+
+select
+count(*) as count
+from opicm.text t
+where
+    t.enterprise = '$ENTERPRISE'
+and t.entitytype in ('LSCC','LSWWCC')
+and t.attributecode = 'LSCRGLOBALREPTITLE'
+and t.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.valto and t.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.effto;
+
+--#COMMENT
+--#COMMENT restate text rows to new attributecode 'LSCRGLOBALREPTITLE'
+--#COMMENT
+
+update opicm.text t
+set t.attributecode = 'LSCRGLOBALREPTITLE'
+where 
+    t.enterprise = '$ENTERPRISE'
+and t.entitytype in ('LSCC','LSWWCC')
+and t.attributecode = 'NAME'
+and t.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.valto and t.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.effto;
+
+--#COMMENT
+--#COMMENT provide count of text rows which have attributecode = 'NAME' 
+--#COMMENT
+
+select
+count(*) as count
+from opicm.text t
+where
+    t.enterprise = '$ENTERPRISE'
+and t.entitytype in ('LSCC','LSWWCC')
+and t.attributecode = 'NAME'
+and t.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.valto and t.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.effto;
+
+--#COMMENT
+--#COMMENT provide count of text rows which have attributecode = 'LSCRGLOBALREPTITLE'
+--#COMMENT
+
+select
+count(*) as count
+from opicm.text t
+where
+    t.enterprise = '$ENTERPRISE'
+and t.entitytype in ('LSCC','LSWWCC')
+and t.attributecode = 'LSCRGLOBALREPTITLE'
+and t.valfrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.valto and t.efffrom <= '$RUNDATETIME' and '$RUNDATETIME' < t.effto;
+
+EOF
+
+db2batch -d $DATABASE -f $JOB -r $OUTPUT
+rm $JOB
+
+echo Ending $0 `date`
+
+

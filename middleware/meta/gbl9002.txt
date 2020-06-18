@@ -1,0 +1,134 @@
+@name=GBL9002
+@type=basic
+@dbase=opicmpdh
+@noremote=true
+
+@narrative
+
+Pulls all attributes for a given entitytype,entityid in the trsnavigate Table for a sessionid
+Used for ODS engine
+
+$Log: gbl9002.txt,v $
+Revision 1.8  2010/06/21 15:43:10  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2004/10/20 21:01:50  dave
+changes to gen parm
+
+Revision 1.6  2004/03/03 01:16:45  gregg
+"put back" to old way.  GBL9006 now handles 'turned-off' attributes as well.
+
+Revision 1.5  2004/03/03 00:48:29  gregg
+order by AttribtueCode, ValFrom
+
+Revision 1.4  2004/03/03 00:34:48  gregg
+changes for 'turned-off' attributes
+
+Revision 1.3  2004/02/20 20:21:58  roger
+Must be @t_schema
+
+Revision 1.2  2004/02/20 18:09:38  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.1  2003/01/23 23:35:39  dave
+ODS engine SP's
+
+
+@desc=Pulls all attributes for a given entitytype,entityid in the trsnavigate Table for a sessionid
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+
+char brand[80] = "$Id: gbl9002.txt,v 1.8 2010/06/21 15:43:10 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR 
+SELECT
+ RTRIM(T.EntityType)  as EntityType
+,T.EntityID  as EntityID
+,RTRIM(T.AttributeCode) as AttributeCode
+,T.NLSID as NLSID
+,RTRIM(T.AttributeValue) as AttributeValue
+,T.EffFrom as EffFrom
+,T.EffTo as EffTo
+FROM @t_schema.trsNavigate N
+INNER JOIN @t_schema.Text T ON
+    T.Enterprise = :Enterprise
+AND T.EntityType = N.EntityType
+AND T.EntityID = N.EntityID
+AND T.ValFrom <= :ValOn AND :ValOn <= T.ValTo AND T.EffFrom <= :EffOn AND :EffOn <= T.EffTo
+WHERE
+    N.SessionID = :SessionID
+UNION ALL
+SELECT
+ RTRIM(F.EntityType)
+,F.EntityID
+,RTRIM(F.AttributeCode) as AttributeCode
+,1
+,RTRIM(F.AttributeValue)
+,F.EffFrom
+,F.EffTo
+FROM @t_schema.trsNavigate N
+INNER JOIN @t_schema.Flag F ON
+    F.Enterprise = :Enterprise
+AND F.EntityType = N.EntityType
+AND F.EntityID = N.EntityID
+AND F.ValFrom <= :ValOn AND :ValOn <= F.ValTo AND F.EffFrom <= :EffOn AND :EffOn <= F.EffTo
+WHERE
+    N.SessionID = :SessionID
+UNION ALL
+SELECT
+ RTRIM(T.EntityType)
+,T.EntityID
+,RTRIM(T.AttributeCode) as AttributeCode
+,T.NLSID
+,T.AttributeValue
+,T.EffFrom
+,T.EffTo
+FROM @t_schema.trsNavigate N
+INNER JOIN @t_schema.LongText T ON
+    T.Enterprise = :Enterprise
+AND T.EntityType = N.EntityType
+AND T.EntityID = N.EntityID
+AND T.ValFrom <= :ValOn AND :ValOn <= T.ValTo AND T.EffFrom <= :EffOn AND :EffOn <= T.EffTo
+WHERE
+    N.SessionID = :SessionID
+UNION ALL
+SELECT
+ RTRIM(B.EntityType)
+,B.EntityID
+,RTRIM(B.AttributeCode) as AttributeCode
+,B.NLSID
+,B.BlobExtension
+,B.EffFrom
+,B.EffTo
+FROM @t_schema.trsNavigate N
+INNER JOIN @t_schema.Blob B ON
+    B.Enterprise = :Enterprise
+AND B.EntityType = N.EntityType
+AND B.EntityID = N.EntityID
+AND B.ValFrom <= :ValOn AND :ValOn <= B.ValTo AND B.EffFrom <= :EffOn AND :EffOn <= B.EffTo
+WHERE
+    N.SessionID = :SessionID
+;
+
+@execute
+
+//
+// Pull the records here...
+//
+
+EXEC SQL OPEN sp_cursor1;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in SessionID int
+in ValOn varchar(27)
+in EffOn varchar(27)
+@end
+
+

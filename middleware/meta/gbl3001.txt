@@ -1,0 +1,212 @@
+@name=GBL3001
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+--------------------------------------------------------------------------
+--  This guy Inserts a new ID/NAME record in the Text table 
+--  for a given Relator, and deactivates any old ID/Name info
+--  It posts to both the Text and Textx tables
+--------------------------------------------------------------------------
+$Log: gbl3001.txt,v $
+Revision 1.18  2010/06/21 15:42:41  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.17  2004/10/20 21:01:41  dave
+changes to gen parm
+
+Revision 1.16  2004/02/20 20:21:51  roger
+Must be @t_schema
+
+Revision 1.15  2004/02/20 18:09:31  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.14  2003/08/05 20:45:19  joan
+put back set NAME and ID for fb51601
+
+Revision 1.11  2001/07/27 06:35:26  roger
+Added log
+
+@desc=Creates ID/Name attributes for a relator (given its curret parent/child)
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl3001.txt,v 1.18 2010/06/21 15:42:41 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+// First close them out 
+EXEC SQL 
+  UPDATE @t_schema.Text 
+  SET VALTO = :now 
+  WHERE 
+      Enterprise = :Enterprise
+  AND EntityType = :EntityType
+  AND EntityID = :EntityID
+  AND ValTo = :forever
+  AND AttributeCode in ('NAME','ID')
+;
+
+EXEC SQL 
+  UPDATE @t_schema.Textx 
+  SET VALTO = :now 
+  WHERE 
+      Enterprise = :Enterprise
+  AND EntityType = :EntityType
+  AND EntityID = :EntityID
+  AND ValTo = :forever
+  AND AttributeCode in ('NAME','ID')
+;
+
+// Insert the new NAME Attribute into the text record
+EXEC SQL
+  INSERT INTO @t_schema.Text 
+   (Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,NLSID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    ,TRANID
+   )
+  (SELECT
+   :Enterprise
+  ,:EntityType
+  ,:EntityID
+  ,'NAME'
+  ,COALESCE(RTRIM(T1.Attributevalue),R.Entity1Type) || ' --> ' || COALESCE(RTRIM(T2.AttributeValue),R.Entity2Type)
+  ,1
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    ,:TRANID
+     FROM @t_schema.Relator R
+   LEFT JOIN @t_schema.Text T1 ON
+       T1.Enterprise = :Enterprise
+   AND T1.EntityType = R.Entity1Type
+   AND T1.EntityID = R.Entity1ID
+   AND T1.AttributeCode = 'NAME'
+   AND T1.NLSID = 1
+   AND T1.Valfrom <= :now AND :now < T1.ValTo AND T1.Efffrom <= :now AND :now < T1.EffTo 
+   LEFT JOIN @t_schema.Text T2 ON
+       T2.Enterprise = :Enterprise
+   AND T2.EntityType = R.Entity2Type
+   AND T2.EntityID = R.Entity2ID
+   AND T2.AttributeCode = 'NAME'
+   AND T2.NLSID = 1
+   AND T2.Valfrom <= :now AND :now < T2.ValTo AND T2.Efffrom <= :now AND :now < T2.EffTo 
+   WHERE 
+       R.Enterprise = :Enterprise
+     AND R.EntityType = :EntityType
+     AND R.EntityID = :EntityID
+     AND R.Valfrom <= :now AND :now < R.ValTo AND R.Efffrom <= :now AND :now < R.EffTo)         
+;
+
+// The textx table
+EXEC SQL
+  INSERT INTO @t_schema.TextX 
+   (Enterprise
+    ,EntityType
+    ,EntityID
+    ,AttributeCode
+    ,AttributeValue
+    ,NLSID
+    ,ValFrom
+    ,ValTo
+    ,EffFrom
+    ,EffTo
+    ,OPENID
+    ,TRANID
+   )
+  (SELECT
+   :Enterprise
+  ,:EntityType
+  ,:EntityID
+  ,'NAME'
+  ,COALESCE(RTRIM(T1.Attributevalue),R.Entity1Type) || ' --> ' || COALESCE(RTRIM(T2.AttributeValue),R.Entity2Type)
+  ,1
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    ,:TRANID
+     FROM @t_schema.Relator R
+   LEFT JOIN @t_schema.Text T1 ON
+       T1.Enterprise = :Enterprise
+   AND T1.EntityType = R.Entity1Type
+   AND T1.EntityID = R.Entity1ID
+   AND T1.AttributeCode = 'NAME'
+   AND T1.NLSID = 1
+   AND T1.Valfrom <= :now AND :now < T1.ValTo AND T1.Efffrom <= :now AND :now < T1.EffTo 
+   LEFT JOIN @t_schema.Text T2 ON
+       T2.Enterprise = :Enterprise
+   AND T2.EntityType = R.Entity2Type
+   AND T2.EntityID = R.Entity2ID
+   AND T2.AttributeCode = 'NAME'
+   AND T2.NLSID = 1
+   AND T2.Valfrom <= :now AND :now < T2.ValTo AND T2.Efffrom <= :now AND :now < T2.EffTo 
+   WHERE 
+       R.Enterprise = :Enterprise
+     AND R.EntityType = :EntityType
+     AND R.EntityID = :EntityID
+     AND R.Valfrom <= :now AND :now < R.ValTo AND R.Efffrom <= :now AND :now < R.EffTo)         
+;
+
+// Now the ID Attribute
+EXEC SQL
+  INSERT INTO @t_schema.Text
+  VALUES(
+  :Enterprise
+  ,:EntityType
+  ,:EntityID
+  ,'ID'
+  , :now CONCAT ' ' CONCAT CHAR(:OPENID)
+    ,1
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    ,:TRANID
+    )           
+;
+// Now the ID Attribute for the TextX
+EXEC SQL
+  INSERT INTO @t_schema.TextX 
+  VALUES(
+  :Enterprise
+  ,:EntityType
+  ,:EntityID
+  ,'ID'
+  , :now CONCAT ' ' CONCAT CHAR(:OPENID)
+    ,1
+    ,:now
+    ,:forever
+    ,:now
+    ,:forever
+    ,:OPENID
+    ,:TRANID
+    )           
+;
+@execute
+EXEC SQL COMMIT WORK;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPENID int
+in EntityType varchar(32)
+in EntityID int
+in TRANID int
+@end
+
+

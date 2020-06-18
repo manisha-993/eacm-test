@@ -1,0 +1,82 @@
+@name=PSG0001
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------------------------------------
+--  PSG query for MTM search report and solution search report
+----------------------------------------------------------------------------------------------------
+$Log: PSG0001.txt,v $
+Revision 1.13  2010/06/21 15:42:39  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.12  2005/01/28 18:21:33  dave
+changing to general parm
+
+Revision 1.11  2004/02/20 20:21:43  roger
+Must be @t_schema
+
+Revision 1.10  2004/02/20 18:09:22  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.9  2004/02/19 21:57:07  joan
+no more Role/Entity
+
+Revision 1.8  2004/02/06 16:42:32  joan
+bring it back from v1.0
+
+Revision 1.6  2001/07/21 04:02:07  roger
+Change MetaLinkAttribute to MetaLinkAttr
+Change "opicm" to @t_schema in some
+
+Revision 1.5  2001/03/26 15:39:39  roger
+Misc clean up
+
+Revision 1.4  2001/03/17 04:47:08  roger
+Misc clean up
+
+Revision 1.3  2001/03/16 18:27:46  roger
+Added branding feature to stored procedures
+
+Revision 1.2  2001/03/16 03:38:52  roger
+Added Log keyword
+
+@desc=For MTM search report and solution search report
+@fenced=true
+@parmstyle=GENERAL
+@results=1
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: PSG0001.txt,v 1.13 2010/06/21 15:42:39 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  T.EntityID
+, T.ValFrom
+, T.ValTo
+, T.EffFrom
+, T.EffTo
+, T.NLSID
+FROM @t_schema.Text T
+WHERE
+T.Enterprise = :Enterprise AND
+T.NLSID IN (1, :NLSID) AND
+T.EntityType = :EntityType AND
+T.AttributeCode = :AttributeCode AND
+T.AttributeValue = :AttributeValue AND
+T.ValTo = :forever
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(8)
+in EntityType varchar(32)
+in AttributeCode varchar(32)
+in AttributeValue varchar(254)
+in OPENID int
+in NLSID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end

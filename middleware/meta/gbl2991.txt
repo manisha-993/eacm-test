@@ -1,0 +1,89 @@
+@name=GBL2991
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+------------------------------------------------------------------------------------------------------------
+-- Get the Relator ID of a specified relator type by enterprise/relatortype/entity1type+id/entity2type+id
+-- This is Role Sensitive... You should be able to see the entity/Relator to get the ID
+------------------------------------------------------------------------------------------------------------
+$Log: gbl2991.txt,v $
+Revision 1.14  2010/06/21 15:42:41  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.13  2004/10/20 21:01:41  dave
+changes to gen parm
+
+Revision 1.12  2004/02/20 20:21:51  roger
+Must be @t_schema
+
+Revision 1.11  2004/02/20 18:09:31  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.10  2003/09/08 16:31:12  roger
+Enterprise was changed to 16 char length
+
+Revision 1.9  2003/04/28 21:10:01  dave
+more Entity/Role removal logic
+
+Revision 1.8  2001/11/05 20:28:42  dave
+fix to SP to not be role sensitive on dup check
+
+Revision 1.7  2001/10/11 22:37:24  dave
+run 'S' inserts
+
+Revision 1.6  2001/07/21 04:02:13  roger
+Change MetaLinkAttribute to MetaLinkAttr
+Change "opicm" to @t_schema in some
+
+Revision 1.5  2001/03/21 22:12:35  roger
+Renamed GBL####A to GBL####
+
+Revision 1.4  2001/03/21 21:16:40  roger
+Make the GBL####A SPs named GBL####
+
+Revision 1.3  2001/03/16 18:27:55  roger
+Added branding feature to stored procedures
+
+Revision 1.2  2001/03/16 03:38:59  roger
+Added Log keyword
+
+@desc=Get relator id of specified relator by enterprise/relatortype/entity1type+id/entity2type+id
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2991.txt,v 1.14 2010/06/21 15:42:41 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  R.EntityID
+, R.EffFrom
+FROM @t_schema.Relator R
+WHERE
+R.Enterprise = :Enterprise AND
+R.EntityType = :EntityType AND
+R.Entity1Type = :Entity1Type AND
+R.Entity1ID = :Entity1ID AND
+R.Entity2Type = :Entity2Type AND
+R.Entity2ID = :Entity2ID AND
+R.ValFrom <= :ValOn AND :ValOn < R.ValTo AND R.EffFrom <= :EffOn AND :EffOn < R.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in Entity1Type varchar(32)
+in Entity1ID int
+in Entity2Type varchar(32)
+in Entity2ID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

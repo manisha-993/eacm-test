@@ -1,0 +1,53 @@
+@name=GBL0006
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+Rule51:
+is this a rule 51 entitytype?
+--------------------------------------------------------------------------------------------
+$Log: gbl0006.txt,v $
+Revision 1.1  2005/01/31 18:30:42  gregg
+gbl0004 now gbl0006
+
+Revision 1.3  2005/01/20 22:20:55  gregg
+desc
+
+Revision 1.2  2005/01/20 22:20:24  gregg
+phix
+
+Revision 1.1  2005/01/20 21:08:51  gregg
+more rule51
+
+
+
+
+@desc=Rule51:is this a rule 51 entitytype?
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0006.txt,v 1.1 2005/01/31 18:30:42 gregg Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+
+SELECT * FROM
+@schema.MetaLinkAttr
+MLA
+
+WHERE
+MLA.Enterprise =  :Enterprise
+AND MLA.linktype = 'Entity/Group' 
+AND MLA.linkcode = 'Rule51'
+AND MLA.linktype1 = :EntityType
+AND MLA.ValFrom <= :now AND :now < MLA.ValTo AND MLA.EffFrom <= :now AND :now < MLA.EffTo
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+@end

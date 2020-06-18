@@ -1,0 +1,14 @@
+#
+# $Log: run.mwcp,v $
+# Revision 1.1  2003/12/10 21:00:43  dave
+# added script files and tagging to eccmods
+#
+#
+#!/bin/sh
+
+if [ ! -f ~/storedp/middleware.jar.new ]; then
+  echo No new middleware.jar file in ~/storedp - cant update - bye!
+  exit
+fi
+cp ~/storedp/middleware.jar.new ./middleware.jar
+

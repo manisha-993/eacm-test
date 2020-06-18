@@ -1,0 +1,275 @@
+@name=GBL1017
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+ This guy inserts a new record into the trsNavigateTable
+
+ It inserts the entitis in their proper place
+ It is tracked by the Session ID, ObjectType, and Object Class for the request in this
+
+ This is primarily used to build a list a of Entities to do other things with
+$Log: gbl1017.txt,v $
+Revision 1.14  2010/06/21 15:42:42  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.13  2009/10/20 00:21:59  rick
+update to change long datatype to sqlint32
+
+Revision 1.12  2006/03/23 01:00:25  joan
+fix compile
+
+Revision 1.11  2006/03/23 00:53:05  joan
+fix compile
+
+Revision 1.10  2006/03/16 22:23:30  yang
+removing logs
+
+Revision 1.9  2006/03/16 22:21:18  yang
+adding condition for relator
+
+Revision 1.8  2004/10/20 21:01:38  dave
+changes to gen parm
+
+Revision 1.7  2004/02/20 20:21:47  roger
+Must be @t_schema
+
+Revision 1.6  2004/02/20 18:09:28  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.5  2003/09/08 16:31:09  roger
+Enterprise was changed to 16 char length
+
+Revision 1.4  2002/07/30 01:00:03  dave
+whopps brought back to life
+
+Revision 1.2  2002/03/08 00:59:19  dave
+sp fix
+
+Revision 1.1  2002/03/07 23:25:29  dave
+new sp for edit (loading trsTable with all kinds of information)
+
+@desc=insert a record into the trsnavigateTable for the given session ID
+@results=0
+@parmstyle=GENERAL
+@sql
+
+// File logging stuff
+FILE *t;
+mode_t Mode2;
+Mode2 = 0777;
+chmod("/tmp/omiglog1017",Mode2);
+
+t=fopen("/tmp/omiglog1017","a");
+//fprintf(t,"-->start of stored procedure GBL1017\n");
+
+// begin sql tag
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl1017.txt,v 1.14 2010/06/21 15:42:42 wendy Exp $";
+sqlint32 iCount1;
+sqlint32 iCount2;
+sqlint32 iCount3;
+sqlint32 iCount4;
+sqlint32 iCount5;
+EXEC SQL END DECLARE SECTION;
+@execute
+
+iCount1 = 1;
+iCount2 = 1;
+iCount3 = 1;
+iCount4 = 1;
+iCount5 = 1;
+
+EXEC SQL SELECT COUNT(*) INTO :iCount1 
+FROM @t_schema.Entity
+WHERE
+    Enterprise = :Enterprise
+AND EntityType = :EntityType
+AND EntityID = :EntityID
+AND Valfrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+;
+    //fprintf(t,"GBL1017:Using iCount1 entity table:%s,%ld,%ld\n", EntityType,EntityID,iCount1);
+
+if (iCount1 == 0) {
+EXEC SQL
+SELECT COUNT(*) INTO :iCount1 
+FROM @t_schema.Relator
+WHERE
+    Enterprise = :Enterprise
+AND EntityType = :EntityType
+AND EntityID = :EntityID
+AND Valfrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+;
+    //fprintf(t,"GBL1017:Using iCount1 relator table:%s,%ld,%ld\n", EntityType,EntityID,iCount1);
+}
+
+
+EXEC SQL SELECT COUNT(*) INTO :iCount2 
+FROM @t_schema.Entity
+WHERE
+    Enterprise = :Enterprise
+AND EntityType = :Entity1Type
+AND EntityID = :Entity1ID
+AND Valfrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+;
+    //fprintf(t,"GBL1017:Using iCount2 entity table:%s,%ld,%ld\n", Entity1Type,Entity1ID,iCount2);
+
+if (iCount2 < 2) {
+EXEC SQL
+SELECT COUNT(*) INTO :iCount4
+FROM @t_schema.Relator
+WHERE
+    Enterprise = :Enterprise
+AND EntityType = :Entity1Type
+AND EntityID = :Entity1ID
+AND Valfrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+;
+    //fprintf(t,"GBL1017:Using iCount4 relator table:%s,%ld,%ld\n", Entity1Type,Entity1ID,iCount4);
+}
+
+
+
+EXEC SQL SELECT COUNT(*) INTO :iCount3 
+FROM @t_schema.Entity
+WHERE
+    Enterprise = :Enterprise
+AND EntityType = :Entity2Type
+AND EntityID = :Entity2ID
+AND Valfrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+;
+    //fprintf(t,"GBL1017:Using iCount3 entity table:%s,%ld,%ld\n", Entity2Type,Entity2ID,iCount3);
+
+if (iCount3 < 2) {
+EXEC SQL
+SELECT COUNT(*) INTO :iCount5 
+FROM @t_schema.Relator
+WHERE
+    Enterprise = :Enterprise
+AND EntityType = :Entity2Type
+AND EntityID = :Entity2ID
+AND Valfrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+;
+    //fprintf(t,"GBL1017:Using iCount5 relator table:%s,%ld,%ld\n", Entity2Type,Entity2ID,iCount5);
+}
+
+    //fprintf(t,"GBL1017:iCount status table:%ld,%ld,%ld,%ld,%ld\n", iCount1,iCount2,iCount3,iCount4,iCount5);
+
+if((iCount1 > 0) && (iCount2 > 0 || iCount4 > 0 ) && (iCount3 > 0 || iCount5 > 0)) {
+    
+EXEC SQL INSERT INTO @t_schema.trsNavigate 
+VALUES
+(
+ :Enterprise
+,:SessionID
+,'Entity'
+,'List'
+,-1
+,0
+,'X'
+,'X'
+,:Entity1Type
+,:Entity1ID
+,:EntityType
+,:EntityID
+,:Entity2Type
+,:Entity2ID
+,:now
+,:now
+)
+;
+    //fprintf(t,"GBL1017:inserting trsnavigate condition1 table:%s,%s,%ld,%s,%ld,%s,%ld\n", Enterprise,Entity1Type,Entity1ID,EntityType,EntityID,Entity2Type,Entity2ID);
+}
+
+if (iCount4 == 1) {
+EXEC SQL
+INSERT into @t_schema.trsNavigate
+(SELECT ENTERPRISE
+,:SessionID
+,'Entity'
+,'List'
+,-1
+,0
+,'X'
+,'X'
+,Entity1Type
+,Entity1ID
+,EntityType
+,EntityID
+,Entity2Type
+,Entity2ID
+,:now
+,:now
+FROM @t_schema.Relator
+WHERE
+    Enterprise = :Enterprise
+AND EntityType = :Entity1Type
+AND EntityID = :Entity1ID
+AND Valfrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+)
+;
+    //fprintf(t,"GBL1017:inserting trsnavigate condition2 table:%s,%s,%ld,%s,%ld,%s,%ld\n", Enterprise,Entity1Type,Entity1ID,EntityType,EntityID,Entity2Type,Entity2ID);
+    //fprintf(t,"GBL1017:iCount4 status table:%s,%ld,%ld\n", Entity1Type,Entity1ID,iCount4);
+}
+
+
+if (iCount5 == 1) {
+EXEC SQL
+INSERT into @t_schema.trsNavigate
+(SELECT ENTERPRISE
+,:SessionID
+,'Entity'
+,'List'
+,-1
+,0
+,'X'
+,'X'
+,Entity1Type
+,Entity1ID
+,EntityType
+,EntityID
+,Entity2Type
+,Entity2ID
+,:now
+,:now
+FROM @t_schema.Relator
+WHERE
+    Enterprise = :Enterprise
+AND EntityType = :Entity2Type
+AND EntityID = :Entity2ID
+AND Valfrom <= :ValOn AND :ValOn < ValTo AND EffFrom <= :EffOn AND :EffOn < EffTo
+)
+;
+    //fprintf(t,"GBL1017:inserting trsnavigate condition3 table:%s,%s,%ld,%s,%ld,%s,%ld\n", Enterprise,Entity1Type,Entity1ID,EntityType,EntityID,Entity2Type,Entity2ID);
+    //fprintf(t,"GBL1017:iCount5 status table:%s,%ld,%ld\n", Entity2Type,Entity2ID,iCount5);
+}
+
+
+
+EXEC SQL COMMIT WORK;
+
+
+// File Closing
+//
+EXEC SQL COMMIT WORK;
+//fprintf(t,"<--end of stored procedure GBL1017\n");
+fclose(t);
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in Entity1Type varchar(32)
+in Entity1ID int
+in EntityType varchar(32)
+in EntityID int
+in Entity2Type varchar(32)
+in Entity2ID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+
+

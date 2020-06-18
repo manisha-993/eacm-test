@@ -1,0 +1,12 @@
+#!/bin/sh
+
+#
+# $Logx$
+#
+
+#
+# This script pings a RemoteRunnable RMI object under Linux or AIX
+#
+
+java -classpath middleware.jar COM.ibm.opicmpdh.middleware.taskmaster.PingObject $1
+

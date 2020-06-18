@@ -1,0 +1,54 @@
+@name=GBL2913
+@noremote=true
+@type=history
+@addperm=false
+@dbase=opicmpdh
+@narrative
+$Log: gbl2913.txt,v $
+Revision 1.8  2010/06/21 15:42:39  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2004/10/20 21:01:39  dave
+changes to gen parm
+
+Revision 1.6  2004/02/20 20:21:49  roger
+Must be @t_schema
+
+Revision 1.5  2004/02/20 18:09:30  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.4  2003/09/08 16:31:11  roger
+Enterprise was changed to 16 char length
+
+Revision 1.3  2001/07/27 00:36:10  roger
+Add Log keyword and/or branding as needed
+
+Revision 1.2  2001/05/11 15:41:34  dave
+fix to return results 1 from 2913
+
+Revision 1.1  2001/05/01 17:21:08  roger
+Needed history stored procedure for v2.3
+
+@table=@t_schema.Entity
+@parmstyle=GENERAL
+@desc=Select row history for table @table
+@fenced=true
+@results=1
+@history_cols=Enterprise EntityType EntityID ValFrom ValTo EffFrom EffTo OPENID
+@history_where=Enterprise EntityType EntityID
+@execute
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2913.txt,v 1.8 2010/06/21 15:42:39 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

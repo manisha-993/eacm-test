@@ -1,0 +1,42 @@
+//
+// TEMPLATE: INSERT2.TXT (@date)
+//
+// $Log: insert2.txt,v $
+// Revision 1.2  2004/06/22 15:45:05  roger
+// Comment update
+//
+// Revision 1.1  2004/06/22 15:34:09  roger
+// New template for insert into "non-conforming" tables
+//
+//
+
+EXEC SQL BEGIN DECLARE SECTION;
+char d_brand[80] = "$Id: insert2.txt,v 1.2 2004/06/22 15:45:05 roger Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL
+INSERT
+INTO @t_schema.@table
+(
+@insert_cols
+)
+VALUES
+(
+@insert_values
+)
+;
+// what to do here? ...
+//EXEC SQL
+//UPDATE @t_schema.@table
+//SET
+//  UserToken = :UserToken
+//, VersionLiteral = :VersionLiteral
+//, Client = :Client
+//, IPAddr = :IPAddr
+//, ClientData = :ClientData
+//, LogIn = :LogIn
+//, LogOut = :LogOut
+//WHERE
+//@update_where
+//;
+EXEC SQL COMMIT WORK;

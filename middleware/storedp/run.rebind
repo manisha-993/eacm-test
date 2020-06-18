@@ -1,0 +1,22 @@
+#!/bin/ksh 
+
+. ~/storedp/vars
+
+date
+
+db2 connect to $DBASE user $USER using $PASSWD
+db2 "select pkgschema,pkgname from syscat.packages \
+where (pkgname LIKE 'WHY%' or pkgname LIKE 'PSG%' or pkgname LIKE 'GBL%') order by pkgschema,pkgname" |
+awk 'NR > 3 && NF == 2 {print $1"."$2}' |
+while read PACKAGE
+do
+  date
+  db2 connect to $DBASE user $USER using $PASSWD
+  db2 -v REBIND $PACKAGE 
+  db2 terminate
+  date
+done
+db2 terminate 
+
+date
+

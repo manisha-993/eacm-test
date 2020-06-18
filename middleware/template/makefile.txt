@@ -1,0 +1,142 @@
+#
+# TEMPLATE: MAKEFILE.TXT (@date)
+#
+# Copyright (c) 2001, International Business Machines Corp., Ltd.
+# All Rights Reserved.
+# Licensed for use in connection with IBM business only.
+#
+# $Log: makefile.txt,v $
+# Revision 1.43  2014/12/19 08:14:40  wangyul
+# change the password in the makefile
+#
+# Revision 1.42  2004/10/25 17:59:27  roger
+# Works better now
+#
+# Revision 1.41  2004/10/25 17:55:13  roger
+# Not working
+#
+# Revision 1.40  2004/10/25 17:50:43  roger
+# Probably best to leave this off
+#
+# Revision 1.39  2004/10/25 17:48:53  roger
+# Attempt to semi-automate threadsafe option
+#
+# Revision 1.38  2004/05/27 21:49:10  roger
+# rm *out *planout redundant
+#
+# Revision 1.37  2004/05/27 21:47:52  roger
+# Remove *out *planout on make dist
+#
+# Revision 1.36  2004/02/19 23:51:32  roger
+# Change permissions on group
+#
+# Revision 1.35  2003/11/13 23:31:02  roger
+# Gotta preserve spaces in Makefiles ...
+#
+# Revision 1.34  2003/11/13 21:52:48  dave
+# for sp compile
+#
+# Revision 1.33  2003/07/29 17:20:48  roger
+# In order to support SPs in both PDH+ODS, connect string must be this way.
+# All makes should be done in lower-case in order to command variable to be set as needed.
+# eg) make gbl2028 -or- make gbl9999, NOT make GBL9999
+#
+# Revision 1.32  2003/07/23 23:05:37  joan
+# *** empty log message ***
+#
+# Revision 1.31  2003/06/19 21:38:58  dave
+# changing the code tag for db login
+#
+# Revision 1.30  2003/06/03 19:41:14  roger
+# New form of Makefile
+#
+#
+
+PDH_FILES = \
+@pdh_splist
+	list_pdh
+
+ODS_FILES = \
+@ods_splist
+	list_ods
+
+SPSOURCE="./"
+DB2VER=`db2level|grep token|cut -d" " -f7|cut -c1-2`
+threadsafe="$(threadsafe_off)"
+threadsafe_on="THREADSAFE"
+threadsafe_off=""
+
+PDH_DBASE="opicmpdh"
+PDH_USER="opicmadm"
+PDH_PASSWD="mice8chs"
+PDH_INSTALLDIR="/home/opicmdb2/sqllib/"
+
+ODS_DBASE="opicmods"
+ODS_USER="opicmadm"
+ODS_PASSWD="mice8chs"
+ODS_INSTALLDIR="/home/opicmdb2/sqllib/"
+
+all:: pdh ods
+
+pdh:
+	${MAKE} $(PDH_FILES) "BASE=${PDH_DBASE}" "USER=${PDH_USER}" "PASSWD=${PDH_PASSWD}" "INSTALLDIR=${PDH_INSTALLDIR}"
+
+ods:
+	${MAKE} $(ODS_FILES) "BASE=${ODS_DBASE}" "USER=${ODS_USER}" "PASSWD=${ODS_PASSWD}" "INSTALLDIR=${ODS_INSTALLDIR}"
+
+list_pdh:
+	-ls -al ${INSTALLDIR}function
+
+list_ods:
+	-ls -al ${INSTALLDIR}function
+
+dist::
+	-chmod 750 *
+	-rm sp.tar sp.tar.gz sp.tar.Z *out
+	-tar -cvf sp.tar *
+	-compress sp.tar
+
+clean:
+	-echo "clean up"
+
+.SUFFIXES: .sqC
+
+.sqC:
+	# start the process
+	-date
+	# clean up from last run
+	-rm -f $(SPSOURCE)$*.bnd
+	-rm -f $(SPSOURCE)$*.o
+	-rm -f $(SPSOURCE)$*.C
+	# prep and bind the SQL
+	-db2 CONNECT TO ${BASE} USER ${USER} USING ${PASSWD};
+	-db2 PREP $(SPSOURCE)$*.sqC BINDFILE DATETIME ISO QUERYOPT 5 DEGREE ANY SQLWARN NO;
+	-db2 BIND $(SPSOURCE)$*.bnd DATETIME ISO BLOCKING ALL ISOLATION UR QUERYOPT 5 SQLWARN NO;
+	-db2 TERMINATE;
+	# compile the C file
+	if \
+	/usr/vacpp/bin/cc -c $*.C -I${INSTALLDIR}include -o $*.o ; \
+	then \
+		echo "compile OK for "$* >>compile.out ; \
+	else \
+		echo "compile FAILED for "$* >>compile.out ; \
+	fi
+	# make a shared library
+	-/usr/vacpp/bin/cc -qmkshrobj -e$* -o $* $*.o -L$(INSTALLDIR)lib -ldb2
+	# chmod on the library and move it to the function directory
+	-rm -f $(INSTALLDIR)function/$*
+	-chmod 775 $*
+	-mv $(SPSOURCE)$* $(INSTALLDIR)function/$*
+	# register the stored proc
+	-grep "~" $*.sqC|cut -d"~" -f2|sed "s/FENCED/FENCED $(threadsafe)/" >$(SPSOURCE)reg.$$
+	-cat reg.$$
+	-db2batch -d ${BASE} -a ${USER}/${PASSWD} -f $(SPSOURCE)reg.$$
+	-rm $(SPSOURCE)reg.$$
+	# clean up the mess
+	-rm -f $(SPSOURCE)$*.bnd
+	-rm -f $(SPSOURCE)$*.o
+	-rm -f $(SPSOURCE)$*.C
+	# finish the process
+	-date
+
+@targets

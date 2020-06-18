@@ -1,0 +1,214 @@
+@name=GBL8601
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+(was 6001)
+
+$Log: gbl8601.txt,v $
+Revision 1.12  2010/06/21 15:42:43  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.11  2006/05/09 17:27:36  tony
+CR103103686
+
+Revision 1.10  2004/10/20 21:01:49  dave
+changes to gen parm
+
+Revision 1.9  2004/06/29 16:51:30  joan
+need to make sure effto = forever also
+
+Revision 1.8  2004/05/06 19:50:13  dave
+sp speed updates
+
+Revision 1.7  2004/02/20 20:21:57  roger
+Must be @t_schema
+
+Revision 1.6  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.5  2003/09/08 16:31:21  roger
+Enterprise was changed to 16 char length
+
+Revision 1.4  2002/08/01 16:46:49  gregg
+removed first 'order by 1, 4, 5' for compile
+
+Revision 1.3  2002/07/30 16:07:23  dave
+Added Default WorkGroup the process
+
+Revision 1.2  2002/07/11 00:28:48  dave
+simplify because of profile changes
+
+Revision 1.1  2002/05/03 18:18:28  gregg
+moved from gbl6001
+
+Revision 1.8  2002/04/08 23:30:23  joan
+working on OPWG
+
+Revision 1.7  2001/12/07 18:48:43  dave
+right triming enterprise stuff
+
+Revision 1.6  2001/09/26 19:42:42  roger
+Fixes
+
+Revision 1.5  2001/09/26 18:02:58  roger
+Also retrieve attributes on the WG
+
+Revision 1.4  2001/09/20 23:27:03  roger
+Needed enterprise cause OPWGID is not unique across DB
+
+Revision 1.3  2001/08/21 17:45:28  roger
+English only
+
+Revision 1.2  2001/08/09 19:38:20  roger
+Remove some hard-coding
+
+Revision 1.1  2001/08/08 21:42:08  roger
+New SP for Profile object
+
+@desc=Get Attributes for OPWG relator
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8601.txt,v 1.12 2010/06/21 15:42:43 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  'OPWG'
+, R.EntityID
+, RTRIM(F1.AttributeCode)
+, RTRIM('F')
+, RTRIM(F1.AttributeValue)
+, RTRIM(MD.LongDescription)
+FROM @t_schema.Relator R
+INNER JOIN @t_schema.MetaLinkAttr MA ON
+    MA.Enterprise = R.Enterprise
+AND MA.LinkType  = 'Entity/Attribute'
+AND MA.LinkType1 = R.EntityType
+AND MA.LinkCode = 'EntityAttribute'
+AND MA.ValFrom <= :ValOn AND :ValOn < MA.ValTo AND MA.EffFrom <= :EffOn AND :EffOn < MA.EffTo
+INNER JOIN @t_schema.Flag F1 ON
+    F1.Enterprise = R.Enterprise
+AND F1.EntityType = R.EntityType
+AND F1.EntityID = R.EntityID
+AND F1.AttributeCode = MA.LinkType2
+AND F1.valto = :forever AND F1.effto = :forever
+INNER JOIN @t_schema.MetaDescription MD ON
+    MD.Enterprise = R.Enterprise
+AND MD.DescriptionType = F1.AttributeCode
+AND MD.DescriptionClass = F1.AttributeValue
+AND MD.NLSID = 1
+AND MD.ValFrom <= :ValOn AND :ValOn < MD.ValTo AND MD.EffFrom <= :EffOn AND :EffOn < MD.EffTo
+WHERE
+    R.Enterprise = :Enterprise
+AND R.EntityType = :OPWGType
+AND R.EntityID = :EntityID
+AND R.valto = :forever AND R.effto = :forever
+
+UNION ALL
+SELECT
+  'OPWG'
+, R.EntityID
+, RTRIM(T1.AttributeCode)
+, RTRIM('T')
+, RTRIM(T1.AttributeValue)
+, RTRIM(T1.AttributeValue)
+FROM @t_schema.Relator R
+INNER JOIN @t_schema.MetaLinkAttr MA ON
+    MA.Enterprise = R.Enterprise
+AND MA.LinkType  = 'Entity/Attribute'
+AND MA.LinkType1 = R.EntityType
+AND MA.LinkCode = 'EntityAttribute'
+AND MA.ValFrom <= :ValOn AND :ValOn < MA.ValTo AND MA.EffFrom <= :EffOn AND :EffOn < MA.EffTo
+INNER JOIN @t_schema.Text T1 ON
+    T1.Enterprise = R.Enterprise
+AND T1.EntityType = R.EntityType
+AND T1.EntityID = R.EntityID
+AND T1.AttributeCode = MA.LinkType2
+AND T1.NLSID = 1
+AND T1.valto = :forever AND T1.effto = :forever
+WHERE
+    R.Enterprise = :Enterprise
+AND R.EntityType = :OPWGType
+AND R.EntityID = :EntityID
+AND R.ValTo = :forever AND R.effto = :forever
+
+UNION ALL
+SELECT
+  'WG'
+, R.EntityID
+, RTRIM(F1.AttributeCode)
+, RTRIM('F')
+, RTRIM(F1.AttributeValue)
+, RTRIM(MD.LongDescription)
+FROM @t_schema.Relator R
+INNER JOIN @t_schema.MetaLinkAttr MA ON
+    MA.Enterprise = R.Enterprise
+AND MA.LinkType  = 'Entity/Attribute'
+AND MA.LinkType1 = R.Entity1Type
+AND MA.LinkCode = 'EntityAttribute'
+AND MA.ValFrom <= :ValOn AND :ValOn < MA.ValTo AND MA.EffFrom <= :EffOn AND :EffOn < MA.EffTo
+INNER JOIN @t_schema.Flag F1 ON
+    F1.Enterprise = R.Enterprise
+AND F1.EntityType = R.Entity1Type
+AND F1.EntityID = R.Entity1ID
+AND F1.AttributeCode = MA.LinkType2
+AND F1.Valto = :forever AND F1.effto = :forever
+INNER JOIN @t_schema.MetaDescription MD ON
+    MD.Enterprise = R.Enterprise
+AND MD.DescriptionType = F1.AttributeCode
+AND MD.DescriptionClass = F1.AttributeValue
+AND MD.NLSID = 1
+AND MD.ValFrom <= :ValOn AND :ValOn < MD.ValTo AND MD.EffFrom <= :EffOn AND :EffOn < MD.EffTo
+WHERE
+    R.Enterprise = :Enterprise
+AND R.EntityType = :OPWGType
+AND R.EntityID = :EntityID
+AND R.valto = :forever AND R.effto = :forever
+
+UNION ALL
+SELECT
+  'WG'
+, R.EntityID
+, RTRIM(T1.AttributeCode)
+, RTRIM('T')
+, RTRIM(T1.AttributeValue)
+, RTRIM(T1.AttributeValue)
+FROM @t_schema.Relator R
+INNER JOIN @t_schema.MetaLinkAttr MA ON
+    MA.Enterprise = R.Enterprise
+AND MA.LinkType  = 'Entity/Attribute'
+AND MA.LinkType1 = R.Entity1Type
+AND MA.LinkCode = 'EntityAttribute'
+AND MA.ValFrom <= :ValOn AND :ValOn < MA.ValTo AND MA.EffFrom <= :EffOn AND :EffOn < MA.EffTo
+INNER JOIN @t_schema.Text T1 ON
+    T1.Enterprise = R.Enterprise
+AND T1.EntityType = R.Entity1Type
+AND T1.EntityID = R.Entity1ID
+AND T1.AttributeCode = MA.LinkType2
+AND T1.NLSID = 1
+AND T1.valto = :forever AND T1.effto = :forever
+WHERE
+    R.Enterprise = :Enterprise
+AND R.EntityType = :OPWGType
+AND R.EntityID = :EntityID
+AND R.ValTo = :forever AND R.effto = :forever
+ORDER BY
+1, 4, 5
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPWGType varchar(32)
+in EntityID int
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

@@ -1,0 +1,119 @@
+@name=GBL9994
+@parmstyle=GENERAL
+@type=basic
+@dbase=opicmpdh
+@noremote=true
+@addperm=false
+@narrative
+This SP is used to implement partno reservations
+$Log: gbl9994.txt,v $
+Revision 1.15  2010/06/21 15:43:15  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.14  2004/12/29 18:59:47  dave
+changes 5 to 1 minute.. and fix to ensure
+that we do not remove records from the prodattrelator
+table if a relator record still exists in the table
+
+Revision 1.13  2004/12/20 20:23:32  roger
+Support for sessions of PartNo uniqueness checking
+
+Revision 1.12  2004/10/20 21:01:51  dave
+changes to gen parm
+
+Revision 1.11  2004/09/15 23:39:10  dave
+fixing change group and sp's
+
+Revision 1.10  2004/07/30 20:32:00  roger
+Fixes
+
+Revision 1.9  2004/07/30 15:39:54  roger
+Fixes
+
+Revision 1.8  2004/07/29 22:02:22  roger
+Fixes
+
+Revision 1.7  2004/07/29 21:48:47  roger
+Always return a result set
+
+Revision 1.6  2004/07/29 20:43:13  roger
+Make PartNo 128 chars
+
+Revision 1.5  2004/07/29 16:55:12  roger
+Change aging
+
+Revision 1.4  2004/07/26 16:11:08  roger
+More fixes
+
+Revision 1.3  2004/07/26 16:01:17  roger
+Fixes to compile
+
+Revision 1.2  2004/07/26 15:47:38  roger
+DELETE from?
+
+Revision 1.1  2004/07/26 15:37:43  roger
+New SP for PartNo reservations
+
+@desc=Partno reservations
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9994.txt,v 1.15 2010/06/21 15:43:15 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+switch (Action[0])
+{
+case 'G' :  // GET
+  EXEC SQL DELETE FROM @t_schema.TRSPARTNO WHERE INSERTTIME <= CURRENT TIMESTAMP - 1 minutes;
+  EXEC SQL DECLARE sp_cursor0 CURSOR FOR
+  SELECT PARTNO FROM @t_schema.TRSPARTNO WHERE PARTNO = :PartNo;
+  EXEC SQL OPEN sp_cursor0;
+  break;
+case 'P' :  // PUT
+  EXEC SQL DELETE FROM @t_schema.TRSPARTNO WHERE INSERTTIME <= CURRENT TIMESTAMP - 1 minutes;
+  EXEC SQL INSERT INTO @t_schema.TRSPARTNO (PARTNO,INSERTTIME,SESSIONID) VALUES (:PartNo, :now, :SessionId);
+  // this is a kludge since must return something (and no need to return anything)
+  EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+  SELECT COUNT(*) FROM @t_schema.TRSPARTNO;
+  EXEC SQL OPEN sp_cursor1;
+  break;
+case 'R' :  // REMOVE
+  EXEC SQL DELETE FROM @t_schema.TRSPARTNO WHERE INSERTTIME <= CURRENT TIMESTAMP - 1 minutes;
+  EXEC SQL DELETE FROM @t_schema.TRSPARTNO WHERE PARTNO = :PartNo;
+  // this is a kludge since must return something (and no need to return anything)
+  EXEC SQL DECLARE sp_cursor2 CURSOR FOR
+  SELECT COUNT(*) FROM @t_schema.TRSPARTNO;
+  EXEC SQL OPEN sp_cursor2;
+  break;
+case 'C' :  // CLEAR
+  EXEC SQL DELETE FROM @t_schema.TRSPARTNO WHERE INSERTTIME <= CURRENT TIMESTAMP - 1 minutes;
+  // this is a kludge since must return something (and no need to return anything)
+  EXEC SQL DECLARE sp_cursor3 CURSOR FOR
+  SELECT COUNT(*) FROM @t_schema.TRSPARTNO;
+  EXEC SQL OPEN sp_cursor3;
+  break;
+case 'T' :  // TRUNCATE
+  EXEC SQL DELETE FROM @t_schema.TRSPARTNO;
+  // this is a kludge since must return something (and no need to return anything)
+  EXEC SQL DECLARE sp_cursor4 CURSOR FOR
+  SELECT COUNT(*) FROM @t_schema.TRSPARTNO;
+  EXEC SQL OPEN sp_cursor4;
+  break;
+case 'S' :  // REMOVE FOR SESSION
+  EXEC SQL DELETE FROM @t_schema.TRSPARTNO WHERE SessionId = :SessionId;
+  // this is a kludge since must return something (and no need to return anything)
+  EXEC SQL DECLARE sp_cursor5 CURSOR FOR
+  SELECT COUNT(*) FROM @t_schema.TRSPARTNO;
+  EXEC SQL OPEN sp_cursor5;
+  break;
+default :
+  break;
+}
+@execute
+@parameters
+inout ReturnStatus int
+in Action varchar(16)
+in PartNo varchar(128)
+in SessionId int
+@end

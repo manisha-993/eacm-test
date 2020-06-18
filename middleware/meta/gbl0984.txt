@@ -1,0 +1,361 @@
+@name=GBL0984
+@type=basic
+@dbase=opicmpdh
+@noremote=true
+@narrative
+
+Manages the update of an Feature Detail Record
+
+// $Log: gbl0984.txt,v $
+// Revision 1.8  2010/07/21 19:57:46  praveen
+// Change Long data type to Sqlint32 in support for db2 9.5
+//
+// Revision 1.7  2009/01/27 17:09:49  praveen
+// *** empty log message ***
+//
+// Revision 1.6  2009/01/23 00:08:05  praveen
+// Supporting dual catdb schema
+//
+// Revision 1.5  2006/04/24 22:51:49  dave
+// sp fixes
+//
+// Revision 1.4  2006/03/11 02:29:39  dave
+// getting more stuff
+//
+// Revision 1.3  2006/03/10 20:05:52  dave
+// logging to gbl0984
+//
+// Revision 1.2  2006/03/02 01:08:54  dave
+// Minor SP fix
+//
+// Revision 1.1  2006/03/02 00:56:21  dave
+// new SQL
+//
+
+@desc= Manages the update of an Feature Detail Record
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+//
+// BEGIN ERROR CHECK DECLARE SECTION
+//
+const int SQLERROR = -1;
+const int SQLCOMPLETE = 1;
+//set this to SQLCOMPLETE when finished!
+int m_iSQLState = SQLERROR;
+EXEC SQL WHENEVER SQLERROR GOTO error_exit;
+EXEC SQL WHENEVER SQLWARNING CONTINUE;
+//
+// END ERROR CHECK DECLARE SECTION
+//
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl0984.txt,v 1.8 2010/07/21 19:57:46 praveen Exp $";
+sqlint32 count = 0;
+EXEC SQL END DECLARE SECTION;
+@execute
+
+if (strcmp(schema,"BIGCAT") == 0) {
+
+	EXEC SQL
+
+	Select count(*) into :count
+	from bigcat.featuredetail
+	where
+	enterprise = :enterprise and
+	featEntityType = :featentitytype and
+	featEntityID = :featentityid and
+	itemEntityType = :itementitytype and
+	itemEntityID = :itementityid and
+	attributecode = :attributecode and
+	countrycode = :countrycode and
+	languagecode = :languagecode and
+	nlsid = :nlsid
+	;
+
+	if (count == 0 && isactive == 0) {
+
+	    // do nothing
+
+	} else if (count == 0 && isactive == 1) {
+
+	    // insert this guy
+	    EXEC SQL
+	    insert into bigcat.featuredetail
+	    (
+	      enterprise
+	    , countrycode
+	    , languagecode
+	    , nlsid
+	    , countrylist
+	    , featentitytype
+	    , featentityid
+	    , itementitytype
+	    , itementityid
+	    , attributetype
+	    , attributecode
+	    , attributetoken
+	    , attributevalue
+	    , attributeuom
+	    , attributevaluelong
+	    , isderived
+	    , valfrom
+	    , valto
+	    , isactive
+	    )
+	    values (
+	      :enterprise
+	    , :countrycode
+	    , :languagecode
+	    , :nlsid
+	    , :countrylist
+	    , :featentitytype
+	    , :featentityid
+	    , :itementitytype
+	    , :itementityid
+	    , :attributetype
+	    , :attributecode
+	    , :attributetoken
+	    , :attributevalue
+	    , :attributeuom
+	    , :attributevaluelong
+	    , :isderived
+	    , current timestamp
+	    , :forever
+	    , 1
+	    )
+	    ;
+	} else if (count != 0 && isactive == 1) {
+
+	    EXEC SQL
+	    update bigcat.featuredetail
+	    set
+	      attributevalue = :attributevalue
+	    , attributeuom = :attributeuom
+	    , attributevaluelong = :attributevaluelong
+	    , isderived = :isderived
+	    , valfrom = current timestamp
+	    , valto = :forever
+	    , isactive = 1
+	    where
+	    enterprise = :enterprise and
+	    featEntityType = :featentitytype and
+	    featEntityID = :featentityid and
+	    itemEntityType = :itementitytype and
+	    itemEntityID = :itementityid and
+	    attributecode = :attributecode and
+	    countrycode = :countrycode and
+	    languagecode = :languagecode and
+	    nlsid = :nlsid
+	    ;
+
+	} else {
+
+	    // turn it off
+	    EXEC SQL
+	    update bigcat.featuredetail
+	    set
+	    valfrom = current timestamp,
+	    valto  =  current timestamp,
+	    isactive = 0
+	    where
+	    enterprise = :enterprise and
+	    featEntityType = :featentitytype and
+	    featEntityID = :featentityid and
+	    itemEntityType = :itementitytype and
+	    itemEntityID = :itementityid and
+	    attributecode = :attributecode and
+	    countrycode = :countrycode and
+	    languagecode = :languagecode and
+	    nlsid = :nlsid
+	    ;
+	}
+
+}
+else if (strcmp(schema,"IBMCAT") == 0) {
+
+	EXEC SQL
+
+	Select count(*) into :count
+	from ibmcat.featuredetail
+	where
+	enterprise = :enterprise and
+	featEntityType = :featentitytype and
+	featEntityID = :featentityid and
+	itemEntityType = :itementitytype and
+	itemEntityID = :itementityid and
+	attributecode = :attributecode and
+	countrycode = :countrycode and
+	languagecode = :languagecode and
+	nlsid = :nlsid
+	;
+
+	if (count == 0 && isactive == 0) {
+
+	    // do nothing
+
+	} else if (count == 0 && isactive == 1) {
+
+	    // insert this guy
+	    EXEC SQL
+	    insert into ibmcat.featuredetail
+	    (
+	      enterprise
+	    , countrycode
+	    , languagecode
+	    , nlsid
+	    , countrylist
+	    , featentitytype
+	    , featentityid
+	    , itementitytype
+	    , itementityid
+	    , attributetype
+	    , attributecode
+	    , attributetoken
+	    , attributevalue
+	    , attributeuom
+	    , attributevaluelong
+	    , isderived
+	    , valfrom
+	    , valto
+	    , isactive
+	    )
+	    values (
+	      :enterprise
+	    , :countrycode
+	    , :languagecode
+	    , :nlsid
+	    , :countrylist
+	    , :featentitytype
+	    , :featentityid
+	    , :itementitytype
+	    , :itementityid
+	    , :attributetype
+	    , :attributecode
+	    , :attributetoken
+	    , :attributevalue
+	    , :attributeuom
+	    , :attributevaluelong
+	    , :isderived
+	    , current timestamp
+	    , :forever
+	    , 1
+	    )
+	    ;
+	} else if (count != 0 && isactive == 1) {
+
+	    EXEC SQL
+	    update ibmcat.featuredetail
+	    set
+	      attributevalue = :attributevalue
+	    , attributeuom = :attributeuom
+	    , attributevaluelong = :attributevaluelong
+	    , isderived = :isderived
+	    , valfrom = current timestamp
+	    , valto = :forever
+	    , isactive = 1
+	    where
+	    enterprise = :enterprise and
+	    featEntityType = :featentitytype and
+	    featEntityID = :featentityid and
+	    itemEntityType = :itementitytype and
+	    itemEntityID = :itementityid and
+	    attributecode = :attributecode and
+	    countrycode = :countrycode and
+	    languagecode = :languagecode and
+	    nlsid = :nlsid
+	    ;
+
+	} else {
+
+	    // turn it off
+	    EXEC SQL
+	    update ibmcat.featuredetail
+	    set
+	    valfrom = current timestamp,
+	    valto  =  current timestamp,
+	    isactive = 0
+	    where
+	    enterprise = :enterprise and
+	    featEntityType = :featentitytype and
+	    featEntityID = :featentityid and
+	    itemEntityType = :itementitytype and
+	    itemEntityID = :itementityid and
+	    attributecode = :attributecode and
+	    countrycode = :countrycode and
+	    languagecode = :languagecode and
+	    nlsid = :nlsid
+	    ;
+	}
+
+}
+
+// this won't get executed if sql error occurs
+m_iSQLState = SQLCOMPLETE;
+
+error_exit:
+
+if(m_iSQLState == SQLERROR) {
+
+    // ensure no infinite loops in the case that a failed SQL connection is used past this point...
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+
+    FILE *t;
+    mode_t Mode2;
+    Mode2 = 0777;
+    chmod("/tmp/0984.log",Mode2);
+    // append...
+    t=fopen("/tmp/0984.log","w");
+
+
+    fprintf(t,"********************  GBL0984 SQLCA DUMP  ********************\n");
+    char msg[1025];
+    sqlaintp(msg, 1024, 0, &sqlca);
+    fprintf(t,"msg:%s\n",msg);
+    fprintf(t,"SQLCAID: %s\n", sqlca.sqlcaid);
+    fprintf(t,"SQLCABC: %d\n", sqlca.sqlcabc);
+    fprintf(t,"SQLCODE: %d\n", sqlca.sqlcode);
+    fprintf(t,"SQLERRML: %d\n", sqlca.sqlerrml);
+    fprintf(t,"SQLERRMC: %s\n", sqlca.sqlerrmc);
+    fprintf(t,"SQLERRP: %s\n", sqlca.sqlerrp);
+    fprintf(t,"SQLERRD[0]: %d\n", sqlca.sqlerrd[0]);
+    fprintf(t,"SQLERRD[1]: %d\n", sqlca.sqlerrd[1]);
+    fprintf(t,"SQLERRD[2]: %d\n", sqlca.sqlerrd[2]);
+    fprintf(t,"SQLERRD[3]: %d\n", sqlca.sqlerrd[3]);
+    fprintf(t,"SQLERRD[4]: %d\n", sqlca.sqlerrd[4]);
+    fprintf(t,"SQLERRD[5]: %d\n", sqlca.sqlerrd[5]);
+    fprintf(t,"SQLWARN: %s\n", sqlca.sqlwarn);
+    fprintf(t,"SQLSTATE: %s\n", sqlca.sqlstate);
+    //
+    // Dumping Input params:
+    // End dump params
+    fprintf(t,"******************  END OF GBL0984 SQLCA DUMP  *******************\n");
+    fclose(t);
+
+}
+//
+// END ERROR CHECK SECTION
+//
+@parameters
+inout ReturnStatus int
+in enterprise varchar(8)
+in countrycode varchar(2)
+in languagecode varchar(2)
+in nlsid int
+in countrylist varchar(8)
+in featentitytype varchar(32)
+in featentityid int
+in itementitytype varchar(32)
+in itementityid int
+in attributetype varchar(2)
+in attributecode varchar(32)
+in attributetoken varchar(32)
+in attributevalue varchar(254)
+in attributeuom varchar(50)
+in attributevaluelong varchar(3000)
+in isderived int
+in isactive int
+in schema varchar(8)
+@end

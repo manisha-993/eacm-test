@@ -1,0 +1,105 @@
+@name=GBL9986
+@noremote=true
+@type=basic
+@dbase=opicmods
+@narrative
+
+Inserts a record into the ECCMODS product Detail Record
+
+//
+// $Log: gbl9986.txt,v $
+// Revision 1.5  2010/06/21 15:43:03  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.4  2004/12/01 21:48:17  gregg
+// changing SPs for use of ProductDetailRec
+//
+// Revision 1.3  2004/10/20 21:01:50  dave
+// changes to gen parm
+//
+// Revision 1.2  2004/09/30 01:00:59  dave
+// more sp fix
+//
+// Revision 1.1  2004/09/30 00:02:20  dave
+// new SP's for performance run testing
+//
+//
+
+@desc=Insert into Product Detail
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9986.txt,v 1.5 2010/06/21 15:43:03 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+@execute
+
+EXEC SQL 
+INSERT INTO GBLI.PRODUCTDETAIL 
+(
+ENTERPRISE,
+NLSID,
+COUNTRYCODE,
+ENTITYTYPE,
+ENTITYID,
+GSEQUENCE,
+GVISIBLE,
+ISEQUENCE,
+IVISIBLE,
+HERITAGE,
+ATTRIBUTECODE,
+ATTRIBUTETYPE,
+FLAGCODE,
+ATTRIBUTEVALUE,
+PUBLISHFLAG,
+VALFROM,
+RECID
+) 
+
+VALUES 
+(
+:ENTERPRISE,
+:NLSID,
+:COUNTRYCODE,
+:ENTITYTYPE,
+:ENTITYID,
+:GSEQUENCE,
+:GVISIBLE,
+:ISEQUENCE,
+:IVISIBLE,
+:HERITAGE,
+:ATTRIBUTECODE,
+:ATTRIBUTETYPE,
+:FLAGCODE,
+:ATTRIBUTEVALUE,
+:PUBLISHFLAG,
+:VALFROM,
+:RECID
+) 
+
+;
+@parameters
+inout ReturnStatus int
+in ENTERPRISE varchar(16)
+in NLSID int
+in COUNTRYCODE varchar(8)
+in ENTITYTYPE varchar(32)
+in ENTITYID int
+in GSEQUENCE int
+in GVISIBLE int
+in ISEQUENCE int
+in IVISIBLE int
+in HERITAGE varchar(50)
+in ATTRIBUTECODE varchar(32)
+in ATTRIBUTETYPE varchar(2)
+in FLAGCODE varchar(16)
+in ATTRIBUTEVALUE varchar(255)
+in PUBLISHFLAG varchar(2)
+in VALFROM varchar(27)
+in RECID int
+@end
+
+                                                              
+                                                              

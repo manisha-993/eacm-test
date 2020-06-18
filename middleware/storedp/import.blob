@@ -1,0 +1,21 @@
+#!/bin/ksh
+
+DBASE=opicmpdh
+USER=opicmadm
+PASSWD=cat9tail
+
+DIR="/data/"
+BLOB_DIR="/data/blobfiles/"
+NAME="ALL"
+COMMIT="10"
+#MODE="in exclusive mode"
+MODE="in shared mode"
+
+set DB2CODEPAGE 1208
+export DB2CODEPAGE=1208
+
+db2 connect to $DBASE $MODE user $USER using $PASSWD
+echo Importing OPICM.BLOB from $DIR$NAME.OPICM.BLOB.IXF
+db2 "IMPORT FROM $DIR$NAME.OPICM.BLOB.IXF OF IXF LOBS FROM $BLOB_DIR MODIFIED BY LOBSINFILE COMMITCOUNT $COMMIT INSERT INTO OPICM.BLOB" >>$DIR$NAME.IMPORT.OUT
+db2 terminate
+

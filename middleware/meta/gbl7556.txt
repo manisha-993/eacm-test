@@ -1,0 +1,69 @@
+@name=GBL7556
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------------------------------------
+--  This will return the valfrom of the last modified text record (expired or current) for an Attribute. 
+----------------------------------------------------------------------------------------------------
+$Log: gbl7556.txt,v $
+Revision 1.4  2010/06/21 15:43:22  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.3  2004/10/20 21:01:46  dave
+changes to gen parm
+
+Revision 1.2  2004/03/11 20:52:11  gregg
+committed to head
+
+Revision 1.1.2.3  2004/03/11 18:53:54  gregg
+remove addperm
+
+Revision 1.1.2.2  2004/03/11 18:46:36  gregg
+update
+
+Revision 1.1.2.1  2004/03/11 18:07:06  gregg
+initial load
+
+
+@desc=This will return the valfrom of the last modified text record (expired or current) for an Attribute. 
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7556.txt,v 1.4 2010/06/21 15:43:22 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT 
+CASE WHEN 
+   T1.EFFTO = T1.EFFFROM then T2.valfrom
+   ELSE T1.valfrom
+END
+ FROM opicm.text T1 
+left JOIN opicm.text T2 on
+ T2.Enterprise = T1.enterprise AND 
+ T2.NLSID in (1, :NLSID) AND 
+ T2.EntityType = T1.entitytype AND 
+ T2.EntityID = T1.EntityID AND 
+ T2.AttributeCode = T1.AttributeCode
+and T2.valto = T1.ValFrom
+ WHERE 
+ T1.Enterprise = :Enterprise AND 
+ T1.NLSID IN (1, :NLSID) AND 
+ T1.EntityType = :EntityType AND 
+ T1.EntityID = :EntityID AND 
+ T1.AttributeCode = :AttributeCode
+and T1.valto = '9999-12-31-00.00.00.000000'
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(8)
+in EntityType varchar(32)
+in EntityID int
+in AttributeCode varchar(32)
+in NLSID int
+@end
+

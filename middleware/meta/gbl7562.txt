@@ -1,0 +1,65 @@
+@name=GBL7562
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+Grab our Target ID mapping [for the "Strawman" Requirement].
+
+$Log: gbl7562.txt,v $
+Revision 1.8  2010/06/21 15:43:05  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2004/10/20 21:01:46  dave
+changes to gen parm
+
+Revision 1.6  2004/06/23 22:48:48  gregg
+ok
+
+Revision 1.5  2004/06/23 21:57:59  gregg
+trying to change the schema
+
+Revision 1.4  2004/06/23 17:12:33  gregg
+add MOVE_DATE to rs
+
+Revision 1.3  2004/06/21 19:21:04  gregg
+results = 1
+
+Revision 1.2  2004/06/21 14:22:09  gregg
+compile fix
+
+Revision 1.1  2004/06/21 14:15:27  gregg
+initial load
+
+
+
+@desc=Grab our Target ID mapping [for the "Strawman" Requirement].
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7562.txt,v 1.8 2010/06/21 15:43:05 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT 
+  TARGET_ID
+ ,MOVE_DATE
+from gbli.STRAWMAN
+where
+    enterprise = :Enterprise 
+AND entitytype = :EntityType
+AND source_id = :SourceID
+;
+
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in SourceID int
+@end
+
+

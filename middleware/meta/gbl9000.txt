@@ -1,0 +1,183 @@
+@name=GBL9000
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+@addperm=false
+
+  This returns all the active Entities in a given EntityID Range for a given EntityType, Enterprise
+    
+    This is primarily used in the ODS Initialization Program
+    
+$Log: gbl9000.txt,v $
+Revision 1.11  2010/06/21 15:42:46  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.10  2004/10/20 21:01:49  dave
+changes to gen parm
+
+Revision 1.9  2004/02/20 20:21:58  roger
+Must be @t_schema
+
+Revision 1.8  2004/02/20 18:09:38  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.7  2003/09/12 22:24:14  dave
+checking in some changes
+
+Revision 1.6  2003/09/08 16:31:22  roger
+Enterprise was changed to 16 char length
+
+Revision 1.5  2003/01/23 23:18:22  dave
+mods to ODS SP's for Relator Pickups
+
+Revision 1.4  2003/01/14 00:09:17  dave
+adding schema filter on ODS init pull.
+Also fixing display statements
+
+Revision 1.3  2003/01/09 19:19:44  dave
+sp fixes
+
+Revision 1.2  2003/01/09 19:11:37  dave
+misc fixes
+
+
+@desc=This returns all the active Entities for a given EntityType, Enterprise, and ID Range
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9000.txt,v 1.11 2010/06/21 15:42:46 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE entity_cursor CURSOR FOR
+SELECT
+  Entity1ID
+ ,EntityID
+ ,Entity2ID
+ ,ValOn
+ ,EffOn
+FROM @t_schema.trsNavigate
+WHERE 
+  SESSIONID = :SessionID
+;
+@execute
+
+EXEC SQL INSERT INTO @t_schema.trsNavigate
+SELECT DISTINCT
+    :Enterprise
+ ,:SessionID
+ ,'ODSINIT'
+ ,'LIST'
+ ,0
+ ,1
+ ,'D'
+ ,'D'
+ ,CASE WHEN R1.Enterprise IS NULL THEN 'NOOP' ELSE R1.Entity1Type END
+ ,CASE WHEN R1.Enterprise IS NULL THEN 0 ELSE R1.Entity1ID END
+ ,E.EntityType
+ ,E.EntityID
+ ,CASE WHEN R1.Enterprise IS NULL THEN 'NOOP' ELSE R1.Entity2Type END 
+ ,CASE WHEN R1.Enterprise IS NULL THEN 0 ELSE R1.Entity2ID END
+ ,E.ValFrom
+ ,E.Valto
+FROM @t_schema.ENTITY E 
+LEFT JOIN @t_schema.Relator R1 ON
+        R1.Enterprise = :Enterprise
+AND R1.EntityType = E.EntityType
+AND R1.EntityID = E.EntityID
+AND R1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN R1.EffFrom AND R1.EffTo
+LEFT JOIN @t_schema.MetaLinkAttr M1 ON
+        M1.Enterprise = :Enterprise
+AND M1.LinkType = 'Entity/Status/ODSFilter'
+AND M1.LinkType1 = :EntityType 
+AND M1.Linktype2 = :ODSSchema
+AND M1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN M1.EffFrom AND M1.EffTo
+LEFT JOIN @t_schema.Flag F1 ON
+        F1.Enterprise = :Enterprise
+AND F1.EntityType = E.EntityType
+AND F1.EntityID = E.EntityID
+AND F1.AttributeCode = M1.LinkCode
+AND F1.AttributeValue = M1.LinkValue
+AND F1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN F1.EffFrom AND F1.EffTo
+WHERE 
+    E.Enterprise = :Enterprise
+AND E.EntityId BETWEEN :StartID AND :EndID 
+AND E.EntityType = :EntityType 
+AND E.Valto = :forever
+AND CURRENT TIMESTAMP BETWEEN E.EffFrom AND E.EffTo
+AND 1 = (CASE 
+    WHEN M1.Enterprise IS NOT NULL AND F1.Enterprise IS NULL THEN 0 
+    ELSE 1 END)
+;
+
+EXEC SQL COMMIT WORK;
+
+// Get all the relator records that were not caught by the Above SQL..
+
+EXEC SQL INSERT INTO @t_schema.trsNavigate
+SELECT DISTINCT
+    :Enterprise
+ ,:SessionID
+ ,'ODSINIT'
+ ,'LIST'
+ ,0
+ ,1
+ ,'D'
+ ,'D'
+ ,R.Entity1Type
+ ,R.Entity1ID
+ ,R.EntityType
+ ,R.EntityID
+ ,R.Entity2Type
+ ,R.Entity2ID
+ ,R.ValFrom
+ ,R.Valto
+FROM @t_schema.Relator R 
+LEFT JOIN @t_schema.MetaLinkAttr M1 ON
+        M1.Enterprise = :Enterprise
+AND M1.LinkType = 'Entity/Status/ODSFilter'
+AND M1.LinkType1 = :EntityType 
+AND M1.Linktype2 = :ODSSchema
+AND M1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN M1.EffFrom AND M1.EffTo
+LEFT JOIN @t_schema.Flag F1 ON
+        F1.Enterprise = :Enterprise
+AND F1.EntityType = R.EntityType
+AND F1.EntityID = R.EntityID
+AND F1.AttributeCode = M1.LinkCode
+AND F1.AttributeValue = M1.LinkValue
+AND F1.Valto = :forever AND CURRENT TIMESTAMP BETWEEN F1.EffFrom AND F1.EffTo
+LEFT JOIN @t_schema.trsNavigate N1 ON
+        N1.SessionID = :SessionID
+AND N1.EntityType = R.EntityType
+AND N1.EntityID = R.EntityID
+WHERE 
+    R.Enterprise = :Enterprise
+AND R.EntityId BETWEEN :StartID AND :EndID 
+AND R.EntityType = :EntityType 
+AND R.Valto = :forever AND CURRENT TIMESTAMP BETWEEN R.EffFrom AND R.EffTo
+AND 1 = (CASE 
+    WHEN M1.Enterprise IS NOT NULL AND F1.Enterprise IS NULL THEN 0 
+    ELSE 1 END)
+AND N1.SessionID IS NULL
+;
+
+EXEC SQL COMMIT WORK;
+
+// Now open the cursor
+
+EXEC SQL OPEN entity_cursor;
+
+@parameters
+inout ReturnStatus int
+in SessionID int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in ODSSchema varchar(16)
+in StartID int
+in EndID int
+@end
+
+

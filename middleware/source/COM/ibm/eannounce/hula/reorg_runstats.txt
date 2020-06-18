@@ -1,0 +1,15 @@
+-- GBL9990
+reorg table GBLI.PRODUCT index GBLI.PRODUCT_PK;
+runstats on table GBLI.PRODUCT with distribution and detailed indexes all shrlevel change;
+
+-- GBL9989
+reorg table GBLI.PRODUCTDETAIL index GBLI.PRODUCTDETAIL_IX1;
+runstats on table GBLI.PRODUCTDETAIL with distribution and detailed indexes all shrlevel change;
+
+-- GBL9988
+reorg table GBLI.PRODUCTDETAILBLOB index GBLI.PRODUCTDETBLOB_PK;
+runstats on table GBLI.PRODUCTDETAILBLOB with distribution and detailed indexes all shrlevel change;
+
+-- GBL9987
+reorg table GBLI.PRODUCTDETAILLONG index GBLI.PRODUCTDETLONG_PK;
+runstats on table GBLI.PRODUCTDETAILLONG with distribution and detailed indexes all shrlevel change;

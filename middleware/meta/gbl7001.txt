@@ -1,0 +1,92 @@
+@name=GBL7001
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+@narrative
+Returns all ActionKeys and Classes for a given Action Group
+$Log: gbl7001.txt,v $
+Revision 1.13  2010/06/21 15:42:51  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.12  2005/07/22 19:47:07  joan
+fixes
+
+Revision 1.11  2005/06/23 17:07:57  joan
+add Category order
+
+Revision 1.10  2004/10/20 21:01:43  dave
+changes to gen parm
+
+Revision 1.9  2004/02/20 20:21:53  roger
+Must be @t_schema
+
+Revision 1.8  2004/02/20 18:09:33  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.7  2003/09/08 16:31:15  roger
+Enterprise was changed to 16 char length
+
+Revision 1.6  2003/04/02 19:47:06  dave
+removing the need for addperm in 8140
+
+Revision 1.5  2002/07/17 17:33:18  roger
+Ensured Log was in @narrative
+
+@desc= Returns all ActionKeys and Classes for a given Action Group.
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7001.txt,v 1.13 2010/06/21 15:42:51 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE sp_cursor1 CURSOR FOR
+SELECT
+ RTRIM(ME.EntityType)  as ActionKey
+,RTRIM(ME.EntityClass) as ActionClass
+,RTRIM(MLA.LinkValue) as Order
+,COALESCE(RTRIM(MLA1.LinkType2), 'NOT CATEGORIZED') as Category
+,CONCAT(COALESCE(RTRIM(MLA2.LinkType2), 'ZZZ'), RTRIM(MLA.LinkValue)) as FinalOrder
+FROM @t_schema.metalinkattr MLA
+
+LEFT JOIN opicm.MetaLinkAttr MLA1 ON
+    MLA1.Enterprise = :Enterprise
+AND MLA1.LinkType = 'Action/Category'
+AND MLA1.LinkType1 = MLA.LinkType2
+AND MLA1.LinkCode = 'Link'
+AND MLA1.ValFrom <= :ValOn and :ValOn < MLA1.ValTo AND MLA1.EffFrom <= :EffOn and :EffOn < MLA1.EffTo
+
+LEFT JOIN opicm.MetaLinkAttr MLA2 ON
+    MLA2.Enterprise = :Enterprise
+AND MLA2.LinkType = 'Category/Order'
+AND MLA2.LinkType1 = MLA1.LinkType2
+AND MLA2.LinkCode = 'Link'
+AND MLA2.ValFrom <= :ValOn and :ValOn < MLA2.ValTo AND MLA2.EffFrom <= :EffOn and :EffOn < MLA2.EffTo
+
+INNER JOIN @t_schema.MetaEntity ME ON
+    ME.Enterprise = :Enterprise
+AND ME.EntityType = MLA.LinkType2
+AND ME.ValFrom <= :ValOn and :ValOn < ME.ValTo AND ME.EffFrom <= :EffOn and :EffOn < ME.EffTo
+WHERE
+    MLA.Enterprise = :Enterprise
+AND MLA.LinkType = 'Group/Action'
+AND MLA.LinkType1 = :GroupType
+AND MLA.LinkCode = 'Link'
+AND MLA.ValFrom <= :ValOn and :ValOn < MLA.ValTo AND MLA.EffFrom <= :EffOn and :EffOn < MLA.EffTo
+ORDER BY 5
+;
+@execute
+EXEC SQL OPEN sp_cursor1;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in GroupType varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

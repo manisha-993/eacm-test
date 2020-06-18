@@ -1,0 +1,213 @@
+//
+// TEMPLATE: SPMETHOD.TXT
+//
+// Copyright (c) 2001, International Business Machines Corp., Ltd.
+// All Rights Reserved.
+// Licensed for use in connection with IBM business only.
+//
+// $Log: spmethod.txt,v $
+// Revision 1.40  2015/03/11 15:48:55  stimpsow
+// RTC1119727 - add support for second ods
+//
+// Revision 1.39  2009/03/11 18:16:34  wendy
+// Fix jre1.4 compiler warnings
+//
+// Revision 1.38  2006/03/16 16:10:21  roger
+// Changed timing line to D.EBUG_INFO level
+//
+// Revision 1.37  2005/02/08 20:32:52  roger
+// jTest indent
+//
+// Revision 1.36  2005/02/03 17:06:10  roger
+// Change javadoc directives
+//
+// Revision 1.35  2005/01/04 20:50:05  roger
+// Make usage logging conditional based on middleware property
+//
+// Revision 1.34  2004/11/22 18:53:48  roger
+// Fix
+//
+// Revision 1.33  2004/11/22 18:50:42  roger
+// Out
+//
+// Revision 1.32  2004/11/22 18:15:07  roger
+// Implement counting of transactions
+//
+// Revision 1.31  2004/08/03 21:06:09  roger
+// Put timing output @ DETAIL output level
+//
+// Revision 1.30  2003/06/03 23:27:24  roger
+// Fix start up connect
+//
+// Revision 1.29  2003/06/02 21:43:02  roger
+// Clean up
+//
+// Revision 1.28  2003/06/02 21:30:26  roger
+// Refine/clean up
+//
+// Revision 1.27  2003/06/02 21:20:30  roger
+// Switch handle based on @dbase
+//
+// Revision 1.26  2003/06/02 20:35:20  roger
+// Hope this gets easier
+//
+// Revision 1.25  2003/06/02 20:27:59  roger
+// Change order of some blocks
+//
+// Revision 1.24  2003/06/02 20:02:37  roger
+// Show spname
+//
+// Revision 1.23  2003/06/02 19:37:27  roger
+// Get correct handle based on SP needs
+//
+// Revision 1.22  2003/06/02 19:07:44  roger
+// Share stmt handles between PDH & ODS
+//
+// Revision 1.21  2003/06/02 16:54:03  roger
+// Reminder for what needs to happen in here
+//
+// Revision 1.20  2003/06/02 16:21:45  roger
+// PDH & ODS need distinct conHandles and stmtHandles
+//
+// Revision 1.19  2002/07/31 19:28:17  roger
+// @schema should be on procedures as well
+//
+// Revision 1.18  2002/07/17 16:17:07  roger
+// Remove rs variable message
+//
+// Revision 1.17  2002/06/25 16:57:35  roger
+// Report rs variable
+//
+// Revision 1.16  2002/06/25 15:04:24  roger
+// Location for isPending
+//
+// Revision 1.15  2002/06/18 00:10:56  dave
+// rollback of test
+//
+// Revision 1.14  2002/06/17 23:48:57  dave
+// change back execute/executeQuery
+//
+// Revision 1.13  2002/06/12 20:17:17  roger
+// New tag
+//
+// Revision 1.12  2001/12/12 21:24:34  roger
+// Keep compiler quiet about not throwing exception
+//
+// Revision 1.11  2001/12/12 21:11:32  roger
+// Wrap length checking code in try block
+//
+// Revision 1.10  2001/06/15 21:23:11  roger
+// Changed T.est to test
+//
+// Revision 1.9  2001/06/15 06:00:15  roger
+// Change D.ebug to debug method
+//
+// Revision 1.8  2001/06/04 20:10:47  roger
+// Changed timing format
+//
+// Revision 1.7  2001/03/27 01:21:03  roger
+// Misc formatting clean up
+//
+// Revision 1.6  2001/03/16 03:18:49  roger
+// Added Log keyword
+//
+
+/**
+* Call @spname (@desc)
+* @author generated code
+* @return the stored procedure output from @spname as a JDBC <code>ResultSet</code>
+* @exception MiddlewareException
+*/
+
+final public @methodreturntype call@spname
+(
+@callmethodparms
+) throws MiddlewareException {
+
+    // ResultSet
+    ResultSet rs = null;
+
+    // Return value (for insert/update)
+    ReturnID returnID = new ReturnID(0);
+    MiddlewareException mx = null;
+    long m_lStart = System.currentTimeMillis();
+    long m_lFinish = 0;
+
+    Connection conn = null;
+
+    try {
+        debug(D.EBUG_DETAIL, "executing call@spname");
+
+        String strNeedDB = "@dbase";
+    
+        debug(D.EBUG_DETAIL, "database needed for @spname is " + strNeedDB);
+
+	    conn = getDBConnection(strNeedDB, "@spname");//RTC1119727
+
+        try {
+@parmlength
+            // This will never happen, used just to keep java compiler quiet in case there are no parms to SP
+            if (1 == 2) {
+                throw new java.io.UnsupportedEncodingException();
+            }
+        }
+        catch (java.io.UnsupportedEncodingException uex) {
+            debug(D.EBUG_ERR, "Threw an exception checking byte length " + uex);
+        }
+        if (this.LogUsage()) {
+            String strTransaction = "@spname";
+            // increment the use count for this transaction
+            if (!strTransaction.equals("GBL9981")) {
+                record_transaction("@spname");
+            }
+        }
+        // Build a string containing the SQL CALL statement with parameter markers
+        String strSQL = "CALL @schema.@spname(@callmethodparmcount)";
+        // If not connected to database, now is the time!
+        // After making a connection, we should have a connection handle
+        test(conn != null, "call@spname:Connection handle is null");
+        // If there is a prior statement something is wrong
+        this.isPending("call@spname");
+        // Prepare the SQL
+        m_cstmtHandle = conn.prepareCall(strSQL);
+        // After preparing a statement, there should be a handle
+        test(m_cstmtHandle != null, "call@spname:Statement handle is null");
+        m_cstmtHandle.registerOutParameter(1, Types.INTEGER);
+        // Bind the method parameters to the SQL statement markers
+@callmethodsetparms
+        // Execute the SQL statement
+        @methodexecutem_cstmtHandle.execute@executetype();
+        // Retrieve the return status
+        returnStatus.setValue(m_cstmtHandle.getInt(1));
+@retinout
+        } catch (RuntimeException rx) {
+            mx = new MiddlewareException("(call@spname) RuntimeException: " + rx);
+            debug(D.EBUG_ERR, "RuntimeException trapped at call@spname: " + rx);
+            StringWriter writer = new StringWriter();
+            rx.printStackTrace(new PrintWriter(writer));
+            String x = writer.toString();
+            debug(D.EBUG_ERR, "" + x);
+            debug(D.EBUG_DETAIL, "exiting call@spname - error");
+            throw mx;
+        } catch (Exception x) {
+            mx = new MiddlewareException("(call@spname) Exception: " + x);
+            debug(D.EBUG_ERR, "Exception trapped at call@spname: " + x);
+            debug(D.EBUG_DETAIL, "exiting call@spname - error");
+            throw mx;
+        } finally {
+            m_lFinish = System.currentTimeMillis();
+            long longDuration = m_lFinish - m_lStart;
+            debug(D.EBUG_INFO, "timing @spname " + Stopwatch.format(longDuration));
+            /*if (mx != null) {
+                debug(D.EBUG_DETAIL, "exiting call@spname - error");
+                throw mx;
+            } else {
+                debug(D.EBUG_DETAIL, "exiting call@spname");
+                // Return the ResultSet
+                return@methodreturnvar;
+            }*/
+        }
+        debug(D.EBUG_DETAIL, "exiting call@spname");
+        // Return the ResultSet
+        return@methodreturnvar;        
+}

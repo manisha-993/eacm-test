@@ -1,0 +1,110 @@
+@name=GBL3033
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=true
+@fenced=true
+@narrative
+$Log: gbl3033.txt,v $
+Revision 1.32  2010/06/21 15:43:07  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.31  2004/10/20 21:01:42  dave
+changes to gen parm
+
+Revision 1.30  2004/02/20 20:21:52  roger
+Must be @t_schema
+
+Revision 1.29  2004/02/20 18:09:32  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.28  2003/09/08 16:31:13  roger
+Enterprise was changed to 16 char length
+
+Revision 1.27  2002/09/13 21:26:44  gregg
+syntax fix
+
+Revision 1.26  2002/01/28 20:53:23  dave
+merging 1.0 maint into 1.1
+
+Revision 1.25  2001/10/10 17:57:24  dave
+added 'X' to the mix
+
+Revision 1.24  2001/07/27 00:36:11  roger
+Add Log keyword and/or branding as needed
+
+@desc=build a list of Attributes from MetaLinkAttr based upon enterprise, linktype, linktype2
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl3033.txt,v 1.32 2010/06/21 15:43:07 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE NavCur CURSOR FOR
+SELECT
+COALESCE(MDA.LONGDESCRIPTION, ' ') as EntityDescription
+,MDA.DESCRIPTIONTYPE
+,COALESCE(MA.LONGDESCRIPTION, ' ') as AttributeDescription
+,MA.DESCRIPTIONTYPE
+,MRA.LINKTYPE2
+,COALESCE(MFV.LONGDESCRIPTION, MRA.LinkValue) as DefaultValue
+,COALESCE(MFV2.LONGDESCRIPTION, MRA.LinkCode) as LockValue
+,MRA.ENTERPRISE
+
+FROM @t_schema.MetaLinkAttr MRA
+
+INNER JOIN @t_schema.MetaLinkAttr ML on
+ML.enterprise = :Enterprise AND
+ML.linktype   ='Entity/Attribute' and
+ML.linktype2  = MRA.LinkType1 and
+ML.linkcode   = 'EntityAttribute' and
+ML.ValFrom <= :ValOn AND :ValOn < ML.ValTo AND ML.EffFrom <= :EffOn AND :EffOn < ML.EffTo
+
+INNER JOIN @t_schema.MetaDescription MA ON
+MA.Enterprise = :Enterprise AND
+MA.DescriptionType = MRA.LinkType1 AND
+MA.DescriptionClass in ('B','D','F','I','L','X','P','S','T','U','A') AND
+MA.NLSID = 1 AND
+MA.ValFrom <= :ValOn AND :ValOn < MA.ValTo AND MA.EffFrom <= :EffOn AND :EffOn < MA.EffTo
+INNER JOIN @t_schema.MetaDescription MDA ON
+MDA.Enterprise = :Enterprise AND
+MDA.DescriptionType = ML.LinkType1 AND
+MDA.DescriptionClass in ('Entity', 'Relator') AND
+MDA.NLSID = 1 AND
+MDA.ValFrom <= :ValOn AND :ValOn < MDA.ValTo AND MDA.EffFrom <= :EffOn AND :EffOn < MDA.EffTo
+LEFT JOIN @t_schema.MetaDescription MFV ON
+MFV.Enterprise = :Enterprise  AND
+MFV.DescriptionType = MRA.LinkType1 AND
+MFV.DescriptionClass = MRA.LinkValue AND
+MFV.NLSID = 1 AND
+MFV.ValFrom <= :ValOn AND :ValOn < MFV.ValTo AND MFV.EffFrom <= :EffOn AND :EffOn < MFV.EffTo
+LEFT JOIN @t_schema.MetaDescription MFV2 ON
+MFV2.Enterprise = :Enterprise  AND
+MFV2.DescriptionType = MRA.LinkType1 AND
+MFV2.DescriptionClass = MRA.LinkCode AND
+MFV2.NLSID = 1 AND
+MFV2.ValFrom <= :ValOn AND :ValOn < MFV2.ValTo AND MFV2.EffFrom <= :EffOn AND :EffOn < MFV2.EffTo
+
+WHERE
+    MRA.Enterprise = :Enterprise
+AND MRA.LinkType = :LinkType
+AND MRA.LinkType2 = :LinkType2
+AND MRA.Valfrom <= :ValOn AND :ValOn < MRA.ValTo AND MRA.EffFrom <= :EffOn AND :EffOn < MRA.EffTo
+ORDER BY
+EntityDescription
+,AttributeDescription
+;
+@execute
+EXEC SQL OPEN NavCur;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in LinkType varchar(32)
+in LinkType2 varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+

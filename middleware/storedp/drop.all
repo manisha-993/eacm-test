@@ -1,0 +1,24 @@
+#!/bin/ksh 
+
+. ~/storedp/vars
+
+db2 connect to $DBASE user $USER using $PASSWD
+
+db2 "select procschema,procname from sysibm.sysprocedures \
+where procname LIKE 'WHY%' or procname LIKE 'PSG%' or procname LIKE 'GBL%' order by procschema,procname" |
+awk 'NR > 3 && NF == 2 {print $1"."$2}' |
+while read PROCEDURE
+  do
+  db2 DROP PROCEDURE $PROCEDURE
+  done
+
+db2 "select pkgschema,pkgname from syscat.packages \
+where pkgname LIKE 'WHY%' or pkgname LIKE 'PSG%' or pkgname LIKE 'GBL%' order by pkgschema,pkgname" |
+awk 'NR > 3 && NF == 2 {print $1"."$2}' |
+while read PACKAGE
+  do
+  db2 DROP PACKAGE $PACKAGE
+  done
+
+db2 terminate 
+

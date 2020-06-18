@@ -1,0 +1,19 @@
+#!/bin/ksh 
+
+. ~/storedp/vars
+
+WHERE="where valto<>'9999-12-31-00.00.00.000000'"
+
+db2 connect to $DBASE user $USER using $PASSWD 
+db2 "select creator,name from sysibm.systables \
+where creator = 'OPICM' order by creator,name" |
+awk 'NR > 3 && NF == 2 {print $1"."$2}' |
+while read TABLE
+  do
+    db2 connect to $DBASE user $USER using $PASSWD 
+    echo Pruning $TABLE 
+    db2 "delete from $TABLE $WHERE"
+    db2 terminate
+  done
+db2 terminate 
+

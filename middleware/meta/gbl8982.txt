@@ -1,0 +1,592 @@
+@name=GBL8982
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+Manages the update of an WWProduct Reocrd
+
+//
+// $Log: gbl8982.txt,v $
+// Revision 1.55  2015/02/24 23:04:55  ptatinen
+// fix column lengths
+//
+// Revision 1.54  2015/02/24 21:43:43  ptatinen
+// Add PRCFILENAM as per Lenovo CQ
+//
+// Revision 1.53  2011/06/15 17:07:51  praveen
+// increase length of oslevel to fit more oslevels
+//
+// Revision 1.52  2011/05/10 07:13:08  guobin
+// add two columns: dualpipe,dualpipe_fc
+//
+//
+// Revision 1.51  2010/06/21 15:42:38  wendy
+// Exceeded RMI 64k static block limit, not needed for RMI
+//
+// Revision 1.50  2009/10/20 00:22:01  rick
+// update to change long datatype to sqlint32
+//
+// Revision 1.49  2007/05/31 15:35:10  rick
+// increase length of oslevel and oslevel_fc
+//
+// Revision 1.48  2006/06/06 01:37:19  dave
+// final lengths
+//
+// Revision 1.47  2006/06/06 01:25:59  dave
+// redressing widths
+//
+// Revision 1.46  2006/06/05 20:46:20  dave
+// widening OSLevel
+//
+// Revision 1.45  2006/02/28 23:14:44  gregg
+// specialbid_fc = 8
+//
+// Revision 1.44  2006/02/28 00:00:24  dave
+// fixing primary key for counts
+//
+// Revision 1.43  2006/02/22 00:19:12  gregg
+// add nlsid to count query
+//
+// Revision 1.42  2006/01/31 21:21:15  gregg
+// cleanup
+//
+// Revision 1.41  2006/01/31 21:20:32  gregg
+// fix nulls_ok directive
+//
+// Revision 1.40  2005/12/13 18:09:13  gregg
+// add oslevel
+//
+// Revision 1.39  2005/09/27 20:23:47  gregg
+// update where clause sql
+//
+// Revision 1.38  2005/09/26 18:35:16  gregg
+// fix some columns widths
+//
+// Revision 1.37  2005/09/23 21:01:12  gregg
+// fix
+//
+// Revision 1.36  2005/09/23 20:47:25  gregg
+// syncing up parms w/ ddl
+//
+// Revision 1.35  2005/09/13 06:16:59  dave
+// minor SP change
+//
+// Revision 1.34  2005/09/13 05:55:55  dave
+// more minor changes
+//
+// Revision 1.33  2005/09/13 05:42:19  dave
+// final PROJCDNAM fix
+//
+// Revision 1.32  2005/09/13 04:14:31  dave
+// ok.. lets add the PROJCDNAM, and lets take a hard look at
+// WWSEO and how to get prod structures
+//
+// Revision 1.31  2005/09/12 02:59:12  dave
+// temp fix NULL = 'NULL'
+//
+// Revision 1.30  2005/09/09 21:19:36  gregg
+// using nulls_ok directive
+//
+// Revision 1.29  2005/09/09 17:34:56  gregg
+// update
+//
+// Revision 1.28  2005/09/09 16:38:12  gregg
+// formatting dumps of parms
+//
+// Revision 1.27  2005/09/09 16:18:24  gregg
+// dumping input parms
+//
+// Revision 1.26  2005/09/09 15:31:48  gregg
+// small tweaks to  date vals
+//
+// Revision 1.25  2005/09/09 15:28:24  gregg
+// input parms fixes
+//
+// Revision 1.24  2005/09/09 15:00:33  gregg
+// some error logging
+//
+// Revision 1.23  2005/09/07 19:24:57  gregg
+// moving isActive around
+//
+// Revision 1.22  2005/09/07 18:08:57  gregg
+// fix
+//
+// Revision 1.21  2005/09/07 18:05:48  gregg
+// 8982 parms
+//
+// Revision 1.17  2005/09/06 22:39:26  gregg
+// parm fixing
+//
+// Revision 1.16  2005/09/06 22:31:53  gregg
+// more parm syncing
+//
+// Revision 1.15  2005/09/06 22:17:13  gregg
+// putting back params
+//
+// Revision 1.11  2005/06/22 19:57:51  dave
+// minor sp fix
+//
+// Revision 1.10  2005/06/22 19:48:50  dave
+// more country list
+//
+// Revision 1.9  2005/06/20 15:47:28  roger
+// Allow nulls in parms [stand clear]
+//
+// Revision 1.8  2005/06/16 16:46:04  dave
+// changes for Collateral
+//
+// Revision 1.7  2005/06/13 18:22:37  dave
+// ok.. see if our table is good
+//
+// Revision 1.6  2005/06/13 17:51:54  dave
+// adding more fields
+//
+// Revision 1.5  2005/06/07 04:34:50  dave
+// working on commit control
+//
+// Revision 1.4  2005/06/02 08:16:19  dave
+// ok.. lets give it a whirl
+//
+// Revision 1.3  2005/06/02 07:55:53  dave
+// more space squeezing
+//
+// Revision 1.2  2005/06/02 07:39:56  dave
+// removing trailing spaces
+//
+// Revision 1.1  2005/06/02 07:29:12  dave
+// lets try a new update SP
+//
+
+@desc= Manages the update of an WWProduct Reocrd
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@nulls_ok=true
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8982.txt,v 1.55 2015/02/24 23:04:55 ptatinen Exp $";
+sqlint32 count = 0;
+EXEC SQL END DECLARE SECTION;
+@execute
+
+//
+// BEGIN ERROR CHECK DECLARE SECTION
+//
+const int SQLERROR = -1;
+const int SQLCOMPLETE = 1;
+//set this to SQLCOMPLETE when finished!
+int m_iSQLState = SQLERROR;
+EXEC SQL WHENEVER SQLERROR GOTO error_exit;
+EXEC SQL WHENEVER SQLWARNING CONTINUE;
+//
+// END ERROR CHECK DECLARE SECTION
+//
+
+FILE *t;
+mode_t Mode2;
+Mode2 = 0777;
+chmod("/tmp/8982.log",Mode2);
+t=fopen("/tmp/8982.log","a");
+t=fopen("/tmp/8982.log","w");
+fprintf(t,"-->start of stored procedure GBL8982\n");
+
+fprintf(t,"isactive:%d\n",isactive);
+
+EXEC SQL
+
+Select count(*) into :count
+from gbli.WWProduct where
+enterprise = :enterprise and
+WWEntityType = :wwentitytype and
+WWEntityID = :wwentityid and
+countrycode = :countrycode and
+languagecode = :languagecode and
+nlsid = :nlsid
+;
+
+if (count == 0 && isactive == 0) {
+// do nothing
+fprintf(t,"count == 0 && isactive == 0\n");
+} else if (count == 0 && isactive == 1) {
+fprintf(t,"count == 0 && isactive == 1\n");
+// insert this guy
+EXEC SQL
+insert into gbli.wwproduct
+(
+enterprise,
+countrycode,
+languagecode,
+nlsid,
+countrylist,
+wwentitytype,
+wwentityid,
+status,
+status_fc,
+projcdnam,
+projcdnam_fc,
+wwpartnumber,
+machtype,
+model,
+specialbid,
+specialbid_fc,
+category,
+category_fc,
+subcategory,
+subcategory_fc,
+group,
+group_fc,
+subgroup,
+subgroup_fc,
+ordercode,
+ordercode_fc,
+sarindc,
+sarindc_fc,
+serviceindicator,
+division,
+division_fc,
+ratecardcode,
+ratecardcode_fc,
+mktname,
+anndate,
+withdrawdate,
+standalone,
+standalone_fc,
+unitclass,
+unitclass_fc,
+unspsc,
+unspsc_fc,
+unspscsec,
+unspscsec_fc,
+unuom,
+unuom_fc,
+unuomsec,
+unuomsec_fc,
+applicationtype,
+applicationtype_fc,
+oslevel,
+oslevel_fc,
+dualpipe,
+dualpipe_fc,
+valfrom,
+valto,
+isactive,
+prcfilenam
+)
+values (
+:enterprise,
+:countrycode,
+:languagecode,
+:nlsid,
+:countrylist,
+:wwentitytype,
+:wwentityid,
+:status,
+:status_fc,
+:projcdnam,
+:projcdnam_fc,
+:wwpartnumber,
+:machtype,
+:model,
+:specialbid,
+:specialbid_fc,
+:category,
+:category_fc,
+:subcategory,
+:subcategory_fc,
+:group,
+:group_fc,
+:subgroup,
+:subgroup_fc,
+:ordercode,
+:ordercode_fc,
+:sarindc,
+:sarindc_fc,
+:serviceindicator,
+:division,
+:division_fc,
+:ratecardcode,
+:ratecardcode_fc,
+:mktname,
+:anndate,
+:withdrawdate,
+:standalone,
+:standalone_fc,
+:unitclass,
+:unitclass_fc,
+:unspsc,
+:unspsc_fc,
+:unspscsec,
+:unspscsec_fc,
+:unuom,
+:unuom_fc,
+:unuomsec,
+:unuomsec_fc,
+:applicationtype,
+:applicationtype_fc,
+:oslevel,
+:oslevel_fc,
+:dualpipe,
+:dualpipe_fc,
+current timestamp,
+'9999-12-31-00.00.00.000000',
+1,
+:prcfilenam
+);
+} else if (count != 0 && isactive == 1) {
+fprintf(t,"count != 0 && isactive == 1\n");
+// update this guy
+EXEC SQL
+update gbli.wwproduct
+set
+enterprise = :enterprise,
+countrycode = :countrycode,
+languagecode = :languagecode,
+nlsid = :nlsid,
+countrylist = :countrylist,
+wwentitytype = :wwentitytype,
+wwentityid = :wwentityid,
+status = :status,
+status_fc = :status_fc,
+projcdnam = :projcdnam,
+projcdnam_fc = :projcdnam_fc,
+wwpartnumber = :wwpartnumber,
+machtype = :machtype,
+model = :model,
+specialbid = :specialbid,
+specialbid_fc = :specialbid_fc,
+category = :category,
+category_fc = :category_fc,
+subcategory = :subcategory,
+subcategory_fc = :subcategory_fc,
+group = :group,
+group_fc = :group_fc,
+subgroup = :subgroup,
+subgroup_fc = :subgroup_fc,
+ordercode = :ordercode,
+ordercode_fc = :ordercode_fc,
+sarindc = :sarindc,
+sarindc_fc = :sarindc_fc,
+serviceindicator = :serviceindicator,
+division = :division,
+division_fc = :division_fc,
+ratecardcode = :ratecardcode,
+ratecardcode_fc = :ratecardcode_fc,
+mktname = :mktname,
+anndate = :anndate,
+withdrawdate = :withdrawdate,
+standalone = :standalone,
+standalone_fc = :standalone_fc,
+unitclass = :unitclass,
+unitclass_fc = :unitclass_fc,
+unspsc = :unspsc,
+unspsc_fc = :unspsc_fc,
+unspscsec = :unspscsec,
+unspscsec_fc = :unspscsec_fc,
+unuom = :unuom,
+unuom_fc = :unuom_fc,
+unuomsec = :unuomsec,
+unuomsec_fc = :unuomsec_fc,
+applicationtype = :applicationtype,
+applicationtype_fc = :applicationtype_fc,
+oslevel = :oslevel,
+oslevel_fc = :oslevel_fc,
+dualpipe = :dualpipe,
+dualpipe_fc = :dualpipe_fc,
+valfrom = current timestamp,
+valto = '9999-12-31-00.00.00.000000',
+isactive = 1,
+prcfilenam = :prcfilenam
+where
+enterprise = :enterprise and
+wwentitytype = :wwentitytype and
+wwentityid = :wwentityid and
+countrycode = :countrycode and
+languagecode = :languagecode and
+nlsid = :nlsid
+;
+} else {
+fprintf(t,"else...\n");
+
+// turn it off
+EXEC SQL
+update gbli.wwproduct
+set
+valfrom = current timestamp,
+valto  =  current timestamp,
+isactive = 0
+where
+enterprise = :enterprise and
+wwentitytype = :wwentitytype and
+wwentityid = :wwentityid and
+countrycode = :countrycode and
+languagecode = :languagecode and
+nlsid = :nlsid
+;
+}
+
+//
+// BEGIN ERROR CHECK SECTION
+//
+
+// this won't get executed if sql error occurs
+m_iSQLState = SQLCOMPLETE;
+
+error_exit:
+
+if(m_iSQLState == SQLERROR) {
+
+    // ensure no infinite loops in the case that a failed SQL connection is used past this point...
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+
+
+    fprintf(t,"********************  GBL8982 SQLCA DUMP  ********************\n");
+    char msg[1025];
+    sqlaintp(msg, 1024, 0, &sqlca);
+    fprintf(t,"msg:%s\n",msg);
+    fprintf(t,"SQLCAID: %s\n", sqlca.sqlcaid);
+    fprintf(t,"SQLCABC: %d\n", sqlca.sqlcabc);
+    fprintf(t,"SQLCODE: %d\n", sqlca.sqlcode);
+    fprintf(t,"SQLERRML: %d\n", sqlca.sqlerrml);
+    fprintf(t,"SQLERRMC: %s\n", sqlca.sqlerrmc);
+    fprintf(t,"SQLERRP: %s\n", sqlca.sqlerrp);
+    fprintf(t,"SQLERRD[0]: %d\n", sqlca.sqlerrd[0]);
+    fprintf(t,"SQLERRD[1]: %d\n", sqlca.sqlerrd[1]);
+    fprintf(t,"SQLERRD[2]: %d\n", sqlca.sqlerrd[2]);
+    fprintf(t,"SQLERRD[3]: %d\n", sqlca.sqlerrd[3]);
+    fprintf(t,"SQLERRD[4]: %d\n", sqlca.sqlerrd[4]);
+    fprintf(t,"SQLERRD[5]: %d\n", sqlca.sqlerrd[5]);
+    fprintf(t,"SQLWARN: %s\n", sqlca.sqlwarn);
+    fprintf(t,"SQLSTATE: %s\n", sqlca.sqlstate);
+    //
+    // Dumping Input params:
+    fprintf(t,"enterprise:\"%s\"\n",enterprise);
+    fprintf(t,"countrycode:\"%s\"\n",countrycode);
+    fprintf(t,"languagecode:\"%s\"\n",languagecode);
+    fprintf(t,"nlsid:\"%d\"\n",nlsid);
+    fprintf(t,"countrylist:\"%s\"\n",countrylist);
+    fprintf(t,"wwentitytype:\"%s\"\n",wwentitytype);
+    fprintf(t,"wwentityid:\"%d\"\n",wwentityid);
+    fprintf(t,"status:\"%s\"\n",status);
+    fprintf(t,"status_fc:\"%s\"\n",status_fc);
+    fprintf(t,"projcdnam:\"%s\"\n",projcdnam);
+    fprintf(t,"projcdnam_fc:\"%s\"\n",projcdnam_fc);
+    fprintf(t,"wwpartnumber:\"%s\"\n",wwpartnumber);
+    fprintf(t,"machtype:\"%s\"\n",machtype);
+    fprintf(t,"model:\"%s\"\n",model);
+    fprintf(t,"specialbid:\"%s\"\n",specialbid);
+    fprintf(t,"specialbid_fc:\"%s\"\n",specialbid_fc);
+    fprintf(t,"category:\"%s\"\n",category);
+    fprintf(t,"category_fc:\"%s\"\n",category_fc);
+    fprintf(t,"subcategory:\"%s\"\n",subcategory);
+    fprintf(t,"subcategory_fc:\"%s\"\n",subcategory_fc);
+    fprintf(t,"group:\"%s\"\n",group);
+    fprintf(t,"group_fc:\"%s\"\n",group_fc);
+    fprintf(t,"subgroup:\"%s\"\n",subgroup);
+    fprintf(t,"subgroup_fc:\"%s\"\n",subgroup_fc);
+    fprintf(t,"ordercode:\"%s\"\n",ordercode);
+    fprintf(t,"ordercode_fc:\"%s\"\n",ordercode_fc);
+    fprintf(t,"sarindc:\"%s\"\n",sarindc);
+    fprintf(t,"sarindc_fc:\"%s\"\n",sarindc_fc);
+    fprintf(t,"serviceindicator:\"%s\"\n",serviceindicator);
+    fprintf(t,"division:\"%s\"\n",division);
+    fprintf(t,"division_fc:\"%s\"\n",division_fc);
+    fprintf(t,"ratecardcode:\"%s\"\n",ratecardcode);
+    fprintf(t,"ratecardcode_fc:\"%s\"\n",ratecardcode_fc);
+    fprintf(t,"mktname:\"%s\"\n",mktname);
+    fprintf(t,"anndate:\"%s\"\n",anndate);
+    fprintf(t,"withdrawdate:\"%s\"\n",withdrawdate);
+    fprintf(t,"standalone:\"%s\"\n",standalone);
+    fprintf(t,"standalone_fc:\"%s\"\n",standalone_fc);
+    fprintf(t,"unitclass:\"%s\"\n",unitclass);
+    fprintf(t,"unitclass_fc:\"%s\"\n",unitclass_fc);
+    fprintf(t,"unspsc:\"%s\"\n",unspsc);
+    fprintf(t,"unspsc_fc:\"%s\"\n",unspsc_fc);
+    fprintf(t,"unspscsec:\"%s\"\n",unspscsec);
+    fprintf(t,"unspscsec_fc:\"%s\"\n",unspscsec_fc);
+    fprintf(t,"unuom:\"%s\"\n",unuom);
+    fprintf(t,"unuom_fc:\"%s\"\n",unuom_fc);
+    fprintf(t,"unuomsec:\"%s\"\n",unuomsec);
+    fprintf(t,"unuomsec_fc:\"%s\"\n",unuomsec_fc);
+    fprintf(t,"applicationtype:\"%s\"\n",applicationtype);
+    fprintf(t,"applicationtype_fc:\"%s\"\n",applicationtype_fc);
+    fprintf(t,"oslevel:\"%s\"\n",oslevel);
+    fprintf(t,"oslevel_fc:\"%s\"\n",oslevel_fc);
+	fprintf(t,"dualpipe:\"%s\"\n",dualpipe);
+    fprintf(t,"dualpipe_fc:\"%s\"\n",dualpipe_fc);
+    fprintf(t,"isactive:\"%d\"\n",isactive);
+    fprintf(t,"prcfilenam:\"%s\"\n",prcfilenam);
+    // End dump params
+    fprintf(t,"******************  END OF GBL8982 SQLCA DUMP  *******************\n");
+    fclose(t);
+}
+//
+// END ERROR CHECK SECTION
+//
+
+ fprintf(t,"end of GBL8982\n");
+fclose(t);
+
+//EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in enterprise varchar(8)
+in countrycode varchar(2)
+in languagecode varchar(2)
+in nlsid int
+in countrylist varchar(8)
+in wwentitytype varchar(32)
+in wwentityid int
+in status varchar(25)
+in status_fc varchar(8)
+in projcdnam varchar(50)
+in projcdnam_fc varchar(8)
+in wwpartnumber varchar(7)
+in machtype varchar(4)
+in model varchar(3)
+in specialbid varchar(10)
+in specialbid_fc varchar(8)
+in category varchar(20)
+in category_fc varchar(8)
+in subcategory varchar(80)
+in subcategory_fc varchar(8)
+in group varchar(20)
+in group_fc varchar(8)
+in subgroup varchar(60)
+in subgroup_fc varchar(8)
+in ordercode varchar(1)
+in ordercode_fc varchar(2)
+in sarindc varchar(10)
+in sarindc_fc varchar(8)
+in serviceindicator varchar(10)
+in division varchar(8)
+in division_fc varchar(8)
+in ratecardcode varchar(10)
+in ratecardcode_fc varchar(8)
+in mktname varchar(254)
+in anndate varchar(10)
+in withdrawdate varchar(10)
+in standalone varchar(10)
+in standalone_fc varchar(8)
+in unitclass varchar(10)
+in unitclass_fc varchar(8)
+in unspsc varchar(128)
+in unspsc_fc varchar(8)
+in unspscsec varchar(128)
+in unspscsec_fc varchar(8)
+in unuom varchar(8)
+in unuom_fc varchar(8)
+in unuomsec varchar(8)
+in unuomsec_fc varchar(8)
+in applicationtype varchar(15)
+in applicationtype_fc varchar(8)
+in oslevel varchar(13400)
+in oslevel_fc varchar(1024)
+in dualpipe varchar(3)
+in dualpipe_fc varchar(3)
+in isactive int
+in prcfilenam varchar(128)
+@end
+

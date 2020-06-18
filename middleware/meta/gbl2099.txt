@@ -1,0 +1,361 @@
+@name=GBL2099
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+------------------------------------------------------------------------------------------------
+-- This guy Deactivates a Relator given the EntityType and EntityID
+-- What if this guy has attributes?
+-------------------------------------------------------------------------------------------------
+$Log: gbl2099.txt,v $
+Revision 1.15  2010/06/21 15:43:09  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.14  2009/10/20 00:21:59  rick
+update to change long datatype to sqlint32
+
+Revision 1.13  2006/04/11 17:03:21  joan
+checking entityid > 0 for GroupABR
+
+Revision 1.12  2006/03/17 16:53:34  joan
+changes on GroupABR trigger
+
+Revision 1.11  2005/11/02 23:11:46  joan
+add GroupABR check
+
+Revision 1.10  2004/10/20 21:01:38  dave
+changes to gen parm
+
+Revision 1.9  2004/02/20 20:21:48  roger
+Must be @t_schema
+
+Revision 1.8  2004/02/20 18:09:29  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.7  2003/09/08 16:31:10  roger
+Enterprise was changed to 16 char length
+
+Revision 1.6  2003/04/17 17:56:14  dave
+clean up link,deactivate, tagging
+
+Revision 1.5  2001/05/02 03:52:10  dave
+Added X table updates for all update/insert info in SP's
+Activate/Deactivate. copy
+
+Revision 1.4  2001/03/26 15:39:42  roger
+Misc clean up
+
+Revision 1.3  2001/03/16 18:27:51  roger
+Added branding feature to stored procedures
+
+Revision 1.2  2001/03/16 03:38:56  roger
+Added Log keyword
+
+@desc=This guy Deactivates a Relator given the EntityType and EntityID
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl2099.txt,v 1.15 2010/06/21 15:43:09 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL BEGIN DECLARE SECTION;
+char Entity1Type[33];
+char Entity2Type[33];
+sqlint32 Entity1ID;
+sqlint32 Entity2ID;
+char cQueueName [33];
+char tmpEntityType [32];
+char cDirection [32];
+sqlint32 iCount;
+EXEC SQL END DECLARE SECTION;
+
+char acQueueName[100][33];
+char atmpEntityType[100][32];
+char acDirection[100][32];
+sqlint32 iCQueue;
+sqlint32 i;
+
+EXEC SQL DECLARE  queueGroupABR CURSOR FOR
+SELECT RTRIM(ml1.LinkCode), RTRIM(COALESCE(ML2.linkcode,'NONE')), RTRIM(COALESCE(ML2.linkvalue,'NA'))
+from @t_schema.MetaLinkAttr ml1
+
+left join @t_schema.metalinkattr ml2 on
+   ml2.enterprise = :Enterprise
+   and ml2.linktype = 'GroupABR/Relator/Entity'
+   and ml2.linktype1 = RTRIM(ml1.linkcode)
+   and ml2.linktype2 = :EntityType
+   and ml2.valto > current timestamp and ml2.effto > current timestamp
+    
+WHERE
+   ml1.Enterprise = :Enterprise
+   AND ml1.LinkType = 'Status/Trigger/GroupABR'
+   AND ml1.LinkType1 in ('REL')
+   AND ml1.LinkType2 in ('DEL')
+   AND ml1.LinkValue = :EntityType
+   AND ml1.ValTo = :forever
+   AND ml1.EffTo > CURRENT TIMESTAMP
+;
+
+@execute
+if (EntityID > 0) {
+    strcpy(cQueueName, "NONE");
+    
+    iCQueue = 1;
+    EXEC SQL OPEN queueGroupABR;
+    do {
+        EXEC SQL FETCH queueGroupABR INTO :cQueueName, :tmpEntityType, :cDirection;
+        if (SQLCODE != 0) break;
+
+        strcpy(acQueueName[iCQueue],cQueueName);
+        strcpy(atmpEntityType[iCQueue],tmpEntityType);
+        strcpy(acDirection[iCQueue++],cDirection);
+    } while (1);
+    EXEC SQL CLOSE queueGroupABR WITH RELEASE;
+    EXEC SQL COMMIT WORK;
+    
+    // Do you have a hit?
+    
+    for (i=1; i < iCQueue; i++) {
+        strcpy(cQueueName, acQueueName[i]);
+        strcpy(tmpEntityType, atmpEntityType[i]);
+        strcpy(cDirection, acDirection[i]);
+                
+        if (strcmp(cQueueName,"NONE") != 0) {
+            iCount =0;
+            if (strcmp(tmpEntityType,"NONE") == 0) {
+        EXEC SQL select count(*) INTO :iCount from opicm.queue
+        where enterprise = :Enterprise
+        and queue = :cQueueName
+        and entitytype = :EntityType
+        and entityid = :EntityID
+        and status in (20, 50);
+        
+        if (iCount <= 0) {
+            EXEC SQL INSERT INTO @t_schema.QUEUE VALUES 
+            (   
+            :Enterprise
+            ,:OPENID
+            ,0
+            ,:cQueueName
+            ,20
+            ,:EntityType
+            ,:EntityID
+            ,CURRENT TIMESTAMP
+            ,'1980-01-01-00.00.00.000000'
+            ,'1980-01-01-00.00.00.000000'
+            ,'9999-12-31-00.00.00.000000'
+            );
+        }
+        } else {
+        if (strcmp(cDirection,"U") == 0) {
+            EXEC SQL select count(*) INTO :iCount from opicm.queue Q
+            join opicm.relator R1
+            on  R1.enterprise = :Enterprise
+            and R1.entitytype = :EntityType
+            and R1.entityid = :EntityID
+            and R1.entity1type = :tmpEntityType
+            and R1.valto > current timestamp and R1.effto > current timestamp
+
+            where Q.enterprise = :Enterprise
+            and Q.queue = :cQueueName
+            and Q.entitytype = :tmpEntityType
+            and Q.entityid = R1.entity1id
+            and Q.status in (20, 50);
+
+            if (iCount <= 0) {
+            EXEC SQL INSERT INTO @t_schema.QUEUE  
+            SELECT
+            :Enterprise
+            ,:OPENID
+            ,0
+            ,:cQueueName
+            ,20
+                ,:tmpEntityType
+            ,entity1id
+            ,CURRENT TIMESTAMP
+            ,'1980-01-01-00.00.00.000000'
+            ,'1980-01-01-00.00.00.000000'
+            ,'9999-12-31-00.00.00.000000'
+            from opicm.relator 
+            where enterprise = :Enterprise
+            and entitytype = :EntityType
+            and entityid = :EntityID
+            and entity1type = :tmpEntityType
+            and valto > current timestamp and effto > current timestamp
+            ;
+            }
+        } else {
+            EXEC SQL select count(*) INTO :iCount from opicm.queue Q
+            join opicm.relator R1
+            on  R1.enterprise = :Enterprise
+            and R1.entitytype = :EntityType
+            and R1.entityid = :EntityID
+            and R1.entity2type = :tmpEntityType
+            and R1.valto > current timestamp and R1.effto > current timestamp
+
+            where Q.enterprise = :Enterprise
+            and Q.queue = :cQueueName
+            and Q.entitytype = :tmpEntityType
+            and Q.entityid = R1.entity2id
+            and Q.status in (20, 50);
+
+            if (iCount <= 0) {
+            EXEC SQL INSERT INTO @t_schema.QUEUE  
+            SELECT
+            :Enterprise
+            ,:OPENID
+            ,0
+            ,:cQueueName
+            ,20
+            ,:tmpEntityType
+            ,Entity2ID
+            ,CURRENT TIMESTAMP
+            ,'1980-01-01-00.00.00.000000'
+            ,'1980-01-01-00.00.00.000000'
+            ,'9999-12-31-00.00.00.000000'
+
+            from opicm.relator 
+            where enterprise = :Enterprise
+            and entitytype = :EntityType
+            and entityid = :EntityID
+            and entity2type = :tmpEntityType
+            and valto > current timestamp and effto > current timestamp
+                    ;
+            }
+        }
+        }
+       }
+    }
+    EXEC SQL COMMIT WORK;
+}
+
+
+
+EXEC SQL
+SELECT
+ Entity1Type
+,Entity1ID
+,Entity2Type
+,Entity2ID
+INTO :Entity1Type, :Entity1ID, :Entity2Type, :Entity2ID
+FROM @t_schema.Relator
+WHERE
+    Enterprise = :Enterprise
+AND EntityType = :EntityType
+AND EntityID   = :EntityID
+AND ValTo = :forever
+;
+
+EXEC SQL COMMIT WORK;
+
+// Close out the existing
+EXEC SQL
+UPDATE @t_schema.Relator
+SET
+   ValTo = :now
+WHERE
+Enterprise = :Enterprise AND
+EntityType = :EntityType AND
+EntityID = :EntityID AND
+ValTo = :forever
+;
+
+// Now for the shadow table
+EXEC SQL
+UPDATE @t_schema.RelatorX
+SET
+   ValTo = :now
+WHERE
+Enterprise = :Enterprise AND
+EntityType = :EntityType AND
+EntityID = :EntityID AND
+ValTo = :forever
+;
+
+// Add a new closed Relator
+EXEC SQL
+INSERT
+INTO @t_schema.Relator
+(
+  Enterprise
+, EntityType
+, EntityID
+, Entity1Type
+, Entity1ID
+, Entity2Type
+, Entity2ID
+, TranID
+, ValFrom
+, ValTo
+, EffFrom
+, EffTo
+, OPENID
+)
+VALUES
+(
+  :Enterprise
+, :EntityType
+, :EntityID
+, :Entity1Type
+, :Entity1ID
+, :Entity2Type
+, :Entity2ID
+, :TranID
+, :now
+, :forever
+, :now
+, :now
+, :OPENID
+)
+;
+
+// Now for the shadow table
+EXEC SQL
+INSERT
+INTO @t_schema.RelatorX
+(
+  Enterprise
+, EntityType
+, EntityID
+, Entity1Type
+, Entity1ID
+, Entity2Type
+, Entity2ID
+, TranID
+, ValFrom
+, ValTo
+, EffFrom
+, EffTo
+, OPENID
+)
+VALUES
+(
+  :Enterprise
+, :EntityType
+, :EntityID
+, :Entity1Type
+, :Entity1ID
+, :Entity2Type
+, :Entity2ID
+, :TranID
+, :now
+, :forever
+, :now
+, :now
+, :OPENID
+)
+;
+EXEC SQL COMMIT WORK;
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in EntityID int
+in TranID int
+@end
+
+
+

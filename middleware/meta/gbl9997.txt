@@ -1,0 +1,76 @@
+@name=GBL9997
+@noremote=true
+@parmstyle=GENERAL
+@type=basic
+@dbase=opicmpdh
+@narrative
+----------------------------------------------------------------------
+--  This is insert/update for USAGE table
+----------------------------------------------------------------------
+$Log: gbl9997.txt,v $
+Revision 1.4  2010/06/21 15:43:01  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.3  2004/10/20 21:01:51  dave
+changes to gen parm
+
+Revision 1.2  2004/05/06 20:15:58  roger
+Fill in details
+
+Revision 1.1  2004/05/06 19:58:21  roger
+New SP
+
+
+@desc=Insert/Update USAGE table
+@fenced=true
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9997.txt,v 1.4 2010/06/21 15:43:01 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+@execute
+EXEC SQL
+INSERT INTO @t_schema.Usage
+VALUES
+(
+  :Enterprise
+, :SessionID
+, :UserToken
+, :VersionLiteral
+, :Client
+, :IPAddr
+, :ClientData
+, :LogIn
+, :LogOut
+)           
+;
+
+EXEC SQL
+UPDATE @t_schema.Usage
+SET
+  UserToken = :UserToken
+, VersionLiteral = :VersionLiteral
+, Client = :Client
+, IPAddr = :IPAddr
+, ClientData = :ClientData
+, LogIn = :LogIn
+, LogOut = :LogOut
+WHERE
+    Enterprise = :Enterprise
+AND SessionID = :SessionID
+;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(8)
+in SessionID int
+in UserToken varchar(80)
+in VersionLiteral varchar(80)
+in Client varchar(80)
+in IPAddr varchar(80)
+in ClientData varchar(80)
+in LogIn varchar(26)
+in LogOut varchar(26)
+@end

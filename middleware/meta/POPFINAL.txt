@@ -1,0 +1,243 @@
+@name=POPFINAL
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+
+----------------------------------------------------------------------
+--  This is insert for 
+----------------------------------------------------------------------
+$Log: POPFINAL.txt,v $
+Revision 1.19  2009/10/20 00:21:58  rick
+update to change long datatype to sqlint32
+
+Revision 1.18  2007/12/11 03:26:50  yang
+change base on new requirement
+
+Revision 1.17  2007/10/30 08:33:22  liubdl
+fix bugs
+
+
+Revision 1.15  2007/07/26 06:38:34  liubdl
+no message
+
+Revision 1.14  2007/07/26 06:05:56  liubdl
+no message
+
+Revision 1.13  2007/07/26 03:24:25  yang
+more varible changes
+
+Revision 1.12  2007/07/26 03:06:36  yang
+updated varibles
+
+Revision 1.11  2007/07/26 02:52:01  yang
+my last try
+
+Revision 1.10  2007/07/26 02:36:12  yang
+one more try
+
+Revision 1.9  2007/07/26 02:19:02  yang
+one more try
+
+Revision 1.8  2007/07/26 01:56:32  yang
+additional changes
+
+Revision 1.7  2007/07/26 01:27:09  yang
+more changes
+
+Revision 1.4  2007/07/18 02:50:31  yang
+more changes
+
+@desc=build a common list for Price table
+@results=1
+@parmstyle=GENERAL
+@sql
+
+EXEC SQL BEGIN DECLARE SECTION;
+	char fullTableName[50];
+	char fullFinalTableName[50];
+	char stmt[100];
+	sqlint32 tableCount=0;
+	char idxName[30];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: POPFINAL.txt,v 1.19 2009/10/20 00:21:58 rick Exp $";
+EXEC SQL END DECLARE SECTION;
+
+strcpy(fullTableName,schemaName);
+strcat(fullTableName,".");
+strcat(fullTableName,tableName);
+
+strcpy(fullFinalTableName,fullTableName);
+strcat(fullFinalTableName,"_F");
+
+EXEC SQL select count(*) into :tableCount from syscat.tables
+ where tabschema=:schemaName and tabname=:tableName||'_F' and type='T';
+
+if(tableCount <= 0){
+	strcpy(stmt,"create table ");
+	strcat(stmt,fullFinalTableName);
+	strcat(stmt," like ");
+	strcat(stmt,fullTableName);
+	if(strcmp(tspaceName,"DEFAULT")!=0){
+		strcat(stmt," in ");
+		strcat(stmt,tspaceName);
+	}
+	if(strcmp(idxspaceName,"DEFAULT")!=0){
+		strcat(stmt," index in ");
+		strcat(stmt,idxspaceName);
+	}
+	EXEC SQL PREPARE stmtIdx FROM :stmt;
+	EXEC SQL EXECUTE stmtIdx;
+	
+	stmt[0] = '\0';
+	EXEC SQL VALUES rtrim(left(:tableName,14)) INTO :idxName;
+	strcpy(stmt,"create unique index ");
+	strcat(stmt,schemaName);
+	strcat(stmt,".");
+	strcat(stmt,idxName);
+	strcat(stmt,"_FPK on ");
+	strcat(stmt,fullFinalTableName);
+	strcat(stmt,"(ENTITYID, NLSID, VALFROM)");	
+	EXEC SQL PREPARE stmtTb FROM :stmt;
+	EXEC SQL EXECUTE stmtTb;
+	EXEC SQL COMMIT WORK;
+}
+
+EXEC SQL BEGIN DECLARE SECTION;
+char columnNames[128];
+sqlint32 colCount =0;
+char type[128];	
+char alterSql[1024];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL select count(*) into :colCount from syscat.columns 
+where tabname = :tableName 
+and tabschema = :schemaName 
+and colname not in (select colname from syscat.columns 
+where tabname = :tableName||'_F' and tabschema = :schemaName);
+
+strcpy(alterSql,"alter table ");
+strcat(alterSql,fullFinalTableName);
+
+if(colCount>0){
+	EXEC SQL DECLARE colCur CURSOR FOR 
+		select colname,concat(rtrim(concat(concat(typename,'('), char(length))),')')
+		from syscat.columns 
+		where tabname = :tableName 
+		and tabschema = :schemaName 
+		and colname not in (select colname from syscat.columns 
+		where tabname = :tableName||'_F' 
+		and tabschema = :schemaName);
+	EXEC SQL OPEN colCur;
+	do {
+    EXEC SQL FETCH colCur INTO :columnNames,:type;   
+    if (SQLCODE != 0) break;
+    strcat(alterSql," add column ");
+    strcat(alterSql,columnNames);
+    strcat(alterSql," ");
+    strcat(alterSql,type);
+  } while (1);
+  
+  EXEC SQL CLOSE colCur WITH RELEASE;
+  EXEC SQL PREPARE alterStmt FROM :alterSql;
+	EXEC SQL EXECUTE alterStmt;
+	EXEC SQL COMMIT WORK;
+}
+
+EXEC SQL BEGIN DECLARE SECTION;
+    char finalTableName[50];
+    char colName[50];
+    char colType[20];
+    char str_rep0[4096];
+    char str_rep1[4096];
+    char str_rep2[4096];
+    char str_insertSQL[10240];
+    char str_updateSQL[10240];
+    char stmt_x[2048];
+    sqlint32 colNum=0;
+    sqlint32 length=0;
+EXEC SQL END DECLARE SECTION;
+
+str_rep0[0]='\0';
+str_rep1[0]='\0';
+str_rep2[0]='\0';
+    
+strcpy(finalTableName,tableName);
+strcat(finalTableName,"_F");    
+    
+EXEC SQL DECLARE cursor_x CURSOR FOR 
+	select RTRIM(colname),RTRIM(typename) from syscat.columns 
+	where tabschema=:schemaName
+	and tabname =:finalTableName 
+	order by colname;
+EXEC SQL OPEN cursor_x;
+EXEC SQL FETCH cursor_x INTO :colName, :colType;
+while (sqlca.sqlcode != 100){
+  strcat(str_rep0,colName);
+  strcat(str_rep0,",");
+  strcat(str_rep1,"a.");
+  strcat(str_rep1,colName);
+  strcat(str_rep1,",");
+  strcat(str_rep2,"b.");
+  strcat(str_rep2,colName);
+  strcat(str_rep2,",");
+  colNum = colNum+1;
+  EXEC SQL FETCH cursor_x INTO :colName, :colType;
+}
+EXEC SQL CLOSE cursor_x;
+  
+if(colNum > 0){
+	EXEC SQL VALUES LENGTH(:str_rep0) INTO :length;
+	EXEC SQL VALUES SUBSTR(:str_rep0, 1, :length-1) INTO :str_rep0;
+	EXEC SQL VALUES LENGTH(:str_rep1) INTO :length;
+	EXEC SQL VALUES SUBSTR(:str_rep1, 1, :length-1) INTO :str_rep1;
+	EXEC SQL VALUES LENGTH(:str_rep2) INTO :length;
+	EXEC SQL VALUES SUBSTR(:str_rep2, 1, :length-1) INTO :str_rep2;  	
+  
+  strcpy(str_insertSQL,"insert into ");
+  strcat(str_insertSQL,fullFinalTableName);
+  strcat(str_insertSQL," (");
+  strcat(str_insertSQL,str_rep0);
+  strcat(str_insertSQL,")");
+  strcat(str_insertSQL," (select ");
+  strcat(str_insertSQL,str_rep0);
+  strcat(str_insertSQL," from ");
+  strcat(str_insertSQL,fullTableName);
+  strcat(str_insertSQL," b where not exists (select a.ENTITYID from ");
+  strcat(str_insertSQL,fullFinalTableName);
+  strcat(str_insertSQL," a where a.ENTITYID=b.ENTITYID and a.NLSID=b.NLSID) and b.STATUS_FC='");
+  strcat(str_insertSQL,status);
+  strcat(str_insertSQL,"')");  
+  
+  strcpy(str_updateSQL,"update ");
+  strcat(str_updateSQL,fullFinalTableName);
+  strcat(str_updateSQL," a set(");
+  strcat(str_updateSQL,str_rep1);
+  strcat(str_updateSQL,")=(select ");
+  strcat(str_updateSQL,str_rep2);
+  strcat(str_updateSQL," from ");
+  strcat(str_updateSQL,fullTableName);
+  strcat(str_updateSQL," b where a.ENTITYID=b.ENTITYID and a.NLSID=b.NLSID) where exists (select b.ENTITYID from ");
+  strcat(str_updateSQL,fullTableName);
+  strcat(str_updateSQL," b where a.ENTITYID=b.ENTITYID and a.NLSID=b.NLSID and a.VALFROM <> b.VALFROM and b.STATUS_FC='");
+  strcat(str_updateSQL,status);
+  strcat(str_updateSQL,"')"); 
+
+  EXEC SQL PREPARE s_insert FROM :str_insertSQL;
+  EXEC SQL EXECUTE s_insert;
+  EXEC SQL PREPARE s_update FROM :str_updateSQL;
+  EXEC SQL EXECUTE s_update;
+  EXEC SQL COMMIT ;
+}
+
+@parameters
+inout ReturnStatus int
+IN schemaName VARCHAR(10)
+IN tableName VARCHAR(20)
+IN status VARCHAR(20)
+IN tspaceName VARCHAR(20)
+IN idxspaceName VARCHAR(20)
+@end
+

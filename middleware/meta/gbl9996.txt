@@ -1,0 +1,48 @@
+@name=GBL9996
+@noremote=true
+@parmstyle=GENERAL
+@type=insert2
+@dbase=opicmods
+@table=gbli.Product
+@narrative
+----------------------------------------------------------------------
+--  This is insert for @table
+----------------------------------------------------------------------
+$Log: gbl9996.txt,v $
+Revision 1.5  2010/06/21 15:42:49  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.4  2004/10/20 21:01:51  dave
+changes to gen parm
+
+Revision 1.3  2004/06/22 18:02:41  roger
+More cols
+
+Revision 1.2  2004/06/22 17:49:45  roger
+Wrong name
+
+Revision 1.1  2004/06/22 15:51:15  roger
+New SP for hula
+
+
+@desc=Insert for @table
+@fenced=true
+@results=0
+@change_cols=Enterprise ChangeDate SessionID EntityType EntityID Country nlsid
+@update_cols=Enterprise ChangeDate SessionID EntityType EntityID Country nlsid
+@insert_cols=Enterprise ChangeDate SessionID EntityType EntityID Country nlsid
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl9996.txt,v 1.5 2010/06/21 15:42:49 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(8)
+in ChangeDate varchar(27)
+in SessionID int
+in EntityType varchar(32)
+in EntityID int
+in Country int
+in nlsid int
+@end

@@ -1,0 +1,64 @@
+@name=GBL7535
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@addperm=false
+@fenced=true
+@results=1
+@narrative
+$Log: gbl7535.txt,v $
+Revision 1.6  2010/06/21 15:42:48  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.5  2004/10/20 21:01:45  dave
+changes to gen parm
+
+Revision 1.4  2004/02/20 20:21:55  roger
+Must be @t_schema
+
+Revision 1.3  2004/02/20 18:09:35  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.2  2003/09/08 16:31:19  roger
+Enterprise was changed to 16 char length
+
+Revision 1.1  2003/01/29 17:42:22  gregg
+initial load
+
+
+@desc=Check the existence of any current Assoicated Data for an Allowed Flag Value. Non-role sensitive. 
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl7535.txt,v 1.6 2010/06/21 15:42:48 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT DISTINCT
+ FLAG.ENTITYID
+from 
+@t_schema.FLAG FLAG
+where
+    FLAG.enterprise = :Enterprise 
+AND FLAG.AttributeCode = :AttributeCode
+AND FLAG.AttributeValue = :AttributeValue
+AND FLAG.valto > :ValOn 
+AND FLAG.valfrom <= :ValOn 
+AND FLAG.effto > :EffOn 
+AND FLAG.efffrom <= :EffOn
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in AttributeCode varchar(32)
+in AttributeValue varchar(32)
+in ValOn varchar(26)
+in EffOn varchar(26)
+@end
+
+
+
+
+

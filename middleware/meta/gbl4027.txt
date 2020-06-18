@@ -1,0 +1,82 @@
+@name=GBL4027
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+-- Retrieve a matching CATLGPUB based on audience/country/pn for purpose of fetching pubfrom/pubto dates.
+--------------------------------------------------------------------------------------------
+$Log: gbl4027.txt,v $
+Revision 1.8  2010/06/21 15:43:00  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.7  2008/01/28 21:07:18  yang
+removing valfrom & valto criteria
+
+Revision 1.6  2007/05/15 17:37:56  rick
+Changed to only pull CATLGPUB records which are
+not deleted (isactive=1) and are active in UI
+CATACTIVE_FC='Active'.
+
+Revision 1.5  2006/04/26 21:00:32  gregg
+extend type col length to 12
+
+Revision 1.4  2006/04/25 16:51:47  gregg
+fix
+
+Revision 1.3  2006/04/25 16:28:46  gregg
+initial load
+
+
+
+@desc=Retrieve a matching CATLGPUB based on audience/country/pn for purpose of fetching pubfrom/pubto dates.
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl4027.txt,v 1.8 2010/06/21 15:43:00 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL DECLARE MODEL_cur CURSOR FOR
+SELECT
+  entityid
+ ,pubfrom
+ ,pubto
+FROM gbli.CATLGPUB
+WHERE
+    NLSID = :NLSID
+AND CATAUDIENCE_FC = :Audience_fc
+AND (CATMACHTYPE || CATMODEL) = :PartNumber
+AND ISACTIVE = 1
+AND CATACTIVE_FC = 'Active'
+;
+
+EXEC SQL DECLARE LSEO_cur CURSOR FOR
+SELECT
+  entityid
+ ,pubfrom
+ ,pubto
+FROM gbli.CATLGPUB
+WHERE
+    NLSID = :NLSID
+AND CATAUDIENCE_FC = :Audience_fc
+AND CATSEOID = :PartNumber
+AND ISACTIVE = 1
+AND CATACTIVE_FC = 'Active'
+;
+
+@execute
+if (strcmp(Type,"MODEL") == 0) {
+        EXEC SQL OPEN MODEL_cur;
+} else if (strcmp(Type,"LSEO") == 0 || strcmp(Type,"LSEOBUNDLE") == 0) {
+        EXEC SQL OPEN LSEO_cur;
+}
+@parameters
+inout ReturnStatus int
+in NLSID int
+in Type varchar(12)
+in PartNumber varchar(12)
+in Audience_fc varchar(12)
+in ValOn varchar(26)
+@end

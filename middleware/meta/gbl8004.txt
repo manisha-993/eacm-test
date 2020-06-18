@@ -1,0 +1,448 @@
+@name=GBL8004
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+Pulls back the Action Template used in GBL8000 for API use
+
+$Log: gbl8004.txt,v $
+Revision 1.10  2015/01/27 19:09:07  ptatinen
+Add extra condition in where clauses to resolve db2 9.5 restriction on INT function
+
+Revision 1.9  2004/10/20 21:01:47  dave
+changes to gen parm
+
+Revision 1.8  2004/07/20 16:39:16  dave
+Attempting to do the trickey T think to pick up both ends of
+the relator on a Nav.. or extract
+
+Revision 1.7  2004/02/20 20:21:56  roger
+Must be @t_schema
+
+Revision 1.6  2004/02/20 18:09:36  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.5  2003/09/08 16:31:20  roger
+Enterprise was changed to 16 char length
+
+Revision 1.4  2003/08/21 20:30:51  dave
+adding ordering to GBL8004
+
+Revision 1.3  2002/08/12 18:14:48  dave
+added the call 8004 to the extract action item
+
+Revision 1.2  2002/08/12 17:42:21  dave
+added new sp for VE Step reveals
+
+
+@results=1
+@desc=Pulls back the Action Template used in GBL8000 for API use
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8004.txt,v 1.10 2015/01/27 19:09:07 ptatinen Exp $";
+EXEC SQL END DECLARE SECTION;
+
+// ===================================================================
+// This guy Generates a Navigation Template based upon the Navigation
+// Type and the EntityType
+// This guy is the big kahuna that replaces  all previous Navigation
+// ===================================================================
+EXEC SQL DECLARE ActionTemplate CURSOR FOR
+WITH myWire
+  (Level
+  ,FromEntity
+  ,ToEntity
+  ,RelatorType
+  ,ParentDirection
+  ,ChildDirection
+  ,Category
+  ,RClass)
+AS
+(SELECT DISTINCT
+  INT(ROOT.LinkValue)
+, E.LinkType1
+, E.LinkType2
+, ROOT.LinkType2
+--, CHAR(ROOT.LinkCode,1)
+,'D'
+, CHAR(ROOT.LinkCode,1)
+, 'E'
+, E.LinkCode
+FROM @t_schema.MetaLinkAttr ROOT
+INNER JOIN @t_schema.MetaLinkAttr E ON
+   E.Enterprise = :Enterprise
+AND E.LinkCode in ('Relator','Assoc')
+AND E.LinkType = ROOT.LinkType2
+AND CASE ROOT.LinkCode
+     WHEN 'D' THEN E.LinkType1
+     WHEN 'U' THEN E.LinkType2
+   END = :EntityType
+AND E.ValFrom <= :now AND :now < E.ValTo AND E.EffFrom <= :now AND :now < E.EffTo
+WHERE
+    ROOT.Enterprise = :Enterprise
+AND ROOT.LinkType in ('Action/Entity')
+AND ROOT.LinkType1= :ActionType
+AND ROOT.LinkCode not like 'Filter%'
+AND ROOT.LinkCode IN ('D','U')
+AND INT(ROOT.LinkValue) >= 0
+AND ROOT.ValFrom <= :now AND :now < ROOT.ValTo AND ROOT.EffFrom <= :now AND :now < ROOT.EffTo
+UNION ALL
+-- CASE I   Parent Direction is Down .. and Child Direction is Down
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :now AND :now < E.ValTo AND E.EffFrom <= :now AND :now < E.EffTo
+  WHERE
+     E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'D'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= :now AND :now < E1.ValTo AND E1.EffFrom <= :now AND  :now < E1.EffTo) CHILD
+WHERE
+    PARENT.ToEntity  = CHILD.FromEntity
+AND PARENT.ChildDirection = 'D'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+--
+-- CASE Parent UP.. Child Up
+--
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :now AND :now < E.ValTo AND E.EffFrom <= :now AND :now < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'U'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= :now AND :now < E1.ValTo AND E1.EffFrom <= :now AND  :now < E1.EffTo) CHILD
+WHERE
+PARENT.FromEntity =  CHILD.ToEntity
+AND PARENT.ChildDirection = 'U'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+UNION ALL
+--
+-- CASE Parent UP.. Child Down
+--
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :now AND :now < E.ValTo AND E.EffFrom <= :now AND :now < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'D'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= :now AND :now < E1.ValTo AND E1.EffFrom <= :now AND  :now < E1.EffTo) CHILD
+WHERE
+    PARENT.FromEntity =  CHILD.FromEntity
+AND PARENT.ChildDirection = 'U'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+UNION ALL
+--
+-- CASE Parent Down.. Child Up
+--
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'E'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+   INT(E1.LinkValue) AS Level
+  ,E.LinkType1 AS FromEntity
+  ,E.LinkType2 AS ToEntity
+  ,E1.LinkType2 AS RelatorType
+  ,E1.LinkCode AS Direction
+  ,E.LinkCode AS RCLASS
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :now AND :now < E.ValTo AND E.EffFrom <= :now AND :now < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType IN ('Action/Entity')
+  AND E1.LinkCode = 'U'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= :now AND :now < E1.ValTo AND E1.EffFrom <= :now AND  :now < E1.EffTo) CHILD
+WHERE
+    PARENT.ToEntity =  CHILD.ToEntity
+AND PARENT.ChildDirection = 'D'
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+--
+-- Case Parent a Relator.. child goes up to an entity
+--
+
+UNION ALL
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'R'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+   INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+     E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :now AND :now < E.ValTo AND E.EffFrom <= :now AND :now < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode = 'U'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= :now AND :now < E1.ValTo AND E1.EffFrom <= :now AND  :now < E1.EffTo) CHILD
+WHERE
+    PARENT.RelatorType =  CHILD.ToEntity
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+UNION ALL
+--
+-- Case Parent a Relator.. child goes Down to an Entity
+--
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'R'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :now AND :now < E.ValTo AND E.EffFrom <= :now AND :now < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType IN ('Action/Entity')
+  AND E1.LinkCode = 'D'
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= :now AND :now < E1.ValTo AND E1.EffFrom <= :now AND  :now < E1.EffTo) CHILD
+WHERE
+    PARENT.RelatorType = CHILD.FromEntity
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+UNION ALL
+--
+-- Case parent is an Entity.. and we are going down to a relator
+--
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(Parent.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'T'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+   INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+     E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :now AND :now < E.ValTo AND E.EffFrom <= :now AND :now < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType  in ('Action/Entity')
+  AND E1.LinkCode not like 'Filter%'
+  AND E1.LinkCode in ('U','D')
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= :now AND :now < E1.ValTo AND E1.EffFrom <= :now AND  :now < E1.EffTo) CHILD
+WHERE
+    PARENT.ToEntity =  CHILD.RelatorType
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+UNION ALL
+--
+-- Case parent is an entity. and we are going from an up case
+--
+SELECT
+ PARENT.Level + 1
+,CHILD.FromEntity
+,CHILD.ToEntity
+,CHILD.RelatorType
+,CHAR(PARENT.ChildDirection,1)
+,CHAR(CHILD.Direction,1)
+,'T'
+,CHILD.RClass
+FROM
+myWire PARENT,
+ (SELECT DISTINCT
+    INT(E1.LinkValue) AS Level
+   ,E.LinkType1 AS FromEntity
+   ,E.LinkType2 AS ToEntity
+   ,E1.LinkType2 AS RelatorType
+   ,E1.LinkCode AS Direction
+   ,E.LinkCode AS RClass
+  FROM @t_schema.MetaLinkAttr E1
+  INNER JOIN @t_schema.MetaLinkAttr E ON
+      E.Enterprise = :Enterprise
+  AND E.LinkCode in ('Relator','Assoc')
+  AND E.LinkType = E1.LinkType2
+  AND E.ValFrom <= :now AND :now < E.ValTo AND E.EffFrom <= :now AND :now < E.EffTo
+  WHERE
+      E1.Enterprise = :Enterprise
+  AND E1.LinkType1 = :ActionType
+  AND E1.LinkType IN ('Action/Entity')
+  AND E1.LinkCode not like 'Filter%'
+  AND E1.LinkCode in ('U','D')
+  AND INT(E1.LinkValue) >= 0
+  AND E1.ValFrom <= :now AND :now < E1.ValTo AND E1.EffFrom <= :now AND  :now < E1.EffTo) CHILD
+WHERE
+    PARENT.FromEntity = CHILD.RelatorType
+AND CHILD.Level = PARENT.Level + 1
+AND PARENT.Level <= 10
+
+)
+SELECT DISTINCT
+  Level
+, CASE(Select Max(Level) from myWire) WHEN Level THEN 1 ELSE 0 END
+, RTRIM(FromEntity)
+, RTRIM(ToEntity)
+, RTRIM(RelatorType)
+, RTRIM(ParentDirection)
+, RTRIM(ChildDirection)
+, RTRIM(Category)
+, RTRIM(RClass)
+, (select
+   RTRIM(md.LongDescription)
+   from @t_schema.MetaDescription md
+   where
+       md.enterprise = :Enterprise
+   and md.descriptionType = RelatorType
+   and md.nlsid = 1
+   and md.valto = :forever
+   and md.effto > :now
+  )
+FROM myWire
+ORDER BY 1,10
+;
+
+@execute
+
+// send the final result set back to the caller
+
+EXEC SQL OPEN ActionTemplate;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in EntityType varchar(32)
+in ActionType varchar(32)
+@end
+
+

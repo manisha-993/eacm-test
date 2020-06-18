@@ -1,0 +1,53 @@
+@name=GBL8005
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+Moves information between work Queues
+
+@results=0
+@desc=Moves information between work Queues
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8005.txt,v 1.9 2010/06/21 15:43:23 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+@execute
+
+EXEC SQL
+INSERT INTO @t_schema.Queue
+SELECT
+:Enterprise
+,:OPWGID
+,SESSIONID
+,QUEUE
+,STATUS
+,ENTITYTYPE
+,ENTITYID
+,CURRENT TIMESTAMP
+,'1980-01-01-00.00.00.000000'
+,'1980-01-01-00.00.00.000000'
+,'9999-12-31-00.00.00.000000'
+FROM @t_schema.QUEUE
+WHERE
+    OPWGID = :OLDOPWGID
+AND QUEUE = :QueueName
+AND EntityID BETWEEN :StartID - 1 AND :EndID + 1
+;
+
+EXEC SQL COMMIT WORK;
+
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in OPWGID int
+in OLDOPWGID int
+in QueueName varchar(32)
+in StartID int
+in EndID int
+@end
+
+

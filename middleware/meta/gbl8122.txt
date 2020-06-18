@@ -1,0 +1,494 @@
+@name=GBL8122
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@fenced=true
+@narrative
+
+Sets up new Translation Flags
+
+$Log: gbl8122.txt,v $
+Revision 1.26  2010/06/21 15:43:24  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.25  2009/10/20 00:22:00  rick
+update to change long datatype to sqlint32
+
+Revision 1.24  2004/11/12 17:22:21  dave
+more fprintf removals
+
+Revision 1.23  2004/10/20 21:01:48  dave
+changes to gen parm
+
+Revision 1.22  2004/05/06 19:50:13  dave
+sp speed updates
+
+Revision 1.21  2004/03/26 17:43:19  gregg
+CR 6744
+
+Revision 1.20  2004/02/20 20:21:57  roger
+Must be @t_schema
+
+Revision 1.19  2004/02/20 18:09:37  roger
+ALL table names must now be prefixed w/ @t_schema in
+order to support multiple schemas in SPs.
+
+Revision 1.18  2003/07/10 18:35:52  dave
+fixes for null pointer
+
+Revision 1.17  2003/06/30 20:10:12  dave
+changes to 8122 attributecodes
+
+Revision 1.16  2003/06/27 22:13:43  dave
+syntax fix
+
+Revision 1.15  2003/06/27 21:50:12  dave
+making sure its status 0 not double entered
+
+Revision 1.13  2003/06/26 23:03:50  dave
+pay attention to ISO format on dates
+
+Revision 1.12  2003/06/26 22:45:04  dave
+adding nlsid check
+
+Revision 1.11  2003/06/26 21:48:26  dave
+checking in changes
+
+Revision 1.10  2003/06/25 22:53:50  dave
+minor changes
+
+Revision 1.9  2003/06/24 23:58:40  dave
+Translation I
+
+Revision 1.8  2003/06/24 23:47:53  dave
+Translation part I
+
+Revision 1.7  2003/06/24 22:25:22  dave
+auto inserting directly into the queue table
+to prep for initial packaging
+
+Revision 1.6  2003/06/24 19:59:07  dave
+rearranging SQL to be more effiecient
+
+Revision 1.5  2003/06/23 21:54:43  dave
+removed distinct
+
+Revision 1.4  2003/06/23 20:19:34  dave
+adding translation loging to the splog
+
+Revision 1.3  2003/06/20 17:45:23  dave
+mods to GBL8122
+
+Revision 1.2  2003/06/19 21:14:03  dave
+checking in GBL8122
+
+Revision 1.1  2003/06/19 19:40:08  dave
+new INITATION SP for TRANSLATION
+
+
+@desc= Looks to set TRANSLATIONWATCH to ON
+@results=0
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl8122.txt,v 1.26 2010/06/21 15:43:24 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL BEGIN DECLARE SECTION;
+sqlint32 iEntityID;
+char cEntityType [33];
+char cAttributeCode [33];
+char tstamp [27];
+EXEC SQL END DECLARE SECTION;
+
+sqlint32 iEntityTypeCount;
+sqlint32 iEntityCount;
+char acEntityType[25] [33];
+char acAttributeCode[25] [33];
+sqlint32 aiEntityID[250000];
+
+strcpy(acEntityType[0],"CSOL");
+strcpy(acAttributeCode[0],"TARG_ANN_DATE_CT");
+
+strcpy(acEntityType[1],"CCTO");
+strcpy(acAttributeCode[1],"CCOSOLTARGANNDATE");
+
+strcpy(acEntityType[2],"CVAR");
+strcpy(acAttributeCode[2],"TARGANNDATE_CVAR");
+
+strcpy(acEntityType[3],"CB");
+strcpy(acAttributeCode[3],"TARG_ANN_DATE_CB");
+
+iEntityTypeCount = 4;
+
+//
+//  This is the Generic Cursor
+//
+EXEC SQL DECLARE curGEN CURSOR FOR
+SELECT
+E1.EntityID
+FROM OPICM.ENTITY E1
+INNER JOIN OPICM.TEXT T1 ON
+    T1.ENTERPRISE = :Enterprise
+AND T1.ENTITYTYPE = E1.ENTITYTYPE
+AND T1.ENTITYID = E1.ENTITYID
+AND T1.ATTRIBUTECODE = :cAttributeCode
+AND T1.NLSID = 1
+AND T1.ATTRIBUTEVALUE
+BETWEEN
+CHAR(Date(CURRENT TIMESTAMP)) AND CHAR(Date(CURRENT TIMESTAMP) + 60 days)
+AND T1.VALTO = :forever
+AND CURRENT TIMESTAMP < T1.EFFTO
+-- Begin CR6744
+INNER JOIN OPICM.FLAG F3 ON
+    F3.ENTERPRISE = :Enterprise
+AND F3.ENTITYTYPE = E1.ENTITYTYPE
+AND F3.ENTITYID = E1.ENTITYID
+AND F3.ATTRIBUTECODE = 'GENAREANAME'
+AND RTRIM(F3.ATTRIBUTEVALUE) NOT IN (
+    '10871',
+    '10878',
+    '10881',
+    '10885',
+    '10890',
+    '10894',
+    '10933',
+    '10934',
+    '10946',
+    '10956',
+    '10957',
+    '10968',
+    '10970',
+    '10973',
+    '10981',
+    '10994',
+    '11001',
+    '11010',
+    '11023',
+    '11042',
+    '11047',
+    '11048',
+    '11049')
+AND F3.VALTO = :forever
+AND CURRENT TIMESTAMP < F3.EFFTO
+-- End CR 6744
+LEFT JOIN OPICM.FLAG F2 ON
+    F2.ENTERPRISE = :Enterprise
+AND F2.ENTITYTYPE = E1.ENTITYTYPE
+AND F2.ENTITYID = E1.ENTITYID
+AND F2.ATTRIBUTECODE = 'TRANSLATIONWATCH'
+AND F2.ATTRIBUTEVALUE = 'TWON'
+AND F2.VALTO = :forever
+AND CURRENT TIMESTAMP < F2.EFFTO
+WHERE
+    E1.ENTERPRISE = :Enterprise
+AND E1.ENTITYTYPE = :cEntityType
+AND E1.VALTO = :forever
+AND CURRENT TIMESTAMP < E1.EFFTO
+AND F2.ENTERPRISE IS NULL
+;
+
+@execute
+
+
+for (sqlint32 ii = 0;ii < iEntityTypeCount;ii++) {
+
+  strcpy(cEntityType, acEntityType[ii]);
+  strcpy(cAttributeCode, acAttributeCode[ii]);
+
+  EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+//  fprintf(f,"GBL8122:Checking %s:%s\n", cEntityType,cAttributeCode);
+
+  iEntityCount = 0;
+  EXEC SQL OPEN curGEN;
+  do {
+    EXEC SQL FETCH curGEN INTO :iEntityID;
+    if (SQLCODE != 0) break;
+    aiEntityID[iEntityCount++] =  iEntityID;
+  } while (1);
+
+  EXEC SQL CLOSE curGEN WITH RELEASE;
+
+  for (sqlint32 iy=0;iy<iEntityCount;iy++) {
+
+
+    iEntityID = aiEntityID[iy];
+    EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :now;
+    EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :tstamp;
+//    fprintf(f,"GBL8122:Checking %s:%s:Count %ld of %ld:EntityID: %ld\n", cEntityType,cAttributeCode,iy, iEntityCount, iEntityID);
+
+    // Here is where we turn off
+    EXEC SQL
+      UPDATE @t_schema.Flag
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = :cEntityType
+      AND EntityID = :iEntityID
+      AND AttributeCode IN ('TRANSLATIONWATCH','TRANSLATIONLANGUAGES')
+      AND ValTo = :forever
+    ;
+    // Here is where we turn off
+    EXEC SQL
+      UPDATE @t_schema.FlagX
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = :cEntityType
+      AND EntityID = :iEntityID
+      AND AttributeCode IN ('TRANSLATIONWATCH','TRANSLATIONLANGUAGES')
+      AND RTRIM(CHAR(ValTo)) = :forever
+    ;
+
+    // Here is where we insert new records
+    // We must do it for the FlagX recoreds also
+
+    EXEC SQL
+      INSERT
+      INTO @t_schema.Flag
+      (
+      Enterprise
+      ,EntityType
+      ,EntityID
+      ,AttributeCode
+      ,AttributeValue
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+      :Enterprise
+      ,:cEntityType
+      ,:iEntityID
+      ,'TRANSLATIONWATCH'
+      ,'TWON'
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+    EXEC SQL
+      INSERT
+      INTO @t_schema.FlagX
+      (
+      Enterprise
+      ,EntityType
+      ,EntityID
+      ,AttributeCode
+      ,AttributeValue
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+      :Enterprise
+      ,:cEntityType
+      ,:iEntityID
+      ,'TRANSLATIONWATCH'
+      ,'TWON'
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+//    EXEC SQL
+//      INSERT
+//      INTO @t_schema.Flag
+//      (
+//      Enterprise
+//      ,EntityType
+//      ,EntityID
+//      ,AttributeCode
+//      ,AttributeValue
+//      ,TranID
+//      ,ValFrom
+//      ,ValTo
+//      ,EffFrom
+//      ,EffTo
+//      ,OPENID
+//      )
+//      VALUES
+//      (
+//      :Enterprise
+//      ,:cEntityType
+//      ,:iEntityID
+//      ,'TRANSLATIONLANGUAGES'
+//      ,'TLNONE'
+//      ,2
+//      ,:now
+//      ,:forever
+//      ,:now
+//      ,:forever
+//      ,:OPENID
+//      )
+//    ;
+//    EXEC SQL
+//      INSERT
+//      INTO @t_schema.FlagX
+//      (
+//      Enterprise
+//      ,EntityType
+//      ,EntityID
+//      ,AttributeCode
+//      ,AttributeValue
+//      ,TranID
+//      ,ValFrom
+//      ,ValTo
+//      ,EffFrom
+//      ,EffTo
+//      ,OPENID
+//      )
+//      VALUES
+//      (
+//      :Enterprise
+//      ,:cEntityType
+//      ,:iEntityID
+//      ,'TRANSLATIONLANGUAGES'
+//      ,'TLNONE'
+//      ,2
+//      ,:now
+//    ,:forever
+//      ,:now
+//      ,:forever
+//      ,:OPENID
+//      )
+//    ;
+
+    EXEC SQL
+      UPDATE @t_schema.Entity
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = :cEntityType
+      AND EntityID = :iEntityID
+      AND ValTo = :forever
+    ;
+    EXEC SQL
+      UPDATE @t_schema.EntityX
+      SET
+      ValTo = :now
+      WHERE
+          Enterprise = :Enterprise
+      AND EntityType = :cEntityType
+      AND EntityID = :iEntityID
+      AND RTRIM(CHAR(ValTo)) = :forever
+    ;
+
+    // Now insert the new entity rec
+    EXEC SQL
+      INSERT
+      INTO @t_schema.Entity
+      (
+       Enterprise
+      ,EntityType
+      ,EntityID
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+       :Enterprise
+      ,:cEntityType
+      ,:iEntityID
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+    // Now insert the new entity rec
+    EXEC SQL
+      INSERT
+      INTO @t_schema.EntityX
+      (
+       Enterprise
+      ,EntityType
+      ,EntityID
+      ,TranID
+      ,ValFrom
+      ,ValTo
+      ,EffFrom
+      ,EffTo
+      ,OPENID
+      )
+      VALUES
+      (
+       :Enterprise
+      ,:cEntityType
+      ,:iEntityID
+      ,2
+      ,:now
+      ,:forever
+      ,:now
+      ,:forever
+      ,:OPENID
+      )
+    ;
+  }
+
+  // Now.. we have to insert this into the TRANSINIT + EntityType queue under opwgid = 0.
+  // This is a group queue.
+  EXEC SQL INSERT INTO OPICM.Queue SELECT
+  :Enterprise
+  ,0
+  ,0
+  ,'TRANSLATIONINIT' || RTRIM(:cEntityType)
+  ,0
+  ,:cEntityType
+  ,:iEntityID
+  ,:now
+  ,'1980-01-01-00.00.00.000000'
+  ,:now
+  ,:now
+  FROM @t_schema.Entity E
+  LEFT JOIN @t_schema.Queue Q ON
+      Q.Enterprise = :Enterprise
+  AND Q.SessionID = 0
+  AND Q.OPWGID = 0
+  AND Q.Queue = 'TRANSLATIONINIT' || RTRIM(:cEntityType)
+  AND Q.EntityType = E.EntityType
+  AND Q.EntityID = E.EntityID
+  AND Q.status = 0
+  WHERE
+      E.Enterprise = :Enterprise
+  AND E.EntityType = :cEntityType
+  AND E.EntityID = :iEntityID
+  AND E.ValTo = :forever
+  AND E.EffTo > Current Timestamp
+  AND Q.Enterprise is NULL
+  ;
+
+  EXEC SQL COMMIT WORK;
+}
+
+@parameters
+inout ReturnStatus int
+in OPENID int
+in Enterprise varchar(16)
+@end
+
+
+

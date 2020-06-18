@@ -1,0 +1,53 @@
+@name=GBL4016
+@noremote=true
+@type=basic
+@dbase=opicmpdh
+@narrative
+--------------------------------------------------------------------------------------------
+-- Retrive BASIC product data here, based on WWEntitytype/WWEntityID.
+-- For a SPECIFIC NLSID (???)
+--------------------------------------------------------------------------------------------
+$Log: gbl4016.txt,v $
+Revision 1.3  2010/06/21 15:43:03  wendy
+Exceeded RMI 64k static block limit, not needed for RMI
+
+Revision 1.2  2005/05/24 21:05:37  gregg
+distinct
+
+Revision 1.1  2005/05/24 21:04:55  gregg
+initial load
+
+Revision 1.1  2005/05/20 19:49:26  gregg
+initial load
+
+
+
+@desc=Retrieve a Part Number Record from the CatDB table
+@fenced=true
+@results=1
+@parmstyle=GENERAL
+@sql
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: gbl4016.txt,v 1.3 2010/06/21 15:43:03 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+SELECT
+  DISTINCT
+  LOCENTITYTYPE
+, LOCENTITYID
+FROM gbli.PRODUCT 
+WHERE
+    Enterprise = :Enterprise
+AND WWEntityType = :WWEntityType
+AND WWEntityID = :WWEntityID
+AND NLSID = :NLSID
+;
+@execute
+EXEC SQL OPEN sp_cursor;
+@parameters
+inout ReturnStatus int
+in Enterprise varchar(16)
+in WWEntityType varchar(32)
+in WWEntityID int
+in NLSID int
+@end

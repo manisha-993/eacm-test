@@ -1,0 +1,11 @@
+for user in aixdba opicmdb2 db2as opicmadm 
+do
+  rmuser -p $user
+  rm -Rf /home/$user
+done
+
+for group in opicusrg proddb2g db2asgrp
+do
+  rmgroup $group
+done
+
