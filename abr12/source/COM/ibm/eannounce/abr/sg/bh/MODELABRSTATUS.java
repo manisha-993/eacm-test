@@ -200,8 +200,8 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 
 	private static final String WARRSVCCOVR_NOWARR = "WSVC01";
 	private static final Hashtable ATTR_OF_INTEREST_TBL;
-private static final String reg = "^\\d+$";
-private static Pattern pattern = Pattern.compile(reg);
+	private static final String reg = "^\\d+$";
+	private static Pattern pattern = Pattern.compile(reg);
 	private static Set set = new HashSet();
 
 	static {
@@ -313,8 +313,8 @@ private static Pattern pattern = Pattern.compile(reg);
 	 * complete abr processing when status is already final; (dq was final too)
 	 * E. Status is Final
 	 * 
-	 * When this ABR is invoked and STATUS = DATAQUALITY = ï¿½Finalï¿½, then
-	 * checking is not required. CATDATA derivation is required. If the
+	 * When this ABR is invoked and STATUS = DATAQUALITY = ï¿½Finalï¿½,
+	 * then checking is not required. CATDATA derivation is required. If the
 	 * generation fails, the DQ ABR will fail. The DQ ABR will process data for
 	 * the selected offering and only utilizes CATADATA rules that have a Life
 	 * Cycle of Production. If the generation of CATDATA is successful, then
@@ -434,12 +434,13 @@ private static Pattern pattern = Pattern.compile(reg);
 	 * Status is Ready for Review
 	 * 
 	 * When this ABR is invoked and STATUS = DATAQUALITY = ï¿½Ready for
-	 * Reviewï¿½, then checking is not required. CATDATA derivation is required.
-	 * If the generation fails, the DQ ABR will fail. The DQ ABR will process
-	 * data for the selected offering and only utilizes CATADATA rules that have
-	 * a Life Cycle of Production. If the generation of CATDATA is successful,
-	 * then only the setting of ADSABRSTATUS is processed. This includes the
-	 * necessary conditions and only column M (Ready for Review) applies.
+	 * Reviewï¿½, then checking is not required. CATDATA derivation is
+	 * required. If the generation fails, the DQ ABR will fail. The DQ ABR will
+	 * process data for the selected offering and only utilizes CATADATA rules
+	 * that have a Life Cycle of Production. If the generation of CATDATA is
+	 * successful, then only the setting of ADSABRSTATUS is processed. This
+	 * includes the necessary conditions and only column M (Ready for Review)
+	 * applies.
 	 * 
 	 */
 	protected void doAlreadyRFRProcessing(EntityItem rootEntity) throws Exception {
@@ -1030,9 +1031,9 @@ private static Pattern pattern = Pattern.compile(reg);
 	 * the DQ ABR Passed. The VE is:
 	 * 
 	 * MODELWARR:D:0 A change of interest may be any one or more of the
-	 * following: ï¿½ MODELWARR (i.e. add or remove a relator of this type) ï¿½
-	 * EFFECTIVEDATE (attribute on MODELWARR) ï¿½ ENDDATE (attribute on
-	 * MODELWARR) ï¿½ COUNTRYLIST (attribute on MODELWARR) ï¿½ DEFWARR
+	 * following: ï¿½ MODELWARR (i.e. add or remove a relator of this type)
+	 * ï¿½ EFFECTIVEDATE (attribute on MODELWARR) ï¿½ ENDDATE (attribute
+	 * on MODELWARR) ï¿½ COUNTRYLIST (attribute on MODELWARR) ï¿½ DEFWARR
 	 * (ATTRIBUTE on MODELWARR)
 	 * 
 	 * If there is a change of interest, then Queue grandchildren LSEOs. They
@@ -1128,9 +1129,9 @@ private static Pattern pattern = Pattern.compile(reg);
 	 * the DQ ABR Passed. The VE is:
 	 * 
 	 * MODELWARR:D:0 A change of interest may be any one or more of the
-	 * following: ï¿½ MODELWARR (i.e. add or remove a relator of this type) ï¿½
-	 * EFFECTIVEDATE (attribute on MODELWARR) ï¿½ ENDDATE (attribute on
-	 * MODELWARR) ï¿½ COUNTRYLIST (attribute on MODELWARR) ï¿½ DEFWARR
+	 * following: ï¿½ MODELWARR (i.e. add or remove a relator of this type)
+	 * ï¿½ EFFECTIVEDATE (attribute on MODELWARR) ï¿½ ENDDATE (attribute
+	 * on MODELWARR) ï¿½ COUNTRYLIST (attribute on MODELWARR) ï¿½ DEFWARR
 	 * (ATTRIBUTE on MODELWARR)
 	 * 
 	 * If there is a change of interest, then Queue grandchildren LSEOs.
@@ -1531,7 +1532,7 @@ private static Pattern pattern = Pattern.compile(reg);
 
 		addDebug(rootEntity.getKey() + " COFCAT: " + modelCOFCAT + " isSvcModel " + isSvcModel + " prodhierFlag "
 				+ prodhierFlag);
-
+		doWarrantyWTY0000(rootEntity);
 		// 2.00 ANNDATE
 		// 3.00 WITHDRAWDATE => MODEL ANNDATE E E E {LD: WITHDRAWDATE}
 		// {WITHDRAWDATE} can not be earlier than {LD: ANNDATE} {ANNDATE}
@@ -1660,19 +1661,89 @@ private static Pattern pattern = Pattern.compile(reg);
 		}
 	}
 
+	private void doWarrantyWTY0000(EntityItem rootEntity) throws SQLException, MiddlewareException {
+
+		addHeading(3, rootEntity.getEntityGroup().getLongDescription() + " Warranty Checks:");
+		// String warrID = PokUtils.getAttributeFlagValue(rootEntity, "WARRID");
+
+
+		// if ("WTY0000".equals(warrID)) {
+
+		EntityGroup warrGrp = m_elist.getEntityGroup("WARR");
+		if (warrGrp != null && warrGrp.getEntityItemCount() > 0) {
+			for (int i = 0; i < warrGrp.getEntityItemCount(); i++) {
+				EntityItem wItem = warrGrp.getEntityItem(i);
+				String warrID = PokUtils.getAttributeValue(wItem, "WARRID", null, null);
+				if ("WTY0000".equals(warrID)) {
+					EntityItem mwItem = wItem.getUpLink().size() > 0 ? (EntityItem) wItem.getUpLink().get(0) : null;
+					if (mwItem != null) {
+						//PokUtils.getAttributeValue(item, attCode, delim, defValue)
+						String defWarr = PokUtils.getAttributeValue(mwItem, "DEFWARR",null,null,true);
+						if (defWarr == null || !defWarr.equals("No")) {
+							args[0] = PokUtils.getAttributeDescription(mwItem.getEntityGroup(), "DEFWARR", "") + ":"
+									+ defWarr + " on MODELWARR ";
+							// args[1]=PokUtils.getAttributeDescription(entityItem.getEntityGroup(),
+							// "TAXCLS","");
+							args[1] = "Warranty ID WTY0000,"+PokUtils.getAttributeDescription(mwItem.getEntityGroup(), "DEFWARR", "") + ":"+"No is expected";
+							addError("INVALID_VALUES_ERR", args);
+						}
+					}
+				}
+			}
+		}
+
+		/*
+		 * Vector modelv = PokUtils.getAllLinkedEntities(rootEntity,
+		 * "MODELWARR", "MODEL"); if(modelv!=null&&modelv.size()>0){ for(int
+		 * i=0;i<modelv.size();i++){ EntityItem tItem =
+		 * (EntityItem)modelv.get(i); EntityItem dItem =(EntityItem)
+		 * tItem.getDownLink().get(0); //EntityItem uItem =(EntityItem)
+		 * tItem.getUpLink().get(0);
+		 * addDebug("tItem:"+tItem.getEntityType()+":"+tItem.getEntityID());
+		 * addDebug("tItem downlink:"+tItem.getDownLinkCount()+":"+tItem.
+		 * getDownLink());
+		 * addDebug("tItem uItem:"+dItem.getEntityID()+":"+dItem.getEntityType()
+		 * ); }
+		 * 
+		 * }
+		 * 
+		 * if (modelwarrGrp != null && modelwarrGrp.getEntityItemCount()>0) {
+		 * for (int i = 0; i < modelwarrGrp.getEntityItemCount(); i++) {
+		 * EntityItem tItem = modelwarrGrp.getEntityItem(i);
+		 * addDebug("modelwarrGrp tItem uItem:"+tItem.getEntityID()+":"+tItem.
+		 * getEntityType()); String defWarr =
+		 * PokUtils.getAttributeFlagValue(tItem, "DEFWARR");
+		 * 
+		 * //,", ", "", false addDebug("defWarr:"+defWarr);
+		 * if(defWarr==null||!defWarr.equals("N1")){
+		 * args[0]="DEFWARR:"+PokUtils.getAttributeDescription(modelwarrGrp,
+		 * "DEFWARR", "") +":"+defWarr+" on MODELWARR:"+tItem.getEntityID();
+		 * //args[1]=PokUtils.getAttributeDescription(entityItem.getEntityGroup(
+		 * ), "TAXCLS",""); args[1] = "Warranty ID WTY0000";
+		 * addError("INVALID_VALUES_ERR", args); }
+		 * 
+		 * } // } }
+		 */
+
+		// check model avails
+
+	}
+
 	/**
 	 * from BH FS ABR Catalog Attr Derivation 20110221.doc C. Data Quality As
 	 * part of the normal process for offering information, a user first creates
-	 * data in ï¿½Draftï¿½. The user then asserts the Data Quality (DATAQUALITY)
-	 * as being ï¿½Ready for Reviewï¿½ which queues the Data Quality ABR. The DQ
-	 * ABR checks to ensure that the data is ï¿½Ready for Reviewï¿½ and then
-	 * advances Status (STATUS) to ï¿½Ready for Reviewï¿½.
+	 * data in ï¿½Draftï¿½. The user then asserts the Data Quality
+	 * (DATAQUALITY) as being ï¿½Ready for Reviewï¿½ which queues the Data
+	 * Quality ABR. The DQ ABR checks to ensure that the data is ï¿½Ready for
+	 * Reviewï¿½ and then advances Status (STATUS) to ï¿½Ready for
+	 * Reviewï¿½.
 	 * 
 	 * The Data Quality ABR will be enhanced such that if the checks pass, then
 	 * the DQ ABR will process the corresponding DARULE. If DARULE is processed
-	 * successfully, then the DQ ABR will set STATUS = ï¿½Ready for Reviewï¿½.
-	 * If DARULE is not processed successfully, then the DQ ABR will ï¿½Failï¿½
-	 * and return Data Quality to the prior state (Draft or Change Request).
+	 * successfully, then the DQ ABR will set STATUS = ï¿½Ready for
+	 * Reviewï¿½. If DARULE is not processed successfully, then the DQ ABR
+	 * will ï¿½Failï¿½ and return Data Quality to the prior state (Draft
+	 * or Change Request).
 	 */
 	protected boolean updateDerivedData(EntityItem rootEntity) throws Exception {
 		boolean chgsMade = false;
@@ -2579,15 +2650,17 @@ private static Pattern pattern = Pattern.compile(reg);
 						EntityItem entityItem = (EntityItem) tItem.getUpLink().get(0);
 
 						String v2 = PokUtils.getAttributeValue(entityItem, "TAXCLS", "", "");
-						if("".equals(v2)||pattern.matcher(v2).find()){
+						if ("".equals(v2) || pattern.matcher(v2).find()) {
 
 							args[0] = getLD_NDN(entityItem);
-							//args[1] = PokUtils.getAttributeDescription(entityItem.getEntityGroup(), "TAXCLS", "");
+							// args[1] =
+							// PokUtils.getAttributeDescription(entityItem.getEntityGroup(),
+							// "TAXCLS", "");
 							args[1] = "Tax Country US";
 							addError("INVALID_VALUES_ERR", args);
-						
+
 						}
-						
+
 					}
 
 				}
