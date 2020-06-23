@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MAINTPRODSTRUCT_UPDATE"
+	elementFormDefault="qualified"
+	xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MAINTPRODSTRUCT_UPDATE">
+
+	<xsd:element name="MAINTPRODSTRUCT_UPDATE"
+		type="MAINTPRODSTRUCT_UPDATETYPE" />
+
+	<xsd:complexType name="MAINTPRODSTRUCT_UPDATETYPE">
+		<xsd:sequence>
+			<xsd:element name="PDHDOMAIN" type="xsd:string"
+				maxOccurs="unbounded" />
+			<xsd:element name="DTSOFMSG" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ACTIVITY" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="OFFERING_ID" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FEATURE_CD" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="QTY_MIN_NUM" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="QTY_MAX_NUM" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FEATURE_S_NM" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FEATURE_L_NM" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="STATUS" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="MAP_TO_PRICE_TYPE_CD"
+				type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FEATURE_CATEG_CD" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FEATURE_MODIF_IND" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="SERVICE_LEVEL_MAPPING_CD"
+				type="xsd:string" minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>		 
