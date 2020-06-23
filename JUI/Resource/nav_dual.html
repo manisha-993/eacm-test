@@ -1,0 +1,65 @@
+<opicmForm_1.1>
+<!--font face="creepy" size="18" style="0"-->
+<variable name="true" class = "boolean" value="true"/>
+<variable name="false" class = "boolean" value="false"/>
+<variable name="int0" class = "int" value="0"/>
+<variable name="int1" class = "int" value="1"/>
+<variable name="int2" class = "int" value="2"/>
+
+	The following line is for control of the navigate appearance
+		parm1:	history type
+				HISTORY_BOX  = 0; (default)
+				HISTORY_LIST = 1;
+
+		parm2:	data type
+				DATA_SINGLE  = 0; (default)
+				DATA_DOUBLE  = 1;
+				DATA_FORM	 = 2;
+
+		parm3:	action type
+				ACTION_TREE	 = 0; (default)
+				ACTION_BOX   = 1;
+				ACTION_LIST  = 2;
+
+		parm4:	clicks
+				SINGLE_CLICK = 1; (default)
+				DOUBLE_CLICK = 2;
+	NOTE: build with no parameters uses the defaults.
+
+<method name="navigateBuild0" parms ="int,int,int,int" args="int0,int1,int0,int1" method="build" object="navigate0"/>
+<method name="navigateBuild1" parms ="int,int,int,int" args="int0,int1,int0,int1" method="build" object="navigate1"/>
+<do method="navigateBuild0"/>
+<do method="navigateBuild1"/>
+
+<method name="getData0" method="getData" Object="navigate0"/>
+<method name="getHist0" method="getHistory" Object="navigate0"/>
+
+<method name="getData1" method="getData" Object="navigate1"/>
+<method name="getHist1" method="getHistory" Object="navigate1"/>
+
+<JComponent name="navData0" component="getData0" misc="borderLocation,Center"/>
+<JComponent name="navData1" component="getData1" misc="borderLocation,Center"/>
+
+<background color="#FFFFFF">
+<JComponent name="navHist0" component="getHist0" misc="borderlocation,North"/>
+<JComponent name="navHist1" component="getHist1" misc="borderlocation,North"/>
+</background>
+
+<GPanel name="navPanel0" layout="border" misc="borderlocation,Center" add="navData0,navHist0" opaque="true"/>
+<GPanel name="navPanel1" layout="border" misc="borderlocation,Center" add="navData1,navHist1" opaque="true"/>
+
+by using the defined component and placing nav 0 on the left
+we can auto select the appropriate nav when split adjusted.
+<method name= "getParentSplit" method="getSplit" parms = "int" args="int1" object="parent"/>
+<JSplitPane name="JSplit" component="getParentSplit" add="navPanel0,navPanel1" misc="borderLocation,Center"/>
+JSplitPane name="JSplit" jsplitPanelType="1" add="navPanel0,navPanel1" misc="borderLocation,Center"
+
+<GPanel name="navPanel" layout="border" misc="borderlocation,Center" add="JSplit" opaque="true"/>
+<mainPane layout="border" add="navPanel"/>
+Toolbar set="getToolbar" orientation="Vertical" anchor="West" floatable="true"/
+<method name="setCartVisible" method="setCartOnForm" parms="boolean" args="false" Object="navigate0"/>
+<method name="setTabSelectorVisible" method="setTabSelectorOnForm" parms="boolean" args="false" Object="navigate0"/>
+<do method="setCartVisible"/>
+<do method="setTabSelectorVisible"/>
+<!--/font -->
+</opicmForm_1.1>

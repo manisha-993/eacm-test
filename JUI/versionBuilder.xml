@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Create a new Version.java file containing the current timestamp -->
+<project basedir="./eacmsrc/com/ibm/eannounce/version/" default="replace" name="JUIVersion">
+	<property name="version.location" value="./eacmsrc/com/ibm/eannounce/version/" />
+
+	<target name="init">
+		<tstamp>
+			<!-- Use Eastern Standard Time in jar Manifest -->
+			<format property="build.date" pattern="EEE MM/dd/yyyy" timezone="America/New_York" />
+		</tstamp>
+		<tstamp>
+			<format property="build.time" pattern="hh:mm:ss.SS" timezone="America/New_York" />
+		</tstamp>
+
+		<tstamp>
+			<!-- Use local System time in message -->
+			<format property="start.ts" pattern="EEE MM/dd/yyyy hh:mm:ss.SS" />
+		</tstamp>
+		<echo message="Init: ${start.ts}" />
+		<echo message="Ant JVM version: ${ant.java.version}" />
+	</target>
+
+	<target name="clean" depends="init">
+		<delete file="Version.java" />
+	</target>
+
+	<target name="copy" depends="clean">
+		<copy file="Version.template" toFile="Version.java" />
+	</target>
+
+	<target name="replace" depends="copy">
+		<replace file="Version.java" token="@VERSION_TAG@" 
+			value="Built on ${build.date} at ${build.time}" />
+		<echo message="@VERSION_TAG@ replaced" />
+		<replace file="Version.java" token="@BUILD_DATE_TAG@" 
+			value="${build.date}${build.time}" />
+		<echo message="@BUILD_DATE_TAG@ replaced" />
+	</target>
+
+</project>

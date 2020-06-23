@@ -1,0 +1,43 @@
+<!-- (C) Copyright IBM Corp. 2003, 2008  All Rights Reserved.
+
+ls.dtd used by IGS LS V1.0.1 -->
+<!-- Parameter Entities -->
+
+<!ENTITY % list "UL | OL">
+
+<!--=================== Text Markup =======================================-->
+<!ENTITY % font "I | B | U">
+
+<!ENTITY % text "(#PCDATA)* | %font ">
+
+<!ELEMENT (%font) (%text | BR)* >
+
+<!--================== HTML content models ================================-->
+<!ELEMENT BR  EMPTY    -- forced line break -- >
+
+<!ENTITY % block "P | %list">
+     
+<!--=================== Paragraph=========================================-->
+<!ELEMENT P   (%text | BR)*>
+<!ATTLIST P
+        publish (webonly|printonly) #IMPLIED -- control of content --        
+        >
+
+<!--=================== Lists =============================================-->
+<!ELEMENT (OL|UL) (LI)+>
+
+<!ATTLIST OL -- ordered lists --
+        publish (webonly|printonly) #IMPLIED -- control of content --        
+        >
+
+<!ATTLIST UL -- unordered lists --
+        publish (webonly|printonly) #IMPLIED -- control of content --        
+        >
+
+<!ELEMENT LI (%text | BR | %list)*  -- list item with text, font, br and nested lists-->
+<!ATTLIST LI
+        publish (webonly|printonly) #IMPLIED -- control of content --
+        >
+
+<!--=================== Document Body =====================================-->
+<!ENTITY % body.content "(%block)*"  -- no text without structure -- >

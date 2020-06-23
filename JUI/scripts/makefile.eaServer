@@ -1,0 +1,17 @@
+END_PAUSE=pause
+xEND_PAUSE=
+DIST_DIR=..\dist
+JAVA_DIR_13="C:\Program Files\IBM\Java13"
+JAVA_DIR_131="C:\Program Files\IBM\Java131"
+JAVA_DIR="C:\Program Files\IBM\Java14"
+JAVA_DIR_141="C:\sdk_141\"
+SERVER_JAR="c:\Documents and Settings\Anthony C. Liberto\Jars\eaServer.jar"
+SOURCE_DIR=.
+DOC_DIR=.\doc
+COMP=$(JAVA_DIR)\bin\javac -O -deprecation
+QUICKORNOT=
+
+pkg:
+  -$(QUICKORNOT) $(JAVA_DIR)\bin\jar cmfv c:\manifest.eaServer $(LOGIN_JAR)
+  -$(QUICKORNOT) $(JAVA_DIR)\bin\jar uvf $(SERVER_JAR) ea-server.properties
+  -$(END_PAUSE)

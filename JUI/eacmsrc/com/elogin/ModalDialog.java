@@ -1,0 +1,495 @@
+/**
+ * Copyright (c) 2002-2003 International Business Machines Corp., Ltd.
+ * All Rights Reserved.
+ * Licensed for use in connection with IBM business only.
+ *
+ *
+ * @version 1.2  2002/12/05
+ * @author Anthony C. Liberto
+ *
+ * $Log: ModalDialog.java,v $
+ * Revision 1.2  2008/01/30 16:26:59  wendy
+ * Cleanup RSA warnings
+ *
+ * Revision 1.1  2007/04/18 19:42:17  wendy
+ * Reorganized JUI module
+ *
+ * Revision 1.2  2005/09/12 19:03:10  tony
+ * JTest Modifications
+ *
+ * Revision 1.1.1.1  2005/09/09 20:37:40  tony
+ * This is the initial load of OPICM
+ *
+ * Revision 1.6  2005/09/08 17:58:56  tony
+ * Adjusted Package information for compatibility with
+ * XML editor per AHE
+ *
+ * Revision 1.5  2005/02/03 16:38:52  tony
+ * JTest Second Pass Wrapup
+ *
+ * Revision 1.4  2005/02/02 17:30:22  tony
+ * JTest Second Pass
+ *
+ * Revision 1.3  2005/01/27 23:18:19  tony
+ * JTest Formatting
+ *
+ * Revision 1.2  2004/06/25 18:04:54  tony
+ * enhanced logic to properly select the dialog.
+ *
+ * Revision 1.1.1.1  2004/02/10 16:59:26  tony
+ * This is the initial load of OPICM
+ *
+ * Revision 1.17  2003/12/19 23:14:01  tony
+ * acl20031219
+ * updated logic so that on 'x' close click on longeditor
+ * editing is completed.
+ *
+ * Revision 1.16  2003/12/10 22:03:49  tony
+ * 53373
+ *
+ * Revision 1.15  2003/12/01 19:46:27  tony
+ * accessibility
+ *
+ * Revision 1.14  2003/10/29 00:22:23  tony
+ * removed System.out. statements.
+ *
+ * Revision 1.13  2003/08/07 21:45:25  joan
+ * 51700
+ *
+ * Revision 1.12  2003/05/28 18:15:03  tony
+ * fixed null pointer on base filter, find, and sort
+ *
+ * Revision 1.11  2003/05/28 16:28:21  tony
+ * 50924
+ *
+ * Revision 1.10  2003/05/15 19:33:05  tony
+ * KC_20030515 added behavior fixes for KC
+ *
+ * Revision 1.9  2003/04/22 22:04:14  joan
+ * 50405
+ *
+ * Revision 1.8  2003/04/11 20:47:18  tony
+ * improved Windows logic.
+ *
+ * Revision 1.7  2003/04/10 20:06:23  tony
+ * updated logic to allow for dialogs to properly
+ * eminiate from the dialogs parent.
+ *
+ * Revision 1.6  2003/04/03 16:19:06  tony
+ * changed refreshLookAndFeel to refreshAppearance()
+ * updated logic to take into account displayed dialogs
+ * as well.
+ *
+ * Revision 1.5  2003/03/25 21:44:48  tony
+ * adjusted logic to integrate in the xmlEditor.
+ *
+ * Revision 1.4  2003/03/13 21:16:31  tony
+ * adjusted disposeDialog and enhance modalDialog.
+ *
+ * Revision 1.3  2003/03/13 18:38:43  tony
+ * accessibility and column Order.
+ *
+ * Revision 1.2  2003/03/07 21:40:47  tony
+ * Accessibility update
+ *
+ * Revision 1.1.1.1  2003/03/03 18:03:40  tony
+ * This is the initial load of OPICM
+ *
+ *
+ */
+package com.elogin;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.accessibility.*;
+
+/**
+ * To change the template for this generated type comment go to
+ * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ *
+ * @author Anthony C. Liberto
+ */
+public class ModalDialog extends JDialog implements EAccessConstants, Accessible, InterfaceDialog, WindowListener {
+	private static final long serialVersionUID = 1L;
+	private DisplayableComponent dc = null;
+    private JFrame pFrame = null;
+    private Window ownWin = null;
+    private boolean bListen = false;
+
+    private ModalDialog(JFrame _parent) {
+        super(_parent, true);
+        pFrame = _parent;
+        init();
+        return;
+    }
+
+    private ModalDialog() {
+        super();
+        setModal(true);
+        init();
+        return;
+    }
+
+    /**
+     * eaccess
+     * @return
+     * @author Anthony C. Liberto
+     */
+    public static EAccess eaccess() {
+        return EAccess.eaccess();
+    }
+
+    /**
+     * createDialog
+     * @param _parent
+     * @return
+     * @author Anthony C. Liberto
+     */
+    public static ModalDialog createDialog(JFrame _parent) {
+        if (_parent != null) {
+            return new ModalDialog(_parent);
+        }
+        return new ModalDialog();
+    }
+
+    /**
+     * init
+     * @author Anthony C. Liberto
+     */
+    public void init() {
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        if (eaccess().isWindows()) {
+            setResizable(false);
+        }
+        //		addWindowListener(this);
+        return;
+    }
+
+    /**
+     * @see java.awt.Window#addWindowListener(java.awt.event.WindowListener)
+     * @author Anthony C. Liberto
+     */
+    public void addWindowListener(WindowListener _wl) {
+        if (!bListen) {
+            super.addWindowListener(_wl);
+            bListen = true;
+        }
+        return;
+    }
+
+    /**
+     * @see java.awt.Window#removeWindowListener(java.awt.event.WindowListener)
+     * @author Anthony C. Liberto
+     */
+    public void removeWindowListener(WindowListener _wl) {
+        if (bListen) {
+            super.removeWindowListener(_wl);
+            bListen = false;
+        }
+        return;
+    }
+
+    /**
+     * repaintImmediately
+     * @author Anthony C. Liberto
+     */
+    public void repaintImmediately() {
+        update(getGraphics());
+        return;
+    }
+
+    /**
+     * @see java.awt.Component#hide()
+     * @author Anthony C. Liberto
+     */
+    public void hide() {
+        if (dc != null) {
+            dc.hideMe();
+            dc = null;
+        }
+        super.hide();
+        moveToFront(true);
+        return;
+    }
+
+    /**
+     * construct
+     * @author Anthony C. Liberto
+     * @param _dc
+     */
+    public void construct(DisplayableComponent _dc) {
+        setContentPane((JComponent) _dc);
+        if (!_dc.isPanelType(TYPE_XMLPANEL)) {
+            setJMenuBar(_dc.getMenuBar());
+        }
+        if (!bListen) {
+            addWindowListener(this);
+        }
+
+        dc = _dc;
+        pack();
+        return;
+    }
+
+    /**
+     * show
+     * @author Anthony C. Liberto
+     * @param _dc
+     */
+    public void show(DisplayableComponent _dc) {
+        construct(_dc);
+        position();
+        moveToFront(false);
+        _dc.showMe();
+        show();
+        return;
+    }
+
+    /**
+     * @see java.awt.Component#show()
+     * @author Anthony C. Liberto
+     */
+    public void show() {
+        super.show();
+        return;
+    }
+
+    private void moveToFront(boolean _repaint) {
+        if (ownWin != null) {
+            ownWin.toFront();
+            if (_repaint) {
+                ownWin.repaint();
+            }
+        } else if (pFrame != null) {
+            pFrame.toFront();
+            if (_repaint) {
+                pFrame.repaint();
+            }
+        }
+        return;
+    }
+
+    /**
+     * position
+     * @author Anthony C. Liberto
+     */
+    public void position() {
+//        Dimension d = getPreferredSize();
+//        int w = d.width;
+//        int h = d.height;
+        //kc_20030515		if (pFrame != null && pFrame.isShowing()) {
+        //kc_20030515			Point pnt = pFrame.getLocationOnScreen();
+        //kc_20030515			int x = (pnt.x + ((pFrame.getWidth() -w) / 2));
+        //kc_20030515			int y = (pnt.y + ((pFrame.getHeight() -h)/ 2));
+        //kc_20030515			if (x < 0) x = 0;		//50405
+        //kc_20030515			if (y < 0) y = 0;		//50405
+        //kc_20030515			setLocation(x,y);
+        //kc_20030515		} else {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        //51700			setLocation(((screenSize.width-getWidth())/2),((screenSize.height-getHeight())/ 2));
+        int x = (screenSize.width - getWidth()) / 2; //51700
+        int y = (screenSize.height - getHeight()) / 2; //51700
+        if (x < 0 || y < 0) {
+            x = screenSize.width / 2; //51700
+            y = screenSize.height / 2; //51700
+        }
+        setLocation(x, y); //51700
+
+        //kc_20030515		}
+        return;
+    }
+
+    /**
+     * dereference
+     * @author Anthony C. Liberto
+     */
+    public void dereference() {
+        if (dc != null) {
+            dc.setParentDialog(null);
+            dc = null;
+        }
+        ownWin = null;
+        removeWindowListener(this);
+        return;
+    }
+
+    /**
+     * dereferenceFull
+     * @author Anthony C. Liberto
+     */
+    public void dereferenceFull() {
+        pFrame = null;
+        removeAll();
+        removeNotify();
+        return;
+    }
+
+    /**
+     * @see java.awt.Window#dispose()
+     * @author Anthony C. Liberto
+     */
+    public void dispose() {
+        super.dispose();
+        dereference();
+        return;
+    }
+
+    /**
+     * setOwner
+     * @param _win
+     * @author Anthony C. Liberto
+     */
+    public void setOwner(Window _win) {
+        ownWin = _win;
+        return;
+    }
+
+    /**
+     * @see java.awt.Dialog#isResizable()
+     * @author Anthony C. Liberto
+     */
+    public boolean isResizable() {
+        if (dc != null) {
+            return dc.isResizable();
+        }
+        return super.isResizable();
+    }
+
+    /**
+     * isShowing
+     * @param _dc
+     * @return
+     * @author Anthony C. Liberto
+     */
+    public boolean isShowing(DisplayableComponent _dc) {
+        boolean bShow = isShowing();
+        if (dc == _dc && bShow) {
+            return false;
+        }
+        return bShow;
+    }
+
+    /**
+     * @see java.awt.Component#getMinimumSize()
+     * @author Anthony C. Liberto
+     */
+    public Dimension getMinimumSize() {
+        if (dc != null) {
+            return dc.getMinimumSize();
+        }
+        return super.getMinimumSize();
+    }
+
+    /**
+     * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
+     * @author Anthony C. Liberto
+     */
+    public void windowActivated(WindowEvent _we) {
+        if (dc != null) {
+            dc.activateMe();
+        }
+        return;
+    }
+    /**
+     * @see java.awt.event.WindowListener#windowClosed(java.awt.event.WindowEvent)
+     * @author Anthony C. Liberto
+     */
+    public void windowClosed(WindowEvent _we) {
+    }
+    /**
+     * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
+     * @author Anthony C. Liberto
+     */
+    public void windowClosing(WindowEvent _we) {
+        if (ownWin != null) { //53373
+            ownWin.validate(); //53373
+        } //53373
+        if (dc != null) {
+            if (dc.canWindowClose()) {
+                if (dc != null && dc.isShowing()) {
+                    dc.disposeDialog();
+                    eaccess().dereferenceDialog(this);
+                }
+            }
+        }
+        return;
+    }
+    /**
+     * @see java.awt.event.WindowListener#windowDeactivated(java.awt.event.WindowEvent)
+     * @author Anthony C. Liberto
+     */
+    public void windowDeactivated(WindowEvent _we) {
+    }
+    /**
+     * @see java.awt.event.WindowListener#windowDeiconified(java.awt.event.WindowEvent)
+     * @author Anthony C. Liberto
+     */
+    public void windowDeiconified(WindowEvent _we) {
+    }
+    /**
+     * @see java.awt.event.WindowListener#windowIconified(java.awt.event.WindowEvent)
+     * @author Anthony C. Liberto
+     */
+    public void windowIconified(WindowEvent _we) {
+    }
+    /**
+     * @see java.awt.event.WindowListener#windowOpened(java.awt.event.WindowEvent)
+     * @author Anthony C. Liberto
+     */
+    public void windowOpened(WindowEvent _we) {
+    }
+
+    /**
+     * refreshAppearance
+     * @author Anthony C. Liberto
+     */
+    public void refreshAppearance() {
+        validate();
+        repaint();
+        return;
+    }
+
+    /*
+     50924
+     */
+    /**
+     * getSearchObject
+     * @author Anthony C. Liberto
+     * @return Object
+     */
+    public Object getSearchObject() {
+        if (ownWin instanceof InterfaceDialog) {
+            return ((InterfaceDialog) ownWin).getSearchableObject();
+        }
+        return eaccess().getSearchObject();
+    }
+
+    /**
+     * getSearchableObject
+     * @author Anthony C. Liberto
+     * @return Object
+     */
+    public Object getSearchableObject() {
+        if (dc != null) {
+            return dc.getSearchableObject();
+        }
+        return null;
+    }
+
+    /*
+     accessibility
+     */
+    /**
+     * @see java.awt.Container#getFocusTraversalPolicy()
+     * @author Anthony C. Liberto
+     */
+    public FocusTraversalPolicy getFocusTraversalPolicy() {
+        if (dc != null) {
+            if (dc.hasCustomFocusPolicy()) {
+                return dc.getFocusTraversalPolicy();
+            }
+        }
+        return super.getFocusTraversalPolicy();
+    }
+
+}

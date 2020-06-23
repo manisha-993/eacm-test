@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="lib" path="jars/jspell2n_java2.jar"/>
+	<classpathentry kind="lib" path="jars/jspell2s_java2.jar"/>
+	<classpathentry kind="lib" path="jars/xerces.jar"/>
+	<classpathentry kind="lib" path="jars/poi-3.0.1-FINAL-20070705.jar"/>
+	<classpathentry kind="src" path="eacmsrc"/>
+	<classpathentry kind="lib" path="jars/CommRes.jar"/>
+	<classpathentry kind="lib" path="jars/STComm.jar"/>
+	<classpathentry kind="lib" path="jars/STMeeting.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/middleware/source/jsse.jar"/>
+	<classpathentry kind="src" path="/middleware"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

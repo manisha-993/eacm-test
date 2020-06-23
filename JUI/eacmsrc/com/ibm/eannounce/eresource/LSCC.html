@@ -1,0 +1,582 @@
+<!--
+Kevin's LSCC Form (with only one tables and 6 columns), created March 1503
+-->
+
+<html>
+<mainpanel bgcolor="#FFFFFF" opaque="true" Insets = "7,0,8,0" Anchor="WEST" Fill="NONE" X="0" Y="0" WIDTH="1" HEIGHT="1" WEIGHTX="0" WEIGHTY="0">
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EE" vlink="#551A8B" alink="#6373B5">
+
+<panel title1="Edit/View In-Country Course" collapsible="true" Insets = "0,10,0,10" Anchor="WEST" Fill="NONE" X="0" Y="1" WIDTH="1" HEIGHT="1" WEIGHTX="0" WEIGHTY="0">
+<table border="0"  width = "575">
+
+
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSID" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSTITLE" PROPERTY="LONG"/></td>
+<!--td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="NAME" PROPERTY="LONG"/></td-->
+<td colspan = "2" style="border-bottom"></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSID" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSTITLE" EDITABLE="TRUE"/></td>
+<!--td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="NAME" EDITABLE="TRUE"/></td -->
+<td colspan = "2" style="border-bottom"></td>
+</tr>
+<tr>
+<td colspan = "6" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRGLOBALREPTITLE" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "6" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRGLOBALREPTITLE" EDITABLE="TRUE"/></td>
+</tr>
+
+<!--
+<b>Course Details</b>
+-->
+<tr>
+<td style="background-color:#ccc;vertical-align:bottom;border-bottom" colspan = "6" height = "15"><b>Course Details</b></td>
+</tr>
+<!--tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSAVLDATE" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSEXPDATE" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCLIFECYCLE" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSAVLDATE" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSEXPDATE" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCLIFECYCLE" EDITABLE="TRUE"/></td>
+</tr -->
+
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSAVLDATE" PROPERTY="LONG"/>
+<br /><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSAVLDATE" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSEXPDATE" PROPERTY="LONG"/>
+<br /><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSEXPDATE" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom">
+<fieldset><legend><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCLIFECYCLE" PROPERTY="LONG"/></legend>
+<table summary='layout' >
+	<tr><td><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCLIFECYCLE" EDITABLE="TRUE"/></td></tr>
+</table>
+</fieldset>
+</td>
+</tr>
+
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDURATION" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDURATIONUNITS" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDURATIONTEXT" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDURATION" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDURATIONUNITS" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDURATIONTEXT" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCREDITHOURS" PROPERTY="LONG"/></td>
+<td colspan = "4" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSPONSOR" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCREDITHOURS" EDITABLE="TRUE"/></td>
+<td colspan = "4" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSPONSOR" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMEDIA" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCSEGMENT" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDELIVERY" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMEDIA" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCSEGMENT" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDELIVERY" EDITABLE="TRUE"/></td>
+</tr>
+
+<!--tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSUBDELIVERY" PROPERTY="LONG"/></td>
+<td colspan = "4" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCATADIND" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSUBDELIVERY" EDITABLE="TRUE"/></td>
+<td colspan = "4" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCATADIND" EDITABLE="TRUE"/></td>
+</tr -->
+<tr>
+<td colspan = "2" style="border-bottom">
+<fieldset><legend><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSUBDELIVERY" PROPERTY="LONG"/></legend>
+<table summary='layout' >
+	<tr><td><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSUBDELIVERY" EDITABLE="TRUE"/></td></tr>
+</table>
+</fieldset>
+</td>
+<td colspan = "4" style="border-bottom">
+<fieldset><legend><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCATADIND" PROPERTY="LONG"/></legend>
+<table summary='layout' >
+	<tr><td><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCATADIND" EDITABLE="TRUE"/></td></tr>
+</table>
+</fieldset>
+</td>
+</tr>
+
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSLANGINDICATOR" PROPERTY="LONG"/></td>
+<td colspan = "4" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSADVERTISING" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSLANGINDICATOR" EDITABLE="TRUE"/></td>
+<td colspan = "4" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSADVERTISING" EDITABLE="TRUE"/></td>
+</tr>
+
+<!--tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMATERIALSLANG" PROPERTY="LONG"/></td>
+<td colspan = "4" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCCUSTOMINDICATOR" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMATERIALSLANG" EDITABLE="TRUE"/></td>
+<td colspan = "4" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCCUSTOMINDICATOR" EDITABLE="TRUE"/></td>
+</tr -->
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMATERIALSLANG" PROPERTY="LONG"/>
+<br /><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMATERIALSLANG" EDITABLE="TRUE"/></td>
+<td colspan = "4" style="border-bottom">
+<fieldset><legend><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCCUSTOMINDICATOR" PROPERTY="LONG"/></legend>
+<table summary='layout' >
+	<tr><td><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCCUSTOMINDICATOR" EDITABLE="TRUE"/></td></tr>
+</table>
+</fieldset>
+</td>
+</tr>
+
+
+<tr>
+<!--td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDISTLANG" PROPERTY="LONG"/></span></td -->
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSPECNOTES" PROPERTY="LONG"/></td>
+<td colspan = "4" style="border-bottom"></td>
+</tr>
+<tr>
+<!--td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDISTLANG" EDITABLE="TRUE"/></span></td-->
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSPECNOTES" EDITABLE="TRUE"/></td>
+<td colspan = "4" style="border-bottom"></td>
+</tr>
+
+<!--
+<b>TA Details</b>
+-->
+<tr>
+<td style="background-color:#ccc;vertical-align:bottom;border-bottom" colspan = "6" height = "15"><b>TA Details</b></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSAUDIENCE" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSTAAUD" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDRESSCODE" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSAUDIENCE" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSTAAUD" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDRESSCODE" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td colspan = "4" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSTIERCODE" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td colspan = "4" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSTIERCODE" EDITABLE="TRUE"/></td>
+</tr>
+
+<!--table border="0"  width = "100%">-->
+<tr>
+<td colspan = "6" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSTASERVERINDICATOR" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "6" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSTASERVERINDICATOR" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSTUDENTMIN" PROPERTY="LONG"/></td>
+<td colspan = "4" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSTUDENTMAX" PROPERTY="LONG"/></td>
+</tr>
+
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSTUDENTMIN" EDITABLE="TRUE"/></td>
+<td colspan = "4" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSTUDENTMAX" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "6" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSTACREATEDATE" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "6" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSTACREATEDATE" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "6" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSECURITY" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "6" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSECURITY" EDITABLE="TRUE"/></td>
+</tr>
+
+<!--
+<b>Mandatory Elements for Delivery Types of: Classroom, NTU, On-Line Instructor Led or Satellite</b>
+-->
+<!--<table border="0"  width = "100%">-->
+<tr>
+
+<td style="background-color:#ccc;vertical-align:bottom;border-bottom" colspan = "6" height = "15"><b>Mandatory Elements for Delivery Types</b></td>
+</tr>
+<tr>
+
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSESSTARTTIME" PROPERTY="LONG"/></td>
+<td colspan = "4" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSESLENGTH" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSESSTARTTIME" EDITABLE="TRUE"/></td>
+<td colspan = "4" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSESLENGTH" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSINSTRUCTORCOUNT" PROPERTY="LONG"/></td>
+<td colspan = "4" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSINSTPREPHOURS" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSINSTRUCTORCOUNT" EDITABLE="TRUE"/></td>
+<td colspan = "4" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSINSTPREPHOURS" EDITABLE="TRUE"/></td>
+</tr>
+
+
+<!--
+<b>Pricing</b>
+-->
+<!--<table border="0"  width = "100%">-->
+<tr>
+<td style="background-color:#ccc;vertical-align:bottom;border-bottom" colspan = "6" height = "15"><b>Pricing</b></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSEXTPRICE" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSEXTNEWPRICE" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSEXTNPRICEEFFDATE" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSEXTPRICE" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSEXTNEWPRICE" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSEXTNPRICEEFFDATE" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSINTPRICE" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSINTNEWPRICE" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSINTNPRICEEFFDATE" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSINTPRICE" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSINTNEWPRICE" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSINTNPRICEEFFDATE" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSWTPRICE" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSWTNEWPRICE" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSWTNEWPRICEDATE" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSWTPRICE" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSWTNEWPRICE" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSWTNEWPRICEDATE" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVSTUDADDPRICE" PROPERTY="LONG"/></td>
+<td colspan = "4" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVSTUDNEWADDPRICE" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVSTUDADDPRICE" EDITABLE="TRUE"/></td>
+<td colspan = "4" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVSTUDNEWADDPRICE" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVSTUDMAX" PROPERTY="LONG"/></td>
+<td colspan = "4" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVSTUDNEWMAX" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVSTUDMAX" EDITABLE="TRUE"/></td>
+<td colspan = "4" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVSTUDNEWMAX" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVPRICE" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVNEWPRICE" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVNPRICEEFFDATE" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVPRICE" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVNEWPRICE" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRIVNPRICEEFFDATE" EDITABLE="TRUE"/></td>
+</tr>
+<!-- tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCPRICINGSTATUS" PROPERTY="LONG"/></td>
+<td colspan = "4" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRICERCOMMENT" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCPRICINGSTATUS" EDITABLE="TRUE"/></td>
+<td colspan = "4" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRICERCOMMENT" EDITABLE="TRUE"/></td>
+</tr -->
+<tr>
+<td colspan = "2" style="border-bottom">
+<fieldset><legend><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCPRICINGSTATUS" PROPERTY="LONG"/></legend>
+<table summary='layout' >
+	<tr><td><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCPRICINGSTATUS" EDITABLE="TRUE"/></td></tr>
+</table>
+</fieldset>
+</td>
+<td colspan = "4" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRICERCOMMENT" PROPERTY="LONG"/>
+<br /><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRICERCOMMENT" EDITABLE="TRUE"/></td>
+</tr>
+<!--
+In-Country Course Description
+-->
+<!--<table border="0"  width = "100%">-->
+<tr>
+<td style="background-color:#ccc;vertical-align:bottom;border-bottom" colspan = "6" height = "15"><b>In-Country Course Description</b></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSABSTRACT" PROPERTY="LONG"/></td>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCOURSEOVERVIEW" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSABSTRACT" EDITABLE="TRUE"/></td>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCOURSEOVERVIEW" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSAUDIENCEDESC" PROPERTY="LONG"/></td>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPREREQDESC" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSAUDIENCEDESC" EDITABLE="TRUE"/></td>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPREREQDESC" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSOBJECTIVES" PROPERTY="LONG"/></td>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSTOPICS" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSOBJECTIVES" EDITABLE="TRUE"/></td>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSTOPICS" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSTUDENTMACHREQTS" PROPERTY="LONG"/></td>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCOURSEMAT" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSSTUDENTMACHREQTS" EDITABLE="TRUE"/></td>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCOURSEMAT" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCERTPGMDESC" PROPERTY="LONG"/></td>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSREMARKS" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCERTPGMDESC" EDITABLE="TRUE"/></td>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSREMARKS" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDELFORMATDESC" PROPERTY="LONG"/></td>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSKEYWORD" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSDELFORMATDESC" EDITABLE="TRUE"/></td>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSKEYWORD" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSORD" PROPERTY="LONG"/></td>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCATSKILLVDES" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSORD" EDITABLE="TRUE"/></td>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCATSKILLVDES" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "6" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSIBMTRADEMARKS" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "6" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSIBMTRADEMARKS" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSOTHERCOMTMS" PROPERTY="LONG"/></td>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSOTHCOMTMSONWERNAME" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSOTHERCOMTMS" EDITABLE="TRUE"/></td>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSOTHCOMTMSONWERNAME" EDITABLE="TRUE"/></td>
+</tr>
+
+<!--
+Catalog Editor Details
+-->
+<!--<table border="0"  width = "100%">-->
+<tr>
+<td style="background-color:#ccc;vertical-align:bottom;border-bottom" colspan = "6" height = "15"><b>Catalog Editor Details</b></td>
+</tr>
+<!--tr>
+<td colspan = "6" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCCATEDITSTATUS" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "6" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCCATEDITSTATUS" EDITABLE="TRUE"/></td>
+</tr -->
+<tr>
+<td colspan = "6" style="border-bottom">
+<fieldset><legend><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCCATEDITSTATUS" PROPERTY="LONG"/></legend>
+<table summary='layout' >
+	<tr><td><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCCCATEDITSTATUS" EDITABLE="TRUE"/></td></tr>
+</table>
+</fieldset>
+</td>
+</tr>
+
+<!--
+Marketing Chapter Details
+-->
+<!--<table border="0"  width = "100%">-->
+<tr>
+<td style="background-color:#ccc;vertical-align:bottom;border-bottom" colspan = "6" height = "15"><b>Marketing Chapter Details</b></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSWWGLBMKTCHAPPRI" PROPERTY="LONG"/></td>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSWWGLBMKTCHAPSEC" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSWWGLBMKTCHAPPRI" EDITABLE="TRUE"/></td>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSWWGLBMKTCHAPSEC" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSWWGLBMKTSUBCHAPPRI" PROPERTY="LONG"/></td>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSWWGLBMKTSUBCHAPSEC" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSWWGLBMKTSUBCHAPPRI" EDITABLE="TRUE"/></td>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSWWGLBMKTSUBCHAPSEC" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTCHAPPRIM" PROPERTY="LONG"/></td>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTCHAPSEC" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTCHAPPRIM" EDITABLE="TRUE"/></td>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTCHAPSEC" EDITABLE="TRUE"/></td>
+</tr>
+<!--tr>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTSUBCHAPPRI" PROPERTY="LONG"/></td>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTSUBCHAPSEC" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTSUBCHAPPRI" EDITABLE="TRUE"/></td>
+<td colspan = "3" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTSUBCHAPSEC" EDITABLE="TRUE"/></td>
+</tr -->
+
+<tr>
+<td colspan = "3" style="border-bottom">
+<fieldset><legend><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTSUBCHAPPRI" PROPERTY="LONG"/></legend>
+<table summary='layout' >
+	<tr><td><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTSUBCHAPPRI" EDITABLE="TRUE"/></td></tr>
+</table>
+</fieldset>
+</td>
+<td colspan = "3" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTSUBCHAPSEC" PROPERTY="LONG"/>
+<br /><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTSUBCHAPSEC" EDITABLE="TRUE"/></td>
+</tr>
+<tr>
+<td colspan = "6" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTCHAPREG" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "6" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMKTCHAPREG" EDITABLE="TRUE"/></td>
+</tr>
+
+
+<!--
+Country Code 897 (U.S.) Mandatory Elements
+-->
+<!--<table border="0"  width = "100%">-->
+<tr>
+<td style="background-color:#ccc;vertical-align:bottom;border-bottom" colspan = "6" height = "15"><b>Country Code 897 (U.S.) Mandatory Elements</b></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCERIS" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCEU" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCATSKILLLEV" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCERIS" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCEU" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSCATSKILLLEV" EDITABLE="TRUE"/></td>
+</tr>
+
+
+<!--
+Status
+-->
+<!--<table border="0"  width = "100%">-->
+<tr>
+<td style="background-color:#ccc;vertical-align:bottom;border-bottom" colspan = "6" height = "15"><b>Status</b></td>
+</tr>
+<!--tr>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSLOCK" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMATLSETSTATUS" PROPERTY="LONG"/></td>
+<td colspan = "2" style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRTCATET" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSLOCK" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMATLSETSTATUS" EDITABLE="TRUE"/></td>
+<td colspan = "2" style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRTCATET" EDITABLE="TRUE"/></td>
+</tr -->
+
+<tr>
+<td colspan = "2" style="border-bottom">
+<fieldset><legend><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSLOCK" PROPERTY="LONG"/></legend>
+<table summary='layout' >
+	<tr><td><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSLOCK" EDITABLE="TRUE"/></td></tr>
+</table>
+</fieldset>
+</td>
+<td colspan = "2" style="border-bottom">
+<fieldset><legend><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMATLSETSTATUS" PROPERTY="LONG"/></legend>
+<table summary='layout' >
+	<tr><td><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSMATLSETSTATUS" EDITABLE="TRUE"/></td></tr>
+</table>
+</fieldset>
+</td>
+<td colspan = "2" style="border-bottom">
+<fieldset><legend><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRTCATET" PROPERTY="LONG"/></legend>
+<table summary='layout' >
+	<tr><td><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="LSCRSPRTCATET" EDITABLE="TRUE"/></td></tr>
+</table>
+</fieldset>
+</td>
+</tr>
+</table>
+</panel>
+</body>
+</mainpanel>
+</html>
+
+
+
+
+<!--
+
+<tr>
+<td style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="blah" PROPERTY="LONG"/></td>
+<td style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="blah" PROPERTY="LONG"/></td>
+<td style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="blah" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="blah" EDITABLE="TRUE"/></td>
+<td style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="blah" EDITABLE="TRUE"/></td>
+<td style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="blah" EDITABLE="TRUE"/></td>
+</tr>
+
+
+<tr>
+<td style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="blah" PROPERTY="LONG"/></td>
+<td style="border-bottom"><UIMETA ENTITYTYPE="LSCC" ATTRIBUTECODE="blah" PROPERTY="LONG"/></td>
+</tr>
+<tr>
+<td style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="blah" EDITABLE="TRUE"/></td>
+<td style="border-bottom"><UIDATA ENTITYTYPE="LSCC" ATTRIBUTECODE="blah" EDITABLE="TRUE"/></td>
+</tr>
+
+
+-->
+
+
+
