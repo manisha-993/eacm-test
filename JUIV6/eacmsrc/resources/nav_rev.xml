@@ -1,0 +1,37 @@
+<eacmForm3.0>
+
+<!--  	The following line is for control of the navigate appearance
+		parm1:	data type
+				DATA_SINGLE  = 0; (default)
+				DATA_DOUBLE  = 1;
+				DATA_FORM	 = 2;
+
+		parm2:	clicks
+				SINGLE_CLICK = 1; (default)
+				DOUBLE_CLICK = 2;
+	NOTE: build with no parameters uses the defaults.
+
+-->
+<method name="navigateBuild" method="build" object="navigate0"/>
+<do method="navigateBuild"/>
+<method name="getData" method="getData" Object="navigate0"/>
+<method name="getHist" method="getHistory" Object="navigate0"/>
+<method name="getActionTree" method="getActionTree" Object="navigate0"/>
+
+<GLabel name="lblAction" text="Action" misc="borderLocation,North"/>
+
+<JComponent name="navAction" component="getActionTree" misc="borderLocation,Center"/>
+<GPanel name="pnlAction" layout="border" add="lblAction,navAction"/>
+
+<JComponent name="navData" component="getData" misc="borderLocation,Center"/>
+<JSplitPane name="JSplit" jsplitPanelType="1" add="pnlAction,navData" misc="borderLocation,Center"/>
+
+<JComponent name="navHist" component="getHist" misc="borderlocation,North"/>
+
+<!-- use navigate as a jpanel
+GPanel name="navPanel" layout="border" misc="borderlocation,Center" add="JSplit,navHist" opaque="true"/ -->
+<Navigate name="navPanel" component="navigate0" layout="border" misc="borderlocation,Center" add="JSplit,navHist" opaque="true"/>
+
+<mainPane layout="border" add="navPanel"/>
+
+</eacmForm3.0>
