@@ -63,9 +63,8 @@ public class IBIRPTSTATUS extends PokBaseABR {
 	private static final String WTHDRWEFFCTVDATE = "WTHDRWEFFCTVDATE";
 	private static final String DIV = "DIV";
 	private static final String STATUS = "STATUS";
-	private static final String[] COLUMN_ARR = new String[] { MACHTYPEATR,
-			MODELATR, MKTGNAME, INSTALL, COFCAT, COFSUBCAT, COFSUBGRP, ANNDATE,
-			WITHDRAWDATE, WTHDRWEFFCTVDATE, DIV, STATUS};
+	private static final String[] COLUMN_ARR = new String[] { MACHTYPEATR, MODELATR, MKTGNAME, INSTALL, COFCAT,
+			COFSUBCAT, COFSUBGRP, ANNDATE, WITHDRAWDATE, WTHDRWEFFCTVDATE, DIV, STATUS };
 	private static final Hashtable COLUMN_LENGTH;
 	static {
 		COLUMN_LENGTH = new Hashtable();
@@ -83,12 +82,11 @@ public class IBIRPTSTATUS extends PokBaseABR {
 		COLUMN_LENGTH.put(STATUS, "20");
 	}
 	// m_elist.getParentEntityGroup().getEntityItem(0)
-	private final static String QUERY = "select m.machtypeatr,m.modelatr,m.mktgname,m.install,m.cofcat,m.cofsubcat,m.cofsubgrp,m.anndate,m.withdrawdate,m.WTHDRWEFFCTVDATE,S.div,m.status from price.model m join price.SGMNTACRNYM S on m.PRFTCTR=S.PRFTCTR where m.nlsid=1  and m.cofcat='Hardware' and m.status in ('Final','Ready for Review') and s.nlsid=1 and S.DIV<>'71' and m.INSTALL='CE' with ur";
+	private final static String QUERY = "select m.machtypeatr,m.modelatr,m.mktgname,m.install,m.cofcat,m.cofsubcat,m.cofsubgrp,m.anndate,m.withdrawdate,m.WTHDRWEFFCTVDATE,S.div,m.status from price.model m join price.SGMNTACRNYM S on m.PRFTCTR=S.PRFTCTR where m.nlsid=1  and m.cofcat='Hardware' and m.status in ('Final','Ready for Review') and s.nlsid=1 and S.DIV<>'71 Retail Store Systems' and m.INSTALL='CE' with ur";
 
 	private void setFileName() throws IOException {
 		// FILE_PREFIX=EACM_TO_QSM_
-		String fileprefix = ABRServerProperties.getFilePrefix(m_abri
-				.getABRCode());
+		String fileprefix = ABRServerProperties.getFilePrefix(m_abri.getABRCode());
 		// ABRServerProperties.getOutputPath()
 		// ABRServerProperties.get
 		StringBuffer sb = new StringBuffer(fileprefix.trim());
@@ -96,8 +94,7 @@ public class IBIRPTSTATUS extends PokBaseABR {
 		// replace special characters
 		dts = dts.replace(' ', '_');
 		sb.append(dts + ".txt");
-		dir = ABRServerProperties.getValue(m_abri.getABRCode(), IBIPRTPATH,
-				"/Dgq");
+		dir = ABRServerProperties.getValue(m_abri.getABRCode(), IBIPRTPATH, "/Dgq");
 		if (!dir.endsWith("/")) {
 			dir = dir + "/";
 		}
@@ -108,27 +105,14 @@ public class IBIRPTSTATUS extends PokBaseABR {
 
 	public void execute_run() {
 		// TODO Auto-generated method stub
-		String HEADER = "<head>"
-				+ EACustom.getMetaTags(getDescription())
-				+ NEWLINE
-				+ EACustom.getCSS()
-				+ NEWLINE
-				+ EACustom.getTitle("{0} {1}")
-				+ NEWLINE
-				+ "</head>"
-				+ NEWLINE
-				+ "<body id=\"ibm-com\">"
-				+ EACustom.getMastheadDiv()
-				+ NEWLINE
-				+ "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>"
-				+ NEWLINE;
-		String HEADER2 = "<table>" + NEWLINE
-				+ "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE
-				+ "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE
-				+ "<tr><th>Workgroup: </th><td>{2}</td></tr>" + NEWLINE
-				+ "<tr><th>Date: </th><td>{3}</td></tr>" + NEWLINE
-				+ "<tr><th>Result: </th><td>{4}</td></tr>" + NEWLINE
-				+ "</table>" + "<!-- {5} -->" + NEWLINE;
+		String HEADER = "<head>" + EACustom.getMetaTags(getDescription()) + NEWLINE + EACustom.getCSS() + NEWLINE
+				+ EACustom.getTitle("{0} {1}") + NEWLINE + "</head>" + NEWLINE + "<body id=\"ibm-com\">"
+				+ EACustom.getMastheadDiv() + NEWLINE
+				+ "<p class=\"ibm-intro ibm-alternate-three\"><em>{0}: {1}</em></p>" + NEWLINE;
+		String HEADER2 = "<table>" + NEWLINE + "<tr><th>Userid: </th><td>{0}</td></tr>" + NEWLINE
+				+ "<tr><th>Role: </th><td>{1}</td></tr>" + NEWLINE + "<tr><th>Workgroup: </th><td>{2}</td></tr>"
+				+ NEWLINE + "<tr><th>Date: </th><td>{3}</td></tr>" + NEWLINE + "<tr><th>Result: </th><td>{4}</td></tr>"
+				+ NEWLINE + "</table>" + "<!-- {5} -->" + NEWLINE;
 		MessageFormat msgf;
 		String abrversion = "";
 		Object[] args = new String[10];
@@ -183,11 +167,9 @@ public class IBIRPTSTATUS extends PokBaseABR {
 			args[1] = m_prof.getRoleDescription();
 			args[2] = m_prof.getWGName();
 			args[3] = getNow();
-			sb.append(creatFile ? "generated the IBI report file successful "
-					: "generated the IBI report file faild");
+			sb.append(creatFile ? "generated the IBI report file successful " : "generated the IBI report file faild");
 			sb.append(",");
-			sb.append(sentFile ? "send the IBI report file successful "
-					: "sent the IBI report file faild");
+			sb.append(sentFile ? "send the IBI report file successful " : "sent the IBI report file faild");
 			if (!sentFile)
 				sb.append(lineStr.replaceFirst(FAILD, ""));
 			args[4] = sb.toString();
@@ -205,8 +187,7 @@ public class IBIRPTSTATUS extends PokBaseABR {
 
 	}
 
-	private void generateFlatFile(/* EntityItem rootEntity */)
-			throws IOException, MiddlewareException, SQLException {
+	private void generateFlatFile(/* EntityItem rootEntity */) throws IOException, MiddlewareException, SQLException {
 		// generate file name
 		setFileName();
 		FileOutputStream fos = new FileOutputStream(ffPathName);
@@ -224,8 +205,8 @@ public class IBIRPTSTATUS extends PokBaseABR {
 		String dts = date + " " + time + sec;
 
 		Connection conn = m_db.getPDHConnection();
-		PreparedStatement ps = conn.prepareStatement(QUERY,
-				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+		PreparedStatement ps = conn.prepareStatement(QUERY, ResultSet.TYPE_SCROLL_INSENSITIVE,
+				ResultSet.CONCUR_READ_ONLY);
 		ResultSet rs = ps.executeQuery();
 
 		if (rs.last()) {
@@ -235,7 +216,7 @@ public class IBIRPTSTATUS extends PokBaseABR {
 			// println("EACM" + dts + " " + count);
 			rs.first();
 		}
-		while (rs.next()) {
+		do {
 
 			for (int i = 0; i < COLUMN_ARR.length; i++) {
 
@@ -243,7 +224,7 @@ public class IBIRPTSTATUS extends PokBaseABR {
 			}
 			wOut.write(NEW_LINE);
 			wOut.flush();
-		}
+		} while (rs.next());
 		wOut.flush();
 	}
 
@@ -251,8 +232,7 @@ public class IBIRPTSTATUS extends PokBaseABR {
 		if (columnValue == null)
 			columnValue = "";
 		int columnValueLength = columnValue == null ? 0 : columnValue.length();
-		int columnNameLength = Integer.parseInt(COLUMN_LENGTH.get(columnNmae)
-				.toString());
+		int columnNameLength = Integer.parseInt(COLUMN_LENGTH.get(columnNmae).toString());
 		if (columnValueLength == columnNameLength)
 			return columnValue;
 		if (columnValueLength > columnNameLength)
@@ -272,12 +252,11 @@ public class IBIRPTSTATUS extends PokBaseABR {
 
 	public boolean exeFtpShell(String fileName) {
 		// String cmd =
-		// "/usr/bin/rsync -av /var/log/www.solive.kv/access_log testuser@10.0.1.219::store --password-file=/etc/client/rsync.pwd";
+		// "/usr/bin/rsync -av /var/log/www.solive.kv/access_log
+		// testuser@10.0.1.219::store --password-file=/etc/client/rsync.pwd";
 
-		String cmd = ABRServerProperties.getValue(m_abri.getABRCode(),
-				SFTPSCRPATH, null) + " -f " + fileName;
-		String ibiinipath = ABRServerProperties.getValue(m_abri.getABRCode(),
-				IBIINIPATH, null);
+		String cmd = ABRServerProperties.getValue(m_abri.getABRCode(), SFTPSCRPATH, null) + " -f " + fileName;
+		String ibiinipath = ABRServerProperties.getValue(m_abri.getABRCode(), IBIINIPATH, null);
 		if (ibiinipath != null)
 			cmd += " -i " + ibiinipath;
 		Runtime run = Runtime.getRuntime();
