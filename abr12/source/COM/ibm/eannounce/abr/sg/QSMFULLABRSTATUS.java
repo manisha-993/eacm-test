@@ -351,6 +351,8 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 	private static final char[] FOOL_JTEST = { '\n' };
 	static final String NEWLINE = new String(FOOL_JTEST);
 
+	public static int DEBUG_LVL = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties.getABRDebugLevel("QSMFULLABRSTATUS");
+	
 	private ResourceBundle rsBundle = null;
 	private Hashtable metaTbl = new Hashtable();
 	private String navName = "";
@@ -3751,7 +3753,10 @@ private String validateProdstructs2(EntityItem eiFeature) throws MiddlewareReque
 	 * add debug info as html comment
 	 */
 	protected void addDebug(String msg) {
-		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
+		if (D.EBUG_DETAIL <= DEBUG_LVL) {
+		   
+		    rptSb.append("<!-- "+msg+" -->"+NEWLINE);		    
+    	}
 	}
 
 	/**********************************
