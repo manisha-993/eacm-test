@@ -359,6 +359,7 @@ Delete 2011-10-20d		182.020	R1.0	END	181.280
 			if (isHIPOModel(mdlItem)) {
 				setFlagValue(m_elist.getProfile(),"RFCABRSTATUS", getQueuedValue("RFCABRSTATUS"));
 			}
+			setFlagValue(m_elist.getProfile(), "ADSABRSTATUS", getQueuedValue("ADSABRSTATUS"), mdlItem);
 		}
 	}
 

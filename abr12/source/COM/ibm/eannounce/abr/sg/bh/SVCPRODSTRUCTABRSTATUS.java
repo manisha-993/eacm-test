@@ -42,6 +42,8 @@ public class SVCPRODSTRUCTABRSTATUS extends DQABRSTATUS
 	COM.ibm.opicmpdh.middleware.MiddlewareRequestException
 	{
 		//setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", getRFRQueuedValue("ADSABRSTATUS"));
+		EntityItem mdlItem = m_elist.getEntityGroup("SVCMOD").getEntityItem(0);
+		setFlagValue(m_elist.getProfile(),"ADSABRSTATUS", getQueuedValue("ADSABRSTATUS"), mdlItem);
 	}
 
 	/**********************************
