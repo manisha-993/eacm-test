@@ -1887,7 +1887,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 				ResultSet.CONCUR_READ_ONLY);
 		//ps.setInt(1, eiFeature.getEntityID());
 		ResultSet rs = ps.executeQuery();
-		int count =0;
+		
 		List list = new ArrayList();
 		while (rs.next()) {
 			if(rs.getString("ATTRIBUTEVALUE")==null||rs.getString("ATTRIBUTEVALUE").trim().equals(""))
@@ -1895,9 +1895,6 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 			list.add(rs.getString("ATTRIBUTEVALUE"));
 		}
 		
-		if(list.size()<count){
-			return strReturnDate;
-		}
 		for (int i = 0; i < list.size(); i++) {
 
 			String psWdDate = list.get(i).toString();
