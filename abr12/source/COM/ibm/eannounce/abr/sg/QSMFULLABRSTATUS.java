@@ -528,6 +528,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 	private static final String ISLMXX1 = "ISLMXX1";
 	private static final String QSMNPMT = "QSMNPMT";
 	private static final String QSMNPMM = "QSMNPMM";
+	private HashMap fidMap = new HashMap();
 	private static final List geoWWList = Collections.unmodifiableList(new ArrayList() {
 		{
 			add("Asia Pacific");
@@ -1873,58 +1874,66 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		return strReturnDate;
 	}
 
-	private String validateProdstructsSQL(EntityItem eiFeature)
+	private void validateProdstructsSQL(String ids)
 			throws MiddlewareRequestException, SQLException, MiddlewareException {
-
+		fidMap.clear();
+		if(ids.length()<1)
+			return;
 		String strReturnDate = "2050-12-31";
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 		Date oldestDate = null;
 		Date psDate = null;
-		//String sql = "select prod.ATTRIBUTEVALUE from opicm.text prod join opicm.Relator R on R.entitytype=prod.entitytype and prod.entityid = R.entityid where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID = "+eiFeature.getEntityID()+" AND prod.ATTRIBUTECODE = 'WTHDRWEFFCTVDATE' AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP and prod.valto>current timestamp and prod.EFFTO >current timestamp";
-		String sql = "select R.entityid,prod.WTHDRWEFFCTVDATE as ATTRIBUTEVALUE from  opicm.Relator R left join price.prodstruct prod  on prod.entityid= R.entityid where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID = "+eiFeature.getEntityID()+"  AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP  and prod.nlsid=1";
-		//addDebug("sql:"+sqlCount);
+		// String sql = "select prod.ATTRIBUTEVALUE from opicm.text prod join
+		// opicm.Relator R on R.entitytype=prod.entitytype and prod.entityid =
+		// R.entityid where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID =
+		// "+eiFeature.getEntityID()+" AND prod.ATTRIBUTECODE =
+		// 'WTHDRWEFFCTVDATE' AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current
+		// TIMESTAMP and prod.valto>current timestamp and prod.EFFTO >current
+		// timestamp";
+		String sql = "select R.entityid,prod.WTHDRWEFFCTVDATE as ATTRIBUTEVALUE from  opicm.Relator R left join price.prodstruct prod  on prod.entityid= R.entityid where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID in ("
+				+ ids + ")  AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP  and prod.nlsid=1";
+		 addDebug("sql:"+sql);
 		Connection conn = m_db.getPDHConnection();
 		PreparedStatement ps = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
 				ResultSet.CONCUR_READ_ONLY);
-		//ps.setInt(1, eiFeature.getEntityID());
+		// ps.setInt(1, eiFeature.getEntityID());
 		ResultSet rs = ps.executeQuery();
-		
+
 		List list = new ArrayList();
 		while (rs.next()) {
-			if(rs.getString("ATTRIBUTEVALUE")==null||rs.getString("ATTRIBUTEVALUE").trim().equals(""))
-				return strReturnDate;
-			list.add(rs.getString("ATTRIBUTEVALUE"));
-		}
-		
-		for (int i = 0; i < list.size(); i++) {
+			String date = rs.getString("ATTRIBUTEVALUE");
+			String id = rs.getString("entityid");
+			if (date == null || date.trim().equals(""))
+				fidMap.put(id, "2050-12-31");
+			else if (fidMap.get(id) == null) {
+				fidMap.put(id, date);
+			} else {
 
-			String psWdDate = list.get(i).toString();
-			addDebug("*****mlm oldestdate=" + oldestDate);
-			addDebug("*****mlm psWdDate=" + psWdDate);
-			if (!psWdDate.equals("")) {
-				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 				try {
-					psDate = df.parse(psWdDate);
+					oldestDate = df.parse(fidMap.get(id).toString());
+					psDate = df.parse(date);
 					if ((oldestDate == null) || (psDate.after(oldestDate))) {
 						addDebug("*****mlm setting odlestdate to psWdDate");
-						oldestDate = psDate;
-						strReturnDate = psWdDate;
+						fidMap.put(id, date);
 					}
 				} catch (ParseException e) {
 					addDebug(e.toString());
 					addDebug("*****mlm error: ParseException, setting date to 2050-12-31 - end");
-					strReturnDate = "2050-12-31";
-					i = list.size();
+
+					fidMap.put(id, "2050-12-31");
 					break;
 				}
-			} else {
-				addDebug("*****mlm psWdDate is blank, set date to 2050-12-31 - end");
-				strReturnDate = "2050-12-31";
-				i = list.size();
-				break;
 			}
+			// list.add(rs.getString("ATTRIBUTEVALUE"));
 		}
+		rs.close();
 
-		return strReturnDate;
+	}
+
+	private String validateProdstructsDate(EntityItem eiFeature) {
+		String resutl = fidMap.get(eiFeature.getEntityID() + "")==null?"":fidMap.get(eiFeature.getEntityID() + "").toString();
+
+		return resutl;
 	}
 
 	private String validateProdstructs(EntityItem eiFeature)
@@ -2133,6 +2142,15 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		 * addDebug("groupCount:" + groupCount);
 		 */
 		// sb = new StringBuffer();
+		EntityGroup feature = list.getEntityGroup("FEATURE");
+		String fids = "";
+		for (int fi = 0; fi < feature.getEntityItemCount(); fi++) {
+			if (fids.length() > 0)
+				fids += ',';
+			fids += feature.getEntityItem(fi).getEntityID();
+		}
+		validateProdstructsSQL(fids);
+
 		for (int i = 0; i < prodVect.size(); i++) {
 
 			EntityItem eiProdstruct = (EntityItem) prodVect.get(i);
@@ -2356,7 +2374,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 			sb.append(getValue(QSMEDMW, "2050-12-31"));
 			sb.append(getValue(DSLMMVA, PokUtils.getAttributeValue(rootEntity, "ANNDATE", ",", "", false)));
 
-			strDSLMWDN = validateProdstructsSQL(eiFeature);
+			strDSLMWDN = validateProdstructsDate(eiFeature);
 			sb.append(getValue(DSLMWDN, strDSLMWDN));
 
 			strPricedFeature = PokUtils.getAttributeValue(eiFeature, "PRICEDFEATURE", ",", "", false);
