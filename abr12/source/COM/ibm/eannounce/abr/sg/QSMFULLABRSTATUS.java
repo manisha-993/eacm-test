@@ -1890,7 +1890,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		// 'WTHDRWEFFCTVDATE' AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current
 		// TIMESTAMP and prod.valto>current timestamp and prod.EFFTO >current
 		// timestamp";
-		String sql = "select R.entityid,prod.WTHDRWEFFCTVDATE as ATTRIBUTEVALUE from  opicm.Relator R left join price.prodstruct prod  on prod.entityid= R.entityid where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID in ("
+		String sql = "select R.entity1id as entityid,prod.WTHDRWEFFCTVDATE as ATTRIBUTEVALUE from  opicm.Relator R left join price.prodstruct prod  on prod.entityid= R.entityid where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID in ("
 				+ ids + ")  AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP  and prod.nlsid=1";
 		 addDebug("sql:"+sql);
 		Connection conn = m_db.getPDHConnection();
@@ -1934,6 +1934,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		String resutl = fidMap.get(eiFeature.getEntityID() + "")==null?"":fidMap.get(eiFeature.getEntityID() + "").toString();
 
 		return resutl;
+	
 	}
 
 	private String validateProdstructs(EntityItem eiFeature)
@@ -2347,7 +2348,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 					availQSMGeoList = null;
 					oofAvail = (EntityItem) availVec.elementAt(iA);
 
-					idString.append(oofAvail.getEntityID() + "，");
+					idString.append(oofAvail.getEntityID() + "");
 					strAvailType = PokUtils.getAttributeValue(oofAvail, "AVAILTYPE", ",", "", false);
 					availQSMGeoList = (EANFlagAttribute) oofAvail.getAttribute("QSMGEO");
 					if (isQSMGeoSelected(strAvailGenAreaSel, availQSMGeoList)
