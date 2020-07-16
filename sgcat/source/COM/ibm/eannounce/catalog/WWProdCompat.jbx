@@ -1,0 +1,31 @@
+[PropertyInfo]
+attributeKeys,COM.ibm.eannounce.catalog.SyncMapCollection,false,false, , ,true,<default>
+attributeKeys,String[],false,false, , ,true,<default>
+COMPATTYPE,String,false,false, , ,true,<default>
+COUNTRYCODE,String,false,false, , ,true,<default>
+COUNTRYLIST,String,false,false, , ,true,<default>
+ENTERPRISE,String,false,false, , ,true,<default>
+ISACTIVE,boolean,false,false, , ,false,<default>
+LANGUAGECODE,String,false,false, , ,true,<default>
+m_AttCollection,java.util.HashMap,false,false, , ,false,<default>
+m_smc,COM.ibm.eannounce.catalog.SyncMapCollection,false,false, , ,false,<default>
+NLSID,int,false,false, , ,true,<default>
+OS,String,false,false, , ,true,<default>
+OS_FC,String,false,false, , ,true,<default>
+PUBFROM,String,false,false, , ,true,<default>
+PUBTO,String,false,false, , ,true,<default>
+smc,COM.ibm.eannounce.catalog.SyncMapCollection,false,false, , ,true,<default>
+VALFROM,String,false,false, , ,true,<default>
+VALTO,String,false,false, , ,true,<default>
+WWPARTNUMBERFROM,String,false,false, , ,true,<default>
+WWPARTNUMBERTO,String,false,false, , ,true,<default>
+WWProdCompatId,COM.ibm.eannounce.catalog.WWProdCompatId,false,false, , ,true,<default>
+WWPRODENTITYIDFROM,int,false,false, , ,true,<default>
+WWPRODENTITYIDTO,int,false,false, , ,true,<default>
+WWPRODENTITYTYPEFROM,String,false,false, , ,true,<default>
+WWPRODENTITYTYPETO,String,false,false, , ,true,<default>
+[IconNames]
+
+
+
+

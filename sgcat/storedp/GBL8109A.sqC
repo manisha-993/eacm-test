@@ -1,0 +1,268 @@
+//
+// TEMPLATE: BASICSP.TXT (2007-04-12-01.47.14.537000)
+//
+// Copyright (c) 2001, International Business Machines Corp., Ltd.
+// All Rights Reserved.
+// Licensed for use in connection with IBM business only.
+//
+// Stored Procedure: GBL8109A
+// Description: Clears out the trsNetter tables for a Given SessionID
+// Generated: 2007-04-12-01.47.14.537000 PST
+//
+// Narrative:
+// 
+//  This guy removes any trsNetterPass1, trsNetterPass2, trsNetterAtts, trsNetterFinal records for the given SessionID
+// 
+// $Log: GBL8109A.sqC,v $
+// Revision 1.1  2011/05/05 11:25:58  wendy
+// src from IBMCHINA
+//
+// Revision 1.1  2007/10/29 09:27:48  jingb
+// New GBL8109 to selete temptable gbli.* by sessionID
+//
+// Revision 1.2  2006/02/20 18:04:03  joan
+// fix compile
+// 
+// Revision 1.1  2006/02/20 17:41:53  joan
+// add sp
+// 
+// 
+// 
+//
+// $Log: GBL8109A.sqC,v $
+// Revision 1.1  2011/05/05 11:25:58  wendy
+// src from IBMCHINA
+//
+// Revision 1.1  2007/10/29 09:27:48  jingb
+// New GBL8109 to selete temptable gbli.* by sessionID
+//
+// Revision 1.34  2004/11/10 20:02:16  dave
+// ok.. round two!
+//
+// Revision 1.33  2004/11/10 19:33:16  roger
+// Fix it
+//
+// Revision 1.29  2004/10/26 01:45:46  dave
+// more trying
+//
+// Revision 1.28  2004/10/26 01:41:22  dave
+// trying hold_proc (still getting abends in dari)
+//
+// Revision 1.27  2004/10/25 16:25:06  roger
+// Set the inout parms
+//
+// Revision 1.26  2004/10/21 18:05:17  dave
+// experimenting w/ Theadsafe sqlca stuff - may break it..
+// may not
+//
+// Revision 1.25  2004/10/20 19:48:38  roger
+// For GENERAL parm style
+//
+// Revision 1.24  2004/10/20 19:13:22  roger
+// Restore
+//
+// Revision 1.22  2004/07/30 20:08:37  dave
+// let us save some progress
+//
+// Revision 1.21  2004/07/30 01:52:53  dave
+// trick to get strcmp to work (may not need fprint now)
+//
+// Revision 1.20  2004/07/30 00:31:00  dave
+// fix strcmp .. not getting ending \0 on the strncpy..
+//
+// Revision 1.19  2004/02/11 23:12:48  roger
+// Change PDT to PST to test
+//
+// Revision 1.18  2004/02/11 23:12:13  roger
+// change PST to PDT to test
+//
+// Revision 1.17  2003/07/14 22:38:59  dave
+// strcpy switchback test
+//
+// Revision 1.16  2003/07/11 16:34:40  roger
+// Fix for DB2 8 & KEEPFENCED trouble
+//
+// Revision 1.15  2002/05/21 23:28:49  roger
+// Missed some
+//
+// Revision 1.14  2002/05/21 23:01:00  roger
+// Handle long text and long text with null indicator
+//
+// Revision 1.13  2001/10/23 20:22:12  roger
+// Fix references to C library routines for AIX
+//
+// Revision 1.12  2001/07/27 00:00:50  roger
+// Unused variable
+//
+// Revision 1.11  2001/04/20 21:14:26  dave
+// Found a Values command in SQL to get values into Host Variables without a Select
+//
+// Revision 1.10  2001/03/17 03:11:50  roger
+// brand was defined multiple times - renamed to x_brand
+//
+// Revision 1.9  2001/03/16 19:10:40  roger
+// More branding code
+//
+// Revision 1.8  2001/03/16 03:48:57  roger
+// Misc clean up
+//
+// Revision 1.7  2001/03/16 03:18:47  roger
+// Added Log keyword
+//
+
+#include <stdio.h>
+#include <string.h>
+#include <memory.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <math.h>
+
+#include <sqlenv.h>
+#include <sql.h>
+#include <sqlda.h>
+#include <sqlca.h>
+#include "status.h"
+
+#ifdef __cplusplus
+extern "C"
+#endif
+
+SQL_API_RC SQL_API_FN GBL8109A
+(
+  sqlint32* inoutReturnStatus
+, sqlint32* inSessionID
+, char inEnterprise[16]
+)
+{
+
+/* Declare a local SQLCA */ 
+struct sqlca sqlca;
+
+// Variables specific to this SP (local copy of input parms)
+EXEC SQL BEGIN DECLARE SECTION;
+char epoch[27];
+char now[27];
+char forever[27];
+long SessionID;
+char Enterprise[17];
+EXEC SQL END DECLARE SECTION;
+ 
+
+// Set some local date/times
+EXEC SQL VALUES ('1980-01-01-00.00.00.000000') INTO :epoch;
+EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :now;
+EXEC SQL VALUES ('9999-12-31-00.00.00.000000') INTO :forever;
+
+// Set the return status
+// GENERAL parm style
+*inoutReturnStatus = SP_EXITED_PREMATURELY;
+
+// Save the input parameters to local variables
+SessionID = *inSessionID;
+strcpy(Enterprise, inEnterprise);
+
+
+// begin sql tag
+EXEC SQL BEGIN DECLARE SECTION;
+char brand[80] = "$Id: GBL8109A.sqC,v 1.1 2011/05/05 11:25:58 wendy Exp $";
+EXEC SQL END DECLARE SECTION;
+// end sql tag
+
+// begin execute tag
+// =================================================================
+// Now Remove any possible records for this guy for the given SessionID
+// ==================================================================
+EXEC SQL delete from gbli.trsNetterPass1 where sessionid = :SessionID and Enterprise = :Enterprise;
+EXEC SQL delete from gbli.trsNetterAtts where sessionid = :SessionID and Enterprise = :Enterprise;
+EXEC SQL delete from gbli.trsNetterPass2 where sessionid = :SessionID and Enterprise = :Enterprise;
+EXEC SQL delete from gbli.trsNetterFinal where sessionid = :SessionID and Enterprise = :Enterprise;
+EXEC SQL COMMIT WORK;
+// end execute tag
+
+
+// Set the return status
+// GENERAL parm style
+*inoutReturnStatus = SP_OK;
+
+exit_sp:
+
+// Copy SQLCA back to caller (contains info that a cursor is open)
+// GENERAL parm style - do nothing
+
+return(0);
+
+}
+// SQL DDL to register the SP
+/*
+//
+// TEMPLATE: REGISTER.TXT
+//
+// $Log: GBL8109A.sqC,v $
+// Revision 1.1  2011/05/05 11:25:58  wendy
+// src from IBMCHINA
+//
+// Revision 1.1  2007/10/29 09:27:48  jingb
+// New GBL8109 to selete temptable gbli.* by sessionID
+//
+// Revision 1.17  2004/10/21 17:19:33  dave
+// Threadsafe no workie in 7.x
+//
+// Revision 1.16  2004/10/20 23:24:27  dave
+// new single instance Boolean concept
+//
+// Revision 1.15  2004/10/20 19:47:35  roger
+// For GENERAL parm style
+//
+// Revision 1.14  2004/10/20 19:09:05  roger
+// Change back
+//
+// Revision 1.13  2004/10/20 18:50:49  roger
+// Changes for GENERAL parm style
+//
+// Revision 1.12  2003/06/03 16:42:36  roger
+// Remove grant package statement
+//
+// Revision 1.11  2003/04/10 22:04:55  dave
+// converted back to package
+//
+// Revision 1.10  2003/04/07 17:05:39  roger
+// Schema is now OPICM only
+//
+// Revision 1.9  2002/07/31 19:28:17  roger
+// opicm should be on procedures as well
+//
+// Revision 1.8  2002/07/31 18:43:14  roger
+// Clean up
+//
+// Revision 1.7  2002/07/31 16:21:50  roger
+// Grant for opica101
+//
+// Revision 1.6  2001/11/07 17:27:36  roger
+// Grant for v1.1 environment - are these really needed?
+//
+// Revision 1.5  2001/07/27 00:03:40  roger
+// Changed opicm to opicm
+//
+// Revision 1.4  2001/07/23 21:49:01  roger
+// Changes for 1.0
+//
+// Revision 1.3  2001/07/23 19:57:35  roger
+// Changes for SSL support
+//
+// Revision 1.2  2001/03/16 03:18:48  roger
+// Added Log keyword
+//
+
+~DROP PROCEDURE opicm.GBL8109A;
+~CREATE PROCEDURE opicm.GBL8109A
+~(
+~  inout ReturnStatus int
+~, in SessionID int
+~, in Enterprise varchar(16)
+~)
+~RESULT SETS 0
+~EXTERNAL NAME 'GBL8109A'
+~LANGUAGE C
+~PARAMETER STYLE GENERAL
+~FENCED;
+*/

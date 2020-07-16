@@ -1,0 +1,49 @@
+SPSOURCE=./
+INSTALLDIR=/home/opicmdb2/sqllib/
+
+DB2VER=`db2level|grep token|cut -d" " -f7|cut -c1-2`
+threadsafe="$(threadsafe_off)"
+threadsafe_on="THREADSAFE"
+threadsafe_off=""
+
+BASE="pdhalias"
+USER="opicmadm"
+PASSWD="cat9tail"
+
+GBL81841:
+	# start the process
+	-date
+	# clean up from last run
+	-rm -f $(SPSOURCE)$*.bnd
+	-rm -f $(SPSOURCE)$*.o
+	-rm -f $(SPSOURCE)$*.C
+	-rm -f $(SPSOURCE)$*
+	
+	# prep and bind the SQL
+	-db2 CONNECT TO ${BASE} USER ${USER} USING ${PASSWD};
+	-db2 PREP $(SPSOURCE)$*.sqC BINDFILE DATETIME ISO QUERYOPT 5 DEGREE ANY SQLWARN NO;
+	-db2 BIND $(SPSOURCE)$*.bnd DATETIME ISO BLOCKING ALL ISOLATION UR QUERYOPT 5 SQLWARN NO;
+	-db2 TERMINATE;
+	
+	# compile the C file
+	/usr/vacpp/bin/cc -c $(SPSOURCE)$*.C -I${INSTALLDIR}include -o $(SPSOURCE)$*.o 
+
+	# make a shared library
+	-/usr/vacpp/bin/cc -qmkshrobj -e$*  -o $* $(SPSOURCE)$*.o -L$(INSTALLDIR)lib -ldb2
+	
+	# chmod on the library and move it to the function directory
+	-rm -f $(INSTALLDIR)function/$*
+	-chmod 775 $*
+	-cp $(SPSOURCE)$* $(INSTALLDIR)function/$*
+	# register the stored proc
+	-grep "~" $*.sqC|cut -d"~" -f2|sed "s/FENCED/FENCED $(threadsafe)/" >$(SPSOURCE)tmpreg
+	-cat tmpreg
+	-db2batch -d ${BASE} -a ${USER}/${PASSWD} -f $(SPSOURCE)tmpreg
+	-rm $(SPSOURCE)tmpreg
+	# clean up the mess
+	-rm -f $(SPSOURCE)$*.bnd
+	-rm -f $(SPSOURCE)$*.o
+	-rm -f $(SPSOURCE)$*.C
+	-rm -f $(SPSOURCE)$*
+	# finish the process
+	-date

@@ -1,0 +1,22 @@
+#
+# Script called from the Java IDL program on every x passes of the  
+# main IDL loop
+#
+db2 connect to opicmpdh user opicmadm using cat9tail
+echo "1"
+db2 "reorg table gbli.trsNetterPass1"
+db2 "reorg table gbli.trsNetterPass2"
+db2 "reorg table gbli.trsNetterFinal"
+db2 "reorg table gbli.trsNetterAtts"
+
+echo "2"
+db2 "runstats on table gbli.trsNetterPass1 and detailed indexes all"
+db2 "runstats on table gbli.trsNetterPass2 and detailed indexes all"
+db2 "runstats on table gbli.trsNetterFinal and detailed indexes all"
+db2 "runstats on table gbli.trsNetterAtts and detailed indexes all"
+
+echo "3"
+db2 "rebind opicmadm.gbl8184"
+
+db2 terminate
+

@@ -1,0 +1,7 @@
+run CreateTable.sh
+run creatColStatus.sh
+run insertColStatus.sh
+run InsertMetaLink.sh 
+db2 export to ./MetaEntity of del select * from opicm.METAENTITY where entitytype in ('TMPS1','LSEOPS1','WWSEOPS1','LSEOBPS1','LCTOPS1','LSEOPS1')
+db2 "import from ./MetaEntity.txt of del insert into opicm.METAENTITY"
+db2 "import from ./MetaDesc.txt of del insert into opicm.METADESCRIPTION"
