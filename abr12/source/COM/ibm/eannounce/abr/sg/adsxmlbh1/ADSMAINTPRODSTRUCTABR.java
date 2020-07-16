@@ -1,11 +1,15 @@
 package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 
+import com.ibm.transform.oim.eacm.util.PokUtils;
+
 import COM.ibm.eannounce.abr.util.XMLActivityElem;
 import COM.ibm.eannounce.abr.util.XMLElem;
 import COM.ibm.eannounce.abr.util.XMLGroupElem;
+import COM.ibm.eannounce.abr.util.XMLMAINTMFAVAILElem;
 import COM.ibm.eannounce.abr.util.XMLNotificationElem;
 import COM.ibm.eannounce.abr.util.XMLRELATElem;
 import COM.ibm.eannounce.abr.util.XMLVMElem;
+import COM.ibm.eannounce.objects.EntityList;
 
 public class ADSMAINTPRODSTRUCTABR extends XMLMQRoot{
 
@@ -39,6 +43,17 @@ public class ADSMAINTPRODSTRUCTABR extends XMLMQRoot{
 		 XMLMAP.addChild(new XMLElem("FEATURE_MODIF_IND","FEATUREMODIFIND"));
 		 XMLMAP.addChild(new XMLElem("SERVICE_LEVEL_MAPPING_CD","SERVICELEVELMAPPINGCD"));
 		 
+		 XMLElem model = new XMLGroupElem(null, "SVCMOD", "D:SVCMOD");
+		 XMLMAP.addChild(model);
+		 model.addChild(new XMLElem("OFFERING_MARKETING_NM", "INVNAME"));
+		 
+		 XMLElem feature = new XMLGroupElem(null, "MAINTFEATURE", "U:MAINTFEATURE");
+		 XMLMAP.addChild(feature);
+		 feature.addChild(new XMLElem("FEATURE_MKTNG_NAME","FCMKTNAME"));
+		 
+		 XMLElem list = new XMLElem("AVAILABILITYLIST");
+		 XMLMAP.addChild(list);
+		 list.addChild(new XMLMAINTMFAVAILElem());
 		 
 	}
 	/**********************************
@@ -53,6 +68,8 @@ public class ADSMAINTPRODSTRUCTABR extends XMLMQRoot{
      */
     public String getVeName() { return "ADSMAINTPRODSTRUCT"; }
 
+    public String getVeName2() { return "ADSMAINTPRODSTRUCT2"; }
+    
     /**********************************
      * get the status attribute to use for this ABR
      */
@@ -76,6 +93,16 @@ public class ADSMAINTPRODSTRUCTABR extends XMLMQRoot{
     }
 	
   
-	
+    protected void mergeLists(ADSABRSTATUS abr, EntityList list1, EntityList list2) throws
+    java.sql.SQLException,
+    COM.ibm.opicmpdh.middleware.MiddlewareException,
+    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
+    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
+    {
+    	abr.addDebug("Entered ADSPRODSTRUCTABR call COM.ibm.eannounce.objects.EntityList.mergeLists");
+
+    	COM.ibm.eannounce.objects.EntityList.mergeLists(list1,list2);
+    	abr.addDebug("mergeLists:: after merge Extract "+PokUtils.outputList(list1));
+    }
 
 }

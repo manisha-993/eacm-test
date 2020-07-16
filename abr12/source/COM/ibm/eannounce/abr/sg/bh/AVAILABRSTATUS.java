@@ -583,7 +583,15 @@ Delete 2011-10-20		49.820	R1.0	END	49.680
 				//	R1.0	AND		SVCMODSVCSEO-u	SVCMOD	STATUS	=	"Ready for Review" (0040)		
 				//49.895	R1.0	AND			SVCMOD	LIFECYCLE	=	"Develop" (LF02)  | "Plan" (LF01)		
 				//49.896	R1.0	SET			SVCMOD				ADSABRSTATUS	&ADSFEEDRFR
-				//49.897	R1.0	END	49.894							
+				//49.897	R1.0	END	49.894		
+				
+					
+				//		IF		MAINTMFAVAIL-u	MAINTPRODSTRUCT	STATUS	=	"Ready for Review" (0040)		
+				//		AND			MAINTPRODSTRUCT	LIFECYCLE	=	"Develop" (LF02)  | "Plan" (LF01)		
+				//		SET			MAINTPRODSTRUCT				ADSABRSTATUS	&ADSFEEDRFR
+				//		END	4.001												
+				doRFR_ADSXML("MAINTPRODSTRUCT");
+				
 				verifySVCSEORFRAndQueue(avail);
 				
 				//49.90	R1.0	END	49.11
@@ -1483,6 +1491,17 @@ Delete 20110318 51.0			STATUS	=>	A: AVAIL	DATAQUALITY		E	E	E		{LD: STATUS} can n
 		}
 		//56.0	END	9
 		//105.0	END	58
+		
+		//	MAINTPRODSTRUCT		MAINTMFAVAIL-u									
+		eGrp = m_elist.getEntityGroup("MAINTPRODSTRUCT");
+		addHeading(3,eGrp.getLongDescription()+" Checks:");
+		// get models thru avail
+		vct = PokUtils.getAllLinkedEntities(rootEntity, "MAINTMFAVAIL", "MAINTPRODSTRUCT");
+		for (int i=0; i< eGrp.getEntityItemCount(); i++){
+			EntityItem mpsItem = (EntityItem)vct.elementAt(i);
+			//35.2,84.2			STATUS	=>	A: AVAIL	DATAQUALITY		E	E	E		{LD: STATUS} can not be higher than {LD: SWPRODSTRUCT} {NDN: SWPRODSTRUCT} {LD: STATUS} {STATUS}
+			checkStatusVsDQ(mpsItem, "STATUS",rootEntity,CHECKLEVEL_E);
+		}
 	}
 
 	/**
