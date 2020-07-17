@@ -114,12 +114,12 @@ public class AVAILABRSTATUS extends DQABRSTATUS
 	private static final String[] MODELABRS = {"ADSABRSTATUS"};
 	private static final String[] SVCMODABRS = {"ADSABRSTATUS"};
 	private static final String[] LSEOBDLABRS = {"ADSABRSTATUS"};
+	private static final String[] MAINTABRS = {"ADSABRSTATUS"};
 	
 	private static final String[] LSEOEPIMS = {"EPIMSABRSTATUS"};
 	private static final String[] LSEOBLEPIMS = {"EPIMSABRSTATUS"};
 	
 	private static final String[] RFCABRS = {"RFCABRSTATUS"};
-
 	/**********************************
 	 * ready4review
 	 */
@@ -885,6 +885,7 @@ Delete 2011-10-20		46.280		END	46.140
 			verifyFinalAndQueue(rootEntity, "MODELCONVERTAVAIL", "MODELCONVERT",MODELABRS);
 			verifyFinalAndQueue(rootEntity, "MODELCONVERTAVAIL", "MODELCONVERT",RFCABRS);
 			
+			verifyFinalAndQueue(rootEntity, "MAINTMFAVAIL", "MAINTPRODSTRUCT",MAINTABRS);
 			//48.00		
 //		}
 		//49.00		END	32.00	

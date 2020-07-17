@@ -17,8 +17,12 @@
 				minOccurs="1" maxOccurs="1" />
 			<xsd:element name="OFFERING_ID" type="xsd:string"
 				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="OFFERING_MARKETING_NM"
+				type="xsd:string" minOccurs="1" maxOccurs="1" />
 			<xsd:element name="FEATURE_CD" type="xsd:string"
 				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FEATURE_MKTNG_NAME"
+				type="xsd:string" minOccurs="1" maxOccurs="1" />
 			<xsd:element name="QTY_MIN_NUM" type="xsd:string"
 				minOccurs="1" maxOccurs="1" />
 			<xsd:element name="QTY_MAX_NUM" type="xsd:string"
@@ -37,10 +41,7 @@
 				minOccurs="1" maxOccurs="1" />
 			<xsd:element name="SERVICE_LEVEL_MAPPING_CD"
 				type="xsd:string" minOccurs="1" maxOccurs="1" />
-			<xsd:element name="OFFERING_MARKETING_NM"
-				type="xsd:string" minOccurs="1" maxOccurs="1" />
-			<xsd:element name="FEATURE_MKTNG_NAME"
-				type="xsd:string" minOccurs="1" maxOccurs="1" />
+			
 			<xsd:element name="AVAILABILITYLIST"
 						 type="AVAILABILITYLISTTYPE" minOccurs="1" maxOccurs="1" />
 		</xsd:sequence>	

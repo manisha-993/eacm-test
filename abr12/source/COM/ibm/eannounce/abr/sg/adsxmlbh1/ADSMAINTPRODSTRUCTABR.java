@@ -23,15 +23,16 @@ public class ADSMAINTPRODSTRUCTABR extends XMLMQRoot{
 		 XMLMAP.addChild(new XMLNotificationElem("DTSOFMSG"));
 		 XMLMAP.addChild(new XMLActivityElem("ACTIVITY"));
 //		 XMLElem model = new XMLGroupElem(null, "SVCMOD", "D:SVCMOD");
-//		 XMLMAP.addChild(model);
-//		 String modelatr = new XMLElem("MODELATR","MODELATR").toString();
-//		 String mtypeatr = new XMLElem("MACHTYPEATR","SMACHTYPEATR").toString();	 
-		 
+//		 XMLMAP.addChild(model);	 		 
 		 XMLMAP.addChild(new XMLRELATElem("OFFERING_ID","SMACHTYPEATR","MODELATR"));
+		 XMLElem model = new XMLGroupElem(null, "SVCMOD", "D:SVCMOD");
+		 XMLMAP.addChild(model);
+		 model.addChild(new XMLElem("OFFERING_MARKETING_NM", "INVNAME"));
 		 
-//		 XMLElem feature = new XMLGroupElem(null, "MAINTFEATURE", "U:MAINTFEATURE");
-//		 XMLMAP.addChild(feature);
-		 XMLMAP.addChild(new XMLRELATElem("FEATURE_CD","FEATURECODE"));
+		 XMLElem feature = new XMLGroupElem(null, "MAINTFEATURE", "U:MAINTFEATURE");
+		 XMLMAP.addChild(feature);
+		 feature.addChild(new XMLElem("FEATURE_CD","FEATURECODE"));
+		 feature.addChild(new XMLElem("FEATURE_MKTNG_NAME","FCMKTNAME"));
 		 
 		 XMLMAP.addChild(new XMLElem("QTY_MIN_NUM","QTYMINNUM"));
 		 XMLMAP.addChild(new XMLElem("QTY_MAX_NUM","QTYMAXNUM"));
@@ -42,15 +43,7 @@ public class ADSMAINTPRODSTRUCTABR extends XMLMQRoot{
 		 XMLMAP.addChild(new XMLElem("FEATURE_CATEG_CD","FEATURECATEGCD"));
 		 XMLMAP.addChild(new XMLElem("FEATURE_MODIF_IND","FEATUREMODIFIND"));
 		 XMLMAP.addChild(new XMLElem("SERVICE_LEVEL_MAPPING_CD","SERVICELEVELMAPPINGCD"));
-		 
-		 XMLElem model = new XMLGroupElem(null, "SVCMOD", "D:SVCMOD");
-		 XMLMAP.addChild(model);
-		 model.addChild(new XMLElem("OFFERING_MARKETING_NM", "INVNAME"));
-		 
-		 XMLElem feature = new XMLGroupElem(null, "MAINTFEATURE", "U:MAINTFEATURE");
-		 XMLMAP.addChild(feature);
-		 feature.addChild(new XMLElem("FEATURE_MKTNG_NAME","FCMKTNAME"));
-		 
+		 	 
 		 XMLElem list = new XMLElem("AVAILABILITYLIST");
 		 XMLMAP.addChild(list);
 		 list.addChild(new XMLMAINTMFAVAILElem());
@@ -68,7 +61,7 @@ public class ADSMAINTPRODSTRUCTABR extends XMLMQRoot{
      */
     public String getVeName() { return "ADSMAINTPRODSTRUCT"; }
 
-    public String getVeName2() { return "ADSMAINTPRODSTRUCT2"; }
+    
     
     /**********************************
      * get the status attribute to use for this ABR
@@ -93,16 +86,6 @@ public class ADSMAINTPRODSTRUCTABR extends XMLMQRoot{
     }
 	
   
-    protected void mergeLists(ADSABRSTATUS abr, EntityList list1, EntityList list2) throws
-    java.sql.SQLException,
-    COM.ibm.opicmpdh.middleware.MiddlewareException,
-    COM.ibm.opicmpdh.middleware.MiddlewareRequestException,
-    COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
-    {
-    	abr.addDebug("Entered ADSPRODSTRUCTABR call COM.ibm.eannounce.objects.EntityList.mergeLists");
-
-    	COM.ibm.eannounce.objects.EntityList.mergeLists(list1,list2);
-    	abr.addDebug("mergeLists:: after merge Extract "+PokUtils.outputList(list1));
-    }
+    
 
 }
