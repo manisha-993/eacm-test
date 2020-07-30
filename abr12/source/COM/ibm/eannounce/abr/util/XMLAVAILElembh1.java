@@ -2151,7 +2151,7 @@ public class XMLAVAILElembh1 extends XMLElem {
 				rfrthedate = temps[1];
 			}
 
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
+			if (CHEAT.equals(thedate) && CHEAT.equals(rfrthedate)) {
 				// 5. get parentDiff.ANNDATE
 				temps = AvailUtil.getParentAttributeDate(findT1, parentDiffEntity, thedate, rfrthedate, "ANNDATE",
 						debugSb);

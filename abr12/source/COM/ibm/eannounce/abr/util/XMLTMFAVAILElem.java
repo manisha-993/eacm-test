@@ -2333,17 +2333,17 @@ public class XMLTMFAVAILElem extends XMLElem {
 				thedate = temps[0];
 				rfrthedate = temps[1];
 			}			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
+			if (CHEAT.equals(thedate) && CHEAT.equals(rfrthedate)) {
 				temps = AvailUtil.getProdstructAttributeDate(findT1, parentDiff, plModelAvailDiff, feaCtry, thedate, rfrthedate,country, "ANNDATE", debugSb);
 				thedate = temps[0];
 				rfrthedate = temps[1];
 			}			
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
+			if (CHEAT.equals(thedate) && CHEAT.equals(rfrthedate)) {
 				temps = AvailUtil.getModelFeatureAttributeDate(findT1, parentDiff, plModelAvailDiff, feaCtry, thedate, rfrthedate, country, "ANNDATE","FIRSTANNDATE", debugSb);
 				thedate = temps[0];
 				rfrthedate = temps[1];
 			}
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
+			if (CHEAT.equals(thedate) && CHEAT.equals(rfrthedate)) {
 				temps = AvailUtil.getSwprodModelAnnDate(findT1, parentDiff, thedate, rfrthedate, debugSb);
 				thedate = temps[0];
 				rfrthedate = temps[1];
