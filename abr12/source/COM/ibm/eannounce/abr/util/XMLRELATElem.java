@@ -11,14 +11,13 @@ import com.ibm.transform.oim.eacm.diff.DiffEntity;
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
 import COM.ibm.eannounce.objects.EntityItem;
-import COM.ibm.eannounce.objects.EntityList;
 import COM.ibm.opicmpdh.middleware.Database;
 
 public class XMLRELATElem extends XMLElem {
 
 	private String attrcode1;
 	private String attrcode2;
-	private String attrcode;
+
 
 	public XMLRELATElem(String nname, String attcode1, String attcode2) {
 		super(nname);
@@ -26,10 +25,6 @@ public class XMLRELATElem extends XMLElem {
 		attrcode2 = attcode2;
 	}
 
-	public XMLRELATElem(String nname, String code) {
-		super(nname);
-		attrcode = code;
-	}
 
 	/**********************************************************************************
 	 * Create a node for this element and add to the parent and any children this
@@ -73,13 +68,7 @@ public class XMLRELATElem extends XMLElem {
 			// use value from constructor
 			elem.appendChild(document.createTextNode(attvalue1 + attvalue2));
 			parent.appendChild(elem);
-		} else if ("FEATURE_CD".equals(nodeName)) {
-			EntityItem feaEntity = (EntityItem) item.getUpLink().get(0);
-			ABRUtil.append(debugSb, "MAINTFEATURE Entity" + feaEntity.getKey()+ NEWLINE);
-			String attvalue = PokUtils.getAttributeValue(feaEntity, attrcode, ", ", CHEAT, false);
-			elem.appendChild(document.createTextNode(attvalue));
-			parent.appendChild(elem);
-		}
+		} 
 		// add any children
 		for (int c = 0; c < childVct.size(); c++) {
 			XMLElem childElem = (XMLElem) childVct.elementAt(c);
