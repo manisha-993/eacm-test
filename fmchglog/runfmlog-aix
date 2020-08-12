@@ -1,0 +1,192 @@
+#!/bin/sh
+
+#
+# $Log: runfmlog-aix,v $
+# Revision 1.7  2005/05/05 14:02:42  wendy
+# Add compress and reduce duration
+#
+# Revision 1.6  2005/03/30 18:32:41  wendy
+# Add tail of mw log to error msg
+#
+# Revision 1.5  2005/03/16 18:32:36  wendy
+# Add success or failure to msg
+#
+# Revision 1.4  2004/11/03 02:08:21  wendy
+# Raise max memory to 1024M
+#
+# Revision 1.3  2004/11/02 16:05:35  wendy
+# Increased maximum memory setting
+#
+# Revision 1.2  2004/11/02 13:50:29  wendy
+# Changed check for currently running
+#
+# Revision 1.1  2004/10/18 18:00:34  wendy
+# Init for FM Chg Log application
+#
+#
+# This script runs the FMChgLog under Linux or AIX
+#
+
+cd /home/opicmadm/fm.changelog/
+
+DIRECTORY=`pwd`
+CURRENT_REPORT="fmchglog.out"
+SQLLIB=/home/opicmdb2/sqllib
+MW_JAR_FILE="middleware.jar"
+FMCHGLOG_JAR_FILE="oim_fmchglog.jar"
+JAVA_COMMAND="java"
+JAVA_OPTIONS="-Xms128M -Xmx1024M -Xss32M"
+OTHER_CLASSES="j2ee.jar"
+DIR=`basename $PWD`
+HOSTNAME=`hostname -s`
+INSTANCE="$HOSTNAME@$DIR"
+scriptMailMsg=FMChgLogMailMsg
+MAILTO="stimpsow@us.ibm.com"
+jobname="runfmlog-aix"
+
+CLASSPATH=$CLASSPATH:$FMCHGLOG_JAR_FILE:$MW_JAR_FILE:$OTHER_CLASSES
+
+#
+# export DB2 profile
+#
+. $SQLLIB/db2profile
+
+#
+# these directories store prior copies of FMChgLog reports (make sure they exist and are secure)
+#
+if [ ! -d rpt ]; then
+  mkdir rpt
+  chmod 700 rpt
+fi
+
+#
+# if we are currently running in this directory, bail out
+#
+TestRunning=`ps -ef|grep -c $jobname`
+if [ TestRunning -gt 2 ];
+then
+  now=`date +%Y-%m-%d-%H.%M.%S.000000`
+  echo $now FMChgLog ABORTING - currently running > $scriptMailMsg 
+  echo $now FMChgLog ABORT - currently running >>$CURRENT_REPORT
+  mail -s "FMChgLog instance $INSTANCE - currently running ABORT at $now" "$MAILTO" < $scriptMailMsg
+  exit
+fi
+
+#
+# save the output of the prior execution to rpt/rpts.currentDate
+#
+# loop to copy *.txt to the new dir
+rptdate=`date +%Y%m%d%H%M%S`
+mkdir rpt/rpts.$rptdate
+chmod 700 rpt/rpts.$rptdate
+
+if [ -f *.txt ]; then
+  PREVFILES=*.txt
+  for PREV in $PREVFILES
+  do
+    echo "Moving "$PREV" to "rpt/rpts.$rptdate
+    mv $PREV rpt/rpts.$rptdate
+    compress rpt/rpts.$rptdate/$PREV
+  done
+fi
+
+echo "Moving "$CURRENT_REPORT" to "rpt/rpts.$rptdate
+touch $CURRENT_REPORT
+mv $CURRENT_REPORT rpt/rpts.$rptdate
+compress rpt/rpts.$rptdate/$CURRENT_REPORT
+
+#
+# Build the contents of the dynamic property file
+#
+PROPERTY_FILE=middleware.server.dynamic.properties
+cat > $PROPERTY_FILE << EOF
+#OPICM Middleware Server Dynamic Properties
+EOF
+HOSTNAME=`hostname -s`
+echo "hostname=$HOSTNAME" >> $PROPERTY_FILE
+IP=`host $HOSTNAME|cut -f3 -d" "`
+echo "actual_ip_address=$IP" >> $PROPERTY_FILE
+DIR=`basename $PWD`
+echo "directory=$DIR" >> $PROPERTY_FILE
+INSTANCE="$HOSTNAME@$DIR"
+echo "instance=$INSTANCE" >> $PROPERTY_FILE
+
+#
+# who are we?
+#
+echo "FMChgLog running as user: " `whoami` >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# save the middleware config file to this output
+#
+cat middleware.server.properties >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# save the middleware dynamic config file to this output
+#
+cat middleware.server.dynamic.properties >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# save the FMChgLog config file to this output
+#
+cat FMChgLog.properties >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# lets also record this value for help trouble shooting
+#
+set >>$CURRENT_REPORT
+echo " " >>$CURRENT_REPORT
+
+#
+# run FMChgLog 
+#
+now=`date +%Y-%m-%d-%H.%M.%S.000000`
+mail -s "FMChgLog instance $INSTANCE is starting at $now" "$MAILTO" < /dev/null > /dev/null
+
+echo $now FMChgLog begin >>$CURRENT_REPORT
+echo Invoking FMChgLog
+echo "*** command ***"
+echo "$JAVA_COMMAND $1 $2 $3 $4 $5 $JAVA_OPTIONS -classpath $CLASSPATH com.ibm.oim30.isgfm.FMChgLog  1>>$CURRENT_REPORT"
+$JAVA_COMMAND $1 $2 $3 $4 $5 $JAVA_OPTIONS -classpath $CLASSPATH com.ibm.oim30.isgfm.FMChgLog 1>>$CURRENT_REPORT 2>>$CURRENT_REPORT
+STATUS=$?
+chglogStatus="Success"
+if [  STATUS -ne 0 ]; then
+chglogStatus="Failure"
+fi
+echo FMChgLog $chglogStatus exitStatus is $STATUS
+now=`date +%Y-%m-%d-%H.%M.%S.000000`
+echo $now $chglogStatus FMChgLog complete ExitStatus=$STATUS >>$CURRENT_REPORT
+
+# list the txt files created and report that
+CURFILES=*.txt
+echo "FMChgLog created: "> $scriptMailMsg 
+if [ -f *.txt ]; then
+  CURFILES=*.txt
+  for CUR in $CURFILES
+  do
+    echo $CUR >> $scriptMailMsg
+  done
+  if [ STATUS -ne 0 ]; then
+    echo "Last 100 lines of middleware log: " >> $scriptMailMsg
+    tail -100 $CURRENT_REPORT >> $scriptMailMsg
+  fi  
+else
+  echo "Nothing generated!" >> $scriptMailMsg
+  cat $CURRENT_REPORT >> $scriptMailMsg
+fi
+mail -s "$chglogStatus - FMChgLog instance $INSTANCE completed at $now" "$MAILTO" < $scriptMailMsg
+
+#
+# delete reports more than 14 days old
+#
+echo "*** deleting the following reports more than 14 days old:"
+find ./rpt -mtime +14 -print -prune -exec rm -Rf {} \;
+echo "end ***"
+
+#
+# end of script
+#
