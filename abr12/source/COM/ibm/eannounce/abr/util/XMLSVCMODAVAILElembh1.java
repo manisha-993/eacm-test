@@ -1009,7 +1009,7 @@ public class XMLSVCMODAVAILElembh1 extends XMLElem {
 				rfrthedate = temps[1];
 			}
 			//new added 0904b
-			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
+			if (CHEAT.equals(thedate) && CHEAT.equals(rfrthedate)) {
 				//2. SVCMOD.ANNDATE
 				if (parentDiffEntity != null && !parentDiffEntity.isDeleted()) {
 					if ("SVCMOD".equals(parentDiffEntity.getEntityType())){
