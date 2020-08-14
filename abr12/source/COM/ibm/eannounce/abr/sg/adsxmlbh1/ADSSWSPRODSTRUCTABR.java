@@ -28,7 +28,7 @@ public class ADSSWSPRODSTRUCTABR extends XMLMQRoot{
 		 XMLMAP.addChild(model);
 		 model.addChild(new XMLElem("OFFERING_MARKETING_NM", "INVNAME"));
 		 
-		 XMLElem feature = new XMLGroupElem(null, "MAINTFEATURE", "U:MAINTFEATURE");
+		 XMLElem feature = new XMLGroupElem(null, "SWSFEATURE", "U:SWSFEATURE");
 		 XMLMAP.addChild(feature);
 		 feature.addChild(new XMLElem("FEATURE_CD","FEATURECODE"));
 		 feature.addChild(new XMLElem("FEATURE_MKTNG_NAME","FCMKTNAME"));

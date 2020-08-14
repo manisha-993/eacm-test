@@ -590,7 +590,12 @@ Delete 2011-10-20		49.820	R1.0	END	49.680
 				//		AND			SWSPRODSTRUCT	LIFECYCLE	=	"Develop" (LF02)  | "Plan" (LF01)		
 				//		SET			SWSPRODSTRUCT				ADSABRSTATUS	&ADSFEEDRFR
 				//		END	4.001												
-				doRFR_ADSXML("SWSPRODSTRUCT");
+				Vector swstmfVct = PokUtils.getAllLinkedEntities(avail, "SWSTMFAVAIL", "SWSPRODSTRUCT");
+				for (int i = 0; i<swstmfVct.size(); i++){
+					EntityItem tmfItem = (EntityItem)swstmfVct.elementAt(i);
+					doRFR_ADSXML(tmfItem.getEntityType());
+				}
+				swstmfVct.clear();
 				
 				verifySVCSEORFRAndQueue(avail);
 				
