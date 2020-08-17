@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MAINTPRODSTRUCT_UPDATE"
+	elementFormDefault="qualified"
+	xmlns="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MAINTPRODSTRUCT_UPDATE">
+
+	<xsd:element name="MAINTPRODSTRUCT_UPDATE"
+		type="MAINTPRODSTRUCT_UPDATETYPE" />
+
+	<xsd:complexType name="MAINTPRODSTRUCT_UPDATETYPE">
+		<xsd:sequence>
+			<xsd:element name="PDHDOMAIN" type="xsd:string"
+				maxOccurs="unbounded" />
+			<xsd:element name="DTSOFMSG" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ACTIVITY" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="OFFERING_ID" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="OFFERING_MARKETING_NM"
+				type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FEATURE_CD" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FEATURE_MKTNG_NAME"
+				type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="QTY_MIN_NUM" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="QTY_MAX_NUM" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FEATURE_S_NM" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FEATURE_L_NM" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="STATUS" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="MAP_TO_PRICE_TYPE_CD"
+				type="xsd:string" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FEATURE_CATEG_CD" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="FEATURE_MODIF_IND" type="xsd:string"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="SERVICE_LEVEL_MAPPING_CD"
+				type="xsd:string" minOccurs="1" maxOccurs="1" />
+			
+			<xsd:element name="AVAILABILITYLIST"
+						 type="AVAILABILITYLISTTYPE" minOccurs="1" maxOccurs="1" />
+		</xsd:sequence>	
+	</xsd:complexType>
+	<xsd:complexType name="AVAILABILITYLISTTYPE">
+		<xsd:sequence>
+			<xsd:element name="AVAILABILITYELEMENT" type="AVAILABILITYELEMENTTYPE" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AVAILABILITYELEMENTTYPE">
+		<xsd:sequence>
+			<xsd:element name="AVAILABILITYACTION">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="Update" />
+						<xsd:enumeration value="Delete" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="COUNTRY_FC">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:int">
+						<xsd:minInclusive value="1000" />
+						<xsd:maxInclusive value="9999" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="PLANNEDAVAILABILITY" type="xsd:string"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>		 

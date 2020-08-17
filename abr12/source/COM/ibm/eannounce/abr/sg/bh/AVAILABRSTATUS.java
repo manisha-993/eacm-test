@@ -114,12 +114,12 @@ public class AVAILABRSTATUS extends DQABRSTATUS
 	private static final String[] MODELABRS = {"ADSABRSTATUS"};
 	private static final String[] SVCMODABRS = {"ADSABRSTATUS"};
 	private static final String[] LSEOBDLABRS = {"ADSABRSTATUS"};
+	private static final String[] SWSABRS = {"ADSABRSTATUS"};
 	
 	private static final String[] LSEOEPIMS = {"EPIMSABRSTATUS"};
 	private static final String[] LSEOBLEPIMS = {"EPIMSABRSTATUS"};
 	
 	private static final String[] RFCABRS = {"RFCABRSTATUS"};
-
 	/**********************************
 	 * ready4review
 	 */
@@ -583,7 +583,20 @@ Delete 2011-10-20		49.820	R1.0	END	49.680
 				//	R1.0	AND		SVCMODSVCSEO-u	SVCMOD	STATUS	=	"Ready for Review" (0040)		
 				//49.895	R1.0	AND			SVCMOD	LIFECYCLE	=	"Develop" (LF02)  | "Plan" (LF01)		
 				//49.896	R1.0	SET			SVCMOD				ADSABRSTATUS	&ADSFEEDRFR
-				//49.897	R1.0	END	49.894							
+				//49.897	R1.0	END	49.894		
+				
+					
+				//		IF		SWSTMFAVAIL-u	SWSPRODSTRUCT	STATUS	=	"Ready for Review" (0040)		
+				//		AND			SWSPRODSTRUCT	LIFECYCLE	=	"Develop" (LF02)  | "Plan" (LF01)		
+				//		SET			SWSPRODSTRUCT				ADSABRSTATUS	&ADSFEEDRFR
+				//		END	4.001												
+				Vector swstmfVct = PokUtils.getAllLinkedEntities(avail, "SWSTMFAVAIL", "SWSPRODSTRUCT");
+				for (int i = 0; i<swstmfVct.size(); i++){
+					EntityItem tmfItem = (EntityItem)swstmfVct.elementAt(i);
+					doRFR_ADSXML(tmfItem.getEntityType());
+				}
+				swstmfVct.clear();
+				
 				verifySVCSEORFRAndQueue(avail);
 				
 				//49.90	R1.0	END	49.11
@@ -877,6 +890,7 @@ Delete 2011-10-20		46.280		END	46.140
 			verifyFinalAndQueue(rootEntity, "MODELCONVERTAVAIL", "MODELCONVERT",MODELABRS);
 			verifyFinalAndQueue(rootEntity, "MODELCONVERTAVAIL", "MODELCONVERT",RFCABRS);
 			
+			verifyFinalAndQueue(rootEntity, "SWSTMFAVAIL", "SWSPRODSTRUCT", SWSABRS);
 			//48.00		
 //		}
 		//49.00		END	32.00	
@@ -1483,6 +1497,17 @@ Delete 20110318 51.0			STATUS	=>	A: AVAIL	DATAQUALITY		E	E	E		{LD: STATUS} can n
 		}
 		//56.0	END	9
 		//105.0	END	58
+		
+		//	SWSPRODSTRUCT		SWSTMFAVAIL-u									
+		eGrp = m_elist.getEntityGroup("SWSPRODSTRUCT");
+		addHeading(3,eGrp.getLongDescription()+" Checks:");
+		// get models thru avail
+		vct = PokUtils.getAllLinkedEntities(rootEntity, "SWSTMFAVAIL", "SWSPRODSTRUCT");
+		for (int i=0; i< vct.size(); i++){
+			EntityItem mpsItem = (EntityItem)vct.elementAt(i);
+			//35.2,84.2			STATUS	=>	A: AVAIL	DATAQUALITY		E	E	E		{LD: STATUS} can not be higher than {LD: SWPRODSTRUCT} {NDN: SWPRODSTRUCT} {LD: STATUS} {STATUS}
+			checkStatusVsDQ(mpsItem, "STATUS",rootEntity,CHECKLEVEL_E);
+		}
 	}
 
 	/**
