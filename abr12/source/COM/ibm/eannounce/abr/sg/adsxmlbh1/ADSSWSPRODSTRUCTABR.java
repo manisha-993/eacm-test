@@ -4,6 +4,7 @@ import COM.ibm.eannounce.abr.util.XMLActivityElem;
 import COM.ibm.eannounce.abr.util.XMLElem;
 import COM.ibm.eannounce.abr.util.XMLGroupElem;
 import COM.ibm.eannounce.abr.util.XMLSWSTMFAVAILElem;
+import COM.ibm.eannounce.abr.util.XMLStatusElem;
 import COM.ibm.eannounce.abr.util.XMLNotificationElem;
 import COM.ibm.eannounce.abr.util.XMLRELATElem;
 import COM.ibm.eannounce.abr.util.XMLVMElem;
@@ -37,7 +38,7 @@ public class ADSSWSPRODSTRUCTABR extends XMLMQRoot{
 		 XMLMAP.addChild(new XMLElem("QTY_MAX_NUM","QTYMAXNUM"));
 		 XMLMAP.addChild(new XMLElem("FEATURE_S_NM","TMFMKTGSHRTDESC"));
 		 XMLMAP.addChild(new XMLElem("FEATURE_L_NM","TMFMKTGLONGDESC"));
-		 XMLMAP.addChild(new XMLElem("STATUS","STATUS"));
+		 XMLMAP.addChild(new XMLStatusElem("STATUS", "STATUS", XMLElem.FLAGVAL));
 		 XMLMAP.addChild(new XMLElem("MAP_TO_PRICE_TYPE_CD","MAPTOPRICETYPECD"));
 		 XMLMAP.addChild(new XMLElem("FEATURE_CATEG_CD","FEATURECATEGCD"));
 		 XMLMAP.addChild(new XMLElem("FEATURE_MODIF_IND","FEATUREMODIFIND"));
