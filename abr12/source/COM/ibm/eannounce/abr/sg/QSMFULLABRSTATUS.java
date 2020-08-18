@@ -9,6 +9,9 @@ package COM.ibm.eannounce.abr.sg;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.MessageFormat;
@@ -17,7 +20,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.*;
+import COM.ibm.eannounce.objects.EANFlagAttribute;
+import COM.ibm.eannounce.objects.EANList;
+import COM.ibm.eannounce.objects.EANMetaAttribute;
+import COM.ibm.eannounce.objects.EntityGroup;
+import COM.ibm.eannounce.objects.EntityItem;
+import COM.ibm.eannounce.objects.EntityList;
+import COM.ibm.eannounce.objects.ExtractActionItem;
 import COM.ibm.opicmpdh.middleware.*;
 
 import com.ibm.transform.oim.eacm.util.PokUtils;
@@ -351,6 +360,9 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 	private static final char[] FOOL_JTEST = { '\n' };
 	static final String NEWLINE = new String(FOOL_JTEST);
 
+	public static int DEBUG_LVL = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties
+			.getABRDebugLevel("QSMFULLABRSTATUS");
+
 	private ResourceBundle rsBundle = null;
 	private Hashtable metaTbl = new Hashtable();
 	private String navName = "";
@@ -516,6 +528,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 	private static final String ISLMXX1 = "ISLMXX1";
 	private static final String QSMNPMT = "QSMNPMT";
 	private static final String QSMNPMM = "QSMNPMM";
+	private HashMap fidMap = new HashMap();
 	private static final List geoWWList = Collections.unmodifiableList(new ArrayList() {
 		{
 			add("Asia Pacific");
@@ -858,7 +871,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		createT512ReleaseTo(rootEntity, wOut);
 		addDebug("Processing TypeModelFeatureRelation" + new Date().toLocaleString());
 		createT632TypeModelFeatureRelation(rootEntity, wOut);
-		addDebug("Processing Done" + new Date().getTime());
+		addDebug("Processing Done" + new Date().toLocaleString());
 		wOut.close();
 
 		dirDest = ABRServerProperties.getValue(m_abri.getABRCode(), QSMFTPPATH, "/Dgq");
@@ -1810,23 +1823,23 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		return eiReturn;
 	}
 
-	
-	
-	
-private String validateProdstructs2(EntityItem eiFeature) throws MiddlewareRequestException, SQLException, MiddlewareException {
-		
+	private String validateProdstructs2(EntityItem eiFeature)
+			throws MiddlewareRequestException, SQLException, MiddlewareException {
+
 		String strReturnDate = "";
 		Date oldestDate = null;
 		Date psDate = null;
 
 		ExtractActionItem eaItem = new ExtractActionItem(null, m_db, m_prof, getT006FeatureVEName());
 
-		EntityList list = m_db.getEntityList(m_prof, eaItem, new EntityItem[] { new EntityItem(null, m_prof, eiFeature.getEntityType(), eiFeature.getEntityID())});
-		
-	    EntityGroup prodStructGrp = list.getEntityGroup("PRODSTRUCT");
-		addDebug("*****mlm feature.id=" + eiFeature.getEntityType() + eiFeature.getEntityID() + " prodstructcount=" + prodStructGrp.getEntityItemCount());
-		
-		for (int i = 0; i < prodStructGrp.getEntityItemCount(); i++){
+		EntityList list = m_db.getEntityList(m_prof, eaItem,
+				new EntityItem[] { new EntityItem(null, m_prof, eiFeature.getEntityType(), eiFeature.getEntityID()) });
+
+		EntityGroup prodStructGrp = list.getEntityGroup("PRODSTRUCT");
+		addDebug("*****mlm feature.id=" + eiFeature.getEntityType() + eiFeature.getEntityID() + " prodstructcount="
+				+ prodStructGrp.getEntityItemCount());
+
+		for (int i = 0; i < prodStructGrp.getEntityItemCount(); i++) {
 
 			EntityItem eiProdstruct = prodStructGrp.getEntityItem(i);
 			addDebug("*****mlm prodstruct=" + eiProdstruct.getEntityType() + eiProdstruct.getEntityID());
@@ -1834,11 +1847,11 @@ private String validateProdstructs2(EntityItem eiFeature) throws MiddlewareReque
 			String psWdDate = PokUtils.getAttributeValue(eiProdstruct, "WTHDRWEFFCTVDATE", ",", "", false);
 			addDebug("*****mlm oldestdate=" + oldestDate);
 			addDebug("*****mlm psWdDate=" + psWdDate);
-			if (!psWdDate.equals("")){
+			if (!psWdDate.equals("")) {
 				DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 				try {
 					psDate = df.parse(psWdDate);
-					if((oldestDate == null) || (psDate.after(oldestDate))) {
+					if ((oldestDate == null) || (psDate.after(oldestDate))) {
 						addDebug("*****mlm setting odlestdate to psWdDate");
 						oldestDate = psDate;
 						strReturnDate = psWdDate;
@@ -1857,9 +1870,73 @@ private String validateProdstructs2(EntityItem eiFeature) throws MiddlewareReque
 				break;
 			}
 		}
-		
+
 		return strReturnDate;
 	}
+
+	private void validateProdstructsSQL(String ids)
+			throws MiddlewareRequestException, SQLException, MiddlewareException {
+		fidMap.clear();
+		if(ids.length()<1)
+			return;
+		String strReturnDate = "2050-12-31";
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		Date oldestDate = null;
+		Date psDate = null;
+		// String sql = "select prod.ATTRIBUTEVALUE from opicm.text prod join
+		// opicm.Relator R on R.entitytype=prod.entitytype and prod.entityid =
+		// R.entityid where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID =
+		// "+eiFeature.getEntityID()+" AND prod.ATTRIBUTECODE =
+		// 'WTHDRWEFFCTVDATE' AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current
+		// TIMESTAMP and prod.valto>current timestamp and prod.EFFTO >current
+		// timestamp";
+		String sql = "select R.entity1id as entityid,prod.WTHDRWEFFCTVDATE as ATTRIBUTEVALUE from  opicm.Relator R left join price.prodstruct prod  on prod.entityid= R.entityid where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID in ("
+				+ ids + ")  AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP  and prod.nlsid=1";
+		 addDebug("sql:"+sql);
+		Connection conn = m_db.getPDHConnection();
+		PreparedStatement ps = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+				ResultSet.CONCUR_READ_ONLY);
+		// ps.setInt(1, eiFeature.getEntityID());
+		ResultSet rs = ps.executeQuery();
+
+		List list = new ArrayList();
+		while (rs.next()) {
+			String date = rs.getString("ATTRIBUTEVALUE");
+			String id = rs.getString("entityid");
+			if (date == null || date.trim().equals(""))
+				fidMap.put(id, "2050-12-31");
+			else if (fidMap.get(id) == null) {
+				fidMap.put(id, date);
+			} else {
+
+				try {
+					oldestDate = df.parse(fidMap.get(id).toString());
+					psDate = df.parse(date);
+					if ((oldestDate == null) || (psDate.after(oldestDate))) {
+						addDebug("*****mlm setting odlestdate to psWdDate");
+						fidMap.put(id, date);
+					}
+				} catch (ParseException e) {
+					addDebug(e.toString());
+					addDebug("*****mlm error: ParseException, setting date to 2050-12-31 - end");
+
+					fidMap.put(id, "2050-12-31");
+					break;
+				}
+			}
+			// list.add(rs.getString("ATTRIBUTEVALUE"));
+		}
+		rs.close();
+
+	}
+
+	private String validateProdstructsDate(EntityItem eiFeature) {
+		String resutl = fidMap.get(eiFeature.getEntityID() + "")==null?"":fidMap.get(eiFeature.getEntityID() + "").toString();
+
+		return resutl;
+	
+	}
+
 	private String validateProdstructs(EntityItem eiFeature)
 			throws MiddlewareRequestException, SQLException, MiddlewareException {
 
@@ -1879,8 +1956,8 @@ private String validateProdstructs2(EntityItem eiFeature) throws MiddlewareReque
 		addDebug("Featue:" + eiFeature.getEntityID() + "-PRODUCT size:" + prodStructGrp.size());
 		addDebug("Featue uplink:" + eiFeature.getUpLinkCount());
 		String idString = "";
-		for(int i=0;i<prodStructGrp.size();i++){
-			idString+=((EntityItem)prodStructGrp.get(i)).getEntityID()+":";
+		for (int i = 0; i < prodStructGrp.size(); i++) {
+			idString += ((EntityItem) prodStructGrp.get(i)).getEntityID() + ":";
 		}
 		addDebug("*****mlm idString=" + idString);
 		for (int i = 0; i < prodStructGrp.size(); i++) {
@@ -1938,9 +2015,9 @@ private String validateProdstructs2(EntityItem eiFeature) throws MiddlewareReque
 		m_elist = getEntityList(getT006ProdstructVEName());
 
 		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
-		availSet=new HashSet();
+		availSet = new HashSet();
 		for (int availI = 0; availI < availGrp.getEntityItemCount(); availI++) {
-			availSet.add(availGrp.getEntityItem(availI).getEntityID()+"");
+			availSet.add(availGrp.getEntityItem(availI).getEntityID() + "");
 		}
 		for (int availI = 0; availI < availGrp.getEntityItemCount(); availI++) {
 			qsmGeoList = null;
@@ -2042,7 +2119,7 @@ private String validateProdstructs2(EntityItem eiFeature) throws MiddlewareReque
 		EntityItem avail = list.getParentEntityGroup().getEntityItem(0);
 		Vector prodVect = PokUtils.getAllLinkedEntities(avail, "OOFAVAIL", "PRODSTRUCT");
 		addDebug("prodVect:" + (prodVect == null ? 0 : prodVect.size()));
-		
+
 		addDebug("list:" + PokUtils.outputList(list));
 
 		/*
@@ -2066,6 +2143,15 @@ private String validateProdstructs2(EntityItem eiFeature) throws MiddlewareReque
 		 * addDebug("groupCount:" + groupCount);
 		 */
 		// sb = new StringBuffer();
+		EntityGroup feature = list.getEntityGroup("FEATURE");
+		String fids = "";
+		for (int fi = 0; fi < feature.getEntityItemCount(); fi++) {
+			if (fids.length() > 0)
+				fids += ',';
+			fids += feature.getEntityItem(fi).getEntityID();
+		}
+		validateProdstructsSQL(fids);
+
 		for (int i = 0; i < prodVect.size(); i++) {
 
 			EntityItem eiProdstruct = (EntityItem) prodVect.get(i);
@@ -2143,8 +2229,8 @@ private String validateProdstructs2(EntityItem eiFeature) throws MiddlewareReque
 			EntityGroup modelStdMaintGrp1 = list.getEntityGroup("STDMAINT");
 
 			/*
-			 * addDebug("sgmntAcrnymGrp sizeï¼š" + (sgmntAcrnymGrp == null ? 0 :
-			 * sgmntAcrnymGrp.size())); addDebug("geoModGrp" + (geoModGrp ==
+			 * addDebug("sgmntAcrnymGrp sizeï¼š" + (sgmntAcrnymGrp == null ?
+			 * 0 : sgmntAcrnymGrp.size())); addDebug("geoModGrp" + (geoModGrp ==
 			 * null ? 0 : geoModGrp.size())); addDebug("modelWarrGrp" +
 			 * (modelWarrGrp == null ? 0 : modelWarrGrp.size()));
 			 * addDebug("modelStdMaintGrp" + (modelStdMaintGrp == null ? 0 :
@@ -2247,26 +2333,27 @@ private String validateProdstructs2(EntityItem eiFeature) throws MiddlewareReque
 			String strOrderCode = PokUtils.getAttributeValue(eiProdstruct, "ORDERCODE", ",", "", false);
 			EntityItem oofAvail = null;
 			EANFlagAttribute availQSMGeoList;
-			 StringBuffer idString=new StringBuffer();
+			StringBuffer idString = new StringBuffer();
 			if (strOrderCode.equals("Both") || strOrderCode.equals("MES")) {
 				Vector availVec = PokUtils.getAllLinkedEntities(eiProdstruct, "OOFAVAIL", "AVAIL");
-				 addDebug("availVec" + (availVec == null ? 0 : availVec.size()));
-				//addDebug("list:"+availVec);
-				 for (int iA = 0; iA < availVec.size(); iA++) {
-					 idString.append(((EntityItem)availVec.get(iA)).getEntityID()+",");
-				 }
-				 
-				 idString.append("||||");
+				addDebug("availVec" + (availVec == null ? 0 : availVec.size()));
+				// addDebug("list:"+availVec);
 				for (int iA = 0; iA < availVec.size(); iA++) {
-					
+					idString.append(((EntityItem) availVec.get(iA)).getEntityID() + ",");
+				}
+
+				idString.append("||||");
+				for (int iA = 0; iA < availVec.size(); iA++) {
+
 					availQSMGeoList = null;
 					oofAvail = (EntityItem) availVec.elementAt(iA);
-					
-					idString.append(oofAvail.getEntityID()+"，");
+
+					idString.append(oofAvail.getEntityID() + "");
 					strAvailType = PokUtils.getAttributeValue(oofAvail, "AVAILTYPE", ",", "", false);
 					availQSMGeoList = (EANFlagAttribute) oofAvail.getAttribute("QSMGEO");
 					if (isQSMGeoSelected(strAvailGenAreaSel, availQSMGeoList)
-							&& strAvailType.equals("MES Planned Availability")&&availSet.contains(oofAvail.getEntityID()+"")) {
+							&& strAvailType.equals("MES Planned Availability")
+							&& availSet.contains(oofAvail.getEntityID() + "")) {
 						strDSLMMES = PokUtils.getAttributeValue(oofAvail, "EFFECTIVEDATE", ",", "", false);
 						iA = availVec.size();
 					}
@@ -2281,14 +2368,14 @@ private String validateProdstructs2(EntityItem eiFeature) throws MiddlewareReque
 			if (strDSLMMES.equals("")) {
 				strDSLMMES = "2050-12-31";
 			}
-			addDebug("Prod id:"+eiProdstruct.getEntityID()+"   idString:" + idString);
-			
+			addDebug("Prod id:" + eiProdstruct.getEntityID() + "   idString:" + idString);
+
 			sb.append(getValue(DSLMMES, strDSLMMES));
 
 			sb.append(getValue(QSMEDMW, "2050-12-31"));
 			sb.append(getValue(DSLMMVA, PokUtils.getAttributeValue(rootEntity, "ANNDATE", ",", "", false)));
 
-			strDSLMWDN = validateProdstructs(eiFeature);
+			strDSLMWDN = validateProdstructsDate(eiFeature);
 			sb.append(getValue(DSLMWDN, strDSLMWDN));
 
 			strPricedFeature = PokUtils.getAttributeValue(eiFeature, "PRICEDFEATURE", ",", "", false);
@@ -2887,7 +2974,7 @@ private String validateProdstructs2(EntityItem eiFeature) throws MiddlewareReque
 				}
 			}
 		}
-		
+
 		return vct;
 
 	}
@@ -3751,7 +3838,10 @@ private String validateProdstructs2(EntityItem eiFeature) throws MiddlewareReque
 	 * add debug info as html comment
 	 */
 	protected void addDebug(String msg) {
-		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
+		if (D.EBUG_DETAIL <= DEBUG_LVL) {
+
+			rptSb.append("<!-- " + msg + " -->" + NEWLINE);
+		}
 	}
 
 	/**********************************

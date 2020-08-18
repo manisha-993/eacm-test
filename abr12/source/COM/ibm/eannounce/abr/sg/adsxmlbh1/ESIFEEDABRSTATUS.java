@@ -76,7 +76,7 @@ public class ESIFEEDABRSTATUS extends PokBaseABR{
 	}
 	
 	protected static final String[][] country_convert_Array = {
-		{"1501", "706"},//France
+//		{"1501", "706"},//France
 		{"1447", "624"},//Belgium
 		{"1626", "838"},//Spain
 		{"1600", "822"},//Portugal
