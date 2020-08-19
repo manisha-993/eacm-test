@@ -155,6 +155,13 @@ public class SWSPRODSTRUCTABRSTATUS extends DQABRSTATUS{
 		}
 	}
 
+	/* (non-Javadoc)
+	 * update LIFECYCLE value when STATUS is updated
+	 * @see COM.ibm.eannounce.abr.sg.bh.DQABRSTATUS#doPostProcessing(COM.ibm.eannounce.objects.EntityItem, java.lang.String)
+	 */
+	protected String getLCRFRWFName(){ return "WFLCSWSPRODSTRFR";}
+	protected String getLCFinalWFName(){ return "WFLCSWSPRODSTFINAL";}
+	
 	/***********************************************
     *  Get ABR description
     *
