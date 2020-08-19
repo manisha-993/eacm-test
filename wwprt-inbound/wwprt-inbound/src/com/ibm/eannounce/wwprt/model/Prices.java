@@ -23,6 +23,7 @@ import com.ibm.eannounce.wwprt.model.price.QTOPrice;
 import com.ibm.eannounce.wwprt.model.price.QTYPrice;
 import com.ibm.eannounce.wwprt.model.price.RPQPrice;
 import com.ibm.eannounce.wwprt.model.price.SWFPrice;
+import com.ibm.eannounce.wwprt.model.price.SWSPrice;
 import com.ibm.eannounce.wwprt.model.price.TFUPrice;
 import com.ibm.eannounce.wwprt.model.price.TMUPrice;
 import com.ibm.eannounce.wwprt.model.price.VALPrice;
@@ -130,7 +131,12 @@ public class Prices {
 					}
 					priceTypeMap.put("NoType", new NoTypePrice(Version));
 					priceTypeMap.put("MOD", new MODPrice(Version));
-					priceTypeMap.put("FEA", new FEAPrice(Version));
+					String offeringtype_value = offeringtype.item(0).getTextContent();
+					if("PID".equalsIgnoreCase(offeringtype_value)){
+						priceTypeMap.put("FEA", new SWSPrice(Version));
+					}else {
+						priceTypeMap.put("FEA", new FEAPrice(Version));
+					}
 					priceTypeMap.put("FUP", new FUPPrice(Version));
 					priceTypeMap.put("MUP", new MUPPrice(Version));
 					priceTypeMap.put("RPQ", new RPQPrice(Version));
