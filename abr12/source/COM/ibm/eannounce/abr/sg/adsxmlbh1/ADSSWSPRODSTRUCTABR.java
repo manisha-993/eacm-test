@@ -32,7 +32,7 @@ public class ADSSWSPRODSTRUCTABR extends XMLMQRoot{
 		 XMLElem feature = new XMLGroupElem(null, "SWSFEATURE", "U:SWSFEATURE");
 		 XMLMAP.addChild(feature);
 		 feature.addChild(new XMLElem("FEATURE_CD","FEATURECODE"));
-		 feature.addChild(new XMLElem("FEATURE_MKTNG_NAME","FCMKTNAME"));
+//		 feature.addChild(new XMLElem("FEATURE_MKTNG_NAME","FCMKTNAME"));
 		 
 		 XMLMAP.addChild(new XMLElem("QTY_MIN_NUM","QTYMINNUM"));
 		 XMLMAP.addChild(new XMLElem("QTY_MAX_NUM","QTYMAXNUM"));

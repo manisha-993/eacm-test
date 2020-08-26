@@ -24,8 +24,9 @@
 				type="xsd:string" minOccurs="1" maxOccurs="1" />
 			<xsd:element name="FEATURE_CD" type="xsd:string"
 				minOccurs="1" maxOccurs="1" />
-			<xsd:element name="FEATURE_MKTNG_NAME"
+			<!-- <xsd:element name="FEATURE_MKTNG_NAME"
 				type="xsd:string" minOccurs="1" maxOccurs="1" />
+				-->
 			<xsd:element name="QTY_MIN_NUM" type="xsd:string"
 				minOccurs="1" maxOccurs="1" />
 			<xsd:element name="QTY_MAX_NUM" type="xsd:string"
