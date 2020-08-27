@@ -49,6 +49,25 @@ import com.ibm.transform.oim.eacm.util.PokUtils;
 //
 
 public class XMLRelatorSearchElem extends XMLSearchElem {
+	//fString fsql2 = "select entityid as FEATUREID from opicm.text where attributecode = 'FEATURECODE' and  ATTRIBUTEVALUE = ? and effto>current timestamp and valto>current timestamp with ur";
+	String fsql = "select tf.entityid as FEATUREID from opicm.text tf "
+			+ "inner join opicm.flag df on df.entityid = tf.entityid and df.entitytype = tf.entitytype and df.attributecode = 'PDHDOMAIN' and  df.effto>current timestamp and df.valto>current timestamp "
+			+ "where tf.attributecode = 'FEATURECODE' and  tf.ATTRIBUTEVALUE = ? and  df.ATTRIBUTEVALUE = ? and tf.effto>current timestamp and tf.valto>current timestamp with ur";
+	/*String psql2 = "select r.entity1id as FEATUREID,r.entity2id as MODELID from opicm.flag mf inner join opicm.text mt "
+			+ "on mt.entityid = mf.entityid and mf.entitytype = mt.entitytype and mf.ATTRIBUTECODE='MACHTYPEATR' and mt.ATTRIBUTECODE='MODELATR' "
+			+ "inner join opicm.relator r on r.entitytype='PRODSTRUCT'  AND r.entity2id = mf.entityid "
+			+ "inner join opicm.text ff on ff.ATTRIBUTECODE='FEATURECODE'  and ff.entityid=r.entity1id "
+			+ "where   mf.ATTRIBUTEVALUE= ?  AND mt.ATTRIBUTEVALUE= ? and ff.ATTRIBUTEVALUE = ?  and mf.effto>current timestamp and mf.valto>current timestamp and mt.effto>current timestamp and mt.valto>current timestamp and r.effto>current timestamp and r.valto>current timestamp and ff.effto>current timestamp and ff.valto>current timestamp with ur";
+*/
+	String psql = "select r.entity1id as FEATUREID,r.entity2id as MODELID from opicm.flag mf "
+			+ "inner join opicm.text mt on mt.entityid = mf.entityid and mf.entitytype = mt.entitytype and mf.ATTRIBUTECODE='MACHTYPEATR' and mt.ATTRIBUTECODE='MODELATR' "
+			+ "inner join opicm.flag dm on dm.entityid = mt.entityid and dm.entitytype = mt.entitytype and dm.attributecode = 'PDHDOMAIN' and  dm.effto>current timestamp and dm.valto>current timestamp "
+			+ "inner join opicm.relator r on r.entitytype='PRODSTRUCT'  AND r.entity2id = mf.entityid "
+			+ "inner join opicm.text ff on ff.ATTRIBUTECODE='FEATURECODE'  and ff.entityid=r.entity1id "
+			+ "inner join opicm.flag df on df.entityid = ff.entityid and df.entitytype = ff.entitytype and df.attributecode = 'PDHDOMAIN' and  df.effto>current timestamp and df.valto>current timestamp "
+			+ "where   mf.ATTRIBUTEVALUE=?  AND mt.ATTRIBUTEVALUE= ? and ff.ATTRIBUTEVALUE =?  and df.attributevalue = ? and dm.attributevalue=? "
+			+ "and mf.effto>current timestamp and mf.valto>current timestamp and mt.effto>current timestamp and mt.valto>current timestamp and r.effto>current timestamp and r.valto>current timestamp and ff.effto>current timestamp and ff.valto>current timestamp with ur";
+
 	private String upNodeName;
 
 	/**********************************************************************************
@@ -94,12 +113,12 @@ public class XMLRelatorSearchElem extends XMLSearchElem {
 		// search to find entity needed for entityid
 		String value = CHEAT;
 		String upvalue = CHEAT;
-		System.out.println("EntityItem parentItem");
+		//System.out.println("EntityItem parentItem");
 		boolean emptymod = false;
 		String machtype = null;
 		String mod = null;
 		String code = null;
-		String fsql2 = "select entityid as FEATUREID from opicm.text where attributecode = 'FEATURECODE' and  ATTRIBUTEVALUE = ? and effto>current timestamp and valto>current timestamp with ur";
+		/*String fsql2 = "select entityid as FEATUREID from opicm.text where attributecode = 'FEATURECODE' and  ATTRIBUTEVALUE = ? and effto>current timestamp and valto>current timestamp with ur";
 		String fsql = "select entityid as FEATUREID from opicm.text tf "
 				+ "inner join opicm.flag df on df.eneityid = tf.eneityid and df.entitytype = tf.entitytype and df.attributecode = 'PDHDOMAIN' and  df.effto>current timestamp and df.valto>current timestamp "
 				+ "where tf.attributecode = 'FEATURECODE' and  tf.ATTRIBUTEVALUE = ? and  df.ATTRIBUTEVALUE = ? and tf.effto>current timestamp and tf.valto>current timestamp with ur";
@@ -117,11 +136,11 @@ public class XMLRelatorSearchElem extends XMLSearchElem {
 				+ "inner join opicm.flag df on df.eneityid = ff.eneityid and df.entitytype = ff.entitytype and df.attributecode = 'PDHDOMAIN' and  df.effto>current timestamp and df.valto>current timestamp "
 				+ "where   mf.ATTRIBUTEVALUE=?  AND mt.ATTRIBUTEVALUE= ? and ff.ATTRIBUTEVALUE =?  and df.attributevalue = ? and dm.attributecode=? "
 				+ "and mf.effto>current timestamp and mf.valto>current timestamp and mt.effto>current timestamp and mt.valto>current timestamp and r.effto>current timestamp and r.valto>current timestamp and ff.effto>current timestamp and ff.valto>current timestamp with ur";
-
+*/
 		Connection connection = dbCurrent.getPDHConnection();
 		PreparedStatement statement = null;
-		String domain = PokUtils.getAttributeValue(parentItem, "PDHDOMAIN", ", ", CHEAT, false);
-		System.out.println("Domin:" + domain);
+		String domain = PokUtils.getAttributeFlagValue(parentItem, "PDHDOMAIN");
+		//System.out.println("Domin:" + domain);
 		// do speical check, if rootentity is FEATURE Transaction and
 		// FromModel/ToModel is empty ,then Modelentityid = empty and
 		// Featureentityid using Featurecode search.
@@ -142,7 +161,7 @@ public class XMLRelatorSearchElem extends XMLSearchElem {
 				machtype = PokUtils.getAttributeValue(parentItem, "FROMMACHTYPE", ", ", CHEAT, false);
 				mod = PokUtils.getAttributeValue(parentItem, "FROMMODEL", ", ", CHEAT, false);
 				code = PokUtils.getAttributeValue(parentItem, "FROMFEATURECODE", ", ", CHEAT, false);
-				ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
+				//ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
 			}
 		}
 		if ("FCTRANSACTION".equals(parentItem.getEntityType()) && "TOMODELENTITYID".equals(nodeName)) {
@@ -173,7 +192,7 @@ public class XMLRelatorSearchElem extends XMLSearchElem {
 			statement.setString(5, domain);
 			ABRUtil.append(debugSb, "sql=" + psql + ":" + machtype + ":" + mod + ":" + code + "\n");
 
-			System.out.println("sql=" + psql + ":" + machtype + ":" + mod + ":" + code + "\n");
+			//System.out.println("sql=" + psql + ":" + machtype + ":" + mod + ":" + code + "\n");
 		}
 
 		ResultSet resultSet = statement.executeQuery();
@@ -233,7 +252,7 @@ public class XMLRelatorSearchElem extends XMLSearchElem {
 			COM.ibm.opicmpdh.middleware.MiddlewareException,
 			COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException {
 		Element elem = (Element) document.createElement(nodeName);
-		System.out.println("DiffEntity parentItem");
+		//System.out.println("DiffEntity parentItem");
 		addXMLAttrs(elem);
 		// search to find entity needed for entityid
 		String value = CHEAT;
@@ -243,12 +262,12 @@ public class XMLRelatorSearchElem extends XMLSearchElem {
 		if (parentItem.isDeleted()) {
 			item = parentItem.getPriorEntityItem();
 		}
-		String domain = PokUtils.getAttributeValue(item, "PDHDOMAIN", ", ", CHEAT, false);
-		System.out.println("Domin:" + domain);
+		String domain = PokUtils.getAttributeFlagValue(item, "PDHDOMAIN");
+		//System.out.println("Domin:" + domain);
 		String machtype = null;
 		String mod = null;
 		String code = null;
-		String fsql = "select entityid as FEATUREID from opicm.text tf "
+		/*String fsql = "select entityid as FEATUREID from opicm.text tf "
 				+ "inner join opicm.flag df on df.eneityid = tf.eneityid and df.entitytype = tf.entitytype and  df.effto>current timestamp and df.valto>current timestamp "
 				+ "where tf.attributecode = 'FEATURECODE' and df.attributecode = 'PDHDOMAIN'  and tf.entitytype = 'FEATURE' and  tf.ATTRIBUTEVALUE = ? AND df.ATTRIBUTEVALUE= ?  and tf.effto>current timestamp and tf.valto>current timestamp   and df.effto>current timestamp and df.valto>current timestamp with ur";
 		String psql = "select r.entity1id as FEATUREID,r.entity2id as MODELID from opicm.flag mf inner join opicm.text mt "
@@ -256,7 +275,7 @@ public class XMLRelatorSearchElem extends XMLSearchElem {
 				+ "inner join opicm.relator r on r.entitytype='PRODSTRUCT'  AND r.entity2id = mf.entityid "
 				+ "inner join opicm.text ff on ff.ATTRIBUTECODE='FEATURECODE'  and ff.entityid=r.entity1id "
 				+ "where   mf.ATTRIBUTEVALUE=?  AND mt.ATTRIBUTEVALUE= ? and ff.ATTRIBUTEVALUE = ?  and mf.effto>current timestamp and mf.valto>current timestamp and mt.effto>current timestamp and mt.valto>current timestamp and r.effto>current timestamp and r.valto>current timestamp and ff.effto>current timestamp and ff.valto>current timestamp with ur";
-
+*/
 		Connection connection = dbCurrent.getPDHConnection();
 		PreparedStatement statement = null;
 		// do speical check, if rootentity is FEATURE Transaction and
@@ -274,12 +293,13 @@ public class XMLRelatorSearchElem extends XMLSearchElem {
 				code = PokUtils.getAttributeValue(item, "FROMFEATURECODE", ", ", CHEAT, false);
 				statement.setString(1, code);
 				statement.setString(2, domain);
-				ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
+				//ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
+				System.out.println("sql=1" + fsql + ":" + machtype + ":" + mod + ":" + code + "\n");
 			} else {
 				machtype = PokUtils.getAttributeValue(item, "FROMMACHTYPE", ", ", CHEAT, false);
 				mod = PokUtils.getAttributeValue(item, "FROMMODEL", ", ", CHEAT, false);
 				code = PokUtils.getAttributeValue(item, "FROMFEATURECODE", ", ", CHEAT, false);
-				ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
+				//ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
 			}
 		}
 		if ("FCTRANSACTION".equals(parentItem.getEntityType()) && "TOMODELENTITYID".equals(nodeName)) {
@@ -292,7 +312,7 @@ public class XMLRelatorSearchElem extends XMLSearchElem {
 				code = PokUtils.getAttributeValue(item, "TOFEATURECODE", ", ", CHEAT, false);
 				statement.setString(1, code);
 				statement.setString(2, domain);
-				ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
+				//ABRUtil.append(debugSb, "sql=" + fsql + ":" + code + "\n");
 			} else {
 				machtype = PokUtils.getAttributeValue(item, "TOMACHTYPE", ", ", CHEAT, false);
 				mod = PokUtils.getAttributeValue(item, "TOMODEL", ", ", CHEAT, false);
@@ -308,8 +328,8 @@ public class XMLRelatorSearchElem extends XMLSearchElem {
 			statement.setString(3, code);
 			statement.setString(4, domain);
 			statement.setString(5, domain);
-			ABRUtil.append(debugSb, "sql=" + psql + ":" + machtype + ":" + mod + ":" + code + "\n");
-			System.out.println("sql=" + psql + ":" + machtype + ":" + mod + ":" + code + "\n");
+			/*ABRUtil.append(debugSb, "sql=" + psql + ":" + machtype + ":" + mod + ":" + code + "\n");
+			System.out.println("sql=" + psql + ":" + machtype + ":" + mod + ":" + code + "\n");*/
 		}
 
 		ResultSet resultSet = statement.executeQuery();
