@@ -1126,7 +1126,7 @@
 												addDebug("*****WD date CCN= " + strDSLMWDNCCN);
 												addDebug("*****WD date US= " + strDSLMOPDCCN);
 											}
-											if (strGenArea.indexOf("Worldwide") != -1) {
+											else if (strGenArea.indexOf("Worldwide") != -1) {
 												strDSLMWDNLA = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
 												strDSLMWDNEMEA = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
 												strDSLMWDNAP = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
@@ -1137,6 +1137,7 @@
 												strDSLMOPDAP = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
 												strDSLMOPDUS = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
 												strDSLMOPDCCN = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
+												addDebug("*****worldwide successfully" );
 												strCPDAA = "O";
 											}
 										} else {
@@ -3546,6 +3547,7 @@
 									
 									if ((strAvailType.equals("Planned Availability")) || (strAvailType.equals("Last Order"))) {
 									// Create T632 records only for US ONLY and WorldWide GEOs
+										addDebug("*****mlm Availtype=" + strAvailType);
 									EANFlagAttribute qsmGeoList = (EANFlagAttribute) availEI.getAttribute("QSMGEO");
 									if (qsmGeoList != null) {
 										if (qsmGeoList.isSelected("6221")) {
