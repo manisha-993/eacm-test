@@ -2168,7 +2168,7 @@
 								}
 								EntityGroup model = list.getEntityGroup("MODEL");
 								String fids1 = "";
-								for (int fi = 0; fi < feature.getEntityItemCount(); fi++) {
+								for (int fi = 0; fi < model.getEntityItemCount(); fi++) {
 									if (fids1.length() > 0)
 										fids1 += ',';
 									fids1 += model.getEntityItem(fi).getEntityID();
