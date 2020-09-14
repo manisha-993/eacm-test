@@ -1888,12 +1888,10 @@
 								return strReturnDate;
 							}
 						
-							private void validateProdstructsSQL(String ids,String ids1)
+							private void validateProdstructsSQL(String ids)
 									throws MiddlewareRequestException, SQLException, MiddlewareException {
 								fidMap.clear();
 								if(ids.length()<1)
-									return;
-								if(ids1.length()<1)
 									return;
 								String strReturnDate = "2050-12-31";
 								DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -1907,7 +1905,7 @@
 								// TIMESTAMP and prod.valto>current timestamp and prod.EFFTO >current
 								// timestamp";
 								String sql = "select R.entity1id as entityid,prod.WTHDRWEFFCTVDATE as ATTRIBUTEVALUE from  opicm.Relator R left join price.prodstruct prod  on prod.entityid= R.entityid where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID in ("
-										+ ids + ")  AND  R.ENTITY2ID in (" + ids1 +")  AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP  and prod.nlsid=1";
+										+ ids + ")  AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP  and prod.nlsid=1";
 								 addDebug("sql:"+sql);
 								Connection conn = m_db.getPDHConnection();
 								PreparedStatement ps = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
@@ -2166,14 +2164,7 @@
 										fids += ',';
 									fids += feature.getEntityItem(fi).getEntityID();
 								}
-								EntityGroup model = list.getEntityGroup("MODEL");
-								String fids1 = "";
-								for (int fi = 0; fi < model.getEntityItemCount(); fi++) {
-									if (fids1.length() > 0)
-										fids1 += ',';
-									fids1 += model.getEntityItem(fi).getEntityID();
-								}
-								validateProdstructsSQL(fids,fids1);
+								validateProdstructsSQL(fids);
 						
 								for (int i = 0; i < prodVect.size(); i++) {
 						
