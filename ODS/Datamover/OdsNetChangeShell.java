@@ -1154,7 +1154,7 @@ class ODSNetChangeEngine {
 
     }
 
-    if (strTableName.equals(strCGOSSEO) || strTableName.equals(strDGENTITY))
+    if (strTableName.equals(strCGOSSEO) || strTableName.equals(strDGENTITY) || strTableName.equals(strPDHUPDATE) || strTableName.equals(strPDHUPDATEACT))
     {
     	printOK("processAllKeys:Exiting:ET:" + strTableName);
     } else {
