@@ -85,6 +85,7 @@ public class ADSFEATUREABR extends XMLMQRoot
         //BH FS ABR XML System Feed Mapping 20141118.xls
         XMLMAP.addChild(new XMLElem("HWORINFOFEATURE","HWORINFOFEATURE"));
         XMLMAP.addChild(new XMLElem("LICENSETYPE"));
+        XMLMAP.addChild(new XMLElem("FIRSTANNDATE", "FIRSTANNDATE"));
         XMLMAP.addChild(new XMLElem("WTHDRWEFFCTVDATE", "WITHDRAWDATEEFF_T"));
         XMLElem list = new XMLElem("LANGUAGELIST");
         XMLMAP.addChild(list);
