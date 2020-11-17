@@ -34,14 +34,18 @@ import COM.ibm.eannounce.objects.EANList;
 import COM.ibm.eannounce.objects.EANMetaAttribute;
 import COM.ibm.eannounce.objects.EntityGroup;
 import COM.ibm.eannounce.objects.EntityItem;
+import COM.ibm.eannounce.objects.EntityList;
 import COM.ibm.eannounce.objects.ExtractActionItem;
+import COM.ibm.opicmpdh.middleware.MiddlewareBusinessRuleException;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
+import COM.ibm.opicmpdh.middleware.Profile;
+import COM.ibm.opicmpdh.middleware.ReturnEntityKey;
 import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
+import COM.ibm.opicmpdh.objects.ControlBlock;
 
 public class IBIDATAABRSTATUS extends PokBaseABR {
 	private StringBuffer rptSb = new StringBuffer();
 	private String ffFileName = null;
-	private String ffPathName = null;
 	private String modelFileName = null;
 	private String prodFileName = null;
 	private String swFileName = null;
@@ -81,7 +85,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	private static final String PANNDATE = "PANNDATE";
 	private static final String LANNDATE = "LANNDATE";
 	boolean sentFile = true;
-	
+	 EntityItem rootEntity = null;
 	private static final String COFCAT = "COFCAT";
 	private static final String DIV = "DIV";
 	private static final String COFSUBCAT = "COFSUBCAT";
@@ -150,7 +154,6 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			dir = dir + "/";
 		}
 		ffFileName = sb.toString();
-		ffPathName = dir + ffFileName;
 		modelFileName = dir+"MODEL"+ffFileName;
 		prodFileName=dir+"PRODSTRUCT"+ffFileName;
 		swFileName = dir+"SWPRODSTRUCT"+ffFileName;
@@ -176,11 +179,12 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		
 
 		try {
+			m_elist = getEntityList("dummy");
 			 //get the root entity using current timestamp, need this to get the timestamps or info for VE pulls
-            m_elist = m_db.getEntityList(m_prof,
+          /*  m_elist = m_db.getEntityList(m_prof,
                     new ExtractActionItem(null, m_db, m_prof,"dummy"),
-                    new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
-            EntityItem rootEntity  = m_elist.getParentEntityGroup().getEntityItem(0);
+                    new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });*/
+             rootEntity  = m_elist.getParentEntityGroup().getEntityItem(0);
             
             t1=PokUtils.getAttributeValue(rootEntity, "IBIDATADTS", "","1980-01-01.00.00.00.000000",false);
             t2=getNow();
@@ -244,7 +248,6 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			println(EACustom.getDocTypeHtml()); // Output the doctype and html
 			println(rptSb.toString()); // Output the Report
 			printDGSubmitString();
-
 			println(EACustom.getTOUDiv());
 			buildReportFooter(); // Print </html>
 		}
@@ -416,6 +419,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			sentFile = exeFtpShell(prodFileName,tprod);
 			generateSWProd();
 			sentFile = exeFtpShell(swFileName,tswprod);
+			setTextValue(m_elist.getProfile(), "IBIDATADTS", t2, rootEntity);
 		} catch (Exception e) {
 			sentFile=false;
 		}
@@ -490,6 +494,72 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		return "IBIDATAABRSTATUS";
 	}
 
+	/*protected void setTextValue(){
+		m_db.update(arg0, arg1);
+		
+	}*/
+protected void setTextValue(Profile profile, String _sAttributeCode, String _sAttributeValue,
+			EntityItem eitem)
+	{
+		logMessage(getDescription()+" ***** "+eitem.getKey()+" "+_sAttributeCode+" set to: " + _sAttributeValue);
+		
+
+		// if meta does not have this attribute, there is nothing to do
+		EANMetaAttribute metaAttr = eitem.getEntityGroup().getMetaAttribute(_sAttributeCode);
+		if (metaAttr==null) {
+			logMessage(getDescription()+" ***** "+_sAttributeCode+" was not in meta for "+
+					eitem.getEntityType()+", nothing to do");
+			return;
+		}
+
+
+		if( _sAttributeValue != null ) {
+			if (m_cbOn==null){
+				setControlBlock(); // needed for attribute updates
+			}
+			ControlBlock cb = m_cbOn;
+			if (_sAttributeValue.length()==0){ // deactivation is now needed
+				EANAttribute att = eitem.getAttribute(_sAttributeCode);
+				String efffrom = att.getEffFrom();
+				cb = new ControlBlock(efffrom, efffrom, efffrom, efffrom, profile.getOPWGID());
+				_sAttributeValue = att.toString();
+			}
+			Vector vctAtts = new Vector();
+			Vector vctReturnsEntityKeys = new Vector();
+			// look at each key to see if this item is there yet
+				ReturnEntityKey rek = new ReturnEntityKey(eitem.getEntityType(),
+						eitem.getEntityID(), true);
+				rek.m_vctAttributes = vctAtts;
+				vctReturnsEntityKeys.addElement(rek);
+			
+			COM.ibm.opicmpdh.objects.Text sf = new COM.ibm.opicmpdh.objects.Text(profile.getEnterprise(),
+					eitem.getEntityType(), eitem.getEntityID(), _sAttributeCode, _sAttributeValue, 1, cb);
+			vctAtts.addElement(sf);
+			try {
+				m_db.update(profile, vctReturnsEntityKeys);
+			} catch (MiddlewareBusinessRuleException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (MiddlewareException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+private EntityList getEntityList(String veName)
+		throws java.sql.SQLException, COM.ibm.opicmpdh.middleware.MiddlewareException {
+
+	ExtractActionItem eaItem = new ExtractActionItem(null, m_db, m_prof, veName);
+
+	EntityList list = m_db.getEntityList(m_prof, eaItem,
+			new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
+	// debug display list of groups
+
+	return list;
+}
 	/***********************************************
 	 * Get the version
 	 * 
