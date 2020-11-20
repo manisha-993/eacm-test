@@ -32,8 +32,17 @@
 			<xs:element name="BHWARRCATEGORY" type="xs:string" minOccurs="1" maxOccurs="1"></xs:element>
             <xs:element name="OEMESAPRTSLBR" type="xs:string"
 				minOccurs="1" maxOccurs="1" />
-			<xs:element name="OEMESAPRTSONY" type="xs:string"
+				<xs:element name="TECHADV" type="xs:string"
 				minOccurs="1" maxOccurs="1" />
+				<xs:element name="REMCODLOAD" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+				<xs:element name="ENHCOMRES" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+				<xs:element name="PREDSUPP" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+				<xs:element name="TIERMAIN" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
+
             <xs:element name="LANGUAGELIST" type="LANGUAGELISTTYPE"
 				minOccurs="1" maxOccurs="1" />
 		
