@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import com.ibm.security.krb5.internal.crypto.v;
 import com.ibm.transform.oim.eacm.util.PokUtils;
+import com.ibm.xtq.bcel.generic.I2F;
 
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.LockPDHEntityException;
@@ -71,7 +72,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	String tmodel = null;
 	String tprod = null;
 	String tswprod = null;
-	
+	String type ="FULL";
 	private static final String ENTITYTYPE ="ENTITYTYPE";
 	private static final String MACHTYPEATR = "MACHTYPEATR";
 	private static final String MODELATR = "MODELATR";
@@ -126,20 +127,20 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	// m_elist.getParentEntityGroup().getEntityItem(0)
 	private final static String QUERY = "select m.machtypeatr,m.modelatr,m.mktgname,m.install,m.cofcat,m.cofsubcat,m.cofsubgrp,m.anndate,m.withdrawdate,m.WTHDRWEFFCTVDATE,S.div,m.status from price.model m join price.SGMNTACRNYM S on m.PRFTCTR=S.PRFTCTR where m.nlsid=1  and m.cofcat='Hardware' and m.status in ('Final','Ready for Review') and s.nlsid=1 and S.DIV<>'71 Retail Store Systems' and m.INSTALL='CE' with ur";
 
-	private final static String QUERY_MODEL = "select ENTITYTYPE,MACHTYPEATR,MODELATR,MKTGNAME,ANNDATE,WITHDRAWDATE,WTHDRWEFFCTVDATE,INSTALL,STATUS,VALFROM from OPICM.MODEL  where VALFROM> ? and VALFROM < ? and nlsid =1 with UR";
+	private final static String QUERY_MODEL = "select ENTITYTYPE,MACHTYPEATR,MODELATR,MKTGNAME,ANNDATE,WITHDRAWDATE,WTHDRWEFFCTVDATE,INSTALL,STATUS,VALFROM from OPICM.MODEL  where VALFROM> ? and VALFROM < ? and nlsid =1 and status='Final' with UR";
 
-	private final static String QUERY_PRODSTRUCT = "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id  and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 where  m.VALFROM> ? and m.VALFROM < ? and  m.nlsid=1 with ur";
+	private final static String QUERY_PRODSTRUCT = "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and f.status='Final' and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 and p.status='Final' where  p.VALFROM> ? and p.VALFROM < ? and p.status='Final' and  m.nlsid=1 with ur";
 	private final static String QUERY_SWPRODSTRUCT ="select sw.entitytype ,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,sw.MKTGNAME,annp.ANNDATE AS PANNDATE,annL.ANNDATE as LANNDATE,A.EFFECTIVEDATE,sw.STATUS,sw.VALFROM from opicm.SWPRODSTRUCT sw "+
 			"join  opicm.relator r on  r.entitytype = 'SWPRODSTRUCTAVAIL' and r.entity1id = sw.entityid "+
-			"join  opicm.avail a on a.entityid = r.entity2id and a.nlsid=1 and  a.AVAILTYPE='Planned Availability' "+
-			"join opicm.announcement annp on  a.anncodename=annp.anncodename and annp.nlsid=1  "+
+			"join  opicm.avail a on a.entityid = r.entity2id and a.nlsid=1 and  a.AVAILTYPE='Planned Availability' and a.status='Final' "+
+			"join opicm.announcement annp on  a.anncodename=annp.anncodename and annp.nlsid=1 "+
 			"join  opicm.relator r1 on  r1.entitytype = 'SWPRODSTRUCTAVAIL' and r1.entity1id = sw.entityid "+
-			"join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order' "+
+			"join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  "+
 			"join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1 and a1.AVAILTYPE='Last Order' "+
 			"join opicm.relator r2 on r2.entitytype = 'SWPRODSTRUCT' and r2.entityid = sw.entityid "+
-			"join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id "+
-			"join opicm.feature f on f.nlsid =1 and f.entityid = r2.entity1id "+
-			"where sw.nlsid=1 and (sw.VALFROM > ? and sw.VALFROM <?) or (a.VALFROM > ? and a.VALFROM <?)  or (a1.VALFROM > ? and a1.VALFROM <?)  or (annl.VALFROM > ? and annl.VALFROM <?) or (annp.VALFROM > ? and annp.VALFROM <?)   with ur";
+			"join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id and m.status='Final' "+
+			"join opicm.feature f on f.nlsid =1 and f.entityid = r2.entity1id and f.status='Final' "+
+			"where  sw.status='Final' and sw.nlsid=1 and (sw.VALFROM > ? and sw.VALFROM <?) or (a.VALFROM > ? and a.VALFROM <?)  or (a1.VALFROM > ? and a1.VALFROM <?)  or (annl.VALFROM > ? and annl.VALFROM <?) or (annp.VALFROM > ? and annp.VALFROM <?)   with ur";
 	private void setFileName() throws IOException {
 		// FILE_PREFIX=EACM_TO_QSM_
 		String fileprefix = ABRServerProperties.getFilePrefix(m_abri.getABRCode());
@@ -198,8 +199,13 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
              rootEntity  = m_elist.getParentEntityGroup().getEntityItem(0);
           
            
-            t1=PokUtils.getAttributeValue(rootEntity, "IBIDATADTS", "","1980-01-01.00.00.00.000000");
+            t1=PokUtils.getAttributeValue(rootEntity, "IBIDATADTS", "","1980-01-01-00.00.00.000000");
             //System.out.println("temp:"+temp);
+            if("1980-01-01-00.00.00.000000".equals(t1)){
+            	type = "FULL";
+            }else {
+            	type = "DELTA";
+			}
             t2=getNow();
 			msgf = new MessageFormat(HEADER);
 			args[0] = getShortClassName(getClass());
@@ -294,13 +300,14 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 
 		if (rs.last()) {
 			 count = rs.getRow();
-			wOut.write("EACM" + dts + count);
+			wOut.write(type+"EACM" + dts + count);
 			wOut.write(NEW_LINE);
 			rs.first();
 		}
 		if(count==0){
 			wOut.write("EACM" + dts + count);
 			wOut.write(NEW_LINE);
+			wOut.close();
 			return;
 		}
 		do {
@@ -350,14 +357,16 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		int count =0;
 		if (rs.last()) {
 			count = rs.getRow();
-			wOut.write("EACM" + dts + count);
+			wOut.write(type+"EACM" + dts + count);
 			wOut.write(NEW_LINE);
+			
 			// println("EACM" + dts + " " + count);
 			rs.first();
 		}
 		if(count==0){
 			wOut.write("EACM" + dts + count);
 			wOut.write(NEW_LINE);
+			wOut.close();
 			return;
 		}
 		do {
@@ -416,7 +425,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		int count = 0;
 		if (rs.last()) {
 			count = rs.getRow();
-			wOut.write("EACM" + dts + count);
+			wOut.write(type+"EACM" + dts + count);
 			wOut.write(NEW_LINE);
 			// println("EACM" + dts + " " + count);
 			rs.first();
@@ -424,6 +433,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		if(count==0){
 			wOut.write("EACM" + dts + count);
 			wOut.write(NEW_LINE);
+			wOut.close();
 			return;
 		}
 		do {
@@ -455,13 +465,14 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		
 	}
 
-	protected String getValue(String columnValue, String columnNmae) {
-		
-		columnValue =replaceBlank(columnValue);
+	protected String getValue(String columnValue, String columnName) {
+		com.ibm.mq.MQException mqException = null;
+		columnValue =replaceBlank(columnValue).trim();
 		int columnValueLength = columnValue == null ? 0 : columnValue.length();
-		int columnNameLength = Integer.parseInt(COLUMN_LENGTH.get(columnNmae).toString());
+		int columnNameLength = Integer.parseInt(COLUMN_LENGTH.get(columnName).toString());
 		if (columnValueLength == columnNameLength)
 			return columnValue;
+		//System.out.println("columnName:"+columnName+" columnValue:"+columnValue+"   -columnValueLength:"+columnValueLength+"columnNameLength:"+columnNameLength);
 		if (columnValueLength > columnNameLength)
 			return columnValue.substring(0, columnNameLength);
 
