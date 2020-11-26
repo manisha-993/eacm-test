@@ -129,7 +129,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 
 	private final static String QUERY_MODEL = "select ENTITYTYPE,MACHTYPEATR,MODELATR,MKTGNAME,ANNDATE,WITHDRAWDATE,WTHDRWEFFCTVDATE,INSTALL,STATUS,VALFROM from OPICM.MODEL  where VALFROM> ? and VALFROM < ? and nlsid =1 and status='Final' with UR";
 
-	private final static String QUERY_PRODSTRUCT = "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and f.status='Final' and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 and p.status='Final' where  p.VALFROM> ? and p.VALFROM < ? and p.status='Final' and  m.nlsid=1 with ur";
+	private final static String QUERY_PRODSTRUCT = "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and f.status='Final' and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 and p.status='Final' where  p.VALFROM> ? and p.VALFROM < ? and m.status='Final' and  m.nlsid=1 with ur";
 	private final static String QUERY_SWPRODSTRUCT ="select sw.entitytype ,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,sw.MKTGNAME,annp.ANNDATE AS PANNDATE,annL.ANNDATE as LANNDATE,A.EFFECTIVEDATE,sw.STATUS,sw.VALFROM from opicm.SWPRODSTRUCT sw "+
 			"join  opicm.relator r on  r.entitytype = 'SWPRODSTRUCTAVAIL' and r.entity1id = sw.entityid "+
 			"join  opicm.avail a on a.entityid = r.entity2id and a.nlsid=1 and  a.AVAILTYPE='Planned Availability' and a.status='Final' "+
@@ -314,7 +314,9 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 
 			for (int i = 0; i < MODELCOLUMNS.length; i++) {
 				String value = rs.getString(MODELCOLUMNS[i]);
+				value=value==null?"":value.trim();
 				wOut.write(getValue(value, MODELCOLUMNS[i]));
+				if(INSTALL.equals(MODELCOLUMNS[i])){
 				if("CE".equals(value)){
 					wOut.write("IBI");
 				}else if ("CIF".equals(value)) {
@@ -322,6 +324,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 					wOut.write("CSU");
 				}else {
 					wOut.write("   ");
+				}
 				}
 			}
 			wOut.write(NEW_LINE);
@@ -374,6 +377,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			for (int i = 0; i < PRODCOLUMNS.length; i++) {
 				String value = rs.getString(PRODCOLUMNS[i]);
 				wOut.write(getValue(value, PRODCOLUMNS[i]));
+				if(INSTALL.equals(PRODCOLUMNS[i])){
 				if("CE".equals(value)){
 					wOut.write("IBI");
 				}else if ("CIF".equals(value)) {
@@ -381,6 +385,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 					wOut.write("CSU");
 				}else {
 					wOut.write("   ");
+				}
 				}
 				
 			}
@@ -466,13 +471,12 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	}
 
 	protected String getValue(String columnValue, String columnName) {
-		com.ibm.mq.MQException mqException = null;
+		
 		columnValue =replaceBlank(columnValue).trim();
 		int columnValueLength = columnValue == null ? 0 : columnValue.length();
 		int columnNameLength = Integer.parseInt(COLUMN_LENGTH.get(columnName).toString());
 		if (columnValueLength == columnNameLength)
 			return columnValue;
-		//System.out.println("columnName:"+columnName+" columnValue:"+columnValue+"   -columnValueLength:"+columnValueLength+"columnNameLength:"+columnNameLength);
 		if (columnValueLength > columnNameLength)
 			return columnValue.substring(0, columnNameLength);
 
