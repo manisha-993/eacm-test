@@ -16,6 +16,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.ibm.security.jgss.mech.krb5.s;
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
 import COM.ibm.eannounce.abr.util.EACustom;
@@ -86,7 +87,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	private static final String[] PRODCOLUMNS = new String[] {
 			ENTITYTYPE, MACHTYPEATR, MODELATR,FEATURECODE, MKTGNAME,ANNDATE,WITHDRAWDATE, WTHDRWEFFCTVDATE,INSTALL,STATUS,VALFROM };
 	private static final String[] SWPRODCOLUMNS = new String[] {
-			ENTITYTYPE, MACHTYPEATR, MODELATR,FEATURECODE, MKTGNAME,LANNDATE,PANNDATE,EFFECTIVEDATE,STATUS,VALFROM };
+			ENTITYTYPE, MACHTYPEATR, MODELATR,FEATURECODE, MKTGNAME,PANNDATE,LANNDATE,EFFECTIVEDATE,STATUS,VALFROM };
 
 	private static final Hashtable COLUMN_LENGTH;
 	static {
@@ -126,7 +127,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 "left join opicm.relator r2 on r2.entitytype = 'SWPRODSTRUCT' and r2.entityid = sw.entityid "+
 "left join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id and m.status='Final' "+
 "left join opicm.swfeature f on f.nlsid =1 and f.entityid = r2.entity1id and f.status='Final' where  sw.status='Final' and sw.nlsid=1) "+
-"select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,min(PANNDATE),min(LANNDATE),min(EFFECTIVEDATE),STATUS,VALFROM from temp "+
+"select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,min(PANNDATE) as PANNDATE,min(LANNDATE) as LANNDATE,min(EFFECTIVEDATE) as EFFECTIVEDATE,STATUS,VALFROM from temp "+
 "where MAXDATA between ? and ? "+
 "group by entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,VALFROM,STATUS "+
 "with ur";
