@@ -1,12 +1,8 @@
 package COM.ibm.eannounce.abr.sg;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -15,27 +11,17 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.ibm.security.krb5.internal.crypto.v;
 import com.ibm.transform.oim.eacm.util.PokUtils;
-import com.ibm.xtq.bcel.generic.I2F;
 
 import COM.ibm.eannounce.abr.util.EACustom;
-import COM.ibm.eannounce.abr.util.LockPDHEntityException;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
-import COM.ibm.eannounce.abr.util.UpdatePDHEntityException;
-import COM.ibm.eannounce.abr.util.XLRow;
-import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
-import COM.ibm.eannounce.objects.AttributeChangeHistoryItem;
 import COM.ibm.eannounce.objects.EANAttribute;
-import COM.ibm.eannounce.objects.EANList;
 import COM.ibm.eannounce.objects.EANMetaAttribute;
-import COM.ibm.eannounce.objects.EntityGroup;
 import COM.ibm.eannounce.objects.EntityItem;
 import COM.ibm.eannounce.objects.EntityList;
 import COM.ibm.eannounce.objects.ExtractActionItem;
@@ -130,17 +116,20 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	private final static String QUERY_MODEL = "select ENTITYTYPE,MACHTYPEATR,MODELATR,MKTGNAME,ANNDATE,WITHDRAWDATE,WTHDRWEFFCTVDATE,INSTALL,STATUS,VALFROM from OPICM.MODEL  where VALFROM> ? and VALFROM < ? and nlsid =1 and status='Final' with UR";
 
 	private final static String QUERY_PRODSTRUCT = "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and f.status='Final' and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 and p.status='Final' where  p.VALFROM> ? and p.VALFROM < ? and m.status='Final' and  m.nlsid=1 with ur";
-	private final static String QUERY_SWPRODSTRUCT ="select sw.entitytype ,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,sw.MKTGNAME,annp.ANNDATE AS PANNDATE,annL.ANNDATE as LANNDATE,A.EFFECTIVEDATE,sw.STATUS,sw.VALFROM from opicm.SWPRODSTRUCT sw "+
-			"join  opicm.relator r on  r.entitytype = 'SWPRODSTRUCTAVAIL' and r.entity1id = sw.entityid "+
-			"join  opicm.avail a on a.entityid = r.entity2id and a.nlsid=1 and  a.AVAILTYPE='Planned Availability' and a.status='Final' "+
-			"join opicm.announcement annp on  a.anncodename=annp.anncodename and annp.nlsid=1 "+
-			"join  opicm.relator r1 on  r1.entitytype = 'SWPRODSTRUCTAVAIL' and r1.entity1id = sw.entityid "+
-			"join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  "+
-			"join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1 and a1.AVAILTYPE='Last Order' "+
-			"join opicm.relator r2 on r2.entitytype = 'SWPRODSTRUCT' and r2.entityid = sw.entityid "+
-			"join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id and m.status='Final' "+
-			"join opicm.feature f on f.nlsid =1 and f.entityid = r2.entity1id and f.status='Final' "+
-			"where  sw.status='Final' and sw.nlsid=1 and (sw.VALFROM > ? and sw.VALFROM <?) or (a.VALFROM > ? and a.VALFROM <?)  or (a1.VALFROM > ? and a1.VALFROM <?)  or (annl.VALFROM > ? and annl.VALFROM <?) or (annp.VALFROM > ? and annp.VALFROM <?)   with ur";
+	private final static String QUERY_SWPRODSTRUCT ="with temp as (select distinct sw.entitytype ,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,sw.MKTGNAME,coalesce(annp.ANNDATE,'9999-12-31') AS PANNDATE,coalesce( annl.ANNDATE,'9999-12-31') as LANNDATE,coalesce(A.EFFECTIVEDATE,'9999-12-31') as EFFECTIVEDATE,sw.STATUS,sw.VALFROM,max(coalesce(sw.VALFROM,'1980-01-01 00:00:00.000000') ,coalesce(a1.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(a.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annp.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annl.VALFROM,'1980-01-01 00:00:00.000000')) as MAXDATA from opicm.SWPRODSTRUCT sw "+
+"left join  opicm.relator r on  r.entitytype = 'SWPRODSTRUCTAVAIL' and r.entity1id = sw.entityid "+
+"left join  opicm.avail a on a.entityid = r.entity2id and a.nlsid=1 and  a.AVAILTYPE='Planned Availability' and a.status='Final' "+
+"left join opicm.announcement annp on  a.anncodename=annp.anncodename and annp.nlsid=1 "+
+"left join  opicm.relator r1 on  r1.entitytype = 'SWPRODSTRUCTAVAIL' and r1.entity1id = sw.entityid "+
+"left join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  "+
+"left join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1 "+
+"left join opicm.relator r2 on r2.entitytype = 'SWPRODSTRUCT' and r2.entityid = sw.entityid "+
+"left join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id and m.status='Final' "+
+"left join opicm.swfeature f on f.nlsid =1 and f.entityid = r2.entity1id and f.status='Final' where  sw.status='Final' and sw.nlsid=1) "+
+"select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,min(PANNDATE),min(LANNDATE),min(EFFECTIVEDATE),STATUS,VALFROM from temp "+
+"where MAXDATA between ? and ? "+
+"group by entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,VALFROM,STATUS "+
+"with ur";
 	private void setFileName() throws IOException {
 		// FILE_PREFIX=EACM_TO_QSM_
 		String fileprefix = ABRServerProperties.getFilePrefix(m_abri.getABRCode());
@@ -198,7 +187,6 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
                     new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });*/
              rootEntity  = m_elist.getParentEntityGroup().getEntityItem(0);
           
-           
             t1=PokUtils.getAttributeValue(rootEntity, "IBIDATADTS", "","1980-01-01-00.00.00.000000");
             //System.out.println("temp:"+temp);
             if("1980-01-01-00.00.00.000000".equals(t1)){
@@ -417,14 +405,6 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 				ResultSet.CONCUR_READ_ONLY);
 		ps.setString(1, t1);
 		ps.setString(2, t2);
-		ps.setString(3, t1);
-		ps.setString(4, t2);
-		ps.setString(5, t1);
-		ps.setString(6, t2);
-		ps.setString(7, t1);
-		ps.setString(8, t2);
-		ps.setString(9, t1);
-		ps.setString(10, t2);
 		System.out.println("query:"+QUERY_SWPRODSTRUCT+":"+t1+":"+t2);
 		ResultSet rs = ps.executeQuery();
 		int count = 0;
