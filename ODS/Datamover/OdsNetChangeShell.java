@@ -5482,7 +5482,19 @@ class ODSNetChangeEngine {
           psInsertODSRow.setString(4, strAttrVal);
           break;
         case (ISBLOB):
-
+        	  printOK(
+                      "insertIntoODS:INSERT: BLOB:ETYPE:"
+                      + strEtype
+                      + ":EID:"
+                      + intEid
+                      + ":NLSID"
+                      + iNLSID
+                      + ":ATTRIBUTETYPE:"
+                      + strAttrType
+                      + ":ATTRIBUTECODE:"
+                      + strAttrCode
+                      + ":BLOBEXTENSION:"
+                      + strBlobExtension);
           printOK(
               "insertIntoODS:INSERT: BLOB:ETYPE:"
               + strEtype.trim()
