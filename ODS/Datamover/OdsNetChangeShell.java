@@ -3256,7 +3256,9 @@ class ODSNetChangeEngine {
       for (intProgColCount = 1;
            intProgColCount <= intRSColCount;
            intProgColCount++) {
-        vColName.addElement(rsmdColInfo.getColumnName(intProgColCount).trim());
+    	 // rsmdColInfo.getc
+        //vColName.addElement(rsmdColInfo.getColumnName(intProgColCount).trim());
+        vColName.addElement(rsmdColInfo.getColumnLabel(intProgColCount).trim());
         vColType.addElement(
             new Integer(rsmdColInfo.getColumnType(intProgColCount)));
       }
