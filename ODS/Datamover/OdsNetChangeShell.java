@@ -3326,6 +3326,7 @@ class ODSNetChangeEngine {
             }
             else if (strTempColName.equals("ATTRIBUTETYPE")) {
               strAttrType = rdrsPDH.getColumn(x, intRSColNo).trim();
+              printOK("BLOBTYPE:"+strAttrType);
             }
             else if (
                 strTempColName.equals(
