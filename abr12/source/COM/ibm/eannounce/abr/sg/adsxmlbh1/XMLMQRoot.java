@@ -488,12 +488,7 @@ public abstract class XMLMQRoot extends XMLMQAdapter
 					//				case 1. initalization Cache. generate full XML 1.0 put into Cache
 					xmlCache = generateMutilXML(abr, this, diffTbl, reusable, null);
 
-					if("MODEL".equals(rootEntity.getEntityType())) {
-						UpdateXML change = new UpdateXML();
-						xmlCache = change.update(xmlCache, change.store(xmlCache));
-						abr.addDebugComment(D.EBUG_DETAIL,"sort warranty in model xml"+xmlCache);
-					}
-					
+
                     //new added
 					boolean ifpass = false;
 					String entitytype = rootEntity.getEntityType();
@@ -543,11 +538,7 @@ public abstract class XMLMQRoot extends XMLMQAdapter
 						//generate full 1.0 XML put into Cache
 						xmlCache = generateMutilXML(abr,this,diffTbl, reusable, null);
 
-						if("MODEL".equals(rootEntity.getEntityType())) {
-							UpdateXML change = new UpdateXML();
-							xmlCache = change.update(xmlCache, change.store(xmlCache));
-						}
-						
+
 //						new added
 						boolean ifpass = false;
 						String entitytype = rootEntity.getEntityType();
@@ -615,11 +606,6 @@ public abstract class XMLMQRoot extends XMLMQAdapter
 							// generate Delta XML , and send to MQ
 							xml10MQ = generateXML(abr, diffTb2);
 
-							if("MODEL".equals(rootEntity.getEntityType())) {
-								UpdateXML change = new UpdateXML();
-								xml10MQ = change.update(xml10MQ, change.store(xml10MQ));
-								abr.addDebugComment(D.EBUG_DETAIL,"sort warranty in model xml"+xml10MQ);
-							}
 						}
 						Vector mq10 = (Vector) VersionmqVct.get(key10);
 						//add flag(new added)

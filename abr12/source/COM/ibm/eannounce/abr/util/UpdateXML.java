@@ -1,14 +1,9 @@
 package COM.ibm.eannounce.abr.util;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.Vector;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -22,19 +17,15 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 
 public class UpdateXML {
 
 
-	public LinkedList store(String xml) {
+	public LinkedList store(Document doc) {
 		LinkedList warrList = new LinkedList();
 		
-		try {
-			DocumentBuilder newDocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			Document doc = newDocumentBuilder.parse(new InputSource(new StringReader(xml)));
+		try {			
 			Element root = doc.getDocumentElement();	
 
 			NodeList warrVec = root.getElementsByTagName("WARRELEMENT");
@@ -77,14 +68,15 @@ public class UpdateXML {
 		        	
 		        for(int j = 0;j < countryList.getLength();j++) {
 		        	Ctry ctry = new Ctry();
-		        	Element countryElement = (Element) countryList.item(i);
-		        	Element caction = (Element) countryElement.getElementsByTagName("COUNTRYACTION").item(j);
+		        	Element countryElement = (Element) countryList.item(0);
+		        	Element caction = (Element) warrElement.getElementsByTagName("COUNTRYACTION").item(j);
 		        	ctry.setAction(caction.getTextContent());
-			       	Element ctry_fc = (Element) countryElement.getElementsByTagName("COUNTRY_FC").item(j);
+			       	Element ctry_fc = (Element) warrElement.getElementsByTagName("COUNTRY_FC").item(j);
 			       	ctry.setCtry(ctry_fc.getTextContent());
 			        	
 			       	ctryList.add(ctry);
 		        }
+		       
 		        
 	            warr.setCountryList(ctryList);
 		            
@@ -98,26 +90,16 @@ public class UpdateXML {
 		}catch (TransformerFactoryConfigurationError e) {
 			
 			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			
-			e.printStackTrace();
-		} catch (SAXException e) {
-			
-			e.printStackTrace();
-		} catch (IOException e) {
-			
-			e.printStackTrace();
 		}
 	        	   
 	    return warrList;
 	}
 	
-	public String update(String xml, LinkedList list) {
+	public Document update(Document doc, LinkedList list) {
 		
 		StreamResult result = null;
 		try {
-			DocumentBuilder newDocumentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			Document doc = newDocumentBuilder.parse(new InputSource(new StringReader(xml)));
+			
 			Element root = doc.getDocumentElement();
 		
 			NodeList warrList = root.getElementsByTagName("WARRELEMENT");
@@ -172,35 +154,14 @@ public class UpdateXML {
 		        }
 		        warrElement.appendChild(countryElem);
 			}
-			
-			Transformer transformer;
-		
-			transformer = TransformerFactory.newInstance().newTransformer();
-			
-			Source source = new DOMSource(doc);
-			
-			result = new StreamResult( new StringWriter());
-			transformer.transform(source, result);
 					
 			
-		} catch (TransformerConfigurationException | TransformerFactoryConfigurationError e) {
-			
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			
-			e.printStackTrace();
-		} catch (SAXException e) {
-			
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (TransformerFactoryConfigurationError e) {
 			
 			e.printStackTrace();
 		}
 	
-		return result.getWriter().toString();
+		return doc;
 	}
 	
 	private static class WarrElem{

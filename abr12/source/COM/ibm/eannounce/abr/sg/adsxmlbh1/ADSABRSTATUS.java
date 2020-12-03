@@ -3405,10 +3405,16 @@ ADSATTRIBUTE    40  WARRTYPE
         //deal the special character of docment 
         parseAndConvert(document);
 
+        String type = document.getDocumentElement().getTextContent();
+        if(type.contains("MODEL")) {
+        	UpdateXML change = new UpdateXML();
+        	document = change.update(document, change.store(document));
+        }
+        
         //create string from xml tree
         java.io.StringWriter sw = new java.io.StringWriter();
         StreamResult result = new StreamResult(sw);
-        DOMSource source = new DOMSource(document);
+        DOMSource source = new DOMSource(document);     
         trans.transform(source, result);
         String xmlString = XMLElem.removeCheat(sw.toString());
 
@@ -3418,6 +3424,8 @@ ADSATTRIBUTE    40  WARRTYPE
         sw = new java.io.StringWriter();
         result = new StreamResult(sw);
         trans.transform(source, result);
+        
+      
         if(!USERXML_OFF_LOG){
         	addUserXML(XMLElem.removeCheat(sw.toString()));
         }
