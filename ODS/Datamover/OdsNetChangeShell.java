@@ -3260,7 +3260,7 @@ class ODSNetChangeEngine {
         vColType.addElement(
             new Integer(rsmdColInfo.getColumnType(intProgColCount)));
       }
-
+      printOK("vColName:"+vColName);
       /*
        * Move the resultset into a returndata result set
        * so that we can close the result set and reduce
@@ -3326,7 +3326,7 @@ class ODSNetChangeEngine {
             }
             else if (strTempColName.equals("ATTRIBUTETYPE")) {
               strAttrType = rdrsPDH.getColumn(x, intRSColNo).trim();
-              printOK("BLOBTYPE:"+strAttrType);
+             
             }
             else if (
                 strTempColName.equals(
