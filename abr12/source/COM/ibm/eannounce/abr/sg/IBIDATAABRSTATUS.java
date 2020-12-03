@@ -114,22 +114,24 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	// m_elist.getParentEntityGroup().getEntityItem(0)
 	private final static String QUERY = "select m.machtypeatr,m.modelatr,m.mktgname,m.install,m.cofcat,m.cofsubcat,m.cofsubgrp,m.anndate,m.withdrawdate,m.WTHDRWEFFCTVDATE,S.div,m.status from price.model m join price.SGMNTACRNYM S on m.PRFTCTR=S.PRFTCTR where m.nlsid=1  and m.cofcat='Hardware' and m.status in ('Final','Ready for Review') and s.nlsid=1 and S.DIV<>'71 Retail Store Systems' and m.INSTALL='CE' with ur";
 
-	private final static String QUERY_MODEL = "select ENTITYTYPE,MACHTYPEATR,MODELATR,MKTGNAME,ANNDATE,WITHDRAWDATE,WTHDRWEFFCTVDATE,INSTALL,STATUS,VALFROM from OPICM.MODEL  where VALFROM> ? and VALFROM < ? and nlsid =1 and status='Final' with UR";
+	private final static String QUERY_MODEL = "select ENTITYTYPE,MACHTYPEATR,MODELATR,MKTGNAME,ANNDATE,WITHDRAWDATE,WTHDRWEFFCTVDATE,INSTALL,STATUS,VALFROM from OPICM.MODEL  where VALFROM>= ? and VALFROM < ? and nlsid =1 and status='Final' with UR";
 
-	private final static String QUERY_PRODSTRUCT = "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and f.status='Final' and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 and p.status='Final' where  p.VALFROM> ? and p.VALFROM < ? and m.status='Final' and  m.nlsid=1 with ur";
-	private final static String QUERY_SWPRODSTRUCT ="with temp as (select distinct sw.entitytype ,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,sw.MKTGNAME,coalesce(annp.ANNDATE,'9999-12-31') AS PANNDATE,coalesce( annl.ANNDATE,'9999-12-31') as LANNDATE,coalesce(A.EFFECTIVEDATE,'9999-12-31') as EFFECTIVEDATE,sw.STATUS,sw.VALFROM,max(coalesce(sw.VALFROM,'1980-01-01 00:00:00.000000') ,coalesce(a1.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(a.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annp.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annl.VALFROM,'1980-01-01 00:00:00.000000')) as MAXDATA from opicm.SWPRODSTRUCT sw "+
+	private final static String QUERY_PRODSTRUCT = "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and f.status='Final' and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 and p.status='Final' where  p.VALFROM>= ? and p.VALFROM < ? and m.status='Final' and  m.nlsid=1 with ur";
+	private final static String QUERY_SWPRODSTRUCT ="with temp as ("+
+"select sw.entitytype ,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,sw.MKTGNAME,coalesce(annp.ANNDATE,'9999-12-32') AS PANNDATE,coalesce( annl.ANNDATE,'9999-12-32') as LANNDATE,coalesce(a1.EFFECTIVEDATE,'9999-12-32') as EFFECTIVEDATE,sw.STATUS,sw.VALFROM,max(coalesce(sw.VALFROM,'1980-01-01 00:00:00.000000') ,coalesce(a1.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(a.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annp.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annl.VALFROM,'1980-01-01 00:00:00.000000')) as MAXDATA from opicm.SWPRODSTRUCT sw "+
+ "join opicm.relator r2 on r2.entitytype = 'SWPRODSTRUCT' and r2.entityid = sw.entityid "+
+ "join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id and m.status='Final' "+
+"join opicm.swfeature f on f.nlsid =1 and f.entityid = r2.entity1id and f.status='Final' "+
 "left join  opicm.relator r on  r.entitytype = 'SWPRODSTRUCTAVAIL' and r.entity1id = sw.entityid "+
 "left join  opicm.avail a on a.entityid = r.entity2id and a.nlsid=1 and  a.AVAILTYPE='Planned Availability' and a.status='Final' "+
-"left join opicm.announcement annp on  a.anncodename=annp.anncodename and annp.nlsid=1 "+
+"left join opicm.announcement annp on  a.anncodename=annp.anncodename and annp.nlsid=1 and annp.ANNSTATUS ='Final' "+
 "left join  opicm.relator r1 on  r1.entitytype = 'SWPRODSTRUCTAVAIL' and r1.entity1id = sw.entityid "+
-"left join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  "+
-"left join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1 "+
-"left join opicm.relator r2 on r2.entitytype = 'SWPRODSTRUCT' and r2.entityid = sw.entityid "+
-"left join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id and m.status='Final' "+
-"left join opicm.swfeature f on f.nlsid =1 and f.entityid = r2.entity1id and f.status='Final' where  sw.status='Final' and sw.nlsid=1) "+
-"select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,min(PANNDATE) as PANNDATE,min(LANNDATE) as LANNDATE,min(EFFECTIVEDATE) as EFFECTIVEDATE,STATUS,VALFROM from temp "+
-"where MAXDATA between ? and ? "+
+"left join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  AND a1.status='Final'  "+
+"left join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1  and annl.ANNSTATUS ='Final' "+
+"where  sw.status='Final' and sw.nlsid=1 and sw.ENTITYID in(28841,35784,20902,21329,27679,1267300,1399135,15180) )"+
+"select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,(case min(PANNDATE) when '9999-12-32' then '' else min(PANNDATE) end )as PANNDATE,(case min(LANNDATE) when '9999-12-32' then '' else min(LANNDATE) end ) as LANNDATE,(case min(EFFECTIVEDATE) when '9999-12-32' then '' else min(EFFECTIVEDATE) end ) as EFFECTIVEDATE,STATUS,VALFROM from temp "+
 "group by entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,VALFROM,STATUS "+
+"having max(MAXDATA) >= ? and max(MAXDATA) < ?  "+
 "with ur";
 	private void setFileName() throws IOException {
 		// FILE_PREFIX=EACM_TO_QSM_
