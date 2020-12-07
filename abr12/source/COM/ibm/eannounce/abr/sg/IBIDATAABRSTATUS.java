@@ -128,7 +128,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 "left join  opicm.relator r1 on  r1.entitytype = 'SWPRODSTRUCTAVAIL' and r1.entity1id = sw.entityid "+
 "left join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  AND a1.status='Final'  "+
 "left join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1  and annl.ANNSTATUS ='Final' "+
-"where  sw.status='Final' and sw.nlsid=1 and sw.ENTITYID in(28841,35784,20902,21329,27679,1267300,1399135,15180) )"+
+"where  sw.status='Final' and sw.nlsid=1  )"+
 "select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,(case min(PANNDATE) when '9999-12-32' then '' else min(PANNDATE) end )as PANNDATE,(case min(LANNDATE) when '9999-12-32' then '' else min(LANNDATE) end ) as LANNDATE,(case min(EFFECTIVEDATE) when '9999-12-32' then '' else min(EFFECTIVEDATE) end ) as EFFECTIVEDATE,STATUS,VALFROM from temp "+
 "group by entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,VALFROM,STATUS "+
 "having max(MAXDATA) >= ? and max(MAXDATA) < ?  "+
@@ -296,7 +296,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			rs.first();
 		}
 		if(count==0){
-			wOut.write("EACM" + dts + count);
+			wOut.write(type+"EACM" + dts + count);
 			wOut.write(NEW_LINE);
 			wOut.close();
 			return;
