@@ -358,7 +358,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			rs.first();
 		}
 		if(count==0){
-			wOut.write("EACM" + dts + count);
+			wOut.write(type+"EACM" + dts + count);
 			wOut.write(NEW_LINE);
 			wOut.close();
 			return;
@@ -419,7 +419,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			rs.first();
 		}
 		if(count==0){
-			wOut.write("EACM" + dts + count);
+			wOut.write(type+"EACM" + dts + count);
 			wOut.write(NEW_LINE);
 			wOut.close();
 			return;
