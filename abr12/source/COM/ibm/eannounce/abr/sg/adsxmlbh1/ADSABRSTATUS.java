@@ -3406,7 +3406,7 @@ ADSATTRIBUTE    40  WARRTYPE
         parseAndConvert(document);
 
         String type = document.getDocumentElement().getTextContent();
-        if(type.contains("MODEL")) {
+        if(type.contains("MODEL_UPDATE")) {
         	UpdateXML change = new UpdateXML();
         	document = change.update(document, change.store(document));
         }
