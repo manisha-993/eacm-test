@@ -439,11 +439,11 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		// generate file name
 		try {
 			generateModel();
-			sentFile = exeFtpShell(modelFileName,tmodel);
+			sentFile = exeFtpShell(modelFileName,tmodel,"CSF0006");
 			generateProd();
-			sentFile = exeFtpShell(prodFileName,tprod);
+			sentFile = exeFtpShell(prodFileName,tprod,"CSF0007");
 			generateSWProd();
-			sentFile = exeFtpShell(swFileName,tswprod);
+			sentFile = exeFtpShell(swFileName,tswprod,"CSF0008");
 			setTextValue(m_elist.getProfile(), "IBIDATADTS", t2, rootEntity);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -482,12 +482,12 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		return sb.toString();
 	}
 
-	public boolean exeFtpShell(String fileName,String tarName) {
+	public boolean exeFtpShell(String fileName,String tarName,String triger) {
 		// String cmd =
 		// "/usr/bin/rsync -av /var/log/www.solive.kv/access_log
 		// testuser@10.0.1.219::store --password-file=/etc/client/rsync.pwd";
 
-		String cmd = ABRServerProperties.getValue(m_abri.getABRCode(), SFTPSCRPATH, null) + " -f " + fileName+" -t '"+tarName+"'";
+		String cmd = ABRServerProperties.getValue(m_abri.getABRCode(), SFTPSCRPATH, null) + " -f " + fileName+" -t '"+tarName+"'" +" -c "+triger;
 		String ibiinipath = ABRServerProperties.getValue(m_abri.getABRCode(), IBIINIPATH, null);
 		if (ibiinipath != null)
 			cmd += " -i " + ibiinipath;
