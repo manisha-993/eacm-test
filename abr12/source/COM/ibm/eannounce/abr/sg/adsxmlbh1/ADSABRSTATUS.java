@@ -3403,9 +3403,9 @@ ADSATTRIBUTE    40  WARRTYPE
         trans.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 
         //deal the special character of docment 
-        parseAndConvert(document);
-
-        String type = document.getDocumentElement().getTextContent();
+        
+        String type = document.getDocumentElement().getNodeName();
+        
         if(type.contains("MODEL_UPDATE")) {
         	UpdateXML change = new UpdateXML();
         	document = change.update(document, change.store(document));
