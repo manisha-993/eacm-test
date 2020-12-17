@@ -439,11 +439,11 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		// generate file name
 		try {
 			generateModel();
-			sentFile = exeFtpShell(modelFileName,tmodel,"CSF0006");
+			sentFile = exeFtpShell(modelFileName,tmodel,"CSF0005");
 			generateProd();
-			sentFile = exeFtpShell(prodFileName,tprod,"CSF0007");
+			sentFile = exeFtpShell(prodFileName,tprod,"CSF0006");
 			generateSWProd();
-			sentFile = exeFtpShell(swFileName,tswprod,"CSF0008");
+			sentFile = exeFtpShell(swFileName,tswprod,"CSF0007");
 			setTextValue(m_elist.getProfile(), "IBIDATADTS", t2, rootEntity);
 		} catch (Exception e) {
 			e.printStackTrace();
