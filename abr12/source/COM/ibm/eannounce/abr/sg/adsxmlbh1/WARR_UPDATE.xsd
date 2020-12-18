@@ -34,7 +34,7 @@
 				minOccurs="1" maxOccurs="1" />
 				<xs:element name="OEMESAPRTSONY" type="xs:string"
 				minOccurs="1" maxOccurs="1" />
-				<xs:element name="TIERCSU" type="xs:string"
+				<xs:element name="TIERWSU" type="xs:string"
 				minOccurs="1" maxOccurs="1" />
 				<xs:element name="REMCODLOAD" type="xs:string"
 				minOccurs="1" maxOccurs="1" />
