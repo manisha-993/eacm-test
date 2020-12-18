@@ -137,7 +137,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		String fileprefix = ABRServerProperties.getFilePrefix(m_abri.getABRCode());
 		// ABRServerProperties.getOutputPath()
 		// ABRServerProperties.get
-		StringBuffer sb = new StringBuffer(fileprefix.trim());
+		StringBuffer sb = new StringBuffer();
 		String dts = getNow();
 		// replace special characters
 		dts = dts.replace(' ', '_');
@@ -150,9 +150,9 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			dir = dir + "/";
 		}
 		ffFileName = sb.toString();
-		modelFileName = dir+"MODEL"+ffFileName;
-		prodFileName=dir+"PRODSTRUCT"+ffFileName;
-		swFileName = dir+"SWPRODSTRUCT"+ffFileName;
+		modelFileName = dir+fileprefix.trim()+"MODEL"+ffFileName;
+		prodFileName=dir+fileprefix.trim()+"PRODSTRUCT"+ffFileName;
+		swFileName = dir+fileprefix.trim()+"SWPRODSTRUCT"+ffFileName;
 		
 		// addDebug("ffPathName: " + ffPathName + " ffFileName: " + ffFileName);
 	}
