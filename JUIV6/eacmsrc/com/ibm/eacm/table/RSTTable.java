@@ -648,6 +648,7 @@ public abstract class RSTTable extends BaseTable implements Findable, HistoryInt
 			int[] rows = getSelectedRows();
 			int[] cols = getSelectedColumns();
 	
+			/**
 			boolean multipleSelection = rows.length>1 || cols.length>1; 
 			if(multipleSelection){
 				// make sure that multiple longtext are not selected
@@ -666,6 +667,7 @@ public abstract class RSTTable extends BaseTable implements Findable, HistoryInt
 					}
 				}
 			}
+			**/
 			
 			//save model row selected
 			int modelRows[] = new int[rows.length];
