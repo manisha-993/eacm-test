@@ -7,9 +7,9 @@
 /* This is a generated file.  Do not modify. */ 
 package com.ibm.eannounce.version; 
 public class Version { 
-public static final String BUILD_DATE = "Fri 03/06/2015 8:21:02.21"; 
+public static final String BUILD_DATE = "Fri 12/12/2020 8:21:02.21"; 
 public static String getVersion() { 
-return "Built on Fri 03/06/2015 at  8:21:02.21"; 
+return "Built on Fri 12/12/2020 at  8:21:02.21"; 
 } 
 public static String getDate() { 
 return BUILD_DATE.substring(4); 
