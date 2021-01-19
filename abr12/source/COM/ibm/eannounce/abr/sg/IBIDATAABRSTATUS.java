@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -52,6 +54,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	private static final String TMODNAME = "_tmodname";
 	private static final String TPRODNAME = "_tprodname";
 	private static final String TSWPRODNAME = "_tswprodname";
+	public static final String US_ASCII = "ASCII"; 
 
 	String t1 = null;
 	String t2 = null;
@@ -80,7 +83,8 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	private static final String COFSUBCAT = "COFSUBCAT";
 	private static final String COFSUBGRP = "COFSUBGRP";
 	Pattern p = Pattern.compile("\t|\r|\n");
-
+	 byte bytes[] = {(byte) 0xC2,(byte) 0xA0};
+	private String UTFSpace  = null;
 	private static final String[] MODELCOLUMNS = new String[] { ENTITYTYPE, MACHTYPEATR, MODELATR, MKTGNAME, ANNDATE,
 			WITHDRAWDATE, WTHDRWEFFCTVDATE, INSTALL, STATUS, VALFROM };
 	private static final String[] PRODCOLUMNS = new String[] { ENTITYTYPE, MACHTYPEATR, MODELATR, FEATURECODE, MKTGNAME,
@@ -111,10 +115,36 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	// m_elist.getParentEntityGroup().getEntityItem(0)
 	private final static String QUERY = "select m.machtypeatr,m.modelatr,m.mktgname,m.install,m.cofcat,m.cofsubcat,m.cofsubgrp,m.anndate,m.withdrawdate,m.WTHDRWEFFCTVDATE,S.div,m.status from price.model m join price.SGMNTACRNYM S on m.PRFTCTR=S.PRFTCTR where m.nlsid=1  and m.cofcat='Hardware' and m.status in ('Final','Ready for Review') and s.nlsid=1 and S.DIV<>'71 Retail Store Systems' and m.INSTALL='CE' with ur";
 
-	private final static String QUERY_MODEL = "select ENTITYTYPE,MACHTYPEATR,MODELATR,MKTGNAME,ANNDATE,WITHDRAWDATE,WTHDRWEFFCTVDATE,INSTALL,STATUS,VALFROM from OPICM.MODEL  where VALFROM>= ? and VALFROM < ? and nlsid =1 and status='Final' with UR";
+	// private final static String QUERY_MODEL = "select
+	// ENTITYTYPE,MACHTYPEATR,MODELATR,MKTGNAME,ANNDATE,WITHDRAWDATE,WTHDRWEFFCTVDATE,INSTALL,STATUS,VALFROM
+	// from OPICM.MODEL where VALFROM>= ? and VALFROM < ? and nlsid =1 and
+	// status='Final' with UR";
 
-	private final static String QUERY_PRODSTRUCT = "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and f.status='Final' and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 and p.status='Final' where  p.VALFROM>= ? and p.VALFROM < ? and m.status='Final' and  m.nlsid=1 with ur";
-	private final static String QUERY_SWPRODSTRUCT = "with temp as ("
+	private final static String QUERY_MODEL = "with dump(machtypeatr,modelatr) as (select machtypeatr, modelatr from opicm.model where nlsid = 1 and cofcat = 'Software' and status = 'Final'  "
+			+ "group by machtypeatr, modelatr having count(*) >1 ),dump1(id) as( "
+			+ "select m.entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and entityid not in  "
+			+ "(select entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and m.status ='Final' and m.COFGRP = 'Base' and m.COFSUBCAT = 'Application'  and m.valto > current timestamp and m.nlsid=1 ))  "
+			+ "select distinct m.ENTITYTYPE,m.MACHTYPEATR,m.MODELATR,m.MKTGNAME,m.ANNDATE,m.WITHDRAWDATE,m.WTHDRWEFFCTVDATE,m.INSTALL,m.STATUS,m.VALFROM from opicm.model m  "
+			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1  "
+			+ "where   m.status='Final' and m.nlsid=1 and (S.DIV<>'71' or S.div is null) and m.entityid not in (select id from dump1)and  m.VALFROM>= ? and m.VALFROM < ?  "
+			+ "with ur";
+	// private final static String QUERY_PRODSTRUCT = "select
+	// r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM
+	// from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and
+	// r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and
+	// f.status='Final' and f.nlsid=1 join opicm.prodstruct p on
+	// p.entityid=r.entityid and p.nlsid=1 and p.status='Final' where
+	// p.VALFROM>= ? and p.VALFROM < ? and m.status='Final' and m.nlsid=1 with
+	// ur";
+	private final static String QUERY_PRODSTRUCT = "with dump(machtypeatr,modelatr) as (select machtypeatr, modelatr from opicm.model where nlsid = 1 and cofcat = 'Software' and status = 'Final' "
+			+ "group by machtypeatr, modelatr having count(*) >1 ),dump1(id) as( "
+			+ "select m.entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and entityid not in "
+			+ "(select entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and m.status ='Final' and m.COFGRP = 'Base' and m.COFSUBCAT = 'Application'  and m.valto > current timestamp and valto > current timestamp ))"
+			+ "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and f.status='Final' and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 and p.status='Final' "
+			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1 "
+			+ "where  p.VALFROM>= ? and p.VALFROM < ? and m.status='Final' and  m.nlsid=1  and m.entityid not in (select id from dump1)  and (S.DIV<>'71' or S.div is null) with ur";
+
+	/*private final static String QUERY_SWPRODSTRUCT = "with temp as ("
 			+ "select sw.entitytype ,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,sw.MKTGNAME,coalesce(annp.ANNDATE,'9999-12-32') AS PANNDATE,coalesce( annl.ANNDATE,'9999-12-32') as LANNDATE,coalesce(a1.EFFECTIVEDATE,'9999-12-32') as EFFECTIVEDATE,sw.STATUS,sw.VALFROM,max(coalesce(sw.VALFROM,'1980-01-01 00:00:00.000000') ,coalesce(a1.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(a.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annp.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annl.VALFROM,'1980-01-01 00:00:00.000000')) as MAXDATA from opicm.SWPRODSTRUCT sw "
 			+ "join opicm.relator r2 on r2.entitytype = 'SWPRODSTRUCT' and r2.entityid = sw.entityid "
 			+ "join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id and m.status='Final' "
@@ -125,7 +155,28 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			+ "left join  opicm.relator r1 on  r1.entitytype = 'SWPRODSTRUCTAVAIL' and r1.entity1id = sw.entityid "
 			+ "left join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  AND a1.status='Final'  "
 			+ "left join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1  and annl.ANNSTATUS ='Final' "
+			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1 and (S.DIV<>'71' or S.div is null) "
 			+ "where  sw.status='Final' and sw.nlsid=1  )"
+			+ "select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,(case min(PANNDATE) when '9999-12-32' then '' else min(PANNDATE) end )as PANNDATE,(case min(LANNDATE) when '9999-12-32' then '' else min(LANNDATE) end ) as LANNDATE,(case min(EFFECTIVEDATE) when '9999-12-32' then '' else min(EFFECTIVEDATE) end ) as EFFECTIVEDATE,STATUS,VALFROM from temp "
+			+ "group by entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,VALFROM,STATUS "
+			+ "having max(MAXDATA) >= ? and max(MAXDATA) < ?  " + "with ur";*/
+	private final static String QUERY_SWPRODSTRUCT = "with dump(machtypeatr,modelatr) as (select machtypeatr, modelatr from opicm.model where nlsid = 1 and cofcat = 'Software' and status = 'Final' "
+			+ "group by machtypeatr, modelatr having count(*) >1 ),dump1(id) as( "
+			+ "select m.entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and entityid not in "
+			+ "(select entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and m.status ='Final' and m.COFGRP = 'Base' and m.COFSUBCAT = 'Application'  and m.valto > current timestamp and valto > current timestamp ))"
+			+",temp as ("
+			+ "select sw.entitytype ,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,sw.MKTGNAME,coalesce(annp.ANNDATE,'9999-12-32') AS PANNDATE,coalesce( annl.ANNDATE,'9999-12-32') as LANNDATE,coalesce(a1.EFFECTIVEDATE,'9999-12-32') as EFFECTIVEDATE,sw.STATUS,sw.VALFROM,max(coalesce(sw.VALFROM,'1980-01-01 00:00:00.000000') ,coalesce(a1.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(a.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annp.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annl.VALFROM,'1980-01-01 00:00:00.000000')) as MAXDATA from opicm.SWPRODSTRUCT sw "
+			+ "join opicm.relator r2 on r2.entitytype = 'SWPRODSTRUCT' and r2.entityid = sw.entityid "
+			+ "join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id and m.status='Final' "
+			+ "join opicm.swfeature f on f.nlsid =1 and f.entityid = r2.entity1id and f.status='Final' "
+			+ "left join  opicm.relator r on  r.entitytype = 'SWPRODSTRUCTAVAIL' and r.entity1id = sw.entityid "
+			+ "left join  opicm.avail a on a.entityid = r.entity2id and a.nlsid=1 and  a.AVAILTYPE='Planned Availability' and a.status='Final' "
+			+ "left join opicm.announcement annp on  a.anncodename=annp.anncodename and annp.nlsid=1 and annp.ANNSTATUS ='Final' "
+			+ "left join  opicm.relator r1 on  r1.entitytype = 'SWPRODSTRUCTAVAIL' and r1.entity1id = sw.entityid "
+			+ "left join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  AND a1.status='Final'  "
+			+ "left join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1  and annl.ANNSTATUS ='Final' "
+			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1 "
+			+ "where  sw.status='Final' and sw.nlsid=1  and m.entityid not in (select id from dump1) )  and (S.DIV<>'71' or S.div is null) "
 			+ "select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,(case min(PANNDATE) when '9999-12-32' then '' else min(PANNDATE) end )as PANNDATE,(case min(LANNDATE) when '9999-12-32' then '' else min(LANNDATE) end ) as LANNDATE,(case min(EFFECTIVEDATE) when '9999-12-32' then '' else min(EFFECTIVEDATE) end ) as EFFECTIVEDATE,STATUS,VALFROM from temp "
 			+ "group by entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,VALFROM,STATUS "
 			+ "having max(MAXDATA) >= ? and max(MAXDATA) < ?  " + "with ur";
@@ -175,6 +226,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		try {
 			start_ABRBuild(false);
 			setReturnCode(PASS);
+			UTFSpace =  new String(bytes,"utf-8");
 			// m_elist = getEntityList("dummy");
 			m_elist = m_db.getEntityList(m_prof, new ExtractActionItem(null, m_db, m_prof, "dummy"),
 					new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
@@ -269,7 +321,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		// OutputStreamWriter will convert from characters to bytes using
 		// the specified character encoding or the platform default if none
 		// is specified. Output as unicode
-		OutputStreamWriter wOut = new OutputStreamWriter(fos, "UTF-8");
+		OutputStreamWriter wOut = new OutputStreamWriter(fos,US_ASCII);
 
 		// build the text file
 		String dtsDb = getNow(); // format this
@@ -309,7 +361,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 					if ("CE".equals(value)) {
 						wOut.write("IBI");
 					} else if ("CIF".equals(value)) {
-
+						
 						wOut.write("CSU");
 					} else {
 						wOut.write("   ");
@@ -329,7 +381,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		// OutputStreamWriter will convert from characters to bytes using
 		// the specified character encoding or the platform default if none
 		// is specified. Output as unicode
-		OutputStreamWriter wOut = new OutputStreamWriter(fos, "UTF-8");
+		OutputStreamWriter wOut = new OutputStreamWriter(fos, US_ASCII);
 
 		// build the text file
 		String dtsDb = getNow(); // format this
@@ -391,7 +443,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		// OutputStreamWriter will convert from characters to bytes using
 		// the specified character encoding or the platform default if none
 		// is specified. Output as unicode
-		OutputStreamWriter wOut = new OutputStreamWriter(fos, "UTF-8");
+		OutputStreamWriter wOut = new OutputStreamWriter(fos, US_ASCII);
 
 		// build the text file
 		String dtsDb = getNow(); // format this
@@ -452,8 +504,14 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	}
 
 	protected String getValue(String columnValue, String columnName) {
-
-		columnValue = replaceBlank(columnValue).trim();
+		
+		columnValue = remove(columnValue);
+		try {
+			columnValue = new String(columnValue.getBytes("UTF-8"),US_ASCII);
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		int columnValueLength = columnValue == null ? 0 : columnValue.length();
 		int columnNameLength = Integer.parseInt(COLUMN_LENGTH.get(columnName).toString());
 		if (columnValueLength == columnNameLength)
@@ -488,8 +546,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		// "/usr/bin/rsync -av /var/log/www.solive.kv/access_log
 		// testuser@10.0.1.219::store --password-file=/etc/client/rsync.pwd";
 
-		String cmd = ABRServerProperties.getValue(m_abri.getABRCode(), SFTPSCRPATH, null) + " -f " + fileName + " -t '"
-				+ tarName + "'" + " -c " + triger;
+		String cmd = ABRServerProperties.getValue(m_abri.getABRCode(), SFTPSCRPATH, null) + " -f " + fileName + " -t '"+ tarName + "'" + " -c " + triger;
 		String ibiinipath = ABRServerProperties.getValue(m_abri.getABRCode(), IBIINIPATH, null);
 		if (ibiinipath != null)
 			cmd += " -i " + ibiinipath;
@@ -604,5 +661,26 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	 */
 	public String getABRVersion() {
 		return "1.0";
+	}
+	public String remove(String sReturn) {
+		sReturn = replaceBlank(sReturn).trim().replace(UTFSpace, " ");
+		sReturn = sReturn.replace('，', ',');
+		sReturn = sReturn.replace('。', '.');
+		sReturn = sReturn.replace('；', ';');
+		sReturn = sReturn.replace('！', '!');
+		sReturn = sReturn.replace('？', '?');
+		sReturn = sReturn.replace('：', ':');
+		sReturn = sReturn.replace('"', '＂');
+		sReturn = sReturn.replace('“', '＂');
+		sReturn = sReturn.replace('”', '＂');
+		sReturn = sReturn.replace('-', '-');
+		sReturn = sReturn.replace('-', '-');
+		sReturn = sReturn.replace('_', '_');
+		sReturn = sReturn.replace('，', ',');
+		sReturn = sReturn.replace(' ', ' ');
+		sReturn = sReturn.replace("’", "'").replace("‘", "'").replace("‘", "'");
+		// 的 ，j
+		// 6756N92RTS for VMware ESXi - 2 Sockets - 3yr
+		return sReturn;
 	}
 }
