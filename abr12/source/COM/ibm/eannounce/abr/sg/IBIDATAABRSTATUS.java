@@ -679,7 +679,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		sReturn = sReturn.replace('，', ',');
 		sReturn = sReturn.replace(' ', ' ');
 		sReturn = sReturn.replace("’", "'").replace("‘", "'").replace("‘", "'");
-		// 的 ，j
+		// çš„ ï¼Œj
 		// 6756N92RTS for VMware ESXi - 2 Sockets - 3yr
 		return sReturn;
 	}
