@@ -83,7 +83,11 @@ public class ADSWARRABR extends XMLMQRoot
         XMLMAP.addChild(new XMLElem("BHWARRCATEGORY","BHWARRCATEGORY",XMLElem.SHORTDESC));
         XMLMAP.addChild(new XMLElem("OEMESAPRTSLBR","OEMESAPRTSLBR"));
         XMLMAP.addChild(new XMLElem("OEMESAPRTSONY","OEMESAPRTSONY"));
-        
+        XMLMAP.addChild(new XMLElem("TIERWSU","TIERWSU"));
+        XMLMAP.addChild(new XMLElem("REMCODLOAD","REMCODLOAD"));
+        XMLMAP.addChild(new XMLElem("ENHCOMRES","ENHCOMRES"));
+        XMLMAP.addChild(new XMLElem("PREDSUPP","PREDSUPP"));
+        XMLMAP.addChild(new XMLElem("TIERMAIN","TIERMAIN"));
         XMLElem list = new XMLElem("LANGUAGELIST");
         XMLMAP.addChild(list);
          
