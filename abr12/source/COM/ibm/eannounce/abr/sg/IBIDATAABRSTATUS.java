@@ -662,16 +662,15 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	public String getABRVersion() {
 		return "1.0";
 	}
-	public String remove(String sReturn) {
+public String remove(String sReturn) {
+		
 		sReturn = replaceBlank(sReturn).trim().replace(UTFSpace, " ");
 		sReturn = replaceBlank(sReturn).trim().replace(UTFSpace, " ");
-		//‚ÄúHardware‚Äù
-		sReturn = sReturn.replace("‚Äú", "\"");
-		sReturn = sReturn.replace("‚Äù", "\"");
-		sReturn = sReturn.replace("?", "Ôºü");
-		sReturn = sReturn.replace("‚Äô", "'").replace("‚Äò", "'");
-		// 6756N92RTS for VMware ESXi - 2 Sockets - 3yr
-		//
+		//ìHardwareî
+		sReturn = sReturn.replace("ì", "\"");
+		sReturn = sReturn.replace("î", "\"");
+		sReturn = sReturn.replace("?", "?");
+		sReturn = sReturn.replace("í", "'").replace("ë", "'");
 		return sReturn;
 	}
 }
