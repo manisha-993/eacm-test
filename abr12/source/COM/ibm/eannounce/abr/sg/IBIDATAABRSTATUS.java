@@ -664,22 +664,11 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	}
 	public String remove(String sReturn) {
 		sReturn = replaceBlank(sReturn).trim().replace(UTFSpace, " ");
-		sReturn = sReturn.replace('，', ',');
-		sReturn = sReturn.replace('。', '.');
-		sReturn = sReturn.replace('；', ';');
-		sReturn = sReturn.replace('！', '!');
-		sReturn = sReturn.replace('？', '?');
-		sReturn = sReturn.replace('：', ':');
-		sReturn = sReturn.replace('"', '＂');
-		sReturn = sReturn.replace('“', '＂');
-		sReturn = sReturn.replace('”', '＂');
-		sReturn = sReturn.replace('-', '-');
-		sReturn = sReturn.replace('-', '-');
-		sReturn = sReturn.replace('_', '_');
-		sReturn = sReturn.replace('，', ',');
-		sReturn = sReturn.replace(' ', ' ');
-		sReturn = sReturn.replace("’", "'").replace("‘", "'").replace("‘", "'");
-		// çš„ ï¼Œj
+		sReturn = replaceBlank(sReturn).trim().replace(UTFSpace, " ");
+		//“Hardware”
+		sReturn = sReturn.replace("“", "\"");
+		sReturn = sReturn.replace("”", "\"");
+		sReturn = sReturn.replace("’", "'").replace("‘", "'");
 		// 6756N92RTS for VMware ESXi - 2 Sockets - 3yr
 		return sReturn;
 	}
