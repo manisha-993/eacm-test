@@ -176,7 +176,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			+ "left join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  AND a1.status='Final'  "
 			+ "left join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1  and annl.ANNSTATUS ='Final' "
 			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1 "
-			+ "where  sw.status='Final' and sw.nlsid=1  and m.entityid not in (select id from dump1) )  and (S.DIV<>'71' or S.div is null) "
+			+ "where  sw.status='Final' and sw.nlsid=1  and (S.DIV<>'71' or S.div is null) and m.entityid not in (select id from dump1) )  "
 			+ "select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,(case min(PANNDATE) when '9999-12-32' then '' else min(PANNDATE) end )as PANNDATE,(case min(LANNDATE) when '9999-12-32' then '' else min(LANNDATE) end ) as LANNDATE,(case min(EFFECTIVEDATE) when '9999-12-32' then '' else min(EFFECTIVEDATE) end ) as EFFECTIVEDATE,STATUS,VALFROM from temp "
 			+ "group by entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,VALFROM,STATUS "
 			+ "having max(MAXDATA) >= ? and max(MAXDATA) < ?  " + "with ur";
