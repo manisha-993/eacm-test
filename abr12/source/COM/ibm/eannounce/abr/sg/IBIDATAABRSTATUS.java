@@ -2,18 +2,21 @@ package COM.ibm.eannounce.abr.sg;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +45,8 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	private String swFileName = null;
 	private String dir = null;
 	private String lineStr = null;
+	public String filepath = null;
+
 	private static final char[] FOOL_JTEST = { '\n' };
 	static final String NEWLINE = new String(FOOL_JTEST);
 	private Object[] args = new String[10];
@@ -54,7 +59,11 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	private static final String TMODNAME = "_tmodname";
 	private static final String TPRODNAME = "_tprodname";
 	private static final String TSWPRODNAME = "_tswprodname";
+	private static final String CODEFILENAME = "_codefilename";
+
 	public static final String US_ASCII = "ASCII"; 
+	
+	
 
 	String t1 = null;
 	String t2 = null;
@@ -92,6 +101,12 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	private static final String[] SWPRODCOLUMNS = new String[] { ENTITYTYPE, MACHTYPEATR, MODELATR, FEATURECODE,
 			MKTGNAME, PANNDATE, LANNDATE, EFFECTIVEDATE, STATUS, VALFROM };
 
+	public static final String ASCII = "ASCII";
+
+	public static final String ISO_8859_1 = "ISO-8859-1";
+
+	public static final String UTF_8 = "UTF-8";
+	private Map<String, String> mapping = null;
 	private static final Hashtable COLUMN_LENGTH;
 	static {
 		COLUMN_LENGTH = new Hashtable();
@@ -195,6 +210,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		tmodel = ABRServerProperties.getValue(m_abri.getABRCode(), TMODNAME);
 		tprod = ABRServerProperties.getValue(m_abri.getABRCode(), TPRODNAME);
 		tswprod = ABRServerProperties.getValue(m_abri.getABRCode(), TSWPRODNAME);
+		filepath = ABRServerProperties.getValue(m_abri.getABRCode(), CODEFILENAME);
 		if (!dir.endsWith("/")) {
 			dir = dir + "/";
 		}
@@ -202,10 +218,104 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		modelFileName = dir + fileprefix.trim() + "MODEL" + ffFileName;
 		prodFileName = dir + fileprefix.trim() + "PRODSTRUCT" + ffFileName;
 		swFileName = dir + fileprefix.trim() + "SWPRODSTRUCT" + ffFileName;
+		init();
 
 		// addDebug("ffPathName: " + ffPathName + " ffFileName: " + ffFileName);
 	}
+	public static void main(String[] args) throws IOException {
+		new IBIDATAABRSTATUS().test();
+	}
+	public void test() throws IOException {
+		init();
+		String filePath = "C:\\Users\\JianBoXu\\Downloads\\masscode.txt";
+		// String filePath =
+		// "C:\\Users\\JianBoXu\\Documents\\IBI_MODEL2021-01-07-03.44.48.464889.txt";
+		String filePathm = "C:\\Users\\JianBoXu\\Downloads\\MODELIBI_2020-12-15-01.32.13.072315.txt";
+		String filePathp = "C:\\Users\\JianBoXu\\Downloads\\PRODSTRUCTIBI_2020-12-15-01.32.13.072315.txt";
+		String filePathsw = "C:\\Users\\JianBoXu\\Downloads\\SWPRODSTRUCTIBI_2020-12-15-01.32.13.072315.txt";                                    
+		String filePath3 = "C:\\Users\\JianBoXu\\Downloads\\SWPRODSTRUCT.txt";
+		
+		//MODELIBI_2020-12-15-01.32.13.072315.txt
+		//
+		//SWPRODSTRUCTIBI_2020-12-15-01.32.13.072315.txt
+		// BufferedReader reader = new BufferedReader( new FileInputStream(new
+		// InputStreamReader("filePath", "")));
+		// BufferedWriter writer = new BufferedWriter(new
+		// FileWriter(filePath2));
 
+		InputStreamReader reader = new InputStreamReader(new FileInputStream(filePathsw),"utf-8");
+		OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(filePath3), ASCII);
+		String line = null;
+		BufferedReader br = new BufferedReader(reader);
+		BufferedWriter bw = new BufferedWriter(writer);
+		/*
+		 * while ((line=br.readLine())!=null) { writer2.write(line);
+		 * //writer2.write(new String(line.getBytes("UTF-8"),"GBK"));
+		 * //writer.write(Q2BChange(line,true)); //writer.write(ToSBC(line));
+		 * wri
+		 * ter2.newLine(); } writer.flush(); writer.close();
+		 */
+		/*	System.out.println(Charset.defaultCharset());
+			int len = 0;
+			char[] chars = new char[1024];
+			while ((len = reader.read(chars)) != -1) {
+			    writer.write(chars,0, len);
+			}
+			reader.close();
+			writer.close();*/
+		String UTFSpace = new String(bytes,"utf-8");
+		while ((line=br.readLine())!=null) {
+			if(line.contains("6756N89RTS for VMware ESXi")){
+				System.out.println(new String(line.getBytes("UTF-8"),US_ASCII));
+				
+			}
+			line = remove(line);
+		//	line = new String(line.getBytes("UTF-8"),US_ASCII);
+			
+			//line = changeCharset(line.replace(UTFSpace, " "), UTF_8,ASCII);
+			bw.write(line);
+			bw.newLine();
+			
+		}
+		System.out.println(reader.getEncoding());
+		System.out.println(writer.getEncoding());
+		bw.close();
+		
+		/*int len = reader.read();
+		while (-1 != len) {
+
+			writer.write(len);
+			len = reader.read();
+		}
+		System.out.println(reader.getEncoding());
+		System.out.println(writer.getEncoding());
+		writer.flush();
+		writer.close();*/
+
+	}
+
+	public void init() throws UnsupportedEncodingException{
+		UTFSpace =  new String(bytes,"utf-8");
+		mapping = new Hashtable<>();
+		try {
+			//BufferedReader reader = new BufferedReader(new InputStreamReader(IBIDATAABRSTATUS.class.getClassLoader().getResourceAsStream("IBIDATAABRSATUS.txt"), "UTF-8"));
+			
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filepath), "UTF-8"));
+		
+			String read =null;
+			while ((read = reader.readLine())!=null) {
+				String[] datas = read.split("%");
+				mapping.put(datas[0].trim(), datas[1].trim());
+				
+			}
+			reader.close();
+		
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	public void execute_run() {
 
 		// TODO Auto-generated method stub
@@ -664,13 +774,16 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	}
 public String remove(String sReturn) {
 		
+	
 		sReturn = replaceBlank(sReturn).trim().replace(UTFSpace, " ");
 		sReturn = replaceBlank(sReturn).trim().replace(UTFSpace, " ");
-		//“Hardware”
-		sReturn = sReturn.replace("“", "\"");
-		sReturn = sReturn.replace("”", "\"");
-		sReturn = sReturn.replace("?", "?");
-		sReturn = sReturn.replace("’", "'").replace("‘", "'");
+		Iterator iterator = mapping.keySet().iterator();
+
+		while (iterator.hasNext()) {
+			String key  = iterator.next().toString();
+			sReturn = sReturn.replace(key, mapping.get(key).toString());
+			
+		}
 		return sReturn;
 	}
 }
