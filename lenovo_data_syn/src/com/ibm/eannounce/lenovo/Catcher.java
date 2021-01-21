@@ -38,7 +38,7 @@ public class Catcher {
 		Log.init(logLevel, logPersistent, new File("logs"), "lenovo");
 	
 		String T1date = getT1();
-		if(T1date.equals(null)) {
+		if(T1date == null || T1date.equals("")) {
 			T1date = "1980-01-01.00.00.00.000000";
 		}
 		if (args.length == 0) {
