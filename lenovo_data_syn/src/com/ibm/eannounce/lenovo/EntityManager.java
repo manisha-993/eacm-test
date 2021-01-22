@@ -293,7 +293,7 @@ public class EntityManager {
 		Log.d(TAG, "get Records From table MTYPE");
 //		String sql = "select MTYPE||'' as MT,UPD_DT,FAMILYNAME,SERIESNAME,DIVISION,BRAND,ANNOUNCE_DATE from opicm.MTYPE where UPD_DT>='"+ T1 +"' with ur";
 		
-		String sql = "select * from opicm.MTYPE where UPD_DT>='"+ T1 +"' with ur";
+		String sql = "select UPD_DT from opicm.MTYPE where UPD_DT>='"+ T1 +"' with ur";
 		
 		Log.d(TAG, "Extract SQL:" + sql);
 		List entitys = new ArrayList();
