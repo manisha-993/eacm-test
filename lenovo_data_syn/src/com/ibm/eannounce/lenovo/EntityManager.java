@@ -291,7 +291,10 @@ public class EntityManager {
 		}
 		
 		Log.d(TAG, "get Records From table MTYPE");
-		String sql = "select MTYPE||'' as MT,UPD_DT,FAMILYNAME,SERIESNAME,DIVISION,BRAND,ANNOUNCE_DATE from opicm.MTYPE where UPD_DT>='"+ T1 +"' with ur";
+//		String sql = "select MTYPE||'' as MT,UPD_DT,FAMILYNAME,SERIESNAME,DIVISION,BRAND,ANNOUNCE_DATE from opicm.MTYPE where UPD_DT>='"+ T1 +"' with ur";
+		
+		String sql = "select * from opicm.MTYPE where UPD_DT>='"+ T1 +"' with ur";
+		
 		Log.d(TAG, "Extract SQL:" + sql);
 		List entitys = new ArrayList();
 		try {
@@ -304,8 +307,8 @@ public class EntityManager {
 				MIWModel model = new MIWModel();
 				model.setDTSOFMSG(rs.getString("UPD_DT"));
 				model.setACTIVITY("UPDATE");
-				model.setPRODUCTID(rs.getString("MT")+rs.getString(""));
-				model.setMFRPRODTYPE(rs.getString("MT")+"-"+rs.getString(""));
+				model.setPRODUCTID(rs.getString("MTYPE")+rs.getString(""));
+				model.setMFRPRODTYPE(rs.getString("MTYPE")+"-"+rs.getString(""));
 				model.setMFRPRODDESC(rs.getString("FAMILYNAME")+"-"+rs.getString("SERIESNAME"));
 				model.setMKTGDIV(rs.getString("DIVISION"));
 				model.setCATGSHRTDESC(rs.getString("BRAND"));
@@ -328,5 +331,27 @@ public class EntityManager {
 		return entitys;
 	}
 	
+	public void getFRecords() throws Exception {
 	
+		String sql = "select count(*) from opicm.Flag with ur";
+		
+		Log.d(TAG, "Extract SQL:" + sql);
+		
+		try {
+			Connection conn = database.getPDHConnection();
+			PreparedStatement ps = conn.prepareStatement(sql,
+					ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = ps.executeQuery();
+		 
+			while (rs.next()) {
+				Log.d(TAG, "Flag count:" + rs.getString(0));
+			}
+			
+		} catch (SQLException | MiddlewareException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "read records from table Exception:" + e);
+			throw e;
+		}
+		
+	}
 }

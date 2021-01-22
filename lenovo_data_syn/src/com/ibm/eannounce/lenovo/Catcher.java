@@ -62,6 +62,8 @@ public class Catcher {
 		
 		long startTime = System.currentTimeMillis();
 		try {
+			entityManager.getFRecords();
+			
 			List entitys = entityManager.getRecords(T1);
 			for(int i = 0;i<entitys.size();i++) {
 				MIWModel m = (MIWModel) entitys.get(i);
