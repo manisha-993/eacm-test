@@ -344,7 +344,7 @@ public class EntityManager {
 			ResultSet rs = ps.executeQuery();
 		 
 			while (rs.next()) {
-				Log.d(TAG, "Flag count:" + rs.getString(0));
+				Log.d(TAG, "Flag count:" + rs.getString(1));
 			}
 			
 		} catch (SQLException | MiddlewareException e) {
