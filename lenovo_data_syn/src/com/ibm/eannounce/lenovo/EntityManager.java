@@ -283,7 +283,7 @@ public class EntityManager {
 		return null;
 	}
 	
-	public List getRecords(String T1) {
+	public List getRecords(String T1) throws Exception {
 		
 		if (offlineMode) {
 			Log.i(TAG, "PDH is in Offline mode (getRecords): MTYPE");
@@ -291,7 +291,8 @@ public class EntityManager {
 		}
 		
 		Log.d(TAG, "get Records From table MTYPE");
-		String sql = "select MTYPE,UPD_DT,FAMILYNAME,SERIESNAME,DIVISION,BRAND,ANNOUNCE_DATE from opicm.MTYPE";
+		String sql = "select MTYPE||'' as MT,UPD_DT,FAMILYNAME,SERIESNAME,DIVISION,BRAND,ANNOUNCE_DATE from opicm.MTYPE where UPD_DT>='"+ T1 +"' with ur";
+		Log.d(TAG, "Extract SQL:" + sql);
 		List entitys = new ArrayList();
 		try {
 			Connection conn = database.getPDHConnection();
@@ -303,8 +304,8 @@ public class EntityManager {
 				MIWModel model = new MIWModel();
 				model.setDTSOFMSG(rs.getString("UPD_DT"));
 				model.setACTIVITY("UPDATE");
-				model.setPRODUCTID(rs.getString("MTYPE")+rs.getString(""));
-				model.setMFRPRODTYPE(rs.getString("MTYPE")+"-"+rs.getString(""));
+				model.setPRODUCTID(rs.getString("MT")+rs.getString(""));
+				model.setMFRPRODTYPE(rs.getString("MT")+"-"+rs.getString(""));
 				model.setMFRPRODDESC(rs.getString("FAMILYNAME")+"-"+rs.getString("SERIESNAME"));
 				model.setMKTGDIV(rs.getString("DIVISION"));
 				model.setCATGSHRTDESC(rs.getString("BRAND"));
@@ -322,6 +323,7 @@ public class EntityManager {
 		} catch (SQLException | MiddlewareException e) {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "read records from table Exception:" + e);
+			throw e;
 		}
 		return entitys;
 	}
