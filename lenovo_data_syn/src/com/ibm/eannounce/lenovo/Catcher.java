@@ -63,13 +63,6 @@ public class Catcher {
 		
 		long startTime = System.currentTimeMillis();
 		try {
-			entityManager.getRecords1();
-			entityManager.getRecords2();
-			entityManager.getRecords3();
-			entityManager.getRecords4();
-			entityManager.getRecords5();
-			entityManager.getRecords6();
-			entityManager.getRecords7();
 			
 			List entitys = entityManager.getRecords(T1);
 			for(int i = 0;i<entitys.size();i++) {

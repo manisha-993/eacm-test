@@ -305,13 +305,13 @@ public class EntityManager {
 				MIWModel model = new MIWModel();
 				model.setDTSOFMSG(rs.getString("UPD_DT"));
 				model.setACTIVITY("UPDATE");
-				model.setPRODUCTID(rs.getString("MTYPE")+rs.getString(""));
-				model.setMFRPRODTYPE(rs.getString("MTYPE")+"-"+rs.getString(""));
+				model.setPRODUCTID(rs.getString("MTYPE")+"");
+				model.setMFRPRODTYPE(rs.getString("MTYPE")+"-"+"");
 				model.setMFRPRODDESC(rs.getString("FAMILYNAME")+"-"+rs.getString("SERIESNAME"));
 				model.setMKTGDIV(rs.getString("DIVISION"));
 				model.setCATGSHRTDESC(rs.getString("BRAND"));
 				model.setSTRTOSVC(rs.getString("ANNOUNCE_DATE"));
-				model.setENDOFSVC(rs.getString(""));
+				model.setENDOFSVC("");
 				model.setVENDNAM("LENOVO");
 				
 				model.setCECSPRODKEY("3");
@@ -329,166 +329,4 @@ public class EntityManager {
 		return entitys;
 	}
 	
-	public void getRecords1() throws Exception {
-		
-		String sql = "select MTYPE from opicm.EACM_MTYPE fetch first 1 row only with ur";
-		
-		Log.d(TAG, "Extract SQL:" + sql);
-		
-		try {
-			Connection conn = database.getPDHConnection();
-			PreparedStatement ps = conn.prepareStatement(sql,
-					ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet rs = ps.executeQuery();
-		 
-			while (rs.next()) {
-				Log.d(TAG, "MTYPE:" + rs.getString(1));
-			}
-			
-		} catch (SQLException | MiddlewareException e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG, "read records from table Exception:" + e);
-//			throw e;
-		}
-		
-	}
-	public void getRecords2() throws Exception {
-	
-		String sql = "select UPD_DT from opicm.EACM_MTYPE fetch first 1 row only with ur";
-		
-		Log.d(TAG, "Extract SQL:" + sql);
-		
-		try {
-			Connection conn = database.getPDHConnection();
-			PreparedStatement ps = conn.prepareStatement(sql,
-					ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet rs = ps.executeQuery();
-		 
-			while (rs.next()) {
-				Log.d(TAG, "UPD_DT:" + rs.getString(1));
-			}
-			
-		} catch (SQLException | MiddlewareException e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG, "read records from table Exception:" + e);
-//			throw e;
-		}
-		
-	}
-	public void getRecords3() throws Exception {
-		
-		String sql = "select FAMILYNAME from opicm.EACM_MTYPE fetch first 1 row only with ur";
-		
-		Log.d(TAG, "Extract SQL:" + sql);
-		
-		try {
-			Connection conn = database.getPDHConnection();
-			PreparedStatement ps = conn.prepareStatement(sql,
-					ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet rs = ps.executeQuery();
-		 
-			while (rs.next()) {
-				Log.d(TAG, "FAMILYNAME:" + rs.getString(1));
-			}
-			
-		} catch (SQLException | MiddlewareException e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG, "read records from table Exception:" + e);
-//			throw e;
-		}
-		
-	}
-	public void getRecords4() throws Exception {
-		
-		String sql = "select SERIESNAME from opicm.EACM_MTYPE fetch first 1 row only with ur";
-		
-		Log.d(TAG, "Extract SQL:" + sql);
-		
-		try {
-			Connection conn = database.getPDHConnection();
-			PreparedStatement ps = conn.prepareStatement(sql,
-					ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet rs = ps.executeQuery();
-		 
-			while (rs.next()) {
-				Log.d(TAG, "SERIESNAME:" + rs.getString(1));
-			}
-			
-		} catch (SQLException | MiddlewareException e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG, "read records from table Exception:" + e);
-//			throw e;
-		}
-		
-	}
-	public void getRecords5() throws Exception {
-		
-		String sql = "select DIVISION from opicm.EACM_MTYPE fetch first 1 row only with ur";
-		
-		Log.d(TAG, "Extract SQL:" + sql);
-		
-		try {
-			Connection conn = database.getPDHConnection();
-			PreparedStatement ps = conn.prepareStatement(sql,
-					ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet rs = ps.executeQuery();
-		 
-			while (rs.next()) {
-				Log.d(TAG, "DIVISION:" + rs.getString(1));
-			}
-			
-		} catch (SQLException | MiddlewareException e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG, "read records from table Exception:" + e);
-//			throw e;
-		}
-		
-	}
-	public void getRecords6() throws Exception {
-		
-		String sql = "select BRAND from opicm.EACM_MTYPE fetch first 1 row only with ur";
-		
-		Log.d(TAG, "Extract SQL:" + sql);
-		
-		try {
-			Connection conn = database.getPDHConnection();
-			PreparedStatement ps = conn.prepareStatement(sql,
-					ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet rs = ps.executeQuery();
-		 
-			while (rs.next()) {
-				Log.d(TAG, "BRAND:" + rs.getString(1));
-			}
-			
-		} catch (SQLException | MiddlewareException e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG, "read records from table Exception:" + e);
-//			throw e;
-		}
-		
-	}
-	
-	public void getRecords7() throws Exception {
-		
-		String sql = "select ANNOUNCE_DATE from opicm.EACM_MTYPE fetch first 1 row only with ur";
-		
-		Log.d(TAG, "Extract SQL:" + sql);
-		
-		try {
-			Connection conn = database.getPDHConnection();
-			PreparedStatement ps = conn.prepareStatement(sql,
-					ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet rs = ps.executeQuery();
-		 
-			while (rs.next()) {
-				Log.d(TAG, "ANNOUNCE_DATE:" + rs.getString(1));
-			}
-			
-		} catch (SQLException | MiddlewareException e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG, "read records from table Exception:" + e);
-//			throw e;
-		}
-		
-	}
 }
