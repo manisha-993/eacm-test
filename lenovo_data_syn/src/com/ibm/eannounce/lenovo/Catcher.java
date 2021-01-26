@@ -36,7 +36,8 @@ public class Catcher {
 		boolean logPersistent = Boolean.valueOf(
 				properties.getProperty(Keys.LOG_PERSISTENT, "false")).booleanValue();
 		Log.init(logLevel, logPersistent, new File("logs"), "lenovo");
-	
+		
+		Log.i(TAG, "get T1");
 		String T1date = getT1();
 		if(T1date == null || T1date.equals("")) {
 			T1date = "1980-01-01 00:00:00.000000";
@@ -62,6 +63,13 @@ public class Catcher {
 		
 		long startTime = System.currentTimeMillis();
 		try {
+			entityManager.getRecords1();
+			entityManager.getRecords2();
+			entityManager.getRecords3();
+			entityManager.getRecords4();
+			entityManager.getRecords5();
+			entityManager.getRecords6();
+			entityManager.getRecords7();
 			
 			List entitys = entityManager.getRecords(T1);
 			for(int i = 0;i<entitys.size();i++) {
