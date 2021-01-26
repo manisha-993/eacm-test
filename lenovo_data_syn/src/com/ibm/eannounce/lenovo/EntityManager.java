@@ -27,7 +27,7 @@ import COM.ibm.opicmpdh.objects.Text;
 
 public class EntityManager {
 
-	private static final String LN_PDHDOMAIN = "PLENOVO";
+	private static final String PDHDOMAIN = "PLENOVO";
 	
 	private static final String QUEUED = "0020";
 
@@ -234,7 +234,7 @@ public class EntityManager {
 				attrs.add(new Text(enterprise, eType, eID, "SYSIDUNIT", "Y".equals(model.getFSLMCPU()) ? "S00010" : "S00020", NLSID, ctrl));
 //				attrs.add(new Text(enterprise, eType, eID, "PRODSUPRTCD", , NLSID, ctrl));
 //				attrs.add(new Text(enterprise, eType, eID, "PRFTCTR", , NLSID, ctrl));
-				attrs.add(new SingleFlag(enterprise, eType, eID, "PDHDOMAIN", LN_PDHDOMAIN, NLSID, ctrl));
+				attrs.add(new SingleFlag(enterprise, eType, eID, "PDHDOMAIN", PDHDOMAIN, NLSID, ctrl));
 
 				attrs.add(new SingleFlag(enterprise, eType, eID, "DATAQUALITY", "FINAL", NLSID, ctrl));
 				attrs.add(new SingleFlag(enterprise, eType, eID, "STATUS", "0020", NLSID, ctrl));
@@ -252,6 +252,7 @@ public class EntityManager {
 			
 		} catch (Exception e) {
 			Log.e(TAG, "Create Entity Exception:" + e);
+			throw e;
 		}
 	}
 
@@ -311,7 +312,7 @@ public class EntityManager {
 				model.setMKTGDIV(rs.getString("DIVISION"));
 				model.setCATGSHRTDESC(rs.getString("BRAND"));
 				model.setSTRTOSVC(rs.getString("ANNOUNCE_DATE"));
-				model.setENDOFSVC("");
+//				model.setENDOFSVC("");
 				model.setVENDNAM("LENOVO");
 				
 				model.setCECSPRODKEY("3");

@@ -45,6 +45,7 @@ public class Catcher {
 		if (args.length == 0) {
 			//Read from MQ
 			Boolean is = execute(T1date);
+			Log.i(TAG, "create records " + (is==true?"success":"failed"));
 			String sDateTimeFormat = "yyyy-MM-dd hh:mm:ss.SSSSSS";
 			DateFormat inDateTimeFormat = new SimpleDateFormat(sDateTimeFormat);
 			if(is) updateT1(inDateTimeFormat.format(new Date()));
@@ -65,12 +66,14 @@ public class Catcher {
 		try {
 			
 			List entitys = entityManager.getRecords(T1);
+			Log.i(TAG, "find " + entitys.size()+ " records change");
 			for(int i = 0;i<entitys.size();i++) {
 				MIWModel m = (MIWModel) entitys.get(i);
 				
 				entityManager.createEntity(m);
 				Log.i(TAG, "create REFOFER entity: " + m.toString());
 			}
+			
 			isSuccess = true;
 		} catch (Exception e) {
 			Log.e(TAG, "Unable to create REFOFER entity", e);	
