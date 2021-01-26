@@ -291,10 +291,7 @@ public class EntityManager {
 		}
 		
 		Log.d(TAG, "get Records From table MTYPE");
-//		String sql = "select MTYPE||'' as MT,UPD_DT,FAMILYNAME,SERIESNAME,DIVISION,BRAND,ANNOUNCE_DATE from opicm.MTYPE where UPD_DT>='"+ T1 +"' with ur";
-		
-		String sql = "select UPD_DT from opicm.MTYPE where UPD_DT>='"+ T1 +"' with ur";
-		
+		String sql = "select MTYPE,UPD_DT,FAMILYNAME,SERIESNAME,DIVISION,BRAND,ANNOUNCE_DATE from opicm.EACM_MTYPE where UPD_DT>='"+ T1 +"' with ur";
 		Log.d(TAG, "Extract SQL:" + sql);
 		List entitys = new ArrayList();
 		try {
@@ -304,6 +301,7 @@ public class EntityManager {
 			ResultSet rs = ps.executeQuery();
 		 
 			while (rs.next()) {
+				
 				MIWModel model = new MIWModel();
 				model.setDTSOFMSG(rs.getString("UPD_DT"));
 				model.setACTIVITY("UPDATE");
@@ -330,28 +328,5 @@ public class EntityManager {
 		}
 		return entitys;
 	}
-	
-	public void getFRecords() throws Exception {
-	
-		String sql = "select count(*) from opicm.Flag with ur";
 		
-		Log.d(TAG, "Extract SQL:" + sql);
-		
-		try {
-			Connection conn = database.getPDHConnection();
-			PreparedStatement ps = conn.prepareStatement(sql,
-					ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			ResultSet rs = ps.executeQuery();
-		 
-			while (rs.next()) {
-				Log.d(TAG, "Flag count:" + rs.getString(1));
-			}
-			
-		} catch (SQLException | MiddlewareException e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG, "read records from table Exception:" + e);
-			throw e;
-		}
-		
-	}
 }
