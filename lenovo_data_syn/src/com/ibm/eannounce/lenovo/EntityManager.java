@@ -268,7 +268,7 @@ public class EntityManager {
 					attrs, vals, debugSb);
 			for (int i = 0; i < list.length; i++) {
 				EntityItem ei = list[i];
-				String id = PokUtils.getAttributeValue(ei, "PRODUCTID", null, null);
+				String id = PokUtils.getAttributeValue(ei, "PRODUCTID", ",", "", false);
 				String domain = PokUtils.getAttributeFlagValue(ei, "PDHDOMAIN");
 				Log.d(TAG, "Looking at " + ei.getKey() + " [" + id + "," + domain + "]");
 				if (productID.equalsIgnoreCase(id) && "LENOVO".equals(domain)) {
