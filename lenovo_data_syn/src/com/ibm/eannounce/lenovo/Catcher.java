@@ -45,10 +45,11 @@ public class Catcher {
 		if (args.length == 0) {
 			//Read from MQ
 			Boolean is = execute(T1date);
-			Log.i(TAG, "create records " + (is==true?"success":"failed"));
+			Log.i(TAG, "create records " + (is==true?"succeed":"failed"));
 			String sDateTimeFormat = "yyyy-MM-dd hh:mm:ss.SSSSSS";
 			DateFormat inDateTimeFormat = new SimpleDateFormat(sDateTimeFormat);
 			if(is) updateT1(inDateTimeFormat.format(new Date()));
+			Log.i(TAG, "Lenovo Catcher Finished.");
 		}
 	}
 

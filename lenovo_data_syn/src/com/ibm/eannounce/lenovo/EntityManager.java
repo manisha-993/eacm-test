@@ -306,13 +306,13 @@ public class EntityManager {
 				MIWModel model = new MIWModel();
 				model.setDTSOFMSG(rs.getString("UPD_DT"));
 				model.setACTIVITY("UPDATE");
-				model.setPRODUCTID(rs.getString("MTYPE")+"");
-				model.setMFRPRODTYPE(rs.getString("MTYPE")+"-"+"");
-				model.setMFRPRODDESC(rs.getString("FAMILYNAME")+"-"+rs.getString("SERIESNAME"));
+				model.setPRODUCTID(rs.getString("MTYPE")+"DUM");
+				model.setMFRPRODTYPE(rs.getString("MTYPE")+"-"+"DUM");
+				model.setMFRPRODDESC(rs.getString("FAMILYNAME")+" - "+rs.getString("SERIESNAME"));
 				model.setMKTGDIV(rs.getString("DIVISION"));
 				model.setCATGSHRTDESC(rs.getString("BRAND"));
 				model.setSTRTOSVC(rs.getString("ANNOUNCE_DATE"));
-//				model.setENDOFSVC("");
+				model.setENDOFSVC("9999-12-31");
 				model.setVENDNAM("LENOVO");
 				
 				model.setCECSPRODKEY("3");
