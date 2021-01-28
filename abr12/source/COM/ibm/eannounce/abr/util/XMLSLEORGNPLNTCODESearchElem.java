@@ -46,16 +46,16 @@ import com.ibm.transform.oim.eacm.util.PokUtils;
 // Revision 1.1  2008/04/17 19:37:53  wendy
 // Init for
 //  Search for the MODEL
-// 	1.	If there isn’t an AVAIL where AVAILTYPE="Planned Availability" (146) and ANNDATE < “20100301” then 
+// 	1.	If there isnâ€™t an AVAIL where AVAILTYPE="Planned Availability" (146) and ANNDATE < â€œ20100301â€� then 
 //		retrieve all SLEORGNPLNTCODE entities where SLEORGNPLNTCODE.MODCATG equals 
-//	a.	MODEL.COFCAT if MODEL.COFCAT = “Hardware” or “Software”
-//	b.	“Hardware” if MODEL.COFCAT = “Service”
+//	a.	MODEL.COFCAT if MODEL.COFCAT = â€œHardwareâ€� or â€œSoftwareâ€�
+//	b.	â€œHardwareâ€� if MODEL.COFCAT = â€œServiceâ€�
 //	Else retrieve all SLEORGNPLNTCODE entities where SLEORGNPLNTCODE.SLEORGGRP = a value in AVAIL.SLEORGGRP and SLEORGNPLNTCODE.MODCATG equals 
-//	a.	MODEL.COFCAT if MODEL.COFCAT = “Hardware” or “Software”
-//	b.	“Hardware” if MODEL.COFCAT = “Service”
+//	a.	MODEL.COFCAT if MODEL.COFCAT = â€œHardwareâ€� or â€œSoftwareâ€�
+//	b.	â€œHardwareâ€� if MODEL.COFCAT = â€œServiceâ€�
 //  
 //  Search for the PRODSTRUCT and SWPRODSTRUCT
-//  retrieve all SLEORGNPLNTCODE entities where SLEORGNPLNTCODE.MODCATG = “Hardware” for PRODSTRUCT or “Software” for SWPRODSTRUCT
+//  retrieve all SLEORGNPLNTCODE entities where SLEORGNPLNTCODE.MODCATG = â€œHardwareâ€� for PRODSTRUCT or â€œSoftwareâ€� for SWPRODSTRUCT
 //
 
 public class XMLSLEORGNPLNTCODESearchElem extends XMLElem
@@ -99,9 +99,9 @@ public class XMLSLEORGNPLNTCODESearchElem extends XMLElem
                         if (mfArray[i].isSelected()) {
                         	COFCAT = (mfArray[i].toString()); // get longdesription
                         	/**
-                        	 * Deriving logic in the case where there isn’t an AVAIL where AVAILTYPE="Planned Availability" (146) 
-                        	 * and ANNDATE < “20100301” is not designed.
-                             * If MODEL.COFCAT = “Service”, match to SLEORGNPLNTCODE.MODCATG with value “Hardware” 
+                        	 * Deriving logic in the case where there isnâ€™t an AVAIL where AVAILTYPE="Planned Availability" (146) 
+                        	 * and ANNDATE < â€œ20100301â€� is not designed.
+                             * If MODEL.COFCAT = â€œServiceâ€�, match to SLEORGNPLNTCODE.MODCATG with value â€œHardwareâ€� 
                              * and requires code changes. So we have to defer the test cases until code update.
                         	 */
                         	if("Service".equalsIgnoreCase(COFCAT)){
@@ -153,14 +153,14 @@ public class XMLSLEORGNPLNTCODESearchElem extends XMLElem
 				int entityid = SLEORGNPLNTCODE.getEntityID();
 				String entitytype = SLEORGNPLNTCODE.getEntityType();
 				String country = getCounryList(dbCurrent,item,entityid,entitytype);				
-				String SLEORGGRP = PokUtils.getAttributeValue(SLEORGNPLNTCODE, "SLEORGGRP",",", "", false);				
+				String SLEORGGRP = PokUtils.getAttributeValue(SLEORGNPLNTCODE, "SLEORGGRP",";", "", false);				
 				Object sop = (Object)xmltable.get(country);
 				if(sop==null){
 					Vector vct[] = new Vector[2];
 					vct[0] = new Vector();
 					vct[1] = new Vector();
 					Hashtable SLEORGGRP_table = new Hashtable();
-					StringTokenizer str = new StringTokenizer(SLEORGGRP,",");
+					StringTokenizer str = new StringTokenizer(SLEORGGRP,";");
 					while (str.hasMoreTokens()) {
 						String dir = str.nextToken();
 						SLEORGGRP_table.put(dir, "");
