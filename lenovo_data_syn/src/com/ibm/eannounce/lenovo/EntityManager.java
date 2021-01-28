@@ -229,11 +229,11 @@ public class EntityManager {
 				attrs.add(new Text(enterprise, eType, eID, "VENDNAM", model.getVENDNAM(), NLSID, ctrl));
 //				attrs.add(new Text(enterprise, eType, eID, "MACHRATECATG", "", NLSID, ctrl));
 				attrs.add(new Text(enterprise, eType, eID, "CECSPRODKEY", model.getCECSPRODKEY(), NLSID, ctrl));
-				attrs.add(new Text(enterprise, eType, eID, "MAINTANNBILLELIGINDC", "Y".equals(model.getMAINTANNBILLELIGINDC()) ? "MAINY" : "MAINN",
+				attrs.add(new SingleFlag(enterprise, eType, eID, "MAINTANNBILLELIGINDC", "Y".equals(model.getMAINTANNBILLELIGINDC()) ? "MAINY" : "MAINN",
 						NLSID, ctrl));
-				attrs.add(new Text(enterprise, eType, eID, "SYSIDUNIT", "Y".equals(model.getFSLMCPU()) ? "S00010" : "S00020", NLSID, ctrl));
+				attrs.add(new SingleFlag(enterprise, eType, eID, "SYSIDUNIT", "Y".equals(model.getFSLMCPU()) ? "S00010" : "S00020", NLSID, ctrl));
 //				attrs.add(new Text(enterprise, eType, eID, "PRODSUPRTCD", , NLSID, ctrl));
-//				attrs.add(new Text(enterprise, eType, eID, "PRFTCTR", , NLSID, ctrl));
+//				attrs.add(new SingleFlag(enterprise, eType, eID, "PRFTCTR", , NLSID, ctrl));
 				attrs.add(new SingleFlag(enterprise, eType, eID, "PDHDOMAIN", PDHDOMAIN, NLSID, ctrl));
 
 				attrs.add(new SingleFlag(enterprise, eType, eID, "DATAQUALITY", "FINAL", NLSID, ctrl));
