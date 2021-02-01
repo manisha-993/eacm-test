@@ -27,7 +27,7 @@ import COM.ibm.opicmpdh.objects.Text;
 
 public class EntityManager {
 
-	private static final String PDHDOMAIN = "PLENOVO";
+	private static final String PDHDOMAIN = "LENOVO";
 	
 	private static final String QUEUED = "0020";
 
