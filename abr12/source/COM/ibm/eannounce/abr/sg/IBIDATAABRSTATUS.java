@@ -133,65 +133,65 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 	// private final static String QUERY_MODEL = "select
 	// ENTITYTYPE,MACHTYPEATR,MODELATR,MKTGNAME,ANNDATE,WITHDRAWDATE,WTHDRWEFFCTVDATE,INSTALL,STATUS,VALFROM
 	// from OPICM.MODEL where VALFROM>= ? and VALFROM < ? and nlsid =1 and
-	// status='Final' with UR";
-
-	private final static String QUERY_MODEL = "with dump(machtypeatr,modelatr) as (select machtypeatr, modelatr from opicm.model where nlsid = 1 and cofcat = 'Software' and status = 'Final'  "
+	// status in ('Final','Ready for Review') with UR";
+	//in ('Final','Ready for Review')
+	private final static String QUERY_MODEL = "with dump(machtypeatr,modelatr) as (select machtypeatr, modelatr from opicm.model where nlsid = 1 and cofcat = 'Software' and status in ('Final','Ready for Review')  "
 			+ "group by machtypeatr, modelatr having count(*) >1 ),dump1(id) as( "
 			+ "select m.entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and entityid not in  "
-			+ "(select entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and m.status ='Final' and m.COFGRP = 'Base' and m.COFSUBCAT = 'Application'  and m.valto > current timestamp and m.nlsid=1 ))  "
+			+ "(select entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and m.status  in ('Final','Ready for Review') and m.COFGRP = 'Base' and m.COFSUBCAT = 'Application'  and m.valto > current timestamp and m.nlsid=1 ))  "
 			+ "select distinct m.ENTITYTYPE,m.MACHTYPEATR,m.MODELATR,m.MKTGNAME,m.ANNDATE,m.WITHDRAWDATE,m.WTHDRWEFFCTVDATE,m.INSTALL,m.STATUS,m.VALFROM from opicm.model m  "
 			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1  "
-			+ "where   m.status='Final' and m.nlsid=1 and (S.DIV<>'71' or S.div is null) and m.entityid not in (select id from dump1)and  m.VALFROM>= ? and m.VALFROM < ?  "
+			+ "where   m.status in ('Final','Ready for Review') and m.nlsid=1 and (S.DIV<>'71' or S.div is null) and m.entityid not in (select id from dump1)and  m.VALFROM>= ? and m.VALFROM < ?  "
 			+ "with ur";
 	// private final static String QUERY_PRODSTRUCT = "select
 	// r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM
 	// from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and
 	// r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and
-	// f.status='Final' and f.nlsid=1 join opicm.prodstruct p on
-	// p.entityid=r.entityid and p.nlsid=1 and p.status='Final' where
-	// p.VALFROM>= ? and p.VALFROM < ? and m.status='Final' and m.nlsid=1 with
+	// f.status in ('Final','Ready for Review') and f.nlsid=1 join opicm.prodstruct p on
+	// p.entityid=r.entityid and p.nlsid=1 and p.status in ('Final','Ready for Review') where
+	// p.VALFROM>= ? and p.VALFROM < ? and m.status in ('Final','Ready for Review') and m.nlsid=1 with
 	// ur";
-	private final static String QUERY_PRODSTRUCT = "with dump(machtypeatr,modelatr) as (select machtypeatr, modelatr from opicm.model where nlsid = 1 and cofcat = 'Software' and status = 'Final' "
+	private final static String QUERY_PRODSTRUCT = "with dump(machtypeatr,modelatr) as (select machtypeatr, modelatr from opicm.model where nlsid = 1 and cofcat = 'Software' and status in ('Final','Ready for Review') "
 			+ "group by machtypeatr, modelatr having count(*) >1 ),dump1(id) as( "
 			+ "select m.entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and entityid not in "
-			+ "(select entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and m.status ='Final' and m.COFGRP = 'Base' and m.COFSUBCAT = 'Application'  and m.valto > current timestamp and valto > current timestamp ))"
-			+ "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and f.status='Final' and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 and p.status='Final' "
+			+ "(select entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and m.status  in ('Final','Ready for Review') and m.COFGRP = 'Base' and m.COFSUBCAT = 'Application'  and m.valto > current timestamp and valto > current timestamp ))"
+			+ "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and f.status in ('Final','Ready for Review') and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 and p.status in ('Final','Ready for Review') "
 			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1 "
-			+ "where  p.VALFROM>= ? and p.VALFROM < ? and m.status='Final' and  m.nlsid=1  and m.entityid not in (select id from dump1)  and (S.DIV<>'71' or S.div is null) with ur";
+			+ "where  p.VALFROM>= ? and p.VALFROM < ? and m.status in ('Final','Ready for Review') and  m.nlsid=1  and m.entityid not in (select id from dump1)  and (S.DIV<>'71' or S.div is null) with ur";
 
 	/*private final static String QUERY_SWPRODSTRUCT = "with temp as ("
 			+ "select sw.entitytype ,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,sw.MKTGNAME,coalesce(annp.ANNDATE,'9999-12-32') AS PANNDATE,coalesce( annl.ANNDATE,'9999-12-32') as LANNDATE,coalesce(a1.EFFECTIVEDATE,'9999-12-32') as EFFECTIVEDATE,sw.STATUS,sw.VALFROM,max(coalesce(sw.VALFROM,'1980-01-01 00:00:00.000000') ,coalesce(a1.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(a.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annp.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annl.VALFROM,'1980-01-01 00:00:00.000000')) as MAXDATA from opicm.SWPRODSTRUCT sw "
 			+ "join opicm.relator r2 on r2.entitytype = 'SWPRODSTRUCT' and r2.entityid = sw.entityid "
-			+ "join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id and m.status='Final' "
-			+ "join opicm.swfeature f on f.nlsid =1 and f.entityid = r2.entity1id and f.status='Final' "
+			+ "join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id and m.status in ('Final','Ready for Review') "
+			+ "join opicm.swfeature f on f.nlsid =1 and f.entityid = r2.entity1id and f.status in ('Final','Ready for Review') "
 			+ "left join  opicm.relator r on  r.entitytype = 'SWPRODSTRUCTAVAIL' and r.entity1id = sw.entityid "
-			+ "left join  opicm.avail a on a.entityid = r.entity2id and a.nlsid=1 and  a.AVAILTYPE='Planned Availability' and a.status='Final' "
-			+ "left join opicm.announcement annp on  a.anncodename=annp.anncodename and annp.nlsid=1 and annp.ANNSTATUS ='Final' "
+			+ "left join  opicm.avail a on a.entityid = r.entity2id and a.nlsid=1 and  a.AVAILTYPE='Planned Availability' and a.status in ('Final','Ready for Review') "
+			+ "left join opicm.announcement annp on  a.anncodename=annp.anncodename and annp.nlsid=1 and annp.ANNSTATUS  in ('Final','Ready for Review') "
 			+ "left join  opicm.relator r1 on  r1.entitytype = 'SWPRODSTRUCTAVAIL' and r1.entity1id = sw.entityid "
-			+ "left join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  AND a1.status='Final'  "
-			+ "left join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1  and annl.ANNSTATUS ='Final' "
+			+ "left join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  AND a1.status in ('Final','Ready for Review')  "
+			+ "left join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1  and annl.ANNSTATUS  in ('Final','Ready for Review') "
 			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1 and (S.DIV<>'71' or S.div is null) "
-			+ "where  sw.status='Final' and sw.nlsid=1  )"
+			+ "where  sw.status in ('Final','Ready for Review') and sw.nlsid=1  )"
 			+ "select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,(case min(PANNDATE) when '9999-12-32' then '' else min(PANNDATE) end )as PANNDATE,(case min(LANNDATE) when '9999-12-32' then '' else min(LANNDATE) end ) as LANNDATE,(case min(EFFECTIVEDATE) when '9999-12-32' then '' else min(EFFECTIVEDATE) end ) as EFFECTIVEDATE,STATUS,VALFROM from temp "
 			+ "group by entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,VALFROM,STATUS "
 			+ "having max(MAXDATA) >= ? and max(MAXDATA) < ?  " + "with ur";*/
-	private final static String QUERY_SWPRODSTRUCT = "with dump(machtypeatr,modelatr) as (select machtypeatr, modelatr from opicm.model where nlsid = 1 and cofcat = 'Software' and status = 'Final' "
+	private final static String QUERY_SWPRODSTRUCT = "with dump(machtypeatr,modelatr) as (select machtypeatr, modelatr from opicm.model where nlsid = 1 and cofcat = 'Software' and status in ('Final','Ready for Review') "
 			+ "group by machtypeatr, modelatr having count(*) >1 ),dump1(id) as( "
 			+ "select m.entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and entityid not in "
-			+ "(select entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and m.status ='Final' and m.COFGRP = 'Base' and m.COFSUBCAT = 'Application'  and m.valto > current timestamp and valto > current timestamp ))"
+			+ "(select entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and m.status  in ('Final','Ready for Review') and m.COFGRP = 'Base' and m.COFSUBCAT = 'Application'  and m.valto > current timestamp and valto > current timestamp ))"
 			+",temp as ("
 			+ "select sw.entitytype ,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,sw.MKTGNAME,coalesce(annp.ANNDATE,'9999-12-32') AS PANNDATE,coalesce( annl.ANNDATE,'9999-12-32') as LANNDATE,coalesce(a1.EFFECTIVEDATE,'9999-12-32') as EFFECTIVEDATE,sw.STATUS,sw.VALFROM,max(coalesce(sw.VALFROM,'1980-01-01 00:00:00.000000') ,coalesce(a1.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(a.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annp.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annl.VALFROM,'1980-01-01 00:00:00.000000')) as MAXDATA from opicm.SWPRODSTRUCT sw "
 			+ "join opicm.relator r2 on r2.entitytype = 'SWPRODSTRUCT' and r2.entityid = sw.entityid "
-			+ "join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id and m.status='Final' "
-			+ "join opicm.swfeature f on f.nlsid =1 and f.entityid = r2.entity1id and f.status='Final' "
+			+ "join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id and m.status in ('Final','Ready for Review') "
+			+ "join opicm.swfeature f on f.nlsid =1 and f.entityid = r2.entity1id and f.status in ('Final','Ready for Review') "
 			+ "left join  opicm.relator r on  r.entitytype = 'SWPRODSTRUCTAVAIL' and r.entity1id = sw.entityid "
-			+ "left join  opicm.avail a on a.entityid = r.entity2id and a.nlsid=1 and  a.AVAILTYPE='Planned Availability' and a.status='Final' "
-			+ "left join opicm.announcement annp on  a.anncodename=annp.anncodename and annp.nlsid=1 and annp.ANNSTATUS ='Final' "
+			+ "left join  opicm.avail a on a.entityid = r.entity2id and a.nlsid=1 and  a.AVAILTYPE='Planned Availability' and a.status in ('Final','Ready for Review') "
+			+ "left join opicm.announcement annp on  a.anncodename=annp.anncodename and annp.nlsid=1 and annp.ANNSTATUS  in ('Final','Ready for Review') "
 			+ "left join  opicm.relator r1 on  r1.entitytype = 'SWPRODSTRUCTAVAIL' and r1.entity1id = sw.entityid "
-			+ "left join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  AND a1.status='Final'  "
-			+ "left join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1  and annl.ANNSTATUS ='Final' "
+			+ "left join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  AND a1.status in ('Final','Ready for Review')  "
+			+ "left join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1  and annl.ANNSTATUS  in ('Final','Ready for Review') "
 			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1 "
-			+ "where  sw.status='Final' and sw.nlsid=1  and (S.DIV<>'71' or S.div is null) and m.entityid not in (select id from dump1) )  "
+			+ "where  sw.status in ('Final','Ready for Review') and sw.nlsid=1  and (S.DIV<>'71' or S.div is null) and m.entityid not in (select id from dump1) )  "
 			+ "select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,(case min(PANNDATE) when '9999-12-32' then '' else min(PANNDATE) end )as PANNDATE,(case min(LANNDATE) when '9999-12-32' then '' else min(LANNDATE) end ) as LANNDATE,(case min(EFFECTIVEDATE) when '9999-12-32' then '' else min(EFFECTIVEDATE) end ) as EFFECTIVEDATE,STATUS,VALFROM from temp "
 			+ "group by entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,VALFROM,STATUS "
 			+ "having max(MAXDATA) >= ? and max(MAXDATA) < ?  " + "with ur";
@@ -656,6 +656,14 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 		// "/usr/bin/rsync -av /var/log/www.solive.kv/access_log
 		// testuser@10.0.1.219::store --password-file=/etc/client/rsync.pwd";
 
+		boolean exeFtp = false;
+		
+		if(!exeFtp)
+		{
+			
+			return true;
+			
+		}
 		String cmd = ABRServerProperties.getValue(m_abri.getABRCode(), SFTPSCRPATH, null) + " -f " + fileName + " -t '"+ tarName + "'" + " -c " + triger;
 		String ibiinipath = ABRServerProperties.getValue(m_abri.getABRCode(), IBIINIPATH, null);
 		if (ibiinipath != null)
