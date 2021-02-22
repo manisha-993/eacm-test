@@ -58,7 +58,7 @@ public class CCINRPTSTATUS extends PokBaseABR {
 		String dts = getNow();
 		// replace special characters
 		dts = dts.replace(' ', '_');
-		sb.append(dts + ".csv");
+		sb.append(dts + ".xls");
 		dir = ABRServerProperties.getValue(m_abri.getABRCode(), CCINPRTPATH,
 				"/Dgq");
 		if (!dir.endsWith("/")) {
