@@ -28,7 +28,7 @@ import COM.ibm.opicmpdh.objects.Text;
 public class EntityManager {
 
 	private static final String PDHDOMAIN = "LENOVO";
-	
+
 	private static final String QUEUED = "0020";
 
 	private static final int NLSID = 1;
@@ -50,7 +50,7 @@ public class EntityManager {
 	private String enterprise;
 
 	private String pdhDomain;
-	
+
 	private boolean offlineMode;
 
 	public EntityManager(Properties properties) {
@@ -63,14 +63,13 @@ public class EntityManager {
 			Log.i(TAG, "PDH is in Offline mode (connect)");
 			return;
 		}
-		
+
 		Log.i(TAG, "Connecting to PDH...");
 		try {
 			Class.forName("COM.ibm.db2.jdbc.app.DB2Driver").newInstance();
 		} catch (Throwable e) {
 			Log.e(TAG, "Unable to access DB2 driver: COM.ibm.db2.jdbc.app.DB2Driver", e);
-			throw new IllegalStateException(
-					"Unable to access DB2 driver: COM.ibm.db2.jdbc.app.DB2Driver");
+			throw new IllegalStateException("Unable to access DB2 driver: COM.ibm.db2.jdbc.app.DB2Driver");
 		}
 		database = new Database();
 		try {
@@ -113,11 +112,10 @@ public class EntityManager {
 				}
 			}
 			if (profile == null) {
-				throw new Exception("Profile not found for "+ldapId);
+				throw new Exception("Profile not found for " + ldapId);
 			}
-			Log.i(TAG, "Logged in via ldap: " + ldapId + ", role: " + profile.getRoleCode()
-					+ ", OPWGID: " + profile.getOPWGID() + ", OP: " + profile.getOPID()
-					+ ", enterprise: " + profile.getEnterprise());
+			Log.i(TAG, "Logged in via ldap: " + ldapId + ", role: " + profile.getRoleCode() + ", OPWGID: "
+					+ profile.getOPWGID() + ", OP: " + profile.getOPID() + ", enterprise: " + profile.getEnterprise());
 			Log.d(TAG, "TimeStampNow is " + now + ", TimeStampForever is " + timeStampForever);
 
 		} catch (Exception e) {
@@ -142,10 +140,9 @@ public class EntityManager {
 		}
 	}
 
-	public void createEntity(MIWModel model) throws MiddlewareException,
-			SQLException {
+	public void createEntity(MIWModel model) throws MiddlewareException, SQLException {
 		if (offlineMode) {
-			Log.i(TAG, "PDH is in Offline mode (createEntity): "+model);
+			Log.i(TAG, "PDH is in Offline mode (createEntity): " + model);
 			return;
 		}
 
@@ -186,8 +183,7 @@ public class EntityManager {
 //			setReturnCode(RETURNCODE_SUCCESS);
 //			Log.i(TAG, "REFOFER attributes updated");
 //		}
-	
-		
+
 		try {
 			EntityItem refofer = findRefofer(model.getPRODUCTID());
 
@@ -220,18 +216,33 @@ public class EntityManager {
 				attrs.add(new Text(enterprise, eType, eID, "ACTIVITY", model.getACTIVITY(), NLSID, ctrl));
 				attrs.add(new Text(enterprise, eType, eID, "DTSMIWCREATE", now, NLSID, ctrl));
 				attrs.add(new Text(enterprise, eType, eID, "PRODUCTID", model.getPRODUCTID(), NLSID, ctrl));
-				attrs.add(new Text(enterprise, eType, eID, "MFRPRODTYPE", model.getMFRPRODTYPE(), NLSID, ctrl));
-				attrs.add(new Text(enterprise, eType, eID, "MFRPRODDESC", model.getMFRPRODDESC(), NLSID, ctrl));
-				attrs.add(new Text(enterprise, eType, eID, "MKTGDIV", model.getMKTGDIV(), NLSID, ctrl));
-				attrs.add(new Text(enterprise, eType, eID, "CATGSHRTDESC", model.getCATGSHRTDESC(), NLSID, ctrl));
-				attrs.add(new Text(enterprise, eType, eID, "STRTOSVC", model.getSTRTOSVC(), NLSID, ctrl));
-				attrs.add(new Text(enterprise, eType, eID, "ENDOFSVC", model.getENDOFSVC(), NLSID, ctrl));
+
+				if (model.getMFRPRODTYPE() != null && !"".equals(model.getMFRPRODTYPE())) {
+					attrs.add(new Text(enterprise, eType, eID, "MFRPRODTYPE", model.getMFRPRODTYPE(), NLSID, ctrl));
+				}
+				if (model.getMFRPRODDESC() != null && !"".equals(model.getMFRPRODDESC())) {
+					attrs.add(new Text(enterprise, eType, eID, "MFRPRODDESC", model.getMFRPRODDESC(), NLSID, ctrl));
+				}
+				if (model.getMKTGDIV() != null && !"".equals(model.getMKTGDIV())) {
+					attrs.add(new Text(enterprise, eType, eID, "MKTGDIV", model.getMKTGDIV(), NLSID, ctrl));
+				}
+				if (model.getCATGSHRTDESC() != null && !"".equals(model.getCATGSHRTDESC())) {
+					attrs.add(new Text(enterprise, eType, eID, "CATGSHRTDESC", model.getCATGSHRTDESC(), NLSID, ctrl));
+				}
+				if (model.getSTRTOSVC() != null && !"".equals(model.getSTRTOSVC())) {
+					attrs.add(new Text(enterprise, eType, eID, "STRTOSVC", model.getSTRTOSVC(), NLSID, ctrl));
+				}
+				if (model.getENDOFSVC() != null && !"".equals(model.getENDOFSVC())) {
+					attrs.add(new Text(enterprise, eType, eID, "ENDOFSVC", model.getENDOFSVC(), NLSID, ctrl));
+				}
+
 				attrs.add(new Text(enterprise, eType, eID, "VENDNAM", model.getVENDNAM(), NLSID, ctrl));
 //				attrs.add(new Text(enterprise, eType, eID, "MACHRATECATG", "", NLSID, ctrl));
 				attrs.add(new Text(enterprise, eType, eID, "CECSPRODKEY", model.getCECSPRODKEY(), NLSID, ctrl));
-				attrs.add(new SingleFlag(enterprise, eType, eID, "MAINTANNBILLELIGINDC", "Y".equals(model.getMAINTANNBILLELIGINDC()) ? "MAINY" : "MAINN",
-						NLSID, ctrl));
-				attrs.add(new SingleFlag(enterprise, eType, eID, "SYSIDUNIT", "Y".equals(model.getFSLMCPU()) ? "S00010" : "S00020", NLSID, ctrl));
+				attrs.add(new SingleFlag(enterprise, eType, eID, "MAINTANNBILLELIGINDC",
+						"Y".equals(model.getMAINTANNBILLELIGINDC()) ? "MAINY" : "MAINN", NLSID, ctrl));
+				attrs.add(new SingleFlag(enterprise, eType, eID, "SYSIDUNIT",
+						"Y".equals(model.getFSLMCPU()) ? "S00010" : "S00020", NLSID, ctrl));
 //				attrs.add(new Text(enterprise, eType, eID, "PRODSUPRTCD", , NLSID, ctrl));
 //				attrs.add(new SingleFlag(enterprise, eType, eID, "PRFTCTR", , NLSID, ctrl));
 				attrs.add(new SingleFlag(enterprise, eType, eID, "PDHDOMAIN", PDHDOMAIN, NLSID, ctrl));
@@ -239,40 +250,40 @@ public class EntityManager {
 				attrs.add(new SingleFlag(enterprise, eType, eID, "DATAQUALITY", "FINAL", NLSID, ctrl));
 				attrs.add(new SingleFlag(enterprise, eType, eID, "STATUS", "0020", NLSID, ctrl));
 				attrs.add(new SingleFlag(enterprise, eType, eID, "ADSABRSTATUS", QUEUED, NLSID, ctrl));
-				
+
 				Vector transactions = new Vector();
 				returnEntityKey.m_vctAttributes = attrs;
 				Log.d(TAG, "returnEntityKey.m_vctAttributes:" + returnEntityKey.m_vctAttributes);
 				transactions.addElement(returnEntityKey);
 				database.update(profile, transactions, false, false);
 				database.commit();
-				
-				Log.i(TAG, "REFOFER "+eID+" attributes updated");
+
+				Log.i(TAG, "REFOFER " + eID + " attributes updated");
 			}
-			
+
 		} catch (Exception e) {
 			Log.e(TAG, "Create Entity Exception:" + e);
 			throw e;
 		}
 	}
 
-	private EntityItem findRefofer(String productID){
-		//Search all REFOFER entity ids for ProductID and PDHDOMAIN = 'MIW'
+	private EntityItem findRefofer(String productID) {
+		// Search all REFOFER entity ids for ProductID and PDHDOMAIN = 'MIW'
 		Vector attrs = new Vector();
 		attrs.addElement("PRODUCTID");
 		Vector vals = new Vector();
 		vals.addElement(productID);
 		StringBuffer debugSb = new StringBuffer();
 		try {
-			EntityItem[] list = ABRUtil.doSearch(database, profile, "SRDREFOFER1", "REFOFER", false,
-					attrs, vals, debugSb);
+			EntityItem[] list = ABRUtil.doSearch(database, profile, "SRDREFOFER1", "REFOFER", false, attrs, vals,
+					debugSb);
 			for (int i = 0; i < list.length; i++) {
 				EntityItem ei = list[i];
 				String id = PokUtils.getAttributeValue(ei, "PRODUCTID", ",", "", false);
 				String domain = PokUtils.getAttributeFlagValue(ei, "PDHDOMAIN");
 				Log.d(TAG, "Looking at " + ei.getKey() + " [" + id + "," + domain + "]");
 				if (productID.equalsIgnoreCase(id) && "LENOVO".equals(domain)) {
-					//Found REFOFERFEAT
+					// Found REFOFERFEAT
 					return ei;
 				}
 			}
@@ -283,45 +294,59 @@ public class EntityManager {
 		}
 		return null;
 	}
-	
+
 	public List getRecords(String T1) throws Exception {
-		
+
 		if (offlineMode) {
 			Log.i(TAG, "PDH is in Offline mode (getRecords): MTYPE");
 			return null;
 		}
-		
+
 		Log.d(TAG, "get Records From table MTYPE");
-		String sql = "select MTYPE,UPD_DT,FAMILYNAME,SERIESNAME,DIVISION,BRAND,ANNOUNCE_DATE from opicm.EACM_MTYPE where UPD_DT>='"+ T1 +"' with ur";
+		String sql = null;
+		boolean isDelta = false;
+		if ("1980-01-01 00:00:00.000000".equals(T1)) {
+			sql = "select MTYPE,UPD_DT,FAMILYNAME,SERIESNAME,DIVISION,BRAND,ANNOUNCE_DATE from opicm.EACM_MTYPE with ur";
+
+		} else {
+			sql = "select MTYPE,UPD_DT,FAMILYNAME,SERIESNAME,DIVISION,BRAND,ANNOUNCE_DATE,ACTION_TYPE from opicm.EACM_MTYPE_LOG t1 "
+					+ "where ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTYPE_LOG where ACTION_TIME between '"
+					+ T1 + "' and current timestamp and t1.mtype= mtype Group by mtype) with ur";
+			isDelta = true;
+		}
 		Log.d(TAG, "Extract SQL:" + sql);
 		List entitys = new ArrayList();
 		try {
 			Connection conn = database.getPDHConnection();
-			PreparedStatement ps = conn.prepareStatement(sql,
-					ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			PreparedStatement ps = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
 			ResultSet rs = ps.executeQuery();
-		 
+
 			while (rs.next()) {
-				
+
 				MIWModel model = new MIWModel();
 				model.setDTSOFMSG(rs.getString("UPD_DT"));
-				model.setACTIVITY("UPDATE");
-				model.setPRODUCTID(rs.getString("MTYPE")+"DUM");
-				model.setMFRPRODTYPE(rs.getString("MTYPE")+"-"+"DUM");
-				model.setMFRPRODDESC(rs.getString("FAMILYNAME")+" - "+rs.getString("SERIESNAME"));
+				if (isDelta) {
+					model.setACTIVITY(getValue(rs.getString("ACTION_TYPE")));
+				} else {
+					model.setACTIVITY("Update");
+				}
+				model.setPRODUCTID(rs.getString("MTYPE") + "DUM");
+				model.setMFRPRODTYPE(rs.getString("MTYPE") + "-" + "DUM");
+				model.setMFRPRODDESC(rs.getString("FAMILYNAME") + " - " + rs.getString("SERIESNAME"));
 				model.setMKTGDIV(rs.getString("DIVISION"));
 				model.setCATGSHRTDESC(rs.getString("BRAND"));
 				model.setSTRTOSVC(rs.getString("ANNOUNCE_DATE"));
 				model.setENDOFSVC("9999-12-31");
 				model.setVENDNAM("LENOVO");
-				
+
 				model.setCECSPRODKEY("3");
 				model.setMAINTANNBILLELIGINDC("N");
 				model.setFSLMCPU("N");
-				
+
 				entitys.add(model);
 			}
-			
+
 		} catch (SQLException | MiddlewareException e) {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "read records from table Exception:" + e);
@@ -329,5 +354,13 @@ public class EntityManager {
 		}
 		return entitys;
 	}
-	
+
+	private String getValue(String string) {
+		if ("D".equals(string)) {
+			return "Delete";
+		} else {
+			return "Update";
+		}
+	}
+
 }

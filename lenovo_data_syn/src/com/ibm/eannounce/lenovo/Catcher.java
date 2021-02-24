@@ -1,11 +1,12 @@
 package com.ibm.eannounce.lenovo;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -89,27 +90,39 @@ public class Catcher {
 	
 	private String getT1() {
 		String date = null;
+		File file = new File("tmp");
+        BufferedReader reader = null;
 		try {
-			FileInputStream in = new FileInputStream("tmp");
-			ObjectInputStream s = new ObjectInputStream(in);
-			date = (String)s.readObject();
+			reader = new BufferedReader(new FileReader(file));
+			date = reader.readLine();
 			Log.i(TAG, "get Last Ran time: " + date);
-			s.close();
-		} catch (IOException | ClassNotFoundException e) {
+			reader.close();
+		} catch (IOException e) {
 			Log.e(TAG, "get Last Ran time exception: " + e);
-		} 
+			e.printStackTrace();
+		} finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e1) {
+                }
+            }
+        }
 		return date;
 	}
 	
 	private void updateT1(String current) {
 		
 		try {
-			FileOutputStream f = new FileOutputStream("tmp");
-			ObjectOutputStream s = new ObjectOutputStream(f);
-			s.writeObject(current);
-			s.flush();
+			
+			File file = new File("tmp");
+			if (!file.exists()) 
+			    file.createNewFile();
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write(current);
+			bw.flush();
+			bw.close();
 			Log.i(TAG, "Update Last Ran time to: " + current);
-			s.close();
 		} catch (IOException e) {
 			Log.e(TAG, "Update Last Ran time exception: " + e);
 		}
