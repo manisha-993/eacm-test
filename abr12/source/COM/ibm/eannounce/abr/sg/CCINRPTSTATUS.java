@@ -181,12 +181,13 @@ public class CCINRPTSTATUS extends PokBaseABR {
 		ResultSet rs = ps.executeQuery();
 
 		while (rs.next()) {
-			String[] record = new String[5];
+			String[] record = new String[6];
 			record[0] = rs.getString(1);
 			record[1] = rs.getString(2);
 			record[2] = rs.getString(3);
 			record[3] = rs.getString(4);
 			record[4] = rs.getString(5);
+			record[5] = rs.getString(6);
 			list.add(record);
 		}
 		return list;
