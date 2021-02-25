@@ -42,8 +42,9 @@ public class CCINRPTSTATUS extends PokBaseABR {
 	private static final String CCIN_INTERNALNAME = "CCIN_INTERNALNAME";
 	private static final String FEATURECODE = "FEATURECODE";
 	private static final String FC_COMNAME = "FC_COMNAME";	
+	private static final String FC_HWFCSUBCAT = "FC_HWFCSUBCAT";	
 	private static final String[] COLUMN_ARR = new String[] { CCINATR,
-		CCIN_CODENAME, CCIN_INTERNALNAME, FEATURECODE, FC_COMNAME};
+		CCIN_CODENAME, CCIN_INTERNALNAME, FEATURECODE, FC_COMNAME,FC_HWFCSUBCAT};
 	
 	// m_elist.getParentEntityGroup().getEntityItem(0)
 	private final static String QUERY = "select * from OPICM.CCIN_FEATURE_V with ur";
