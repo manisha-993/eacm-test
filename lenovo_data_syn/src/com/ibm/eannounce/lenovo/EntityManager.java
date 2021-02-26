@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -140,53 +142,17 @@ public class EntityManager {
 		}
 	}
 
-	public void createEntity(MIWModel model) throws MiddlewareException, SQLException {
+	public void createEntity(MIWModel model) throws Exception {
 		if (offlineMode) {
 			Log.i(TAG, "PDH is in Offline mode (createEntity): " + model);
 			return;
 		}
 
-//		if ("Update".equalsIgnoreCase(model.getACTIVITY())) {
-//			if (refofer == null) {
-//				// REFOFER not found, create a new one
-//				EntityGroup eg = new EntityGroup(profile, ENTITY_TYPE, null);
-//				refofer = new EntityItem(eg, profile, "REFOFER", 0);
-//				Log.i(TAG, "New REFOFER created");
-//			}
-//			// Update attributes
-//			refoferWrapper = new EntityWrapper(refofer);
-//			refoferWrapper.text("PRODUCTID", model.getPRODUCTID());
-//			refoferWrapper.text("DTSMIWCREATE", refoferModel.DTSMIWCREATE);
-//			refoferWrapper.flag("PDHDOMAIN", MIW_PDHDOMAIN);
-//			refoferWrapper.text("MFRPRODTYPE", refoferModel.MFRPRODTYPE, 30);
-//			refoferWrapper.text("MFRPRODDESC", refoferModel.MFRPRODDESC, 32);
-//			refoferWrapper.text("MKTGDIV", refoferModel.MKTGDIV, 2);
-//			refoferWrapper.flag("PRFTCTR", refoferModel.PRFTCTR);
-//			refoferWrapper.text("CATGSHRTDESC", refoferModel.CATGSHRTDESC, 30);
-//			refoferWrapper.text("STRTOFSVC", refoferModel.STRTOSVC);
-//			refoferWrapper.text("ENDOFSVC", refoferModel.ENDOFSVC);
-//			refoferWrapper.text("VENDNAM", refoferModel.VENDNAM, 30);
-//			refoferWrapper.text("MACHRATECATG", refoferModel.MACHRATECATG, 1);
-//			refoferWrapper.text("CECSPRODKEY", refoferModel.CECSPRODKEY, 1);
-//			// FLAG N = MAINN / Y = MAINY
-//			refoferWrapper.flag("MAINTANNBILLELIGINDC",
-//					"Y".equals(refoferModel.MAINTANNBILLELIGINDC) ? "MAINY" : "MAINN");
-//			// REFOFER_DATA/FSLMCPU -> SYSIDUNIT
-//			// If input='Y', value is "SIU-CPU" (S00010); if input='N', value is "SIU-Non
-//			// CPU" (S00020)
-//			refoferWrapper.flag("SYSIDUNIT", "Y".equals(refoferModel.FSLMCPU) ? "S00010" : "S00020");
-//			refoferWrapper.text("PRODSUPRTCD", refoferModel.PRODSUPRTCD, 3);
-//			refoferWrapper.flag("DATAQUALITY", DQ_FINAL);
-//			refoferWrapper.flag("STATUS", STATUS_FINAL);
-//			refoferWrapper.flag("ADSABRSTATUS", ABR_QUEUE);
-//			refoferWrapper.end();
-//			setReturnCode(RETURNCODE_SUCCESS);
-//			Log.i(TAG, "REFOFER attributes updated");
-//		}
-
 		try {
 			EntityItem refofer = findRefofer(model.getPRODUCTID());
 
+			EntityWrapper refoferWrapper = null;
+			
 			if (refofer != null) {
 				Log.i(TAG, "REFOFER found: " + refofer.getKey());
 			} else {
@@ -208,57 +174,51 @@ public class EntityManager {
 				ReturnEntityKey returnEntityKey = new ReturnEntityKey(ENTITY_TYPE, 0, true);
 				Log.d(TAG, "returnEntityKey:" + returnEntityKey);
 
-				String eType = refofer.getEntityType();
-				int eID = refofer.getEntityID();
-				Vector attrs = new Vector();
+				
+				refoferWrapper = new EntityWrapper(refofer);
 				// Entity attribute mapping
-				attrs.add(new Text(enterprise, eType, eID, "DTSOFMSG", model.getDTSOFMSG(), NLSID, ctrl));
-				attrs.add(new Text(enterprise, eType, eID, "ACTIVITY", model.getACTIVITY(), NLSID, ctrl));
-				attrs.add(new Text(enterprise, eType, eID, "DTSMIWCREATE", now, NLSID, ctrl));
-				attrs.add(new Text(enterprise, eType, eID, "PRODUCTID", model.getPRODUCTID(), NLSID, ctrl));
+				refoferWrapper.text("DTSOFMSG", model.getDTSOFMSG(), ctrl);
+				refoferWrapper.text("ACTIVITY", model.getACTIVITY(), ctrl);
+				refoferWrapper.text("DTSMIWCREATE", now, ctrl);
+				refoferWrapper.text("PRODUCTID", model.getPRODUCTID(), ctrl);
 
 				if (model.getMFRPRODTYPE() != null && !"".equals(model.getMFRPRODTYPE())) {
-					attrs.add(new Text(enterprise, eType, eID, "MFRPRODTYPE", model.getMFRPRODTYPE(), NLSID, ctrl));
+					refoferWrapper.text("MFRPRODTYPE", model.getMFRPRODTYPE(), ctrl);
 				}
 				if (model.getMFRPRODDESC() != null && !"".equals(model.getMFRPRODDESC())) {
-					attrs.add(new Text(enterprise, eType, eID, "MFRPRODDESC", model.getMFRPRODDESC(), NLSID, ctrl));
+					refoferWrapper.text("MFRPRODDESC", model.getMFRPRODDESC(), ctrl);
 				}
 				if (model.getMKTGDIV() != null && !"".equals(model.getMKTGDIV())) {
-					attrs.add(new Text(enterprise, eType, eID, "MKTGDIV", model.getMKTGDIV(), NLSID, ctrl));
+					refoferWrapper.text("MKTGDIV", model.getMKTGDIV(), ctrl);
 				}
 				if (model.getCATGSHRTDESC() != null && !"".equals(model.getCATGSHRTDESC())) {
-					attrs.add(new Text(enterprise, eType, eID, "CATGSHRTDESC", model.getCATGSHRTDESC(), NLSID, ctrl));
+					refoferWrapper.text("CATGSHRTDESC", model.getCATGSHRTDESC(), ctrl);
 				}
-				if (model.getSTRTOSVC() != null && !"".equals(model.getSTRTOSVC())) {
-					attrs.add(new Text(enterprise, eType, eID, "STRTOSVC", model.getSTRTOSVC(), NLSID, ctrl));
+				if (model.getSTRTOFSVC() != null && !"".equals(model.getSTRTOFSVC())) {
+					refoferWrapper.text("STRTOFSVC", model.getSTRTOFSVC(), ctrl);
 				}
 				if (model.getENDOFSVC() != null && !"".equals(model.getENDOFSVC())) {
-					attrs.add(new Text(enterprise, eType, eID, "ENDOFSVC", model.getENDOFSVC(), NLSID, ctrl));
+					refoferWrapper.text("ENDOFSVC", model.getENDOFSVC(), ctrl);
 				}
 
-				attrs.add(new Text(enterprise, eType, eID, "VENDNAM", model.getVENDNAM(), NLSID, ctrl));
-//				attrs.add(new Text(enterprise, eType, eID, "MACHRATECATG", "", NLSID, ctrl));
-				attrs.add(new Text(enterprise, eType, eID, "CECSPRODKEY", model.getCECSPRODKEY(), NLSID, ctrl));
-				attrs.add(new SingleFlag(enterprise, eType, eID, "MAINTANNBILLELIGINDC",
-						"Y".equals(model.getMAINTANNBILLELIGINDC()) ? "MAINY" : "MAINN", NLSID, ctrl));
-				attrs.add(new SingleFlag(enterprise, eType, eID, "SYSIDUNIT",
-						"Y".equals(model.getFSLMCPU()) ? "S00010" : "S00020", NLSID, ctrl));
-//				attrs.add(new Text(enterprise, eType, eID, "PRODSUPRTCD", , NLSID, ctrl));
-//				attrs.add(new SingleFlag(enterprise, eType, eID, "PRFTCTR", , NLSID, ctrl));
-				attrs.add(new SingleFlag(enterprise, eType, eID, "PDHDOMAIN", PDHDOMAIN, NLSID, ctrl));
+				refoferWrapper.text("VENDNAM", model.getVENDNAM(), ctrl);
+//				refoferWrapper.text("MACHRATECATG", "", ctrl);
+				refoferWrapper.text("CECSPRODKEY", model.getCECSPRODKEY(), ctrl);
+				refoferWrapper.flag("MAINTANNBILLELIGINDC",
+						"Y".equals(model.getMAINTANNBILLELIGINDC()) ? "MAINY" : "MAINN", ctrl);
+				refoferWrapper.flag("SYSIDUNIT",
+						"Y".equals(model.getFSLMCPU()) ? "S00010" : "S00020", ctrl);
+//				refoferWrapper.text("PRODSUPRTCD", , ctrl);
+//				refoferWrapper.text("PRFTCTR", , ctrl);
+				refoferWrapper.flag("PDHDOMAIN", PDHDOMAIN, ctrl);
 
-				attrs.add(new SingleFlag(enterprise, eType, eID, "DATAQUALITY", "FINAL", NLSID, ctrl));
-				attrs.add(new SingleFlag(enterprise, eType, eID, "STATUS", "0020", NLSID, ctrl));
-				attrs.add(new SingleFlag(enterprise, eType, eID, "ADSABRSTATUS", QUEUED, NLSID, ctrl));
+				refoferWrapper.flag("DATAQUALITY", "FINAL", ctrl);
+				refoferWrapper.flag("STATUS", "0020", ctrl);
+				refoferWrapper.flag("ADSABRSTATUS", QUEUED, ctrl);
 
-				Vector transactions = new Vector();
-				returnEntityKey.m_vctAttributes = attrs;
-				Log.d(TAG, "returnEntityKey.m_vctAttributes:" + returnEntityKey.m_vctAttributes);
-				transactions.addElement(returnEntityKey);
-				database.update(profile, transactions, false, false);
-				database.commit();
-
-				Log.i(TAG, "REFOFER " + eID + " attributes updated");
+				refoferWrapper.end();
+				Log.d(TAG, model.toString());
+				Log.i(TAG, "REFOFER " + refofer.getEntityID() + " attributes updated");
 			}
 
 		} catch (Exception e) {
@@ -336,7 +296,7 @@ public class EntityManager {
 				model.setMFRPRODDESC(rs.getString("FAMILYNAME") + " - " + rs.getString("SERIESNAME"));
 				model.setMKTGDIV(rs.getString("DIVISION"));
 				model.setCATGSHRTDESC(rs.getString("BRAND"));
-				model.setSTRTOSVC(rs.getString("ANNOUNCE_DATE"));
+				model.setSTRTOFSVC(rs.getString("ANNOUNCE_DATE"));
 				model.setENDOFSVC("9999-12-31");
 				model.setVENDNAM("LENOVO");
 
@@ -363,4 +323,62 @@ public class EntityManager {
 		}
 	}
 
+	class EntityWrapper {
+
+		EntityItem ei;
+
+		ReturnEntityKey rek;
+
+		Vector attrs;
+		Map map;
+
+		public EntityWrapper(EntityItem ei) {
+			this.ei = ei;
+			rek = new ReturnEntityKey(ei.getEntityType(), ei.getEntityID(), true);
+			map = new HashMap();
+			attrs = new Vector();
+		}
+		
+		private void put(String key, Object value) {
+			Object oldValue = map.get(key);
+			if (oldValue != null) {
+				//Replace old value
+				int index = attrs.indexOf(oldValue);
+				if (index >= 0) {
+					attrs.remove(index);
+					attrs.insertElementAt(value, index);
+				}
+			} else {
+				attrs.add(value);
+			}
+			map.put(key, value);
+		}
+
+		public void flag(String attributeCode, String attributeValue, ControlBlock ctrl) throws Exception {
+			SingleFlag sf = new SingleFlag(profile.getEnterprise(), rek.getEntityType(), rek
+					.getEntityID(), attributeCode, attributeValue, 1, ctrl);
+			put(attributeCode, sf);
+		}
+
+		public void text(String attributeCode, String attributeValue, ControlBlock ctrl) {
+			Text sf = new Text(profile.getEnterprise(), rek.getEntityType(), rek.getEntityID(),
+					attributeCode, attributeValue, 1, ctrl);
+			put(attributeCode, sf);
+		}
+
+		public void end() throws Exception {
+			Vector vctReturnsEntityKeys = new Vector();
+			rek.m_vctAttributes = attrs;
+			vctReturnsEntityKeys.addElement(rek);
+			try {
+				database.update(profile, vctReturnsEntityKeys, false, false);
+				database.commit();
+			} catch (Exception e) {
+				throw new Exception("Unable to set text attributes for " + ei.getKey() + ": "
+						+ e.getClass().getName() + " " + e.getMessage());
+
+			}
+		}
+
+	}
 }

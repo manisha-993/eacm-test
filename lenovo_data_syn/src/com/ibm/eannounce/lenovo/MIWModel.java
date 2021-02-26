@@ -16,7 +16,7 @@ public class MIWModel {
 
 	public String CATGSHRTDESC = "";
 
-	public String STRTOSVC = "";
+	public String STRTOFSVC = "";
 
 	public String ENDOFSVC = "";
 
@@ -85,12 +85,12 @@ public class MIWModel {
 		CATGSHRTDESC = cATGSHRTDESC;
 	}
 
-	public String getSTRTOSVC() {
-		return STRTOSVC;
+	public String getSTRTOFSVC() {
+		return STRTOFSVC;
 	}
 
-	public void setSTRTOSVC(String sTRTOSVC) {
-		STRTOSVC = sTRTOSVC;
+	public void setSTRTOFSVC(String sTRTOSVC) {
+		STRTOFSVC = sTRTOSVC;
 	}
 
 	public String getENDOFSVC() {
@@ -145,7 +145,7 @@ public class MIWModel {
 	public String toString() {
 		return "Entity [DTSOFMSG=" + DTSOFMSG + ", ACTIVITY=" + ACTIVITY + ", DTSMIWCREATE=" + DTSMIWCREATE
 				+ ", PRODUCTID=" + PRODUCTID + ", MFRPRODTYPE=" + MFRPRODTYPE + ", MFRPRODDESC=" + MFRPRODDESC
-				+ ", MKTGDIV=" + MKTGDIV + ", CATGSHRTDESC=" + CATGSHRTDESC + ", STRTOSVC=" + STRTOSVC + ", ENDOFSVC="
+				+ ", MKTGDIV=" + MKTGDIV + ", CATGSHRTDESC=" + CATGSHRTDESC + ", STRTOFSVC=" + STRTOFSVC + ", ENDOFSVC="
 				+ ENDOFSVC + ", VENDNAM=" + VENDNAM + ", CECSPRODKEY=" + CECSPRODKEY + ", MAINTANNBILLELIGINDC="
 				+ MAINTANNBILLELIGINDC + ", FSLMCPU=" + FSLMCPU + "]";
 	}
