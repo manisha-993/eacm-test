@@ -42,8 +42,9 @@ public class CCINRPTSTATUS extends PokBaseABR {
 	private static final String CCIN_INTERNALNAME = "CCIN_INTERNALNAME";
 	private static final String FEATURECODE = "FEATURECODE";
 	private static final String FC_COMNAME = "FC_COMNAME";	
+	private static final String FC_HWFCSUBCAT = "FC_HWFCSUBCAT";	
 	private static final String[] COLUMN_ARR = new String[] { CCINATR,
-		CCIN_CODENAME, CCIN_INTERNALNAME, FEATURECODE, FC_COMNAME};
+		CCIN_CODENAME, CCIN_INTERNALNAME, FEATURECODE, FC_COMNAME,FC_HWFCSUBCAT};
 	
 	// m_elist.getParentEntityGroup().getEntityItem(0)
 	private final static String QUERY = "select * from OPICM.CCIN_FEATURE_V with ur";
@@ -58,7 +59,7 @@ public class CCINRPTSTATUS extends PokBaseABR {
 		String dts = getNow();
 		// replace special characters
 		dts = dts.replace(' ', '_');
-		sb.append(dts + ".csv");
+		sb.append(dts + ".xls");
 		dir = ABRServerProperties.getValue(m_abri.getABRCode(), CCINPRTPATH,
 				"/Dgq");
 		if (!dir.endsWith("/")) {
@@ -181,12 +182,13 @@ public class CCINRPTSTATUS extends PokBaseABR {
 		ResultSet rs = ps.executeQuery();
 
 		while (rs.next()) {
-			String[] record = new String[5];
+			String[] record = new String[6];
 			record[0] = rs.getString(1);
 			record[1] = rs.getString(2);
 			record[2] = rs.getString(3);
 			record[3] = rs.getString(4);
 			record[4] = rs.getString(5);
+			record[5] = rs.getString(6);
 			list.add(record);
 		}
 		return list;
