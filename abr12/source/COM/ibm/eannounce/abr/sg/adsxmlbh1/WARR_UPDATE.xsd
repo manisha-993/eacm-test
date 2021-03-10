@@ -36,6 +36,8 @@
 				minOccurs="1" maxOccurs="1" />
 				<xs:element name="TIERWSU" type="xs:string"
 				minOccurs="1" maxOccurs="1" />
+				<xs:element name="TECHADV" type="xs:string"
+				minOccurs="1" maxOccurs="1" />
 				<xs:element name="REMCODLOAD" type="xs:string"
 				minOccurs="1" maxOccurs="1" />
 				<xs:element name="ENHCOMRES" type="xs:string"
