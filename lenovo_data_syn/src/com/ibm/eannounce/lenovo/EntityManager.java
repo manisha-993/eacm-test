@@ -152,7 +152,7 @@ public class EntityManager {
 			EntityItem refofer = findRefofer(model.getPRODUCTID());
 
 			EntityWrapper refoferWrapper = null;
-			
+
 			if (refofer != null) {
 				Log.i(TAG, "REFOFER found: " + refofer.getKey());
 			} else {
@@ -174,7 +174,6 @@ public class EntityManager {
 				ReturnEntityKey returnEntityKey = new ReturnEntityKey(ENTITY_TYPE, 0, true);
 				Log.d(TAG, "returnEntityKey:" + returnEntityKey);
 
-				
 				refoferWrapper = new EntityWrapper(refofer);
 				// Entity attribute mapping
 				refoferWrapper.text("DTSOFMSG", model.getDTSOFMSG(), ctrl);
@@ -206,8 +205,7 @@ public class EntityManager {
 				refoferWrapper.text("CECSPRODKEY", model.getCECSPRODKEY(), ctrl);
 				refoferWrapper.flag("MAINTANNBILLELIGINDC",
 						"Y".equals(model.getMAINTANNBILLELIGINDC()) ? "MAINY" : "MAINN", ctrl);
-				refoferWrapper.flag("SYSIDUNIT",
-						"Y".equals(model.getFSLMCPU()) ? "S00010" : "S00020", ctrl);
+				refoferWrapper.flag("SYSIDUNIT", "Y".equals(model.getFSLMCPU()) ? "S00010" : "S00020", ctrl);
 //				refoferWrapper.text("PRODSUPRTCD", , ctrl);
 //				refoferWrapper.text("PRFTCTR", , ctrl);
 				refoferWrapper.flag("PDHDOMAIN", PDHDOMAIN, ctrl);
@@ -258,20 +256,26 @@ public class EntityManager {
 	public List getRecords(String T1) throws Exception {
 
 		if (offlineMode) {
-			Log.i(TAG, "PDH is in Offline mode (getRecords): MTYPE");
+			Log.i(TAG, "PDH is in Offline mode");
 			return null;
 		}
 
-		Log.d(TAG, "get Records From table MTYPE");
+		Log.d(TAG, "get Records From table MTYPE and MTM");
 		String sql = null;
 		boolean isDelta = false;
 		if ("1980-01-01 00:00:00.000000".equals(T1)) {
-			sql = "select MTYPE,UPD_DT,FAMILYNAME,SERIESNAME,DIVISION,BRAND,ANNOUNCE_DATE from opicm.EACM_MTYPE with ur";
+			sql = "select distinct t1.MTYPE,t2.MACHINE_MODEL,t1.UPD_DT,t1.FAMILYNAME,t1.SERIESNAME,t1.DIVISION,t1.BRAND,t1.ANNOUNCE_DATE,t1.ACTION_TYPE from opicm.EACM_MTYPE_LOG t1 "
+					+ "join opicm.EACM_MTM t2 on t1.Mtype=t2.MACHINE_TYPE where t2.MACHINE_MODEL is not null with ur";
 
 		} else {
-			sql = "select MTYPE,UPD_DT,FAMILYNAME,SERIESNAME,DIVISION,BRAND,ANNOUNCE_DATE,ACTION_TYPE from opicm.EACM_MTYPE_LOG t1 "
-					+ "where ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTYPE_LOG where ACTION_TIME between '"
-					+ T1 + "' and current timestamp and t1.mtype= mtype Group by mtype) with ur";
+
+			sql = "select distinct t1.MTYPE,t2.MACHINE_MODEL,t1.UPD_DT,t1.FAMILYNAME,t1.SERIESNAME,t1.DIVISION,t1.BRAND,t1.ANNOUNCE_DATE,t1.ACTION_TYPE from opicm.EACM_MTYPE_LOG t1 "
+					+ "join opicm.EACM_MTM_LOG t2 on t1.Mtype=t2.MACHINE_TYPE where t1.ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTYPE_LOG where ACTION_TIME between'"
+					+ T1 + "' and current timestamp and t1.mtype= mtype Group by mtype) and t2.MACHINE_MODEL is not null"
+					+ "Union select distinct t1.MTYPE,t2.MACHINE_MODEL,t1.UPD_DT,t1.FAMILYNAME,t1.SERIESNAME,t1.DIVISION,t1.BRAND,t1.ANNOUNCE_DATE,t1.ACTION_TYPE from opicm.EACM_MTYPE_LOG t1 "
+					+ "join opicm.EACM_MTM_LOG t2 on t1.Mtype=t2.MACHINE_TYPE where t2.ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTM_LOG where ACTION_TIME between '"
+					+ T1 + "' and current timestamp and t2.PRODUCT_ID= PRODUCT_ID Group by PRODUCT_ID) and t2.MACHINE_MODEL is not null with ur";
+
 			isDelta = true;
 		}
 		Log.d(TAG, "Extract SQL:" + sql);
@@ -291,8 +295,8 @@ public class EntityManager {
 				} else {
 					model.setACTIVITY("Update");
 				}
-				model.setPRODUCTID(rs.getString("MTYPE") + "DUM");
-				model.setMFRPRODTYPE(rs.getString("MTYPE") + "-" + "DUM");
+				model.setPRODUCTID(rs.getString("MTYPE") + "CTO");
+				model.setMFRPRODTYPE(rs.getString("MTYPE") + "-" + "CTO");
 				model.setMFRPRODDESC(rs.getString("FAMILYNAME") + " - " + rs.getString("SERIESNAME"));
 				model.setMKTGDIV(rs.getString("DIVISION"));
 				model.setCATGSHRTDESC(rs.getString("BRAND"));
@@ -323,6 +327,62 @@ public class EntityManager {
 		}
 	}
 
+	public List getIbmType() throws Exception {
+
+		if (offlineMode) {
+			Log.i(TAG, "PDH is in Offline mode: get IBM TYPE");
+			return null;
+		}
+		Log.d(TAG, "get MACHTYPE From metadescription table");
+		String sql = "select descriptionclass from opicm.metadescription where descriptiontype='MACHTYPEATR' and nlsid=1 and valto>current timestamp and effto>current timestamp and descriptionclass not in "
+				+ "(select linktype2 from opicm.metalinkattr where linktype1='MACHTYPEATR' and linkcode='Expired' and linkvalue='Y' and valto>current timestamp and effto>current timestamp)  with ur";
+		Log.d(TAG, "Extract SQL:" + sql);
+		List types = new ArrayList();
+		try {
+			Connection conn = database.getPDHConnection();
+			PreparedStatement ps = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				types.add(rs.getString(0));
+			}
+		} catch (SQLException | MiddlewareException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "read records from table Exception:" + e);
+			throw e;
+		}
+		return types;
+	}
+
+	public List getIbmPseudoType() throws Exception {
+
+		if (offlineMode) {
+			Log.i(TAG, "PDH is in Offline mode: get IBM pseudo Type");
+			return null;
+		}
+		Log.d(TAG, "get pseudo Type From text table");
+		String sql = "\r\n"
+				+ "select distinct substring(attributevalue,0,5) from opicm.text where entitytype='REFOFER' and attributecode='PRODUCTID' and valto>current timestamp and effto>current timestamp with ur";
+		Log.d(TAG, "Extract SQL:" + sql);
+		List types = new ArrayList();
+		try {
+			Connection conn = database.getPDHConnection();
+			PreparedStatement ps = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				types.add(rs.getString(0));
+			}
+		} catch (SQLException | MiddlewareException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "read records from table Exception:" + e);
+			throw e;
+		}
+		return types;
+	}
+
 	class EntityWrapper {
 
 		EntityItem ei;
@@ -338,11 +398,11 @@ public class EntityManager {
 			map = new HashMap();
 			attrs = new Vector();
 		}
-		
+
 		private void put(String key, Object value) {
 			Object oldValue = map.get(key);
 			if (oldValue != null) {
-				//Replace old value
+				// Replace old value
 				int index = attrs.indexOf(oldValue);
 				if (index >= 0) {
 					attrs.remove(index);
@@ -355,14 +415,14 @@ public class EntityManager {
 		}
 
 		public void flag(String attributeCode, String attributeValue, ControlBlock ctrl) throws Exception {
-			SingleFlag sf = new SingleFlag(profile.getEnterprise(), rek.getEntityType(), rek
-					.getEntityID(), attributeCode, attributeValue, 1, ctrl);
+			SingleFlag sf = new SingleFlag(profile.getEnterprise(), rek.getEntityType(), rek.getEntityID(),
+					attributeCode, attributeValue, 1, ctrl);
 			put(attributeCode, sf);
 		}
 
 		public void text(String attributeCode, String attributeValue, ControlBlock ctrl) {
-			Text sf = new Text(profile.getEnterprise(), rek.getEntityType(), rek.getEntityID(),
-					attributeCode, attributeValue, 1, ctrl);
+			Text sf = new Text(profile.getEnterprise(), rek.getEntityType(), rek.getEntityID(), attributeCode,
+					attributeValue, 1, ctrl);
 			put(attributeCode, sf);
 		}
 
@@ -374,11 +434,12 @@ public class EntityManager {
 				database.update(profile, vctReturnsEntityKeys, false, false);
 				database.commit();
 			} catch (Exception e) {
-				throw new Exception("Unable to set text attributes for " + ei.getKey() + ": "
-						+ e.getClass().getName() + " " + e.getMessage());
+				throw new Exception("Unable to set text attributes for " + ei.getKey() + ": " + e.getClass().getName()
+						+ " " + e.getMessage());
 
 			}
 		}
 
 	}
+
 }
