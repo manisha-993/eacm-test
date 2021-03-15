@@ -345,7 +345,7 @@ public class EntityManager {
 			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
-				types.add(rs.getString(0));
+				types.add(rs.getString(1));
 			}
 		} catch (SQLException | MiddlewareException e) {
 			// TODO Auto-generated catch block
@@ -373,7 +373,7 @@ public class EntityManager {
 			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
-				types.add(rs.getString(0));
+				types.add(rs.getString(1));
 			}
 		} catch (SQLException | MiddlewareException e) {
 			// TODO Auto-generated catch block
