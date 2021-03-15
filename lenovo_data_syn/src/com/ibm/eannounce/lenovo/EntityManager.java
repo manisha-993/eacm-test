@@ -271,7 +271,7 @@ public class EntityManager {
 
 			sql = "select distinct t1.MTYPE,t2.MACHINE_MODEL,t1.UPD_DT,t1.FAMILYNAME,t1.SERIESNAME,t1.DIVISION,t1.BRAND,t1.ANNOUNCE_DATE,t1.ACTION_TYPE from opicm.EACM_MTYPE_LOG t1 "
 					+ "join opicm.EACM_MTM_LOG t2 on t1.Mtype=t2.MACHINE_TYPE where t1.ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTYPE_LOG where ACTION_TIME between'"
-					+ T1 + "' and current timestamp and t1.mtype= mtype Group by mtype) and t2.MACHINE_MODEL is not null"
+					+ T1 + "' and current timestamp and t1.mtype= mtype Group by mtype) and t2.MACHINE_MODEL is not null "
 					+ "Union select distinct t1.MTYPE,t2.MACHINE_MODEL,t1.UPD_DT,t1.FAMILYNAME,t1.SERIESNAME,t1.DIVISION,t1.BRAND,t1.ANNOUNCE_DATE,t1.ACTION_TYPE from opicm.EACM_MTYPE_LOG t1 "
 					+ "join opicm.EACM_MTM_LOG t2 on t1.Mtype=t2.MACHINE_TYPE where t2.ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTM_LOG where ACTION_TIME between '"
 					+ T1 + "' and current timestamp and t2.PRODUCT_ID= PRODUCT_ID Group by PRODUCT_ID) and t2.MACHINE_MODEL is not null with ur";
