@@ -29,6 +29,8 @@ public class MIWModel {
 
 //	public String PRODSUPRTCD = "";
 //	public String PRFTCTR = "";
+	public String DCG = "";
+	
 	public String getDTSOFMSG() {
 		return DTSOFMSG;
 	}
@@ -141,13 +143,21 @@ public class MIWModel {
 		FSLMCPU = fSLMCPU;
 	}
 
+	public String getDCG() {
+		return DCG;
+	}
+
+	public void setDCG(String dCG) {
+		DCG = dCG;
+	}
+
 	@Override
 	public String toString() {
-		return "Entity [DTSOFMSG=" + DTSOFMSG + ", ACTIVITY=" + ACTIVITY + ", DTSMIWCREATE=" + DTSMIWCREATE
+		return "MIWModel [DTSOFMSG=" + DTSOFMSG + ", ACTIVITY=" + ACTIVITY + ", DTSMIWCREATE=" + DTSMIWCREATE
 				+ ", PRODUCTID=" + PRODUCTID + ", MFRPRODTYPE=" + MFRPRODTYPE + ", MFRPRODDESC=" + MFRPRODDESC
 				+ ", MKTGDIV=" + MKTGDIV + ", CATGSHRTDESC=" + CATGSHRTDESC + ", STRTOFSVC=" + STRTOFSVC + ", ENDOFSVC="
 				+ ENDOFSVC + ", VENDNAM=" + VENDNAM + ", CECSPRODKEY=" + CECSPRODKEY + ", MAINTANNBILLELIGINDC="
-				+ MAINTANNBILLELIGINDC + ", FSLMCPU=" + FSLMCPU + "]";
+				+ MAINTANNBILLELIGINDC + ", FSLMCPU=" + FSLMCPU + ", DCG=" + DCG + "]";
 	}
 
 }
