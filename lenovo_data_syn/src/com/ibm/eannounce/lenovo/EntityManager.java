@@ -578,16 +578,27 @@ public class EntityManager {
 			List ibmType = getIbmType();
 			List ibmPseudoType = getIbmPseudoType();
 			List all = filterType(getTypeRecords(T1), ibmType, ibmPseudoType);
+			List DCGtype = new ArrayList();
+			List noDCGtype = new ArrayList();
 			for (int i=0;i<all.size();i++) {
 				String dCG = (String) ((Map) all.get(i)).get("DCG");
 				String type = (String) ((Map) all.get(i)).get("MTYPE");
 				if("Y".equals(dCG)) {
-					DCG.append("'" + type + "'");
-					if(i != all.size()-1) DCG.append(",");
+					DCGtype.add(type);
 				}else {
-					noDCG.append("'" + type + "'");
-					if(i != all.size()-1) noDCG.append(",");
+					noDCGtype.add(type);
+					
 				}
+			}
+			
+			for(int i=0;i<DCGtype.size();i++) {
+				DCG.append("'" + DCGtype.get(i) + "'");
+				if(i != DCGtype.size()-1) DCG.append(",");
+			}
+			
+			for(int i=0;i<noDCGtype.size();i++) {
+				noDCG.append("'" + noDCGtype.get(i) + "'");
+				if(i != noDCGtype.size()-1) noDCG.append(",");
 			}
 			Log.i(TAG, "DCG Type: " + DCG.toString());
 			Log.i(TAG, "not DCG Type: " + noDCG.toString());
