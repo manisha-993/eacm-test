@@ -305,7 +305,7 @@ public class EntityManager {
 
 		sql = "select distinct t1.MTYPE,t2.MACHINE_MODEL as model,t1.UPD_DT,t1.FAMILYNAME,t1.SERIESNAME,t1.DIVISION,t1.BRAND,t1.ANNOUNCE_DATE,t1.DCG from opicm.EACM_MTYPE_LOG t1 "
 				+ "join opicm.EACM_MTM_LOG t2 on t1.MTYPE=t2.MACHINE_TYPE where t1.ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTYPE_LOG where ACTION_TIME between '" 
-				+ T1 + "' and current timestamp and t1.mtype= mtype Group by mtype) and t1.DCG='Y' and t2.MACHINE_TYPE is not null and t1.MTYPE in (" 
+				+ T1 + "' and current timestamp and t1.mtype= mtype Group by mtype) and t1.DCG='Y' and t2.MACHINE_MODEL is not null and t1.MTYPE in (" 
 				+ DCGtype + ") with ur";
 		
 		
