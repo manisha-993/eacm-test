@@ -492,20 +492,29 @@ public class EntityManager {
 	}
 	
 	public List filterType(List types, List ibmType, List ibmPseudoType) {
-		for (int i=0;i<types.size();i++) {
+		List newType = new ArrayList();
+		int length =types.size();
+		for (int i=0;i<length;i++) {
 			String type = (String) ((Map) types.get(i)).get("MTYPE");
 			if(ibmType.contains(type)||ibmPseudoType.contains(type)) {				
-				types.remove(types.get(i));				
+						
+			}else {
+				newType.add(types);
 			}
 		}
+		
 		Log.i(TAG, "After Filter MTYPE: " + types.toString());
-		return types;
+		return newType;
 	}
 	
-	public List filterDCGModel(List entities) {
+	public List filterDCGModel(List types) {
 		
-		for(int i = 0;i<entities.size();i++) {
-			MIWModel m = (MIWModel) entities.get(i);
+		List newType = new ArrayList();
+		int length =types.size();
+		
+		List MIWType = getMIWType();
+		for(int i = 0;i<length;i++) {
+			String type = (String) types.get(i);
 			/**
 			Business rule 1: If the machine type is DCG (business rule 3) AND in the set that was made available for Lenovo (business rule 4) 
 					AND type is alpha numeric AND type on the approved list from MIW AND there is a model in MTM (model not blank) 
@@ -526,29 +535,25 @@ public class EntityManager {
 			Business rule 9: If the machine type is DCG it needs to have a model. If the machine is NOT DCG it should be kept type only 
 					and not be enriched with a model.
 			*/
-
-			String type = m.getPRODUCTID().substring(0,5);
 				
 //			Log.i(TAG, "Filter DCG MTYPE: " + type);
 			if(normalstr(type)) {
 				if(type.matches("[0-9]+")) {
-					continue;
+					newType.add(type);
 				}
 				//if on the MIW list
-				if(getMIWType().contains(type)) {
-					continue;
+				if(MIWType.contains(type)) {
+					newType.add(type);
 				}else {
-					entities.remove(m);	
-					Log.i(TAG, "Filter DCG MODEL not on MIW List : " + m.toString());
+					Log.i(TAG, "Filter DCG MODEL not on MIW List : " + type.toString());
 					break;
 				}
 			}else {
-				entities.remove(m);	
-				Log.i(TAG, "Filter DCG MODEL not alpha numeric : " + m.toString());
+				Log.i(TAG, "Filter DCG MODEL not alpha numeric : " + type.toString());
 				break;
 			}						
 		}	
-		return entities;
+		return newType;
 	}
 
 	/**
@@ -591,6 +596,8 @@ public class EntityManager {
 				}
 			}
 			
+			DCGtype=filterDCGModel(DCGtype);
+			
 			for(int i=0;i<DCGtype.size();i++) {
 				DCG.append("'" + DCGtype.get(i) + "'");
 				if(i != DCGtype.size()-1) DCG.append(",");
@@ -610,8 +617,9 @@ public class EntityManager {
 			noDCGtype = null;
 			System.gc();
 			
+			
 			entities.add(getNotDCGRecords(T1, noDCG.toString()));
-			entities.add(filterDCGModel(getDCGRecords(T1, DCG.toString())));
+			entities.add(getDCGRecords(T1, DCG.toString()));
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
