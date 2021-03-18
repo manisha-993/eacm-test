@@ -211,7 +211,7 @@ public class EntityManager {
 //				refoferWrapper.text("PRODSUPRTCD", , ctrl);
 //				refoferWrapper.text("PRFTCTR", , ctrl);
 				refoferWrapper.flag("PDHDOMAIN", PDHDOMAIN, ctrl);
-
+				refoferWrapper.flag("DCG", model.getDCG(), ctrl);
 				refoferWrapper.flag("DATAQUALITY", "FINAL", ctrl);
 				refoferWrapper.flag("STATUS", "0020", ctrl);
 				refoferWrapper.flag("ADSABRSTATUS", QUEUED, ctrl);
