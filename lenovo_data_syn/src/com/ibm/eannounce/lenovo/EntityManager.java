@@ -545,12 +545,10 @@ public class EntityManager {
 				if(MIWType.contains(type)) {
 					newType.add(type);
 				}else {
-					Log.i(TAG, "Filter DCG MODEL not on MIW List : " + type.toString());
-					break;
+					Log.i(TAG, "Filter DCG MODEL not on MIW List : " + type.toString());			
 				}
 			}else {
 				Log.i(TAG, "Filter DCG MODEL not alpha numeric : " + type.toString());
-				break;
 			}						
 		}	
 		return newType;
