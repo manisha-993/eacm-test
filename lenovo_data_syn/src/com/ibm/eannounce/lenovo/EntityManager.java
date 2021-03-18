@@ -471,8 +471,8 @@ public class EntityManager {
 			reader = new BufferedReader(new FileReader(file));
 			reader.readLine();
 			reader.readLine();
-			String line = reader.readLine();
-			while(line != null) {
+			String line=null;
+			while((line=reader.readLine()) != null) {
 				types.add(line.trim());
 			}			
 			Log.i(TAG, "get MIW type from file: " + types.toString());
@@ -503,7 +503,7 @@ public class EntityManager {
 			}
 		}
 		
-		Log.i(TAG, "After Filter MTYPE: " + types.toString());
+		Log.i(TAG, "After Filter MTYPE: " + newType.toString());
 		return newType;
 	}
 	
