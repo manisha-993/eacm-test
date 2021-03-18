@@ -603,6 +603,13 @@ public class EntityManager {
 			Log.i(TAG, "DCG Type: " + DCG.toString());
 			Log.i(TAG, "not DCG Type: " + noDCG.toString());
 			
+			ibmType = null;
+			ibmPseudoType = null;
+			all = null;
+			DCGtype = null;
+			noDCGtype = null;
+			System.gc();
+			
 			entities.add(getNotDCGRecords(T1, noDCG.toString()));
 			entities.add(filterDCGModel(getDCGRecords(T1, DCG.toString())));
 			
