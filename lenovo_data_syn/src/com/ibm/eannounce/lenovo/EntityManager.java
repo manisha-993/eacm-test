@@ -493,13 +493,13 @@ public class EntityManager {
 	
 	public List filterType(List types, List ibmType, List ibmPseudoType) {
 		List newType = new ArrayList();
-		int length =types.size();
+		int length = types.size();
 		for (int i=0;i<length;i++) {
 			String type = (String) ((Map) types.get(i)).get("MTYPE");
 			if(ibmType.contains(type)||ibmPseudoType.contains(type)) {				
 						
 			}else {
-				newType.add(types);
+				newType.add(types.get(i));
 			}
 		}
 		
