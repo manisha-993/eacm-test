@@ -265,8 +265,8 @@ public class EntityManager {
 		Log.d(TAG, "get Records From table MTYPE and MTM");
 		String sql = null;
 
-		sql = "select distinct MTYPE,DCG from opicm.EACM_MTYPE_LOG where ACTION_TIME=(select max(t1.ACTION_TIME) from opicm.EACM_MTYPE_LOG t1 where t1.ACTION_TIME between '" 
-				+ T1 + "' and current timestamp and t1.mtype= mtype Group by mtype) with ur";
+		sql = "select distinct t2.MTYPE,t2.DCG from opicm.EACM_MTYPE_LOG t2 where t2.ACTION_TIME=(select max(t1.ACTION_TIME) from opicm.EACM_MTYPE_LOG t1 where t1.ACTION_TIME between '" 
+				+ T1 + "' and current timestamp and t1.mtype= t2.mtype Group by t1.mtype) with ur";
 				
 		Log.d(TAG, "Extract SQL:" + sql);
 		List allType = new ArrayList();
