@@ -67,27 +67,26 @@ public class Catcher {
 		long startTime = System.currentTimeMillis();
 		try {
 			List entities = entityManager.filterRecords(T1);
-			if (entities.size() > 0) {
-				List dcgEntities = (List) entities.get(1);
-				List noDcgEntities = (List) entities.get(0);
-				Log.i(TAG, "find " + noDcgEntities.size() + " Not DCG records change");
-				Log.i(TAG, "find " + dcgEntities.size() + " DCG records change");
-				for (int i = 0; i < noDcgEntities.size(); i++) {
-					MIWModel m = (MIWModel) noDcgEntities.get(i);
+			
+			List noDcgEntities = (List) entities.get(0);
+			List dcgEntities = (List) entities.get(1);
+			
+			Log.i(TAG, "find " + noDcgEntities.size() + " Not DCG records change");
+			Log.i(TAG, "find " + dcgEntities.size() + " DCG records change");
+			for (int i = 0; i < noDcgEntities.size(); i++) {
+				MIWModel m = (MIWModel) noDcgEntities.get(i);
 
-					entityManager.createEntity(m);
-					Log.i(TAG, "create No DCG REFOFER entity: " + m.toString());
-				}
-				for (int i = 0; i < dcgEntities.size(); i++) {
-					MIWModel m = (MIWModel) dcgEntities.get(i);
-
-					entityManager.createEntity(m);
-					Log.i(TAG, "create DCG REFOFER entity: " + m.toString());
-				}
-				isSuccess = true;
-			}else {
-				Log.i(TAG, "find no records change.");
+				entityManager.createEntity(m);
+				Log.i(TAG, "create No DCG REFOFER entity: " + m.toString());
 			}
+			for (int i = 0; i < dcgEntities.size(); i++) {
+				MIWModel m = (MIWModel) dcgEntities.get(i);
+
+				entityManager.createEntity(m);
+				Log.i(TAG, "create DCG REFOFER entity: " + m.toString());
+			}
+			isSuccess = true;
+			
 		} catch (Exception e) {
 			Log.e(TAG, "Unable to create REFOFER entity", e);
 			throw new IllegalStateException("Unable to create entity");

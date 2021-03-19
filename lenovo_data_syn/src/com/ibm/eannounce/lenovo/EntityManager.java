@@ -617,9 +617,13 @@ public class EntityManager {
 			
 			if(noDCG.toString()!= null && !"".equals(noDCG.toString())) {
 				entities.add(getNotDCGRecords(T1, noDCG.toString()));
+			}else {
+				entities.add(new ArrayList());
 			}
 			if(DCG.toString()!= null && !"".equals(DCG.toString())) {
 				entities.add(getDCGRecords(T1, DCG.toString()));
+			}else {
+				entities.add(new ArrayList());
 			}
 						
 		} catch (Exception e) {
