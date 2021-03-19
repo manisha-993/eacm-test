@@ -265,9 +265,9 @@ public class EntityManager {
 		Log.d(TAG, "get Records From table MTYPE and MTM");
 		String sql = null;
 
-		sql = "select distinct t2.MTYPE,t2.DCG from opicm.EACM_MTYPE_LOG t2 where t2.ACTION_TIME=(select max(t1.ACTION_TIME) from opicm.EACM_MTYPE_LOG t1 where t1.ACTION_TIME between '" 
+		sql = "select distinct t2.MTYPE,t2.DCG from opicm.EACM_MTYPE_LOG t2 where t2.ACTION_TIME=(select max(t1.ACTION_TIME) from opicm.EACM_MTYPE_LOG t1 where t1.ACTION_TIME between '"
 				+ T1 + "' and current timestamp and t1.mtype= t2.mtype Group by t1.mtype) with ur";
-				
+
 		Log.d(TAG, "Extract SQL:" + sql);
 		List allType = new ArrayList();
 		try {
@@ -275,9 +275,8 @@ public class EntityManager {
 			PreparedStatement ps = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
 					ResultSet.CONCUR_READ_ONLY);
 			ResultSet rs = ps.executeQuery();
-			
-			
-			while (rs.next()) {				
+
+			while (rs.next()) {
 				Map data = new HashMap();
 				data.put("MTYPE", rs.getString("MTYPE").trim());
 				data.put("DCG", rs.getString("DCG").trim());
@@ -304,11 +303,11 @@ public class EntityManager {
 		String sql = null;
 
 		sql = "select distinct t1.MTYPE,t2.MACHINE_MODEL as model,t1.UPD_DT,t1.FAMILYNAME,t1.SERIESNAME,t1.DIVISION,t1.BRAND,t1.ANNOUNCE_DATE,t1.DCG from opicm.EACM_MTYPE_LOG t1 "
-				+ "join opicm.EACM_MTM_LOG t2 on t1.MTYPE=t2.MACHINE_TYPE where t1.ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTYPE_LOG where ACTION_TIME between '" 
-				+ T1 + "' and current timestamp and t1.mtype= mtype Group by mtype) and t1.DCG='Y' and t2.MACHINE_MODEL is not null and t1.MTYPE in (" 
+				+ "join opicm.EACM_MTM_LOG t2 on t1.MTYPE=t2.MACHINE_TYPE where t1.ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTYPE_LOG where ACTION_TIME between '"
+				+ T1
+				+ "' and current timestamp and t1.mtype= mtype Group by mtype) and t1.DCG='Y' and t2.MACHINE_MODEL is not null and t1.MTYPE in ("
 				+ DCGtype + ") with ur";
-		
-		
+
 		Log.d(TAG, "Extract SQL:" + sql);
 		List entitys = new ArrayList();
 		try {
@@ -323,19 +322,29 @@ public class EntityManager {
 				model.setDTSOFMSG(rs.getString("UPD_DT").trim());
 				model.setACTIVITY("Update");
 
-				model.setPRODUCTID(rs.getString("MTYPE").trim() + rs.getString("MODEL").trim());
-				model.setMFRPRODTYPE(rs.getString("MTYPE").trim() + "-" + rs.getString("MODEL").trim());
-				model.setMFRPRODDESC(rs.getString("FAMILYNAME").trim() + " - " + rs.getString("SERIESNAME").trim());
-				model.setMKTGDIV(rs.getString("DIVISION").trim());
-				model.setCATGSHRTDESC(rs.getString("BRAND").trim());
-				model.setSTRTOFSVC(rs.getString("ANNOUNCE_DATE").trim());
+				model.setPRODUCTID(rs.getString("MTYPE") == null ? rs.getString("MTYPE")
+						: rs.getString("MTYPE").trim() + rs.getString("MODEL") == null ? rs.getString("MODEL")
+								: rs.getString("MODEL").trim());
+				model.setMFRPRODTYPE(rs.getString("MTYPE") == null ? rs.getString("MTYPE")
+						: rs.getString("MTYPE").trim() + "-" + rs.getString("MODEL") == null ? rs.getString("MODEL")
+								: rs.getString("MODEL").trim());
+				model.setMFRPRODDESC(rs.getString("FAMILYNAME") == null ? rs.getString("FAMILYNAME")
+						: rs.getString("FAMILYNAME").trim() + " - " + rs.getString("SERIESNAME") == null
+								? rs.getString("SERIESNAME")
+								: rs.getString("SERIESNAME").trim());
+				model.setMKTGDIV(
+						rs.getString("DIVISION") == null ? rs.getString("DIVISION") : rs.getString("DIVISION").trim());
+				model.setCATGSHRTDESC(
+						rs.getString("BRAND") == null ? rs.getString("BRAND") : rs.getString("BRAND").trim());
+				model.setSTRTOFSVC(rs.getString("ANNOUNCE_DATE") == null ? rs.getString("ANNOUNCE_DATE")
+						: rs.getString("ANNOUNCE_DATE").trim());
 				model.setENDOFSVC("9999-12-31");
 				model.setVENDNAM("LENOVO");
 
 				model.setCECSPRODKEY("3");
 				model.setMAINTANNBILLELIGINDC("N");
 				model.setFSLMCPU("N");
-				model.setDCG(rs.getString("DCG").trim());
+				model.setDCG(rs.getString("DCG") == null ? rs.getString("DCG") : rs.getString("DCG").trim());
 
 				entitys.add(model);
 			}
@@ -347,7 +356,7 @@ public class EntityManager {
 		}
 		return entitys;
 	}
-	
+
 	public List getNotDCGRecords(String T1, String noDCGtype) throws Exception {
 
 		if (offlineMode) {
@@ -359,11 +368,10 @@ public class EntityManager {
 		String sql = null;
 
 		sql = "select distinct t1.MTYPE,t1.UPD_DT,t1.FAMILYNAME,t1.SERIESNAME,t1.DIVISION,t1.BRAND,t1.ANNOUNCE_DATE,t1.DCG from opicm.EACM_MTYPE_LOG t1 "
-				+ "where t1.ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTYPE_LOG where ACTION_TIME between '" 
-				+ T1 + "' and current timestamp and t1.mtype= mtype Group by mtype) and t1.MTYPE in ("
-				+ noDCGtype + ") and t1.DCG='N' with ur";
-		
-		
+				+ "where t1.ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTYPE_LOG where ACTION_TIME between '"
+				+ T1 + "' and current timestamp and t1.mtype= mtype Group by mtype) and t1.MTYPE in (" + noDCGtype
+				+ ") and t1.DCG='N' with ur";
+
 		Log.d(TAG, "Extract SQL:" + sql);
 		List entitys = new ArrayList();
 		try {
@@ -375,22 +383,31 @@ public class EntityManager {
 			while (rs.next()) {
 
 				MIWModel model = new MIWModel();
-				model.setDTSOFMSG(rs.getString("UPD_DT").trim());
+				model.setDTSOFMSG(
+						rs.getString("UPD_DT") == null ? rs.getString("UPD_DT") : rs.getString("UPD_DT").trim());
 				model.setACTIVITY("Update");
 
-				model.setPRODUCTID(rs.getString("MTYPE").trim());
-				model.setMFRPRODTYPE(rs.getString("MTYPE").trim());
-				model.setMFRPRODDESC(rs.getString("FAMILYNAME").trim() + " - " + rs.getString("SERIESNAME").trim());
-				model.setMKTGDIV(rs.getString("DIVISION").trim());
-				model.setCATGSHRTDESC(rs.getString("BRAND").trim());
-				model.setSTRTOFSVC(rs.getString("ANNOUNCE_DATE").trim());
+				model.setPRODUCTID(
+						rs.getString("MTYPE") == null ? rs.getString("MTYPE") : rs.getString("MTYPE").trim());
+				model.setMFRPRODTYPE(
+						rs.getString("MTYPE") == null ? rs.getString("MTYPE") : rs.getString("MTYPE").trim());
+				model.setMFRPRODDESC(rs.getString("FAMILYNAME") == null ? rs.getString("FAMILYNAME")
+						: rs.getString("FAMILYNAME").trim() + " - " + rs.getString("SERIESNAME") == null
+								? rs.getString("SERIESNAME")
+								: rs.getString("SERIESNAME").trim());
+				model.setMKTGDIV(
+						rs.getString("DIVISION") == null ? rs.getString("DIVISION") : rs.getString("DIVISION").trim());
+				model.setCATGSHRTDESC(
+						rs.getString("BRAND") == null ? rs.getString("BRAND") : rs.getString("BRAND").trim());
+				model.setSTRTOFSVC(rs.getString("ANNOUNCE_DATE") == null ? rs.getString("ANNOUNCE_DATE")
+						: rs.getString("ANNOUNCE_DATE").trim());
 				model.setENDOFSVC("9999-12-31");
 				model.setVENDNAM("LENOVO");
 
 				model.setCECSPRODKEY("3");
 				model.setMAINTANNBILLELIGINDC("N");
 				model.setFSLMCPU("N");
-				model.setDCG(rs.getString("DCG"));
+				model.setDCG(rs.getString("DCG") == null ? rs.getString("DCG") : rs.getString("DCG").trim());
 
 				entitys.add(model);
 			}
@@ -402,7 +419,7 @@ public class EntityManager {
 		}
 		return entitys;
 	}
-	
+
 	public List getIbmType() throws Exception {
 
 		if (offlineMode) {
@@ -423,7 +440,7 @@ public class EntityManager {
 			while (rs.next()) {
 				types.add(rs.getString(1).trim());
 			}
-			
+
 			Log.i(TAG, "get IBM Type: " + types.toString());
 		} catch (SQLException | MiddlewareException e) {
 			// TODO Auto-generated catch block
@@ -440,9 +457,9 @@ public class EntityManager {
 			return null;
 		}
 		Log.d(TAG, "get pseudo Type From text table");
-		String sql = "select distinct substring(t.attributevalue,0,5) from opicm.text t " + 
-				"join opicm.flag f on f.entitytype=t.entitytype and f.entityid=t.entityid and f.attributecode='PDHDOMAIN' and f.attributevalue='MIW' " + 
-				"where t.entitytype='REFOFER' and t.attributecode='PRODUCTID' and t.valto>current timestamp and t.effto>current timestamp and f.valto>current timestamp and f.effto>current timestamp with ur";
+		String sql = "select distinct substring(t.attributevalue,0,5) from opicm.text t "
+				+ "join opicm.flag f on f.entitytype=t.entitytype and f.entityid=t.entityid and f.attributecode='PDHDOMAIN' and f.attributevalue='MIW' "
+				+ "where t.entitytype='REFOFER' and t.attributecode='PRODUCTID' and t.valto>current timestamp and t.effto>current timestamp and f.valto>current timestamp and f.effto>current timestamp with ur";
 		Log.d(TAG, "Extract SQL:" + sql);
 		List types = new ArrayList();
 		try {
@@ -464,175 +481,186 @@ public class EntityManager {
 	}
 
 	private List getMIWType() {
-		List types = new ArrayList() ;
+		List types = new ArrayList();
 		File file = new File("LENOVOEXCLUDED.TXT");
-        BufferedReader reader = null;
+		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(file));
 			reader.readLine();
 			reader.readLine();
-			String line=null;
-			while((line=reader.readLine()) != null) {
+			String line = null;
+			while ((line = reader.readLine()) != null) {
 				types.add(line.trim());
-			}			
+			}
 			Log.i(TAG, "get MIW type from file: " + types.toString());
 			reader.close();
 		} catch (IOException e) {
 			Log.e(TAG, "get MIW type from file: " + e);
 			e.printStackTrace();
 		} finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e1) {
-                }
-            }
-        }
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e1) {
+				}
+			}
+		}
 		return types;
 	}
-	
+
 	public List filterType(List types, List ibmType, List ibmPseudoType) {
 		List newType = new ArrayList();
 		int length = types.size();
-		for (int i=0;i<length;i++) {
+		for (int i = 0; i < length; i++) {
 			String type = (String) ((Map) types.get(i)).get("MTYPE");
-			if(ibmType.contains(type)||ibmPseudoType.contains(type)) {				
-						
-			}else {
+			if (ibmType.contains(type) || ibmPseudoType.contains(type)) {
+
+			} else {
 				newType.add(types.get(i));
 			}
 		}
-		
+
 		Log.i(TAG, "After Filter MTYPE: " + newType.toString());
 		return newType;
 	}
-	
+
 	public List filterDCGModel(List types) {
-		
+
 		List newType = new ArrayList();
-		int length =types.size();
-		
+		int length = types.size();
+
 		List MIWType = getMIWType();
-		for(int i = 0;i<length;i++) {
+		for (int i = 0; i < length; i++) {
 			String type = (String) types.get(i);
 			/**
-			Business rule 1: If the machine type is DCG (business rule 3) AND in the set that was made available for Lenovo (business rule 4) 
-					AND type is alpha numeric AND type on the approved list from MIW AND there is a model in MTM (model not blank) 
-					THEN it is a valid one to be used in IBM (can be used in CHIS/CONGA for contract).
-			Business rule 2: If the machine type is DCG (business rule 3) AND in the set that was made available for Lenovo (business rule 4) 
-					AND type numeric only AND type not matching with an IBM type (business rule 8) or an IBM pseudo type (business rule 7) 
-					AND there is a model (model not blank) in MTM THEN it is valid to be used in IBM (can be used in CHIS/CONGA for a contract).
-			Business rule 3: a type is DCG if the product division is 4S, Z3, 13, Y1 or G9
-			Business rule 4: the set of types that was made available for Lenovo type model have a type that start with 1,2,3,4,5,6,7,8,9
-			Business rule 5: If the machine type is NOT DCG (NOT business rule 3) AND in the set that was made available for Lenovo (business rule 4) 
-					AND type numeric only AND type not the same as an IBM type (business rule 8) or an IBM pseudo type (business rule 7) 
-					THEN it is valid to be used in IBM for Delivery (available in FedCat but not to be used in CHIS/CONGA contracts)
-			Business rule 6: If a machine type is NOT DCG (NOT business rule 3) AND in the set that was made available for Lenovo (business rule 4) 
-					AND type alpha numeric AND type not the same as an IBM type (business rule 8) or an IBM pseudo type (business rule 7) 
-					THEN it is valid to be used in IBM for Delivery (available in FedCat but not to be used by CHIS/CONGA contracts)
-			Business rule 7: all valid IBM pseudo types are registered in MIW
-			Business rule 8: all valid IBM types are registered in EACM (edited)
-			Business rule 9: If the machine type is DCG it needs to have a model. If the machine is NOT DCG it should be kept type only 
-					and not be enriched with a model.
-			*/
-				
+			 * Business rule 1: If the machine type is DCG (business rule 3) AND in the set
+			 * that was made available for Lenovo (business rule 4) AND type is alpha
+			 * numeric AND type on the approved list from MIW AND there is a model in MTM
+			 * (model not blank) THEN it is a valid one to be used in IBM (can be used in
+			 * CHIS/CONGA for contract). Business rule 2: If the machine type is DCG
+			 * (business rule 3) AND in the set that was made available for Lenovo (business
+			 * rule 4) AND type numeric only AND type not matching with an IBM type
+			 * (business rule 8) or an IBM pseudo type (business rule 7) AND there is a
+			 * model (model not blank) in MTM THEN it is valid to be used in IBM (can be
+			 * used in CHIS/CONGA for a contract). Business rule 3: a type is DCG if the
+			 * product division is 4S, Z3, 13, Y1 or G9 Business rule 4: the set of types
+			 * that was made available for Lenovo type model have a type that start with
+			 * 1,2,3,4,5,6,7,8,9 Business rule 5: If the machine type is NOT DCG (NOT
+			 * business rule 3) AND in the set that was made available for Lenovo (business
+			 * rule 4) AND type numeric only AND type not the same as an IBM type (business
+			 * rule 8) or an IBM pseudo type (business rule 7) THEN it is valid to be used
+			 * in IBM for Delivery (available in FedCat but not to be used in CHIS/CONGA
+			 * contracts) Business rule 6: If a machine type is NOT DCG (NOT business rule
+			 * 3) AND in the set that was made available for Lenovo (business rule 4) AND
+			 * type alpha numeric AND type not the same as an IBM type (business rule 8) or
+			 * an IBM pseudo type (business rule 7) THEN it is valid to be used in IBM for
+			 * Delivery (available in FedCat but not to be used by CHIS/CONGA contracts)
+			 * Business rule 7: all valid IBM pseudo types are registered in MIW Business
+			 * rule 8: all valid IBM types are registered in EACM (edited) Business rule 9:
+			 * If the machine type is DCG it needs to have a model. If the machine is NOT
+			 * DCG it should be kept type only and not be enriched with a model.
+			 */
+
 //			Log.i(TAG, "Filter DCG MTYPE: " + type);
-			if(normalstr(type)) {
-				if(type.matches("[0-9]+")) {
+			if (normalstr(type)) {
+				if (type.matches("[0-9]+")) {
 					newType.add(type);
 				}
-				//if on the MIW list
-				if(MIWType.contains(type)) {
+				// if on the MIW list
+				if (MIWType.contains(type)) {
 					newType.add(type);
-				}else {
-					Log.i(TAG, "Filter DCG MODEL not on MIW List : " + type.toString());			
+				} else {
+					Log.i(TAG, "Filter DCG MODEL not on MIW List : " + type.toString());
 				}
-			}else {
+			} else {
 				Log.i(TAG, "Filter DCG MODEL not alpha numeric : " + type.toString());
-			}						
-		}	
+			}
+		}
 		return newType;
 	}
 
 	/**
 	 * check type is alpha numeric
+	 * 
 	 * @param s
 	 * @return
 	 */
-	public boolean normalstr(String s){
-	   	int len = s.length();
-	   	for(int i=0;i<len;i++) {
-	   		char ch = s.charAt(i);
-	   		if(!Character.isLetterOrDigit(ch)) {
-	   			return false;
-	   		}
-	   	}
-	   	return true;
+	public boolean normalstr(String s) {
+		int len = s.length();
+		for (int i = 0; i < len; i++) {
+			char ch = s.charAt(i);
+			if (!Character.isLetterOrDigit(ch)) {
+				return false;
+			}
+		}
+		return true;
 	}
-	
+
 	public List filterRecords(String T1) {
-		
+
 		List entities = new ArrayList();
-		
+
 		StringBuffer noDCG = new StringBuffer();
 		StringBuffer DCG = new StringBuffer();
-				
+
 		try {
 			List ibmType = getIbmType();
 			List ibmPseudoType = getIbmPseudoType();
 			List all = filterType(getTypeRecords(T1), ibmType, ibmPseudoType);
 			List DCGtype = new ArrayList();
 			List noDCGtype = new ArrayList();
-			for (int i=0;i<all.size();i++) {
+			for (int i = 0; i < all.size(); i++) {
 				String dCG = (String) ((Map) all.get(i)).get("DCG");
 				String type = (String) ((Map) all.get(i)).get("MTYPE");
-				if("Y".equals(dCG)) {
+				if ("Y".equals(dCG)) {
 					DCGtype.add(type);
-				}else {
+				} else {
 					noDCGtype.add(type);
-					
+
 				}
 			}
-			if(DCGtype.size()>0)
-				DCGtype=filterDCGModel(DCGtype);
-			
-			for(int i=0;i<DCGtype.size();i++) {
+			if (DCGtype.size() > 0)
+				DCGtype = filterDCGModel(DCGtype);
+
+			for (int i = 0; i < DCGtype.size(); i++) {
 				DCG.append("'" + DCGtype.get(i) + "'");
-				if(i != DCGtype.size()-1) DCG.append(",");
+				if (i != DCGtype.size() - 1)
+					DCG.append(",");
 			}
-			
-			for(int i=0;i<noDCGtype.size();i++) {
+
+			for (int i = 0; i < noDCGtype.size(); i++) {
 				noDCG.append("'" + noDCGtype.get(i) + "'");
-				if(i != noDCGtype.size()-1) noDCG.append(",");
+				if (i != noDCGtype.size() - 1)
+					noDCG.append(",");
 			}
 			Log.i(TAG, "DCG Type: " + DCG.toString());
 			Log.i(TAG, "not DCG Type: " + noDCG.toString());
-			
+
 			ibmType = null;
 			ibmPseudoType = null;
 			all = null;
 			DCGtype = null;
 			noDCGtype = null;
 			System.gc();
-			
-			if(noDCG.toString()!= null && !"".equals(noDCG.toString())) {
+
+			if (noDCG.toString() != null && !"".equals(noDCG.toString())) {
 				entities.add(getNotDCGRecords(T1, noDCG.toString()));
-			}else {
+			} else {
 				entities.add(new ArrayList());
 			}
-			if(DCG.toString()!= null && !"".equals(DCG.toString())) {
+			if (DCG.toString() != null && !"".equals(DCG.toString())) {
 				entities.add(getDCGRecords(T1, DCG.toString()));
-			}else {
+			} else {
 				entities.add(new ArrayList());
 			}
-						
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}			
-		return entities;		
+			Log.e(TAG, "Filter Exception:" + e);
+		}
+		return entities;
 	}
-	
+
 	public String getCurrentTime() throws Exception {
 
 		if (offlineMode) {
@@ -650,9 +678,9 @@ public class EntityManager {
 			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
-				time=rs.getString(1);
+				time = rs.getString(1);
 			}
-			
+
 		} catch (SQLException | MiddlewareException e) {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "read records from table Exception:" + e);
@@ -660,7 +688,7 @@ public class EntityManager {
 		}
 		return time;
 	}
-	
+
 	class EntityWrapper {
 
 		EntityItem ei;
@@ -719,7 +747,5 @@ public class EntityManager {
 		}
 
 	}
-	
-	
 
 }
