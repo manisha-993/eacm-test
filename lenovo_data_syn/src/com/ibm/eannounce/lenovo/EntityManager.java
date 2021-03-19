@@ -633,6 +633,34 @@ public class EntityManager {
 		return entities;		
 	}
 	
+	public String getCurrentTime() throws Exception {
+
+		if (offlineMode) {
+			Log.i(TAG, "PDH is in Offline mode: get current time");
+			return null;
+		}
+		Log.d(TAG, "get current time From table");
+		String sql = "select current timestamp from opicm.EACM_MTYPE_LOG fetch first 1 row only with ur";
+		Log.d(TAG, "Extract SQL:" + sql);
+		String time = "";
+		try {
+			Connection conn = database.getPDHConnection();
+			PreparedStatement ps = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				time=rs.getString(1);
+			}
+			
+		} catch (SQLException | MiddlewareException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "read records from table Exception:" + e);
+			throw e;
+		}
+		return time;
+	}
+	
 	class EntityWrapper {
 
 		EntityItem ei;

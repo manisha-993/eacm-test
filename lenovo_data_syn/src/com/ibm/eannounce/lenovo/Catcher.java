@@ -44,12 +44,7 @@ public class Catcher {
 		}
 		if (args.length == 0) {
 			// Read from MQ
-			Boolean is = execute(T1date);
-			Log.i(TAG, "create records " + (is == true ? "succeed" : "failed"));
-			String sDateTimeFormat = "yyyy-MM-dd hh:mm:ss.SSSSSS";
-			DateFormat inDateTimeFormat = new SimpleDateFormat(sDateTimeFormat);
-			if (is)
-				updateT1(inDateTimeFormat.format(new Date()));
+			execute(T1date);
 			Log.i(TAG, "Lenovo Catcher Finished.");
 		}
 	}
@@ -58,7 +53,7 @@ public class Catcher {
 		Log.close();
 	}
 
-	public Boolean execute(String T1) {
+	public void execute(String T1) {
 		Boolean isSuccess = false;
 		entityManager = new EntityManager(properties);
 		entityManager.connect();
@@ -86,7 +81,9 @@ public class Catcher {
 				Log.i(TAG, "create DCG REFOFER entity: " + m.toString());
 			}
 			isSuccess = true;
+			Log.i(TAG, "create records " + (isSuccess == true ? "succeed" : "failed"));
 			
+			updateT1(entityManager.getCurrentTime());
 		} catch (Exception e) {
 			Log.e(TAG, "Unable to create REFOFER entity", e);
 			throw new IllegalStateException("Unable to create entity");
@@ -95,7 +92,6 @@ public class Catcher {
 			long time = Math.abs(startTime - System.currentTimeMillis());
 			Log.i(TAG, "Execution time: " + Math.round(time / 1000L));
 		}
-		return isSuccess;
 	}
 
 	// need consummate
