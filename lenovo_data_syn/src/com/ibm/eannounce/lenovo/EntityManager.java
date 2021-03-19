@@ -279,8 +279,8 @@ public class EntityManager {
 			
 			while (rs.next()) {				
 				Map data = new HashMap();
-				data.put("MTYPE", rs.getString("MTYPE"));
-				data.put("DCG", rs.getString("DCG"));
+				data.put("MTYPE", rs.getString("MTYPE").trim());
+				data.put("DCG", rs.getString("DCG").trim());
 				allType.add(data);
 			}
 
@@ -320,22 +320,22 @@ public class EntityManager {
 			while (rs.next()) {
 
 				MIWModel model = new MIWModel();
-				model.setDTSOFMSG(rs.getString("UPD_DT"));
+				model.setDTSOFMSG(rs.getString("UPD_DT").trim());
 				model.setACTIVITY("Update");
 
-				model.setPRODUCTID(rs.getString("MTYPE") + rs.getString("MODEL"));
-				model.setMFRPRODTYPE(rs.getString("MTYPE") + "-" + rs.getString("MODEL"));
-				model.setMFRPRODDESC(rs.getString("FAMILYNAME") + " - " + rs.getString("SERIESNAME"));
-				model.setMKTGDIV(rs.getString("DIVISION"));
-				model.setCATGSHRTDESC(rs.getString("BRAND"));
-				model.setSTRTOFSVC(rs.getString("ANNOUNCE_DATE"));
+				model.setPRODUCTID(rs.getString("MTYPE").trim() + rs.getString("MODEL").trim());
+				model.setMFRPRODTYPE(rs.getString("MTYPE").trim() + "-" + rs.getString("MODEL").trim());
+				model.setMFRPRODDESC(rs.getString("FAMILYNAME").trim() + " - " + rs.getString("SERIESNAME").trim());
+				model.setMKTGDIV(rs.getString("DIVISION").trim());
+				model.setCATGSHRTDESC(rs.getString("BRAND").trim());
+				model.setSTRTOFSVC(rs.getString("ANNOUNCE_DATE").trim());
 				model.setENDOFSVC("9999-12-31");
 				model.setVENDNAM("LENOVO");
 
 				model.setCECSPRODKEY("3");
 				model.setMAINTANNBILLELIGINDC("N");
 				model.setFSLMCPU("N");
-				model.setDCG(rs.getString("DCG"));
+				model.setDCG(rs.getString("DCG").trim());
 
 				entitys.add(model);
 			}
@@ -375,15 +375,15 @@ public class EntityManager {
 			while (rs.next()) {
 
 				MIWModel model = new MIWModel();
-				model.setDTSOFMSG(rs.getString("UPD_DT"));
+				model.setDTSOFMSG(rs.getString("UPD_DT").trim());
 				model.setACTIVITY("Update");
 
-				model.setPRODUCTID(rs.getString("MTYPE"));
-				model.setMFRPRODTYPE(rs.getString("MTYPE"));
-				model.setMFRPRODDESC(rs.getString("FAMILYNAME") + " - " + rs.getString("SERIESNAME"));
-				model.setMKTGDIV(rs.getString("DIVISION"));
-				model.setCATGSHRTDESC(rs.getString("BRAND"));
-				model.setSTRTOFSVC(rs.getString("ANNOUNCE_DATE"));
+				model.setPRODUCTID(rs.getString("MTYPE").trim());
+				model.setMFRPRODTYPE(rs.getString("MTYPE").trim());
+				model.setMFRPRODDESC(rs.getString("FAMILYNAME").trim() + " - " + rs.getString("SERIESNAME").trim());
+				model.setMKTGDIV(rs.getString("DIVISION").trim());
+				model.setCATGSHRTDESC(rs.getString("BRAND").trim());
+				model.setSTRTOFSVC(rs.getString("ANNOUNCE_DATE").trim());
 				model.setENDOFSVC("9999-12-31");
 				model.setVENDNAM("LENOVO");
 
@@ -421,7 +421,7 @@ public class EntityManager {
 			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
-				types.add(rs.getString(1));
+				types.add(rs.getString(1).trim());
 			}
 			
 			Log.i(TAG, "get IBM Type: " + types.toString());
@@ -452,7 +452,7 @@ public class EntityManager {
 			ResultSet rs = ps.executeQuery();
 
 			while (rs.next()) {
-				types.add(rs.getString(1));
+				types.add(rs.getString(1).trim());
 			}
 			Log.i(TAG, "get IBM pseudo Type: " + types.toString());
 		} catch (SQLException | MiddlewareException e) {
