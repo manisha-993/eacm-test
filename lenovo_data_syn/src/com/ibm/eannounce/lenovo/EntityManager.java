@@ -442,7 +442,7 @@ public class EntityManager {
 		Log.d(TAG, "get pseudo Type From text table");
 		String sql = "select distinct substring(t.attributevalue,0,5) from opicm.text t " + 
 				"join opicm.flag f on f.entitytype=t.entitytype and f.entityid=t.entityid and f.attributecode='PDHDOMAIN' and f.attributevalue='MIW' " + 
-				"where t.entitytype='REFOFER' and t.attributecode='PRODUCTID' and t.valto>current timestamp and t.effto>current timestamp with ur";
+				"where t.entitytype='REFOFER' and t.attributecode='PRODUCTID' and t.valto>current timestamp and t.effto>current timestamp and f.valto>current timestamp and f.effto>current timestamp with ur";
 		Log.d(TAG, "Extract SQL:" + sql);
 		List types = new ArrayList();
 		try {
@@ -593,8 +593,8 @@ public class EntityManager {
 					
 				}
 			}
-			
-			DCGtype=filterDCGModel(DCGtype);
+			if(DCGtype.size()>0)
+				DCGtype=filterDCGModel(DCGtype);
 			
 			for(int i=0;i<DCGtype.size();i++) {
 				DCG.append("'" + DCGtype.get(i) + "'");
@@ -615,10 +615,13 @@ public class EntityManager {
 			noDCGtype = null;
 			System.gc();
 			
-			
-			entities.add(getNotDCGRecords(T1, noDCG.toString()));
-			entities.add(getDCGRecords(T1, DCG.toString()));
-			
+			if(noDCG.toString()!= null && !"".equals(noDCG.toString())) {
+				entities.add(getNotDCGRecords(T1, noDCG.toString()));
+			}
+			if(DCG.toString()!= null && !"".equals(DCG.toString())) {
+				entities.add(getDCGRecords(T1, DCG.toString()));
+			}
+						
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

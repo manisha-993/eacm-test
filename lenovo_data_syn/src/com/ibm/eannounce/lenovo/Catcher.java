@@ -20,7 +20,6 @@ public class Catcher {
 	private EntityManager entityManager;
 	private Properties properties;
 
-	
 	public static void main(String[] args) {
 		Catcher catcher = new Catcher("lenovo.properties", args);
 		catcher.dispose();
@@ -35,22 +34,22 @@ public class Catcher {
 			return;
 		}
 		int logLevel = Integer.parseInt(properties.getProperty(Keys.LOG_LEVEL, "" + Log.INFO));
-		boolean logPersistent = Boolean.valueOf(
-				properties.getProperty(Keys.LOG_PERSISTENT, "false")).booleanValue();
+		boolean logPersistent = Boolean.valueOf(properties.getProperty(Keys.LOG_PERSISTENT, "false")).booleanValue();
 		Log.init(logLevel, logPersistent, new File("logs"), "lenovo");
-		
+
 		Log.i(TAG, "get T1");
 		String T1date = getT1();
-		if(T1date == null || T1date.equals("")) {
+		if (T1date == null || T1date.equals("")) {
 			T1date = "1980-01-01 00:00:00.000000";
 		}
 		if (args.length == 0) {
-			//Read from MQ
+			// Read from MQ
 			Boolean is = execute(T1date);
-			Log.i(TAG, "create records " + (is==true?"succeed":"failed"));
+			Log.i(TAG, "create records " + (is == true ? "succeed" : "failed"));
 			String sDateTimeFormat = "yyyy-MM-dd hh:mm:ss.SSSSSS";
 			DateFormat inDateTimeFormat = new SimpleDateFormat(sDateTimeFormat);
-			if(is) updateT1(inDateTimeFormat.format(new Date()));
+			if (is)
+				updateT1(inDateTimeFormat.format(new Date()));
 			Log.i(TAG, "Lenovo Catcher Finished.");
 		}
 	}
@@ -64,29 +63,33 @@ public class Catcher {
 		entityManager = new EntityManager(properties);
 		entityManager.connect();
 		Log.i(TAG, "Reading table records...");
-		
+
 		long startTime = System.currentTimeMillis();
 		try {
 			List entities = entityManager.filterRecords(T1);
-			List dcgEntities =  (List) entities.get(1);
-			List noDcgEntities = (List) entities.get(0);
-			Log.i(TAG, "find " + noDcgEntities.size()+ " Not DCG records change");
-			Log.i(TAG, "find " + dcgEntities.size()+ " DCG records change");
-			for(int i = 0;i<noDcgEntities.size();i++) {
-				MIWModel m = (MIWModel) noDcgEntities.get(i);
-				
-				entityManager.createEntity(m);
-				Log.i(TAG, "create No DCG REFOFER entity: " + m.toString());
+			if (entities.size() > 0) {
+				List dcgEntities = (List) entities.get(1);
+				List noDcgEntities = (List) entities.get(0);
+				Log.i(TAG, "find " + noDcgEntities.size() + " Not DCG records change");
+				Log.i(TAG, "find " + dcgEntities.size() + " DCG records change");
+				for (int i = 0; i < noDcgEntities.size(); i++) {
+					MIWModel m = (MIWModel) noDcgEntities.get(i);
+
+					entityManager.createEntity(m);
+					Log.i(TAG, "create No DCG REFOFER entity: " + m.toString());
+				}
+				for (int i = 0; i < dcgEntities.size(); i++) {
+					MIWModel m = (MIWModel) dcgEntities.get(i);
+
+					entityManager.createEntity(m);
+					Log.i(TAG, "create DCG REFOFER entity: " + m.toString());
+				}
+				isSuccess = true;
+			}else {
+				Log.i(TAG, "find no records change.");
 			}
-			for(int i = 0;i<dcgEntities.size();i++) {
-				MIWModel m = (MIWModel) dcgEntities.get(i);
-				
-				entityManager.createEntity(m);
-				Log.i(TAG, "create DCG REFOFER entity: " + m.toString());
-			}
-			isSuccess = true;
 		} catch (Exception e) {
-			Log.e(TAG, "Unable to create REFOFER entity", e);	
+			Log.e(TAG, "Unable to create REFOFER entity", e);
 			throw new IllegalStateException("Unable to create entity");
 		} finally {
 			entityManager.disconnect();
@@ -95,13 +98,13 @@ public class Catcher {
 		}
 		return isSuccess;
 	}
-	
+
 	// need consummate
-	
+
 	private String getT1() {
 		String date = null;
 		File file = new File("tmp");
-        BufferedReader reader = null;
+		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(file));
 			date = reader.readLine();
@@ -111,23 +114,23 @@ public class Catcher {
 			Log.e(TAG, "get Last Ran time exception: " + e);
 			e.printStackTrace();
 		} finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e1) {
-                }
-            }
-        }
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e1) {
+				}
+			}
+		}
 		return date;
 	}
-	
+
 	private void updateT1(String current) {
-		
+
 		try {
-			
+
 			File file = new File("tmp");
-			if (!file.exists()) 
-			    file.createNewFile();
+			if (!file.exists())
+				file.createNewFile();
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			bw.write(current);
 			bw.flush();
@@ -136,7 +139,7 @@ public class Catcher {
 		} catch (IOException e) {
 			Log.e(TAG, "Update Last Ran time exception: " + e);
 		}
-		
+
 	}
 
 }
