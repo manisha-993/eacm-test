@@ -182,25 +182,13 @@ public class EntityManager {
 				refoferWrapper.text("ACTIVITY", model.getACTIVITY(), ctrl);
 				refoferWrapper.text("DTSMIWCREATE", now, ctrl);
 				refoferWrapper.text("PRODUCTID", model.getPRODUCTID(), ctrl);
-
-				if (model.getMFRPRODTYPE() != null && !"".equals(model.getMFRPRODTYPE())) {
-					refoferWrapper.text("MFRPRODTYPE", model.getMFRPRODTYPE(), ctrl);
-				}
-				if (model.getMFRPRODDESC() != null && !"".equals(model.getMFRPRODDESC())) {
-					refoferWrapper.text("MFRPRODDESC", model.getMFRPRODDESC(), ctrl);
-				}
-				if (model.getMKTGDIV() != null && !"".equals(model.getMKTGDIV())) {
-					refoferWrapper.text("MKTGDIV", model.getMKTGDIV(), ctrl);
-				}
-				if (model.getCATGSHRTDESC() != null && !"".equals(model.getCATGSHRTDESC())) {
-					refoferWrapper.text("CATGSHRTDESC", model.getCATGSHRTDESC(), ctrl);
-				}
-				if (model.getSTRTOFSVC() != null && !"".equals(model.getSTRTOFSVC())) {
-					refoferWrapper.text("STRTOFSVC", model.getSTRTOFSVC(), ctrl);
-				}
-				if (model.getENDOFSVC() != null && !"".equals(model.getENDOFSVC())) {
-					refoferWrapper.text("ENDOFSVC", model.getENDOFSVC(), ctrl);
-				}
+				
+				refoferWrapper.text("MFRPRODTYPE", model.getMFRPRODTYPE(), ctrl);				
+				refoferWrapper.text("MFRPRODDESC", model.getMFRPRODDESC(), ctrl);				
+				refoferWrapper.text("MKTGDIV", model.getMKTGDIV(), ctrl);				
+				refoferWrapper.text("CATGSHRTDESC", model.getCATGSHRTDESC(), ctrl);			
+				refoferWrapper.text("STRTOFSVC", model.getSTRTOFSVC(), ctrl);				
+				refoferWrapper.text("ENDOFSVC", model.getENDOFSVC(), ctrl);				
 
 				refoferWrapper.text("VENDNAM", model.getVENDNAM(), ctrl);
 //				refoferWrapper.text("MACHRATECATG", "", ctrl);
@@ -292,7 +280,7 @@ public class EntityManager {
 		return allType;
 	}
 
-	public List getDCGRecords(String T1, String DCGtype) throws Exception {
+	public List getDCGRecords1(String T1, String DCGtype) throws Exception {
 
 		if (offlineMode) {
 			Log.i(TAG, "PDH is in Offline mode");
@@ -302,10 +290,10 @@ public class EntityManager {
 		Log.d(TAG, "get Records From table MTYPE and MTM");
 		String sql = null;
 
-		sql = "select distinct t1.MTYPE,t2.MACHINE_MODEL as model,t1.UPD_DT,t1.FAMILYNAME,t1.SERIESNAME,t1.DIVISION,t1.BRAND,t1.ANNOUNCE_DATE,t1.DCG from opicm.EACM_MTYPE_LOG t1 "
+		sql = "select distinct t1.MTYPE as TYPE,t2.MACHINE_MODEL as model,t1.UPD_DT,t1.FAMILYNAME,t1.SERIESNAME,t1.DIVISION,t1.BRAND,t1.ANNOUNCE_DATE,t1.DCG from opicm.EACM_MTYPE_LOG t1 "
 				+ "join opicm.EACM_MTM_LOG t2 on t1.MTYPE=t2.MACHINE_TYPE where t1.ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTYPE_LOG where ACTION_TIME between '"
 				+ T1
-				+ "' and current timestamp and t1.mtype= mtype Group by mtype) and t1.DCG='Y' and t2.MACHINE_MODEL is not null and t1.MTYPE in ("
+				+ "' and current timestamp and t1.MTYPE= mtype Group by mtype) and t1.DCG='Y' and t2.MACHINE_MODEL is not null and t1.MTYPE in ("
 				+ DCGtype + ") with ur";
 
 		Log.d(TAG, "Extract SQL:" + sql);
@@ -319,32 +307,76 @@ public class EntityManager {
 			while (rs.next()) {
 
 				MIWModel model = new MIWModel();
-				model.setDTSOFMSG(rs.getString("UPD_DT").trim());
+				model.setDTSOFMSG(rs.getString("UPD_DT"));
 				model.setACTIVITY("Update");
 
-				model.setPRODUCTID(rs.getString("MTYPE") == null ? rs.getString("MTYPE")
-						: rs.getString("MTYPE").trim() + rs.getString("MODEL") == null ? rs.getString("MODEL")
-								: rs.getString("MODEL").trim());
-				model.setMFRPRODTYPE(rs.getString("MTYPE") == null ? rs.getString("MTYPE")
-						: rs.getString("MTYPE").trim() + "-" + rs.getString("MODEL") == null ? rs.getString("MODEL")
-								: rs.getString("MODEL").trim());
-				model.setMFRPRODDESC(rs.getString("FAMILYNAME") == null ? rs.getString("FAMILYNAME")
-						: rs.getString("FAMILYNAME").trim() + " - " + rs.getString("SERIESNAME") == null
-								? rs.getString("SERIESNAME")
-								: rs.getString("SERIESNAME").trim());
-				model.setMKTGDIV(
-						rs.getString("DIVISION") == null ? rs.getString("DIVISION") : rs.getString("DIVISION").trim());
-				model.setCATGSHRTDESC(
-						rs.getString("BRAND") == null ? rs.getString("BRAND") : rs.getString("BRAND").trim());
-				model.setSTRTOFSVC(rs.getString("ANNOUNCE_DATE") == null ? rs.getString("ANNOUNCE_DATE")
-						: rs.getString("ANNOUNCE_DATE").trim());
+				model.setPRODUCTID(processValue(rs.getString("TYPE")) + processValue(rs.getString("MODEL")));
+				model.setMFRPRODTYPE(processValue(rs.getString("TYPE")) + "-" + processValue(rs.getString("MODEL")));
+				model.setMFRPRODDESC(processValue(rs.getString("FAMILYNAME")) + " - " + processValue(rs.getString("SERIESNAME")));
+				model.setMKTGDIV(processValue(rs.getString("DIVISION")));
+				model.setCATGSHRTDESC(processValue(rs.getString("BRAND")));
+				model.setSTRTOFSVC(processValue(rs.getString("ANNOUNCE_DATE")));
 				model.setENDOFSVC("9999-12-31");
 				model.setVENDNAM("LENOVO");
 
 				model.setCECSPRODKEY("3");
 				model.setMAINTANNBILLELIGINDC("N");
 				model.setFSLMCPU("N");
-				model.setDCG(rs.getString("DCG") == null ? rs.getString("DCG") : rs.getString("DCG").trim());
+				model.setDCG(processValue(rs.getString("DCG")));
+
+				entitys.add(model);
+			}
+
+		} catch (SQLException | MiddlewareException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "read records from table Exception:" + e);
+			throw e;
+		}
+		return entitys;
+	}
+	
+	public List getDCGRecords2(String T1) throws Exception {
+
+		if (offlineMode) {
+			Log.i(TAG, "PDH is in Offline mode");
+			return null;
+		}
+
+		Log.d(TAG, "get Records From table MTYPE and MTM");
+		String sql = null;
+
+		sql = "select distinct t1.MTYPE as TYPE,t2.MACHINE_MODEL as model,t1.UPD_DT,t1.FAMILYNAME,t1.SERIESNAME,t1.DIVISION,t1.BRAND,t1.ANNOUNCE_DATE,t1.DCG from opicm.EACM_MTYPE_LOG t1 "
+				+ "join opicm.EACM_MTM_LOG t2 on t1.MTYPE=t2.MACHINE_TYPE where t2.ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTM_LOG where ACTION_TIME between '"
+				+ T1
+				+ "' and current timestamp and t2.MACHINE_MODEL= MACHINE_MODEL Group by MACHINE_MODEL) and t1.DCG='Y' and t2.MACHINE_MODEL is not null with ur";
+
+		Log.d(TAG, "Extract SQL:" + sql);
+		List entitys = new ArrayList();
+		try {
+			Connection conn = database.getPDHConnection();
+			PreparedStatement ps = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+
+				MIWModel model = new MIWModel();
+				model.setDTSOFMSG(rs.getString("UPD_DT"));
+				model.setACTIVITY("Update");
+
+				model.setPRODUCTID(processValue(rs.getString("TYPE")) + processValue(rs.getString("MODEL")));
+				model.setMFRPRODTYPE(processValue(rs.getString("TYPE")) + "-" + processValue(rs.getString("MODEL")));
+				model.setMFRPRODDESC(processValue(rs.getString("FAMILYNAME")) + " - " + processValue(rs.getString("SERIESNAME")));
+				model.setMKTGDIV(processValue(rs.getString("DIVISION")));
+				model.setCATGSHRTDESC(processValue(rs.getString("BRAND")));
+				model.setSTRTOFSVC(processValue(rs.getString("ANNOUNCE_DATE")));
+				model.setENDOFSVC("9999-12-31");
+				model.setVENDNAM("LENOVO");
+
+				model.setCECSPRODKEY("3");
+				model.setMAINTANNBILLELIGINDC("N");
+				model.setFSLMCPU("N");
+				model.setDCG(processValue(rs.getString("DCG")));
 
 				entitys.add(model);
 			}
@@ -357,6 +389,16 @@ public class EntityManager {
 		return entitys;
 	}
 
+	public String processValue(String s) {
+		
+		if(s!= null && !"".equals(s)) {
+			s.trim();
+		}else {
+			s = " ";
+		}
+		return s;
+	}
+	
 	public List getNotDCGRecords(String T1, String noDCGtype) throws Exception {
 
 		if (offlineMode) {
@@ -383,31 +425,22 @@ public class EntityManager {
 			while (rs.next()) {
 
 				MIWModel model = new MIWModel();
-				model.setDTSOFMSG(
-						rs.getString("UPD_DT") == null ? rs.getString("UPD_DT") : rs.getString("UPD_DT").trim());
+				model.setDTSOFMSG(rs.getString("UPD_DT"));
 				model.setACTIVITY("Update");
 
-				model.setPRODUCTID(
-						rs.getString("MTYPE") == null ? rs.getString("MTYPE") : rs.getString("MTYPE").trim());
-				model.setMFRPRODTYPE(
-						rs.getString("MTYPE") == null ? rs.getString("MTYPE") : rs.getString("MTYPE").trim());
-				model.setMFRPRODDESC(rs.getString("FAMILYNAME") == null ? rs.getString("FAMILYNAME")
-						: rs.getString("FAMILYNAME").trim() + " - " + rs.getString("SERIESNAME") == null
-								? rs.getString("SERIESNAME")
-								: rs.getString("SERIESNAME").trim());
-				model.setMKTGDIV(
-						rs.getString("DIVISION") == null ? rs.getString("DIVISION") : rs.getString("DIVISION").trim());
-				model.setCATGSHRTDESC(
-						rs.getString("BRAND") == null ? rs.getString("BRAND") : rs.getString("BRAND").trim());
-				model.setSTRTOFSVC(rs.getString("ANNOUNCE_DATE") == null ? rs.getString("ANNOUNCE_DATE")
-						: rs.getString("ANNOUNCE_DATE").trim());
+				model.setPRODUCTID(processValue(rs.getString("MTYPE")));
+				model.setMFRPRODTYPE(processValue(rs.getString("MTYPE")));
+				model.setMFRPRODDESC(processValue(rs.getString("FAMILYNAME")) + " - " + processValue(rs.getString("SERIESNAME")));
+				model.setMKTGDIV(processValue(rs.getString("DIVISION")));
+				model.setCATGSHRTDESC(processValue(rs.getString("BRAND")));
+				model.setSTRTOFSVC(processValue(rs.getString("ANNOUNCE_DATE")));
 				model.setENDOFSVC("9999-12-31");
 				model.setVENDNAM("LENOVO");
 
 				model.setCECSPRODKEY("3");
 				model.setMAINTANNBILLELIGINDC("N");
 				model.setFSLMCPU("N");
-				model.setDCG(rs.getString("DCG") == null ? rs.getString("DCG") : rs.getString("DCG").trim());
+				model.setDCG(processValue(rs.getString("DCG")));
 
 				entitys.add(model);
 			}
@@ -649,16 +682,69 @@ public class EntityManager {
 				entities.add(new ArrayList());
 			}
 			if (DCG.toString() != null && !"".equals(DCG.toString())) {
-				entities.add(getDCGRecords(T1, DCG.toString()));
+				entities.add(getDCGRecords1(T1, DCG.toString()));
 			} else {
 				entities.add(new ArrayList());
 			}
-
+			List l2 = getDCGRecords2(T1);
+			if(l2.size()>0) {
+				entities.add(filterType2(l2, getAllType()));
+			}else {
+				entities.add(new ArrayList());
+			}
+			 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "Filter Exception:" + e);
 		}
 		return entities;
+	}
+
+	
+	
+	private List filterType2(List l2, List allType) {
+		List newType = new ArrayList();
+		int length = l2.size();
+		for (int i = 0; i < length; i++) {
+			MIWModel model = (MIWModel) l2.get(i);
+			String type = model.getPRODUCTID();
+			if (allType.contains(type.substring(0, 4))) {
+				newType.add(model);
+			}
+		}
+
+		Log.i(TAG, "After Filter: " + newType.toString());
+		return newType;
+	}
+
+	private List getAllType() throws Exception {
+		
+		if (offlineMode) {
+			Log.i(TAG, "PDH is in Offline mode: get exits Type");
+			return null;
+		}
+		Log.d(TAG, "get all LENOVO Type From text table");
+		String sql = "select distinct substring(t.attributevalue,0,5) from opicm.text t "
+				+ "join opicm.flag f on f.entitytype=t.entitytype and f.entityid=t.entityid and f.attributecode='PDHDOMAIN' and f.attributevalue='LENOVO' "
+				+ "where t.entitytype='REFOFER' and t.attributecode='PRODUCTID' and t.valto>current timestamp and t.effto>current timestamp and f.valto>current timestamp and f.effto>current timestamp with ur";		
+		Log.d(TAG, "Extract SQL:" + sql);
+		List types = new ArrayList();
+		try {
+			Connection conn = database.getPDHConnection();
+			PreparedStatement ps = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			ResultSet rs = ps.executeQuery();
+
+			while (rs.next()) {
+				types.add(rs.getString(1).trim());
+			}
+			Log.i(TAG, "get exits LENOVO Type: " + types.toString());
+		} catch (SQLException | MiddlewareException e) {
+			// TODO Auto-generated catch block
+			Log.e(TAG, "read records from table Exception:" + e);
+			throw e;
+		}
+		return types;
 	}
 
 	public String getCurrentTime() throws Exception {

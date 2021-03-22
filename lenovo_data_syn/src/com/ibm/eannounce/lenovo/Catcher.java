@@ -64,18 +64,25 @@ public class Catcher {
 			List entities = entityManager.filterRecords(T1);
 			
 			List noDcgEntities = (List) entities.get(0);
-			List dcgEntities = (List) entities.get(1);
+			List dcgEntities1 = (List) entities.get(1);
+			List dcgEntities2 = (List) entities.get(2);
 			
 			Log.i(TAG, "find " + noDcgEntities.size() + " Not DCG records change");
-			Log.i(TAG, "find " + dcgEntities.size() + " DCG records change");
+			Log.i(TAG, "find " + (dcgEntities1.size()+dcgEntities2.size())+ " DCG records change");
 			for (int i = 0; i < noDcgEntities.size(); i++) {
 				MIWModel m = (MIWModel) noDcgEntities.get(i);
 
 				entityManager.createEntity(m);
 				Log.i(TAG, "create No DCG REFOFER entity: " + m.toString());
 			}
-			for (int i = 0; i < dcgEntities.size(); i++) {
-				MIWModel m = (MIWModel) dcgEntities.get(i);
+			for (int i = 0; i < dcgEntities1.size(); i++) {
+				MIWModel m = (MIWModel) dcgEntities1.get(i);
+
+				entityManager.createEntity(m);
+				Log.i(TAG, "create DCG REFOFER entity: " + m.toString());
+			}
+			for (int i = 0; i < dcgEntities2.size(); i++) {
+				MIWModel m = (MIWModel) dcgEntities2.get(i);
 
 				entityManager.createEntity(m);
 				Log.i(TAG, "create DCG REFOFER entity: " + m.toString());
