@@ -392,11 +392,10 @@ public class EntityManager {
 	public String processValue(String s) {
 		
 		if(s!= null && !"".equals(s)) {
-			s.trim();
+			return s.trim();
 		}else {
-			s = " ";
+			return " ";
 		}
-		return s;
 	}
 	
 	public List getNotDCGRecords(String T1, String noDCGtype) throws Exception {
