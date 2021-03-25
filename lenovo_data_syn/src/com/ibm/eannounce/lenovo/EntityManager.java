@@ -182,13 +182,13 @@ public class EntityManager {
 				refoferWrapper.text("ACTIVITY", model.getACTIVITY(), ctrl);
 				refoferWrapper.text("DTSMIWCREATE", now, ctrl);
 				refoferWrapper.text("PRODUCTID", model.getPRODUCTID(), ctrl);
-				
-				refoferWrapper.text("MFRPRODTYPE", model.getMFRPRODTYPE(), ctrl);				
-				refoferWrapper.text("MFRPRODDESC", model.getMFRPRODDESC(), ctrl);				
-				refoferWrapper.text("MKTGDIV", model.getMKTGDIV(), ctrl);				
-				refoferWrapper.text("CATGSHRTDESC", model.getCATGSHRTDESC(), ctrl);			
-				refoferWrapper.text("STRTOFSVC", model.getSTRTOFSVC(), ctrl);				
-				refoferWrapper.text("ENDOFSVC", model.getENDOFSVC(), ctrl);				
+
+				refoferWrapper.text("MFRPRODTYPE", model.getMFRPRODTYPE(), ctrl);
+				refoferWrapper.text("MFRPRODDESC", model.getMFRPRODDESC(), ctrl);
+				refoferWrapper.text("MKTGDIV", model.getMKTGDIV(), ctrl);
+				refoferWrapper.text("CATGSHRTDESC", model.getCATGSHRTDESC(), ctrl);
+				refoferWrapper.text("STRTOFSVC", model.getSTRTOFSVC(), ctrl);
+				refoferWrapper.text("ENDOFSVC", model.getENDOFSVC(), ctrl);
 
 				refoferWrapper.text("VENDNAM", model.getVENDNAM(), ctrl);
 //				refoferWrapper.text("MACHRATECATG", "", ctrl);
@@ -312,7 +312,8 @@ public class EntityManager {
 
 				model.setPRODUCTID(processValue(rs.getString("TYPE")) + processValue(rs.getString("MODEL")));
 				model.setMFRPRODTYPE(processValue(rs.getString("TYPE")) + "-" + processValue(rs.getString("MODEL")));
-				model.setMFRPRODDESC(processValue(rs.getString("FAMILYNAME")) + " - " + processValue(rs.getString("SERIESNAME")));
+				model.setMFRPRODDESC(
+						processValue(rs.getString("FAMILYNAME")) + " - " + processValue(rs.getString("SERIESNAME")));
 				model.setMKTGDIV(processValue(rs.getString("DIVISION")));
 				model.setCATGSHRTDESC(processValue(rs.getString("BRAND")));
 				model.setSTRTOFSVC(processValue(rs.getString("ANNOUNCE_DATE")));
@@ -334,7 +335,7 @@ public class EntityManager {
 		}
 		return entitys;
 	}
-	
+
 	public List getDCGRecords2(String T1) throws Exception {
 
 		if (offlineMode) {
@@ -346,9 +347,10 @@ public class EntityManager {
 		String sql = null;
 
 		sql = "select distinct t1.MTYPE as TYPE,t2.MACHINE_MODEL as model,t1.UPD_DT,t1.FAMILYNAME,t1.SERIESNAME,t1.DIVISION,t1.BRAND,t1.ANNOUNCE_DATE,t1.DCG from opicm.EACM_MTYPE_LOG t1 "
-				+ "join opicm.EACM_MTM_LOG t2 on t1.MTYPE=t2.MACHINE_TYPE where t2.ACTION_TIME=(select max(ACTION_TIME) from opicm.EACM_MTM_LOG where ACTION_TIME between '"
-				+ T1
-				+ "' and current timestamp and t2.MACHINE_MODEL= MACHINE_MODEL Group by MACHINE_MODEL) and t1.DCG='Y' and t2.MACHINE_MODEL is not null with ur";
+				+ "join opicm.EACM_MTM_LOG t2 on t1.MTYPE=t2.MACHINE_TYPE "
+				+ "where t2.ACTION_TIME=(select max(t3.ACTION_TIME) from opicm.EACM_MTM_LOG t3 where t3.ACTION_TIME between '"
+				+ T1 + "' and current timestamp and t2.product_id= t3.product_id Group by t3.product_id) "
+				+ "and t1.DCG='Y' and t2.MACHINE_MODEL is not null with ur";
 
 		Log.d(TAG, "Extract SQL:" + sql);
 		List entitys = new ArrayList();
@@ -366,7 +368,8 @@ public class EntityManager {
 
 				model.setPRODUCTID(processValue(rs.getString("TYPE")) + processValue(rs.getString("MODEL")));
 				model.setMFRPRODTYPE(processValue(rs.getString("TYPE")) + "-" + processValue(rs.getString("MODEL")));
-				model.setMFRPRODDESC(processValue(rs.getString("FAMILYNAME")) + " - " + processValue(rs.getString("SERIESNAME")));
+				model.setMFRPRODDESC(
+						processValue(rs.getString("FAMILYNAME")) + " - " + processValue(rs.getString("SERIESNAME")));
 				model.setMKTGDIV(processValue(rs.getString("DIVISION")));
 				model.setCATGSHRTDESC(processValue(rs.getString("BRAND")));
 				model.setSTRTOFSVC(processValue(rs.getString("ANNOUNCE_DATE")));
@@ -390,14 +393,14 @@ public class EntityManager {
 	}
 
 	public String processValue(String s) {
-		
-		if(s!= null && !"".equals(s)) {
+
+		if (s != null && !"".equals(s)) {
 			return s.trim();
-		}else {
+		} else {
 			return " ";
 		}
 	}
-	
+
 	public List getNotDCGRecords(String T1, String noDCGtype) throws Exception {
 
 		if (offlineMode) {
@@ -429,7 +432,8 @@ public class EntityManager {
 
 				model.setPRODUCTID(processValue(rs.getString("MTYPE")));
 				model.setMFRPRODTYPE(processValue(rs.getString("MTYPE")));
-				model.setMFRPRODDESC(processValue(rs.getString("FAMILYNAME")) + " - " + processValue(rs.getString("SERIESNAME")));
+				model.setMFRPRODDESC(
+						processValue(rs.getString("FAMILYNAME")) + " - " + processValue(rs.getString("SERIESNAME")));
 				model.setMKTGDIV(processValue(rs.getString("DIVISION")));
 				model.setCATGSHRTDESC(processValue(rs.getString("BRAND")));
 				model.setSTRTOFSVC(processValue(rs.getString("ANNOUNCE_DATE")));
@@ -686,12 +690,12 @@ public class EntityManager {
 				entities.add(new ArrayList());
 			}
 			List l2 = getDCGRecords2(T1);
-			if(l2.size()>0) {
+			if (l2.size() > 0) {
 				entities.add(filterType2(l2, getAllType()));
-			}else {
+			} else {
 				entities.add(new ArrayList());
 			}
-			 
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			Log.e(TAG, "Filter Exception:" + e);
@@ -699,8 +703,6 @@ public class EntityManager {
 		return entities;
 	}
 
-	
-	
 	private List filterType2(List l2, List allType) {
 		List newType = new ArrayList();
 		int length = l2.size();
@@ -717,7 +719,7 @@ public class EntityManager {
 	}
 
 	private List getAllType() throws Exception {
-		
+
 		if (offlineMode) {
 			Log.i(TAG, "PDH is in Offline mode: get exits Type");
 			return null;
@@ -725,7 +727,7 @@ public class EntityManager {
 		Log.d(TAG, "get all LENOVO Type From text table");
 		String sql = "select distinct substring(t.attributevalue,0,5) from opicm.text t "
 				+ "join opicm.flag f on f.entitytype=t.entitytype and f.entityid=t.entityid and f.attributecode='PDHDOMAIN' and f.attributevalue='LENOVO' "
-				+ "where t.entitytype='REFOFER' and t.attributecode='PRODUCTID' and t.valto>current timestamp and t.effto>current timestamp and f.valto>current timestamp and f.effto>current timestamp with ur";		
+				+ "where t.entitytype='REFOFER' and t.attributecode='PRODUCTID' and t.valto>current timestamp and t.effto>current timestamp and f.valto>current timestamp and f.effto>current timestamp with ur";
 		Log.d(TAG, "Extract SQL:" + sql);
 		List types = new ArrayList();
 		try {
