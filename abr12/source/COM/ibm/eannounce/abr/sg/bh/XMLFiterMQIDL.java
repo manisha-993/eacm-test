@@ -313,6 +313,12 @@ public class XMLFiterMQIDL {
 			}
 //			reqDts = reqDts + " 00:00:00.000000";
 			buffer.append(" and XMLCACHEDTS >= \'" + reqDts +"\' ");
+			if("REFOFER".equals(entityType)) {
+				String isDCG = PokUtils.getAttributeValue(setupEntity, "DCG", "", null, false);
+				if("Y".equals(isDCG)) {
+					buffer.append(" and length(trim(xmlcast(xmlquery('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/REFOFER_UPDATE\"; $i/REFOFER_UPDATE/PRODUCTID/text()' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\") as varchar(8))))=7 ");
+				}
+			}
 			Vector vCond = getAllFilters(setupEntity, entityType);
 			StringBuffer filterBuf = compositeFilterCond(vCond);
 			String appFilter = filterBuf.toString();
