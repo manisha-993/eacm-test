@@ -148,7 +148,7 @@ public class XMLFiterMQIDL {
 		FILTER_TBL.put("REVUNBUNDCOMP",
 				new String[] {  });
 		//REFOFER | REFOFERFEAT added based on document - BH FS ABR XML IDL 20110720.doc
-		FILTER_TBL.put("REFOFER", new String[] { });
+		FILTER_TBL.put("REFOFER", new String[] { "PDHDOMAIN|F:PDHDOMAIN|X" });
 		FILTER_TBL.put("REFOFERFEAT", new String[] { });
 
 		// only put the different between XML root and entitytype
