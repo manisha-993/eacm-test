@@ -75,7 +75,7 @@ import com.ibm.transform.oim.eacm.util.PokUtils;
 //update country filter for service LSEO
 //
 //Revision 1.16  2011/10/26 08:05:36  guobin
-// Final 閿燂拷 support for old data 閿燂拷 CQ 67890  Changed to handle offerings that have an AVAIL left in Draft where the data is older than 閿燂拷2010-03-01閿燂拷.
+// Final é–¿ç‡‚æ‹· support for old data é–¿ç‡‚æ‹· CQ 67890  Changed to handle offerings that have an AVAIL left in Draft where the data is older than é–¿ç‡‚æ‹·2010-03-01é–¿ç‡‚æ‹·.
 //
 //Revision 1.15  2011/10/17 13:45:39  guobin
 //Support both 0.5 and 1.0 XML together  (BH FS ABR Data Transformation System Feed 20110914.doc)
@@ -182,7 +182,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 		//GENAREA
 		
 		//new add REFOFER and REFOFERFEAT
-		FILTER_TBL.put("REFOFER",new String[]{"STATUS","COUNTRYLIST","ENDOFSVC"});
+		FILTER_TBL.put("REFOFER",new String[]{"STATUS","COUNTRYLIST","ENDOFSVC","DCG"});
 		FILTER_TBL.put("REFOFERFEAT",new String[]{"STATUS","COUNTRYLIST","ENDOFSVC"});
 		//new add REFOFER and REFOFERFEAT end
 		
@@ -496,6 +496,11 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 			else if(attrcode.equals("DIVTEXT")){
 				attrvalue = getDIVISION(rootItem, rootEntityType, "DIV", abr);				
 				rootTable.put(attrcode, attrvalue);				
+			}else if(attrcode.equals("DCG")){
+				if(rootEntityType.equals("REFOFER")){
+					attrvalue = convertValue(PokUtils.getAttributeValue(rootItem, attrcode, "", null, false));
+				}			
+				rootTable.put(attrcode, attrvalue);				
 			}
 		} 
     	//print the rootItme filter information
@@ -665,6 +670,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 		String fCOFSUBCAT = "";
 		String fCOFGRP = "";
 		String fCOFSUBGRP = "";
+		String FDCG = "";
 		
 		for (int i=0; i<filters.length; i++){
     		attrcode = filters[i];
@@ -682,7 +688,12 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
     				attrvalue = "";
     			}
     			filterTable.put(attrcode, attrvalue);
-    		}else{    			
+    		}else if(attrcode.equals("DCG")){
+    			attrvalue = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,attrcode));
+    			if(attrcode.length()>0)
+    			filterTable.put(attrcode, attrvalue);
+    		}
+    			else{    			
     			attrvalue = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,attrcode));
     			filterTable.put(attrcode, attrvalue);
     		}
@@ -693,7 +704,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 			fCOFSUBCAT = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,"COFSUBCAT"));
 			fCOFGRP    = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,"COFGRP"));
 			fCOFSUBGRP = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,"COFSUBGRP"));
-			//If COFCAT = 閳ユ藩ervice閳ワ拷 (102), then the following are not applicable: COFGRP, and COFSUBGRP
+			//If COFCAT = é–³ãƒ¦è—©erviceé–³ãƒ¯æ‹· (102), then the following are not applicable: COFGRP, and COFSUBGRP
 			//check COFCAT from MODEL or LSEO with isService
 			if(isService){
 				fCOFGRP = "";
@@ -704,7 +715,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 //				fCOFSUBGRP = "";
 //			}
 			else{
-				//If COFGRP is applicable, then it defaults to 閳ユ窂ase閳ワ拷 (150) if not specified
+				//If COFGRP is applicable, then it defaults to é–³ãƒ¦çª‚aseé–³ãƒ¯æ‹· (150) if not specified
 				if("".equals(fCOFGRP)){
 					fCOFGRP = "150";
 				}
@@ -780,8 +791,11 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 		    		   || attrcode.equals("FLFILSYSINDC")||attrcode.equals("PDHDOMAIN")||attrcode.equals("DIVTEXT")){
 		    			isEquals = false;
 		    		}
+		    		abr.addDebug("match"+(String)rootTable.get(attrcode)+":"+ (String)filterTable.get(attrcode)+":"+attrcode+":"+ isEquals);
+		    		
 		    		isvaild = isVailidCompare((String)rootTable.get(attrcode), (String)filterTable.get(attrcode),attrcode, isEquals);
-					if(!isvaild){
+		    		abr.addDebug("match"+isvaild);
+		    		if(!isvaild){
 						isMatch = false;
 						break;
 					}
@@ -938,8 +952,10 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 			    		|| attrcode.equals("FLFILSYSINDC")||attrcode.equals("PDHDOMAIN")||attrcode.equals("DIVTEXT")){
 			    			isEquals = false;
 			    		}
+			    		abr.addDebug("match"+(String)rootTable.get(attrcode)+":"+ (String)filterTable.get(attrcode)+":"+attrcode+":"+ isEquals);
 			    		isvaild = isVailidCompare((String)rootTable.get(attrcode), (String)filterTable.get(attrcode),attrcode, isEquals);
-						if(!isvaild){
+			    		abr.addDebug("match"+isvaild);
+			    		if(!isvaild){
 							isMatch = false;
 							break;
 						}
@@ -1119,7 +1135,9 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 				}
 			}else{
 				if(isEquals){
-					if(EXTXMLFEEDItemAttributeValue.equals(rootItemAttributeValue)){
+					if("DCG".equals(attrcode)&&(rootItemAttributeValue==null||"".equals(rootItemAttributeValue)))
+					return true;
+						if(EXTXMLFEEDItemAttributeValue.equals(rootItemAttributeValue)){
 						isvaild = true;
 					}else{
 						isvaild = false;
@@ -1260,7 +1278,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 		//AVAIL: MODEL,      MODELCONVERT     SVCMOD      SWPRODSTRUCT      PRODSTRUCT
 		//VE:    ADFMODEL    ADFMODELCONVERT  ADFSVCMOD   ADFSWPRODSTRUCT   ADFPRODSTRUCT
 		//AVAILTYPE = "Planned Availability" (146)
-		//COUNTRYLIST 閳ワ拷 The 閳ユ穾vailability閳ワ拷 (AVAIL) of type 閳ユ阀lanned Availability閳ワ拷 (146) is used for this filter. 
+		//COUNTRYLIST é–³ãƒ¯æ‹· The é–³ãƒ¦ç©¾vailabilityé–³ãƒ¯æ‹· (AVAIL) of type é–³ãƒ¦é˜€lanned Availabilityé–³ãƒ¯æ‹· (146) is used for this filter. 
 		//If MODEL, MODELCONVERT, SVCMOD, SWPRODSTRUCT do not have an AVAIL of this type, 
 		//then assume "World Wide" and hence this data is NOT filtered out (i.e. it is sent).
 		//Add AVAIL's status must be ready for review and final
@@ -1344,7 +1362,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 		EntityItem itemArray[] = null;
 		if(mdlGrp!=null) {
 			itemArray = mdlGrp.getEntityItemsAsArray();
-			abr.addDebug("getDIVISION閿涳拷 itemArray=" +itemArray.length);
+			abr.addDebug("getDIVISIONé–¿æ¶³æ‹· itemArray=" +itemArray.length);
 		}
 		int k=0;
 		for(int i=0;i<itemArray.length;i++){
@@ -1358,7 +1376,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 				}
 			}
 		}
-		abr.addDebug("getDIVISION閿涙瓱nd");
+		abr.addDebug("getDIVISIONé–¿æ¶™ç“±nd");
 		return attrvalue;
 	}
 	
@@ -1727,7 +1745,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
     /**
      * There is special filtering of MODEL based on classification attributes. 
 	  Only MODELs that match the filtering are to flow. The functional specification 
-	  閳ユ窂H FS ABR XML IDL 2011mmdd.doc閳ワ拷 describes the 閳ユ反ML Setup Entity閳ワ拷 (EXTXMLFEED) 
+	  é–³ãƒ¦çª‚H FS ABR XML IDL 2011mmdd.docé–³ãƒ¯æ‹· describes the é–³ãƒ¦å��ML Setup Entityé–³ãƒ¯æ‹· (EXTXMLFEED) 
 	  which may be used to further filter data for downstream systems 
 	  (i.e. a subset of the data that matches the following criteria).
 	    COFCAT   COFSUBCAT COFGRP  

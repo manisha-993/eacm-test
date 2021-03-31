@@ -675,13 +675,13 @@ public class XMLElem
                     int nlsid = nlsitem.getNLSID();
                     //true if information for the given NLSID is contained in the Text data
                     if (((EANTextAttribute)att).containsNLS(nlsid)) {
-                        value = att.toString();
+                        value = att.toString().trim();
                     } // end attr has this language
                     else{
                         value = CHEAT;
                     }
                 }else{
-                    value = PokUtils.getAttributeValue(item, code,", ", CHEAT, false);
+                    value = PokUtils.getAttributeValue(item, code,", ", CHEAT, false).trim();
                 }
 
                 if(isReq && value.equals(CHEAT)){
