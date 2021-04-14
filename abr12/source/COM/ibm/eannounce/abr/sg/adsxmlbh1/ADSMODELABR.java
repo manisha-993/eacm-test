@@ -434,7 +434,6 @@ public class ADSMODELABR extends XMLMQRoot {
 		// <IBMCREDIT> </IBMCREDIT> 2 MODEL IBMCREDIT Long Desciption
 		XMLMAP.addChild(new XMLElem("VOLUMEDISCOUNTELIG", "VOLUMEDISCOUNTELIG"));
 		XMLMAP.addChild(new XMLElem("IBMCREDIT", "IBMCREDIT"));
-		
 		XMLMAP.addChild(new XMLElem("VENDNAME", "VENDNAME"));
 		// 1.0 <UPCCD> </UPCCD> 2 MODEL UPCCD
 		// XMLMAP.addChild(new XMLElem("UPCCD","UPCCD"));
