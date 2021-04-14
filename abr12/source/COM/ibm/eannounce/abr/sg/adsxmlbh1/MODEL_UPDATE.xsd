@@ -271,6 +271,8 @@
 			<xsd:element name="VOLUMEDISCOUNTELIG" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
 			<xsd:element name="IBMCREDIT" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
 
+			<xsd:element name="VENDNAME" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>			
+
 			<xsd:element name="LANGUAGELIST" type="LANGUAGELISTTYPE"
 						 minOccurs="1" maxOccurs="1" />
 			<xsd:element name="AVAILABILITYLIST"
