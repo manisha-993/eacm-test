@@ -141,7 +141,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			+ "(select entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and m.status  in ('Final','Ready for Review') and m.COFGRP = 'Base' and m.COFSUBCAT = 'Application'  and m.valto > current timestamp and m.nlsid=1 ))  "
 			+ "select distinct m.ENTITYTYPE,m.MACHTYPEATR,m.MODELATR,m.MKTGNAME,m.ANNDATE,m.WITHDRAWDATE,m.WTHDRWEFFCTVDATE,m.INSTALL,m.STATUS,m.VALFROM from opicm.model m  "
 			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1  "
-			+ "where   m.status in ('Final','Ready for Review') and m.nlsid=1 and (S.DIV not in ('71 Retail Store Systems' ,'20','2P','2N','30','36','46','C3','G2','K6','M3','MW','Q9','J6','8F') or S.div is null) and m.entityid not in (select id from dump1)and  m.VALFROM>= ? and m.VALFROM < ?  "
+			+ "where   m.status in ('Final','Ready for Review') and m.nlsid=1 and (S.DIV not in ('71','20','2P','2N','30','36 IBM eBusiness Hosting Services','46','8F','C3','G2','J6','K6 - IBM Services for Managed Applications','M3','MW','Q9') or S.div is null) and m.entityid not in (select id from dump1)and  m.VALFROM>= ? and m.VALFROM < ?  "
 			+ "with ur";
 	// private final static String QUERY_PRODSTRUCT = "select
 	// r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM
@@ -157,7 +157,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			+ "(select entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and m.status  in ('Final','Ready for Review') and m.COFGRP = 'Base' and m.COFSUBCAT = 'Application'  and m.valto > current timestamp and valto > current timestamp ))"
 			+ "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and f.status in ('Final','Ready for Review') and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 and p.status in ('Final','Ready for Review') "
 			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1 "
-			+ "where  p.VALFROM>= ? and p.VALFROM < ? and m.status in ('Final','Ready for Review') and  m.nlsid=1  and m.entityid not in (select id from dump1)  and (S.DIV not in ('71 Retail Store Systems' ,'20','2P','2N','30','36','46','C3','G2','K6','M3','MW','Q9','J6','8F') or S.div is null) with ur";
+			+ "where  p.VALFROM>= ? and p.VALFROM < ? and m.status in ('Final','Ready for Review') and  m.nlsid=1  and m.entityid not in (select id from dump1)  and (S.DIV not in ('71','20','2P','2N','30','36 IBM eBusiness Hosting Services','46','8F','C3','G2','J6','K6 - IBM Services for Managed Applications','M3','MW','Q9') or S.div is null) with ur";
 
 	/*private final static String QUERY_SWPRODSTRUCT = "with temp as ("
 			+ "select sw.entitytype ,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,sw.MKTGNAME,coalesce(annp.ANNDATE,'9999-12-32') AS PANNDATE,coalesce( annl.ANNDATE,'9999-12-32') as LANNDATE,coalesce(a1.EFFECTIVEDATE,'9999-12-32') as EFFECTIVEDATE,sw.STATUS,sw.VALFROM,max(coalesce(sw.VALFROM,'1980-01-01 00:00:00.000000') ,coalesce(a1.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(a.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annp.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annl.VALFROM,'1980-01-01 00:00:00.000000')) as MAXDATA from opicm.SWPRODSTRUCT sw "
@@ -191,7 +191,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			+ "left join  opicm.avail a1 on a1.entityid = r1.entity2id and a1.nlsid=1 and  a1.AVAILTYPE='Last Order'  AND a1.status in ('Final','Ready for Review')  "
 			+ "left join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1  and annl.ANNSTATUS  in ('Final','Ready for Review') "
 			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1 "
-			+ "where  sw.status in ('Final','Ready for Review') and sw.nlsid=1  and (S.DIV not in ('71 Retail Store Systems' ,'20','2P','2N','30','36','46','C3','G2','K6','M3','MW','Q9','J6','8F') or S.div is null) and m.entityid not in (select id from dump1) )  "
+			+ "where  sw.status in ('Final','Ready for Review') and sw.nlsid=1  and (S.DIV not in ('71','20','2P','2N','30','36 IBM eBusiness Hosting Services','46','8F','C3','G2','J6','K6 - IBM Services for Managed Applications','M3','MW','Q9') or S.div is null) and m.entityid not in (select id from dump1) )  "
 			+ "select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,(case min(PANNDATE) when '9999-12-32' then '' else min(PANNDATE) end )as PANNDATE,(case min(LANNDATE) when '9999-12-32' then '' else min(LANNDATE) end ) as LANNDATE,(case min(EFFECTIVEDATE) when '9999-12-32' then '' else min(EFFECTIVEDATE) end ) as EFFECTIVEDATE,STATUS,VALFROM from temp "
 			+ "group by entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,VALFROM,STATUS "
 			+ "having max(MAXDATA) >= ? and max(MAXDATA) < ?  " + "with ur";
