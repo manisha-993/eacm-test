@@ -1,0 +1,65 @@
+<opicmForm_1.1>
+<!--font face="creepy" size="18" style="0"-->
+<variable name="true" class = "boolean" value="true"/>
+<variable name="false" class = "boolean" value="false"/>
+<variable name="int0" class = "int" value="0"/>
+<variable name="int1" class = "int" value="1"/>
+<variable name="int2" class = "int" value="2"/>
+
+	The following line is for control of the navigate appearance
+		parm1:	history type
+				HISTORY_BOX  = 0; (default)
+				HISTORY_LIST = 1;
+
+		parm2:	data type
+				DATA_SINGLE  = 0; (default)
+				DATA_DOUBLE  = 1;
+				DATA_FORM	 = 2;
+
+		parm3:	action type
+				ACTION_TREE	 = 0; (default)
+				ACTION_BOX   = 1;
+				ACTION_LIST  = 2;
+
+		parm4:	clicks
+				SINGLE_CLICK = 1; (default)
+				DOUBLE_CLICK = 2;
+	NOTE: build with no parameters uses the defaults.
+
+method name="navigateBuild" parms ="int,int,int,int" args="int1,int0,int1,int1" method="build" object="navigate0"
+<method name="navigateBuild" method="build" object="navigate0"/>
+<do method="navigateBuild"/>
+<method name="getData" method="getData" Object="navigate0"/>
+<method name="getHist" method="getHistory" Object="navigate0"/>
+<method name="getAction" method="getAction" Object="navigate0"/>
+<method name="getSelector" method ="getSelector" Object="navigate0"/>
+<method name="getToolbar" method="getToolbar" Object="navigate0"/>
+<method name="isCreateable" method="isCreatable" Object="navigate0"/>
+<method name="loadPrevForm" method="loadPrevForm" Object="this"/>
+<method name="loadNextForm" method="loadNextForm" Object="this"/>
+<method name="hasPrevForm" method="hasPrevForm" Object="this"/>
+<method name="hasNextForm" method="hasNextForm" Object="this"/>
+<!--method name="mthdGetNavObject" method="getNavigateObject" Object="navigate0"/ -->
+<!--method name="mthdTest" parms="java.lang.Object,java.lang.String,boolean" args="mthdGetNavObject,nav_test.html,true" method="openNavigateForm" Object="opicm"/ -->
+<Jcomponent name="navSelector" component="getSelector"/>
+<GLabel name="lblAction" text="Action" misc="borderLocation,North"/>
+<background color="#FFFFFF">
+<JComponent name="navAction" component="getAction" misc="borderLocation,Center"/>
+<GPanel name="pnlAction" layout="border" add="lblAction,navAction"/>
+</background>
+<JComponent name="navData" component="getData" misc="borderLocation,Center"/>
+<JSplitPane name="JSplit" jsplitPanelType="1" add="navData,pnlAction" misc="borderLocation,Center"/>
+<background color="#FFFFFF">
+<JComponent name="navHist" component="getHist" misc="borderlocation,North"/>
+</background>
+<GPanel name="navPanel" layout="border" misc="borderlocation,Center" add="JSplit,navHist" opaque="true"/>
+<mainPane layout="border" add="navPanel"/>
+<Toolbar set="getToolbar" orientation="Vertical" anchor="West" floatable="true"/>
+	The following methods set parameters to initialize menu items correctly.
+	They are somewhat optional but removing them could have detremental effects.
+<method name="setCartVisible" method="setCartOnForm" parms="boolean" args="false" Object="navigate0"/>
+<method name="setTabSelectorVisible" method="setTabSelectorOnForm" parms="boolean" args="false" Object="navigate0"/>
+<do method="setCartVisible"/>
+<do method="setTabSelectorVisible"/>
+<!--/font -->
+</opicmForm_1.1>

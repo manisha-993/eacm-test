@@ -1,0 +1,15 @@
+open pokxea6.pok.ibm.com
+opicmadm
+cat9tail
+prompt off
+
+lcd C:\autoUpdate\jre\lib\ext
+cd /home/opicmadm/storedp
+bin
+get middleware.jar.new middleware.jar
+quit
+
+
+
+
+

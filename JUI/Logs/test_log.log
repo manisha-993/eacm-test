@@ -1,0 +1,219 @@
+<e-announce12>
+<!--
+eannounce.version =  e-announce X-12 rc .38 (2004-01-22) MysteryMachine II
+LOGS_DIRECTORY: C:\e-announce12\Logs\
+HOME_DIRECTORY: C:\e-announce12\
+TEMP_DIRECTORY: C:\e-announce12\Temp\
+JAR_DIRECTORY: C:\e-announce12\Jars\
+RESOURCE_DIRECTORY: C:\e-announce12\Resource\
+CACHE_DIRECTORY: C:\e-announce12\Cache\
+eannounce.mode.test = true
+eannounce.mode.batch = null
+eannounce.validate.form = false
+eannounce.lib.ext = c:\e-announce12\jre\lib\ext\
+eannounce.middleware.object = OPICM-Middleware
+eannounce.middleware.ip = pokxea10.pok.ibm.com
+eannounce.middleware.port = 3011
+eannounce.middleware.report = http://pokxea10.pok.ibm.com/eannounce/
+eannounce.middleware.version = $Id: test_log.log,v 1.1 2007/04/18 19:39:32 wendy Exp $
+file.encoding = Cp1252
+user.home = C:\Documents and Settings\Anthony C. Liberto
+user.name = Anthony C. Liberto
+user.language = en
+user.region = null
+user.country = US
+user.timezone = America/Los_Angeles
+user.dir = C:\e-announce12
+os.arch = x86
+os.name = Windows XP
+os.version = 5.1
+sun.os.patch.level = Service Pack 1
+sun.cpu.isalist = null
+java.class.version = 48.0
+java.rmi.server.hostname = null
+sun.arch.data.model = 32
+java.compiler = jitc
+java.library.path = C:\e-announce12;.;C:\WINDOWS\System32;C:\WINDOWS;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\PROGRAM FILES\THINKPAD\UTILITIES;C:\Program Files\JProbe Suite 4.0\bin;C:\SQLLIB\BIN;C:\SQLLIB\HELP;C:\Program Files\Common Files\Ulead Systems\MPEG;c:\Access_Bridge;c:\Program Files\IBM\Java14\bin;C:\Program Files\ATI Technologies\ATI Control Panel;C:\Program Files\SecureCRT\;C:\Program Files\Common Files\Roxio Shared\DLLShared;C:\PROGRA~1\COMMON~1\ROXIOS~1\DLLSHA~1;C:\Program Files\Common Files\Ulead Systems\DVD;C:\PROGRA~1\COMMON~1\MGISHA~1\Video
+java.vm.name = Classic VM
+java.specification.version = 1.4
+java.vendor = IBM Corporation
+java.vm.version = 1.4.0
+java.runtime.version = 1.4.0
+java.vm.info = J2RE 1.4.0 IBM Windows 32 build cn140-20020902 (JIT enabled: jitc)
+java.fullversion = J2RE 1.4.0 IBM Windows 32 build cn140-20020902 (JIT enabled: jitc)
+java.runtime.name = Java(TM) 2 Runtime Environment, Standard Edition
+java.class.path = C:\e-announce12\jars\jspell2n_java2.jar;C:\e-announce12\jars\jspell2s_java2.jar;C:\e-announce12\jars\xerces.jar;C:\e-announce12\jars\Opicm.jar;C:\e-announce12\lax.jar;c:\e-announce12\jre\lib\charsets.jar;c:\e-announce12\jre\lib\core.jar;c:\e-announce12\jre\lib\graphics.jar;c:\e-announce12\jre\lib\javaws.jar;c:\e-announce12\jre\lib\jaws.jar;c:\e-announce12\jre\lib\security.jar;c:\e-announce12\jre\lib\server.jar;c:\e-announce12\jre\lib\xml.jar;
+java.home = c:\e-announce12\jre
+sun.boot.library.path = c:\e-announce12\jre\bin
+sun.io.unicode.encoding = UnicodeLittle
+lax.nl.current.vm = C:\e-announce12\jre\bin\java.exe
+lax.nl.java.option.java.heap.size.initial = 64M
+lax.nl.java.option.java.heap.size.max = 192M
+lax.nl.java.option.stack.size.initial = 4M
+lax.nl.java.option.stack.size.max = 4M
+lax.root.install.dir = C:\e-announce12
+lax.application.name = eLogin.exe
+lax.generated.launcher.name = C:\e-announce12\eLogin.exe
+lax.nl.java.option.additional = null
+lax.version = 5.0
+lax.class.path = jars/jspell2n_java2.jar;jars/jspell2s_java2.jar;jars/xerces.jar;jars/Opicm.jar;lax.jar
+lax.main.class = COM.eLogin.eLogin
+lax.main.method = main
+lax.command.line.args = $CMD_LINE_ARGUMENTS$
+lax.resource.dir = null
+lax.nl.java.compiler = null
+lax.nl.win32.java.compiler = null
+lax.user.dir = .
+lax.nl.java.launcher.main.method = main
+lax.nl.java.launcher.main.class = com.zerog.lax.LAX
+lax.nl.java.option.verbose = null
+lax.nl.java.option.garbage.collection.extent = null
+lax.nl.java.option.garbage.collection.background.thread = null
+lax.nl.java.option.debugging = null
+lax.nl.env.path = C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\PROGRAM FILES\THINKPAD\UTILITIES;C:\Program Files\JProbe Suite 4.0\bin;C:\SQLLIB\BIN;C:\SQLLIB\HELP;C:\Program Files\Common Files\Ulead Systems\MPEG;c:\Access_Bridge;c:\Program Files\IBM\Java14\bin;C:\Program Files\ATI Technologies\ATI Control Panel;C:\Program Files\SecureCRT\;C:\Program Files\Common Files\Roxio Shared\DLLShared;C:\PROGRA~1\COMMON~1\ROXIOS~1\DLLSHA~1;C:\Program Files\Common Files\Ulead Systems\DVD;C:\PROGRA~1\COMMON~1\MGISHA~1\Video
+lax.java.compiler = null
+lax.stdout.redirect = 
+lax.stderr.redirect = 
+lax.nl.env.CLASSPATH = .;C:\SQLLIB\java\db2java.zip;C:\SQLLIB\java\runtime.zip;c:\Documents and Settings\Anthony C. Liberto\Jars\middleware.jar;c:\Documents and Settings\Anthony C. Liberto\Jars\xerces.jar;c:\Documents and Settings\Anthony C. Liberto\Jars\Opicm.jar;c:\Documents and Settings\Anthony C. Liberto\Jars\jspell2n_java2.jar;c:\Documents and Settings\Anthony C. Liberto\Jars\jspell2s_java2.jar;c:\Documents and Settings\Anthony C. Liberto\Jars\FTPProtocol.jar
+lax.nl.env.PROCESSOR_ARCHITECTURE = x86
+lax.nl.env.PROCESSOR_IDENTIFIER = x86 Family 15 Model 2 Stepping 4, GenuineIntel
+lax.nl.env.PROCESSOR_LEVEL = 15
+lax.nl.env.PROCESSOR_REVISION = 0204
+lax.nl.env.NUMBER_OF_PROCESSORS = 1
+lax.nl.env.OS = Windows_NT
+lax.nl.env.COMPUTERNAME = TECHLAP
+lax.nl.env.LOGONSERVER = \\TECHLAP
+lax.nl.env.USERDOMAIN = TECHLAP
+lax.nl.env.USERPROFILE = C:\Documents and Settings\Anthony C. Liberto
+lax.nl.env.windir = C:\WINDOWS
+** properties complete **
+
+Screen Res :  96
+Screen Size:  1600 x 1200
+-->
+login(aliberto@us.ibm.com,**password**,**token**)
+eLogin.actionPerformed: SUBWORKGROUPMENUITEM
+
+    Enterprise:  LS
+    OperatorName:  aliberto@us.ibm.com
+    OperatorID:  210012
+    OPWGID:  210032
+    RoleCode:  LSDIVADMIN
+    RoleDesription:  LS Operational Systems Administrator (OSA)
+    WorkGroupName:  EA10 (LS Enterprise) Master WG
+    WorkGroupID:  1
+    SessionID: 42134
+    TranID:  1
+    DefaultIndex:  -1
+<roleSelect enterprise="LS" role="LSDIVADMIN" opwgid="210032"/>
+getBlob(OPWG, 210032, UIPREFERENCES, 1)
+getBlob(OPWG, 210032, UIPREFERENCES, 1)
+navForm.Element opicmForm_1.1 is undefined.
+<database method="getEntityList" ActionCommand="" EntityItems=""/>
+navigate()
+navForm.Element Toolbar is undefined.
+<navSelect side="0" key="EntryPoint" opwgid="210032"/>
+
+    Enterprise:  LS
+    OperatorName:  aliberto@us.ibm.com
+    OperatorID:  210012
+    OPWGID:  210032
+    RoleCode:  LSDIVADMIN
+    RoleDesription:  LS Operational Systems Administrator (OSA)
+    WorkGroupName:  EA10 (LS Enterprise) Master WG
+    WorkGroupID:  1
+    SessionID: 42134
+    TranID:  1
+    DefaultIndex:  -1
+<tabSelect tab="eNavForm" parentkey="EntryPoint" opwgid="210032"/>
+eLogin.actionPerformed: pref
+<database method="getEntityList" ActionCommand="NAVWGLSDIV" EntityItems="WG1"/>
+DWB: New Local Object Pool Cache
+2004-02-10-08.22.32.652000  Putting Action List:ACTIONLIST:LSDIVADMINNAVWGLSDIV1 - 
+<database method="getEntityList" ActionCommand="NAVLSDIVCT" EntityItems="WGLSDIV1"/>
+2004-02-10-08.22.46.752000  Putting Action List:ACTIONLIST:LSDIVADMINNAVLSDIVCT1 - 
+<database method="getEntityList" ActionCommand="NAVLSCTCCF" EntityItems="LSDIVCT139"/>
+2004-02-10-08.23.00.101000  Putting Action List:ACTIONLIST:LSDIVADMINNAVLSCTCCF1 - 
+<database method="getEntityList" ActionCommand="NAVLSCCFCC" EntityItems="LSCTCCF87"/>
+2004-02-10-08.23.10.146000  Putting Action List:ACTIONLIST:LSDIVADMINNAVLSCCFCC1 - 
+navigate.action: LANGUAGEMENUITEM
+<database method="getEntityList" ActionCommand="NAVLSCCFCC" EntityItems="LSCCF87"/>
+2004-02-10-08.23.24.787000  Putting Action List:ACTIONLIST:LSDIVADMINNAVLSCCFCC4 - 
+navigate.action: edit
+<database method="getEntityList" ActionCommand="EDITLSCC" EntityItems="LSCCFCC44653"/>
+free memory: (45200872/67959296) 66% free
+maximum memory: 1.96E8
+free available memory: 45202192
+total available memory: 67959296
+consumed memory: 2.2757104E7
+% memory used: 11.610767
+% memory available: 88.38924
+% currently available: 66
+minimum % available: 20.0
+
+    Enterprise:  LS
+    OperatorName:  aliberto@us.ibm.com
+    OperatorID:  210012
+    OPWGID:  210032
+    RoleCode:  LSDIVADMIN
+    RoleDesription:  LS Operational Systems Administrator (OSA)
+    WorkGroupName:  EA10 (LS Enterprise) Master WG
+    WorkGroupID:  1
+    SessionID: 42151
+    TranID:  1
+    DefaultIndex:  -1
+EditActionitem.modifyActionItem() was called
+EditActionItem.setEntityOnly() being set to:true
+EditActionItem.setTargetEntity(): setting toLSCC
+Eclip:editTargetOnly: ** Shift and found
+SOCKET:SendBefore:8192:REC:8192
+SOCKET:SendAfter:256000:REC:256000
+EntityItem.getActualRowList() LSCC35496
+editController action is: vert
+EntityItem.getActualRowList() LSCC35496
+EntityItem.getActualRowList() LSCC35496
+
+    Enterprise:  LS
+    OperatorName:  aliberto@us.ibm.com
+    OperatorID:  210012
+    OPWGID:  210032
+    RoleCode:  LSDIVADMIN
+    RoleDesription:  LS Operational Systems Administrator (OSA)
+    WorkGroupName:  EA10 (LS Enterprise) Master WG
+    WorkGroupID:  1
+    SessionID: 42151
+    TranID:  1
+    DefaultIndex:  -1
+<tabSelect tab="editController" parentkey="NAVLSCCFCC" opwgid="210032"/>
+SOCKET:SendBefore:8192:REC:8192
+SOCKET:SendAfter:256000:REC:256000
+SOCKET:SendBefore:8192:REC:8192
+SOCKET:SendAfter:256000:REC:256000
+SOCKET:SendBefore:8192:REC:8192
+SOCKET:SendAfter:256000:REC:256000
+EntityItem.getActualRowList() LSCC35496
+
+    Enterprise:  LS
+    OperatorName:  aliberto@us.ibm.com
+    OperatorID:  210012
+    OPWGID:  210032
+    RoleCode:  LSDIVADMIN
+    RoleDesription:  LS Operational Systems Administrator (OSA)
+    WorkGroupName:  EA10 (LS Enterprise) Master WG
+    WorkGroupID:  1
+    SessionID: 42151
+    TranID:  1
+    DefaultIndex:  -1
+SOCKET:SendBefore:8192:REC:8192
+SOCKET:SendAfter:256000:REC:256000
+<tabSelect tab="editController" parentkey="NAVLSCCFCC" opwgid="210032"/>
+free memory: (29059328/67959296) 42% free
+maximum memory: 1.96E8
+free available memory: 29060560
+total available memory: 67959296
+consumed memory: 3.8898736E7
+% memory used: 19.846292
+% memory available: 80.15371
+% currently available: 42
+minimum % available: 20.0
+</e-announce12>

@@ -1,0 +1,3 @@
+<deploy_file>
+<update optional="true" ip="pokxea6.pok.ibm.com" name="OPICM-Middleware" port="4012" user="aliberto@us.ibm.com" chain="" file="/home/opicmadm/autoUpdate/Updates.zip"/>
+</deploy_file>

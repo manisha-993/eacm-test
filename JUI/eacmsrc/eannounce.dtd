@@ -1,0 +1,93 @@
+<!-- (C) Copyright IBM Corp. 2003, 2006  All Rights Reserved.
+
+eannounce.dtd used by e-announce ServerGroup (CCHW) V1.1.1 -->
+<!-- 01/03/03 WSS CR0110032313 Added support for PRE tag V1.1.1-->
+<!-- 02/19/03 WSS CR0212036046 Added support for TABLE tag V1.1.1-->
+<!-- 01/09/06 WSS AHE Accessibility requires table, th and td attributes -->
+
+<!-- no attributes will be supported except publish on some tags.  There is no way to set extra
+    attributes in the wysiwyg xml editor so they must not be supported if 'pasted' from an external
+    source.
+-->
+
+<!--=================== Heading ==========================================-->
+<!ENTITY % heading "H1|H2|H3|H4|H5">
+
+<!ENTITY % list "UL | OL">
+
+<!--=================== Text Markup =======================================-->
+
+<!ENTITY % font "I | B  | U">
+
+<!ENTITY % text "(#PCDATA)* | %font ">
+
+<!ELEMENT (%font) (%text | BR)* >
+
+<!ELEMENT BR   EMPTY    -- forced line break -- >
+
+<!--================== HTML content models ================================-->
+
+<!ENTITY % block "PRE | P | %list">
+
+<!ENTITY % flow "(%text | %block | BR)*">
+
+<!--=================== Headings ==========================================-->
+<!-- 
+  There are six levels of headers from H1 (the most important) to H6 (the least important).
+  Disable B when inside heading to prevent invalid toggle of bold in a heading
+-->
+
+<!ELEMENT ( %heading )  (%text | BR)* -(B) >
+        
+<!--=================== Paragraphs=========================================-->
+
+<!ELEMENT PRE   (%text | BR)*>
+
+<!ELEMENT P   (%text | BR)*>
+<!ATTLIST P
+        publish (webonly|printonly) #IMPLIED -- control of content --        
+        >
+
+<!--=================== Ordered lists OL, and unordered lists UL ==========-->
+
+<!ELEMENT (OL|UL)  (LI)+>
+
+<!ATTLIST OL -- ordered lists --
+        publish (webonly|printonly) #IMPLIED -- control of content --        
+        >
+
+<!ATTLIST UL -- unordered lists --
+        publish (webonly|printonly) #IMPLIED -- control of content --        
+        >
+
+<!ELEMENT LI  %flow     -(OL|UL|P|PRE)  -- list item  prevent nested structure -->
+<!ATTLIST LI
+        publish (webonly|printonly) #IMPLIED -- control of content --
+        >
+ 
+<!--======================= Tables ========================================-->
+
+<!ELEMENT table  (tr+)>
+<!ELEMENT tr  (th|td)*>
+
+<!ELEMENT td  (%text | BR)*>
+<!ELEMENT th  (%text | BR)* -(B) -- prevent user turning bold off in a header cell-->
+
+<!ATTLIST table                       -- table element --
+     border    NUMBER   #IMPLIED  -- controls frame width around table --
+     summary   CDATA    #IMPLIED  -- table summary used for accessibility --
+     >
+
+<!ATTLIST (th)                  -- header cell --
+        id   CDATA    #IMPLIED  -- used for accessibility --
+        >               
+<!ATTLIST (td)                  -- date cell --
+        headers   CDATA    #IMPLIED  -- used for accessibility --
+        >        
+<!--=== The following is required by the DTD parser supplied by the Java HTML pkg ==-->
+<!--=================== Document Body =====================================-->
+<!ENTITY % body.content "(%heading | %block | table)*">
+
+
+
+

@@ -1,0 +1,2 @@
+SUPPORT_JARS="./eaServer.jar:./version.jar:/home/opicmadm/middleware/middleware.jar:/home/opicmadm/middleware/smtp.jar:/home/opicmadm/middleware/mail.jar:/home/opicmadm/middleware/jsse.jar:/home/opicmadm/middleware/jnet.jar:/home/opicmadm/middleware/jcert.jar:/home/opicmadm/middleware/xerces.jar:"
+java -Xms16M -Xmx64M -Xss4M -classpath $SUPPORT_JARS com/ibm/eannounce/eserver/Deployer $1 $2 $3 $4 $5
