@@ -1,0 +1,52 @@
+#
+# Master script to run an IDL to the CATDB database.
+#
+
+ROOT_DIR=/home/opicmadm/catdb
+
+#
+# Ok, first let's ensure nobody else is running this thing...or anything relevant...
+#
+db2 connect to pdhalias user opicmadm using cat9tail
+
+db2 "select count(*) from eacm.ifmlock where status = 1 and process_id in (1,4,10,20)" | \
+awk 'NR == 4 {print $0}' |
+while  read count
+  do
+
+  if [ $count == 0 ]; then
+    echo "No lock found, proceeding with idl..."
+  else
+    echo "Something is already running, bailing out!!"
+    exit 0;
+  fi;
+
+  done
+
+db2 terminate
+#
+#
+#
+
+# clear all relevant tables..
+cd $ROOT_DIR
+./clear-catdb.sh
+
+
+# Do not run dmint anymore
+# run our dminit engine
+cd $ROOT_DIR/catods
+./run.dminit
+
+
+# run our catalog middleware engine
+cd $ROOT_DIR
+./run.idlToCatDb
+
+
+# now grant some db2 select privileges
+cd $ROOT_DIR
+./grant-tables.sh
+
+cd $ROOT_DIR/rpt
+chmod 644 *Col*

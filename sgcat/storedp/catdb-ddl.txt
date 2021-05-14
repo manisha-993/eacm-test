@@ -1,0 +1,2079 @@
+-- $Log: catdb-ddl.txt,v $
+-- Revision 1.15  2011/05/05 11:25:58  wendy
+-- src from IBMCHINA
+--
+-- Revision 1.1.1.1  2007/06/05 02:09:47  jingb
+-- no message
+--
+-- Revision 1.14  2006/10/30 17:20:04  gregg
+-- projcdnam
+--
+-- Revision 1.13  2006/09/28 17:53:57  gregg
+-- extend prodstruct.oslevel cols to match prod
+--
+-- Revision 1.12  2006/09/28 16:51:25  gregg
+-- move configuratorflag_fc to prodstruct
+--
+-- Revision 1.11  2006/09/14 20:24:38  gregg
+-- configuratorflag*_fc*!!
+--
+-- Revision 1.10  2006/09/13 21:28:00  gregg
+-- add gbli.trsnetter tables
+--
+-- Revision 1.9  2006/09/11 20:26:30  gregg
+-- configuratorflag_fc
+--
+-- Revision 1.8  2006/07/11 16:34:02  gregg
+-- update
+--
+-- Revision 1.7  2006/06/21 17:18:40  gregg
+-- CATSCAN in catdb_tables
+--
+-- Revision 1.6  2006/06/19 22:51:08  gregg
+-- CATSCAN added
+--
+-- Revision 1.5  2006/05/03 21:29:24  gregg
+-- col widths descreased a tad to allow max row of 4k
+--
+-- Revision 1.4  2006/05/03 15:37:07  gregg
+-- extend some col widths for category
+--
+-- Revision 1.3  2006/04/18 14:52:59  gregg
+-- cleanup
+--
+-- Revision 1.2  2006/04/06 18:01:38  gregg
+-- fix countrylist
+--
+-- Revision 1.1  2006/03/31 21:00:22  gregg
+-- moving over from middleware.jar
+--
+-- Revision 1.114  2006/03/08 18:07:00  gregg
+-- pricedisclaimer = longvarchar
+--
+-- Revision 1.113  2006/03/03 17:48:00  gregg
+-- catbulletpoints->long varchar
+--
+-- Revision 1.112  2006/02/28 17:29:24  gregg
+-- up specialbid_fc width to 8
+--
+-- Revision 1.111  2006/02/15 20:33:59  gregg
+-- gamap stuff
+--
+-- Revision 1.110  2006/02/14 18:25:06  gregg
+-- gamap update
+--
+-- Revision 1.109  2006/02/13 21:09:36  gregg
+-- ddl fix
+--
+-- Revision 1.108  2006/02/03 18:17:40  bala
+-- added multirow entry for CATAUDIENCE for catods
+--
+-- Revision 1.107  2006/01/28 18:57:44  joan
+-- increase featurecode column
+--
+-- Revision 1.106  2006/01/13 20:59:58  gregg
+-- extend width of wwproduct.ordercode
+--
+-- Revision 1.105  2006/01/12 20:15:39  gregg
+-- catdb_tables fix
+--
+-- Revision 1.104  2006/01/11 19:48:17  gregg
+-- extend col width on catdb_tables.tablename to 32
+--
+-- Revision 1.103  2006/01/05 00:15:34  gregg
+-- add restart table to catdb_tables
+--
+-- Revision 1.102  2006/01/05 00:11:57  gregg
+-- retardtable
+--
+-- Revision 1.101  2006/01/04 23:11:37  gregg
+-- add ods_purge to master copy
+--
+-- Revision 1.100  2005/12/14 20:52:49  gregg
+-- update the catdb_tables stuff
+--
+-- Revision 1.99  2005/12/14 00:12:59  gregg
+-- add metaflagvalue to grant list
+--
+-- Revision 1.98  2005/12/13 18:02:23  gregg
+-- add oslevel to wwproduct
+--
+-- Revision 1.97  2005/12/01 17:35:27  joan
+-- change to long text for marketing message
+--
+-- Revision 1.96  2005/11/14 20:31:34  gregg
+-- *** empty log message ***
+--
+-- Revision 1.95  2005/11/11 21:10:48  gregg
+-- *** empty log message ***
+--
+-- Revision 1.94  2005/11/11 20:02:26  joan
+-- change status to 32
+--
+-- Revision 1.93  2005/11/11 18:36:10  gregg
+-- *** empty log message ***
+--
+-- Revision 1.92  2005/11/07 22:16:57  joan
+-- change COMPTYPE to CGTYPE for feature
+--
+-- Revision 1.91  2005/10/28 16:40:04  gregg
+-- committing
+--
+-- Revision 1.90  2005/10/25 21:52:58  gregg
+-- exand ORDERCODE to char(4)
+--
+-- Revision 1.89  2005/10/25 21:52:06  gregg
+-- page 1: fun with varchars
+--
+-- Revision 1.88  2005/10/25 20:37:59  joan
+-- fixes
+--
+-- Revision 1.87  2005/10/24 18:58:23  joan
+-- fixes
+--
+-- Revision 1.86  2005/10/20 17:33:53  gregg
+-- extend status_fc on collateral to char(4)
+--
+-- Revision 1.85  2005/10/19 22:00:23  gregg
+-- update
+--
+-- Revision 1.84  2005/10/19 20:59:40  gregg
+-- moving some hard-coded table inserts into ddl
+--
+-- Revision 1.83  2005/10/19 17:37:12  gregg
+-- put PROD_PRICESUM as nodrop in catdb_tables
+--
+-- Revision 1.82  2005/10/19 16:44:01  dave
+-- new baby steps
+--
+-- Revision 1.81  2005/10/18 21:34:08  gregg
+-- *** empty log message ***
+--
+-- Revision 1.80  2005/10/18 19:54:19  gregg
+-- add PRODUCT.LANGUAGES column
+--
+-- Revision 1.79  2005/10/14 20:39:09  gregg
+-- catdb_tables
+--
+-- Revision 1.78  2005/10/14 19:55:11  gregg
+-- update
+--
+-- Revision 1.77  2005/10/12 21:22:39  gregg
+-- table name change CATNAV-->MULTIROWATTR
+--
+-- Revision 1.76  2005/10/10 21:14:26  gregg
+-- change PROJCDNAM_MFC --> PROJCDNAM_FC
+--
+-- Revision 1.75  2005/10/07 21:15:36  gregg
+-- three new category cols
+--
+-- Revision 1.74  2005/10/07 17:41:16  gregg
+-- add WARRTYPE, WARRPRIOD to PRODUCT table, CATAUDIENCE to CATEGORY table
+--
+-- Revision 1.73  2005/10/04 17:52:08  gregg
+-- fix
+--
+-- Revision 1.72  2005/10/04 17:50:52  gregg
+-- CATNAV table
+--
+-- Revision 1.71  2005/10/04 17:36:45  dave
+-- Category
+--
+-- Revision 1.70  2005/09/29 16:39:30  joan
+-- adjusting os_fc length
+--
+-- Revision 1.69  2005/09/28 23:05:52  joan
+-- fixes
+--
+-- Revision 1.68  2005/09/26 20:04:07  joan
+-- fix compile
+--
+-- Revision 1.67  2005/09/26 18:22:06  joan
+-- change wwprodcompat
+--
+-- Revision 1.66  2005/09/26 16:21:49  joan
+-- initial load
+--
+-- Revision 1.65  2005/09/21 16:53:01  gregg
+-- extending some columns
+--
+-- Revision 1.64  2005/09/20 22:52:29  gregg
+-- extend some PRODUCT table columns
+--
+-- Revision 1.63  2005/09/20 03:28:31  dave
+-- more trace for SCM and collateral collection
+--
+-- Revision 1.62  2005/09/13 15:24:05  dave
+-- more ddl changes
+--
+-- Revision 1.61  2005/09/13 06:19:26  dave
+-- updating table def
+--
+--
+-- Catalog View DDL
+--
+
+------------------------------------------------------------------
+--
+-- WW PRODUCT TABLE - We now have a world wide table
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.WWPRODUCT;
+CREATE TABLE GBLI.WWPRODUCT
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2)
+, LANGUAGECODE CHAR(2)
+, NLSID INTEGER NOT NULL
+, COUNTRYLIST VARCHAR(8)
+, WWENTITYTYPE VARCHAR(32) NOT NULL
+, WWENTITYID INTEGER NOT NULL
+, STATUS CHAR(25)
+, STATUS_FC CHAR(8)
+
+--
+-- KEY WAYS TO CATEGORIZE THIS WorldWide PRODUCT
+--
+-- MOST ARE CATEGORIZED UNDER A PROJECT
+--
+--
+-- THIS IS FOR WHEN WE ARE
+-- IN OVERRIDE MODE AND THIS GUY
+-- ENDS UP TREEING DIRECTLY UNDER A NAVCATEGORY
+
+--
+-- WE ARE NOW GOING TO LINK BY PROJCDNAME
+--
+,  PROJCDNAM VARCHAR(50)
+,  PROJCDNAM_FC CHAR(8)
+
+--
+-- NO GEO INFORMATION AT THIS LEVEL
+--
+
+, WWPARTNUMBER CHAR(7)
+, MACHTYPE CHAR(4)
+, MODEL CHAR(3)
+, SPECIALBID CHAR(10)
+, SPECIALBID_FC CHAR(8)
+
+--
+--  More product Classifcations
+--  Don't forget the FC's
+
+, CATEGORY VARCHAR(128)
+, CATEGORY_FC CHAR(8)
+, SUBCATEGORY VARCHAR(128)
+, SUBCATEGORY_FC CHAR(8)
+, GROUP VARCHAR(128)
+, GROUP_FC CHAR(8)
+, SUBGROUP VARCHAR(128)
+, SUBGROUP_FC CHAR(8)
+
+, ORDERCODE CHAR(4)
+, ORDERCODE_FC CHAR(8)
+
+, SARINDC VARCHAR(10)
+, SARINDC_FC CHAR(8)
+, SERVICEINDICATOR CHAR(10)
+, DIVISION VARCHAR(8)
+, DIVISION_FC CHAR(8)
+
+, RATECARDCODE VARCHAR(10)
+, RATECARDCODE_FC CHAR(8)
+
+--
+-- more fields
+--
+, MKTNAME VARCHAR(254)
+, ANNDATE DATE
+, WITHDRAWDATE DATE
+, STANDALONE CHAR(10)
+, STANDALONE_FC CHAR(8)
+, UNITCLASS CHAR(10)
+, UNITCLASS_FC CHAR(8)
+, UNSPSC VARCHAR(254)
+, UNSPSC_FC CHAR(8)
+
+, UNSPSCSEC VARCHAR(254)
+, UNSPSCSEC_FC CHAR(8)
+
+, UNUOM VARCHAR(32)
+, UNUOM_FC CHAR(8)
+
+, UNUOMSEC VARCHAR(15)
+, UNUOMSEC_FC CHAR(8)
+
+-- !! GAB another field
+, APPLICATIONTYPE VARCHAR(15)
+, APPLICATIONTYPE_FC CHAR(8)
+
+-- OSLEVEL added 12/13
+, OSLEVEL VARCHAR(1028)
+, OSLEVEL_FC VARCHAR(1028)
+
+--
+--  PUBLISH, VALFROM, VALTO, ISACTIVE
+--
+
+-- !! GAB we most likely can
+-- !! remove this
+--, PUBLISHFLAG CHAR(1)
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+)  IN TSPACE09 INDEX IN ISPACE04;;
+
+DROP INDEX GBLI.WWPRODUCT_PK;
+CREATE UNIQUE INDEX GBLI.WWPRODUCT_PK ON GBLI.WWPRODUCT(WWENTITYID, WWENTITYTYPE, COUNTRYCODE, LANGUAGECODE, NLSID, ENTERPRISE);
+create index gbli.wwproduct_ix1 on gbli.wwproduct(wwpartnumber,nlsid,enterprise);
+
+------------------------------------------------------------------
+--
+--  WW ATTRIBUTE DETAIL - A LAUNDRY LIST OF EXTRA ENTITIES
+--  UNDER THE VARIOUS WORLD WIDE ENTITES
+--  AND THEIR ATTRIBUTES
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.WWATTRIBUTES;
+CREATE TABLE GBLI.WWATTRIBUTES
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, COUNTRYLIST CHAR(08)
+, WWENTITYTYPE CHAR(32) NOT NULL
+, WWENTITYID INTEGER NOT NULL
+, ATTENTITYTYPE CHAR(32) NOT NULL
+, ATTENTITYID INTEGER NOT NULL
+, ATTRIBUTECODE	 CHAR(32) NOT NULL
+, ATTRIBUTETYPE CHAR(1) NOT NULL
+, FLAGCODE CHAR(16) NOT NULL
+, ATTRIBUTEVALUE VARCHAR(254)
+, ATTRUNITOFMEASURE VARCHAR(25)
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.WWATTRIBUTES_PK;
+CREATE UNIQUE INDEX GBLI.WWATTRIBUTES_PK ON GBLI.WWATTRIBUTES(WWENTITYID, WWENTITYTYPE, ATTENTITYID, ATTENTITYTYPE, ATTRIBUTECODE, FLAGCODE, COUNTRYCODE, LANGUAGECODE, NLSID, ENTERPRISE);
+
+------------------------------------------------------------------
+--
+-- PRODUCT TABLE
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.PRODUCT;
+CREATE TABLE GBLI.PRODUCT
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, COUNTRYLIST CHAR(08)
+
+, WWENTITYTYPE CHAR(32) NOT NULL
+, WWENTITYID INTEGER NOT NULL
+
+, LOCENTITYTYPE VARCHAR(32) NOT NULL
+, LOCENTITYID INTEGER NOT NULL
+
+, MODELNAME VARCHAR(12)
+, WWPARTNUMBER CHAR(12)
+, PARTNUMBER CHAR(7)
+, MARKETINGDESC VARCHAR(254)
+
+, ANNDATE DATE
+, WITHDRAWLDATE DATE
+, FOTDATE DATE
+
+-- added 8/5 per spec
+, PLANAVAILDATE date
+, PUBFROMDATE DATE
+, PUBTODATE DATE
+
+
+, FLFILSYSINDC VARCHAR(32)
+, FLFILSYSINDC_FC CHAR(8)
+
+-- added 8/31 per spec
+-- !! GAB this use  to be CountryPack...
+, OFFCOUNTRY VARCHAR(32)
+, OFFCOUNTRY_FC CHAR(08)
+
+--
+-- !! GAB ... use to be OPERATING SYTEM
+
+, OSLEVEL VARCHAR(1028)
+, OSLEVEL_FC VARCHAR(1028)
+
+-- added 8/5 per spec
+, MKTGNAME VARCHAR(254)
+, SHORTDESC VARCHAR(254)
+
+--
+-- !!GAB lengthened
+--
+, WARRTYPE VARCHAR(128)
+, WARRTYPE_FC CHAR(8)
+, WARRPRIOD VARCHAR(128)
+, WARRPRIOD_FC CHAR(8)
+
+, LANGUAGES VARCHAR(32)
+, LANGUAGES_FC CHAR(8)
+
+--!! GAB if PUBLISTSTATE = FINAL PUBLISHFLAG = 1
+--!! GAB if PUBLISHSTATE = RFR FOTPUBLISHFLAG = 1
+, PUBLISHFLAG CHAR(1)
+, FOTPUBLISHFLAG CHAR(1)
+
+, STATUS CHAR(16)
+, STATUS_FC CHAR(8)
+
+,  PROJCDNAM VARCHAR(50)
+,  PROJCDNAM_FC CHAR(8)
+
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.PRODUCT_PK;
+CREATE UNIQUE INDEX GBLI.PRODUCT_PK ON GBLI.PRODUCT(LOCENTITYID, LOCENTITYTYPE, COUNTRYCODE, LANGUAGECODE, NLSID, ENTERPRISE);
+
+DROP INDEX GBLI.PRODUCT_IX1;
+CREATE INDEX GBLI.PRODUCT_IX1 ON GBLI.PRODUCT(WWENTITYID, WWENTITYTYPE, ENTERPRISE);
+
+
+------------------------------------------------------------------
+--
+-- CATALOG MANAGEMENT OBJECT
+--
+-- EACH LOCALIZED PRODUCT WILL HAVE AND ENTRY IN THIS TABLE
+-- ONE ENTRY FOR EACH COUNTRY AND AUDIENCE COMBINATION
+--
+-- THIS WILL MIRROR A NEW ENTITY CALLED CATMGT
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.CATMGT;
+CREATE TABLE GBLI.CATMGT
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, AUDIENCE CHAR(4) NOT NULL
+, AUDIENCE_FC CHAR(2) NOT NULL
+, PUBLISHFROM CHAR(12)
+, PUBLISHTO CHAR(12)
+, FOCUS_FLAG INTEGER
+, NEW_FLAG INTEGER
+, HIDE_FLAG INTEGER
+, ADDTOCART_FLAG INTEGER
+, CUSTOMIZE_FLAG INTEGER
+, RATETYPE INTEGER
+, AGREEMENTNAME VARCHAR(256)
+, BUYABLE INT
+--
+-- PART NUMBER TIE BACK TO LOCALIZED PART NUMBER
+--
+-- THIS KEY WILL GET YOU BACK TO A LOCALIZED
+-- PRODUCT RECORD IN THE PRODUCT TABLE
+, LPRODUCTID CHAR(42) NOT NULL
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.CATMGT_PK;
+CREATE UNIQUE INDEX GBLI.CATMGT_PK ON GBLI.CATMGT(ENTERPRISE, COUNTRYCODE, LANGUAGECODE, NLSID, AUDIENCE_FC, LPRODUCTID);
+
+------------------------------------------------------------------
+--
+-- MODEL COMPARISON PAGE
+--
+-- MANAGED BY FAMILY
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.MODELCMP;
+CREATE TABLE GBLI.MODELCMP
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, FAMILY CHAR(25) NOT NULL
+, FAMILY_FC CHAR(4) NOT NULL
+, COLUMN INTEGER NOT NULL
+, SEQUENCE INTEGER NOT NULL
+, DESC VARCHAR(128)
+, ATTKEY CHAR(32)
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.MODELCMP_PK;
+CREATE UNIQUE INDEX GBLI.MODELCMP_PK ON GBLI.MODELCMP(ENTERPRISE, COUNTRYCODE, LANGUAGECODE, NLSID, FAMILY_FC, COLUMN, SEQUENCE);
+
+------------------------------------------------------------------
+--
+-- LAYOUT GROUP FOR MODELS DETAILS PAGE
+--
+-- MANAGED BY FAMILY
+-- INTRODUCED A SELF MANAGEMNT GROUP IDENTIFIER
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.LAYOUTGROUP;
+CREATE TABLE GBLI.LAYOUTGROUP
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, FAMILY CHAR(25) NOT NULL
+, FAMILY_FC CHAR(4) NOT NULL
+, LGROUP CHAR(128) NOT NULL
+, LGROUP_FC CHAR(4) NOT NULL
+, CONTEXT CHAR(16)
+, LGROUPDESC VARCHAR(128)
+, SEQUENCE INTEGER
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.LAYOUTGROUP_PK;
+CREATE UNIQUE INDEX GBLI.LAYOUTGROUP_PK ON GBLI.LAYOUTGROUP(ENTERPRISE, COUNTRYCODE, LANGUAGECODE, NLSID, FAMILY_FC, LGROUP_FC);
+
+------------------------------------------------------------------
+--
+-- LAYOUT ITEM FOR MODELS DETAILS PAGE
+--
+-- MANAGED BY FAMILY AND COUNTRY
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.LAYOUTITEM;
+CREATE TABLE GBLI.LAYOUTITEM
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, LGROUP CHAR(128) NOT NULL
+, LGROUP_FC CHAR(4) NOT NULL
+, LITEMKEY CHAR(32) NOT NULL
+, LITEMDESC CHAR(128) NOT NULL
+-- TRANSLATED
+, SEQUENCE INTEGER NOT NULL
+, ATTKEY CHAR(32) NOT NULL
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.LAYOUTITEM_PK;
+CREATE UNIQUE INDEX GBLI.LAYOUTITEM_PK ON GBLI.LAYOUTITEM(ENTERPRISE, COUNTRYCODE, LANGUAGECODE, NLSID, LGROUP_FC, LITEMKEY, SEQUENCE, ATTKEY);
+
+------------------------------------------------------------------
+--
+-- TRNSFMGROUP
+--
+-- MANAGED BY FAMILY AND BY COUNTRY
+-- INTRODUCED A SELF MANAGEMNT GROUP IDENTIFIER
+--
+--
+-- I THINK THESE RULES ONLY APPLY TO COMPONENT ATTRIBUTES
+-- THIS IS CONCAT MAINLY
+--
+-- CHOICE RULES TEND TO BE BASED UPON ABSENCE OR PRESENCE
+-- OF THE LOCALIZED PRODUCT
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.TRNSFMGROUP;
+CREATE TABLE GBLI.TRNSFMGROUP
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, FAMILY CHAR(25) NOT NULL
+, FAMILY_FC CHAR(4) NOT NULL
+-- WHAT OBJECT DO THESE RULES APPLY?
+, CONTEXT CHAR(16)
+, TGROUP CHAR(128) NOT NULL
+, TGROUP_FC CHAR(4) NOT NULL
+, TGROUPDESC VARCHAR(128) NOT NULL
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.TRNSFMGROUP_PK;
+CREATE UNIQUE INDEX GBLI.TRNSFMGROUP_PK ON GBLI.TRNSFMGROUP(ENTERPRISE, COUNTRYCODE, LANGUAGECODE, NLSID, FAMILY_FC, TGROUP_FC);
+
+------------------------------------------------------------------
+--
+-- TRNSFRMITEM
+-- THIS GUY MAPS ALL THE DETAILED INFORMATION ABOUT A PRODUCT
+-- THIS IS ALL DERIVED INFORMATION BASED UPON THE
+-- BASE DATA IN THE TABLES
+--
+-- THESE ARE THE BASIC RULES FOR TRANSFORMING CATDB DATA
+--
+-- INTO EXTERNALLY RECOGIZED INFORMATION
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.TRNSFMITEM;
+CREATE TABLE GBLI.TRNSFMITEM
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, TGROUP CHAR (128) NOT NULL
+, TGROUP_FC CHAR(4) NOT NULL
+, ATTKEY CHAR(32) NOT NULL
+, TEST VARCHAR(254)
+, PASSTRANSFORM VARCHAR(254)
+, FAILTRANSFORM VARCHAR(254)
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.TRNSFMITEM_PK;
+CREATE UNIQUE INDEX GBLI.TRNSFMITEM_PK ON GBLI.TRNSFMITEM(ENTERPRISE, COUNTRYCODE, LANGUAGECODE, NLSID, TGROUP_FC, ATTKEY);
+
+------------------------------------------------------------------
+--
+-- WWPRODCOMPAT
+--
+-- THIS GUY REALLY PROVIDES TECHNICAL COMPATABILITY OF
+-- WWPARTNUMBER GROUPINGS
+-- we will need to review compatability again
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.WWPRODCOMPAT;
+CREATE TABLE GBLI.WWPRODCOMPAT
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, COUNTRYLIST CHAR(8) NOT NULL
+
+, COMPATTYPE VARCHAR(6)
+, OS VARCHAR(64)
+, OS_FC CHAR(16)
+
+-- !! GAB will need to add and figure out how
+-- to fill
+, WWPRODENTITYTYPEFROM  CHAR(32) NOT NULL
+, WWPRODENTITYIDFROM INT NOT NULL
+, WWPARTNUMBERFROM CHAR(12)
+
+, WWPRODENTITYTYPETO CHAR(32) NOT NULL
+, WWPRODENTITYIDTO INT NOT NULL
+, WWPARTNUMBERTO CHAR(12)
+
+, PUBFROM CHAR(10)
+, PUBTO CHAR(10)
+
+--- !! GAB EOF
+
+--
+-- The Type of compatability (WSEO, MFT
+--
+
+--
+-- FROM INFORMATION
+--
+
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.WWPRODCOMPAT_PK;
+CREATE UNIQUE INDEX GBLI.WWPRODCOMPAT_PK ON GBLI.WWPRODCOMPAT(WWPRODENTITYTYPEFROM, WWPRODENTITYIDFROM,WWPRODENTITYTYPETO, WWPRODENTITYIDTO, COUNTRYCODE, LANGUAGECODE, NLSID, ENTERPRISE);
+
+
+------------------------------------------------------------------
+--
+-- CNTYPRODCOMPAT  (Country Level)
+--
+-- THIS GUY REALLY PROVIDES Country Level preselects for all
+-- techincal compats exploded down to the country level
+--
+-- and one off exclusions to hide certain records
+--
+-- (almost like a publish exclusion used elsewhere
+--
+-- Two standalone entities feed this guy
+--
+-- CATLGSVCPACPRESEL
+-- CATLGMKGTCOMPAT
+--
+-- There is only one market exclusion per LSEO
+--
+--   COMPATTYPE = X (market exclusion)
+--
+--    0 or no record for mkting = not excluded
+--    with a record...
+--
+--		1 = excluded (and should be deactivated)
+--		0 should always = not excluded/
+--
+--   COMPATTYPE = P  (preselect)
+--	this record is there..
+--	you use these records only when market compat is
+--	enabled (not excludes)
+
+-- But we will have multiple preselects per LSEO
+------------------------------------------------------------------
+DROP TABLE GBLI.CNTYPRODCOMPAT;
+CREATE TABLE GBLI.CNTYPRODCOMPAT
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+--
+-- FROM/TO INFORMATION
+--
+--
+-- MACHTYPE gets you a list of wwproducts...
+-- This only applies to preselects
+--
+, MACHTYPE_FROM CHAR(12) NOT NULL
+--
+-- This gets you to the product table
+, LSEOID_TO CHAR(12) NOT NULL
+
+--
+-- P = preselect
+-- X = Market exclusion
+
+, COMPTYPE CHAR(01)
+--
+-- !!GAB
+-- We mange these two as apposed to  passing e-announce data through
+--
+
+, OKTOPUB INT
+, PRESELINDC INT
+
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+-- Not sure about this
+DROP INDEX GBLI.CNTYPRODCOMPAT_PK;
+CREATE UNIQUE INDEX GBLI.CNTYPRODCOMPAT_PK ON GBLI.CNTYPRODCOMPAT(LSEOID_TO, MACHTYPE_FROM, COUNTRYCODE, LANGUAGECODE, NLSID, ENTERPRISE);
+
+------------------------------------------------------------------
+--
+-- GAMAP
+--
+-- THIS GUY
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.GAMAP;
+CREATE TABLE GBLI.GAMAP
+(
+  Enterprise CHAR(16) NOT NULL
+, GENERAL_AREA CHAR(8) NOT NULL
+, COUNTRY CHAR(2) NOT NULL
+, LANGUAGE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, COUNTRYLIST CHAR(8) NOT NULL
+);
+
+DROP INDEX GBLI.GAMAP_PK;
+CREATE UNIQUE INDEX GBLI.GAMAP_PK ON GBLI.GAMAP(GENERAL_AREA, COUNTRY, LANGUAGE, NLSID, COUNTRYLIST, Enterprise);
+DROP INDEX GBLI.GAMAP_IX1;
+CREATE INDEX GBLI.GAMAP_IX1 ON GBLI.GAMAP(GENERAL_AREA, Enterprise);
+
+------------------------------------------------------------------
+--
+-- PRODSTRUCT
+--
+-- This now holds Either a Prodstruct Between a WW Product and A
+-- Feature
+--
+-- OR
+--
+-- the County level Product to PRODSTRUCT Relationship
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.PRODSTRUCT;
+CREATE TABLE GBLI.PRODSTRUCT
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+
+, PRODENTITYTYPE CHAR(32) NOT NULL
+, PRODENTITYID INTEGER NOT NULL
+, STRUCTENTITYTYPE CHAR(32) NOT NULL
+, STRUCTENTITYID INTEGER NOT NULL
+, FEATENTITYTYPE CHAR(32) NOT NULL
+, FEATENTITYID INTEGER NOT NULL
+
+--
+-- They only want the first Character
+--
+, ORDERCODE CHAR(1)
+, ORDERCODE_FC CHAR(8)
+
+--
+-- !! GAB - we will make longer
+-- Seperated by ', '
+-- no comma's allowed in data
+--
+, OSLEVEL VARCHAR(2056)
+, OSLEVEL_FC VARCHAR(512)
+
+--
+-- This is the componenet group
+-- need to know how to find this guy.
+-- CGNAME??
+--  !! GAB THIS GOES AWAY
+--, COMPGROUP VARCHAR(64) NOT NULL
+--, COMPGROUP_FC CHAR(8) NOT NULL
+
+, ANNDATE DATE
+, WITHDRAWDATE DATE
+
+, PUBFROMDATE DATE
+, PUBTODATE DATE
+
+, SYSTEMMAX INTEGER
+, SYSTEMMIN INTEGER
+
+--, WWSEOFCQTY INTEGER
+
+-- !! GAB
+-- !! do we do a default? needs to be defaulted to 1		? in the DDL or javacode
+
+, CONFQTY INTEGER
+
+, STATUS VARCHAR(15)
+, STATUS_FC CHAR(8)
+
+, CONFIGURATORFLAG_FC CHAR(8)
+
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+) IN TSPACE09 INDEX IN ISPACE04;
+
+DROP INDEX GBLI.PRODSTRUCT_PK;
+CREATE UNIQUE INDEX GBLI.PRODSTRUCT_PK ON GBLI.PRODSTRUCT(PRODENTITYID, PRODENTITYTYPE, FEATENTITYTYPE, FEATENTITYID, COUNTRYCODE, LANGUAGECODE, NLSID, ENTERPRISE);
+
+------------------------------------------------------------------
+--
+-- FEATURE
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.FEATURE;
+CREATE TABLE GBLI.FEATURE
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+--
+-- !! GAB REVEIW ORIGIN OF COUNTRYLIST
+, COUNTRYLIST CHAR(08)
+
+, FEATENTITYTYPE CHAR(32) NOT NULL
+, FEATENTITYID INTEGER NOT NULL
+--, ITEMENTITYTYPE CHAR(32) NOT NULL
+--, ITEMENTITYID INTEGER NOT NULL
+
+--
+-- Lets specify some attributes
+--
+
+, FEATURECODE CHAR(8)
+, FCMKTGNAME  VARCHAR(254)
+, FCTYPE VARCHAR(32)
+, FCTYPE_FC CHAR(8)
+
+, ANNDATE DATE
+, WITHDRAWDATE DATE
+
+, PRICEDFEATURE CHAR(32)
+, PRICEDFEATURE_FC CHAR(8)
+
+--
+-- SOME SOFTWARE SETTINGS
+--
+
+-- !! GAB THIS FIELD GOES AWAY
+--, SWTYPE VARCHAR(25) NOT NULL
+--, SWTYPE_FC CHAR(8) NOT NULL
+-- !!
+
+, TANDC VARCHAR(128)
+
+-- !! GAB THIS FIELD GETS ADDED
+--, TANDC_FC CHAR(8) NOT NULL
+-- !!
+--
+-- LETS GET SOME CAT, SUBCAT and GROUP INFO
+--
+, CATEGORY VARCHAR(32)
+, CATEGORY_FC CHAR(8)
+, SUBCATEGORY VARCHAR(64)
+, SUBCATEGORY_FC CHAR(8)
+, GROUP VARCHAR(32)
+, GROUP_FC CHAR(8)
+
+--, UNSPSCCD VARCHAR(128)
+--, UNSPSCCD_FC CHAR(8)
+
+--, SECONDRYUNSPSCCD VARCHAR(128)
+--, SECONDRYUNSPSCCD_FC CHAR(8) NOT NULL
+
+--, UNUOM VARCHAR(32)
+--, UNUOM_FC CHAR(8) NOT NULL
+
+--, SECONDRYUNUOM VARCHAR(32)
+--, SECONDRYUNUOM_FC CHAR(8) NOT NULL
+
+--
+--  This is the least of the two states between
+--  The Feature and the Item under neath it
+--
+, STATUS CHAR(32)
+, STATUS_FC CHAR(8)
+
+, CGTYPE VARCHAR(50)
+, CGTYPE_FC CHAR(8)
+
+, OSLEVEL VARCHAR(1028)
+, OSLEVEL_FC VARCHAR(1028)
+
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.FEATURE_PK;
+CREATE UNIQUE INDEX GBLI.FEATURE_PK ON GBLI.FEATURE(FEATENTITYID, FEATENTITYTYPE, COUNTRYCODE, LANGUAGECODE, NLSID, ENTERPRISE);
+
+------------------------------------------------------------------
+--
+-- FEATUREDETAIL
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.FEATUREDETAIL;
+CREATE TABLE GBLI.FEATUREDETAIL
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, COUNTRYLIST CHAR(8) NOT NULL
+
+, FEATENTITYTYPE CHAR(32) NOT NULL
+, FEATENTITYID INTEGER NOT NULL
+, ITEMENTITYTYPE CHAR(32) NOT NULL
+, ITEMENTITYID INTEGER NOT NULL
+
+, ATTCODE CHAR(32) NOT NULL
+, EXTERNALATTCODE CHAR(32)
+, ATTVALUE VARCHAR(254)
+, ATTUNITOFMEASURE VARCHAR(25)
+--
+-- Is this a derived field?
+--
+, ISDERIVED INTEGER
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.FEATUREDETAIL_PK;
+CREATE UNIQUE INDEX GBLI.FEATUREDETAIL_PK ON GBLI.FEATUREDETAIL(FEATENTITYID, ITEMENTITYID, FEATENTITYTYPE, ITEMENTITYTYPE, ATTCODE, COUNTRYCODE, LANGUAGECODE, NLSID, ENTERPRISE);
+
+
+------------------------------------------------------------------
+--
+-- COMPONENTGROUP
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.COMPONENTGROUP;
+CREATE TABLE GBLI.COMPONENTGROUP
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+
+, COMPENTITYTYPE CHAR(32) NOT NULL
+, COMPENTITYID INTEGER NOT NULL
+
+--, CGNAME VARCHAR(254) NOT NULL
+, QTYLOWLIMT INTEGER
+, QTYUPPRLIMT INTEGER
+
+, CGTYPE VARCHAR(50)
+, CGTYPE_FC CHAR(4)
+
+--
+-- CONTROL FLAGS
+--
+
+, MULTIVALSELECTTBLFLG VARCHAR(25)
+, PRCFLG VARCHAR(25)
+, REQFLG VARCHAR(25)
+, SELECTBLFLG VARCHAR(25)
+
+, MULTIVALSELECTTBLFLG_FC CHAR(8)
+, PRCFLG_FC CHAR(8)
+, REQFLG_FC CHAR(8)
+, SELECTBLFLG_FC CHAR(8)
+
+, STATUS VARCHAR(15)
+, STATUS_FC CHAR(2)
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+
+);
+DROP INDEX GBLI.COMPONENTGROUP_PK;
+CREATE UNIQUE INDEX GBLI.COMPONENTGROUP_PK ON GBLI.COMPONENTGROUP(COMPENTITYID, COMPENTITYTYPE, COUNTRYCODE, LANGUAGECODE, NLSID, ENTERPRISE);
+
+
+
+------------------------------------------------------------------
+--
+-- WWCOMPONENTS
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.WWCOMPONENTS;
+CREATE TABLE GBLI.WWCOMPONENTS
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, WWENTITYTYPE CHAR(32) NOT NULL
+, WWENTITYID INT NOT NULL
+, COMPENTITYTYPE CHAR(32) NOT NULL
+, COMPENTITYID INT NOT NULL
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.WWCOMPONENTS_PK;
+CREATE UNIQUE INDEX GBLI.WWCOMPONENTS_PK ON GBLI.WWCOMPONENTS(WWENTITYID, WWENTITYTYPE, COMPENTITYID, COMPENTITYTYPE, ENTERPRISE);
+
+------------------------------------------------------------------
+--
+-- CATEOGRY - OK, We will try this as follows
+-- This guy will hold family, series, Project, along
+-- With a new CATNAV Entity  (We will know this based upon)
+-- Some how.. lost all of thist for CATEGORY
+--  Temporarily reduced the size to fit in development test space
+-- The CATENTITYTYPE
+------------------------------------------------------------------
+DROP TABLE GBLI.CATEGORY;
+CREATE TABLE GBLI.CATEGORY
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, ENTITYTYPE CHAR(32) NOT NULL
+, ENTITYID INT NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, COUNTRYLIST CHAR(8) NOT NULL
+--
+-- Mast / Nav
+, CATNAVTYPE  VARCHAR(15)
+, CATNAVTYPE_FC CHAR(4)
+
+, CATNAME CHAR(25)
+
+, CCEIDENTIFIER VARCHAR(254) NOT NULL
+, CATBR CHAR(50)
+, CATFMLY CHAR(50)
+, CATSER CHAR(50)
+, CATOPTGRPNAM CHAR(50)
+
+, CATFAMDESC VARCHAR(128)
+, CATSERDESC VARCHAR(128)
+, CATSERHEAD VARCHAR(128)
+
+, CATAUDIENCE VARCHAR(128)
+, CATAUDIENCE_FC CHAR(8)
+
+, CATPARTNUMBER_E VARCHAR(128)
+, CATPARTNUMBER_V VARCHAR(128)
+, CATPARTNUMBER_P VARCHAR(128)
+
+--
+-- DERIVED
+-- I can store these for a simulated Hierarchy
+--
+-- BRAND LEVEL
+, CCEIDENTIFIER1 VARCHAR(254) NOT NULL
+-- FAM LEVEL
+, CCEIDENTIFIER2 VARCHAR(254) NOT NULL
+-- SERIES LEVEL
+, CCEIDENTIFIER3 VARCHAR(254) NOT NULL
+-- OPTION GROUP NAME?
+, CCEIDENTIFIER4 VARCHAR(254) NOT NULL
+
+--
+-- more than one of these in the field
+--
+--
+-- Seperate flag codes by ':'  10045:2345:2133
+--
+, PROJCDNAM VARCHAR(254)
+, PROJCDNAM_FC CHAR(128)
+
+--
+-- This will get you to any marketing messages via the collateral table
+-- or images.. or feature benifits if needed
+--
+, FMLYID INT NOT NULL
+, SERID INT NOT NULL
+
+, CATBULLETPOINTS LONG VARCHAR
+
+--
+-- These should have default values in the PDH
+--
+, IMGDISCLAIMER VARCHAR(128)
+, PRICEDISCLAIMER LONG VARCHAR
+, SRCHTITLE VARCHAR(128)
+, SRCHKEYWORD VARCHAR(128)
+, SRCHABSTRACT VARCHAR(128)
+, SRCHDESC VARCHAR(128)
+, SRCHCATG VARCHAR(128)
+, SRCHDOCTYPE VARCHAR(128)
+
+, PUBLISHFLAG INT
+
+--
+-- brand level changes
+--
+, LEVEL1VALFROM TIMESTAMP NOT NULL
+--
+-- family level ...
+--
+, LEVEL2VALFROM TIMESTAMP NOT NULL
+--
+-- series level
+-- and BulletPoints
+, LEVEL3VALFROM TIMESTAMP NOT NULL
+--
+-- Project and options changes
+--
+, LEVEL4VALFROM TIMESTAMP NOT NULL
+
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+
+);
+
+DROP INDEX GBLI.CATEGORY_PK;
+CREATE UNIQUE INDEX GBLI.CATEGORY_PK ON GBLI.CATEGORY(CCEIDENTIFIER, PROJCDNAM, CATAUDIENCE, COUNTRYCODE, LANGUAGECODE, NLSID, ENTERPRISE);
+
+------------------------------------------------------------------
+--
+-- FEATUREBENEFIT
+-- DWB .. DROPPED FOR CONSOLIDATED TABLE
+------------------------------------------------------------------
+DROP TABLE GBLI.FEATUREBENEFIT;
+------------------------------------------------------------------
+--
+-- IMAGE
+-- DWB .. DROPPED FOR CONSOLIDATED  TABLE
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.IMAGE;
+
+------------------------------------------------------------------
+--
+-- WARRANTY
+-- DWB WARRANTY MAY BE PART OF THE WORLD WIDE ATTRIBUTE
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.WARRANTY;
+CREATE TABLE GBLI.WARRANTY
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, COUNTRYLIST CHAR(08) NOT NULL
+, GENAREANAME VARCHAR(32)
+, GENAREANAME_FC CHAR(8)
+, COLLENTITYTYPE CHAR(32) NOT NULL
+, COLLENTITYID INTEGER NOT NULL
+, STATUS VARCHAR(32)
+, STATUS_FC CHAR(2)
+, PUBLISHFROM DATE
+, PUBLISHTO DATE
+, WARRANTYPERIOD VARCHAR(50)
+, WARRANTYPERIOD_FC CHAR(04)
+, WARRANTYTYPE VARCHAR(50)
+, WARRANTYTYPE_FC CHAR(04)
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.WARRANTY_PK;
+CREATE UNIQUE INDEX GBLI.WARRANTY_PK ON GBLI.WARRANTY(COLLENTITYID, COLLENTITYTYPE, COUNTRYCODE, LANGUAGECODE, NLSID, ENTERPRISE);
+
+DROP INDEX GBLI.WARRANTY_IX1;
+CREATE INDEX GBLI.WARRANTY_IX1 ON GBLI.WARRANTY(ENTERPRISE, COLLENTITYTYPE, COLLENTITYID, GENAREANAME_FC);
+
+------------------------------------------------------------------
+-- COLLATERAL
+-- DWB CONSOLIDATE IMAGE/MM/AND FEATURE INTO ONE TABLE
+--
+-- THIS RELATES THESE WWPRODUCT INFORMATION
+-- TO MARKET MESSAGE
+--
+-- IT ALSO Relates Collateral to Category
+--
+-- We can also have
+------------------------------------------------------------------
+DROP TABLE GBLI.COLLATERAL;
+CREATE TABLE GBLI.COLLATERAL
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, PARENTENTITYTYPE CHAR(32) NOT NULL
+, PARENTENTITYID INT NOT NULL
+, COLLENTITYTYPE CHAR(32) NOT NULL
+, COLLENTITYID INT NOT NULL
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+);
+
+DROP INDEX GBLI.COLLATERAL_PK;
+CREATE UNIQUE INDEX GBLI.COLLATERAL_PK ON GBLI.COLLATERAL(PARENTENTITYID, PARENTENTITYTYPE, COLLENTITYID,COLLENTITYTYPE, ENTERPRISE);
+
+DROP INDEX GBLI.COLLATERAL_IX1;
+CREATE INDEX GBLI.COLLATERAL_IX1 ON GBLI.COLLATERAL(ENTERPRISE, COLLENTITYTYPE, COLLENTITYID);
+
+
+------------------------------------------------------------------
+--
+-- MARKET MESSAGE
+-- DWB - this is the combined table for multi media information
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.MARKETINFO;
+CREATE TABLE GBLI.MARKETINFO
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, COUNTRYCODE CHAR(2) NOT NULL
+, LANGUAGECODE CHAR(2) NOT NULL
+, NLSID INTEGER NOT NULL
+, COUNTRYLIST CHAR(08)
+, COLLENTITYTYPE CHAR(32) NOT NULL
+, COLLENTITYID INTEGER NOT NULL
+, STATUS VARCHAR(32)
+, STATUS_FC CHAR(4)
+, PUBLISHFROM DATE
+, PUBLISHTO DATE
+, VALFROM TIMESTAMP NOT NULL
+, VALTO TIMESTAMP NOT NULL
+, ISACTIVE INTEGER NOT NULL
+, MARKETMESSAGE LONG VARCHAR
+, PRODUCTPOSITION LONG VARCHAR
+, FEATUREBENEFIT LONG VARCHAR
+, IMAGE BLOB (2M)
+);
+
+DROP INDEX GBLI.MARKETINFO_PK;
+CREATE UNIQUE INDEX GBLI.MARKETINFO ON GBLI.MARKETINFO(COLLENTITYID, COLLENTITYTYPE, COUNTRYCODE, LANGUAGECODE, NLSID, ENTERPRISE);
+
+DROP INDEX GBLI.MARKETINFO_IX1;
+CREATE INDEX GBLI.MARKETINFO_IX1 ON GBLI.MARKETINFO(COLLENTITYID, COLLENTITYTYPE, ENTERPRISE);
+
+
+------------------------------------------------------------------
+--
+-- RUNTIME
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.RUNTIME;
+CREATE TABLE GBLI.RUNTIME
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, OBJECT_KEY CHAR(128) NOT NULL
+, RUNTIME TIMESTAMP NOT NULL
+);
+
+DROP INDEX GBLI.RUNTIME_PK;
+CREATE UNIQUE INDEX GBLI.RUNTIME_PK ON GBLI.RUNTIME(ENTERPRISE, OBJECT_KEY, RUNTIME);
+
+DROP INDEX GBLI.RUNTIME_IX1;
+CREATE INDEX GBLI.RUNTIME_IX1 ON GBLI.RUNTIME(ENTERPRISE, OBJECT_KEY);
+
+
+------------------------------------------------------------------
+--
+-- RESTARTABLE
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.RESTARTABLE;
+CREATE TABLE GBLI.RESTARTABLE
+(
+  RUNTIME TIMESTAMP NOT NULL
+, TABLENAME VARCHAR(32)
+);
+
+------------------------------------------------------------------
+--
+-- MULTIROWATTR
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.MULTIROWATTR;
+CREATE TABLE GBLI.MULTIROWATTR
+(
+  ENTERPRISE CHAR(8) NOT NULL
+, OBJECT_KEY CHAR(128) NOT NULL
+, COLUMN_KEY CHAR(32) NOT NULL
+);
+
+DROP INDEX GBLI.MULTIROWATTR_PK;
+CREATE UNIQUE INDEX GBLI.MULTIROWATTR_PK ON GBLI.MULTIROWATTR(ENTERPRISE, OBJECT_KEY, COLUMN_KEY);
+
+------------------------------------------------------------------
+--
+-- CATDB_TABLES
+--
+------------------------------------------------------------------
+DROP TABLE GBLI.CATDB_TABLES;
+CREATE TABLE GBLI.CATDB_TABLES
+(
+  TABLESCHEMA CHAR(8) NOT NULL
+, TABLENAME CHAR(32) NOT NULL
+, IDL_PURGE CHAR(1) NOT NULL
+, GRANT_ACCESS CHAR(1) NOT NULL
+, ODS_PURGE CHAR(1) NOT NULL
+);
+
+------------------------------------------------------------------
+-- CATDB_TABLES inserts
+------------------------------------------------------------------
+insert into gbli.catdb_tables values('GBLI','WWPRODUCT','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','WWATTRIBUTES','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','PRODUCT','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','CATMGT','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','MODELCMP','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','LAYOUTGROUP','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','LAYOUTITEM','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','TRNSFMGROUP','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','TRNSFMITEM','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','WWPRODCOMPAT','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','CNTYPRODCOMPAT','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','PRODSTRUCT','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','FEATURE','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','FEATUREDETAIL','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','COMPONENTGROUP','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','WWCOMPONENTS','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','CATEGORY','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','WARRANTY','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','COLLATERAL','Y','Y','N');
+insert into gbli.catdb_tables values('GBLI','MARKETINFO','Y','Y','N');
+--
+insert into gbli.catdb_tables values('GBLI','MULTIROWATTR','N','N','N');
+insert into gbli.catdb_tables values('GBLI','GAMAP','N','N','N');
+insert into gbli.catdb_tables values('GBLI','RUNTIME','N','N','N');
+insert into gbli.catdb_tables values('GBLI','CATDB_TABLES','N','N','N');
+insert into gbli.catdb_tables values('GBLI','RESTARTABLE','N','N','N');
+--
+insert into gbli.catdb_tables values('GBLI','CATLGCNTRY','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATLGMKTGCOMPAT','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATLGSVCPACPRESEL','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATLGPUB','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATVAMATTR','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATATTR','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATGROUP','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATDETAILS','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATGROUPATTR','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','RULESGROUP','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','BASICRULE','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATVAM','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATOFFSEQ','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATNAVCATDETAILS','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATNAVCATVAM','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','FMLYRULESGROUP','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','RULESGRPBASICRULE','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATVAMCATVAMATTR','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATGROUPATTR','N','Y','Y');
+insert into gbli.catdb_tables values('GBLI','CATDETAILSGROUP','N','Y','Y');
+--
+insert into gbli.catdb_tables values('GBLI','METAFLAGTABLE','N','Y','N');
+insert into gbli.catdb_tables values('GBLI','TRSNETTERATTS','Y','N','N');
+insert into gbli.catdb_tables values('GBLI','TRSNETTERPASS1','Y','N','N');
+insert into gbli.catdb_tables values('GBLI','TRSNETTERPASS2','Y','N','N');
+insert into gbli.catdb_tables values('GBLI','TRSNETTERFINAL','Y','N','N');
+--
+insert into gbli.catdb_tables values('GBLI','CATSCAN','N','N','N');
+
+
+
+------------------------------------------------------------------
+-- GAMAP inserts
+------------------------------------------------------------------
+insert into gbli.GAMAP values('SG','WW','CA','fr',10,'1464');
+insert into gbli.GAMAP values('SG','WW','CA','en',7,'1464');
+--insert into gbli.GAMAP values('SG','WW','JA','jp',4,'1535');
+insert into gbli.GAMAP values('SG','WW','US','en',1,'1652');
+
+------------------------------------------------------------------
+-- MULTIROWATTR inserts
+------------------------------------------------------------------
+insert into gbli.multirowattr values('SG','COM.ibm.eannounce.catalog.Category','PROJCDNAM');
+insert into gbli.multirowattr values('SG','COM.ibm.eannounce.catalog.Category','CATAUDIENCE');
+insert into gbli.multirowattr values('SG','CATLGPUB','CATAUDIENCE');
+
+
+------------------------------------------------
+-- DDL Statements for table "GBLI    "."CATSCAN"
+------------------------------------------------
+ DROP TABLE "GBLI"."CATSCAN";
+
+ CREATE TABLE "GBLI    "."CATSCAN"  (
+                  "ENTERPRISE" CHAR(8) NOT NULL ,
+                  "VENAME" CHAR(32) NOT NULL ,
+                  "ENTITYTYPE" CHAR(32) NOT NULL ,
+                  "ATTRIBUTECODE" CHAR(32) NOT NULL ,
+                  "VALFROM" TIMESTAMP NOT NULL ,
+                  "VALTO" TIMESTAMP NOT NULL,
+                  "EFFFROM" TIMESTAMP NOT NULL ,
+                  "EFFTO" TIMESTAMP NOT NULL
+                  )
+                 IN "TSPACE08" ;
+-- DDL Statements for indexes on Table "GBLI    "."CATSCAN"
+
+CREATE UNIQUE INDEX "GBLI    "."CATSCAN_PK" ON "GBLI    "."CATSCAN"
+  ("VENAME" ASC,
+   "ENTITYTYPE" ASC,
+   "ATTRIBUTECODE" ASC,
+   "ENTERPRISE" ASC,
+   "VALFROM" ASC);
+   
+   
+------------------------------------------------
+-- DDL Statements for table "GBLI    "."TRSNETTERPASS1"
+------------------------------------------------
+ DROP TABLE "GBLI"."TRSNETTERPASS1";
+ CREATE TABLE "GBLI    "."TRSNETTERPASS1"  (
+                  "MARKER" INTEGER NOT NULL , 
+                  "ENTERPRISE" CHAR(8) NOT NULL , 
+                  "SESSIONID" INTEGER NOT NULL , 
+                  "TRAN" CHAR(3) NOT NULL , 
+                  "LEVEL" INTEGER NOT NULL , 
+                  "ENTITY1TYPE" CHAR(32) NOT NULL , 
+                  "ENTITY1ID" INTEGER NOT NULL , 
+                  "ENTITYTYPE" CHAR(32) NOT NULL , 
+                  "ENTITYID" INTEGER NOT NULL , 
+                  "ENTITY2TYPE" CHAR(32) NOT NULL , 
+                  "ENTITY2ID" INTEGER NOT NULL , 
+                  "DIRECTION" CHAR(1) NOT NULL , 
+                  "CORETYPE" CHAR(32) NOT NULL , 
+                  "COREID" INTEGER NOT NULL , 
+                  "CORELEVEL" INTEGER NOT NULL , 
+                  "CORETRAN" CHAR(3) NOT NULL , 
+                  "COREDIRECTION" CHAR(1) NOT NULL , 
+                  "TYPE" CHAR(2) NOT NULL , 
+                  "VALFROM" TIMESTAMP NOT NULL , 
+                  "COREPATH" VARCHAR(254) NOT NULL )   
+                 IN "TSPACE08" ; 
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERPASS1"
+
+CREATE INDEX "GBLI    "."TRSNETTERPASS1_IX1" ON "GBLI    "."TRSNETTERPASS1" 
+                ("SESSIONID" ASC,
+                 "TYPE" ASC,
+                 "MARKER" ASC,
+                 "ENTERPRISE" ASC);
+
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERPASS1"
+
+CREATE INDEX "GBLI    "."TRSNETTERPASS1_IX2" ON "GBLI    "."TRSNETTERPASS1" 
+                ("SESSIONID" ASC,
+                 "TRAN" ASC,
+                 "MARKER" ASC,
+                 "ENTERPRISE" ASC,
+                 "ENTITYID" ASC,
+                 "ENTITYTYPE" ASC,
+                 "CORETYPE" ASC);
+
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERPASS1"
+
+CREATE INDEX "GBLI    "."TRSNETTERPASS1_IX3" ON "GBLI    "."TRSNETTERPASS1" 
+                ("SESSIONID" ASC,
+                 "LEVEL" ASC,
+                 "ENTITY2TYPE" ASC,
+                 "ENTITY2ID" ASC)
+                CLUSTER ;
+
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERPASS1"
+
+CREATE INDEX "GBLI    "."TRSNETTERPASS1_IX4" ON "GBLI    "."TRSNETTERPASS1" 
+                ("SESSIONID" ASC,
+                 "LEVEL" ASC,
+                 "ENTITYTYPE" ASC,
+                 "ENTITYID" ASC);
+
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERPASS1"
+
+CREATE INDEX "GBLI    "."TRSNETTERPASS1_IX5" ON "GBLI    "."TRSNETTERPASS1" 
+                ("SESSIONID" ASC,
+                 "LEVEL" ASC,
+                 "ENTITY1TYPE" ASC,
+                 "ENTITY1ID" ASC);
+
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERPASS1"
+
+CREATE INDEX "GBLI    "."TRSNETTERPASS1_IX6" ON "GBLI    "."TRSNETTERPASS1" 
+                ("SESSIONID" ASC,
+                 "COREID" ASC,
+                 "CORETYPE" ASC,
+                 "MARKER" ASC,
+                 "TYPE" ASC,
+                 "ENTERPRISE" ASC);
+
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERPASS1"
+
+CREATE INDEX "GBLI    "."TRSNETTERPASS1_IX7" ON "GBLI    "."TRSNETTERPASS1" 
+                ("SESSIONID" ASC,
+                 "TRAN" ASC,
+                 "MARKER" ASC,
+                 "VALFROM" ASC,
+                 "ENTERPRISE" ASC,
+                 "ENTITYID" ASC,
+                 "ENTITYTYPE" ASC,
+                 "CORETYPE" ASC);
+
+
+
+
+------------------------------------------------
+-- DDL Statements for table "GBLI    "."TRSNETTERPASS2"
+------------------------------------------------
+ DROP TABLE "GBLI"."TRSNETTERPASS2";
+ CREATE TABLE "GBLI    "."TRSNETTERPASS2"  (
+                  "ENTERPRISE" CHAR(8) NOT NULL , 
+                  "SESSIONID" INTEGER NOT NULL , 
+                  "ACTIONTYPE" CHAR(32) NOT NULL , 
+                  "LEVEL" INTEGER NOT NULL , 
+                  "MYDIRECTION" CHAR(1) NOT NULL , 
+                  "PARENTDIRECTION" CHAR(1) NOT NULL , 
+                  "ENTITY1TYPE" CHAR(32) NOT NULL , 
+                  "ENTITY1ID" INTEGER NOT NULL , 
+                  "ENTITYTYPE" CHAR(32) NOT NULL , 
+                  "ENTITYID" INTEGER NOT NULL , 
+                  "ENTITY2TYPE" CHAR(32) NOT NULL , 
+                  "ENTITY2ID" INTEGER NOT NULL , 
+                  "TRAN" CHAR(3) NOT NULL , 
+                  "VALFROM" TIMESTAMP NOT NULL , 
+                  "ROOTTYPE" CHAR(32) NOT NULL , 
+                  "ROOTID" INTEGER NOT NULL , 
+                  "ROOTTRAN" CHAR(3) NOT NULL , 
+                  "PATH" VARCHAR(254) NOT NULL )   
+                 IN "TSPACE08" ; 
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERPASS2"
+
+CREATE INDEX "GBLI    "."TRSNETTERPASS2_IX1" ON "GBLI    "."TRSNETTERPASS2" 
+                ("SESSIONID" ASC,
+                 "LEVEL" ASC,
+                 "ENTITY1TYPE" ASC,
+                 "ENTITY1ID" ASC);
+
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERPASS2"
+
+CREATE INDEX "GBLI    "."TRSNETTERPASS2_IX2" ON "GBLI    "."TRSNETTERPASS2" 
+                ("SESSIONID" ASC,
+                 "LEVEL" ASC,
+                 "ENTITY2TYPE" ASC,
+                 "ENTITY2ID" ASC);
+
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERPASS2"
+
+CREATE INDEX "GBLI    "."TRSNETTERPASS2_IX3" ON "GBLI    "."TRSNETTERPASS2" 
+                ("SESSIONID" ASC,
+                 "LEVEL" ASC,
+                 "ENTITYTYPE" ASC,
+                 "ENTITYID" ASC)
+                CLUSTER ;
+
+
+
+
+------------------------------------------------
+-- DDL Statements for table "GBLI    "."TRSNETTERATTS"
+------------------------------------------------
+ DROP TABLE "GBLI"."TRSNETTERATTS";
+ CREATE TABLE "GBLI    "."TRSNETTERATTS"  (
+                  "SESSIONID" INTEGER NOT NULL , 
+                  "ENTITYID" INTEGER NOT NULL , 
+                  "ENTITYTYPE" CHAR(32) NOT NULL , 
+                  "ENTERPRISE" CHAR(16) NOT NULL )   
+                 IN "TSPACE01" INDEX IN "ISPACE01" ; 
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERATTS"
+
+CREATE INDEX "GBLI    "."TRSNETTERATTS_IX1" ON "GBLI    "."TRSNETTERATTS" 
+                ("ENTITYTYPE" ASC,
+                 "SESSIONID" ASC,
+                 "ENTERPRISE" ASC);
+
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERATTS"
+
+CREATE UNIQUE INDEX "GBLI    "."TRSNETTERATTS_PK" ON "GBLI    "."TRSNETTERATTS" 
+                ("ENTITYID" ASC,
+                 "ENTITYTYPE" ASC,
+                 "SESSIONID" ASC,
+                 "ENTERPRISE" ASC)
+                CLUSTER ;
+
+
+
+
+------------------------------------------------
+-- DDL Statements for table "GBLI    "."TRSNETTERFINAL"
+------------------------------------------------
+ DROP TABLE "GBLI"."TRSNETTERFINAL";
+ CREATE TABLE "GBLI    "."TRSNETTERFINAL"  (
+                  "ENTERPRISE" CHAR(8) NOT NULL , 
+                  "SESSIONID" INTEGER NOT NULL , 
+                  "ACTIONTYPE" CHAR(32) NOT NULL , 
+                  "STARTDATE" TIMESTAMP NOT NULL , 
+                  "ENDDATE" TIMESTAMP NOT NULL , 
+                  "VALFROM" TIMESTAMP NOT NULL , 
+                  "ROOTTYPE" CHAR(32) NOT NULL , 
+                  "ROOTID" INTEGER NOT NULL , 
+                  "ROOTTRAN" CHAR(3) NOT NULL , 
+                  "CHILDTYPE" CHAR(32) NOT NULL , 
+                  "CHILDID" INTEGER NOT NULL , 
+                  "CHILDTRAN" CHAR(3) NOT NULL , 
+                  "CHILDLEVEL" INTEGER NOT NULL , 
+                  "CHILDCLASS" CHAR(1) NOT NULL , 
+                  "CHILDPATH" VARCHAR(254) NOT NULL , 
+                  "ENTITY1TYPE" CHAR(32) NOT NULL , 
+                  "ENTITY1ID" INTEGER NOT NULL , 
+                  "ENTITY2TYPE" CHAR(32) NOT NULL , 
+                  "ENTITY2ID" INTEGER NOT NULL )   
+                 IN "TSPACE08" ; 
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERFINAL"
+
+CREATE INDEX "GBLI    "."TRSNETTERFINAL_IX1" ON "GBLI    "."TRSNETTERFINAL" 
+                ("SESSIONID" ASC,
+                 "ROOTID" ASC,
+                 "ROOTTYPE" ASC,
+                 "ENTERPRISE" ASC);
+
+-- DDL Statements for indexes on Table "GBLI    "."TRSNETTERFINAL"
+
+CREATE INDEX "GBLI    "."TRSNETTERFINAL_IX2" ON "GBLI    "."TRSNETTERFINAL" 
+                ("SESSIONID" ASC,
+                 "CHILDID" ASC,
+                 "CHILDTYPE" ASC,
+                 "ENTERPRISE" ASC);
+
+--
+--
+--
+
+--
+-- $Log: catdb-ddl.txt,v $
+-- Revision 1.15  2011/05/05 11:25:58  wendy
+-- src from IBMCHINA
+--
+-- Revision 1.1.1.1  2007/06/05 02:09:47  jingb
+-- no message
+--
+-- Revision 1.14  2006/10/30 17:20:04  gregg
+-- projcdnam
+--
+-- Revision 1.13  2006/09/28 17:53:57  gregg
+-- extend prodstruct.oslevel cols to match prod
+--
+-- Revision 1.12  2006/09/28 16:51:25  gregg
+-- move configuratorflag_fc to prodstruct
+--
+-- Revision 1.11  2006/09/14 20:24:38  gregg
+-- configuratorflag*_fc*!!
+--
+-- Revision 1.10  2006/09/13 21:28:00  gregg
+-- add gbli.trsnetter tables
+--
+-- Revision 1.9  2006/09/11 20:26:30  gregg
+-- configuratorflag_fc
+--
+-- Revision 1.8  2006/07/11 16:34:02  gregg
+-- update
+--
+-- Revision 1.7  2006/06/21 17:18:40  gregg
+-- CATSCAN in catdb_tables
+--
+-- Revision 1.6  2006/06/19 22:51:08  gregg
+-- CATSCAN added
+--
+-- Revision 1.5  2006/05/03 21:29:24  gregg
+-- col widths descreased a tad to allow max row of 4k
+--
+-- Revision 1.4  2006/05/03 15:37:07  gregg
+-- extend some col widths for category
+--
+-- Revision 1.3  2006/04/18 14:52:59  gregg
+-- cleanup
+--
+-- Revision 1.2  2006/04/06 18:01:38  gregg
+-- fix countrylist
+--
+-- Revision 1.1  2006/03/31 21:00:22  gregg
+-- moving over from middleware.jar
+--
+-- Revision 1.114  2006/03/08 18:07:00  gregg
+-- pricedisclaimer = longvarchar
+--
+-- Revision 1.113  2006/03/03 17:48:00  gregg
+-- catbulletpoints->long varchar
+--
+-- Revision 1.112  2006/02/28 17:29:24  gregg
+-- up specialbid_fc width to 8
+--
+-- Revision 1.111  2006/02/15 20:33:59  gregg
+-- gamap stuff
+--
+-- Revision 1.110  2006/02/14 18:25:06  gregg
+-- gamap update
+--
+-- Revision 1.109  2006/02/13 21:09:36  gregg
+-- ddl fix
+--
+-- Revision 1.108  2006/02/03 18:17:40  bala
+-- added multirow entry for CATAUDIENCE for catods
+--
+-- Revision 1.107  2006/01/28 18:57:44  joan
+-- increase featurecode column
+--
+-- Revision 1.106  2006/01/13 20:59:58  gregg
+-- extend width of wwproduct.ordercode
+--
+-- Revision 1.105  2006/01/12 20:15:39  gregg
+-- catdb_tables fix
+--
+-- Revision 1.104  2006/01/11 19:48:17  gregg
+-- extend col width on catdb_tables.tablename to 32
+--
+-- Revision 1.103  2006/01/05 00:15:34  gregg
+-- add restart table to catdb_tables
+--
+-- Revision 1.102  2006/01/05 00:11:57  gregg
+-- retardtable
+--
+-- Revision 1.101  2006/01/04 23:11:37  gregg
+-- add ods_purge to master copy
+--
+-- Revision 1.100  2005/12/14 20:52:49  gregg
+-- update the catdb_tables stuff
+--
+-- Revision 1.99  2005/12/14 00:12:59  gregg
+-- add metaflagvalue to grant list
+--
+-- Revision 1.98  2005/12/13 18:02:23  gregg
+-- add oslevel to wwproduct
+--
+-- Revision 1.97  2005/12/01 17:35:27  joan
+-- change to long text for marketing message
+--
+-- Revision 1.96  2005/11/14 20:31:34  gregg
+-- *** empty log message ***
+--
+-- Revision 1.95  2005/11/11 21:10:48  gregg
+-- *** empty log message ***
+--
+-- Revision 1.94  2005/11/11 20:02:26  joan
+-- change status to 32
+--
+-- Revision 1.93  2005/11/11 18:36:10  gregg
+-- *** empty log message ***
+--
+-- Revision 1.92  2005/11/07 22:16:57  joan
+-- change COMPTYPE to CGTYPE for feature
+--
+-- Revision 1.91  2005/10/28 16:40:04  gregg
+-- committing
+--
+-- Revision 1.90  2005/10/25 21:52:58  gregg
+-- exand ORDERCODE to char(4)
+--
+-- Revision 1.89  2005/10/25 21:52:06  gregg
+-- page 1: fun with varchars
+--
+-- Revision 1.88  2005/10/25 20:37:59  joan
+-- fixes
+--
+-- Revision 1.87  2005/10/24 18:58:23  joan
+-- fixes
+--
+-- Revision 1.86  2005/10/20 17:33:53  gregg
+-- extend status_fc on collateral to char(4)
+--
+-- Revision 1.85  2005/10/19 22:00:23  gregg
+-- update
+--
+-- Revision 1.84  2005/10/19 20:59:40  gregg
+-- moving some hard-coded table inserts into ddl
+--
+-- Revision 1.83  2005/10/19 17:37:12  gregg
+-- put PROD_PRICESUM as nodrop in catdb_tables
+--
+-- Revision 1.82  2005/10/19 16:44:01  dave
+-- new baby steps
+--
+-- Revision 1.81  2005/10/18 21:34:08  gregg
+-- *** empty log message ***
+--
+-- Revision 1.80  2005/10/18 19:54:19  gregg
+-- add PRODUCT.LANGUAGES column
+--
+-- Revision 1.79  2005/10/14 20:39:09  gregg
+-- catdb_tables
+--
+-- Revision 1.78  2005/10/14 19:55:11  gregg
+-- update
+--
+-- Revision 1.77  2005/10/12 21:22:39  gregg
+-- table name change CATNAV-->MULTIROWATTR
+--
+-- Revision 1.76  2005/10/10 21:14:26  gregg
+-- change PROJCDNAM_MFC --> PROJCDNAM_FC
+--
+-- Revision 1.75  2005/10/07 21:15:36  gregg
+-- three new category cols
+--
+-- Revision 1.74  2005/10/07 17:41:16  gregg
+-- add WARRTYPE, WARRPRIOD to PRODUCT table, CATAUDIENCE to CATEGORY table
+--
+-- Revision 1.73  2005/10/04 17:52:08  gregg
+-- fix
+--
+-- Revision 1.72  2005/10/04 17:50:52  gregg
+-- CATNAV table
+--
+-- Revision 1.71  2005/10/04 17:36:45  dave
+-- Category
+--
+-- Revision 1.70  2005/09/29 16:39:30  joan
+-- adjusting os_fc length
+--
+-- Revision 1.69  2005/09/28 23:05:52  joan
+-- fixes
+--
+-- Revision 1.68  2005/09/26 20:04:07  joan
+-- fix compile
+--
+-- Revision 1.67  2005/09/26 18:22:06  joan
+-- change wwprodcompat
+--
+-- Revision 1.66  2005/09/26 16:21:49  joan
+-- initial load
+--
+-- Revision 1.65  2005/09/21 16:53:01  gregg
+-- extending some columns
+--
+-- Revision 1.64  2005/09/20 22:52:29  gregg
+-- extend some PRODUCT table columns
+--
+-- Revision 1.63  2005/09/20 03:28:31  dave
+-- more trace for SCM and collateral collection
+--
+-- Revision 1.62  2005/09/13 15:24:05  dave
+-- more ddl changes
+--
+-- Revision 1.61  2005/09/13 06:19:26  dave
+-- updating table def
+--
+-- Revision 1.60  2005/09/13 05:57:26  dave
+-- fixing up table alittle more
+--
+-- Revision 1.59  2005/09/13 04:55:11  dave
+-- ok.. need to still pull relator info.. even if the guy
+-- is not an 'R'.  it could be an Relator masq. as an
+-- entity
+--
+-- Revision 1.58  2005/09/13 04:14:31  dave
+-- ok.. lets add the PROJCDNAM, and lets take a hard look at
+-- WWSEO and how to get prod structures
+--
+-- Revision 1.57  2005/09/12 05:20:40  dave
+-- they only want the first character
+--
+-- Revision 1.56  2005/09/09 21:08:43  gregg
+-- remove unecessary NOT NULLS and syncing up indexes.
+-- + generic cleanup.
+--
+-- Revision 1.55  2005/09/09 15:58:20  dave
+-- here is the latest ddl
+--
+-- Revision 1.54  2005/08/30 17:39:15  dave
+-- new cat comments
+--
+-- Revision 1.53  2005/08/23 19:56:02  gregg
+-- more sync w/ spec
+--
+-- Revision 1.52  2005/08/17 21:00:47  joan
+-- fix pricedfeature
+--
+-- Revision 1.51  2005/08/15 21:09:43  gregg
+-- remove CGNAME from component group
+--
+-- Revision 1.50  2005/08/05 17:53:59  gregg
+-- updates... sync'ing w/ spec
+--
+-- Revision 1.49  2005/06/23 21:20:46  joan
+-- adjust for countrylist
+--
+-- Revision 1.48  2005/06/23 19:16:35  joan
+-- adjust for countrylist
+--
+-- Revision 1.47  2005/06/23 01:56:18  dave
+-- lets hook up the update of the wwattributes
+--
+-- Revision 1.46  2005/06/22 20:52:54  gregg
+-- PK use countrylist in PRODUCT table
+--
+-- Revision 1.45  2005/06/22 19:48:51  dave
+-- more country list
+--
+-- Revision 1.44  2005/06/22 19:28:20  dave
+-- ok.. trying to add countryList to the mix for my tables
+--
+-- Revision 1.43  2005/06/21 20:26:55  gregg
+-- remove not null restriction from product table - we may need to put this back in later..
+--
+-- Revision 1.42  2005/06/21 17:58:51  joan
+-- add CountryList in gamap table
+--
+-- Revision 1.41  2005/06/15 22:58:45  gregg
+-- remove some NOT NULL restrictions for PRODUCT
+--
+-- Revision 1.40  2005/06/15 19:38:48  gregg
+-- remove GENERALAREA references from PRODUCT table
+--
+-- Revision 1.39  2005/06/13 15:37:15  dave
+-- addind some columns
+--
+-- Revision 1.38  2005/06/10 21:31:34  dave
+-- ok.. lets make sure we have it all here
+--
+-- Revision 1.37  2005/06/08 18:05:44  dave
+-- CollateralCollection Build all
+--
+-- Revision 1.36  2005/06/07 03:25:29  dave
+-- new IDL sp and approach
+--
+-- Revision 1.35  2005/06/05 21:13:22  dave
+-- type in sp template
+--
+-- Revision 1.34  2005/06/05 18:55:42  dave
+-- xml cleanup
+--
+-- Revision 1.33  2005/06/05 03:01:14  dave
+-- no need to deal with forever in anndate
+--
+-- Revision 1.32  2005/06/05 01:51:51  dave
+-- anndate fixes
+--
+-- Revision 1.31  2005/06/04 23:48:50  dave
+-- attempting to manage the put for prodstruct
+--
+-- Revision 1.30  2005/06/03 21:25:51  dave
+-- lets start getting prodstruct data
+--
+-- Revision 1.29  2005/05/23 01:34:33  dave
+-- small test changes to main
+--
+-- Revision 1.28  2005/05/23 00:36:10  dave
+-- ok.. attempting to build my first collection
+--
+-- Revision 1.27  2005/05/22 23:04:36  dave
+-- Added CollectionId
+-- addind Catalog Interval
+-- Placed enterprise in the Gami
+--
+-- Revision 1.26  2005/05/19 23:50:16  dave
+-- more dump and view unit testing
+--
+-- Revision 1.25  2005/05/19 21:48:13  dave
+-- more list trickery
+--
+-- Revision 1.24  2005/05/19 04:44:50  dave
+-- more baseline testing and config
+--
+-- Revision 1.23  2005/05/19 03:20:48  dave
+-- adding getReference concept and changing DDL abit
+-- to remove the not nulls
+--
+-- Revision 1.22  2005/05/16 16:48:18  gregg
+-- some syntax. Look at CATEGORY_PK
+--
+-- Revision 1.21  2005/05/16 16:34:04  dave
+-- adding  category
+--
+-- Revision 1.20  2005/05/14 23:51:50  dave
+-- massive updates based upon latest IBM spec
+--
+-- Revision 1.19  2005/05/05 23:03:04  roger
+-- Fix
+--
+-- Revision 1.18  2005/05/05 23:00:32  roger
+-- New table
+--
+-- Revision 1.17  2005/05/05 22:29:01  dave
+-- more minor fixes to productdetail
+--
+-- Revision 1.16  2005/05/05 22:24:50  dave
+-- syntax fix
+--
+-- Revision 1.15  2005/05/05 22:24:31  dave
+-- added productdetail table (new usage) here
+--
+-- Revision 1.14  2005/05/02 17:53:20  roger
+-- Again
+--
+-- Revision 1.13  2005/05/02 17:49:09  roger
+-- Updates
+--
+-- Revision 1.12  2005/05/02 17:17:07  roger
+-- Some fixes
+--
+-- Revision 1.11  2005/05/02 16:12:48  roger
+-- IX1's not unique
+--
+-- Revision 1.10  2005/04/29 18:34:31  roger
+-- More
+--
+-- Revision 1.9  2005/04/29 18:30:54  roger
+-- Changes
+--
+-- Revision 1.8  2005/04/28 20:09:12  dave
+-- added collateral changes, and made some columns dates
+-- vs timestamps
+--
+-- Revision 1.7  2005/04/28 19:23:57  roger
+-- Move the log
+--
+--

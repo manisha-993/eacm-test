@@ -1,0 +1,679 @@
+/*
+ * Created on May 31, 2005
+ * To change the template for this generated file go to
+ * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ *
+ */
+package COM.ibm.eannounce.catalog;
+
+import java.sql.SQLException;
+import java.util.Iterator;
+
+import COM.ibm.eannounce.objects.EANFlagAttribute;
+import COM.ibm.eannounce.objects.EANTextAttribute;
+import COM.ibm.eannounce.objects.EntityItem;
+import COM.ibm.opicmpdh.middleware.D;
+import COM.ibm.opicmpdh.middleware.Database;
+import COM.ibm.opicmpdh.middleware.MiddlewareException;
+import COM.ibm.opicmpdh.middleware.Profile;
+import COM.ibm.opicmpdh.middleware.ReturnStatus;
+
+// need some static constants with the hard-coded COLLTYPEs and COLLENTITYTYPEs
+
+/**
+ * Collateral
+ *
+ * @author David Bigelow
+ * To change the template for this generated type comment go to
+ * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ */
+public abstract class Collateral
+    extends CatItem implements Databaseable, XMLable {
+
+    public static final int WORLDWIDEPRODUCT_REFERENCE = 0;
+    public static final int FAMILYPAGE_REFERENCE = 1;
+
+    public static final String MM_STATUS = "MMSTATUS";
+    public static final String IMG_STATUS = "STATUS";
+    public static final String FB_STATUS = "FBSTATUS";
+
+    public static final String MM_PUBFROM = "PUBFROM";
+    public static final String IMG_PUBFROM = "PUBFROM";
+    public static final String FB_PUBFROM = "PUBFROM";
+
+    public static final String MM_PUBTO = "PUBTO";
+    public static final String IMG_PUBTO = "PUBTO";
+    public static final String FB_PUBTO = "PUBTO";
+
+    private String VALFROM = null;
+    private String VALTO = null;
+    private boolean ISACTIVE = true;
+    private String STATUS = null;
+    private String STATUS_FC = null;
+    private String PUBFROM = null;
+    private String PUBTO = null;
+
+    private SyncMapCollection m_smc = null;
+    private WorldWideProductCollection m_wwpc = null;
+    private FamilyPageCollection m_fpc = null;
+
+    /**
+     * Collateral
+     * @param _cid
+     */
+    public Collateral(CatId _cid) {
+        super(_cid);
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     *  (non-Javadoc)
+     *
+     * @param _cat
+     */
+    public abstract void get(Catalog _cat);
+
+    /**
+     *  (non-Javadoc)
+     *
+     * @param _bcommit
+     * @param _cat
+     */
+    public abstract void put(Catalog _cat, boolean _bcommit);
+
+    /**
+     * getCommon
+     *
+     * @param _cat
+     */
+    public void getCommon(Catalog _cat) {
+
+        Profile prof = _cat.getCatalogProfile();
+        CollateralId cid = (CollateralId) getId();
+        cid.getGami();
+        CollateralCollectionId ccid = cid.getCollateralCollectionId();
+        CatalogInterval cati = ccid.getInterval();
+
+        D.ebug(this, D.EBUG_DETAIL, "getCommon() - here is the cid:" + cid);
+        // O.K.. lets see what we got!
+
+        if (ccid.isByInterval() && ccid.isFromPDH()) {
+
+            if (this.getSmc() == null) {
+                System.out.println("Cannot pull out of the PDH since there is no SycnMap for me.");
+                return;
+            }
+
+            //
+            // Lets set the valon's in the profile for the Catalog to
+            // I am not sure i like setting them here.
+            //
+
+            prof.setEffOn(cati.getEndDate());
+            prof.setValOn(cati.getEndDate());
+
+            try {
+
+                EntityItem eiRoot = Catalog.getEntityItem(_cat, cid.getCollEntityType(), cid.getCollEntityID());
+                this.setAttributes( (eiRoot));
+
+            }
+            finally {
+                //TODO
+            }
+            //
+            // Now we have to put the attributes in the right spot
+            //
+
+        }
+    }
+
+    /**
+     *  put will manage the record for all the common information
+     *  the super class will overlay its values once the record is handled in
+     * the CatDb
+     *  (non-Javadoc)
+     *
+     * @param _cat
+     * @param _bcommit
+     */
+    protected void putCommon(Catalog _cat, boolean _bcommit) {
+        Database db = _cat.getCatalogDatabase();
+        ReturnStatus rets = new ReturnStatus( -1);
+        CollateralId colid = (CollateralId)this.getId();
+        GeneralAreaMapItem gami = colid.getGami();
+
+        String strEnterprise = gami.getEnterprise();
+        String strCountryCode = gami.getCountry();
+        String strLanguageCode = gami.getLanguage();
+        String strCountryList = gami.getCountryList();
+        int iNLSID = gami.getNLSID();
+        String strColEntityType = colid.getCollEntityType();
+        int iColEntityID = colid.getCollEntityID();
+
+        try {
+            int iIsactive = 0;
+            if (this.isActive()) 
+            {
+             if (this.getSTATUS_FC() == null) 
+             {
+               iIsactive = 0; 
+	     }
+	     else 
+	     {
+	       iIsactive = 1; 
+             }
+            }
+	    
+            db.callGBL8978(rets, strEnterprise, strCountryCode, strLanguageCode, iNLSID, strCountryList, strColEntityType,
+                iColEntityID, (this.getPUBFROM() == null ? "NULL" : this.getPUBFROM()),
+                (this.getPUBTO() == null ? "NULL" : this.getPUBTO()), (this.getSTATUS() == null ? "NULL" : this.getSTATUS()),
+                (this.getSTATUS_FC() == null ? "NULL" : this.getSTATUS_FC()), iIsactive);
+
+            if (_bcommit) {
+                db.commit();
+            }
+            db.freeStatement();
+            db.isPending();
+
+        }
+        catch (MiddlewareException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * This guy handles all variations of Collateral.
+     *
+     * @param _icase
+     * @param _cat
+     */
+    public final void getReferences(Catalog _cat, int _icase) {
+
+        CollateralId colid = (CollateralId)this.getId();
+        CollateralCollectionId colcid = colid.getCollateralCollectionId();
+        int iType = colcid.getType();
+        int iSource = colcid.getSource();
+        CatalogInterval cati = colcid.getInterval();
+
+        switch (_icase) {
+
+            case WORLDWIDEPRODUCT_REFERENCE:
+
+                //
+                // Lets make a new list for WorldWideProduct and pass on the context of the list
+                //
+                WorldWideProductCollectionId wwpcid = new WorldWideProductCollectionId(colid, cati, iSource, iType);
+                D.ebug(this, D.EBUG_SPEW, "getReferences(WORLDWIDEPRODUCT_REFERENCE) - making new WWPC from colic" + colid);
+                setWorldWideProductCollection(new WorldWideProductCollection(wwpcid));
+
+                //
+                // Lets share the SMC stuff
+                //
+                if (this.hasSyncMapCollection()) {
+                    D.ebug(this, D.EBUG_SPEW, "getReferences(WORLDWIDEPRODUCT_REFERENCE) - setting colid's SMC");
+                    getWorldWideProductCollection().setSmc(this.getSmc());
+                }
+
+                //
+                // Lets get a list of Stubs
+                //
+                D.ebug(this, D.EBUG_DETAIL, "getReferences(PRODSTRUCT_REFERENCE) - lets go stub pout the wwpcid" + wwpcid);
+                getWorldWideProductCollection().get(_cat);
+                setDeep(true);
+                break;
+
+            case FAMILYPAGE_REFERENCE:
+
+                //
+                // Lets make a new list for WorldWideProduct and pass on the context of the list
+                //
+                FamilyPageCollectionId cid = new FamilyPageCollectionId(colid, cati, iSource, iType);
+                D.ebug(this, D.EBUG_SPEW, "getReferences(FAMILYPAGE_REFERENCE) - making new WWPC from colic" + colid);
+                setFamilyPageCollection(new FamilyPageCollection(cid));
+
+                //
+                // Lets share the SMC stuff
+                //
+                if (this.hasSyncMapCollection()) {
+                    D.ebug(this, D.EBUG_DETAIL, "getReferences(FAMILYPAGE_REFERENCE) - setting colid's SMC");
+                    getFamilyPageCollection().setSmc(this.getSmc());
+                }
+
+                //
+                // Lets get a list of Stubs
+                //
+                D.ebug(this, D.EBUG_DETAIL, "getReferences(FAMILYPAGE_REFERENCE) - lets go stub out the wwpcid" + cid);
+                getFamilyPageCollection().get(_cat);
+                setDeep(true);
+                break;
+
+            default:
+
+                break;
+        }
+
+    }
+
+    /**
+     * getSmc
+     * @return
+     */
+    public SyncMapCollection getSmc() {
+        return m_smc;
+    }
+
+    /**
+     * setSmc
+     * @param collection
+     */
+    public void setSmc(SyncMapCollection collection) {
+        m_smc = collection;
+    }
+
+    /**
+     * This generates an XMLFragment per the XML Interface
+     *
+     * Over the time, we can make new getXXXXX's and pass the
+     * xml object to them and they will generate their own fragements
+     * @param _xml
+     */
+    public void generateXMLFragment(XMLWriter _xml) {
+
+        CollateralId colid = (CollateralId)this.getId();
+
+        String strCollEntityType = colid.getCollEntityType();
+        int iCollEntityID = colid.getCollEntityID();
+
+        GeneralAreaMapItem gami = colid.getGami();
+        String strCountry = gami.getCountry();
+        String strLanguage = gami.getLanguage();
+        String xmlEntity = "unknown";
+
+        if (strCollEntityType.equals("MM")) {
+            xmlEntity = "MARKETDESC";
+        }
+        else if (strCollEntityType.equals("FB")) {
+            xmlEntity = "FEATDESC";
+        }
+        else if (strCollEntityType.equals("IMG")) {
+            xmlEntity = "IMAGE";
+        }
+        WorldWideProductCollection wwpc = this.getWorldWideProductCollection();
+
+        try {
+
+            // here we have to loop through all the WorldWideProducts and produce
+            // one of these for each in this picture..
+
+            Iterator it = wwpc.values().iterator();
+
+            while (it.hasNext()) {
+
+                WorldWideProduct wwp = (WorldWideProduct) it.next();
+                WorldWideProductId wwpid = (WorldWideProductId) wwp.getId();
+
+                String strProdEntityType = wwpid.getEntityType();
+                int iProdEntityID = wwpid.getEntityID();
+
+                _xml.writeEntity(xmlEntity);
+                _xml.writeAttributeAsEntity("PARENTID", strProdEntityType + iProdEntityID);
+                _xml.writeAttributeAsEntity("ID", strCollEntityType + iCollEntityID);
+                _xml.writeAttributeAsEntity("COUNTRY", strCountry);
+                _xml.writeAttributeAsEntity("LANGUAGE", strLanguage);
+
+                if (this instanceof MarketMessage) {
+                    _xml.writeAttributeAsEntity("DESCRIPTION", ( (MarketMessage)this).getLONGMKTGMSG());
+                }
+                else if (this instanceof Image) {
+                    _xml.writeAttributeAsEntity("DESCRIPTION", ( (Image)this).getIMGDESC());
+                }
+                else if (this instanceof FeatureBenefit) {
+                    _xml.writeAttributeAsEntity("DESCRIPTION", ( (FeatureBenefit)this).getFBSTMT());
+                }
+
+                _xml.writeAttributeAsEntity("STATUS", this.getSTATUS());
+                _xml.writeAttributeAsEntity("FROMDATE", this.getPUBFROM());
+                _xml.writeAttributeAsEntity("TODATE", this.getPUBTO());
+                _xml.endEntity();
+
+            }
+
+        }
+        catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * isISACTIVE
+     *
+     * @return
+     */
+    public boolean isISACTIVE() {
+        return ISACTIVE;
+    }
+
+    /**
+     * getVALFROM
+     *
+     * @return
+     */
+    public String getVALFROM() {
+        return VALFROM;
+    }
+
+    /**
+     * getVALTO
+     *
+     * @return
+     */
+    public String getVALTO() {
+        return VALTO;
+    }
+
+    /**
+     * setISACTIVE
+     *
+     * @param b
+     */
+    public void setISACTIVE(boolean b) {
+        ISACTIVE = b;
+    }
+
+    /**
+     * setVALFROM
+     *
+     * @param string
+     */
+    public void setVALFROM(String string) {
+        VALFROM = string;
+    }
+
+    /**
+     * setVALTO
+     *
+     * @param string
+     */
+    public void setVALTO(String string) {
+        VALTO = string;
+    }
+
+    /**
+     * getPUBFROM
+     *
+     * @return
+     */
+    public String getPUBFROM() {
+        return PUBFROM;
+    }
+
+    /**
+     * getPUBTO
+     *
+     * @return
+     */
+    public String getPUBTO() {
+        return PUBTO;
+    }
+
+    /**
+     * getSTATUS
+     *
+     * @return
+     */
+    public String getSTATUS() {
+        return STATUS;
+    }
+
+    /**
+     * getSTATUS_FC
+     *
+     * @return
+     */
+    public String getSTATUS_FC() {
+        return STATUS_FC;
+    }
+
+    /**
+     * setPUBFROM
+     *
+     * @param string
+     */
+    public void setPUBFROM(String string) {
+        PUBFROM = string;
+    }
+
+    /**
+     * setPUBTO
+     *
+     * @param string
+     */
+    public void setPUBTO(String string) {
+        PUBTO = string;
+    }
+
+    /**
+     * setSTATUS
+     *
+     * @param string
+     */
+    public void setSTATUS(String string) {
+        STATUS = string;
+    }
+
+    /**
+     * setSTATUS_FC
+     *
+     * @param string
+     */
+    public void setSTATUS_FC(String string) {
+        STATUS_FC = string;
+    }
+
+    public WorldWideProductCollection getWorldWideProductCollection() {
+        return m_wwpc;
+    }
+
+    public void setWorldWideProductCollection(WorldWideProductCollection collection) {
+        m_wwpc = collection;
+    }
+
+    public void setFamilyPageCollection(FamilyPageCollection collection) {
+        m_fpc = collection;
+    }
+
+    public FamilyPageCollection getFamilyPageCollection() {
+        return m_fpc;
+    }
+
+    /**
+     * This sets up all the common attributes.. the subclass needs to call this within
+     * its own setAttributes Method
+     * @param _ei
+     */
+    public void setAttributes(EntityItem _ei) {
+
+        //
+        // This is some ugly code. but we keep it all in one spot
+        //
+        if (_ei.getEntityType().equals(CollateralCollection.MM_ENTITYTYPE)) {
+
+            EANFlagAttribute faSTATUS = (EANFlagAttribute) _ei.getAttribute(MM_STATUS);
+            EANTextAttribute tPUBFROM = (EANTextAttribute) _ei.getAttribute(MM_PUBFROM);
+            EANTextAttribute tPUBTO = (EANTextAttribute) _ei.getAttribute(MM_PUBTO);
+
+            D.ebug(D.EBUG_DETAIL, this.getClass().getName() + " .setAttributes(): in Common MM Section");
+
+            // STATUS
+
+            if (faSTATUS != null) {
+                this.setSTATUS(faSTATUS.toString());
+                this.setSTATUS_FC( (faSTATUS.getFirstActiveFlagCode()));
+            }
+            if (tPUBFROM != null) {
+                this.setPUBFROM(tPUBFROM.toString());
+            }
+            if (tPUBTO != null) {
+                this.setPUBTO(tPUBTO.toString());
+            }
+
+        }
+        else if (_ei.getEntityType().equals(CollateralCollection.FB_ENTITYTYPE)) {
+
+            EANTextAttribute tPUBTO = (EANTextAttribute) _ei.getAttribute(FB_PUBTO);
+            EANFlagAttribute faSTATUS = (EANFlagAttribute) _ei.getAttribute(FB_STATUS);
+            EANTextAttribute tPUBFROM = (EANTextAttribute) _ei.getAttribute(FB_PUBFROM);
+
+            D.ebug(D.EBUG_DETAIL, this.getClass().getName() + " .setAttributes(): in Common FB Section");
+
+            if (faSTATUS != null) {
+                this.setSTATUS(faSTATUS.toString());
+                this.setSTATUS_FC( (faSTATUS.getFirstActiveFlagCode()));
+            }
+            if (tPUBFROM != null) {
+                this.setPUBFROM(tPUBFROM.toString());
+            }
+            if (tPUBTO != null) {
+                this.setPUBTO(tPUBTO.toString());
+            }
+
+        }
+        else if (_ei.getEntityType().equals(CollateralCollection.IMG_ENTITYTYPE)) {
+
+            EANFlagAttribute faSTATUS = (EANFlagAttribute) _ei.getAttribute(IMG_STATUS);
+            EANTextAttribute tPUBFROM = (EANTextAttribute) _ei.getAttribute(IMG_PUBFROM);
+            EANTextAttribute tPUBTO = (EANTextAttribute) _ei.getAttribute(IMG_PUBTO);
+
+            D.ebug(D.EBUG_DETAIL, this.getClass().getName() + " .setAttributes(): in Common IMG Section");
+
+            if (faSTATUS != null) {
+                this.setSTATUS(faSTATUS.toString());
+                this.setSTATUS_FC( (faSTATUS.getFirstActiveFlagCode()));
+            }
+            if (tPUBFROM != null) {
+                this.setPUBFROM(tPUBFROM.toString());
+            }
+            if (tPUBTO != null) {
+                this.setPUBTO(tPUBTO.toString());
+            }
+        }
+    }
+
+    /**
+     * hasSyncMapCollection
+     *
+     * @return
+     */
+    public final boolean hasSyncMapCollection() {
+        return this.getSmc() != null;
+    }
+}
+
+/*
+ * $Log: Collateral.java,v $
+ * Revision 1.3  2011/05/05 11:21:33  wendy
+ * src from IBMCHINA
+ *
+ * Revision 1.1.1.1  2007/06/05 02:09:10  jingb
+ * no message
+ *
+ * Revision 1.2  2007/03/29 16:22:55  rick
+ * MN 30130409 - changed Collateral.java to set
+ * the gbli.marketinfo record inactive and not
+ * set status to 'NULL' when middleware returns null
+ * for status.
+ *
+ * Revision 1.1.1.1  2006/03/30 17:36:28  gregg
+ * Moving catalog module from middleware to
+ * its own module.
+ *
+ * Revision 1.39  2005/10/27 17:40:29  dave
+ * remapping
+ *
+ * Revision 1.38  2005/10/26 18:05:13  dave
+ * ok.. family page for collateral
+ *
+ * Revision 1.37  2005/09/20 04:26:56  dave
+ * more cleanup
+ *
+ * Revision 1.36  2005/09/20 03:39:22  dave
+ * more NULL changes
+ *
+ * Revision 1.35  2005/09/20 03:02:48  dave
+ * starting to clean up collateral collection
+ *
+ * Revision 1.34  2005/06/22 19:28:20  dave
+ * ok.. trying to add countryList to the mix for my tables
+ *
+ * Revision 1.33  2005/06/17 05:01:44  dave
+ * more minor adjustments
+ *
+ * Revision 1.32  2005/06/17 03:46:47  dave
+ * getting close
+ *
+ * Revision 1.31  2005/06/17 03:30:36  dave
+ * more cleanup
+ *
+ * Revision 1.30  2005/06/17 01:26:56  dave
+ * some isPending fixes
+ *
+ * Revision 1.29  2005/06/17 01:14:44  dave
+ * getting around null check
+ *
+ * Revision 1.28  2005/06/17 00:42:12  dave
+ * tying in XML abit for MarketInfo
+ *
+ * Revision 1.27  2005/06/16 18:38:22  dave
+ * ok.. found another bug
+ *
+ * Revision 1.26  2005/06/16 18:23:21  dave
+ * found a null pointer
+ *
+ * Revision 1.25  2005/06/16 18:01:54  dave
+ * checking in some debug trace
+ *
+ * Revision 1.24  2005/06/16 16:46:04  dave
+ * changes for Collateral
+ *
+ * Revision 1.23  2005/06/11 02:12:13  dave
+ * finalizing marketing info pass I
+ *
+ * Revision 1.22  2005/06/10 21:31:34  dave
+ * ok.. lets make sure we have it all here
+ *
+ * Revision 1.21  2005/06/08 23:28:07  dave
+ * ok,  more collateral
+ *
+ * Revision 1.20  2005/06/08 21:28:50  dave
+ * Collateral Common
+ *
+ * Revision 1.19  2005/06/08 20:48:32  dave
+ * ok.. more stuff
+ *
+ * Revision 1.18  2005/06/08 20:31:07  dave
+ * more changes to start picking up attributes for collateral
+ *
+ * Revision 1.17  2005/06/08 18:05:44  dave
+ * CollateralCollection Build all
+ *
+ * Revision 1.16  2005/06/08 14:36:30  dave
+ * ok.. expanding the contstruct
+ *
+ * Revision 1.15  2005/06/08 13:21:21  dave
+ * testing waters to see if structures make sense outside of WWProductId
+ *
+ * Revision 1.14  2005/06/01 03:32:14  dave
+ * JTest clean up
+ *
+ * Revision 1.13  2005/05/13 20:39:49  roger
+ * Turn on logging in source
+ *
+ */

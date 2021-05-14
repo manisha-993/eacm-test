@@ -1,0 +1,451 @@
+#include <stdio.h>
+#include <string.h>
+#include <memory.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <math.h>
+
+#include <sqlenv.h>
+#include <sql.h>
+#include <sqlda.h>
+#include <sqlca.h>
+#include "status.h"
+
+#ifdef __cplusplus
+extern "C"
+#endif
+
+SQL_API_RC SQL_API_FN GBL81841
+(
+  sqlint32* inoutReturnStatus
+, char inEnterprise[16]
+, char inStartDate[26]
+, char inEndDate[26]
+)
+{
+
+/* Declare a local SQLCA */ 
+struct sqlca sqlca;
+
+// Variables specific to this SP (local copy of input parms)
+EXEC SQL BEGIN DECLARE SECTION;
+char epoch[27];
+char now[27];
+char forever[27];
+char Enterprise[17];
+char StartDate[27];
+char EndDate[27];
+EXEC SQL END DECLARE SECTION;
+ 
+
+// Set some local date/times
+EXEC SQL VALUES ('1980-01-01-00.00.00.000000') INTO :epoch;
+EXEC SQL VALUES (CURRENT TIMESTAMP) INTO :now;
+EXEC SQL VALUES ('9999-12-31-00.00.00.000000') INTO :forever;
+
+// Set the return status
+// GENERAL parm style
+*inoutReturnStatus = SP_EXITED_PREMATURELY;
+
+// Save the input parameters to local variables
+strcpy(Enterprise, inEnterprise);
+strcpy(StartDate, inStartDate);
+strcpy(EndDate, inEndDate);
+
+// begin sql tag
+EXEC SQL DECLARE sp_cursor CURSOR FOR
+--get all relator and entity of this VE
+With MyETs (EntityType) AS
+    (   SELECT
+       RTRIM(MLA1.LinkType1)
+       FROM  opicm.MetaLinkAttr MLA
+       INNER JOIN opicm.MetaLinkAttr MLA1 ON
+       MLA1.Enterprise = :Enterprise
+    AND MLA1.LinkType = MLA.LinkType2
+  AND MLA1.LinkCode IN ('Relator','Assoc')
+  AND MLA1.ValFrom <= Current timestamp AND Current timestamp < MLA1.ValTo AND MLA1.EffFrom <= Current timestamp AND Current timestamp < MLA1.EffTo
+  WHERE
+      MLA.Enterprise = :Enterprise
+  AND RTRIM(MLA.LinkType) = 'Action/Entity'
+  AND MLA.LinkType1 = 'VEWWSEO1'
+  AND MLA.LinkCode in ('D','U')
+  AND MLA.ValFrom <= Current timestamp AND Current timestamp < MLA.ValTo AND MLA.EffFrom <= Current timestamp AND Current timestamp < MLA.EffTo
+UNION
+SELECT
+  RTRIM(MLA1.LinkType2)
+  FROM opicm.MetaLinkAttr MLA
+  INNER JOIN opicm.MetaLinkAttr MLA1 ON
+      MLA1.Enterprise = :Enterprise
+  AND MLA1.LinkType = MLA.LinkType2
+  AND MLA1.LinkCode IN ('Relator','Assoc')
+  AND MLA1.ValFrom <= Current timestamp AND Current timestamp < MLA1.ValTo AND MLA1.EffFrom <= Current timestamp AND Current timestamp < MLA1.EffTo
+  WHERE
+      MLA.Enterprise = :Enterprise
+  AND RTRIM(MLA.LinkType) = 'Action/Entity'
+  AND MLA.LinkType1 = 'VEWWSEO1'
+  AND MLA.linkCode in ('D','U')
+  AND MLA.ValFrom <= Current timestamp AND Current timestamp < MLA.ValTo AND MLA.EffFrom <= Current timestamp AND Current timestamp < MLA.EffTo
+UNION
+SELECT
+  RTRIM(MLA.LinkType2)
+  FROM opicm.MetaLinkAttr MLA
+  WHERE
+      MLA.Enterprise =  :Enterprise
+  AND RTRIM(MLA.LinkType) = 'Action/Entity'
+  AND MLA.LinkType1 = 'VEWWSEO1'
+  AND MLA.LinkCode in ('D','U')
+  AND MLA.ValFrom <= Current timestamp AND Current timestamp < MLA.ValTo AND MLA.EffFrom <= Current timestamp AND Current timestamp < MLA.EffTo
+  ),
+  -- get all changed entity and entityid based on catscan table
+  ALLCHANGEENTITY (entityid, entitytype,enterprise) AS(
+  SELECT DISTINCT R.entityid,R.entitytype,R.enterprise FROM opicm.relator R
+  inner join myETs ET ON ET.EntityType = R.entitytype AND R.Enterprise = :Enterprise
+  	AND R.ValFrom Between :StartDate AND :EndDate
+  UNION
+  Select 	DISTINCT	
+         	T.EntityID,
+         	T.EntityType,
+         	T.Enterprise
+  FROM opicm.Textx T
+          INNER JOIN gbli.catscan MLA ON
+          MLA.Enterprise  = :Enterprise
+          AND MLA.VENAME = 'VEWWSEO1'
+          AND MLA.ENTITYTYPE = T.EntityType
+          AND 1 = CASE WHEN MLA.ATTRIBUTECODE = '*' THEN 1 WHEN  MLA.AttributeCode = T.AttributeCode THEN 1 ELSE 0 END
+          AND MLA.ValTo > current timestamp
+          AND MLA.EffTo > Current TimeStamp
+  INNER JOIN myETs ET ON
+  	ET.EntityType = T.EntityType
+  WHERE
+  	    T.Enterprise = :Enterprise
+  	AND T.ValFrom Between :StartDate AND :EndDate
+  UNION
+  Select 	DISTINCT	
+         	T.EntityID,
+         	T.EntityType,
+       	T.Enterprise
+  FROM opicm.Flagx T
+          INNER JOIN gbli.catscan MLA ON
+          MLA.Enterprise  = :Enterprise
+          AND MLA.VENAME = 'VEWWSEO1'
+          AND MLA.ENTITYTYPE = T.EntityType
+          AND 1 = CASE WHEN MLA.ATTRIBUTECODE = '*' THEN 1 WHEN  MLA.AttributeCode = T.AttributeCode THEN 1 ELSE 0 END
+          AND MLA.ValTo > current timestamp
+          AND MLA.EffTo > Current TimeStamp
+  INNER JOIN myETs ET on
+  	ET.EntityType = T.EntityType
+  WHERE
+  	T.Enterprise = :Enterprise
+  	AND T.ValFrom Between :StartDate AND :EndDate
+  UNION
+  Select 	DISTINCT	
+         	T.EntityID,
+         	T.EntityType,
+         	T.Enterprise
+  FROM opicm.LongTextx T
+  INNER JOIN gbli.catscan MLA ON
+          MLA.Enterprise  = :Enterprise
+          AND MLA.VENAME = 'VEWWSEO1'
+          AND MLA.ENTITYTYPE = T.EntityType
+          AND 1 = CASE WHEN MLA.ATTRIBUTECODE = '*' THEN 1 WHEN  MLA.AttributeCode = T.AttributeCode THEN 1 ELSE 0 END
+          AND MLA.ValTo > current timestamp
+          AND MLA.EffTo > Current TimeStamp
+  INNER JOIN myETs ET on
+  	ET.EntityType = T.EntityType
+  WHERE
+  	T.Enterprise = :Enterprise
+  	AND T.ValFrom Between :StartDate AND :EndDate
+  UNION
+  Select 	DISTINCT
+  	       	T.EntityID,
+         	T.EntityType,
+         	T.Enterprise
+  FROM opicm.Blobx T
+  INNER JOIN gbli.catscan MLA ON
+          MLA.Enterprise  = :Enterprise
+          AND MLA.VENAME = 'VEWWSEO1'
+          AND MLA.ENTITYTYPE = T.EntityType
+          AND 1 = CASE WHEN MLA.ATTRIBUTECODE = '*' THEN 1 WHEN  MLA.AttributeCode = T.AttributeCode THEN 1 ELSE 0 END
+          AND MLA.ValTo > current timestamp
+          AND MLA.EffTo > Current TimeStamp
+  INNER JOIN myETs ET on
+  	ET.EntityType = T.EntityType
+  WHERE
+  	T.Enterprise = :Enterprise
+  	AND T.ValFrom Between :StartDate AND :EndDate
+),
+--get all root entityid
+ALLrootEntity (entityid,entitytype,enterprise) AS (
+SELECT entityid,entitytype,enterprise FROM ALLCHANGEENTITY WHERE entitytype = 'WWSEO'
+UNION
+SELECT entity1id,entity1type,enterprise FROM opicm.relator WHERE entitytype = 'WWSEOPRODSTRUCT' AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp and enterprise = :Enterprise  AND entityid IN (SELECT entityid  FROM ALLCHANGEENTITY WHERE entitytype = 'WWSEOPRODSTRUCT')
+UNION
+SELECT entity1id,entity1type,enterprise FROM opicm.relator WHERE entitytype = 'WWSEOSWPRODSTRUCT' AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp and enterprise = :Enterprise  AND entityid IN (SELECT entityid FROM ALLCHANGEENTITY WHERE entitytype = 'WWSEOSWPRODSTRUCT')
+UNION
+SELECT entity1id,entity1type,enterprise FROM opicm.relator WHERE entitytype ='WWSEOPRODSTRUCT' AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp and enterprise = :Enterprise AND entity2type = 'PRODSTRUCT' AND  
+	entity2id IN (
+		SELECT entityid FROM ALLCHANGEENTITY WHERE entitytype = 'PRODSTRUCT'
+		UNION
+		SELECT entityid FROM opicm.relator WHERE entitytype = 'PRODSTRUCT'  and enterprise = :Enterprise AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp AND entity2type = 'MODEL' AND
+			entity2id IN (
+				SELECT entityid FROM  ALLCHANGEENTITY WHERE entitytype = 'MODEL'
+				UNION
+				SELECT entity1id FROM opicm.relator WHERE entitytype = 'COFTECHCAP' AND enterprise = :Enterprise AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp AND entity1type = 'MODEL' AND entityid IN (
+					SELECT entityid FROM ALLCHANGEENTITY WHERE entitytype = 'COFTECHCAP' )
+					UNION
+					SELECT entity1id FROM opicm.relator WHERE 
+					entitytype = 'COFTECHCAP'  and enterprise = :Enterprise AND entity2type = 'TECHCAP' AND  entity2id IN (SELECT entityid FROM  ALLCHANGEENTITY WHERE entitytype = 'TECHCAP' ) AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp
+					)				
+		UNION
+		SELECT entityid FROM opicm.relator WHERE entitytype = 'PRODSTRUCT' and enterprise = :Enterprise AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp AND entity1type = 'FEATURE' AND
+			entity1id IN (	
+				SELECT entityid FROM ALLCHANGEENTITY WHERE entitytype = 'FEATURE'
+				UNION
+				SELECT entity1id FROM opicm.relator WHERE 
+					entitytype = 'FEATUREHDD'  and enterprise = :Enterprise AND entityid IN (SELECT entityid FROM ALLCHANGEENTITY WHERE entitytype = 'FEATUREHDD' ) AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp
+				UNION
+				SELECT entity1id FROM opicm.relator WHERE 
+					entitytype = 'FEATUREHDD'  and enterprise = :Enterprise AND entity2type = 'HDD' AND entity2id IN (SELECT entityid FROM  ALLCHANGEENTITY WHERE entitytype = 'HDD' ) AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp
+				UNION
+				SELECT entity1id FROM opicm.relator WHERE 
+					entitytype = 'FEATUREMECHPKG'  and enterprise = :Enterprise AND entityid IN (SELECT entityid FROM ALLCHANGEENTITY WHERE entitytype = 'FEATUREMECHPKG' ) AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp
+				UNION
+				SELECT entity1id FROM opicm.relator WHERE 
+					entitytype = 'FEATUREMECHPKG'  and enterprise = :Enterprise AND  entity2id IN (SELECT entityid FROM  ALLCHANGEENTITY WHERE entitytype = 'MECHPKG' ) AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp AND entity2type = 'MECHPKG'
+				UNION
+				SELECT entity1id FROM opicm.relator WHERE 
+					entitytype = 'FEATUREMEMORY'  and enterprise = :Enterprise AND entityid IN (SELECT entityid FROM ALLCHANGEENTITY WHERE entitytype = 'FEATUREMEMORY' ) AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp
+				UNION					
+				SELECT entity1id FROM opicm.relator WHERE 
+					entitytype = 'FEATUREMEMORY'  and enterprise = :Enterprise and entity2id IN (SELECT entityid FROM  ALLCHANGEENTITY WHERE entitytype = 'MEMORY' )	AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp AND entity2type = 'MEMORY'				
+				UNION
+				SELECT entity1id FROM opicm.relator WHERE 
+					entitytype = 'FEATUREPLANAR'  and enterprise = :Enterprise AND entityid IN (SELECT entityid FROM ALLCHANGEENTITY WHERE entitytype = 'FEATUREPLANAR' ) AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp 
+				UNION
+				SELECT entity1id FROM opicm.relator WHERE 
+					entitytype = 'FEATUREPLANAR'  and enterprise = :Enterprise AND entity2id IN (SELECT entityid FROM  ALLCHANGEENTITY WHERE entitytype = 'PLANAR' ) AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp AND entity2type = 'PLANAR'
+				UNION
+				SELECT entity1id FROM opicm.relator WHERE 
+					entitytype = 'FEATURETECHINFO'  and enterprise = :Enterprise AND entityid IN (SELECT entityid FROM ALLCHANGEENTITY WHERE entitytype = 'FEATURETECHINFO' ) AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp
+				UNION 
+				SELECT entity1id FROM opicm.relator WHERE 
+					entitytype = 'FEATURETECHINFO'  and enterprise = :Enterprise AND entity2id IN (SELECT entityid FROM  ALLCHANGEENTITY WHERE entitytype = 'TECHINFO' ) AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp AND entity2type = 'TECHINFO'
+				)
+			)
+UNION
+SELECT entity1id,entity1type,enterprise FROM opicm.relator WHERE 
+	entitytype = 'WWSEODERIVEDDATA'  and enterprise = :Enterprise AND entityid IN (SELECT entityid FROM ALLCHANGEENTITY WHERE entitytype = 'WWSEODERIVEDDATA') AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp
+UNION
+SELECT entity1id,entity1type,enterprise FROM opicm.relator WHERE 
+	entitytype = 'WWSEODERIVEDDATA'  and enterprise = :Enterprise AND entity2id IN (SELECT entityid FROM  ALLCHANGEENTITY WHERE entitytype = 'DERIVEDDATA') AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp AND entity2type = 'DERIVEDDATA'
+UNION
+SELECT entity1id,entity1type,enterprise FROM opicm.relator WHERE 
+	entitytype = 'WWSEOWARR'  and enterprise = :Enterprise AND entityid IN (SELECT entityid FROM ALLCHANGEENTITY WHERE entitytype = 'WWSEOWARR') AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp
+UNION
+SELECT entity1id,entity1type,enterprise FROM opicm.relator WHERE 
+	entitytype = 'WWSEOWARR'  and enterprise = :Enterprise AND entity2id IN (SELECT entityid FROM  ALLCHANGEENTITY WHERE entitytype = 'WARR' ) AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp  AND entity2type = 'WARR'
+UNION
+SELECT entity1id,entity1type,enterprise FROM opicm.relator WHERE entitytype ='WWSEOSWPRODSTRUCT'  and enterprise = :Enterprise AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp AND entity2type = 'SWPRODSTRUCT' AND
+	entity2id IN (
+		SELECT entityid FROM ALLCHANGEENTITY WHERE entitytype = 'SWPRODSTRUCT' 
+		UNION
+		SELECT entityid FROM opicm.relator WHERE entitytype = 'SWPRODSTRUCT'  and enterprise = :Enterprise AND entity2type = 'MODEL' AND 
+			entity2id IN (SELECT entityid FROM  ALLCHANGEENTITY WHERE entitytype = 'MODEL') AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp
+		UNION
+		SELECT entityid FROM opicm.relator WHERE entitytype = 'SWPRODSTRUCT' and enterprise = :Enterprise AND entity1type = 'SWFEATURE' AND 
+			entity1id IN (SELECT entityid FROM ALLCHANGEENTITY WHERE entitytype = 'SWFEATURE') AND valfrom < CURRENT timestamp AND valto > CURRENT timestamp
+		)
+)
+,
+--only get the effective entitytid --check the status of product
+RealRootEntity (rootentitytype,rootentityid,entitytype,entityid,childentitytype,childentityid,enterprise,effto,LEVEL) AS 
+ (SELECT root.entitytype,root.entityid, r.entitytype,r.entityid,r.entity2type,r.entity2id,root.enterprise,r.effto,0 FROM ALLrootEntity root
+inner join opicm.relator r ON root.entitytype = r.entity1type AND root.entityid = r.entity1id AND root.enterprise = r.enterprise AND r.entitytype IN ('WWSEOPRODSTRUCT','WWSEOSWPRODSTRUCT') AND r.valfrom < CURRENT timestamp AND r.valto > CURRENT timestamp
+LEFT JOIN opicm.MetaLinkAttr M1 ON
+    M1.Enterprise = :Enterprise
+AND M1.LinkType = 'Entity/Status/ODSFilter'
+AND M1.LinkType1 = root.entitytype
+AND M1.Linktype2 = 'GBLI'
+AND M1.Valto > current timestamp AND CURRENT TIMESTAMP BETWEEN M1.EffFrom AND M1.EffTo
+LEFT JOIN opicm.Flag F1 ON
+    F1.Enterprise = :Enterprise
+AND F1.EntityType = root.entitytype
+AND F1.EntityID = root.entityid
+AND rtrim(F1.AttributeCode || ' ') = M1.LinkCode
+AND rtrim(F1.AttributeValue || ' ')  = M1.LinkValue
+AND F1.Valto > current timestamp
+WHERE
+    root.Enterprise = :Enterprise
+AND 1 = (CASE
+              WHEN M1.Enterprise IS NOT NULL AND F1.Enterprise IS NULL THEN 0
+              ELSE 1 END)
+)
+,
+tempFeatureModel (rootentitytype,rootentityid,entitytype,entityid,childentitytype,childentityid,parententitytype,parententityid,enterprise,effto,path,LEVEL) AS (
+	SELECT root.rootentitytype,root.rootentityid,r.entitytype,r.entityid,r.entity2type,r.entity2id,r.entity1type,r.entity1id,root.enterprise,r.effto,root.entitytype||':'||r.entitytype,1
+	FROM RealRootEntity root inner join opicm.relator r
+	ON root.childentitytype = r.entitytype AND root.enterprise = r.enterprise AND root.childentityid = r.entityid AND r.valfrom < CURRENT timestamp AND r.valto > CURRENT timestamp
+	)
+,
+tempallChildRel(rootentitytype,rootentityid,entitytype,entityid,childentitytype,childentityid,parententitytype,parententityid,enterprise,effto,path,LEVEL) AS (	
+	SELECT root.rootentitytype,root.rootentityid,r.entitytype,r.entityid,r.entity2type,r.entity2id,r.entity1type,r.entity1id,root.enterprise,r.effto,root.path||':'||r.entitytype,2
+	FROM tempFeatureModel root inner join opicm.relator r 
+	ON root.parententitytype = r.entity1type AND root.parententityid = r.entity1id AND root.enterprise = r.enterprise 
+		AND r.entitytype IN ('FEATUREHDD', 'FEATUREMECHPKG','FEATUREMEMORY','FEATUREPLANAR','FEATURETECHINFO') AND r.valfrom < CURRENT timestamp AND r.valto > CURRENT timestamp
+	UNION
+	SELECT root.rootentitytype,root.rootentityid,r.entitytype,r.entityid,r.entity2type,r.entity2id,r.entity1type,r.entity1id,root.enterprise,r.effto,root.path||':'||r.entitytype,2
+	FROM tempFeatureModel root inner join opicm.relator r 
+	ON root.childentitytype = r.entity1type AND root.childentityid = r.entity1id AND root.enterprise = r.enterprise 
+		AND r.entitytype ='COFTECHCAP' AND r.valfrom < CURRENT timestamp AND r.valto > CURRENT timestamp
+	UNION
+	SELECT root.rootentitytype,root.rootentityid,r.entitytype,r.entityid, r.entity2type,r.entity2id,r.entity1type,r.entity1id,root.enterprise,r.effto,r.entitytype,0
+	FROM RealRootEntity root inner join opicm.relator r
+	ON root.rootentitytype = r.entity1type AND root.rootentityid = r.entity1id AND root.enterprise = r.enterprise 
+		AND r.entitytype IN ('WWSEODERIVEDDATA','WWSEOWARR') AND r.valfrom < CURRENT timestamp AND r.valto > CURRENT timestamp
+	UNION 
+	SELECT rootentitytype,rootentityid,entitytype,entityid,childentitytype,childentityid,parententitytype,parententityid,enterprise,effto,path,LEVEL FROM tempFeatureModel
+--	UNION
+--	SELECT rootentitytype,rootentityid,entitytype,entityid,childentitytype,childentityid,rootentitytype,rootentityid,enterprise,effto,entitytype,LEVEL FROM RealRootEntity
+)
+
+-- will get all entityid based on root
+,ChangeVEStruct(roottype,rootid,roottran,childtype,childid,childtran,childlevel,childclass,childpath,entity2type,entity2id,entity1type,entity1id) AS (
+--WWSEOPRODSTRUCT and WWSEOSWPRODSTRUCT
+SELECT DISTINCT
+root.rootentitytype  
+,root.rootentityid      
+,'E'	                          
+, root.entitytype       
+,root.entityid           
+,CASE WHEN root.EffTo >  :EndDate THEN 'ON' ELSE 'OFF' END 
+,LEVEL                          
+,'R'                         
+,root.entitytype        
+,root.childentitytype                     
+,root.childentityid                        
+,root.rootentitytype                      
+,root.rootentityid                       
+FROM RealRootEntity root
+UNION 
+----PRODSTRUCT and SWPRODSTRUCT
+SELECT DISTINCT
+root.rootentitytype  
+,root.rootentityid      
+,'E'	                          
+, root.entitytype       
+,root.entityid           
+,CASE WHEN en.EffTo > :EndDate THEN 'ON' ELSE 'OFF' END 
+,LEVEL-1                          
+,'E'                         
+,root.rootentitytype || root.entitytype    
+,root.childentitytype                 
+,root.childentityid                    
+,root.parententitytype                  
+,root.parententityid                     
+FROM tempFeatureModel root
+inner join opicm.entity en ON root.entityid = en.entityid AND root.entitytype = en.entitytype AND root.enterprise = en.enterprise
+	AND en.valfrom < CURRENT timestamp AND en.valto > CURRENT timestamp
+UNION
+--FEATURE 
+SELECT DISTINCT
+root.rootentitytype  
+,root.rootentityid      
+,'E'	                          
+, root.parententitytype       
+,root.parententityid           
+,CASE WHEN en.EffTo >  :EndDate THEN 'ON' ELSE 'OFF' END 
+,LEVEL                          
+,'E'                         
+,root.path        
+,'XX'                     
+,-9                        
+,'XX'                      
+,-9                        
+FROM tempFeatureModel root
+inner join opicm.entity en ON root.parententityid = en.entityid AND root.parententitytype = en.entitytype AND root.enterprise = en.enterprise
+	AND en.valfrom < CURRENT timestamp AND en.valto > CURRENT timestamp
+UNION
+----'FEATUREHDD', 'FEATUREMECHPKG','FEATUREMEMORY','FEATUREPLANAR','FEATURETECHINFO',COFTECHCAP,'WWSEODERIVEDDATA','WWSEOWARR',--PRODSTRUCT and SWPRODSTRUCT, 
+SELECT DISTINCT
+root.rootentitytype  
+,root.rootentityid      
+,'E'	                          
+, root.entitytype       
+,root.entityid           
+,CASE WHEN root.EffTo >  :EndDate THEN 'ON' ELSE 'OFF' END 
+,LEVEL                          
+,'R'                         
+,root.path        
+,root.childentitytype                     
+,root.childentityid                        
+,root.parententitytype                      
+,root.parententityid                       
+FROM tempallChildRel root
+UNION
+--'HDD', 'MECHPKG','MEMORY','PLANAR','TECHINFO','DERIVEDDATA','WARR',TECHCAP,MODEL,PRODSTRUCT,SWPRODSTRUCT
+SELECT DISTINCT
+root.rootentitytype  
+,root.rootentityid      
+,'E'	                          
+, root.childentitytype       
+,root.childentityid           
+,CASE WHEN en.EffTo >  :EndDate THEN 'ON' ELSE 'OFF' END 
+,LEVEL                          
+,'E'                         
+,root.path        
+,'XX'                     
+,-9                        
+,'XX'                      
+,-9                        
+FROM tempallChildRel root
+inner join opicm.entity en ON root.childentityid = en.entityid AND root.childentitytype = en.entitytype AND root.enterprise = en.enterprise
+	AND en.valfrom < CURRENT timestamp AND en.valto > CURRENT timestamp	
+)
+
+SELECT DISTINCT 
+RTRIM(COALESCE(GAF.ATTRIBUTEVALUE,'DEPRECATED')),
+roottype,rootid,roottran,childtype,childid,childtran,childlevel,childclass,childpath,entity2type,entity2id,entity1type,entity1id,
+'DEPRECATED'
+FROM ChangeVEStruct root
+LEFT JOIN opicm.FLAG GAF ON
+    GAF.Enterprise = :Enterprise
+AND GAF.EntityType = root.roottype
+AND GAF.EntityID = root.rootid
+AND GAF.ATTRIBUTECODE = 'GENAREANAME'
+AND GAF.Valto < CURRENT timestamp AND CURRENT TIMESTAMP BETWEEN GAF.EffFrom AND GAF.EffTo
+ORDER BY roottype,rootid;
+// end sql tag
+
+// begin execute tag
+EXEC SQL OPEN sp_cursor;
+// end execute tag
+
+
+// Set the return status
+// GENERAL parm style
+*inoutReturnStatus = SP_OK;
+
+exit_sp:
+
+// Copy SQLCA back to caller (contains info that a cursor is open)
+// GENERAL parm style - do nothing
+
+return(0);
+
+}
+
+/*
+~DROP PROCEDURE opicm.GBL81841;
+~CREATE PROCEDURE opicm.GBL81841
+~(
+~  inout ReturnStatus int
+~, in Enterprise varchar(16)
+~, in StartDate varchar(26)
+~, in EndDate varchar(26)
+~)
+~RESULT SETS 1
+~EXTERNAL NAME 'GBL81841'
+~LANGUAGE C
+~PARAMETER STYLE GENERAL
+~FENCED;
+*/

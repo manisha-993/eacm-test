@@ -1,0 +1,576 @@
+#
+# TEMPLATE: MAKEFILE.TXT (2007-07-17-22.54.10.051000)
+#
+# Copyright (c) 2001, International Business Machines Corp., Ltd.
+# All Rights Reserved.
+# Licensed for use in connection with IBM business only.
+#
+# $Log: 81841_Make,v $
+# Revision 1.1  2011/05/05 11:25:58  wendy
+# src from IBMCHINA
+#
+# Revision 1.1  2007/11/26 08:41:02  yang
+# New SP for VEWWSEO1 -- WW Product
+#
+# Revision 1.42  2004/10/25 17:59:27  roger
+# Works better now
+#
+# Revision 1.41  2004/10/25 17:55:13  roger
+# Not working
+#
+# Revision 1.40  2004/10/25 17:50:43  roger
+# Probably best to leave this off
+#
+# Revision 1.39  2004/10/25 17:48:53  roger
+# Attempt to semi-automate threadsafe option
+#
+# Revision 1.38  2004/05/27 21:49:10  roger
+# rm *out *planout redundant
+#
+# Revision 1.37  2004/05/27 21:47:52  roger
+# Remove *out *planout on make dist
+#
+# Revision 1.36  2004/02/19 23:51:32  roger
+# Change permissions on group
+#
+# Revision 1.35  2003/11/13 23:31:02  roger
+# Gotta preserve spaces in Makefiles ...
+#
+# Revision 1.34  2003/11/13 21:52:48  dave
+# for sp compile
+#
+# Revision 1.33  2003/07/29 17:20:48  roger
+# In order to support SPs in both PDH+ODS, connect string must be this way.
+# All makes should be done in lower-case in order to command variable to be set as needed.
+# eg) make gbl2028 -or- make gbl9999, NOT make GBL9999
+#
+# Revision 1.32  2003/07/23 23:05:37  joan
+# *** empty log message ***
+#
+# Revision 1.31  2003/06/19 21:38:58  dave
+# changing the code tag for db login
+#
+# Revision 1.30  2003/06/03 19:41:14  roger
+# New form of Makefile
+#
+#
+
+PDH_FILES = \
+	GBL0001 \
+	GBL0002 \
+	GBL0003 \
+	GBL0006 \
+	GBL0009 \
+	GBL0010 \
+	GBL0014 \
+	GBL0019 \
+	GBL0021 \
+	GBL0023 \
+	GBL0024 \
+	GBL0025 \
+	GBL0027 \
+	GBL0028 \
+	GBL0031 \
+	GBL0032 \
+	GBL0033 \
+	GBL0076 \
+	GBL00A2 \
+	GBL00B2 \
+	GBL00C2 \
+	GBL00D2 \
+	GBL00E2 \
+	GBL01A0 \
+	GBL01A1 \
+	GBL01A4 \
+	GBL01B0 \
+	GBL01B1 \
+	GBL01B4 \
+	GBL01C0 \
+	GBL01C1 \
+	GBL01C4 \
+	GBL01D0 \
+	GBL01D1 \
+	GBL01D4 \
+	GBL01E0 \
+	GBL01E1 \
+	GBL01E4 \
+	GBL01F0 \
+	GBL0310 \
+	GBL0410 \
+	GBL0502 \
+	GBL0976 \
+	GBL0977 \
+	GBL0978 \
+	GBL0979 \
+	GBL0980 \
+	GBL0981 \
+	GBL0982 \
+	GBL0983 \
+	GBL0984 \
+	GBL0985 \
+	GBL0986 \
+	GBL0987 \
+	GBL0988 \
+	GBL0989 \
+	GBL1017 \
+	GBL1018 \
+	GBL1019 \
+	GBL1092 \
+	GBL1097 \
+	GBL10A2 \
+	GBL10B2 \
+	GBL10C2 \
+	GBL10D2 \
+	GBL10E2 \
+	GBL11A0 \
+	GBL11A1 \
+	GBL11A4 \
+	GBL11B0 \
+	GBL11B1 \
+	GBL11B4 \
+	GBL11C0 \
+	GBL11C1 \
+	GBL11C4 \
+	GBL11D0 \
+	GBL11D1 \
+	GBL11D4 \
+	GBL11E0 \
+	GBL11E1 \
+	GBL11E4 \
+	GBL2015 \
+	GBL2028 \
+	GBL2029 \
+	GBL2031 \
+	GBL2036 \
+	GBL2038 \
+	GBL2054 \
+	GBL2091 \
+	GBL2092 \
+	GBL2093 \
+	GBL2097 \
+	GBL2098 \
+	GBL2099 \
+	GBL2100 \
+	GBL2222 \
+	GBL2260 \
+	GBL2265 \
+	GBL2266 \
+	GBL2268 \
+	GBL2828 \
+	GBL2909 \
+	GBL2910 \
+	GBL2911 \
+	GBL2912 \
+	GBL2913 \
+	GBL2914 \
+	GBL2920 \
+	GBL2921 \
+	GBL2926 \
+	GBL2927 \
+	GBL2929 \
+	GBL2930 \
+	GBL2931 \
+	GBL2933 \
+	GBL2934 \
+	GBL2935 \
+	GBL2936 \
+	GBL2937 \
+	GBL2939 \
+	GBL2943 \
+	GBL2945 \
+	GBL2954 \
+	GBL2961 \
+	GBL2962 \
+	GBL2965 \
+	GBL2966 \
+	GBL2968 \
+	GBL2969 \
+	GBL2970 \
+	GBL2981 \
+	GBL2991 \
+	GBL2994 \
+	GBL2998 \
+	GBL3000 \
+	GBL3001 \
+	GBL3009 \
+	GBL3010 \
+	GBL3011 \
+	GBL3030 \
+	GBL3031 \
+	GBL3032 \
+	GBL3033 \
+	GBL3034 \
+	GBL3035 \
+	GBL3038 \
+	GBL3047 \
+	GBL3048 \
+	GBL3049 \
+	GBL3050 \
+	GBL3060 \
+	GBL3100 \
+	GBL4000 \
+	GBL4009 \
+	GBL4010 \
+	GBL4011 \
+	GBL4012 \
+	GBL4013 \
+	GBL4014 \
+	GBL4015 \
+	GBL4016 \
+	GBL4017 \
+	GBL4018 \
+	GBL4019 \
+	GBL4020 \
+	GBL4021 \
+	GBL4022 \
+	GBL4023 \
+	GBL4024 \
+	GBL4025 \
+	GBL4026 \
+	GBL4027 \
+	GBL4050 \
+	GBL4051 \
+	GBL5000 \
+	GBL5015 \
+	GBL5016 \
+	GBL5017 \
+	GBL5031 \
+	GBL5714 \
+	GBL6014 \
+	GBL6030 \
+	GBL6031 \
+	GBL6032 \
+	GBL6033 \
+	GBL7000 \
+	GBL7001 \
+	GBL7002 \
+	GBL7003 \
+	GBL7004 \
+	GBL7005 \
+	GBL7006 \
+	GBL7007 \
+	GBL7008 \
+	GBL7009 \
+	GBL7015 \
+	GBL7020 \
+	GBL7021 \
+	GBL7030 \
+	GBL7065 \
+	GBL7422 \
+	GBL7423 \
+	GBL7424 \
+	GBL7500 \
+	GBL7501 \
+	GBL7502 \
+	GBL7503 \
+	GBL7504 \
+	GBL7505 \
+	GBL7506 \
+	GBL7507 \
+	GBL7508 \
+	GBL7509 \
+	GBL7510 \
+	GBL7511 \
+	GBL7512 \
+	GBL7513 \
+	GBL7514 \
+	GBL7515 \
+	GBL7516 \
+	GBL7517 \
+	GBL7518 \
+	GBL7519 \
+	GBL7520 \
+	GBL7521 \
+	GBL7522 \
+	GBL7523 \
+	GBL7524 \
+	GBL7525 \
+	GBL7526 \
+	GBL7527 \
+	GBL7528 \
+	GBL7529 \
+	GBL7530 \
+	GBL7531 \
+	GBL7532 \
+	GBL7533 \
+	GBL7534 \
+	GBL7535 \
+	GBL7536 \
+	GBL7537 \
+	GBL7538 \
+	GBL7539 \
+	GBL7540 \
+	GBL7541 \
+	GBL7542 \
+	GBL7543 \
+	GBL7544 \
+	GBL7545 \
+	GBL7546 \
+	GBL7547 \
+	GBL7548 \
+	GBL7549 \
+	GBL7550 \
+	GBL7551 \
+	GBL7552 \
+	GBL7553 \
+	GBL7554 \
+	GBL7555 \
+	GBL7556 \
+	GBL7557 \
+	GBL7558 \
+	GBL7559 \
+	GBL7560 \
+	GBL7561 \
+	GBL7562 \
+	GBL7563 \
+	GBL7564 \
+	GBL7565 \
+	GBL7566 \
+	GBL7567 \
+	GBL7666 \
+	GBL7667 \
+	GBL7668 \
+	GBL7937 \
+	GBL7938 \
+	GBL7939 \
+	GBL7940 \
+	GBL8000 \
+	GBL8001 \
+	GBL8002 \
+	GBL8003 \
+	GBL8004 \
+	GBL8005 \
+	GBL8006 \
+	GBL8007 \
+	GBL8008 \
+	GBL8009 \
+	GBL8010 \
+	GBL8100 \
+	GBL8101 \
+	GBL8102 \
+	GBL8103 \
+	GBL8104 \
+	GBL8105 \
+	GBL8106 \
+	GBL8107 \
+	GBL8108 \
+	GBL8109 \
+	GBL8114 \
+	GBL8115 \
+	GBL8116 \
+	GBL8117 \
+	GBL8118 \
+	GBL8119 \
+	GBL8120 \
+	GBL8121 \
+	GBL8122 \
+	GBL8123 \
+	GBL8124 \
+	GBL8127 \
+	GBL8133 \
+	GBL8140 \
+	GBL8150 \
+	GBL8167 \
+	GBL8176 \
+	GBL8180 \
+	GBL8181 \
+	GBL8184 \
+	GBL8200 \
+	GBL8201 \
+	GBL8202 \
+	GBL8203 \
+	GBL8206 \
+	GBL8306 \
+	GBL8307 \
+	GBL8400 \
+	GBL8410 \
+	GBL8501 \
+	GBL8502 \
+	GBL8503 \
+	GBL8600 \
+	GBL8601 \
+	GBL8602 \
+	GBL8610 \
+	GBL8611 \
+	GBL8612 \
+	GBL8613 \
+	GBL8700 \
+	GBL8701 \
+	GBL8702 \
+	GBL8703 \
+	GBL8704 \
+	GBL8705 \
+	GBL8706 \
+	GBL8707 \
+	GBL8708 \
+	GBL8709 \
+	GBL8975 \
+	GBL8976 \
+	GBL8977 \
+	GBL8978 \
+	GBL8979 \
+	GBL8980 \
+	GBL8981 \
+	GBL8982 \
+	GBL7777 \
+	GBL8984 \
+	GBL8985 \
+	GBL8986 \
+	GBL8987 \
+	GBL8988 \
+	GBL8989 \
+	GBL8999 \
+	GBL9000 \
+	GBL9001 \
+	GBL9002 \
+	GBL9003 \
+	GBL9004 \
+	GBL9005 \
+	GBL9006 \
+	GBL9010 \
+	GBL9011 \
+	GBL9012 \
+	GBL9100 \
+	GBL9118 \
+	GBL9200 \
+	GBL9201 \
+	GBL9203 \
+	GBL9204 \
+	GBL9205 \
+	GBL9206 \
+	GBL9207 \
+	GBL9208 \
+	GBL9300 \
+	GBL9301 \
+	GBL9302 \
+	GBL9303 \
+	GBL9304 \
+	GBL9305 \
+	GBL9669 \
+	GBL9679 \
+	GBL9974 \
+	GBL9975 \
+	GBL9976 \
+	GBL9981 \
+	GBL9994 \
+	GBL9997 \
+	POPFINAL \
+    NEWTEST \
+	PSG0001 \
+	WHY2038 \
+	WHY2054 \
+	TEST001 \
+	GBL7777 \
+	GBL7778 \
+	GBL81840 \
+	GBL81841 \
+	list_pdh
+
+ODS_FILES = \
+	GBL9977 \
+	GBL9978 \
+	GBL9979 \
+	GBL9980 \
+	GBL9982 \
+	GBL9983 \
+	GBL9984 \
+	GBL9985 \
+	GBL9986 \
+	GBL9987 \
+	GBL9988 \
+	GBL9989 \
+	GBL9990 \
+	GBL9991 \
+	GBL9992 \
+	GBL9993 \
+	GBL9995 \
+	GBL9996 \
+	GBL9998 \
+	GBL9999 \
+	list_ods
+
+SPSOURCE="./"
+DB2VER=`db2level|grep token|cut -d" " -f7|cut -c1-2`
+threadsafe="$(threadsafe_off)"
+threadsafe_on="THREADSAFE"
+threadsafe_off=""
+
+PDH_DBASE="opicmpdh"
+PDH_USER="opicmadm"
+PDH_PASSWD="cat9tail"
+PDH_INSTALLDIR="/home/opicmdb2/sqllib/"
+
+ODS_DBASE="opicmods"
+ODS_USER="opicmadm"
+ODS_PASSWD="cat9tail"
+ODS_INSTALLDIR="/home/opicmdb2/sqllib/"
+
+all:: pdh ods
+
+pdh:
+	${MAKE} $(PDH_FILES) "BASE=${PDH_DBASE}" "USER=${PDH_USER}" "PASSWD=${PDH_PASSWD}" "INSTALLDIR=${PDH_INSTALLDIR}"
+
+ods:
+	${MAKE} $(ODS_FILES) "BASE=${ODS_DBASE}" "USER=${ODS_USER}" "PASSWD=${ODS_PASSWD}" "INSTALLDIR=${ODS_INSTALLDIR}"
+
+list_pdh:
+	-ls -al ${INSTALLDIR}function
+
+list_ods:
+	-ls -al ${INSTALLDIR}function
+
+dist::
+	-chmod 750 *
+	-rm sp.tar sp.tar.gz sp.tar.Z *out
+	-tar -cvf sp.tar *
+	-compress sp.tar
+
+clean:
+	-echo "clean up"
+
+.SUFFIXES: .sqC
+
+.sqC:
+	# start the process
+	-date
+	# clean up from last run
+	-rm -f $(SPSOURCE)$*.bnd
+	-rm -f $(SPSOURCE)$*.o
+	-rm -f $(SPSOURCE)$*.C
+	# prep and bind the SQL
+	-db2 CONNECT TO ${BASE} USER ${USER} USING ${PASSWD};
+	-db2 PREP $(SPSOURCE)$*.sqC BINDFILE DATETIME ISO QUERYOPT 5 DEGREE ANY SQLWARN NO;
+	-db2 BIND $(SPSOURCE)$*.bnd DATETIME ISO BLOCKING ALL ISOLATION UR QUERYOPT 5 SQLWARN NO;
+	-db2 TERMINATE;
+	# compile the C file
+	if \
+	/usr/vacpp/bin/cc -c $*.C -I${INSTALLDIR}include -o $*.o ; \
+	then \
+		echo "compile OK for "$* >>compile.out ; \
+	else \
+		echo "compile FAILED for "$* >>compile.out ; \
+	fi
+	# make a shared library
+	-/usr/vacpp/bin/cc -qmkshrobj -e$* -o $* $*.o -L$(INSTALLDIR)lib -ldb2
+	# chmod on the library and move it to the function directory
+	-rm -f $(INSTALLDIR)function/$*
+	-chmod 775 $*
+	-mv $(SPSOURCE)$* $(INSTALLDIR)function/$*
+	# register the stored proc
+	-grep "~" $*.sqC|cut -d"~" -f2|sed "s/FENCED/FENCED $(threadsafe)/" >$(SPSOURCE)reg.$$
+	-cat reg.$$
+	-db2batch -d ${BASE} -a ${USER}/${PASSWD} -f $(SPSOURCE)reg.$$
+	-rm $(SPSOURCE)reg.$$
+	# clean up the mess
+	-rm -f $(SPSOURCE)$*.bnd
+	-rm -f $(SPSOURCE)$*.o
+	-rm -f $(SPSOURCE)$*.C
+	# finish the process
+	-date
+
+
+gbl81841:
+	${MAKE} GBL81841 BASE=${PDH_DBASE} USER=${PDH_USER} PASSWD=${PDH_PASSWD} INSTALLDIR=${PDH_INSTALLDIR}
+gbl81840:
+	${MAKE} GBL81840 BASE=${PDH_DBASE} USER=${PDH_USER} PASSWD=${PDH_PASSWD} INSTALLDIR=${PDH_INSTALLDIR}
+
