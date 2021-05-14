@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="eacmsrc"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/middleware"/>
+	<classpathentry kind="lib" path="jars/jspell2n_java2.jar"/>
+	<classpathentry kind="lib" path="jars/jspell2s_java2.jar"/>
+	<classpathentry kind="lib" path="jars/poi-3.0.1-FINAL-20070705.jar"/>
+	<classpathentry kind="lib" path="jars/xerces.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

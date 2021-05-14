@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="jar-eaServer" name="JUI">
+	<property name="middleware.location" value="../middleware" />
+
+	<property name="opicm.include" value="com\ibm\transform\oim\eacm\xml\editor\*.class 
+		com\ibm\eacm\actions\*.class
+		com\ibm\eacm\nav\*.class
+		com\ibm\eacm\tree\*.class
+		com\ibm\eacm\mtrx\*.class
+		com\ibm\eacm\wused\*.class
+		com\ibm\eacm\edit\*.class
+		com\ibm\eacm\preference\*.class
+		com\ibm\eacm\table\*.class
+		com\ibm\eacm\toolbar\*.class
+		com\ibm\eacm\tabs\*.class
+		com\ibm\eacm\mw\*.class
+		com\ibm\eacm\cart\*.class
+		com\ibm\eacm\ui\*.class
+		com\ibm\eacm\rend\*.class
+		com\ibm\eacm\editor\*.class
+		com\ibm\eacm\objects\*.class
+		com\ibm\eacm\navform\*.class
+		com\ibm\eacm\edit\form\*.class
+		com\ibm\eacm\edit\formgen\*.class
+	
+		com\ibm\eacm\*.class
+		*.dtd
+		*.ent
+		*.properties
+		
+		resources/*
+
+		images/*.gif
+		images/*.jpg
+		images/*.png"
+	/>
+
+	<property name="eaServer.include" value="com\ibm\eannounce\eserver\Deployer*.class 
+		com\ibm\eannounce\eserver\Updater*.class 
+		com\ibm\eannounce\eserver\UpdateStatus*.class 
+		com\ibm\eannounce\eserver\JarResources*.class 
+		com\ibm\eannounce\eserver\JarClassLoader*.class 
+		com\ibm\eacm\objects\EACMGlobals.class" />
+
+	<!-- The following classpath is not currently used. It is left here in case the
+	code compile is done using this script in the future.-->
+	<path id="JUI.classpath">
+		<pathelement location="jars/jspell2n_java2.jar" />
+		<pathelement location="jars/jspell2s_java2.jar" />
+		<pathelement location="jars/xerces.jar" />
+		<pathelement location="bin" />
+		<pathelement location="jars/poi-3.0.1-FINAL-20070705.jar" />
+		<pathelement location="jars/jOpenDocument-1.3.jar" />
+		<pathelement location="${middleware.location}/source/jsse.jar" />
+		<path refid="middleware.classpath" />
+	</path>
+
+	<target name="init">
+		<tstamp>
+			<!-- Use Eastern Standard Time in jar Manifest -->
+			<format property="jar.date" pattern="EEE MM/dd/yyyy" timezone="America/New_York" />
+		</tstamp>
+		<tstamp>
+			<format property="jar.time" pattern="hh:mm:ss.SS" timezone="America/New_York" />
+		</tstamp>
+
+		<tstamp>
+			<!-- Use local System time in message -->
+			<format property="start.ts" pattern="EEE MM/dd/yyyy hh:mm:ss.SS" />
+		</tstamp>
+		<echo message="Init: ${start.ts}" />
+		<echo message="Ant JVM version: ${ant.java.version}" />
+	</target>
+
+	<target name="clean-version" depends="init">
+		<delete file="bin/jar/version.jar" />
+	</target>
+	<target name="clean-eacm" depends="init">
+		<delete file="bin/jar/EACM.jar" />
+	</target>
+	<target name="clean-eaServer" depends="init">
+		<delete file="bin/jar/eaServer.jar" />
+	</target>
+
+	<target name="build" depends="init">
+		<!-- Build is done by the IDE -->
+		<echo message="Build previously done by the IDE" />
+	</target>
+
+	<target name="jar-version" depends="build,clean-version,init">
+		<mkdir dir="bin/jar" />
+		<jar destfile="bin/jar/version.jar" basedir="bin" includes="com/ibm/eannounce/version/Version.class">
+			<manifest>
+				<section name="Build Information">
+					<attribute name="Built-By" value="${user.name}" />
+					<attribute name="Build-Version" value="Built on ${jar.date} at ${jar.time}" />
+					<attribute name="Build-Date" value="${jar.date}${jar.time}" />
+					<attribute name="Version-Timezone" value="Eastern Standard Time: America/New_York" />
+				</section>
+			</manifest>
+		</jar>
+		<tstamp>
+			<!-- Use local System time in message -->
+			<format property="vFinish.timestamp" pattern="EEE MM/dd/yyyy HH:mm:ss.SS" />
+		</tstamp>
+		<echo message="jar-version finished: ${vFinish.timestamp}" />
+	</target>
+
+	<target name="jar-eacm" depends="jar-version,build,clean-eacm,init">
+		<mkdir dir="bin/jar" />
+		<echo message="includes = ${opicm.include}" />
+		<jar destfile="bin/jar/EACM.jar" basedir="bin" includes="${opicm.include}">
+			<manifest>
+				<section name="Build Information">
+					<attribute name="Built-By" value="${user.name}" />
+					<attribute name="Build-Version" value="Built on ${jar.date} at ${jar.time}" />
+					<attribute name="Build-Date" value="${jar.date}${jar.time}" />
+					<attribute name="Version-Timezone" value="Eastern Standard Time: America/New_York" />
+				</section>
+			</manifest>
+			<fileset dir="eacmsrc" includes="com/**/*html"/>
+		</jar>
+		<tstamp>
+			<!-- Use local System time in message -->
+			<format property="oFinish.timestamp" pattern="EEE MM/dd/yyyy HH:mm:ss.SS" />
+		</tstamp>
+		<echo message="jar-eacm finished: ${oFinish.timestamp}" />
+	</target>
+
+	<target name="jar-eaServer" depends="jar-eacm,jar-version,build,clean-eaServer">
+		<mkdir dir="bin/jar" />
+		<echo message="includes = ${eaServer.include}" />
+		<jar destfile="bin/jar/eaServer.jar" basedir="bin" includes="${eaServer.include}">
+			<manifest>
+				<section name="Build Information">
+					<attribute name="Built-By" value="${user.name}" />
+					<attribute name="Build-Version" value="Built on ${jar.date} at ${jar.time}" />
+					<attribute name="Build-Date" value="${jar.date}${jar.time}" />
+					<attribute name="Version-Timezone" value="Eastern Standard Time: America/New_York" />
+				</section>
+			</manifest>
+		</jar>
+		<tstamp>
+			<!-- Use local System time in message -->
+			<format property="eFinish.timestamp" pattern="EEE MM/dd/yyyy HH:mm:ss.SS" />
+		</tstamp>
+		<echo message="jar-eaServer finished: ${eFinish.timestamp}" />
+	</target>
+</project>
