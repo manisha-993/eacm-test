@@ -186,7 +186,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 		FILTER_TBL.put("REFOFERFEAT",new String[]{"STATUS","COUNTRYLIST","ENDOFSVC"});
 		//new add REFOFER and REFOFERFEAT end
 		
-		
+		FILTER_TBL.put("SWSPRODSTRUCT", new String[]{"STATUS"});
 	}
 	private static final String XMLSTATUS = "XMLSTATUS";
 	

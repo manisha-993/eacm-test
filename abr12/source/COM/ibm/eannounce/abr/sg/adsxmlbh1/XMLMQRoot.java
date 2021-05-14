@@ -418,10 +418,10 @@ public abstract class XMLMQRoot extends XMLMQAdapter
 				hshMap.putAll(hshMapT2B);
 				hshMapT2B.clear();
 			}
-//			if (vename.equals("ADSSWPRODSTRUCT")){
-//				hshMap.put("0SWFEATUREU","Hi");
-//				hshMap.put("0MODELD","Hi");
-//			}
+			if (vename.equals("ADSSWSPRODSTRUCT")){
+				hshMap.put("0SWSFEATUREU","Hi");
+				hshMap.put("0SVCMODD","Hi");
+			}
 			// group all changes by entitytype, except for root entity
 			Hashtable diffTbl = new Hashtable();
 			Hashtable diffTb2 = new Hashtable();

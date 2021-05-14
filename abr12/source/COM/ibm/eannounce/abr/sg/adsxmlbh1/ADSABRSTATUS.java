@@ -642,7 +642,8 @@ public class ADSABRSTATUS extends PokBaseABR
         //add for REFOFER and REFOFERFEAT
         ABR_TBL.put("REFOFER", "COM.ibm.eannounce.abr.sg.adsxmlbh1.ADSREFOFERABR");
         ABR_TBL.put("REFOFERFEAT", "COM.ibm.eannounce.abr.sg.adsxmlbh1.ADSREFOFERFEATABR");
-
+        
+        ABR_TBL.put("SWSPRODSTRUCT", "COM.ibm.eannounce.abr.sg.adsxmlbh1.ADSSWSPRODSTRUCTABR");
 //      ABR_TBL.put("DELFEATURE", "COM.ibm.eannounce.abr.sg.ADSDELFEATUREABR");
 //      ABR_TBL.put("DELFCTRANSACTION", "COM.ibm.eannounce.abr.sg.ADSDELFCTRANSABR");
 //      ABR_TBL.put("DELMODEL", "COM.ibm.eannounce.abr.sg.ADSDELMODELABR");
@@ -679,6 +680,7 @@ public class ADSABRSTATUS extends PokBaseABR
         ADSTYPES_TBL.put("150","SVCMOD");
         ADSTYPES_TBL.put("160","WARR");
         ADSTYPES_TBL.put("170","REVUNBUNDCOMP");
+        ADSTYPES_TBL.put("180","SWSPRODSTRUCT");
         ADSTYPES_TBL.put("20","GENERALAREA");
         ADSTYPES_TBL.put("30","FEATURE");
         //remove xlate and wwcompat, use XMLCOMPATSETUP XMLXLATESETUP to process it
@@ -729,6 +731,7 @@ public class ADSABRSTATUS extends PokBaseABR
         ABR_ATTR_TBL.put("MODEL", "MODELABRSTATUS");
         ABR_ATTR_TBL.put("PRODSTRUCT", "PRODSTRUCTABRSTATUS");
         ABR_ATTR_TBL.put("SWPRODSTRUCT", "SWPRODSTRUCTABRSTATUS");
+        ABR_ATTR_TBL.put("SWSPRODSTRUCT", "SWSPRODSTRUCTABRSTATUS");
     }
     
     static {
