@@ -1,0 +1,111 @@
+<!-- 
+$Log: build.xml,v $
+Revision 1.11  2015/02/10 12:05:46  stimpsow
+update mailto address
+
+Revision 1.10  2015/02/06 13:34:27  stimpsow
+restore mail
+
+Revision 1.9  2015/02/06 13:04:56  stimpsow
+test ant copy
+
+Revision 1.8  2014/12/16 18:25:09  stimpsow
+remove ftp
+
+Revision 1.7  2014/12/16 18:18:28  stimpsow
+change to eacmbhdev
+
+Revision 1.6  2013/02/07 18:23:16  wendy
+change mw location
+
+Revision 1.5  2013/02/07 18:18:29  wendy
+change drop server
+
+Revision 1.4  2009/06/25 21:06:06  wendy
+removed mark
+
+Revision 1.3  2007/10/17 11:59:04  wendy
+changed mike to mark
+
+Revision 1.2  2006/01/26 21:13:06  wendy
+Added 3b to jar that contains all components
+
+Revision 1.1  2006/01/24 19:26:39  wendy
+Init for AHE
+
+-->
+<project name="mktInfo" default="compile" basedir=".">
+  <property file="cvsid" />
+  <property name="mw30.jar" value="/home/opicmadm/middleware/middleware.jar" />
+  <property name="mail.jar" value=".." />
+  <target name="update" >
+    <cvs command="update -d" 
+         cvsRoot=":pserver:${cvs.id}@eacmbhdev.lexington.ibm.com:/home/software/development" 
+         failonerror="true">
+    </cvs>
+  </target>
+  <target name="compile" depends="clean,update">
+      <javac srcdir="com\ibm\transform\oim\eacm\isgfm" includes="**/*.java" debug="on" debuglevel="lines,vars,source">
+      <classpath>
+        <pathelement location="${mw30.jar}"/>
+        <pathelement location="${mail.jar}"/>
+      </classpath>
+    </javac>
+  </target>
+  <target name="jar" depends="compile">
+    <delete file="../fmchglogAhe/oim_fmchglog.jar" />
+    <jar destfile="../fmchglogAhe/oim_fmchglog.jar">
+      <fileset dir=".">
+        <include name="com/**/*.class"/>
+      </fileset>
+    </jar>
+  </target>
+  <target name="jar2" depends="jar">
+    <delete file="../fmchglogAhe/fmchglog3b.jar" />
+    <jar destfile="../fmchglogAhe/fmchglog3b.jar">
+      <fileset dir=".">
+        <include name="oim_fmchglog.jar"/>
+        <include name="runfmlog-aix"/>
+        <include name="FMChgLog.properties"/>
+      </fileset>
+    </jar>
+  </target>  
+  <target name="copyjar" depends="jar2">
+  	<copy file="fmchglog3b.jar" todir="/eacmsw/FMChgLog_drop"/>
+  </target>
+	  <!-- target name="ftp" depends="jar2">
+	    <ftp server="eacmbhdev.lexington.ibm.com"
+	       remotedir="/eacmsw/FMChgLog_drop"
+	       userid="opicmadm"
+	       password="mice8chs"
+	       binary="yes"
+	    >
+	      <fileset dir=".">
+	        <include name="fmchglog3b.jar"/>
+	      </fileset>
+	    </ftp>
+	  </target -->
+  <target name="clean">
+    <delete>
+      <fileset dir="com" includes="**/*.class"/>
+    </delete>
+  </target>
+  <target name="e-mail" depends="copyjar">
+      <echo file="MailBody.txt">All,
+
+A new version of fmchglog3b.jar for OIM3.0b has been placed in the /eacmsw/FMChgLog_drop directory.
+If you wish to be removed or add someone to this automated notification e-mail jilichao@cn.ibm.com.
+
+</echo>
+    <mail 
+      mailhost="relay.us.ibm.com" 
+      subject="fmchglog3b.jar built"
+      messagefile="MailBody.txt"
+    >
+      <from address="jilichao@cn.ibm.com"/>
+      <to address="jilichao@cn.ibm.com"/>
+      <to address="bedore@us.ibm.com"/>
+      <to address="v2ueh21@us.ibm.com"/>
+    </mail>
+  </target>
+</project>

@@ -1,0 +1,86 @@
+<!-- 
+$Log: build.xml,v $
+Revision 1.3  2006/01/23 21:21:11  wendy
+New middleware location
+
+Revision 1.2  2004/10/18 18:49:29  wendy
+Change msg
+
+Revision 1.1  2004/10/18 18:04:20  wendy
+Init for FM Chg Log application
+
+-->
+<project name="mktInfo" default="compile" basedir=".">
+  <property file="cvsid" />
+  <property name="mw12.jar" value="/usr/WebSphere/AppServer/installedApps/pokxea6/eacm.ear/bui.war/WEB-INF/lib/middleware.jar" />
+  <property name="mail.jar" value=".." />
+  <target name="update" >
+    <cvs command="update -d" 
+         cvsRoot=":pserver:${cvs.id}@pokxea6.pok.ibm.com:/home/software/development" 
+         failonerror="true">
+    </cvs>
+  </target>
+  <target name="compile" depends="clean,update">
+      <javac srcdir="com\ibm\oim30\isgfm" includes="**/*.java" debug="on" debuglevel="lines,vars,source">
+      <classpath>
+        <pathelement location="${mw12.jar}"/>
+        <pathelement location="${mail.jar}"/>
+      </classpath>
+    </javac>
+  </target>
+  <target name="jar" depends="compile">
+    <delete file="../fmchglog/oim_fmchglog.jar" />
+    <jar destfile="../fmchglog/oim_fmchglog.jar">
+      <fileset dir=".">
+        <include name="com/**/*.class"/>
+      </fileset>
+    </jar>
+  </target>
+  <target name="jar2" depends="jar">
+    <delete file="../fmchglog/fmchglog.jar" />
+    <jar destfile="../fmchglog/fmchglog.jar">
+      <fileset dir=".">
+        <include name="oim_fmchglog.jar"/>
+        <include name="runfmlog-aix"/>
+        <include name="FMChgLog.properties"/>
+      </fileset>
+    </jar>
+  </target>  
+  <target name="ftp" depends="jar2">
+    <ftp server="pokxea8.pok.ibm.com"
+       remotedir="/home/opicmadm/FMChgLog_drop"
+       userid="opicmadm"
+       password="cat9tail"
+       binary="yes"
+    >
+      <fileset dir=".">
+        <include name="fmchglog.jar"/>
+      </fileset>
+    </ftp>
+  </target>
+  <target name="clean">
+    <delete>
+      <fileset dir="com" includes="**/*.class"/>
+    </delete>
+  </target>
+  <target name="e-mail" depends="ftp">
+      <echo file="MailBody.txt">All,
+
+A new version of fmchglog.jar for OIM3.0a has been placed
+on pokxea8 in the /home/opicmadm/FMChgLog_drop directory.
+If you wish to be removed or add someone to this automated notification e-mail stimpsow@us.ibm.com.
+
+</echo>
+    <mail 
+      mailhost="relay.us.ibm.com" 
+      subject="fmchglog.jar built"
+      messagefile="MailBody.txt"
+    >
+      <from address="stimpsow@us.ibm.com"/>
+      <to address="stimpsow@us.ibm.com"/>
+      <to address="bedore@us.ibm.com"/>
+      <to address="marmstro@us.ibm.com"/>
+      <to address="v2ueh21@us.ibm.com"/>
+    </mail>
+  </target>
+</project>
