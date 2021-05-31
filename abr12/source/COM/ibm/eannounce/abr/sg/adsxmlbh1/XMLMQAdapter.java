@@ -153,13 +153,13 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 		FILTER_TBL = new Hashtable();
 		
         //they must be in ATTRCODE format 
-		FILTER_TBL.put("FEATURE", new String[]{"STATUS","FCTYPE","COUNTRYLIST","PDHDOMAIN"});
-		FILTER_TBL.put("MODEL", new String[]{"STATUS","SPECBID","COFCAT","COFSUBCAT","COFGRP","COFSUBGRP","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","DIVTEXT"});
+		FILTER_TBL.put("FEATURE", new String[]{"STATUS","FCTYPE","COUNTRYLIST","PDHDOMAIN","OLDINDC"});
+		FILTER_TBL.put("MODEL", new String[]{"STATUS","SPECBID","COFCAT","COFSUBCAT","COFGRP","COFSUBGRP","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","DIVTEXT","OLDINDC"});
 		FILTER_TBL.put("SVCMOD", new String[]{"STATUS","SVCMODCATG","SVCMODGRP","SVCMODSUBCATG","SVCMODSUBGRP","COUNTRYLIST","PDHDOMAIN","DIVTEXT"});
 		FILTER_TBL.put("LSEOBUNDLE", new String[]{"STATUS","SPECBID","BUNDLETYPE","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","DIVTEXT"});
 		FILTER_TBL.put("LSEO", new String[]{"STATUS","SPECBID","COFCAT","COFSUBCAT","COFGRP","COFSUBGRP","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","DIVTEXT"});
 		
-		FILTER_TBL.put("PRODSTRUCT",   new String[]{"STATUS","FCTYPE","MACHTYPEATR","MODELATR","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN"});
+		FILTER_TBL.put("PRODSTRUCT",   new String[]{"STATUS","FCTYPE","MACHTYPEATR","MODELATR","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","OLDINDC"});
 		FILTER_TBL.put("SWPRODSTRUCT", new String[]{"STATUS","FCTYPE","MACHTYPEATR","MODELATR","COUNTRYLIST","PDHDOMAIN"});
 		//MACHTYPEATR used for TOMACHTYPE T, WTHDRWEFFCTVDATE will be on the MODEL
 		FILTER_TBL.put("MODELCONVERT",  new String[]{"STATUS","MACHTYPEATR","MODELATR","COUNTRYLIST","PDHDOMAIN"});
@@ -500,6 +500,9 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 				if(rootEntityType.equals("REFOFER")){
 					attrvalue = convertValue(PokUtils.getAttributeValue(rootItem, attrcode, "", null, false));
 				}			
+				rootTable.put(attrcode, attrvalue);				
+			}else if(attrcode.equals("OLDINDC")){
+				attrvalue = convertValue(PokUtils.getAttributeValue(rootItem, attrcode, "", null, false));	
 				rootTable.put(attrcode, attrvalue);				
 			}
 		} 
