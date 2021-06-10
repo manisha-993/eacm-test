@@ -695,8 +695,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
     			attrvalue = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,attrcode));
     			if(attrcode.length()>0)
     			filterTable.put(attrcode, attrvalue);
-    		}
-    			else{    			
+    		}else{    			
     			attrvalue = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,attrcode));
     			filterTable.put(attrcode, attrvalue);
     		}
@@ -1127,6 +1126,8 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 		if(rootItemAttributeValue==null) rootItemAttributeValue="";
 		//for  If MODEL, MODELCONVERT, SVCMOD, SWPRODSTRUCT 
 		//do not have an AVAIL of this type, then assume "World Wide" and hence this data is NOT filtered out
+		
+				
 		if(rootItemAttributeValue.equals(CHEAT)) return true;
 		if(EXTXMLFEEDItemAttributeValue!=null && !"".equals(EXTXMLFEEDItemAttributeValue)){
 			if("ENDOFSVC".equals(attrcode)){
@@ -1172,6 +1173,21 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 			
 		}else{
 			isvaild = true;
+		}
+		if("OLDINDC".equals(attrcode)) {
+			if (EXTXMLFEEDItemAttributeValue != null && !"".equals(EXTXMLFEEDItemAttributeValue.trim())) {
+				if("".equals(rootItemAttributeValue)) {
+					return true;
+				}else if(EXTXMLFEEDItemAttributeValue.equals(rootItemAttributeValue)){
+					isvaild = true;
+				}else{
+					isvaild = false;
+				}
+			}else {
+				if("Y".equals(rootItemAttributeValue)) {
+					isvaild = false;
+				}
+				}		
 		}
 		
 		return isvaild;
