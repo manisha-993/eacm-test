@@ -4088,7 +4088,7 @@ ADSATTRIBUTE    40  WARRTYPE
     	addDebug("get XMLCACHEDTS: " + t2);
     	EntityItem rootEntity  = listT2.getParentEntityGroup().getEntityItem(0);
     	String entityType = rootEntity.getEntityType();
-    	String OLDINDC = PokUtils.getAttributeValue(rootEntity, "OLDINDC", "", null, false);
+    	String OLDINDC = PokUtils.getAttributeFlagValue(rootEntity, "OLDINDC");
     	
     	int entityID = rootEntity.getEntityID();
     	PreparedStatement ps = null;
