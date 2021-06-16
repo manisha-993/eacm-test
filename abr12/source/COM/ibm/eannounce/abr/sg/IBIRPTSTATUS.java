@@ -82,7 +82,8 @@ public class IBIRPTSTATUS extends PokBaseABR {
 		COLUMN_LENGTH.put(STATUS, "20");
 	}
 	// m_elist.getParentEntityGroup().getEntityItem(0)
-	private final static String QUERY = "select m.machtypeatr,m.modelatr,m.mktgname,m.install,m.cofcat,m.cofsubcat,m.cofsubgrp,m.anndate,m.withdrawdate,m.WTHDRWEFFCTVDATE,S.div,m.status from price.model m join price.SGMNTACRNYM S on m.PRFTCTR=S.PRFTCTR where m.nlsid=1  and m.cofcat='Hardware' and m.status in ('Final','Ready for Review') and s.nlsid=1 and S.DIV<>'71 Retail Store Systems' and m.INSTALL='CE' with ur";
+	private final static String QUERY = "select m.machtypeatr,m.modelatr,m.mktgname,m.install,m.cofcat,m.cofsubcat,m.cofsubgrp,m.anndate,m.withdrawdate,m.WTHDRWEFFCTVDATE,S.div,m.status from price.model m join price.SGMNTACRNYM S on m.PRFTCTR=S.PRFTCTR where m.nlsid=1  and m.cofcat='Hardware' and m.status in ('Final','Ready for Review') and s.nlsid=1 and "
+			+ " S.DIV not in ('71','20','2P','2N','30','36 IBM eBusiness Hosting Services','46','8F','C3','G2','J6','K6 - IBM Services for Managed Applications','M3','MW','Q9')  and m.isactive=1 and m.INSTALL='CE' with ur";
 
 	private void setFileName() throws IOException {
 		// FILE_PREFIX=EACM_TO_QSM_
