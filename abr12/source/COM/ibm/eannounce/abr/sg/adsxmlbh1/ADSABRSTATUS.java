@@ -4329,6 +4329,9 @@ ADSATTRIBUTE    40  WARRTYPE
 		if (pdhdomain==null){
 			pdhdomain = "";
 		}
+		if (OLDINDC==null){
+			OLDINDC = "";
+		}
 		status = curStatusvalue;
 	
 		if (status == null){
