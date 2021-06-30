@@ -239,7 +239,7 @@ public class XMLGroupElem extends XMLElem
 						" No entities found for "+etype+NEWLINE);
 					return;
 				}
-
+				//String domain = PokUtils.getAttributeFlagValue(ei, "PDHDOMAIN");
 				// use this entity for children elements
 				for(int i=0; i<entityVct.size(); i++){
 					// it may exist at current or prior time or both
