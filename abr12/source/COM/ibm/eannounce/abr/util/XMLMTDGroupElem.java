@@ -88,7 +88,7 @@ public class XMLMTDGroupElem extends XMLElem
     private String etype =null;
     private boolean isMultUse= false;
     private int ilevel=0;
-    String domian = null;
+    private String domian = null;
     /**********************************************************************************
      * Constructor - used when element is part of a group with child elements that are
      * attributes for the entity or structure based on the entity
@@ -120,24 +120,25 @@ public class XMLMTDGroupElem extends XMLElem
     public String getDomain (DiffEntity diffitem){
     	
 
-    	if(domian==null){
+    	
     		EntityItem theitem = diffitem.getCurrentEntityItem();				
     		if (diffitem.isDeleted()) {
     			theitem = diffitem.getPriorEntityItem();
+    	
     		}
     		domian = getDomain(theitem);
-    	}
+    	
     	return domian;
+    	
     }
     public String getDomain (EntityItem entityItem){
-    	if(domian==null){		
     		domian = PokUtils.getAttributeFlagValue(entityItem, "PDHDOMAIN");
-    	}
     	return domian;
     }
 
     public boolean compareDonmain (EntityItem entityItem){
-    	
+    	D.ebug(D.EBUG_ERR,"P domain:"+domian);
+    	D.ebug(D.EBUG_ERR,"C domain:"+PokUtils.getAttributeFlagValue(entityItem, "PDHDOMAIN"));
     	return domian.equals(PokUtils.getAttributeFlagValue(entityItem, "PDHDOMAIN"));
     }
  public boolean compareDonmain (DiffEntity diffitem){
@@ -145,6 +146,8 @@ public class XMLMTDGroupElem extends XMLElem
 		if (diffitem.isDeleted()) {
 			theitem = diffitem.getPriorEntityItem();
 		}
+		D.ebug(D.EBUG_ERR,"P domain:"+domian);
+    	D.ebug(D.EBUG_ERR,"C domain:"+PokUtils.getAttributeFlagValue(theitem, "PDHDOMAIN"));
     	return domian.equals(PokUtils.getAttributeFlagValue(theitem, "PDHDOMAIN"));
     }
     /**********************************************************************************
@@ -318,13 +321,14 @@ public class XMLMTDGroupElem extends XMLElem
 				for(int i=0; i<entityVct.size(); i++){
 					// it may exist at current or prior time or both
 					DiffEntity de = (DiffEntity)entityVct.elementAt(i);
-
+					
 					// add any children to the parent, not this node
-					if(compareDonmain(de)){
+					/*if(compareDonmain(de)){*/
 					for (int c=0; c<childVct.size(); c++){
 						XMLElem childElem = (XMLElem)childVct.elementAt(c);
 						childElem.addElements(dbCurrent,table, document,parent,de,debugSb);
-					}}
+					/*}*/
+						}
 				}
 				entityVct.clear();
 			} // nodename is null
@@ -365,6 +369,7 @@ public class XMLMTDGroupElem extends XMLElem
 			egrp = list.getEntityGroup(etype);
 		}
 		domian = getDomain(parentItem);
+		D.ebug(D.EBUG_ERR,"P domain:"+domian);
 		if (egrp==null){
 			Element elem = (Element) document.createElement(nodeName);
 			addXMLAttrs(elem);
@@ -423,6 +428,7 @@ public class XMLMTDGroupElem extends XMLElem
 									//keep looking
 									tmp.add(entity);
 								}else{
+									if(compareDonmain(entity))
 									overrideVct.add(entity);
 								}
 							}
@@ -502,8 +508,8 @@ public class XMLMTDGroupElem extends XMLElem
 				for(int i=0; i<entityVct.size(); i++){
 					EntityItem item = (EntityItem)entityVct.elementAt(i);
 
-					if(!compareDonmain(item))
-						continue;
+					/*if(!compareDonmain(item))
+						continue;*/
 					// add any children to the parent, not this node
 					for (int c=0; c<childVct.size(); c++){
 						XMLElem childElem = (XMLElem)childVct.elementAt(c);
@@ -726,4 +732,30 @@ public class XMLMTDGroupElem extends XMLElem
 
 		return vct;
 	}
+     protected Vector getEntities(EntityGroup egrp)
+     {
+         Vector vct = new Vector();
+         if(egrp!=null){  // should not be the case if extract is properly defined
+             for(int i=0; i<egrp.getEntityItemCount(); i++){
+            	 if(domian!=null&&!compareDonmain(egrp.getEntityItem(i)))
+            		 continue;
+                 vct.addElement(egrp.getEntityItem(i));
+             }
+         }
+         return vct;
+     }
+     
+     protected Vector getEntities(Vector vct)
+     
+     {
+    	 Vector v = new Vector();
+    	 for (int j = 0; j < vct.size(); j++) {
+    		 if(domian!=null&&!compareDonmain((EntityItem)vct.get(j)))
+    			 continue;
+    		 v.add(vct.get(j));
+		}
+    	 
+    	
+         return v;
+     }
 }
