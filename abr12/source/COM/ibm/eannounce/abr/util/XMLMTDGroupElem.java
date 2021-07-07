@@ -141,6 +141,7 @@ public class XMLMTDGroupElem extends XMLElem
     	D.ebug(D.EBUG_ERR,"C domain:"+PokUtils.getAttributeFlagValue(entityItem, "PDHDOMAIN"));
     	return domian.equals(PokUtils.getAttributeFlagValue(entityItem, "PDHDOMAIN"));
     }
+    
  public boolean compareDonmain (DiffEntity diffitem){
 	 EntityItem theitem = diffitem.getCurrentEntityItem();				
 		if (diffitem.isDeleted()) {
@@ -750,8 +751,15 @@ public class XMLMTDGroupElem extends XMLElem
      {
     	 Vector v = new Vector();
     	 for (int j = 0; j < vct.size(); j++) {
+    		 Object o = vct.get(j);
+    		 if(o instanceof EntityItem){
     		 if(domian!=null&&!compareDonmain((EntityItem)vct.get(j)))
     			 continue;
+    		 }
+    		 if(o instanceof DiffEntity){
+    			 if(domian!=null&&!compareDonmain((DiffEntity)vct.get(j)))
+        			 continue;
+        		 }
     		 v.add(vct.get(j));
 		}
     	 
