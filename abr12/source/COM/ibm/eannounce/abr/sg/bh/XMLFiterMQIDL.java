@@ -323,8 +323,6 @@ public class XMLFiterMQIDL {
 			String isold = PokUtils.getAttributeValue(setupEntity, "OLDINDC", "", null, false);
 			if(isold == null || "".equals(isold) ) {
 				buffer.append(" and (OLDINDC != 'Y' or OLDINDC is null) ");
-			}else if ("Y".equals(isold)) {
-				buffer.append(" and (OLDINDC = 'Y' or OLDINDC is null) ");
 			}
 			
 			Vector vCond = getAllFilters(setupEntity, entityType);
