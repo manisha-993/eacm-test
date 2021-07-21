@@ -14,7 +14,7 @@
 		</path>
 
 		<!--javac fork="true" executable="C:\IBM\InformationServer\jdk\bin\javac.exe" srcdir="./src" destdir="./bin" encoding="UTF8" classpathref="classpath"-->
-		<javac fork="true" executable="C:\Program Files (x86)\Java\java7\bin\javac.exe" srcdir="./src" destdir="./bin" encoding="UTF8" classpathref="classpath">
+		<javac fork="true" executable="\usr\java7_64\bin\javac.exe" srcdir="./src" destdir="./bin" encoding="UTF8" classpathref="classpath">
 		</javac>
 	</target>
 	
