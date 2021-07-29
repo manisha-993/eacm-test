@@ -311,22 +311,11 @@ public class EntityManager {
 				model.setACTIVITY("Update");
 
 				model.setPRODUCTID(processValue(rs.getString("TYPE")) + processValue(rs.getString("MODEL")));
-				if(rs.getString("MODEL") != null && !"".equals(rs.getString("MODEL"))) {
-					model.setMFRPRODTYPE(processValue(rs.getString("TYPE")) + "-" + processValue(rs.getString("MODEL")));
-				}else {
-					model.setMFRPRODTYPE(processValue(rs.getString("TYPE")));
-				}
-				if((rs.getString("FAMILYNAME") == null || "".equals(rs.getString("FAMILYNAME")))
-						&&(rs.getString("SERIESNAME") == null || "".equals(rs.getString("SERIESNAME")))) {
-					model.setMFRPRODDESC(" ");
-				}else if(rs.getString("FAMILYNAME") == null || "".equals(rs.getString("FAMILYNAME"))){
-					model.setMFRPRODDESC(processValue(rs.getString("SERIESNAME")));
-				}else if(rs.getString("SERIESNAME") == null || "".equals(rs.getString("SERIESNAME"))){ 
-					model.setMFRPRODDESC(processValue(rs.getString("FAMILYNAME")));
-				}else{
-					model.setMFRPRODDESC(
-							processValue(rs.getString("FAMILYNAME")) + " - " + processValue(rs.getString("SERIESNAME")));
-				}
+				
+				model.setMFRPRODTYPE(processValue(rs.getString("TYPE")) + "-" + processValue(rs.getString("MODEL")));
+				model.setMFRPRODDESC(
+						processValue(rs.getString("FAMILYNAME")) + " - " + processValue(rs.getString("SERIESNAME")));
+				
 				model.setMKTGDIV(processValue(rs.getString("DIVISION")));
 				model.setCATGSHRTDESC(processValue(rs.getString("BRAND")));
 				model.setSTRTOFSVC(processValue(rs.getString("ANNOUNCE_DATE")));
@@ -380,22 +369,11 @@ public class EntityManager {
 				model.setACTIVITY("Update");
 
 				model.setPRODUCTID(processValue(rs.getString("TYPE")) + processValue(rs.getString("MODEL")));
-				if(rs.getString("MODEL") != null && !"".equals(rs.getString("MODEL"))) {
-					model.setMFRPRODTYPE(processValue(rs.getString("TYPE")) + "-" + processValue(rs.getString("MODEL")));
-				}else {
-					model.setMFRPRODTYPE(processValue(rs.getString("TYPE")));
-				}
-				if((rs.getString("FAMILYNAME") == null || "".equals(rs.getString("FAMILYNAME")))
-						&&(rs.getString("SERIESNAME") == null || "".equals(rs.getString("SERIESNAME")))) {
-					model.setMFRPRODDESC(" ");
-				}else if(rs.getString("FAMILYNAME") == null || "".equals(rs.getString("FAMILYNAME"))){
-					model.setMFRPRODDESC(processValue(rs.getString("SERIESNAME")));
-				}else if(rs.getString("SERIESNAME") == null || "".equals(rs.getString("SERIESNAME"))){ 
-					model.setMFRPRODDESC(processValue(rs.getString("FAMILYNAME")));
-				}else{
-					model.setMFRPRODDESC(
-							processValue(rs.getString("FAMILYNAME")) + " - " + processValue(rs.getString("SERIESNAME")));
-				}
+				
+				model.setMFRPRODTYPE(processValue(rs.getString("TYPE")) + "-" + processValue(rs.getString("MODEL")));
+				model.setMFRPRODDESC(
+						processValue(rs.getString("FAMILYNAME")) + " - " + processValue(rs.getString("SERIESNAME")));
+				
 				model.setMKTGDIV(processValue(rs.getString("DIVISION")));
 				model.setCATGSHRTDESC(processValue(rs.getString("BRAND")));
 				model.setSTRTOFSVC(processValue(rs.getString("ANNOUNCE_DATE")));
