@@ -3577,12 +3577,13 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 						sb.append(getValue(CAOAV, ""));
 						sb.append(getValue(DSLMCPA, PokUtils.getAttributeValue(rootEntity, "ANNDATE", "", "")));
 						sb.append(getValue(DSLMCPO, PokUtils.getAttributeValue(rootEntity, "ANNDATE", "", "")));
-						if (strAvailType.equals("Last Order")) {
+						
+						/*if (strAvailType.equals("Last Order")) {
 							sb.append(PokUtils.getAttributeValue(availEI, "EFFECTIVEDATE", ",", "", false));
 						} else {
 							sb.append(getValue(DSLMWDN, "2050-12-31"));
-						}
-
+						}*/
+						sb.append(getValue(DSLMWDN,getTMFWDDate(eiProdstruct)));
 						strOrderCode = PokUtils.getAttributeValue(eiProdstruct, "ORDERCODE", "", "");
 
 						if (strOrderCode.equals("MES")) {
@@ -3620,6 +3621,21 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		}
 	}
 
+	public String  getTMFWDDate(EntityItem tmfEI){
+		Vector availVect = PokUtils.getAllLinkedEntities(tmfEI, "OOFAVAIL", "AVAIL");
+
+		addDebug("TMF id "+tmfEI.getEntityID()+" link AVALI size:"+availVect.size());
+		if(availVect.size()>0){
+			for (int i = 0; i < availVect.size(); i++) {
+				EntityItem eiAvail = (EntityItem) availVect.elementAt(i);
+				String strAvailType = PokUtils.getAttributeValue(eiAvail, "AVAILTYPE", "", "");
+				if (strAvailType.equals("Last Order")) {
+					return PokUtils.getAttributeValue(eiAvail, "EFFECTIVEDATE", ",", "", false);
+				} 
+			}
+		}
+		return "2050-12-31";
+	}
 	private String getRFANumber(EntityItem rootEntity, boolean isEpic, EntityItem availEI) {
 		String strISLMRFA;
 		if (isEpic) {
