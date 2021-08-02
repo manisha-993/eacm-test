@@ -365,7 +365,7 @@ public class EntityManager {
 			while (rs.next()) {
 
 				MIWModel model = new MIWModel();
-				model.setDTSOFMSG(rs.getString("UPD_DT"));
+				model.setDTSOFMSG(processValue(rs.getString("UPD_DT")));
 				model.setACTIVITY("Update");
 
 				model.setPRODUCTID(processValue(rs.getString("TYPE")) + processValue(rs.getString("MODEL")));
@@ -431,7 +431,7 @@ public class EntityManager {
 			while (rs.next()) {
 
 				MIWModel model = new MIWModel();
-				model.setDTSOFMSG(rs.getString("UPD_DT"));
+				model.setDTSOFMSG(processValue(rs.getString("UPD_DT")));
 				model.setACTIVITY("Update");
 
 				model.setPRODUCTID(processValue(rs.getString("MTYPE")));
