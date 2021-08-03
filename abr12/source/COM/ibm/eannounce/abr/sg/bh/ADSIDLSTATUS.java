@@ -528,6 +528,7 @@ public class ADSIDLSTATUS extends PokBaseABR {
 				allowedVct.add("XMLSTATUS");
 				allowedVct.add("XMLIDLREQDTS");
 				allowedVct.add("XMLIDLMAXMSG");
+				allowedVct.add("OLDINDC");
 				
 				String filters[] = (String[])FILTER_TBL.get(entityType);
 				if (filters!=null){

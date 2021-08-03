@@ -154,12 +154,12 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 		
         //they must be in ATTRCODE format 
 		FILTER_TBL.put("FEATURE", new String[]{"STATUS","FCTYPE","COUNTRYLIST","PDHDOMAIN"});
-		FILTER_TBL.put("MODEL", new String[]{"STATUS","SPECBID","COFCAT","COFSUBCAT","COFGRP","COFSUBGRP","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","DIVTEXT"});
+		FILTER_TBL.put("MODEL", new String[]{"STATUS","SPECBID","COFCAT","COFSUBCAT","COFGRP","COFSUBGRP","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","DIVTEXT","OLDINDC"});
 		FILTER_TBL.put("SVCMOD", new String[]{"STATUS","SVCMODCATG","SVCMODGRP","SVCMODSUBCATG","SVCMODSUBGRP","COUNTRYLIST","PDHDOMAIN","DIVTEXT"});
 		FILTER_TBL.put("LSEOBUNDLE", new String[]{"STATUS","SPECBID","BUNDLETYPE","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","DIVTEXT"});
 		FILTER_TBL.put("LSEO", new String[]{"STATUS","SPECBID","COFCAT","COFSUBCAT","COFGRP","COFSUBGRP","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","DIVTEXT"});
 		
-		FILTER_TBL.put("PRODSTRUCT",   new String[]{"STATUS","FCTYPE","MACHTYPEATR","MODELATR","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN"});
+		FILTER_TBL.put("PRODSTRUCT",   new String[]{"STATUS","FCTYPE","MACHTYPEATR","MODELATR","COUNTRYLIST","FLFILSYSINDC","PDHDOMAIN","OLDINDC"});
 		FILTER_TBL.put("SWPRODSTRUCT", new String[]{"STATUS","FCTYPE","MACHTYPEATR","MODELATR","COUNTRYLIST","PDHDOMAIN"});
 		//MACHTYPEATR used for TOMACHTYPE T, WTHDRWEFFCTVDATE will be on the MODEL
 		FILTER_TBL.put("MODELCONVERT",  new String[]{"STATUS","MACHTYPEATR","MODELATR","COUNTRYLIST","PDHDOMAIN"});
@@ -501,6 +501,9 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 					attrvalue = convertValue(PokUtils.getAttributeValue(rootItem, attrcode, "", null, false));
 				}			
 				rootTable.put(attrcode, attrvalue);				
+			}else if(attrcode.equals("OLDINDC")){
+				attrvalue = convertValue(PokUtils.getAttributeValue(rootItem, attrcode, "", null, false));	
+				rootTable.put(attrcode, attrvalue);				
 			}
 		} 
     	//print the rootItme filter information
@@ -692,8 +695,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
     			attrvalue = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,attrcode));
     			if(attrcode.length()>0)
     			filterTable.put(attrcode, attrvalue);
-    		}
-    			else{    			
+    		}else{    			
     			attrvalue = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,attrcode));
     			filterTable.put(attrcode, attrvalue);
     		}
@@ -1124,6 +1126,8 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 		if(rootItemAttributeValue==null) rootItemAttributeValue="";
 		//for  If MODEL, MODELCONVERT, SVCMOD, SWPRODSTRUCT 
 		//do not have an AVAIL of this type, then assume "World Wide" and hence this data is NOT filtered out
+		
+				
 		if(rootItemAttributeValue.equals(CHEAT)) return true;
 		if(EXTXMLFEEDItemAttributeValue!=null && !"".equals(EXTXMLFEEDItemAttributeValue)){
 			if("ENDOFSVC".equals(attrcode)){
@@ -1169,6 +1173,21 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 			
 		}else{
 			isvaild = true;
+		}
+		if("OLDINDC".equals(attrcode)) {
+			if (EXTXMLFEEDItemAttributeValue != null && !"".equals(EXTXMLFEEDItemAttributeValue.trim())) {
+				if("".equals(rootItemAttributeValue)) {
+					return true;
+				}else if(EXTXMLFEEDItemAttributeValue.equals(rootItemAttributeValue)){
+					isvaild = true;
+				}else{
+					isvaild = false;
+				}
+			}else {
+				if("Y".equals(rootItemAttributeValue)) {
+					isvaild = false;
+				}
+				}		
 		}
 		
 		return isvaild;

@@ -319,6 +319,12 @@ public class XMLFiterMQIDL {
 					buffer.append(" and length(trim(xmlcast(xmlquery('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/REFOFER_UPDATE\"; $i/REFOFER_UPDATE/PRODUCTID/text()' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\") as varchar(8))))=7 ");
 				}
 			}
+			
+			String isold = PokUtils.getAttributeValue(setupEntity, "OLDINDC", "", null, false);
+			if(isold == null || "".equals(isold) ) {
+				buffer.append(" and (OLDINDC != 'Y' or OLDINDC is null) ");
+			}
+			
 			Vector vCond = getAllFilters(setupEntity, entityType);
 			StringBuffer filterBuf = compositeFilterCond(vCond);
 			String appFilter = filterBuf.toString();

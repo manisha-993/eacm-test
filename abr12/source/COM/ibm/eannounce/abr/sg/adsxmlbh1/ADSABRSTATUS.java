@@ -4088,6 +4088,8 @@ ADSATTRIBUTE    40  WARRTYPE
     	addDebug("get XMLCACHEDTS: " + t2);
     	EntityItem rootEntity  = listT2.getParentEntityGroup().getEntityItem(0);
     	String entityType = rootEntity.getEntityType();
+    	String OLDINDC = PokUtils.getAttributeFlagValue(rootEntity, "OLDINDC");
+    	
     	int entityID = rootEntity.getEntityID();
     	PreparedStatement ps = null;
     	Statement statement = null;
@@ -4130,12 +4132,19 @@ ADSATTRIBUTE    40  WARRTYPE
 			strbSQL = new StringBuffer();
 		    strbSQL.append("UPDATE cache.xmlidlcache");
 		    strbSQL.append(" SET xmlcachevalidto = ?");
+		    if(OLDINDC != null && !"".equals(OLDINDC.trim())) {
+		    	strbSQL.append(" , OLDINDC = ? ");
+		    }
 		    strbSQL.append(" WHERE xmlentitytype = '" + entityType + "'");
 		    strbSQL.append(" AND xmlentityID = " + entityID );
 		    strbSQL.append(" AND xmlcachevalidto > current timestamp");
+		    
 		    try{
 			    ps = m_db.getODSConnection().prepareStatement(new String(strbSQL));
 			    ps.setString(1, t2);
+			    if(OLDINDC != null && !"".equals(OLDINDC.trim())) {
+			    	 ps.setString(2, OLDINDC);
+			    }
 			    ps.execute();
 				if (m_db.getODSConnection() != null){
 					m_db.getODSConnection().commit();
@@ -4314,8 +4323,14 @@ ADSATTRIBUTE    40  WARRTYPE
 		}
 //    		PDHDOMAIN
 		pdhdomain = PokUtils.getAttributeFlagValue(rootItem, "PDHDOMAIN");
+		
+		String OLDINDC = PokUtils.getAttributeFlagValue(rootItem, "OLDINDC");
+    	
 		if (pdhdomain==null){
 			pdhdomain = "";
+		}
+		if (OLDINDC==null){
+			OLDINDC = "";
 		}
 		status = curStatusvalue;
 	
@@ -4323,14 +4338,15 @@ ADSATTRIBUTE    40  WARRTYPE
 			status = "";
 		}
 		strbSQL = new StringBuffer();
-		strbSQL.append("INSERT INTO cache.xmlidlcache (XMLENTITYTYPE, XMLENTITYID, XMLCACHEDTS, XMLCACHEVALIDTO, XMLOFFTYPE, FLFILSYSINDC, WTHDRWEFFCTVDATE, STATUS, XMLMESSAGE, PDHDOMAIN) ");
-		strbSQL.append(" VALUES (?,?,?,?,?,?,?,?,?,? )");
+		strbSQL.append("INSERT INTO cache.xmlidlcache (XMLENTITYTYPE, XMLENTITYID, XMLCACHEDTS, XMLCACHEVALIDTO, XMLOFFTYPE, FLFILSYSINDC, WTHDRWEFFCTVDATE, STATUS, XMLMESSAGE, PDHDOMAIN, OLDINDC) ");
+		strbSQL.append(" VALUES (?,?,?,?,?,?,?,?,?,?,? )");
 		addDebug("T2 :" + t2);
         addDebug("offtype :" + offtype);
         addDebug("flfilsysindc :" + flfilsysindc);
         addDebug("withdrweffctvdate :" + withdrweffctvdate);
         addDebug("status :" + status);
         addDebug("pdhdomain :" + pdhdomain);
+        addDebug("OLDINDC :" + OLDINDC);
         
 		try{
 			ps = m_db.getODSConnection().prepareStatement(new String(strbSQL));
@@ -4344,6 +4360,7 @@ ADSATTRIBUTE    40  WARRTYPE
 		    ps.setString(8, status);
 		    ps.setString(9, xml);	
 		    ps.setString(10, pdhdomain);
+		    ps.setString(11, OLDINDC);
 		    ps.execute();   
 			if (m_db.getODSConnection() != null){
 				m_db.getODSConnection().commit();
