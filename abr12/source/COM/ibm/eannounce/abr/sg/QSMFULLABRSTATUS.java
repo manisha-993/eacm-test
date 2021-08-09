@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import COM.ibm.eannounce.abr.util.*;
+import COM.ibm.eannounce.objects.EANEntity;
 import COM.ibm.eannounce.objects.EANFlagAttribute;
 import COM.ibm.eannounce.objects.EANList;
 import COM.ibm.eannounce.objects.EANMetaAttribute;
@@ -3521,14 +3522,18 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		EntityGroup availGrp = m_elist.getEntityGroup("AVAIL");
 		for (int availI = 0; availI < availGrp.getEntityItemCount(); availI++) {
 			EntityItem availEI = availGrp.getEntityItem(availI);
-
+			
 			// Create T632 records only for US ONLY and WorldWide GEOs
 			EANFlagAttribute qsmGeoList = (EANFlagAttribute) availEI.getAttribute("QSMGEO");
+			//addDebug("qsmGeoList != null:"+(qsmGeoList != null)+"  AVAIL:"+availEI.getEntityID());
 			if (qsmGeoList != null) {
+				//addDebug("qsmGeoList.isSelected 6221:"+(qsmGeoList.isSelected("6221")));
 				if (qsmGeoList.isSelected("6221")) {
 
 					Vector prodstructVect = PokUtils.getAllLinkedEntities(availEI, "OOFAVAIL", "PRODSTRUCT");
 
+					/*Vector lVector = new Vector();
+					getLinkedEntities(availEI,  "OOFAVAIL", "PRODSTRUCT",lVector);*/
 					strAvailType = "";
 					strAvailType = PokUtils.getAttributeValue(availEI, "AVAILTYPE", "", "");
 					strAvailAnnType = PokUtils.getAttributeValue(availEI, "AVAILANNTYPE", "", "");
@@ -3537,9 +3542,10 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 					}
 
 					for (int i = 0; i < prodstructVect.size(); i++) {
+						
 						sb = new StringBuffer();
 						EntityItem eiProdstruct = (EntityItem) prodstructVect.elementAt(i);
-
+						//addDebug("PRODSTRUCT ID:"+eiProdstruct.getEntityID());
 						ExtractActionItem eaItem = new ExtractActionItem(null, m_db, m_prof, getT006FeatureVEName());
 
 						EntityList list = m_db.getEntityList(m_prof, eaItem, new EntityItem[] { new EntityItem(null,
@@ -3605,7 +3611,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 						} else {
 							strQSLMCSU = "00";
 						}
-
+						//addDebug(availEI.getEntityID()+":"+eiProdstruct.getEntityID()+":"+sb.toString());
 						sb.append(getValue(QSLMCSU, strQSLMCSU));
 						sb.append(getValue(TIMSTMP, ""));
 						sb.append(getValue(USERID, ""));
@@ -3624,13 +3630,23 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 	public String  getTMFWDDate(EntityItem tmfEI){
 		Vector availVect = PokUtils.getAllLinkedEntities(tmfEI, "OOFAVAIL", "AVAIL");
 
+		
+		
 		addDebug("TMF id "+tmfEI.getEntityID()+" link AVALI size:"+availVect.size());
 		if(availVect.size()>0){
 			for (int i = 0; i < availVect.size(); i++) {
 				EntityItem eiAvail = (EntityItem) availVect.elementAt(i);
+				
+
 				String strAvailType = PokUtils.getAttributeValue(eiAvail, "AVAILTYPE", "", "");
+				
 				if (strAvailType.equals("Last Order")) {
+					EANFlagAttribute qsmGeoList = (EANFlagAttribute) eiAvail.getAttribute("QSMGEO");
+					if (qsmGeoList != null) {
+						if (qsmGeoList.isSelected("6221")) {
 					return PokUtils.getAttributeValue(eiAvail, "EFFECTIVEDATE", ",", "", false);
+						}
+					}
 				} 
 			}
 		}
@@ -3956,5 +3972,66 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 	public String getDescription() {
 		return "QSMFULLABRSTATUS";
 	}
+	/* private  void getLinkedEntities(EntityItem entityItem, String linkType, String destType,
+		        Vector destVct)
+		    {
+		 addDebug("AVAIL ID:"+entityItem.getEntityID()+":linktype:"+linkType+"destype"+destType);
+		        if (entityItem==null) {
+		            return; }
 
+		        addDebug("UpLinkCout:"+entityItem.getUpLinkCount());
+		        addDebug("DownLinkCout:"+entityItem.getDownLinkCount());
+		        // see if this relator is used as an uplink
+		        for (int ui=0; ui<entityItem.getUpLinkCount(); ui++)
+		        {
+		            EANEntity entityLink = entityItem.getUpLink(ui);
+		            addDebug(entityLink.getEntityType()+":"+entityLink.getEntityID());
+		            addDebug(entityLink.getEntityType()+":getUpLinkCount"+entityLink.getUpLinkCount());
+		            if (entityLink.getEntityType().equals(linkType))
+		            {
+		                // check for destination entity as an uplink
+		                for (int i=0; i<entityLink.getUpLinkCount(); i++)
+		                {
+		                    EANEntity entity = entityLink.getUpLink(i);
+		                    addDebug("entitytype:"+entity.getEntityType()+entity.getEntityID());
+		                    if (entity.getEntityType().equals(destType) && !destVct.contains(entity)) {
+		                        destVct.addElement(entity); }
+		                }
+		                // check for destination entity as a downlink
+		                for (int i=0; i<entityLink.getDownLinkCount(); i++)
+		                {
+		                    EANEntity entity = entityLink.getDownLink(i);
+		                    if (entity.getEntityType().equals(destType) && !destVct.contains(entity))
+		                        destVct.addElement(entity);
+		                }
+		            }
+		        }
+
+		        // see if this relator is used as a downlink
+		        for (int ui=0; ui<entityItem.getDownLinkCount(); ui++)
+		        {
+		        	 
+		            EANEntity entityLink = entityItem.getDownLink(ui);
+		            addDebug(entityLink.getEntityType()+":"+entityLink.getEntityID());
+		            addDebug(entityLink.getEntityType()+":getDownLinkCount"+entityLink.getUpLinkCount());
+		            if (entityLink.getEntityType().equals(linkType))
+		            {
+		                // check for destination entity as an uplink
+		                for (int i=0; i<entityLink.getUpLinkCount(); i++)
+		                {
+		                    EANEntity entity = entityLink.getUpLink(i);
+		                    if (entity.getEntityType().equals(destType) && !destVct.contains(entity))
+		                        destVct.addElement(entity);
+		                }
+		                // check for destination entity as a downlink
+		                for (int i=0; i<entityLink.getDownLinkCount(); i++)
+		                {
+		                    EANEntity entity = entityLink.getDownLink(i);
+		                    addDebug("entitytype:"+entity.getEntityType()+entity.getEntityID());
+		                    if (entity.getEntityType().equals(destType) && !destVct.contains(entity)) {
+		                        destVct.addElement(entity); }
+		                }
+		            }
+		        }
+		    }*/
 }
