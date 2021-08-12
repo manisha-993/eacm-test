@@ -867,8 +867,6 @@ public class ADSPRICEABR extends XMLMQAdapter {
 		return priceTable;
 
 	}
-
-	prevate 
 	/**
 	 * @param abr
 	 * @param ADSPPFORMAT
