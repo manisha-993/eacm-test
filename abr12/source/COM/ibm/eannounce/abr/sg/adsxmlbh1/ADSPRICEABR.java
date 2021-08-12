@@ -754,6 +754,17 @@ public class ADSPRICEABR extends XMLMQAdapter {
 			// compare with the filter of ADSOFFCAT
 			if (ADSOFFCAT != null && !"".equals(ADSOFFCAT)) {
 				if (!PRODUCTCATEGORY.equals(ADSOFFCAT)) {
+					if (maxLimited()) {
+						limit_size++;
+						if (limit_size >= max) {
+							String dstDate = result.getString("INSERT_TS");
+							abr.setT2DTS(dstDate);
+							abr.addDebug("The count of msg has reached the max msg definition in the setup entity: " + max);
+							abr.addDebug("Set the last run date as : " + dstDate);
+							return priceTable;
+						}
+
+					}
 					continue;
 				}
 			}
@@ -763,6 +774,17 @@ public class ADSPRICEABR extends XMLMQAdapter {
 			 */
 			if (!"".equals(ADSDIVTEXT)) {
 				if (!DIVTable.containsKey(DIV)) {
+					if (maxLimited()) {
+						limit_size++;
+						if (limit_size >= max) {
+							String dstDate = result.getString("INSERT_TS");
+							abr.setT2DTS(dstDate);
+							abr.addDebug("The count of msg has reached the max msg definition in the setup entity: " + max);
+							abr.addDebug("Set the last run date as : " + dstDate);
+							return priceTable;
+						}
+
+					}
 					continue;
 				}
 			}
@@ -782,6 +804,17 @@ public class ADSPRICEABR extends XMLMQAdapter {
 				} else if (PDHDOMAIN == null || "".equals(PDHDOMAIN)) {
 					continue;
 				} else if (!ADSPDHDOMAIN.containsKey(PDHDOMAIN)) {
+					if (maxLimited()) {
+						limit_size++;
+						if (limit_size >= max) {
+							String dstDate = result.getString("INSERT_TS");
+							abr.setT2DTS(dstDate);
+							abr.addDebug("The count of msg has reached the max msg definition in the setup entity: " + max);
+							abr.addDebug("Set the last run date as : " + dstDate);
+							return priceTable;
+						}
+
+					}
 					continue;
 				}
 			}
@@ -835,6 +868,7 @@ public class ADSPRICEABR extends XMLMQAdapter {
 
 	}
 
+	prevate 
 	/**
 	 * @param abr
 	 * @param ADSPPFORMAT
