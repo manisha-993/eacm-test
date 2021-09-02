@@ -82,12 +82,13 @@ import org.w3c.dom.*;
 //
 //
 
-public class XMLGroupElem extends XMLElem
+public class XMLMTDGroupElem extends XMLElem
 {
 	private String path = null;
     private String etype =null;
     private boolean isMultUse= false;
     private int ilevel=0;
+    private String domian = null;
     /**********************************************************************************
      * Constructor - used when element is part of a group with child elements that are
      * attributes for the entity or structure based on the entity
@@ -101,20 +102,54 @@ public class XMLGroupElem extends XMLElem
      *@param _path String with path to use to get to this group D:MODELAVAIL:D where type = AVAIL
      *@param _isMultUse boolean with isNesting to check whether XMLGroupElem has a nesting list after leve 2
      */
-    public XMLGroupElem(String nname, String type, String _path,boolean _isMultUse)
+    public XMLMTDGroupElem(String nname, String type, String _path,boolean _isMultUse)
     {
     	super(nname);
         etype = type;
         path = _path;
         isMultUse = _isMultUse;
     }
-    public XMLGroupElem(String nname, String type, String _path,boolean _isMultUse,int _ilevel)
+    public XMLMTDGroupElem(String nname, String type, String _path,boolean _isMultUse,int _ilevel)
     {
     	super(nname);
         etype = type;
         path = _path;
         isMultUse = _isMultUse;
         ilevel = _ilevel;
+    }
+    public String getDomain (DiffEntity diffitem){
+    	
+
+    	
+    		EntityItem theitem = diffitem.getCurrentEntityItem();				
+    		if (diffitem.isDeleted()) {
+    			theitem = diffitem.getPriorEntityItem();
+    	
+    		}
+    		domian = getDomain(theitem);
+    	
+    	return domian;
+    	
+    }
+    public String getDomain (EntityItem entityItem){
+    		domian = PokUtils.getAttributeFlagValue(entityItem, "PDHDOMAIN");
+    	return domian;
+    }
+
+    public boolean compareDonmain (EntityItem entityItem){
+    	D.ebug(D.EBUG_ERR,"P domain:"+domian);
+    	D.ebug(D.EBUG_ERR,"C domain:"+PokUtils.getAttributeFlagValue(entityItem, "PDHDOMAIN"));
+    	return domian.equals(PokUtils.getAttributeFlagValue(entityItem, "PDHDOMAIN"));
+    }
+    
+ public boolean compareDonmain (DiffEntity diffitem){
+	 EntityItem theitem = diffitem.getCurrentEntityItem();				
+		if (diffitem.isDeleted()) {
+			theitem = diffitem.getPriorEntityItem();
+		}
+		D.ebug(D.EBUG_ERR,"P domain:"+domian);
+    	D.ebug(D.EBUG_ERR,"C domain:"+PokUtils.getAttributeFlagValue(theitem, "PDHDOMAIN"));
+    	return domian.equals(PokUtils.getAttributeFlagValue(theitem, "PDHDOMAIN"));
     }
     /**********************************************************************************
     * Constructor - used when element is part of a group with child elements that are
@@ -128,7 +163,7 @@ public class XMLGroupElem extends XMLElem
     *@param type String with entity type
     *@param _path String with path to use to get to this group D:MODELAVAIL:D where type = AVAIL
     */
-    public XMLGroupElem(String nname, String type, String _path)
+    public XMLMTDGroupElem(String nname, String type, String _path)
     {
         super(nname);
         etype = type;
@@ -141,7 +176,7 @@ public class XMLGroupElem extends XMLElem
     *@param nname String with name of node to be created
     *@param type String with entity type
     */
-    public XMLGroupElem(String nname, String type)
+    public XMLMTDGroupElem(String nname, String type)
     {
         super(nname);
         etype = type;
@@ -154,7 +189,7 @@ public class XMLGroupElem extends XMLElem
     *@param type String with entity type
     *@param isroot boolean if true, entity is root
     */
-    public XMLGroupElem(String nname)
+    public XMLMTDGroupElem(String nname)
     {
         super(nname);
         etype = "ROOT";
@@ -185,8 +220,9 @@ public class XMLGroupElem extends XMLElem
 		D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
 		//ABRUtil.append(debugSb,"XMLGroupElem.addElements: entered node:"+nodeName+" etype:"+etype+" "+
 			//	(parentItem==null?" null parent":parentItem.getKey())+" path:"+path+NEWLINE);
-		
+		D.ebug(D.EBUG_ERR,"Working in addElementds hashtable!");
 		Vector vct = getItems(table, parentItem, debugSb);
+		domian = getDomain(parentItem);
 
 		if (vct==null){
 			if (nodeName==null) {nodeName="ERROR";}
@@ -246,7 +282,7 @@ public class XMLGroupElem extends XMLElem
 					DiffEntity de = (DiffEntity)entityVct.elementAt(i);
 //						 only output if changed or is root
 						if (//!de.isChanged() cant do it this way because child structure may use other entities
-							!de.isRoot() && !hasChanges(table, de, debugSb)){
+							!de.isRoot() && !hasChanges(table, de, debugSb)&&!compareDonmain(de)){
 							ABRUtil.append(debugSb,"XMLGroupElem: node:"+nodeName+" path:"+path+
 								" No Changes found in "+de.getKey()+NEWLINE);
 							continue;
@@ -286,12 +322,14 @@ public class XMLGroupElem extends XMLElem
 				for(int i=0; i<entityVct.size(); i++){
 					// it may exist at current or prior time or both
 					DiffEntity de = (DiffEntity)entityVct.elementAt(i);
-
+					
 					// add any children to the parent, not this node
+					/*if(compareDonmain(de)){*/
 					for (int c=0; c<childVct.size(); c++){
 						XMLElem childElem = (XMLElem)childVct.elementAt(c);
 						childElem.addElements(dbCurrent,table, document,parent,de,debugSb);
-					}
+					/*}*/
+						}
 				}
 				entityVct.clear();
 			} // nodename is null
@@ -331,7 +369,8 @@ public class XMLGroupElem extends XMLElem
 		} else {
 			egrp = list.getEntityGroup(etype);
 		}
-
+		domian = getDomain(parentItem);
+		D.ebug(D.EBUG_ERR,"P domain:"+domian);
 		if (egrp==null){
 			Element elem = (Element) document.createElement(nodeName);
 			addXMLAttrs(elem);
@@ -390,6 +429,7 @@ public class XMLGroupElem extends XMLElem
 									//keep looking
 									tmp.add(entity);
 								}else{
+									if(compareDonmain(entity))
 									overrideVct.add(entity);
 								}
 							}
@@ -435,7 +475,8 @@ public class XMLGroupElem extends XMLElem
 				// use this entity for children elements
 				for(int i=0; i<entityVct.size(); i++){
 					EntityItem item = (EntityItem)entityVct.elementAt(i);
-
+					if(!compareDonmain(item))
+						continue;
 					// add any children
 					for (int c=0; c<childVct.size(); c++){
 						XMLElem childElem = (XMLElem)childVct.elementAt(c);
@@ -468,6 +509,8 @@ public class XMLGroupElem extends XMLElem
 				for(int i=0; i<entityVct.size(); i++){
 					EntityItem item = (EntityItem)entityVct.elementAt(i);
 
+					/*if(!compareDonmain(item))
+						continue;*/
 					// add any children to the parent, not this node
 					for (int c=0; c<childVct.size(); c++){
 						XMLElem childElem = (XMLElem)childVct.elementAt(c);
@@ -690,4 +733,37 @@ public class XMLGroupElem extends XMLElem
 
 		return vct;
 	}
+     protected Vector getEntities(EntityGroup egrp)
+     {
+         Vector vct = new Vector();
+         if(egrp!=null){  // should not be the case if extract is properly defined
+             for(int i=0; i<egrp.getEntityItemCount(); i++){
+            	 if(domian!=null&&!compareDonmain(egrp.getEntityItem(i)))
+            		 continue;
+                 vct.addElement(egrp.getEntityItem(i));
+             }
+         }
+         return vct;
+     }
+     
+     protected Vector getEntities(Vector vct)
+     
+     {
+    	 Vector v = new Vector();
+    	 for (int j = 0; j < vct.size(); j++) {
+    		 Object o = vct.get(j);
+    		 if(o instanceof EntityItem){
+    		 if(domian!=null&&!compareDonmain((EntityItem)vct.get(j)))
+    			 continue;
+    		 }
+    		 if(o instanceof DiffEntity){
+    			 if(domian!=null&&!compareDonmain((DiffEntity)vct.get(j)))
+        			 continue;
+        		 }
+    		 v.add(vct.get(j));
+		}
+    	 
+    	
+         return v;
+     }
 }

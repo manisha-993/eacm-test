@@ -467,7 +467,7 @@ public class ADSMODELABR extends XMLMQRoot {
 		 * list.addChild(new XMLMachtypeElem("MTDESCRIPTION", "INTERNALNAME"));
 		 * list.addChild(new XMLElem("MTDESCRIPTION", "INTERNALNAME"));
 		 */
-		XMLElem elemMachtype = new XMLGroupElem(null,"MACHTYPE","D:MODELMACHINETYPEA:D");
+		XMLElem elemMachtype = new XMLMTDGroupElem(null,"MACHTYPE","D:MODELMACHINETYPEA:D");
         langelem.addChild(elemMachtype);
         elemMachtype.addChild(new XMLElem("MTDESCRIPTION", "INTERNALNAME")); 
 /*
