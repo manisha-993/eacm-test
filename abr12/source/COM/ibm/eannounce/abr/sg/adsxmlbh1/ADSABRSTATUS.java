@@ -11,6 +11,7 @@ import COM.ibm.eannounce.objects.*;
 import COM.ibm.opicmpdh.transactions.*;
 import COM.ibm.opicmpdh.objects.*;
 
+import com.ibm.jsse2.util.e;
 import com.ibm.transform.oim.eacm.util.*;
 
 import java.util.*;
@@ -569,6 +570,7 @@ public class ADSABRSTATUS extends PokBaseABR
     private boolean isXMLIDLABR = false;
     private boolean isXMLCACHE = false;
     private boolean isXMLADSABR = false;
+    private boolean isIERPADSABR = false;
     // when Status goes to RFR, but it has been Final before,it is True; Status never been Final, it is False. 
     //private boolean RFRPassedFinal = false;
     private String actionTaken="";
@@ -644,6 +646,8 @@ public class ADSABRSTATUS extends PokBaseABR
         ABR_TBL.put("REFOFERFEAT", "COM.ibm.eannounce.abr.sg.adsxmlbh1.ADSREFOFERFEATABR");
         
         ABR_TBL.put("SWSPRODSTRUCT", "COM.ibm.eannounce.abr.sg.adsxmlbh1.ADSSWSPRODSTRUCTABR");
+        
+        //ABR_TBL.put("SVCMODIERPABRSTATUSABR", "COM.ibm.eannounce.abr.sg.adsxmlbh1.SVCMODIERPABRSTATUSABR");
 //      ABR_TBL.put("DELFEATURE", "COM.ibm.eannounce.abr.sg.ADSDELFEATUREABR");
 //      ABR_TBL.put("DELFCTRANSACTION", "COM.ibm.eannounce.abr.sg.ADSDELFCTRANSABR");
 //      ABR_TBL.put("DELMODEL", "COM.ibm.eannounce.abr.sg.ADSDELMODELABR");
@@ -789,6 +793,7 @@ ADSATTRIBUTE    40  WARRTYPE
     {
         // find class to instantiate based on entitytype
         // Load the specified ABR class in preparation for execution
+    	
         String clsname = (String) ABR_TBL.get(type);
         addDebug("creating instance of ADSABR  = '" + clsname + "' for "+type);
         return clsname;
@@ -842,9 +847,13 @@ ADSATTRIBUTE    40  WARRTYPE
                 EntityItem rootEntity  = m_elist.getParentEntityGroup().getEntityItem(0);
 
                 //isPeriodicABR = getEntityType().equals("ADSXMLSETUP")||getEntityType().equals("XMLPRODPRICESETUP");//add for price abr
-                isPeriodicABR = PERIODIC_ABR_TBL.containsKey(getEntityType());               
+                   
 
-                String etype = getEntityType();                
+                String etype = getEntityType();     
+                if(m_abri.getABRCode().equals("SVCMODIERPABRSTATUS")&&"SVCMOD".equals(etype)){
+                	etype="SVCMODIERPABRSTATUS";
+               }
+                isPeriodicABR = PERIODIC_ABR_TBL.containsKey(etype);          
                 if(isPeriodicABR){
                 	//all the PeriodicABR need turn on or off the userxml                	
                 	if("ADSXMLSETUP".equals(etype)){
@@ -891,6 +900,7 @@ ADSATTRIBUTE    40  WARRTYPE
 
                 // find class to instantiate based on entitytype
                 // Load the specified ABR class in preparation for execution
+             
                 String clsname = getSimpleABRName(etype);
                 if (clsname!=null){
                     boolean shouldExecute = true;
@@ -912,7 +922,7 @@ ADSATTRIBUTE    40  WARRTYPE
                     	addDebugComment(D.EBUG_INFO, "isSystemResendCurrent=" + isSystemResendCurrent +";sysfeedFlag=" + sysfeedFlag );
                     } else if(m_abri.getABRCode().equals("ADSABRSTATUS")){
                     	isXMLADSABR = true;                    	
-                    }                   	
+                    } 
                     if (!isPeriodicABR){
                         String statusAttr = mqAbr.getStatusAttr();
                         String sysfeedFlag = getAttributeFlagEnabledValue(rootEntity, "SYSFEEDRESEND");
@@ -1065,6 +1075,27 @@ ADSATTRIBUTE    40  WARRTYPE
                             }
                         }
                     }
+                }else if("SVCMODIERPABRSTATUSABR".equals(etype)){
+                	//ABR_TBL.put("SVCMODIERPABRSTATUSABR", "COM.ibm.eannounce.abr.sg.adsxmlbh1.SVCMODIERPABRSTATUSABR");
+                	 XMLMQ mqAbr = (XMLMQ) Class.forName( "COM.ibm.eannounce.abr.sg.adsxmlbh1.SVCMODIERPABRSTATUSABR").newInstance();
+                     MQCID = mqAbr.getMQCID();
+                     abrversion = getShortClassName(mqAbr.getClass())+" "+mqAbr.getVersion();
+                     Profile profileT2 = switchRole(mqAbr.getRoleCode());
+                     Profile profileT1 = null;
+                     if (profileT2!=null){
+                     	addDebug(rootEntity.getKey()+ " T1=" + t1DTS + ";T2=" + t2DTS);
+                         profileT2.setValOnEffOn(t2DTS, t2DTS);
+                         profileT2.setEndOfDay(t2DTS); 
+                         profileT2.setReadLanguage(Profile.ENGLISH_LANGUAGE); // default to US english
+                         profileT2.setLoginTime(t2DTS); // used for notification time
+
+                          profileT1 = profileT2.getNewInstance(m_db);
+                         profileT1.setValOnEffOn(t1DTS, t1DTS);
+                         profileT1.setEndOfDay(t2DTS); 
+                         profileT1.setReadLanguage(Profile.ENGLISH_LANGUAGE); // default to US english
+                         profileT1.setLoginTime(t2DTS);// used for notification time
+                     }
+                     mqAbr.processThis(this, profileT1, profileT2, rootEntity);
                 }else{
                     addError(getShortClassName(getClass())+" does not support "+etype);
                 }
@@ -1096,6 +1127,9 @@ ADSATTRIBUTE    40  WARRTYPE
                 }
                 if (isXMLIDLABR){
                     deactivateMultiFlagValue("XMLABRPROPFILE");
+                }
+                if(!isIERPADSABR&&"SVCMOD".equals(getEntityType())&&getReturnCode()==PASS){
+                	setFlagValue("SVCMODIERPABRSTATUSABR", "0020");
                 }
                 if (t2DTS.equals("&nbsp;")){
                 	t2DTS= getNow();
