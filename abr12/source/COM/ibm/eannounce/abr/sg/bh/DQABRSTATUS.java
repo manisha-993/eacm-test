@@ -3963,7 +3963,9 @@ If yes, then both D and G vary by country and the comparison needs to be made fo
 			args[2]=getLD_NDN(ctryItem);//ctryItem.getEntityGroup().getLongDescription();
 			args[3]=args[1];
 			args[4]=missingCtry;
-			createMessage(checklvl,"INCLUDE_ERR2",args);
+//			createMessage(checklvl,"INCLUDE_ERR2",args);
+//			EACM-story-3821 change warning to error
+			createMessage(4,"INCLUDE_ERR2",args);
 		}
 	}
 
