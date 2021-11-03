@@ -34,7 +34,7 @@ public class EACMWebServiceUtil
      * @throws IOException
      * @throws Exception
      */
-    public static String callService(String input, String serviceName,StringBuffer debugSb) throws Exception
+    public static String callService(String input, String serviceName) throws Exception
     {
         HttpURLConnection connection = null;
         OutputStream os = null;
@@ -48,6 +48,7 @@ public class EACMWebServiceUtil
 
         String keyStoreType = RfcConfigProperties.getServiceKeystoreType();
         String algorithm = RfcConfigProperties.getSSLAlgorithm();
+        
         D.ebug("service.uri = " + uri);
        // lo(debugSb, "service.uri = " + uri);
         D.ebug( "service.truststore = " + trustStore);

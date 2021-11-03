@@ -135,6 +135,16 @@ public final class RfcConfigProperties extends Properties {
 		return 
 			c_prop.getProperty("rdh.ssl.algorithm", "");
 	}
+	public static  String getPropertys(String key){
+		reloadProperties();
+		return 
+			c_prop.getProperty(key, "");
+	}
+	public static  String getZsabrtaxPropertys(String key){
+		reloadProperties();
+		return 
+			c_prop.getProperty("ZSABRTAX."+key, null);
+	}
 	/**
 	 * Return the date/time this class was generated
 	 * @return the date/time this class was generated
