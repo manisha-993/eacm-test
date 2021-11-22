@@ -752,7 +752,30 @@ class TAXCATEGORY {
 	public List<SLEORGNPLNTCODE> getSLEORGNPLNTCODELIST() {
 		return SLEORGNPLNTCODELIST;
 	}
-
+@Override
+public boolean equals(Object obj) {
+	// TODO Auto-generated method stub
+	if(obj instanceof TAXCATEGORY) {
+		TAXCATEGORY taxcategory = (TAXCATEGORY)obj;
+		if(obj!=null&&this.getCOUNTRYLIST()!=null&&taxcategory.getCOUNTRYLIST()!=null) {
+			if(this.getCOUNTRYLIST().size()>0&&taxcategory.getCOUNTRYLIST().size()>0) {
+				return this.getCOUNTRYLIST().get(0).getCOUNTRY_FC().equals(taxcategory.getCOUNTRYLIST().get(0).getCOUNTRY_FC());
+			}
+		}
+	}
+	
+	return false;
+}
+@Override
+public int hashCode() {
+	// TODO Auto-generated method stub
+	if(this.getCOUNTRYLIST()!=null) {
+		if(this.getCOUNTRYLIST().size()>0) {
+			return this.getCOUNTRYLIST().get(0).getCOUNTRY_FC().hashCode();
+		}
+	}
+	return super.hashCode();
+}
 }
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
@@ -1240,6 +1263,21 @@ class SLEORGNPLNTCODE {
 	}
 	public String getPLNTCD() {
 		return PLNTCD;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		// TODO Auto-generated method stub
+		if (obj instanceof SLEORGNPLNTCODE) {
+			SLEORGNPLNTCODE newobj = (SLEORGNPLNTCODE) obj;
+			return this.SLEORG.equals(newobj.getSLEORG())&&this.PLNTCD.equals(newobj.getPLNTCD())&&this.getSLEORGNPLNTCODEACTION().equals(newobj.getSLEORGNPLNTCODEACTION());
+			//
+		}
+		return false;
+	}
+	@Override
+	public int hashCode() {
+		// TODO Auto-generated method stub
+		return this.SLEORG.hashCode()+this.PLNTCD.hashCode()+this.SLEORGNPLNTCODEACTION.hashCode();
 	}
 
 }

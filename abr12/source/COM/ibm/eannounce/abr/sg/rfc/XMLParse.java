@@ -1,6 +1,10 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -6608,15 +6612,23 @@ public class XMLParse {
 			factory.setNamespaceAware(false);
 		    DocumentBuilder builder = factory.newDocumentBuilder();
 		    Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));		 
-		    SVCMOD svcObj = getObjFromDoc(doc, SVCMOD.class);
+		    //SVCMOD svcObj = getObjFromDoc(doc, SVCMOD.class);
+		    SVCMOD svcObj = getSvcmodFromXml( loadXml(""));
 		    RdhMatmCreate matmCreate = new RdhMatmCreate(svcObj);
 		    matmCreate.execute();
-		    System.out.println(svcObj.getMACHTYPE()); 
-			/*
-			 * for(AVAILABILITY avail : svcObj.getAVAILABILITYLIST()) {
+		    String obj_id = svcObj.getMACHTYPE()+svcObj.getMODEL();
+		    String event = 	svcObj.getMACHTYPE()+svcObj.getMODEL();
+		    String  class_name="MG_COMMON";
+		    String class_type="001";
+		    RdhClassificationMaint maint = new RdhClassificationMaint(event, obj_id, class_name, class_type, "");
+		    maint.execute();
+		    /*
+			 * System.out.println(svcObj.getMACHTYPE()); for(AVAILABILITY avail :
+			 * svcObj.getAVAILABILITYLIST()) {
 			 * System.out.println("country"+avail.getCOUNTRY_FC()+"  planavail："+avail.
 			 * getPLANNEDAVAILABILITY()); }
 			 */
+			 
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}  
@@ -6630,12 +6642,40 @@ public class XMLParse {
 		    DocumentBuilder builder = factory.newDocumentBuilder();
 		    Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));		 
 		     svcObj = getObjFromDoc(doc, SVCMOD.class);
+		     //695561U.xml
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}  
 		
 		return svcObj;
 	}
+	
+	
+	public static String loadXml(String xmlPath){
+		xmlPath = "C:\\Users\\JianBoXu\\Desktop\\eacm\\695561U.xml";
+		StringBuffer stringBuffer = new StringBuffer();
+		try {
+			BufferedReader reader;
+			reader = new BufferedReader(new FileReader(xmlPath));
+		
+			String line = null;
+			while ((line=reader.readLine())!=null) {
+				stringBuffer.append(line);
+				
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		
+		return stringBuffer.toString();
+		
+	}
+	
 	
 	}
 

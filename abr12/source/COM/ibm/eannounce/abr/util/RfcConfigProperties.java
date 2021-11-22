@@ -140,6 +140,11 @@ public final class RfcConfigProperties extends Properties {
 		return 
 			c_prop.getProperty(key, "");
 	}
+	public static  String getCountry(String key){
+		reloadProperties();
+		return 
+			c_prop.getProperty("COUNTRY."+key, null);
+	}
 	public static  String getZsabrtaxPropertys(String key){
 		reloadProperties();
 		return 

@@ -3,8 +3,11 @@ package COM.ibm.eannounce.abr.sg.rfc;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmm00;
@@ -18,9 +21,9 @@ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_plant;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_sales_org;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_tax_country;
 import COM.ibm.eannounce.abr.util.RfcConfigProperties;
+import COM.ibm.eannounce.abr.util.XMLSLEORGGRPElem;
 
 import com.google.gson.annotations.SerializedName;
-
 
 /**
  * Creates or updates an SAP material master.
@@ -49,14 +52,14 @@ public class RdhMatmCreate extends RdhBase {
 	private String is_multi_plants;
 
 	public RdhMatmCreate(SVCMOD svcmod) {
-		super(svcmod.getMACHTYPE() + svcmod.getMODEL(), "Z_DM_SAP_MATM_CREATE"
-				.toLowerCase(), null);
+		super(svcmod.getMACHTYPE() + svcmod.getMODEL(), "Z_DM_SAP_MATM_CREATE".toLowerCase(), null);
 		// RdhMatm_bmm00 matnr Copy from <SoftwareProduct.productIdentifier>.
 		bmm00.get(0).setMatnr(svcmod.getMACHTYPE() + svcmod.getMODEL());
 		bmm00.get(0).setMtart(getMtart(svcmod));
 		bmm00.get(0).setMbrsh("M");
-		bmm00.get(0).setWerks("00");
-		
+		//bmm00.get(0).setWerks("00");
+		bmm00.get(0).setVtweg("00");
+
 		bmmh1.get(0).setMatkl("000");
 		bmmh1.get(0).setMeins(getMeins(svcmod));
 		bmmh1.get(0).setZeinr("");
@@ -70,187 +73,303 @@ public class RdhMatmCreate extends RdhBase {
 		bmmh1.get(0).setPrctr(svcmod.getPRFTCTR());
 		bmmh1.get(0).setKtgrm(svcmod.getACCTASGNGRP());
 //		/PCTOFCMPLTINDC 
-		if("YES".equals(svcmod.getPCTOFCMPLTINDC()))
+		if ("YES".equals(svcmod.getPCTOFCMPLTINDC()))
 			bmmh1.get(0).setPrat1("Y");
-		
-		
+
 		List<TAXCODE> taxcodes = svcmod.getTAXCODELIST();
-		if (taxcodes!=null&&taxcodes.size()>0) {
+		if (taxcodes != null && taxcodes.size() > 0) {
 			bmmh1.get(0).setMvgr5(taxcodes.get(0).getTAXCODE());
 		}
-		//bmmh1.get(0).setp;
-		
-		
+		// bmmh1.get(0).setp;
+
 		List<LANGUAGE> languages = svcmod.getLANGUAGELIST();
-		if(languages!=null&&languages.size()>0){
+		if (languages != null && languages.size() > 0) {
 			bmmh5.get(0).setSpras(languages.get(0).getNLSID());
 			bmmh5.get(0).setMaktx(languages.get(0).getINVNAME());
 			bmmh5.get(0).setTdline(languages.get(0).getMKTGNAME());
-		}else{
-		bmmh5.get(0).setSpras("E");
+		} else {
+			bmmh5.get(0).setSpras("E");
 		}
-		
-		if("ZSV2".equals(bmm00.get(0).getMtart())){
+
+		if ("ZSV2".equals(bmm00.get(0).getMtart())) {
 			bmmh6.get(0).setMeinh("SMI");
 			bmmh6.get(0).setUmrez("HUR");
 		}
+		bmmh7.get(0).setTdid("0001");
+		bmmh7.get(0).setTdspras("E");
+		// SVCMOD_UPDATE /LANGUAGELIST /LANGUAGEELEMENT /MKTGNAME
+		if (svcmod.getLANGUAGELIST() != null) {
+			bmmh7.get(0).setTdline(svcmod.getLANGUAGELIST().get(0).getMKTGNAME());
+		}
 		List<AVAILABILITY> availabilities = svcmod.getAVAILABILITYLIST();
-		List<TAXCATEGORY> taxcategories= svcmod.getTAXCATEGORYLIST();
-		int index =1;
+		List<TAXCATEGORY> taxcategories = svcmod.getTAXCATEGORYLIST();
+		int index = 1;
 		Set<String> pubfromSet = new HashSet<>();
-		if(availabilities!=null&&availabilities.size()>0){
-			
-			for (int i = 0; i <availabilities.size(); i++) {
-				if(pubfromSet.contains(availabilities.get(i).getPUBFROM())){
-					continue;
-				}else {
-					pubfromSet.add(availabilities.get(i).getPUBFROM());
+		if (availabilities != null && availabilities.size() > 0) {
+			/**
+			 * Group availablities by pubfrom
+			 */
+			Map<String, Set<SLEORGNPLNTCODE>> sMap = new HashMap<String, Set<SLEORGNPLNTCODE>>();
+			Map<String, Set<AVAILABILITY>> aMap = new HashMap<String, Set<AVAILABILITY>>();
+			Map<String, Set<TAXCATEGORY>> cMap = new HashMap<String, Set<TAXCATEGORY>>();
+			// Map<String, Set<SLEORGNPLNTCODE>> sMap = new HashMap<String,
+			// Set<SLEORGNPLNTCODE>>();
+
+			for (int i = 0; i < availabilities.size(); i++) {
+				Set<SLEORGNPLNTCODE> sset = sMap.get(availabilities.get(i).getPUBFROM());
+				if (sset == null) {
+					sset = new HashSet<SLEORGNPLNTCODE>();
+					sMap.put(availabilities.get(i).getPUBFROM(), sset);
 				}
+				sset.addAll(availabilities.get(i).getSLEORGNPLNTCODELIST());
+
+				Set<AVAILABILITY> aset = aMap.get(availabilities.get(i).getPUBFROM());
+				if (aset == null) {
+					aset = new HashSet<AVAILABILITY>();
+					aMap.put(availabilities.get(i).getPUBFROM(), aset);
+				}
+				aset.add(availabilities.get(i));
+				Set<TAXCATEGORY> cset = cMap.get(availabilities.get(i).getPUBFROM());
+				if (cset == null) {
+					cset = new HashSet<TAXCATEGORY>();
+				}
+				if (taxcategories != null) {
+					for (int j = 0; j < taxcategories.size(); j++) {
+						if (taxcategories.get(j) != null && taxcategories.get(j).getCOUNTRYLIST() != null
+								&& taxcategories.get(j).getCOUNTRYLIST().size() > 0) {
+							if (availabilities.get(i).getCOUNTRY_FC()
+									.equals(taxcategories.get(j).getCOUNTRYLIST().get(0).getCOUNTRY_FC())) {
+								cset.add(taxcategories.get(j));
+							}
+
+						}
+
+						/*
+						 * if(taxcategories.get(j).getCOUNTRYLIST().get(i).getCOUNTRY_FC().contains(
+						 * availabilities.get(i).getCOUNTRY_FC())){ cset.add(taxcategories.get(j)); }
+						 */
+					}
+				}
+				cMap.put(availabilities.get(i).getPUBFROM(), cset);
+				// taxcategories.get(i).getCOUNTRYLIST().contains("");
+
+			}
+
+			Iterator<String> iterator = sMap.keySet().iterator();
+			while (iterator.hasNext()) {
+				String pubfrom = iterator.next();
+
 				RdhMatm_geo geo = new RdhMatm_geo();
-				geo.setName("WW"+index++);
+				geo.setName("WW" + index++);
 				geo.setVmsta("Z0");
-				geo.setVmstd(availabilities.get(i).getPUBFROM());
-				
-				List<SLEORGNPLNTCODE> sleorggrps =availabilities.get(i).getSLEORGNPLNTCODELIST();
-				
+				geo.setVmstd(pubfrom);
+
+				List<SLEORGNPLNTCODE> sleorggrps = new ArrayList(sMap.get(pubfrom));
+				List<TAXCATEGORY> taxcList = new ArrayList<TAXCATEGORY>(cMap.get(pubfrom));
 				List<RdhMatm_sales_org> sales_orgList = new ArrayList<RdhMatm_sales_org>();
 				List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
 				List<RdhMatm_tax_country> tax_countries = new ArrayList<RdhMatm_tax_country>();
-				if(sleorggrps!=null&&sleorggrps.size()>0){
-					for (int j = 0; j < sleorggrps.size(); j++) {
-						SLEORGNPLNTCODE sleorgnplntcode = sleorggrps.get(j);
-						RdhMatm_plant plant = new RdhMatm_plant();
-						plant.setWerks(sleorgnplntcode.getPLNTCD());
-						if(plant.getWerks()!=null&&plant.getWerks().startsWith("P")){
-							plant.setPrctr(plant.getWerks().replaceFirst("P", "YY"));
-						}
-						else {
-							plant.setPrctr(bmmh1.get(0).getPrctr());
-						}
-						RdhMatm_sales_org sales_org = new RdhMatm_sales_org();
-						sales_org.setVkorg(sleorggrps.get(j).getSLEORG());
-						sales_org.setDwerk(sleorggrps.get(j).getPLNTCD());
-						//"Canada, Ireland, US"
-						if("0026".contains(sleorggrps.get(j).getSLEORG())){
-							sales_org.setZtaxclsf(getZtaxclsf(svcmod,"Canada"));
-						}
-						else if("0066".contains(sleorggrps.get(j).getSLEORG())){
-							sales_org.setZtaxclsf(getZtaxclsf(svcmod,"Ireland"));
-						}
-						else if("0147".contains(sleorggrps.get(j).getSLEORG())){
-							sales_org.setZtaxclsf(getZtaxclsf(svcmod,"US"));
-						}
-						if("0066".equals(sales_org.getVkorg())){
-							if("2046".equals(plant.getWerks())){
-								if("P4016".equals(bmmh1.get(0).getPrctr())){
-									sales_org.setZsabrtax("SWMA");
-								}else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
-									sales_org.setZsabrtax("HWMA");
-								}
-							}
-						}
-						
-						else if ("0026,0147".contains(sales_org.getVkorg())) {
-							sales_org.setZtaxclsf("");
-							if (sales_org.getZtaxclsf()!=null&&!sales_org.getZtaxclsf().equals("")) {
-								sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
-							}
-						}
-						
-						/**
-						 * If <geo.sales_org.vkorg> in (“0026”,”0147”)
-   							if <geo.sales_org.ztaxclsf> is set to a value, then {
-      						Read the keyword_t table where category == "ZSABRTAX" and kwvalue == <geo.sales_org.ztaxclsf>.
-      						if a row is found, then 
-            				Copy <keyword_t.name> to zsabrtax.
-      						else {
-            				Set error_text to "Error: Unable to set ZSABRTAX value. ZTAXCLSF value geo.sales_org.ztaxclsf> not found in keyword_t table for category "ZSABRTAX".
-      							}
-								}
 
-						 */
-						
-						
-						
-						sales_orgList.add(sales_org);
-						plantList.add(plant);
+				for (int j = 0; j < sleorggrps.size(); j++) {
+					SLEORGNPLNTCODE sleorgnplntcode = sleorggrps.get(j);
+					RdhMatm_plant plant = new RdhMatm_plant();
+					plant.setWerks(sleorgnplntcode.getPLNTCD());
+					if (plant.getWerks() != null && plant.getWerks().startsWith("Y")) {
+						plant.setPrctr(plant.getWerks().replaceFirst("Y", "YY"));
+					} else {
+						plant.setPrctr(bmmh1.get(0).getPrctr());
 					}
-					
+					RdhMatm_sales_org sales_org = new RdhMatm_sales_org();
+					sales_org.setVkorg(sleorggrps.get(j).getSLEORG());
+					sales_org.setDwerk(sleorggrps.get(j).getPLNTCD());
+					// "Canada, Ireland, US"
+					if ("0026".contains(sleorggrps.get(j).getSLEORG())) {
+						sales_org.setZtaxclsf(getZtaxclsf(svcmod, "Canada"));
+					} else if ("0066".contains(sleorggrps.get(j).getSLEORG())) {
+						sales_org.setZtaxclsf(getZtaxclsf(svcmod, "Ireland"));
+					} else if ("0147".contains(sleorggrps.get(j).getSLEORG())) {
+						sales_org.setZtaxclsf(getZtaxclsf(svcmod, "US"));
+					}
+					if ("0066".equals(sales_org.getVkorg())) {
+						if ("2046".equals(plant.getWerks())) {
+							if ("P4016".equals(bmmh1.get(0).getPrctr())) {
+								sales_org.setZsabrtax("SWMA");
+							} else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
+								sales_org.setZsabrtax("HWMA");
+							}
+						}
+					}
+
+					else if ("0026,0147".contains(sales_org.getVkorg())) {
+						sales_org.setZtaxclsf("");
+						if (sales_org.getZtaxclsf() != null && !sales_org.getZtaxclsf().equals("")) {
+							sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
+						}
+					}
+
 					/**
-					 * e.	For each SVCMOD_UPDATE /TAXCATEGORYLIST /TAXCATEGORYELEMENT
-							Associate the TAXCATEGORYELEMENT to the group on the condition that 
-							TAXCATEGORYELEMENT/ COUNTRYLIST /COUNTRYELEMENT /COUNTRY_FC = SVCMOD_UPDATE /AVAILABILITYLIST /AVAILABILITYELEMENT/COUNTRY_FC
-							Create one row into tax_country structure of the group as below and then remove the duplidated rows.
-
+					 * If <geo.sales_org.vkorg> in (“0026”,”0147”) if <geo.sales_org.ztaxclsf> is
+					 * set to a value, then { Read the keyword_t table where category == "ZSABRTAX"
+					 * and kwvalue == <geo.sales_org.ztaxclsf>. if a row is found, then Copy
+					 * <keyword_t.name> to zsabrtax. else { Set error_text to "Error: Unable to set
+					 * ZSABRTAX value. ZTAXCLSF value geo.sales_org.ztaxclsf> not found in keyword_t
+					 * table for category "ZSABRTAX". } }
+					 * 
 					 */
-					if(taxcategories!=null){
-						for (int k = 0; k < taxcategories.size(); k++) {
-							List<COUNTRY> countries = taxcategories.get(k).getCOUNTRYLIST();
-							if(countries!=null){
-								for (int j = 0; j < countries.size(); j++) {
-									if(countries.get(j).getCOUNTRY_FC().equals(availabilities.get(i).getCOUNTRY_FC())){
-										RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
-										tax_country.setTaty1(taxcategories.get(k).getTAXCATEGORYVALUE());
-										tax_country.setTaxm1(taxcategories.get(k).getTAXCATEGORYACTION());
-										tax_country.setTaxm2("1");
-										tax_country.setTaxm3("1");
-										tax_country.setTaxm4("1");
-										tax_country.setTaxm5("1");
-										tax_country.setTaxm6("1");
-										tax_country.setTaxm7("1");
-										tax_country.setTaxm8("1");
-										tax_country.setTaxm9("1");
-									}
-								}
-								
-							}
-						}
+
+					sales_orgList.add(sales_org);
+					plantList.add(plant);
+				}
+
+				/**
+				 * e. For each SVCMOD_UPDATE /TAXCATEGORYLIST /TAXCATEGORYELEMENT Associate the
+				 * TAXCATEGORYELEMENT to the group on the condition that TAXCATEGORYELEMENT/
+				 * COUNTRYLIST /COUNTRYELEMENT /COUNTRY_FC = SVCMOD_UPDATE /AVAILABILITYLIST
+				 * /AVAILABILITYELEMENT/COUNTRY_FC Create one row into tax_country structure of
+				 * the group as below and then remove the duplidated rows.
+				 * 
+				 */
+				if (taxcList != null) {
+					for (int k = 0; k < taxcList.size(); k++) {
+						List<COUNTRY> countries = taxcList.get(k).getCOUNTRYLIST();
+
+						RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
+						tax_country.setTaty1(taxcList.get(k).getTAXCATEGORYVALUE());
+						tax_country.setTaxm1(taxcList.get(k).getTAXCLASSIFICATION());
+						// tax_country.setAland("US");
+						tax_country.setAland(RfcConfigProperties
+								.getCountry(taxcList.get(k).getCOUNTRYLIST().get(0).getCOUNTRY_FC()));
+						tax_country.setTaxm2("1");
+						tax_country.setTaxm3("1");
+						tax_country.setTaxm4("1");
+						tax_country.setTaxm5("1");
+						tax_country.setTaxm6("1");
+						tax_country.setTaxm7("1");
+						tax_country.setTaxm8("1");
+						tax_country.setTaxm9("1");
+
+						tax_countries.add(tax_country);
+
 					}
-					
 				}
 				geo.setPlants(plantList);
 				geo.setSales_orgs(sales_orgList);
 				geo.setTax_countries(tax_countries);
 				geos.add(geo);
-				
+
 			}
-		}
-		
-		
-		
-		//bmm00.get(0).setTcode("MM01");
-		//geos.get(0);
-		//!!!!!
-		//bmmh1.get(0).set
-		
-		
-		//bmmh1.get(0).setMvgr5(svcmod.getTAXCATEGORYLIST());
-		
-		/*
-		 * if(!isNullOrBlank(productSchedule.getRfaNumber())) {
-		 * bmmh1.get(0).setZeiar("RFA");
-		 * bmmh1.get(0).setZeinr(productSchedule.getRfaNumber()); }
-		 * 
-		 * if(this.isAas(softwareProduct)) {
-		 * if(!softwareProduct.getIsSwmaOffered()) { Date annDate =
-		 * this.getEarliestAnnDate(softwareProduct); if(annDate != null) {
-		 * bmmh1.
-		 * get(0).setAeszn(DateUtility.getDateStringWithAesznFormat(annDate)); }
-		 * }
-		 * if(RpqType.NOT_RPQ.name().equals(softwareProduct.getRpqType().getKwValue
-		 * ())) { bmmh1.get(0).setZconf("F"); }else {
-		 * bmmh1.get(0).setZconf("E"); } }
-		 */
 
-		// RdhMatm_bmmh5 spras Set to "E" (English).
-	
-		// if(softwareProduct.getLicenseAgreementType() == null
-		// ||
-		// "F".equalsIgnoreCase(softwareProduct.getLicenseAgreementType().getIsSerialized())){
-		// bmmh1.get(0).setSernp("");
-		// }
+			/*
+			 * for (int i = 0; i <availabilities.size(); i++) {
+			 * if(pubfromSet.contains(availabilities.get(i).getPUBFROM())){ continue; }else
+			 * {
+			 * 
+			 * } RdhMatm_geo geo = new RdhMatm_geo(); geo.setName("WW"+index);
+			 * geo.setVmsta("Z0"); geo.setVmstd(availabilities.get(i).getPUBFROM());
+			 * 
+			 * List<SLEORGNPLNTCODE> sleorggrps
+			 * =availabilities.get(i).getSLEORGNPLNTCODELIST();
+			 * 
+			 * List<RdhMatm_sales_org> sales_orgList = new ArrayList<RdhMatm_sales_org>();
+			 * List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
+			 * List<RdhMatm_tax_country> tax_countries = new
+			 * ArrayList<RdhMatm_tax_country>(); if(sleorggrps!=null&&sleorggrps.size()>0){
+			 * for (int j = 0; j < sleorggrps.size(); j++) { SLEORGNPLNTCODE sleorgnplntcode
+			 * = sleorggrps.get(j); RdhMatm_plant plant = new RdhMatm_plant();
+			 * plant.setWerks(sleorgnplntcode.getPLNTCD());
+			 * if(plant.getWerks()!=null&&plant.getWerks().startsWith("P")){
+			 * plant.setPrctr(plant.getWerks().replaceFirst("P", "YY")); } else {
+			 * plant.setPrctr(bmmh1.get(0).getPrctr()); } RdhMatm_sales_org sales_org = new
+			 * RdhMatm_sales_org(); sales_org.setVkorg(sleorggrps.get(j).getSLEORG());
+			 * sales_org.setDwerk(sleorggrps.get(j).getPLNTCD()); //"Canada, Ireland, US"
+			 * if("0026".contains(sleorggrps.get(j).getSLEORG())){
+			 * sales_org.setZtaxclsf(getZtaxclsf(svcmod,"Canada")); } else
+			 * if("0066".contains(sleorggrps.get(j).getSLEORG())){
+			 * sales_org.setZtaxclsf(getZtaxclsf(svcmod,"Ireland")); } else
+			 * if("0147".contains(sleorggrps.get(j).getSLEORG())){
+			 * sales_org.setZtaxclsf(getZtaxclsf(svcmod,"US")); }
+			 * if("0066".equals(sales_org.getVkorg())){ if("2046".equals(plant.getWerks())){
+			 * if("P4016".equals(bmmh1.get(0).getPrctr())){ sales_org.setZsabrtax("SWMA");
+			 * }else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
+			 * sales_org.setZsabrtax("HWMA"); } } }
+			 * 
+			 * else if ("0026,0147".contains(sales_org.getVkorg())) {
+			 * sales_org.setZtaxclsf(""); if
+			 * (sales_org.getZtaxclsf()!=null&&!sales_org.getZtaxclsf().equals("")) {
+			 * sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf())); } }
+			 * 
+			 *//**
+				 * If <geo.sales_org.vkorg> in (“0026”,”0147”) if <geo.sales_org.ztaxclsf> is
+				 * set to a value, then { Read the keyword_t table where category == "ZSABRTAX"
+				 * and kwvalue == <geo.sales_org.ztaxclsf>. if a row is found, then Copy
+				 * <keyword_t.name> to zsabrtax. else { Set error_text to "Error: Unable to set
+				 * ZSABRTAX value. ZTAXCLSF value geo.sales_org.ztaxclsf> not found in keyword_t
+				 * table for category "ZSABRTAX". } }
+				 * 
+				 */
+			/*
+			 * 
+			 * 
+			 * 
+			 * sales_orgList.add(sales_org); plantList.add(plant); }
+			 * 
+			 *//**
+				 * e. For each SVCMOD_UPDATE /TAXCATEGORYLIST /TAXCATEGORYELEMENT Associate the
+				 * TAXCATEGORYELEMENT to the group on the condition that TAXCATEGORYELEMENT/
+				 * COUNTRYLIST /COUNTRYELEMENT /COUNTRY_FC = SVCMOD_UPDATE /AVAILABILITYLIST
+				 * /AVAILABILITYELEMENT/COUNTRY_FC Create one row into tax_country structure of
+				 * the group as below and then remove the duplidated rows.
+				 * 
+				 *//*
+					 * if(taxcategories!=null){ for (int k = 0; k < taxcategories.size(); k++) {
+					 * List<COUNTRY> countries = taxcategories.get(k).getCOUNTRYLIST();
+					 * if(countries!=null){ for (int j = 0; j < countries.size(); j++) {
+					 * if(countries.get(j).getCOUNTRY_FC().equals(availabilities.get(i).
+					 * getCOUNTRY_FC())){ RdhMatm_tax_country tax_country = new
+					 * RdhMatm_tax_country();
+					 * tax_country.setTaty1(taxcategories.get(k).getTAXCATEGORYVALUE());
+					 * tax_country.setTaxm1(taxcategories.get(k).getTAXCATEGORYACTION());
+					 * tax_country.setTaxm2("1"); tax_country.setTaxm3("1");
+					 * tax_country.setTaxm4("1"); tax_country.setTaxm5("1");
+					 * tax_country.setTaxm6("1"); tax_country.setTaxm7("1");
+					 * tax_country.setTaxm8("1"); tax_country.setTaxm9("1"); } }
+					 * 
+					 * } } } index++; pubfromSet.add(availabilities.get(i).getPUBFROM());
+					 * geo.setPlants(plantList); geo.setSales_orgs(sales_orgList);
+					 * geo.setTax_countries(tax_countries); geos.add(geo); }
+					 */
 
-		//setGeoSalesOrgCountry(softwareProduct, null, null, null);
+		
+	}
+
+	bmm00.get(0).setTcode("MM01");
+	// geos.get(0);
+	// !!!!!
+	// bmmh1.get(0).set
+
+	// bmmh1.get(0).setMvgr5(svcmod.getTAXCATEGORYLIST());
+
+	/*
+	 * if(!isNullOrBlank(productSchedule.getRfaNumber())) {
+	 * bmmh1.get(0).setZeiar("RFA");
+	 * bmmh1.get(0).setZeinr(productSchedule.getRfaNumber()); }
+	 * 
+	 * if(this.isAas(softwareProduct)) { if(!softwareProduct.getIsSwmaOffered()) {
+	 * Date annDate = this.getEarliestAnnDate(softwareProduct); if(annDate != null)
+	 * { bmmh1. get(0).setAeszn(DateUtility.getDateStringWithAesznFormat(annDate));
+	 * } } if(RpqType.NOT_RPQ.name().equals(softwareProduct.getRpqType().getKwValue
+	 * ())) { bmmh1.get(0).setZconf("F"); }else { bmmh1.get(0).setZconf("E"); } }
+	 */
+
+	// RdhMatm_bmmh5 spras Set to "E" (English).
+
+	// if(softwareProduct.getLicenseAgreementType() == null
+	// ||
+	// "F".equalsIgnoreCase(softwareProduct.getLicenseAgreementType().getIsSerialized())){
+	// bmmh1.get(0).setSernp("");
+	// }
+
+	// setGeoSalesOrgCountry(softwareProduct, null, null, null);
 	}
 
 	private String getZsabrtax(String ztaxclsf) {
@@ -258,39 +377,38 @@ public class RdhMatmCreate extends RdhBase {
 		return RfcConfigProperties.getZsabrtaxPropertys(ztaxclsf);
 	}
 
-	private String getZtaxclsf(SVCMOD svcmod,String country){
-	List<TAXCATEGORY> taxs = 	svcmod.getTAXCATEGORYLIST();
-	if(taxs!=null&&taxs.size()>0){
-		for (int i = 0; i < taxs.size(); i++) {
-			List<SLEORGNPLNTCODE> list = taxs.get(i).getSLEORGNPLNTCODELIST();
-			if(list!=null&&list.size()>0){
-				for (int j = 0; j < list.size(); j++) {
-					if("country".contains(list.get(j).getSLEORG())){
-						return taxs.get(i).getTAXCATEGORYACTION();
+	private String getZtaxclsf(SVCMOD svcmod, String country) {
+		List<TAXCATEGORY> taxs = svcmod.getTAXCATEGORYLIST();
+		if (taxs != null && taxs.size() > 0) {
+			for (int i = 0; i < taxs.size(); i++) {
+				List<SLEORGNPLNTCODE> list = taxs.get(i).getSLEORGNPLNTCODELIST();
+				if (list != null && list.size() > 0) {
+					for (int j = 0; j < list.size(); j++) {
+						if (country.contains(list.get(j).getSLEORG())) {
+							return taxs.get(i).getTAXCATEGORYACTION();
+						}
 					}
 				}
 			}
 		}
-	}
 		return null;
-		
+
 	}
+
 	private String getMtpos(COM.ibm.eannounce.abr.sg.rfc.SVCMOD svcmod) {
 		// TODO Auto-generated method stub
-		String result=null;
+		String result = null;
 		if (svcmod == null)
 			return result;
 		if ("Service".equals(svcmod.getCATEGORY())) {
 			if ("Custom".equals(svcmod.getSUBCATEGORY())) {
-				if ("Project Based".equals(svcmod.getGROUP())
-						|| "Operations Based".equals(svcmod.getGROUP())) {
+				if ("Project Based".equals(svcmod.getGROUP()) || "Operations Based".equals(svcmod.getGROUP())) {
 					result = "ZSV1";
 				}
 
 			} else if ("Facility".equals(svcmod.getSUBCATEGORY())) {
 				/**
-				 * SMG0003 (Penalty) SMG0004 (Incident) SMG0005 (Travel) SMG006
-				 * (Activity)
+				 * SMG0003 (Penalty) SMG0004 (Incident) SMG0005 (Travel) SMG006 (Activity)
 				 */
 				if ("Penalty".equals(svcmod.getGROUP())) {
 					result = "ZSV4";
@@ -305,8 +423,7 @@ public class RdhMatmCreate extends RdhBase {
 					&& "Non-Federated".equals(svcmod.getGROUP())) {
 				result = "ZSA1";
 			}
-		} else if ("IP".equals(svcmod.getCATEGORY())
-				&& "SC".equals(svcmod.getSUBCATEGORY())) {
+		} else if ("IP".equals(svcmod.getCATEGORY()) && "SC".equals(svcmod.getSUBCATEGORY())) {
 			result = "ZSV1";
 		}
 		return result;
@@ -325,8 +442,7 @@ public class RdhMatmCreate extends RdhBase {
 					&& "Non-Federated".equals(svcmod.getGROUP())) {
 				mtart = "ZSV2";
 			}
-		} else if ("IP".equals(svcmod.getCATEGORY())
-				&& "SC".equals(svcmod.getSUBCATEGORY())) {
+		} else if ("IP".equals(svcmod.getCATEGORY()) && "SC".equals(svcmod.getSUBCATEGORY())) {
 			mtart = "ZSV1";
 		}
 		return mtart;
@@ -345,8 +461,7 @@ public class RdhMatmCreate extends RdhBase {
 					&& "Non-Federated".equals(svcmod.getGROUP())) {
 				reslut = "EA";
 			}
-		} else if ("IP".equals(svcmod.getCATEGORY())
-				&& "SC".equals(svcmod.getSUBCATEGORY())) {
+		} else if ("IP".equals(svcmod.getCATEGORY()) && "SC".equals(svcmod.getSUBCATEGORY())) {
 			reslut = "EA";
 		}
 		return reslut;
@@ -357,8 +472,8 @@ public class RdhMatmCreate extends RdhBase {
 	 * softwareProduct, LicensedFunction licensedFunction) {
 	 * super(productSchedule.getMainProduct().getProductIdentifier() + "_" +
 	 * productSchedule.getId(), "Z_DM_SAP_MATM_CREATE".toLowerCase(),
-	 * softwareProduct.getEnablementProcess().getKwValue()); this.type = "ZZEE";
-	 * try { RdhClassDefaultValuesUtility.setDefaultValues(this, type); } catch
+	 * softwareProduct.getEnablementProcess().getKwValue()); this.type = "ZZEE"; try
+	 * { RdhClassDefaultValuesUtility.setDefaultValues(this, type); } catch
 	 * (Exception e) { this.setRfcrc(8);
 	 * this.setError_text("Get Default value  - Exception " + e.getMessage()); }
 	 * bmm00.get(0).setMatnr(licensedFunction.getMaterialID());
@@ -372,12 +487,11 @@ public class RdhMatmCreate extends RdhBase {
 	 * setGeoSalesOrgCountry(softwareProduct,licensedFunction,null,null); }
 	 * 
 	 * public RdhMatmCreate(ProductSchedule productSchedule, SoftwareProduct
-	 * softwareProduct, OrderableSupply orderableSupply, String
-	 * orderableSupplyName) {
-	 * super(productSchedule.getMainProduct().getProductIdentifier() + "_" +
+	 * softwareProduct, OrderableSupply orderableSupply, String orderableSupplyName)
+	 * { super(productSchedule.getMainProduct().getProductIdentifier() + "_" +
 	 * productSchedule.getId(), "Z_DM_SAP_MATM_CREATE".toLowerCase(),
-	 * softwareProduct.getEnablementProcess().getKwValue()); this.type = "ZOSP";
-	 * try { RdhClassDefaultValuesUtility.setDefaultValues(this, type); } catch
+	 * softwareProduct.getEnablementProcess().getKwValue()); this.type = "ZOSP"; try
+	 * { RdhClassDefaultValuesUtility.setDefaultValues(this, type); } catch
 	 * (Exception e) { this.setRfcrc(8);
 	 * this.setError_text("Get Default value  - Exception " + e.getMessage()); }
 	 * bmm00.get(0).setMatnr(orderableSupply.getMaterialId());
@@ -389,8 +503,8 @@ public class RdhMatmCreate extends RdhBase {
 	 * softwareProduct, SliceGroupEsw sliceGroupEsw){
 	 * super(productSchedule.getMainProduct().getProductIdentifier() + "_" +
 	 * productSchedule.getId(), "Z_DM_SAP_MATM_CREATE".toLowerCase(),
-	 * softwareProduct.getEnablementProcess().getKwValue()); this.type = "ZGRP";
-	 * try { RdhClassDefaultValuesUtility.setDefaultValues(this, type); } catch
+	 * softwareProduct.getEnablementProcess().getKwValue()); this.type = "ZGRP"; try
+	 * { RdhClassDefaultValuesUtility.setDefaultValues(this, type); } catch
 	 * (Exception e) { this.setRfcrc(8);
 	 * this.setError_text("Get Default value  - Exception " + e.getMessage()); }
 	 * bmm00.get(0).setMatnr(sliceGroupEsw.getMaterialId());
@@ -416,61 +530,57 @@ public class RdhMatmCreate extends RdhBase {
 	 * sapFeedId = "ESW_FEED_ALL";//default for esw -
 	 * <SoftwareProduct.enablementProcess> = "SWPIMS" List<SapGeo> sapGeos =
 	 * softwareProduct.getSapGeoObjects(); if(this.isAas(softwareProduct)) {
-	 * if(softwareProduct.getIsSwmaOffered()) { sapFeedId =
-	 * "CSW_FEED_IERP_SWMA"; }else { sapFeedId = "CSW_FEED_IERP_LIC"; } sapGeos
-	 * = softwareProduct.getSapGeoObjectsBasedOnSapFeedId(sapFeedId); }
+	 * if(softwareProduct.getIsSwmaOffered()) { sapFeedId = "CSW_FEED_IERP_SWMA";
+	 * }else { sapFeedId = "CSW_FEED_IERP_LIC"; } sapGeos =
+	 * softwareProduct.getSapGeoObjectsBasedOnSapFeedId(sapFeedId); }
 	 * 
 	 * for(SapGeo sapGeo : sapGeos) { boolean isSetSalesStatus = false;
-	 * List<GeoAvailStatus> availStatuses = null;// for different case, will get
-	 * the geoavailstatus by different way if(licensedFunction != null) {
-	 * availStatuses = licensedFunction.getGeoAvailStatusObjects(); } else
-	 * if(orderableSupply !=null) { availStatuses =
-	 * orderableSupply.getGeoAvailStatusObjects(); } else if(sliceGroupEsw
-	 * !=null) { availStatuses = softwareProduct.getGeoAvailStatusObjects(); }
-	 * else { availStatuses = softwareProduct.getGeoAvailStatusObjects();
-	 * isSetSalesStatus = true; } if(availStatuses == null ||
-	 * availStatuses.isEmpty()) { continue; } for (GeoAvailStatus availStatus :
-	 * availStatuses) { if
+	 * List<GeoAvailStatus> availStatuses = null;// for different case, will get the
+	 * geoavailstatus by different way if(licensedFunction != null) { availStatuses
+	 * = licensedFunction.getGeoAvailStatusObjects(); } else if(orderableSupply
+	 * !=null) { availStatuses = orderableSupply.getGeoAvailStatusObjects(); } else
+	 * if(sliceGroupEsw !=null) { availStatuses =
+	 * softwareProduct.getGeoAvailStatusObjects(); } else { availStatuses =
+	 * softwareProduct.getGeoAvailStatusObjects(); isSetSalesStatus = true; }
+	 * if(availStatuses == null || availStatuses.isEmpty()) { continue; } for
+	 * (GeoAvailStatus availStatus : availStatuses) { if
 	 * (availStatus.getBusinessGeo().getKwValue().equals(sapGeo
 	 * .getBusinessGeo().getKwValue())) { Date withdrawMarketingDate =
 	 * softwareProduct.getWithdrawDateAllOSPs() != null ?
 	 * softwareProduct.getWithdrawDateAllOSPs() :
 	 * availStatus.getWithdrawMarketingDate(); Date announcementDate =
 	 * availStatus.getAnnouncementDate(); RdhMatm_geo geo =
-	 * generateGeoStructure(softwareProduct, orderableSupply, sliceGroupEsw,
-	 * sapGeo, isSetSalesStatus, announcementDate, withdrawMarketingDate);
-	 * geos.add(geo); }
+	 * generateGeoStructure(softwareProduct, orderableSupply, sliceGroupEsw, sapGeo,
+	 * isSetSalesStatus, announcementDate, withdrawMarketingDate); geos.add(geo); }
 	 * 
-	 * } if("WW".equals(sapGeo.getBusinessGeo().getKwValue())) //no matched GAS
-	 * for WW { RdhMatm_geo geo = generateGeoStructure(softwareProduct,
-	 * orderableSupply, sliceGroupEsw, sapGeo, isSetSalesStatus,
+	 * } if("WW".equals(sapGeo.getBusinessGeo().getKwValue())) //no matched GAS for
+	 * WW { RdhMatm_geo geo = generateGeoStructure(softwareProduct, orderableSupply,
+	 * sliceGroupEsw, sapGeo, isSetSalesStatus,
 	 * this.getEarliestAnnDate(softwareProduct),null); geos.add(geo); } } }
 	 * 
 	 * private RdhMatm_geo generateGeoStructure(SoftwareProduct softwareProduct,
-	 * OrderableSupply orderableSupply, SliceGroupEsw sliceGroupEsw, SapGeo
-	 * sapGeo, boolean isSetSalesStatus, Date annDate, Date wdDate) {
-	 * RdhMatm_geo geo = new RdhMatm_geo();
+	 * OrderableSupply orderableSupply, SliceGroupEsw sliceGroupEsw, SapGeo sapGeo,
+	 * boolean isSetSalesStatus, Date annDate, Date wdDate) { RdhMatm_geo geo = new
+	 * RdhMatm_geo();
 	 * 
 	 * geo.setName(sapGeo.getBusinessGeo().getKwValue());//Copy from
 	 * <SapGeo.getBusinessGeo().value>. if(isSetSalesStatus) {
 	 * 
 	 * if(this.isSWPIMs(softwareProduct)) { if(wdDate != null &&
 	 * !DateUtility.isAfterToday(wdDate)) { geo.setVmsta("ZJ"); }else {
-	 * geo.setVmsta("Z0"); } if(wdDate != null &&
-	 * !DateUtility.isAfterToday(wdDate)) {
-	 * geo.setVmstd(DateUtility.getDateStringWithSapFormat(wdDate)); } else
+	 * geo.setVmsta("Z0"); } if(wdDate != null && !DateUtility.isAfterToday(wdDate))
+	 * { geo.setVmstd(DateUtility.getDateStringWithSapFormat(wdDate)); } else
 	 * if(annDate != null && DateUtility.isBeforeToday(annDate)) {
 	 * geo.setVmstd(DateUtility.getDateStringWithSapFormat(annDate)); } else {
 	 * geo.setVmstd(DateUtility.getTodayStringWithSapFormat()); } }else
 	 * if(this.isAas(softwareProduct)) { geo.setVmsta("Z0");
-	 * if("WW".equals(sapGeo.getBusinessGeo().getKwValue())) { Date earliestDate
-	 * = this.getEarliestAnnDate(softwareProduct); if(earliestDate != null) {
-	 * geo.setVmstd(DateUtility.getDateStringWithSapFormat(earliestDate)); }
-	 * }else { geo.setVmstd(DateUtility.getDateStringWithSapFormat(annDate)); }
-	 * } } //set plant List<RdhMatm_plant> plants = new
-	 * ArrayList<RdhMatm_plant>(); for(SapPlant sapplant :
-	 * sapGeo.getSapPlants()) { RdhMatm_plant plant = new RdhMatm_plant();
-	 * plant.setWerks(sapplant.getPlantCode());
+	 * if("WW".equals(sapGeo.getBusinessGeo().getKwValue())) { Date earliestDate =
+	 * this.getEarliestAnnDate(softwareProduct); if(earliestDate != null) {
+	 * geo.setVmstd(DateUtility.getDateStringWithSapFormat(earliestDate)); } }else {
+	 * geo.setVmstd(DateUtility.getDateStringWithSapFormat(annDate)); } } } //set
+	 * plant List<RdhMatm_plant> plants = new ArrayList<RdhMatm_plant>();
+	 * for(SapPlant sapplant : sapGeo.getSapPlants()) { RdhMatm_plant plant = new
+	 * RdhMatm_plant(); plant.setWerks(sapplant.getPlantCode());
 	 * plant.setLgort(sapplant.getStorageLocation()); plants.add(plant); }
 	 * geo.setPlants(plants);
 	 * 
@@ -494,8 +604,8 @@ public class RdhMatmCreate extends RdhBase {
 	 * if("2".equals(country.getTaxClassRule())) {
 	 * tax_cnty.setTaxm1(softwareProduct.getUsTaxClass() != null ?
 	 * softwareProduct.getUsTaxClass().getKwValue() : ""); }else {
-	 * tax_cnty.setTaxm1(country.getTaxClass()); } } if(orderableSupply != null)
-	 * { if("0".equals(country.getTaxClassRule())) {
+	 * tax_cnty.setTaxm1(country.getTaxClass()); } } if(orderableSupply != null) {
+	 * if("0".equals(country.getTaxClassRule())) {
 	 * tax_cnty.setTaxm1(country.getTaxClass()); }else
 	 * if("1".equals(country.getTaxClassRule()) ||
 	 * "3".equals(country.getTaxClassRule())) {
@@ -507,14 +617,11 @@ public class RdhMatmCreate extends RdhBase {
 	 * softwareProduct.getUsTaxClass().getKwValue() : ""); }else {
 	 * tax_cnty.setTaxm1(country.getTaxClass()); } }
 	 * tax_cnty.setTaty1(country.getTaxCategory());
-	 * tax_cnty.setTaxm2(country.getTaxm2());
-	 * tax_cnty.setTaxm3(country.getTaxm3());
-	 * tax_cnty.setTaxm4(country.getTaxm4());
-	 * tax_cnty.setTaxm5(country.getTaxm5());
-	 * tax_cnty.setTaxm6(country.getTaxm6());
-	 * tax_cnty.setTaxm7(country.getTaxm7());
-	 * tax_cnty.setTaxm8(country.getTaxm8());
-	 * tax_cnty.setTaxm9(country.getTaxm9()); }
+	 * tax_cnty.setTaxm2(country.getTaxm2()); tax_cnty.setTaxm3(country.getTaxm3());
+	 * tax_cnty.setTaxm4(country.getTaxm4()); tax_cnty.setTaxm5(country.getTaxm5());
+	 * tax_cnty.setTaxm6(country.getTaxm6()); tax_cnty.setTaxm7(country.getTaxm7());
+	 * tax_cnty.setTaxm8(country.getTaxm8()); tax_cnty.setTaxm9(country.getTaxm9());
+	 * }
 	 * 
 	 * geo.setTax_countries(tax_countries); return geo; }
 	 */
@@ -542,13 +649,18 @@ public class RdhMatmCreate extends RdhBase {
 						}
 					}
 				} catch (Exception e) {
-					//e.printStackTrace();
+					e.printStackTrace();
 				}
 
 			}
 
 		}
 
+		if (result != null)
+			result = result.replace("-", "");
+		if (result != null && result.length() > 6) {
+			result = result.substring(result.length() - 6);
+		}
 		return result;
 	}
 
@@ -569,8 +681,14 @@ public class RdhMatmCreate extends RdhBase {
 		RdhMatm_bmmh5 bmh5 = new RdhMatm_bmmh5();
 		bmmh5 = new ArrayList<RdhMatm_bmmh5>();
 		bmmh5.add(bmh5);
+		RdhMatm_bmmh6 bmh6 = new RdhMatm_bmmh6();
+		bmmh6 = new ArrayList<RdhMatm_bmmh6>();
+		bmmh6.add(bmh6);
+		RdhMatm_bmmh7 bmh7 = new RdhMatm_bmmh7();
+		bmmh7 = new ArrayList<RdhMatm_bmmh7>();
+		bmmh7.add(bmh7);
 		geos = new ArrayList<RdhMatm_geo>();
-		//geos.add(new RdhMatm_geo());
+		// geos.add(new RdhMatm_geo());
 		// sales_orgs = new ArrayList<RdhMatm_sales_org>();
 		// tax_countries = new ArrayList<RdhMatm_tax_country>();
 	}
