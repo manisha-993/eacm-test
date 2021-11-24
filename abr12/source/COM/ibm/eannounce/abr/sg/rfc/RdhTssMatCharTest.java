@@ -3,6 +3,7 @@ package COM.ibm.eannounce.abr.sg.rfc;
 import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 
 import javax.xml.bind.JAXBContext;
@@ -11,6 +12,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
 
 import org.junit.BeforeClass;
@@ -34,7 +36,9 @@ public class RdhTssMatCharTest
 	    Document doc;
 		try {
 			builder = factory.newDocumentBuilder();
-			doc = builder.parse(new ByteArrayInputStream(inputXML.getBytes()));
+			File file = new File("C:\\Users\\QianYuGao\\Desktop\\695561U.xml");
+			//doc = builder.parse(new ByteArrayInputStream(inputXML.getBytes()));
+			doc = builder.parse(file);
 			svcmod = getObjFromDoc(doc, SVCMOD.class);
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
