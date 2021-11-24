@@ -31,10 +31,10 @@ public class RdhTssMatChar extends RdhBase {
 				entity.setFeature_name(prodStruct.getMKTGNAME());
 				entity.setManopt_flag(prodStruct.getMNATORYOPT());
 				entity.setBukrs("");
-				entity.setWithdrawdate(prodStruct.getWITHDRAWDATE());
-				entity.setWthdrweffctvdate(prodStruct.getWTHDRWEFFCTVDATE());
-				entity.setEffective_date(prodStruct.getEFFECTIVEDATE());
-				entity.setEnd_date(prodStruct.getENDDATE());
+				entity.setWithdrawdate(prodStruct.getWITHDRAWDATE().replaceAll("-", ""));
+				entity.setWthdrweffctvdate(prodStruct.getWTHDRWEFFCTVDATE().replaceAll("-", ""));
+				entity.setEffective_date(prodStruct.getEFFECTIVEDATE().replaceAll("-", ""));
+				entity.setEnd_date(prodStruct.getENDDATE().replaceAll("-", ""));
 				
 				entities.add(entity);
 			}
