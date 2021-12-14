@@ -1,8 +1,9 @@
 /* Copyright IBM Corp. 2016 */
 package COM.ibm.eannounce.abr.sg.rfc;
 
-import java.time.LocalDate;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -21,8 +22,6 @@ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_plant;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_sales_org;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_tax_country;
 import COM.ibm.eannounce.abr.util.RfcConfigProperties;
-import COM.ibm.eannounce.abr.util.XMLSLEORGGRPElem;
-
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -50,7 +49,8 @@ public class RdhMatmCreate extends RdhBase {
 	private List<RdhMatm_geo> geos;
 	@SerializedName("IS_MULTI_PLANTS")
 	private String is_multi_plants;
-
+	@Foo
+	SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd" );
 	public RdhMatmCreate(SVCMOD svcmod) {
 		super(svcmod.getMACHTYPE() + svcmod.getMODEL(), "Z_DM_SAP_MATM_CREATE".toLowerCase(), null);
 		// RdhMatm_bmm00 matnr Copy from <SoftwareProduct.productIdentifier>.
@@ -73,7 +73,7 @@ public class RdhMatmCreate extends RdhBase {
 		bmmh1.get(0).setPrctr(svcmod.getPRFTCTR());
 		bmmh1.get(0).setKtgrm(svcmod.getACCTASGNGRP());
 //		/PCTOFCMPLTINDC 
-		if ("YES".equals(svcmod.getPCTOFCMPLTINDC()))
+		if ("Yes".equals(svcmod.getPCTOFCMPLTINDC()))
 			bmmh1.get(0).setPrat1("Y");
 
 		List<TAXCODE> taxcodes = svcmod.getTAXCODELIST();
@@ -92,8 +92,12 @@ public class RdhMatmCreate extends RdhBase {
 		}
 
 		if ("ZSV2".equals(bmm00.get(0).getMtart())) {
-			bmmh6.get(0).setMeinh("SMI");
-			bmmh6.get(0).setUmrez("HUR");
+			RdhMatm_bmmh6 bmh6 = new RdhMatm_bmmh6();
+			bmh6.setMeinh("SMI");
+			bmmh6.add(bmh6);
+			bmh6 = new RdhMatm_bmmh6();
+			bmh6.setMeinh("HUR");
+			bmmh6.add(bmh6);
 		}
 		bmmh7.get(0).setTdid("0001");
 		bmmh7.get(0).setTdspras("E");
@@ -170,8 +174,10 @@ public class RdhMatmCreate extends RdhBase {
 				List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
 				List<RdhMatm_tax_country> tax_countries = new ArrayList<RdhMatm_tax_country>();
 
+				Set<String> plantSet = new HashSet<String>();
 				for (int j = 0; j < sleorggrps.size(); j++) {
 					SLEORGNPLNTCODE sleorgnplntcode = sleorggrps.get(j);
+					
 					RdhMatm_plant plant = new RdhMatm_plant();
 					plant.setWerks(sleorgnplntcode.getPLNTCD());
 					if (plant.getWerks() != null && plant.getWerks().startsWith("Y")) {
@@ -201,7 +207,7 @@ public class RdhMatmCreate extends RdhBase {
 					}
 
 					else if ("0026,0147".contains(sales_org.getVkorg())) {
-						sales_org.setZtaxclsf("");
+						//sales_org.setZtaxclsf("");
 						if (sales_org.getZtaxclsf() != null && !sales_org.getZtaxclsf().equals("")) {
 							sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
 						}
@@ -218,7 +224,12 @@ public class RdhMatmCreate extends RdhBase {
 					 */
 
 					sales_orgList.add(sales_org);
-					plantList.add(plant);
+					if(plantSet.contains(plant.getWerks())) {
+						plantList.add(plant);
+					}else {
+						plantSet.add(plant.getWerks());
+					}
+					
 				}
 
 				/**
@@ -381,11 +392,11 @@ public class RdhMatmCreate extends RdhBase {
 		List<TAXCATEGORY> taxs = svcmod.getTAXCATEGORYLIST();
 		if (taxs != null && taxs.size() > 0) {
 			for (int i = 0; i < taxs.size(); i++) {
-				List<SLEORGNPLNTCODE> list = taxs.get(i).getSLEORGNPLNTCODELIST();
+				List<SLEORGGRP> list = taxs.get(i).getSLEORGGRPLIST();
 				if (list != null && list.size() > 0) {
 					for (int j = 0; j < list.size(); j++) {
-						if (country.contains(list.get(j).getSLEORG())) {
-							return taxs.get(i).getTAXCATEGORYACTION();
+						if (country.equals(list.get(j).getSLEORGGRP())) {
+							return taxs.get(i).getTAXCLASSIFICATION();
 						}
 					}
 				}
@@ -395,14 +406,14 @@ public class RdhMatmCreate extends RdhBase {
 
 	}
 
-	private String getMtpos(COM.ibm.eannounce.abr.sg.rfc.SVCMOD svcmod) {
+	private String getMtpos(SVCMOD svcmod) {
 		// TODO Auto-generated method stub
 		String result = null;
 		if (svcmod == null)
 			return result;
 		if ("Service".equals(svcmod.getCATEGORY())) {
 			if ("Custom".equals(svcmod.getSUBCATEGORY())) {
-				if ("Project Based".equals(svcmod.getGROUP()) || "Operations Based".equals(svcmod.getGROUP())) {
+				if ("Project Based".equals(svcmod.getGROUP()) || "Operation Based".equals(svcmod.getGROUP())) {
 					result = "ZSV1";
 				}
 
@@ -430,7 +441,7 @@ public class RdhMatmCreate extends RdhBase {
 	}
 
 	public String getMtart(SVCMOD svcmod) {
-		String mtart = "";
+		String mtart = "ZSV1";
 		if (svcmod == null)
 			return mtart;
 		if ("Service".equals(svcmod.getCATEGORY())) {
@@ -449,7 +460,7 @@ public class RdhMatmCreate extends RdhBase {
 	}
 
 	public String getMeins(SVCMOD svcmod) {
-		String reslut = "";
+		String reslut = "EA";
 		if (svcmod == null)
 			return reslut;
 		if ("Service".equals(svcmod.getCATEGORY())) {
@@ -631,7 +642,7 @@ public class RdhMatmCreate extends RdhBase {
 	 * @return
 	 */
 	private String getEarliestAnnDate(SVCMOD svcmod) {
-		LocalDate annDate = null;
+		Date annDate = null;
 		String result = "";
 		List<AVAILABILITY> list = svcmod.getAVAILABILITYLIST();
 		if (list != null && list.size() > 0) {
@@ -639,12 +650,13 @@ public class RdhMatmCreate extends RdhBase {
 				try {
 					if (annDate == null) {
 						result = list.get(i).getANNDATE();
-						annDate = LocalDate.parse(result);
+						 
+						 annDate= sdf.parse(result);
 
 					} else {
-						annDate = LocalDate.parse(list.get(i).getANNDATE());
+						annDate = sdf.parse(list.get(i).getANNDATE());;
 
-						if (annDate.isAfter(LocalDate.parse(result))) {
+						if (annDate.after(sdf.parse(result))) {
 							result = list.get(i).getANNDATE();
 						}
 					}
@@ -681,9 +693,9 @@ public class RdhMatmCreate extends RdhBase {
 		RdhMatm_bmmh5 bmh5 = new RdhMatm_bmmh5();
 		bmmh5 = new ArrayList<RdhMatm_bmmh5>();
 		bmmh5.add(bmh5);
-		RdhMatm_bmmh6 bmh6 = new RdhMatm_bmmh6();
+	
 		bmmh6 = new ArrayList<RdhMatm_bmmh6>();
-		bmmh6.add(bmh6);
+		
 		RdhMatm_bmmh7 bmh7 = new RdhMatm_bmmh7();
 		bmmh7 = new ArrayList<RdhMatm_bmmh7>();
 		bmmh7.add(bmh7);

@@ -4,6 +4,7 @@ package COM.ibm.eannounce.abr.sg.rfc;
 import java.util.ArrayList;
 import java.util.List;
 
+import COM.ibm.eannounce.abr.sg.adsxmlbh1.ADSABRSTATUS;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_api_ausp;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_klah;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_kssk;
@@ -96,9 +97,9 @@ public class RdhClassificationMaint extends RdhBase
      * @param class_type
      * @param enablementprocess
      */
-    public RdhClassificationMaint (String event, String obj_id, String class_name, String class_type,String enablementprocess )
+    public RdhClassificationMaint (String obj_id, String class_name, String class_type )
     {
-    	super(event,"Z_DM_SAP_CLASSIFICATION_MAINT".toLowerCase(),enablementprocess);
+    	super(obj_id,"Z_DM_SAP_CLASSIFICATION_MAINT".toLowerCase(),null);
     	charval_refresh = "1";
     	object_key = new RdhClaf_object_key();
     	object_key.setKey_feld("MATNR");
@@ -120,6 +121,7 @@ public class RdhClassificationMaint extends RdhBase
      * Adds a characteristic and its value to an SAP classification.
      * @param charact Characteristic name
      * @param value Characteristic value
+     * @param abr 
      */
     public void addCharacteristic (String charact, String value)
     {
@@ -127,6 +129,11 @@ public class RdhClassificationMaint extends RdhBase
         apiausp.setCharact(charact);
         apiausp.setValue(value);
         api_ausp.add(apiausp);
+		/*
+		 * if(value!=null&&value.length()>0) {
+		 * 
+		 * api_ausp.add(apiausp); }
+		 */
     }
     
     /**

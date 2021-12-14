@@ -89,7 +89,7 @@ public class SVCMOD {
 	@XmlElement(name = "SOPTASKTYPE")
 	private String SOPTASKTYPE;
 	@XmlElement(name = "ALTID")
-	private String ALTID;
+	private String ALTID; 
 	@XmlElementWrapper(name = "LANGUAGELIST")
 	@XmlElement(name = "LANGUAGEELEMENT")
 	private List<LANGUAGE> LANGUAGELIST;
@@ -270,6 +270,11 @@ public class SVCMOD {
 	}
 	public List<CHRGCOMP> getCHRGCOMPLIST() {
 		return CHRGCOMPLIST;
+	}
+	public boolean hasProds() {
+		if(this.getPRODSTRUCTLIST()!=null&&this.getPRODSTRUCTLIST().size()>0)
+			return true;
+		return false;
 	}
 	
 }

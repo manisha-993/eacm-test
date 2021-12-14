@@ -11,7 +11,6 @@ import COM.ibm.eannounce.objects.*;
 import COM.ibm.opicmpdh.transactions.*;
 import COM.ibm.opicmpdh.objects.*;
 
-import com.ibm.jsse2.util.e;
 import com.ibm.transform.oim.eacm.util.*;
 
 import java.util.*;
@@ -1075,7 +1074,7 @@ ADSATTRIBUTE    40  WARRTYPE
                             }
                         }
                     }
-                }else if("SVCMODIERPABRSTATUSABR".equals(etype)){
+                }else if("SVCMODIERPABRSTATUS".equals(etype)){
                 	//ABR_TBL.put("SVCMODIERPABRSTATUSABR", "COM.ibm.eannounce.abr.sg.adsxmlbh1.SVCMODIERPABRSTATUSABR");
                 	 XMLMQ mqAbr = (XMLMQ) Class.forName( "COM.ibm.eannounce.abr.sg.adsxmlbh1.SVCMODIERPABRSTATUSABR").newInstance();
                      MQCID = mqAbr.getMQCID();
@@ -1128,8 +1127,8 @@ ADSATTRIBUTE    40  WARRTYPE
                 if (isXMLIDLABR){
                     deactivateMultiFlagValue("XMLABRPROPFILE");
                 }
-                if(!isIERPADSABR&&"SVCMOD".equals(getEntityType())&&getReturnCode()==PASS){
-                	setFlagValue("SVCMODIERPABRSTATUSABR", "0020");
+                if(!isIERPADSABR&&"SVCMOD".equals(getEntityType())&&getReturnCode()==PASS&&!m_abri.getABRCode().equals("SVCMODIERPABRSTATUS")){
+                	setFlagValue("SVCMODIERPABRSTATUS", "0020");
                 }
                 if (t2DTS.equals("&nbsp;")){
                 	t2DTS= getNow();

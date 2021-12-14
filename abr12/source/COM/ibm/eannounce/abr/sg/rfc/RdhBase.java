@@ -38,6 +38,8 @@ public abstract class RdhBase
     @Foo
     protected RdhBase_zdm_geo_to_class zdm_geo_to_class;
 
+    @Foo
+    private String input = null;
     // magic field for RFC input
     @SerializedName("N45BZDM_GEO_TO_CLASS")
     private List<RdhBase_zdm_geo_to_class> geo_to_class_list;
@@ -109,7 +111,7 @@ public abstract class RdhBase
         {  
             try
             {
-                String input = generateJson();
+                input = generateJson();
                 GsonBuilder builder = new GsonBuilder();
                 Gson gson = builder.create();
                 OutputData output = gson
@@ -347,7 +349,9 @@ public abstract class RdhBase
         }
         return true;
     }
-    
+    public String getRFCName() {
+    	return rfc_name;
+    }
     /**
      * check if the field value of object is null or empty string 
      * @param obj
@@ -359,5 +363,8 @@ public abstract class RdhBase
         List<String> checkFileds = new ArrayList<String>();
         checkFileds.add(checkFiled);
         return checkFieldsNotEmplyOrNull(obj, checkFileds, true);
+    }
+    public String getInput() {
+    	return input;
     }
 }
