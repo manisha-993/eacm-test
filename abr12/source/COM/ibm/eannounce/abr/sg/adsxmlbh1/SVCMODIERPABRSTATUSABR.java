@@ -237,7 +237,10 @@ public class SVCMODIERPABRSTATUSABR extends XMLMQAdapter {
 						value = "S5";
 					} else if ("Activity".equals(svcmod.getGROUP())) {
 						value = "S4";
-					} else if ("ICA/NEC".equals(svcmod.getGROUP())) {
+					} else if ("OEM".equals(svcmod.getGROUP())) {
+						value = "S4";
+					}
+					else if ("ICA/NEC".equals(svcmod.getGROUP())) {
 						value = "S2";
 					}
 
@@ -266,6 +269,8 @@ public class SVCMODIERPABRSTATUSABR extends XMLMQAdapter {
 					} else if ("Travel".equals(svcmod.getGROUP())) {
 						value = "TE";
 					} else if ("Activity".equals(svcmod.getGROUP())) {
+						value = "SA";
+					}else if ("OEM".equals(svcmod.getGROUP())) {
 						value = "SA";
 					} else if ("ICA/NEC".equals(svcmod.getGROUP())) {
 						value = "No characteristic";
@@ -298,6 +303,8 @@ public class SVCMODIERPABRSTATUSABR extends XMLMQAdapter {
 						value = "WBS";
 					} else if ("Activity".equals(svcmod.getGROUP())) {
 						value = "WBS";
+					}else if ("OEM".equals(svcmod.getGROUP())) {
+						value = "WBS";
 					} else if ("ICA/NEC".equals(svcmod.getGROUP())) {
 						value = "No characteristic";
 					}
@@ -329,6 +336,8 @@ public class SVCMODIERPABRSTATUSABR extends XMLMQAdapter {
 						value = "C";
 					} else if ("Activity".equals(svcmod.getGROUP())) {
 						value = "C";
+					}else if ("OEM".equals(svcmod.getGROUP())) {
+						value = "C";
 					} else if ("ICA/NEC".equals(svcmod.getGROUP())) {
 						value = "No characteristic";
 					}
@@ -359,6 +368,8 @@ public class SVCMODIERPABRSTATUSABR extends XMLMQAdapter {
 					} else if ("Travel".equals(svcmod.getGROUP())) {
 						value = "C";
 					} else if ("Activity".equals(svcmod.getGROUP())) {
+						value = "C";
+					}else if ("OEM".equals(svcmod.getGROUP())) {
 						value = "C";
 					} else if ("ICA/NEC".equals(svcmod.getGROUP())) {
 						value = "No characteristic";

@@ -70,11 +70,11 @@ public class RdhMatmCreate extends RdhBase {
 		bmmh1.get(0).setSpart("00");
 		bmmh1.get(0).setProdh(svcmod.getPRODHIERCD());
 		bmmh1.get(0).setMtpos(getMtpos(svcmod));
-		bmmh1.get(0).setPrctr(svcmod.getPRFTCTR());
-		bmmh1.get(0).setKtgrm(svcmod.getACCTASGNGRP());
+		bmmh1.get(0).setPrctr(svcmod.getPRFTCTR()==null?"":svcmod.getPRFTCTR());
+		bmmh1.get(0).setKtgrm(svcmod.getACCTASGNGRP()==null?"":svcmod.getACCTASGNGRP());
 //		/PCTOFCMPLTINDC 
 		if ("Yes".equals(svcmod.getPCTOFCMPLTINDC()))
-			bmmh1.get(0).setPrat1("Y");
+			bmmh1.get(0).setPrat1("X");
 
 		List<TAXCODE> taxcodes = svcmod.getTAXCODELIST();
 		if (taxcodes != null && taxcodes.size() > 0) {
@@ -84,7 +84,7 @@ public class RdhMatmCreate extends RdhBase {
 
 		List<LANGUAGE> languages = svcmod.getLANGUAGELIST();
 		if (languages != null && languages.size() > 0) {
-			bmmh5.get(0).setSpras(languages.get(0).getNLSID());
+			bmmh5.get(0).setSpras("E");
 			bmmh5.get(0).setMaktx(languages.get(0).getINVNAME());
 			bmmh5.get(0).setTdline(languages.get(0).getMKTGNAME());
 		} else {
@@ -166,7 +166,7 @@ public class RdhMatmCreate extends RdhBase {
 				RdhMatm_geo geo = new RdhMatm_geo();
 				geo.setName("WW" + index++);
 				geo.setVmsta("Z0");
-				geo.setVmstd(pubfrom);
+				geo.setVmstd(pubfrom==null?"":pubfrom.replace("-", ""));
 
 				List<SLEORGNPLNTCODE> sleorggrps = new ArrayList(sMap.get(pubfrom));
 				List<TAXCATEGORY> taxcList = new ArrayList<TAXCATEGORY>(cMap.get(pubfrom));
@@ -225,8 +225,9 @@ public class RdhMatmCreate extends RdhBase {
 
 					sales_orgList.add(sales_org);
 					if(plantSet.contains(plant.getWerks())) {
-						plantList.add(plant);
+						
 					}else {
+						plantList.add(plant);
 						plantSet.add(plant.getWerks());
 					}
 					
@@ -408,7 +409,7 @@ public class RdhMatmCreate extends RdhBase {
 
 	private String getMtpos(SVCMOD svcmod) {
 		// TODO Auto-generated method stub
-		String result = null;
+		String result = "";
 		if (svcmod == null)
 			return result;
 		if ("Service".equals(svcmod.getCATEGORY())) {
@@ -429,6 +430,8 @@ public class RdhMatmCreate extends RdhBase {
 					result = "ZSTE";
 				} else if ("Activity".equals(svcmod.getGROUP())) {
 					result = "ZSA1";
+				}else if ("OEM".equals(svcmod.getGROUP())) {
+					result = "ZSOE";
 				}
 			} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())
 					&& "Non-Federated".equals(svcmod.getGROUP())) {
@@ -451,7 +454,7 @@ public class RdhMatmCreate extends RdhBase {
 				mtart = "ZSV2";
 			} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())
 					&& "Non-Federated".equals(svcmod.getGROUP())) {
-				mtart = "ZSV2";
+				mtart = "ZSV5";
 			}
 		} else if ("IP".equals(svcmod.getCATEGORY()) && "SC".equals(svcmod.getSUBCATEGORY())) {
 			mtart = "ZSV1";

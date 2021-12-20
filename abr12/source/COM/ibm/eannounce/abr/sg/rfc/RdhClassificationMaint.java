@@ -128,12 +128,11 @@ public class RdhClassificationMaint extends RdhBase
         RdhClaf_api_ausp apiausp = new RdhClaf_api_ausp();
         apiausp.setCharact(charact);
         apiausp.setValue(value);
-        api_ausp.add(apiausp);
-		/*
-		 * if(value!=null&&value.length()>0) {
-		 * 
-		 * api_ausp.add(apiausp); }
-		 */
+		
+		  if(value!=null&&value.length()>0) {
+		  api_ausp.add(apiausp);
+		  }
+		 
     }
     
     /**
@@ -162,7 +161,7 @@ public class RdhClassificationMaint extends RdhBase
         rcucos = new ArrayList<RdhClaf_rcuco>();
         rcucos.add(rcuco);
         mara = new RdhClaf_mara();
-        mara.setErsda(DateUtility.getTodayStringWithSapFormat());
+        mara.setErsda(DateUtility.getTodayStringWithSimpleFormat());
         maras = new ArrayList<RdhClaf_mara>();
         maras.add(mara);
     }
