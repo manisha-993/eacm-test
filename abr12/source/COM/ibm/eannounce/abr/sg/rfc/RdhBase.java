@@ -113,7 +113,7 @@ public abstract class RdhBase
             {
                 input = generateJson();
                 GsonBuilder builder = new GsonBuilder();
-                Gson gson = builder.create();
+                Gson gson = builder.disableHtmlEscaping().create();
                 OutputData output = gson
                         .fromJson(EACMWebServiceUtil.callService(input, rfc_name), OutputData.class);
                 saveRfcResults(output);
@@ -148,7 +148,7 @@ public abstract class RdhBase
     protected String generateJson() throws Exception
     {
         GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.setExclusionStrategies(new RdhExclusionStrategy()).registerTypeAdapterFactory(new NullStringToEmptyAdapterFactory()).create();
+        Gson gson = builder.setExclusionStrategies(new RdhExclusionStrategy()).registerTypeAdapterFactory(new NullStringToEmptyAdapterFactory()).disableHtmlEscaping().create();
 
         return gson.toJson(this);
     }

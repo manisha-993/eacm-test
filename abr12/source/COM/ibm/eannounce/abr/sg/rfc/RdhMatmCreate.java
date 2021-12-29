@@ -21,6 +21,7 @@ import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_geo;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_plant;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_sales_org;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_tax_country;
+import COM.ibm.eannounce.abr.util.RFCConfig;
 import COM.ibm.eannounce.abr.util.RfcConfigProperties;
 import com.google.gson.annotations.SerializedName;
 
@@ -166,7 +167,7 @@ public class RdhMatmCreate extends RdhBase {
 				RdhMatm_geo geo = new RdhMatm_geo();
 				geo.setName("WW" + index++);
 				geo.setVmsta("Z0");
-				geo.setVmstd(pubfrom==null?"":pubfrom.replace("-", ""));
+				geo.setVmstd(pubfrom);
 
 				List<SLEORGNPLNTCODE> sleorggrps = new ArrayList(sMap.get(pubfrom));
 				List<TAXCATEGORY> taxcList = new ArrayList<TAXCATEGORY>(cMap.get(pubfrom));
@@ -223,7 +224,11 @@ public class RdhMatmCreate extends RdhBase {
 					 * 
 					 */
 
-					sales_orgList.add(sales_org);
+					if(RFCConfig.getDwerk("6",sales_org.getVkorg())!=null)
+					{
+						sales_org.setDwerk(RFCConfig.getDwerk("6",sales_org.getVkorg()));
+						sales_orgList.add(sales_org);
+					}
 					if(plantSet.contains(plant.getWerks())) {
 						
 					}else {
@@ -249,8 +254,11 @@ public class RdhMatmCreate extends RdhBase {
 						tax_country.setTaty1(taxcList.get(k).getTAXCATEGORYVALUE());
 						tax_country.setTaxm1(taxcList.get(k).getTAXCLASSIFICATION());
 						// tax_country.setAland("US");
-						tax_country.setAland(RfcConfigProperties
-								.getCountry(taxcList.get(k).getCOUNTRYLIST().get(0).getCOUNTRY_FC()));
+						/*
+						 * tax_country.setAland(RfcConfigProperties
+						 * .getCountry(taxcList.get(k).getCOUNTRYLIST().get(0).getCOUNTRY_FC()));
+						 */
+						tax_country.setAland(RFCConfig.getAland(taxcList.get(k).getCOUNTRYLIST().get(0).getCOUNTRY_FC()));
 						tax_country.setTaxm2("1");
 						tax_country.setTaxm3("1");
 						tax_country.setTaxm4("1");
@@ -260,8 +268,9 @@ public class RdhMatmCreate extends RdhBase {
 						tax_country.setTaxm8("1");
 						tax_country.setTaxm9("1");
 
+						if(tax_country.getAland()!=null) {
 						tax_countries.add(tax_country);
-
+						}
 					}
 				}
 				geo.setPlants(plantList);
