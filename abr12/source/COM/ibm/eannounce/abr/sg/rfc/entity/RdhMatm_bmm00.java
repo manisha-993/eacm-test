@@ -33,6 +33,9 @@ public class RdhMatm_bmm00
     private String xeiv4;
     @SerializedName("XEIE1")
     private String xeie1;
+    @SerializedName("XEIV1")
+    private String xeiv1;
+    
     /**
      * @return the tcode
      */
@@ -224,6 +227,9 @@ public class RdhMatm_bmm00
     {
         this.xeie1 = xeie1;
     }
+	public void setXeiv1(String xeiv1) {
+		this.xeiv1 = xeiv1;
+	}
     
     
 }

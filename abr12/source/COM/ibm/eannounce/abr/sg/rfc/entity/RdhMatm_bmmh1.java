@@ -137,7 +137,8 @@ public class RdhMatm_bmmh1
     private String dsw_part_type;
     @SerializedName("PRAT1")
     private String prat1;
-
+    @SerializedName("PRDHA")
+    private String prdha;
       
     /**
      * @return the meins
@@ -1012,6 +1013,9 @@ public class RdhMatm_bmmh1
 	}
 	public void setPrat1(String prat1) {
 		this.prat1 = prat1;
+	}
+	public void setPrdha(String prdha) {
+		this.prdha = prdha;
 	}
     
     
