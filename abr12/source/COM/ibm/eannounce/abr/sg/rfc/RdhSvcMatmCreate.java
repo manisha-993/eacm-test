@@ -82,6 +82,7 @@ public class RdhSvcMatmCreate extends RdhBase {
 		bmm00.get(0).setXeik1("X");
 		bmm00.get(0).setXeiv1("X");
 		bmm00.get(0).setXeie1("X");
+		bmm00.get(0).setTcode("MM01");
 
 		List<LANGUAGE> languages = model.getLANGUAGELIST();
 		if (languages != null && languages.size() > 0) {
@@ -95,12 +96,13 @@ public class RdhSvcMatmCreate extends RdhBase {
 		List<AVAILABILITY> availabilities = model.getAVAILABILITYLIST();
 		List<Date> dates = new ArrayList<Date>();
 
-		SimpleDateFormat formatter = new SimpleDateFormat("YYYYMMDD");
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
 		if (availabilities != null && availabilities.size() > 0) {
 			for (int i = 0; i < availabilities.size(); i++) {
 				AVAILABILITY avail = availabilities.get(i);
 				dates.add(formatter.parse(avail.getPUBFROM()));
 
+				System.out.println(formatter.parse(avail.getPUBFROM()));
 				List<SLEORGNPLNTCODE> sleorggrps = avail.getSLEORGNPLNTCODELIST();
 				if (sleorggrps != null && sleorggrps.size() > 0) {
 					for (int j = 0; j < sleorggrps.size(); j++) {
@@ -128,9 +130,10 @@ public class RdhSvcMatmCreate extends RdhBase {
 					}
 				}
 			}
+			SimpleDateFormat formatter2 = new SimpleDateFormat("YYYY-MM-DD");
 			geos.get(0).setName("WW1");
 			geos.get(0).setVmsta("Z0");
-			geos.get(0).setVmstd(Collections.min(dates).toString());
+			geos.get(0).setVmstd(formatter2.format(Collections.min(dates)));
 		}
 
 		List<TAXCATEGORY> taxcategories = model.getTAXCATEGORYLIST();
@@ -266,6 +269,7 @@ public class RdhSvcMatmCreate extends RdhBase {
 		bmmh5.add(bmh5);
 
 		geos = new ArrayList<RdhMatm_geo>();
+		geos.add(new RdhMatm_geo());
 
 	}
 
