@@ -108,6 +108,9 @@ public class RdhMatmCreate extends RdhBase {
 		}
 		List<AVAILABILITY> availabilities = svcmod.getAVAILABILITYLIST();
 		List<TAXCATEGORY> taxcategories = svcmod.getTAXCATEGORYLIST();
+		Set<TAXCATEGORY> allSet = new HashSet<TAXCATEGORY>(taxcategories);
+		Set<TAXCATEGORY> groupSet = new HashSet<TAXCATEGORY>();
+		String groupName = null;
 		int index = 1;
 		Set<String> pubfromSet = new HashSet<>();
 		if (availabilities != null && availabilities.size() > 0) {
@@ -145,19 +148,25 @@ public class RdhMatmCreate extends RdhBase {
 							if (availabilities.get(i).getCOUNTRY_FC()
 									.equals(taxcategories.get(j).getCOUNTRYLIST().get(0).getCOUNTRY_FC())) {
 								cset.add(taxcategories.get(j));
+								groupSet.add(taxcategories.get(j));
 							}
 
 						}
-
-						/*
-						 * if(taxcategories.get(j).getCOUNTRYLIST().get(i).getCOUNTRY_FC().contains(
-						 * availabilities.get(i).getCOUNTRY_FC())){ cset.add(taxcategories.get(j)); }
-						 */
 					}
 				}
+				if(groupName==null)
+					groupName = availabilities.get(i).getPUBFROM();
 				cMap.put(availabilities.get(i).getPUBFROM(), cset);
 				// taxcategories.get(i).getCOUNTRYLIST().contains("");
 
+			}
+			if (groupName!=null) {
+				allSet.removeAll(groupSet);
+				Set<TAXCATEGORY> cset = cMap.get(groupName);
+				if(cset!=null) {	
+					cset.addAll(allSet);
+				}
+				cMap.put(groupName, cset);
 			}
 
 			Iterator<String> iterator = sMap.keySet().iterator();
@@ -182,7 +191,7 @@ public class RdhMatmCreate extends RdhBase {
 					RdhMatm_plant plant = new RdhMatm_plant();
 					plant.setWerks(sleorgnplntcode.getPLNTCD());
 					if (plant.getWerks() != null && plant.getWerks().startsWith("Y")) {
-						plant.setPrctr(plant.getWerks().replaceFirst("Y", "YY"));
+						plant.setPrctr(bmmh1.get(0).getPrctr().replaceFirst("P", "YY"));
 					} else {
 						plant.setPrctr(bmmh1.get(0).getPrctr());
 					}
