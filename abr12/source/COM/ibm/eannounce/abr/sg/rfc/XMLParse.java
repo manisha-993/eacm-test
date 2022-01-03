@@ -6902,7 +6902,7 @@ public class XMLParse {
 	
 	
 	public static String loadXml(String xmlPath){
-		xmlPath = "C:\\Users\\JianBoXu\\Desktop\\eacm\\6948M11.xml";
+		xmlPath = "C:\\Users\\JianBoXu\\Desktop\\eacm\\6628.xml";
 		StringBuffer stringBuffer = new StringBuffer();
 		try {
 			BufferedReader reader;
