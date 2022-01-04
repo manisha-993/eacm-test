@@ -42,6 +42,8 @@ public class MODEL {
 	private String PRFTCTR;
 	@XmlElement(name = "ACCTASGNGRP")
 	private String ACCTASGNGRP;
+	@XmlElement(name = "ORDERCODE")
+	private String ORDERCODE;
 	
 	@XmlElementWrapper(name = "TAXCODELIST")
 	@XmlElement(name = "TAXCODEELEMENT")
@@ -100,5 +102,11 @@ public class MODEL {
 	}
 	public List<TAXCATEGORY> getTAXCATEGORYLIST() {
 		return TAXCATEGORYLIST;
+	}
+	public String getCATEGORY() {
+		return CATEGORY;
+	}
+	public String getORDERCODE() {
+		return ORDERCODE;
 	}
 }
