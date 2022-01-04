@@ -47,10 +47,6 @@ public class RdhTssFcProdTest
 			File fileToUse = new File("C:\\Users\\QianYuGao\\Desktop\\695525D-toUse.xml");
 			doc = builder.parse(fileToUse);
 			svcmod = getSVCMODObjFromDoc(doc, SVCMOD.class);
-			
-//			File file2 = new File("C:\\Users\\QianYuGao\\Desktop\\GENERALAREA.xml");
-//			doc = builder.parse(file2);
-//			generalArea = getGenAreaObjFromDoc(doc, GENERALAREA.class);
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
@@ -96,18 +92,6 @@ public class RdhTssFcProdTest
     {
 		try {
 			JAXBContext context = JAXBContext.newInstance(SVCMOD.class);
-			Unmarshaller unMarshaller = context.createUnmarshaller();
-			return (T) unMarshaller.unmarshal(doc);
-		} catch (JAXBException e) {
-			throw e;
-		}				
-	}
-    
-    @SuppressWarnings("unchecked")
-	private static <T> T getGenAreaObjFromDoc(Document doc, Class<GENERALAREA> class1) throws JAXBException 
-    {
-		try {
-			JAXBContext context = JAXBContext.newInstance(GENERALAREA.class);
 			Unmarshaller unMarshaller = context.createUnmarshaller();
 			return (T) unMarshaller.unmarshal(doc);
 		} catch (JAXBException e) {
