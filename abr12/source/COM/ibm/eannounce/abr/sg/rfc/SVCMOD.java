@@ -790,8 +790,8 @@ class TAXCODE {
 	private String TAXCODEACTION;
 	@XmlElement(name = "TAXCODEDESCRIPTION")
 	private String TAXCODEDESCRIPTION;
-	@XmlElementWrapper(name = "COUNTRYLIST")
-	@XmlElement(name = "COUNTRYELEMENT")
+	@XmlElementWrapper(name = "COUNTRYLISTLIST")
+	@XmlElement(name = "COUNTRYLISTELEMENT")
 	private List<COUNTRY> COUNTRYLIST;
 	@XmlElement(name = "TAXCODE")
 	private String TAXCODE;
@@ -1061,8 +1061,8 @@ class CNTRYEFF {
 	private String ENTITYTYPE;
 	@XmlElement(name = "ENTITYID")
 	private String ENTITYID;
-	@XmlElementWrapper(name = "COUNTRYLIST")
-	@XmlElement(name = "COUNTRYELEMENT")
+	@XmlElementWrapper(name = "COUNTRYLISTLIST")
+	@XmlElement(name = "COUNTRYLISTELEMENT")
 	private List<COUNTRY> COUNTRYLIST;
 	public String getEFFECTIVEDATE() {
 		return EFFECTIVEDATE;
