@@ -258,7 +258,8 @@ public class RdhMatmCreate extends RdhBase {
 				if (taxcList != null) {
 					for (int k = 0; k < taxcList.size(); k++) {
 						List<COUNTRY> countries = taxcList.get(k).getCOUNTRYLIST();
-
+						if(taxcList.get(k).getCOUNTRYLIST().size()==0)
+							continue; 
 						RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
 						tax_country.setTaty1(taxcList.get(k).getTAXCATEGORYVALUE());
 						tax_country.setTaxm1(taxcList.get(k).getTAXCLASSIFICATION());

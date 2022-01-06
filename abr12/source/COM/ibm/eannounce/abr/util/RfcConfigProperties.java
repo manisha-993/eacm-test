@@ -135,6 +135,11 @@ public final class RfcConfigProperties extends Properties {
 		return 
 			c_prop.getProperty("rdh.ssl.algorithm", "");
 	}
+	public static final String getZdmstatus() {
+		reloadProperties();
+		return 
+			c_prop.getProperty("rdh.zdmstatus", "");
+	}
 	public static  String getPropertys(String key){
 		reloadProperties();
 		return 

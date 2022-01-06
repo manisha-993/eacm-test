@@ -36,7 +36,7 @@ public class RdhTssMatCharTest
 	    Document doc;
 		try {
 			builder = factory.newDocumentBuilder();
-			File file = new File("C:\\Users\\QianYuGao\\Desktop\\695561U.xml");
+			File file = new File("C:\\Users\\JianBoXu\\Desktop\\eacm\\6968CAT.xml");
 			//doc = builder.parse(new ByteArrayInputStream(inputXML.getBytes()));
 			doc = builder.parse(file);
 			svcmod = getObjFromDoc(doc, SVCMOD.class);
@@ -6664,4 +6664,15 @@ public class RdhTssMatCharTest
 			+ "</PRODSTRUCTELEMENT></PRODSTRUCTLIST>\n" + 
 			"</SVCMOD_UPDATE>";
     }
+    @Test
+    public void test() throws Exception {
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_TSS_IERP", svcmod.getMACHTYPE() + svcmod.getMODEL());
+
+		updateParkStatus.execute();
+	}
+    public static void main(String[] args) throws Exception {
+    	UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_TSS_IERP", "694801M");
+
+		updateParkStatus.execute();
+	}
 }

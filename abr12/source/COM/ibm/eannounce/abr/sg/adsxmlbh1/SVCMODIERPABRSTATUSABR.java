@@ -209,7 +209,8 @@ public class SVCMODIERPABRSTATUSABR extends XMLMQAdapter {
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				abr.addError(e.getMessage());
+				abr.addError(e.toString());
+				throw new RuntimeException(e);
 			}
 
 		} else {

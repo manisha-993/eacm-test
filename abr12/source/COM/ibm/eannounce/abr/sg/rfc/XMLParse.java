@@ -6796,13 +6796,13 @@ public class XMLParse {
 					}
 				} else if ("Facility".equals(svcmod.getSUBCATEGORY())) {
 					if ("Penalty".equals(svcmod.getGROUP())) {
-						value = "WPS";
+						value = "WBS";
 					} else if ("Incident".equals(svcmod.getGROUP())) {
-						value = "WPS";
+						value = "WBS";
 					} else if ("Travel".equals(svcmod.getGROUP())) {
-						value = "WPS";
+						value = "WBS";
 					} else if ("Activity".equals(svcmod.getGROUP())) {
-						value = "WPS";
+						value = "WBS";
 					} else if ("ICA/NEC".equals(svcmod.getGROUP())) {
 						value = "No characteristic";
 					}
@@ -6902,7 +6902,7 @@ public class XMLParse {
 	
 	
 	public static String loadXml(String xmlPath){
-		xmlPath = "C:\\Users\\JianBoXu\\Desktop\\eacm\\6628.xml";
+		xmlPath = "C:\\Users\\JianBoXu\\Desktop\\eacm\\6968CAT.xml";
 		StringBuffer stringBuffer = new StringBuffer();
 		try {
 			BufferedReader reader;
