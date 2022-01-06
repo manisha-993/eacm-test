@@ -8,10 +8,6 @@ import COM.ibm.eannounce.abr.sg.rfc.entity.Char_descrTable;
 import COM.ibm.eannounce.abr.sg.rfc.entity.Char_valsTable;
 import COM.ibm.eannounce.abr.sg.rfc.entity.CharactsTable;
 import COM.ibm.eannounce.abr.sg.rfc.entity.Chv_descrTable;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhChwFcProd_FEATURE;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhChwFcProd_Model;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhChwFcProd_TMF;
-import COM.ibm.eannounce.abr.util.RfcConfigProperties;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -43,6 +39,7 @@ public class ChwCharMaintain extends RdhBase {
 			String chdescr) {	
 		super(obj_id, "z_dm_sap_char_maintain", null);
 		this.pims_identity = "H";
+		this.rfa_num = obj_id;
 		this.REFRESH_VALS = "";
 		this.charact = charact;
 		

@@ -28,7 +28,7 @@ public abstract class RdhBase
     @SerializedName("PIMS_IDENTITY")
     protected String pims_identity;
     @SerializedName("RFA_NUM")
-    private String rfa_num;
+    protected String rfa_num;
     @SerializedName("DEFAULT_MANDT")
     private String default_mandt;
     @SerializedName("CLIENT_NAME")
