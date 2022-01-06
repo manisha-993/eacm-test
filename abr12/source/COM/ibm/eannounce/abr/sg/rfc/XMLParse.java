@@ -6903,6 +6903,7 @@ public class XMLParse {
 	
 	public static String loadXml(String xmlPath){
 		xmlPath = "C:\\Users\\JianBoXu\\Desktop\\eacm\\6968CAT.xml";
+
 		StringBuffer stringBuffer = new StringBuffer();
 		try {
 			BufferedReader reader;
