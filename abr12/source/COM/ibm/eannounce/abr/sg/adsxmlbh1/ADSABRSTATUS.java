@@ -1127,9 +1127,11 @@ ADSATTRIBUTE    40  WARRTYPE
                 if (isXMLIDLABR){
                     deactivateMultiFlagValue("XMLABRPROPFILE");
                 }
-                if(!isIERPADSABR&&"SVCMOD".equals(getEntityType())&&getReturnCode()==PASS&&!m_abri.getABRCode().equals("SVCMODIERPABRSTATUS")){
-                	setFlagValue("SVCMODIERPABRSTATUS", "0020");
-                }
+				/*
+				 * if(!isIERPADSABR&&"SVCMOD".equals(getEntityType())&&getReturnCode()==PASS&&!
+				 * m_abri.getABRCode().equals("SVCMODIERPABRSTATUS")){
+				 * setFlagValue("SVCMODIERPABRSTATUS", "0020"); }
+				 */
                 if (t2DTS.equals("&nbsp;")){
                 	t2DTS= getNow();
                 }
@@ -3342,7 +3344,6 @@ ADSATTRIBUTE    40  WARRTYPE
         // Vector mqVct = mqAbr.getMQPropertiesFN();
         int sendCnt=0;
         boolean hasFailure = false;
-
         // write to each queue, only one now, but leave this just in case
         for (int i=0; i<mqVct.size(); i++){
 
@@ -4204,7 +4205,11 @@ ADSATTRIBUTE    40  WARRTYPE
         	
 //    		insertinto XMLIDLCache()
         	insertIntoCache(rootEntity, xml, t2, entityType, entityID, ps);
-        }	                      
+        }	
+        
+        if("SVCMOD".equals(getEntityType())&&!m_abri.getABRCode().equals("SVCMODIERPABRSTATUS")){
+        	setFlagValue("SVCMODIERPABRSTATUS", "0020");
+        }
     }finally{   
 		try {
 			m_db.commit();

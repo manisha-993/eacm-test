@@ -790,8 +790,8 @@ class TAXCODE {
 	private String TAXCODEACTION;
 	@XmlElement(name = "TAXCODEDESCRIPTION")
 	private String TAXCODEDESCRIPTION;
-	@XmlElementWrapper(name = "COUNTRYLISTLIST")
-	@XmlElement(name = "COUNTRYLISTELEMENT")
+	@XmlElementWrapper(name = "COUNTRYLIST")
+	@XmlElement(name = "COUNTRYELEMENT")
 	private List<COUNTRY> COUNTRYLIST;
 	@XmlElement(name = "TAXCODE")
 	private String TAXCODE;

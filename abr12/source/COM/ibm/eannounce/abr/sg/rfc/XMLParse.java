@@ -6704,6 +6704,29 @@ public class XMLParse {
 							
 						}
 					}
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_TSS_IERP", svcmod.getMACHTYPE() + svcmod.getMODEL());
+					updateParkStatus.execute();
+					//this.addDebug(updateParkStatus.createLogEntry());
+
+					if (updateParkStatus.getRfcrc() == 0) {
+						//this.addOutput(updateParkStatus.getRFCName() + " called successfully!");
+						//this.addOutput(updateParkStatus.getError_text());
+					} else {
+						//this.addOutput(updateParkStatus.getRFCName() + " called  faild!");
+						//.addOutput(updateParkStatus.getError_text());
+					}
+					RdhTssFcProd rdhTssFcProd = new RdhTssFcProd(svcmod);
+					if(rdhTssFcProd.canRun())
+					rdhTssFcProd.execute();
+					//this.addDebug(rdhTssFcProd.createLogEntry());
+
+					if (rdhTssFcProd.getRfcrc() == 0) {
+						//this.addOutput(rdhTssFcProd.getRFCName() + " called successfully!");
+						//this.addOutput(rdhTssFcProd.getError_text());
+					} else {
+						//this.addOutput(rdhTssFcProd.getRFCName() + " called  faild!");
+						//this.addOutput(rdhTssFcProd.getError_text());
+					}
 
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -6902,7 +6925,7 @@ public class XMLParse {
 	
 	
 	public static String loadXml(String xmlPath){
-		xmlPath = "C:\\Users\\JianBoXu\\Desktop\\eacm\\6968CAT.xml";
+		xmlPath = "C:\\Users\\JianBoXu\\Desktop\\eacm\\test.xml";
 
 		StringBuffer stringBuffer = new StringBuffer();
 		try {

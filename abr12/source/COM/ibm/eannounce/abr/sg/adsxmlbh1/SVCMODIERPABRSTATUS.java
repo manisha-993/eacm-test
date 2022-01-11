@@ -1,20 +1,13 @@
 package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.CharacterIterator;
-import java.text.DateFormat;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.text.StringCharacterIterator;
-import java.util.Date;
 import java.util.Hashtable;
-import java.util.Vector;
+
 
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
@@ -124,7 +117,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 				xml = resultSet.getString("XMLMESSAGE");
 			}
 			if (xml != null) {
-				
+			
 					SVCMOD svcmod = XMLParse.getSvcmodFromXml(xml);
 					RdhMatmCreate create = new RdhMatmCreate(svcmod);
 					this.addDebug("Calling " + create.getRFCName());
@@ -266,8 +259,10 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 							this.addOutput(chart.getError_text());
 						}
 					}
-
+			
+				
 				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_TSS_IERP", svcmod.getMACHTYPE() + svcmod.getMODEL());
+				this.addDebug("Calling "+updateParkStatus.getRFCName());
 				updateParkStatus.execute();
 				this.addDebug(updateParkStatus.createLogEntry());
 
@@ -278,7 +273,13 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 					this.addOutput(updateParkStatus.getRFCName() + " called  faild!");
 					this.addOutput(updateParkStatus.getError_text());
 				}
+				this.addDebug("Check if RdhTssFcProd can run:");
+				
+				
 				RdhTssFcProd rdhTssFcProd = new RdhTssFcProd(svcmod);
+				this.addDebug("Can run:"+rdhTssFcProd.canRun());
+				if(rdhTssFcProd.canRun()) {
+				this.addDebug("Calling "+rdhTssFcProd.getRFCName());
 				rdhTssFcProd.execute();
 				this.addDebug(rdhTssFcProd.createLogEntry());
 
@@ -288,6 +289,10 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 				} else {
 					this.addOutput(rdhTssFcProd.getRFCName() + " called  faild!");
 					this.addOutput(rdhTssFcProd.getError_text());
+				}
+				}else {
+					this.addDebug("skip "+rdhTssFcProd.getRFCName());
+					
 				}
 			} else {
 				this.addOutput("XML file not exeit in cache,RFC caller not called!");

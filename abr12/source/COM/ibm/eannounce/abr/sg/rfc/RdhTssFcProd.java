@@ -83,6 +83,12 @@ public class RdhTssFcProd extends RdhBase {
 			}
 		}
 	}
+	
+	public boolean canRun() {
+		if(tbl_svcmod_c==null||tbl_svcmod_c.size()==0||tbl_svcmod_b==null||tbl_svcmod_b.size()==0)
+			return false;
+		return true;
+	}
 
 	@Override
 	protected void setDefaultValues() {

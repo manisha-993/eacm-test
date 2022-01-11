@@ -1,13 +1,8 @@
 
-
-
 package COM.ibm.eannounce.abr.util;
-
- 
 import java.io.FileInputStream;
 import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.Vector;
+
 
 import COM.ibm.opicmpdh.middleware.taskmaster.Log;
 
