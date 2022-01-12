@@ -155,7 +155,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			+ "group by machtypeatr, modelatr having count(*) >1 ),dump1(id) as( "
 			+ "select m.entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and entityid not in "
 			+ "(select entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and m.status  in ('Final','Ready for Review') and m.COFGRP = 'Base' and m.COFSUBCAT = 'Application'  and m.valto > current timestamp and valto > current timestamp ))"
-			+ "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and f.status in ('Final','Ready for Review') and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 and p.status in ('Final','Ready for Review') "
+			+ "select  r.entitytype,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,p.MKTGNAME,f.MKTGNAME as FMKTGNAME,p.ANNDATE,p.WITHDRAWDATE,p.WTHDRWEFFCTVDATE,p.INSTALL,p.STATUS,p.VALFROM from OPICM.MODEL m join opicm.relator r on r.entitytype='PRODSTRUCT' and r.entity2id=m.entityid join opicm.feature f on f.entityid=r.entity1id and f.status in ('Final','Ready for Review') and f.nlsid=1 join opicm.prodstruct p on p.entityid=r.entityid and p.nlsid=1 and p.status in ('Final','Ready for Review') "
 			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1 "
 			+ "where  p.VALFROM>= ? and p.VALFROM < ? and m.status in ('Final','Ready for Review') and  m.nlsid=1  and m.entityid not in (select id from dump1)  and (S.DIV not in ('71','20','2P','2N','30','36 IBM eBusiness Hosting Services','46','8F','C3','G2','J6','K6 - IBM Services for Managed Applications','M3','MW','Q9') or S.div is null) with ur";
 
@@ -180,7 +180,7 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			+ "select m.entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and entityid not in "
 			+ "(select entityid from dump d inner join opicm.model m on d.machtypeatr = m .machtypeatr and m.modelatr=d.modelatr and m.status  in ('Final','Ready for Review') and m.COFGRP = 'Base' and m.COFSUBCAT = 'Application'  and m.valto > current timestamp and valto > current timestamp ))"
 			+",temp as ("
-			+ "select sw.entitytype ,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,sw.MKTGNAME,coalesce(annp.ANNDATE,'9999-12-32') AS PANNDATE,coalesce( annl.ANNDATE,'9999-12-32') as LANNDATE,coalesce(a1.EFFECTIVEDATE,'9999-12-32') as EFFECTIVEDATE,sw.STATUS,sw.VALFROM,max(coalesce(sw.VALFROM,'1980-01-01 00:00:00.000000') ,coalesce(a1.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(a.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annp.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annl.VALFROM,'1980-01-01 00:00:00.000000')) as MAXDATA from opicm.SWPRODSTRUCT sw "
+			+ "select sw.entitytype ,m.MACHTYPEATR,m.MODELATR,f.FEATURECODE,sw.MKTGNAME,f.MKTGNAME as FMKTGNAME,coalesce(annp.ANNDATE,'9999-12-32') AS PANNDATE,coalesce( annl.ANNDATE,'9999-12-32') as LANNDATE,coalesce(a1.EFFECTIVEDATE,'9999-12-32') as EFFECTIVEDATE,sw.STATUS,sw.VALFROM,max(coalesce(sw.VALFROM,'1980-01-01 00:00:00.000000') ,coalesce(a1.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(a.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annp.VALFROM,'1980-01-01 00:00:00.000000'),coalesce(annl.VALFROM,'1980-01-01 00:00:00.000000')) as MAXDATA from opicm.SWPRODSTRUCT sw "
 			+ "join opicm.relator r2 on r2.entitytype = 'SWPRODSTRUCT' and r2.entityid = sw.entityid "
 			+ "join opicm.model m on m.nlsid =1 and m.entityid = r2.entity2id and m.status in ('Final','Ready for Review') "
 			+ "join opicm.swfeature f on f.nlsid =1 and f.entityid = r2.entity1id and f.status in ('Final','Ready for Review') "
@@ -192,8 +192,8 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 			+ "left join opicm.announcement annl on  a1.anncodename=annl.anncodename and annl.nlsid=1  and annl.ANNSTATUS  in ('Final','Ready for Review') "
 			+ "left join opicm.SGMNTACRNYM S on m.prftctr = S.prftctr and S.nlsid=1 "
 			+ "where  sw.status in ('Final','Ready for Review') and sw.nlsid=1  and (S.DIV not in ('71','20','2P','2N','30','36 IBM eBusiness Hosting Services','46','8F','C3','G2','J6','K6 - IBM Services for Managed Applications','M3','MW','Q9') or S.div is null) and m.entityid not in (select id from dump1) )  "
-			+ "select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,(case min(PANNDATE) when '9999-12-32' then '' else min(PANNDATE) end )as PANNDATE,(case min(LANNDATE) when '9999-12-32' then '' else min(LANNDATE) end ) as LANNDATE,(case min(EFFECTIVEDATE) when '9999-12-32' then '' else min(EFFECTIVEDATE) end ) as EFFECTIVEDATE,STATUS,VALFROM from temp "
-			+ "group by entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,VALFROM,STATUS "
+			+ "select distinct entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,FMKTGNAME,(case min(PANNDATE) when '9999-12-32' then '' else min(PANNDATE) end )as PANNDATE,(case min(LANNDATE) when '9999-12-32' then '' else min(LANNDATE) end ) as LANNDATE,(case min(EFFECTIVEDATE) when '9999-12-32' then '' else min(EFFECTIVEDATE) end ) as EFFECTIVEDATE,STATUS,VALFROM from temp "
+			+ "group by entitytype ,MACHTYPEATR,MODELATR,FEATURECODE,MKTGNAME,FMKTGNAME,VALFROM,STATUS "
 			+ "having max(MAXDATA) >= ? and max(MAXDATA) < ?  " + "with ur";
 
 	private void setFileName() throws IOException {
@@ -527,6 +527,11 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 
 			for (int i = 0; i < PRODCOLUMNS.length; i++) {
 				String value = rs.getString(PRODCOLUMNS[i]);
+				if(MKTGNAME.equals(PRODCOLUMNS[i])) {
+					if(value==null||value.equals("")) {
+						value=rs.getString("FMKTGNAME");
+					}
+				}
 				wOut.write(getValue(value, PRODCOLUMNS[i]));
 				if (INSTALL.equals(PRODCOLUMNS[i])) {
 					if ("CE".equals(value)) {
@@ -588,6 +593,11 @@ public class IBIDATAABRSTATUS extends PokBaseABR {
 
 			for (int i = 0; i < SWPRODCOLUMNS.length; i++) {
 				String value = rs.getString(SWPRODCOLUMNS[i]);
+				if(MKTGNAME.equals(SWPRODCOLUMNS[i])) {
+					if(value==null||value.equals("")) {
+						value=rs.getString("FMKTGNAME");
+					}
+				}
 				wOut.write(getValue(value, SWPRODCOLUMNS[i]));
 			}
 			wOut.write(NEW_LINE);
