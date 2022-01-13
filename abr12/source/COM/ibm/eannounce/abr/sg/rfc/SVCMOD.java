@@ -1274,7 +1274,7 @@ class SLEORGNPLNTCODE {
 		// TODO Auto-generated method stub
 		if (obj instanceof SLEORGNPLNTCODE) {
 			SLEORGNPLNTCODE newobj = (SLEORGNPLNTCODE) obj;
-			return this.SLEORG.equals(newobj.getSLEORG());
+			return this.SLEORG.equals(newobj.getSLEORG())&&this.PLNTCD.equals(newobj.getPLNTCD())&&this.getSLEORGNPLNTCODEACTION().equals(newobj.getSLEORGNPLNTCODEACTION());
 			//
 		}
 		return false;
@@ -1282,7 +1282,7 @@ class SLEORGNPLNTCODE {
 	@Override
 	public int hashCode() {
 		// TODO Auto-generated method stub
-		return this.SLEORG.hashCode();
+		return this.SLEORG.hashCode()+this.PLNTCD.hashCode()+this.SLEORGNPLNTCODEACTION.hashCode();
 	}
 
 }

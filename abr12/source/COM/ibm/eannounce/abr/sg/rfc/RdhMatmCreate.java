@@ -184,6 +184,7 @@ public class RdhMatmCreate extends RdhBase {
 				List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
 				List<RdhMatm_tax_country> tax_countries = new ArrayList<RdhMatm_tax_country>();
 
+				Set<String> unitSet = new HashSet<String>();
 				Set<String> plantSet = new HashSet<String>();
 				for (int j = 0; j < sleorggrps.size(); j++) {
 					SLEORGNPLNTCODE sleorgnplntcode = sleorggrps.get(j);
@@ -233,10 +234,11 @@ public class RdhMatmCreate extends RdhBase {
 					 * 
 					 */
 
-					if(RFCConfig.getDwerk("6",sales_org.getVkorg())!=null)
+					if(RFCConfig.getDwerk("6",sales_org.getVkorg())!=null&&!unitSet.contains(sales_org.getVkorg()))
 					{
 						sales_org.setDwerk(RFCConfig.getDwerk("6",sales_org.getVkorg()));
 						sales_orgList.add(sales_org);
+						unitSet.add(sales_org.getVkorg());
 					}
 					if(plantSet.contains(plant.getWerks())) {
 						

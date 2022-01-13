@@ -38,7 +38,7 @@ public class XMLParse {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); 		
 			factory.setNamespaceAware(false);
 		    DocumentBuilder builder = factory.newDocumentBuilder();
-		    Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));		 
+		    //Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));		 
 		    //SVCMOD svcObj = getObjFromDoc(doc, SVCMOD.class);
 		    SVCMOD svcmod = getSvcmodFromXml( loadXml(""));
 		    if (xml != null) {
