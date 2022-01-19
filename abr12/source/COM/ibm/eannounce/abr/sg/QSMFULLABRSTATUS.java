@@ -1890,9 +1890,25 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		// 'WTHDRWEFFCTVDATE' AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current
 		// TIMESTAMP and prod.valto>current timestamp and prod.EFFTO >current
 		// timestamp";
-		String sql = "select R.entity1id as entityid,prod.WTHDRWEFFCTVDATE as ATTRIBUTEVALUE from  opicm.Relator R left join price.prodstruct prod  on prod.entityid= R.entityid where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID in ("
-				+ ids + ")  AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP  and prod.nlsid=1";
-		 addDebug("sql:"+sql);
+		/*
+		 * String sql =
+		 * "select R.entity1id as entityid,prod.WTHDRWEFFCTVDATE as ATTRIBUTEVALUE from  opicm.Relator R left join price.prodstruct prod  on prod.entityid= R.entityid where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID in ("
+		 * + ids +
+		 * ")  AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP  and prod.nlsid=1"
+		 * ;
+		 */
+		String sql ="with temp1(pentityid,entityid) as(\n"
+				+ "select R.entityid as pentityid,R.entity1id as entityid from opicm.Relator R\n"
+				+ "left join OPICM.text prod on prod.entityid= R.entityid AND PROD.attributecode='WTHDRWEFFCTVDATE' where R.entitytype='PRODSTRUCT' AND PROD.entitytype = r.ENTITYTYPE AND R.ENTITY1ID in ("+ids+")\n"
+				+ "AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP AND prod.EFFTO >CURRENT TIMESTAMP AND prod.valto>current TIMESTAMP)\n"
+				+ ",temp2(pentityid,entityid) as (select R.entityid as pentityid,R.entity1id as entityid from opicm.Relator R\n"
+				+ " where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID in ("+ids+")\n"
+				+ "AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP AND R.entityid not in (select pentityid from temp1)\n"
+				+ ")\n"
+				+ "select  pentityid,T1.entityid, prod.attributevalue from temp1 t1  inner join opicm.text prod on t1.pentityid=prod.entityid and PROD.attributecode='WTHDRWEFFCTVDATE' AND PROD.entitytype = 'PRODSTRUCT' AND prod.EFFTO >CURRENT TIMESTAMP AND prod.valto>current TIMESTAMP\n"
+				+ "union all\n"
+				+ "select DISTINCT pentityid,entityid,null from temp2 t2";
+		addDebug("sql:"+sql);
 		Connection conn = m_db.getPDHConnection();
 		PreparedStatement ps = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
 				ResultSet.CONCUR_READ_ONLY);
@@ -1931,7 +1947,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 	}
 
 	private String validateProdstructsDate(EntityItem eiFeature) {
-		String resutl = fidMap.get(eiFeature.getEntityID() + "")==null?"":fidMap.get(eiFeature.getEntityID() + "").toString();
+		String resutl = fidMap.get(eiFeature.getEntityID() +"")==null?"":fidMap.get(eiFeature.getEntityID() +"").toString();
 
 		return resutl;
 	
