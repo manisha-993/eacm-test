@@ -44,7 +44,11 @@ public class MODEL {
 	private String ACCTASGNGRP;
 	@XmlElement(name = "ORDERCODE")
 	private String ORDERCODE;
-	
+	@XmlElement(name = "PRPQINDC")
+	private String PRPQINDC;
+	@XmlElement(name = "PHANTOMMODINDC")
+	private String PHANTOMMODINDC;
+
 	@XmlElementWrapper(name = "TAXCODELIST")
 	@XmlElement(name = "TAXCODEELEMENT")
 	private List<TAXCODE> TAXCODELIST;
@@ -108,5 +112,17 @@ public class MODEL {
 	}
 	public String getORDERCODE() {
 		return ORDERCODE;
+	}
+	public String getPRPQINDC() {
+		return PRPQINDC;
+	}
+	public void setPRPQINDC(String pRPQINDC) {
+		PRPQINDC = pRPQINDC;
+	}
+	public String getPHANTOMMODINDC() {
+		return PHANTOMMODINDC;
+	}
+	public void setPHANTOMMODINDC(String pHANTOMMODINDC) {
+		PHANTOMMODINDC = pHANTOMMODINDC;
 	}
 }
