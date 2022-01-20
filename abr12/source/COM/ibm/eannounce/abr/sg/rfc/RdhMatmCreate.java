@@ -60,14 +60,14 @@ public class RdhMatmCreate extends RdhBase {
 		bmm00.get(0).setMbrsh("M");
 		//bmm00.get(0).setWerks("00");
 		bmm00.get(0).setVtweg("00");
-
+		bmm00.get(0).setXeik1("X");
+		bmm00.get(0).setXeiv1("X");
 		bmmh1.get(0).setMatkl("000");
 		bmmh1.get(0).setMeins(getMeins(svcmod));
 		bmmh1.get(0).setZeinr("");
 		bmmh1.get(0).setZeiar("RFA");
-
 		bmmh1.get(0).setAeszn(getEarliestAnnDate(svcmod));
-		bmmh1.get(0).setGewei("KG");
+		bmmh1.get(0).setGewei("");
 		bmmh1.get(0).setSpart("00");
 		bmmh1.get(0).setProdh(svcmod.getPRODHIERCD());
 		bmmh1.get(0).setMtpos(getMtpos(svcmod));
