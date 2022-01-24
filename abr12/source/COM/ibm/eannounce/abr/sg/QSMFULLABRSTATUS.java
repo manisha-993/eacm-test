@@ -2392,7 +2392,8 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 			sb.append(getValue(QSMEDMW, "2050-12-31"));
 			sb.append(getValue(DSLMMVA, PokUtils.getAttributeValue(rootEntity, "ANNDATE", ",", "", false)));
 
-			strDSLMWDN = validateProdstructsDate(eiFeature);
+			//strDSLMWDN = validateProdstructsDate(eiFeature);
+			strDSLMWDN=getTMFWDDateForFeature(eiProdstruct);
 			sb.append(getValue(DSLMWDN, strDSLMWDN));
 
 			strPricedFeature = PokUtils.getAttributeValue(eiFeature, "PRICEDFEATURE", ",", "", false);
@@ -3587,8 +3588,8 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 						// "EPICNUMBER", "", "");
 						strISLMRFA = getRFANumber(rootEntity, isEpic, availEI);
 						addDebug("*****mlm ISLMRFA=" + strISLMRFA);
-						sb.append(getValue(IOPUCTY, "897"));
 						sb.append(getValue(ISLMPAL, strISLMPAL));
+						sb.append(getValue(IOPUCTY, "897"));
 						sb.append(getValue(ISLMRFA, strISLMRFA));
 						sb.append(getValue(ISLMTYP, PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", "", "")));
 						sb.append(getValue(ISLMMOD, PokUtils.getAttributeValue(eiModel, "MODELATR", "", "")));
@@ -3667,6 +3668,35 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 			}
 		}
 		return "2050-12-31";
+	}
+	public String  getTMFWDDateForFeature(EntityItem tmfEI){
+		Vector availVect = PokUtils.getAllLinkedEntities(tmfEI, "OOFAVAIL", "AVAIL");
+		String result = null;
+		
+		
+		addDebug("TMF id "+tmfEI.getEntityID()+" link AVALI size:"+availVect.size());
+		if(availVect.size()>0){
+			for (int i = 0; i < availVect.size(); i++) {
+				EntityItem eiAvail = (EntityItem) availVect.elementAt(i);
+				
+
+				String strAvailType = PokUtils.getAttributeValue(eiAvail, "AVAILTYPE", "", "");
+				
+				if (strAvailType.equals("Last Order")) {
+					EANFlagAttribute qsmGeoList = (EANFlagAttribute) eiAvail.getAttribute("QSMGEO");
+					if (qsmGeoList != null) {
+						if (qsmGeoList.isSelected("6221")) {
+							if(result==null)
+								result = PokUtils.getAttributeValue(eiAvail, "EFFECTIVEDATE", ",", "", false);
+						}
+						else {
+							result=result.compareTo(PokUtils.getAttributeValue(eiAvail, "EFFECTIVEDATE", ",", "", false))>0?result:PokUtils.getAttributeValue(eiAvail, "EFFECTIVEDATE", ",", "", false);
+						}
+					}
+				} 
+			}
+		}
+		return result;
 	}
 	private String getRFANumber(EntityItem rootEntity, boolean isEpic, EntityItem availEI) {
 		String strISLMRFA;
