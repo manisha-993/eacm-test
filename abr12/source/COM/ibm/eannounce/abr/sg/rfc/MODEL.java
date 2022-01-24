@@ -48,7 +48,8 @@ public class MODEL {
 	private String PRPQINDC;
 	@XmlElement(name = "PHANTOMMODINDC")
 	private String PHANTOMMODINDC;
-
+	@XmlElement(name = "DEFAULTCUSTOMIZEABLE")
+	private String DEFAULTCUSTOMIZEABLE;
 	@XmlElementWrapper(name = "TAXCODELIST")
 	@XmlElement(name = "TAXCODEELEMENT")
 	private List<TAXCODE> TAXCODELIST;
@@ -124,5 +125,11 @@ public class MODEL {
 	}
 	public void setPHANTOMMODINDC(String pHANTOMMODINDC) {
 		PHANTOMMODINDC = pHANTOMMODINDC;
+	}
+	public String getDEFAULTCUSTOMIZEABLE() {
+		return DEFAULTCUSTOMIZEABLE;
+	}
+	public void setDEFAULTCUSTOMIZEABLE(String dEFAULTCUSTOMIZEABLE) {
+		DEFAULTCUSTOMIZEABLE = dEFAULTCUSTOMIZEABLE;
 	}
 }

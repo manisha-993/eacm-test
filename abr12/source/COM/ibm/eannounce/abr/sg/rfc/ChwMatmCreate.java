@@ -67,6 +67,7 @@ public class ChwMatmCreate extends RdhBase {
 		//If <materialID> like "%UPG", then copy from MODEL_UPDATE/AVAILABILITYLIST/AVAILABILITYELEMENT/ANNNUMBER.
 		//Else set to blank.
 		if(materialID.endsWith("UPG")) {
+			bmmh1.get(0).setStprs("0.00");
 			bmmh1.get(0).setZeinr(model.getAVAILABILITYLIST().get(0).getANNNUMBER());
 		
 			if(model.getAVAILABILITYLIST().get(0).getANNNUMBER()!=null) {
@@ -80,6 +81,7 @@ public class ChwMatmCreate extends RdhBase {
 		else {
 			bmmh1.get(0).setZeinr("");
 			bmmh1.get(0).setZeiar("");
+			bmmh1.get(0).setStprs("0.01");
 
 		}
 		
@@ -140,17 +142,22 @@ public class ChwMatmCreate extends RdhBase {
 		if(materialID.endsWith("NEW")) {
 			if("LBS".equals(model.getPHANTOMMODINDC())||"'6661', '6662', '6663', '6664', '6665', '6668', '6669'".contains(model.getMACHTYPE()
 					)||"Storage Tier','STORAGE TIER','storage tier'".contains(model.getSUBGROUP())) {
-				
+				bmmh1.get(0).setSernp("NONE");
 			}else if ("'2063', '2068', '2059', '2057', '2058'".contains(model.getMACHTYPE())) {
 				bmmh1.get(0).setSernp("GG01");
 			}else {
 				bmmh1.get(0).setSernp("ZZ06");
 			}
 		}else if (materialID.endsWith("MTC")||materialID.endsWith("UPG")) {
-			
+			bmmh1.get(0).setSernp("ZZ06");
 		}
-		bmmh1.get(0).setSernp("");
+		else if ("ZPRT".equals(materialType)) {
+			bmmh1.get(0).setSernp("NONE");
+		}
 		bmmh1.get(0).setPeinh("1");
+		if("Hardware".equals(model.getCATEGORY())&&"ZMAT".equals(materialType)){
+			bmmh1.get(0).setBwtty("X");
+		}
 		//bmmh1.get(0).bwtty ("V");?
 		bmmh1.get(0).setVersg("1");
 		bmmh1.get(0).setSktof("X");
@@ -158,24 +165,71 @@ public class ChwMatmCreate extends RdhBase {
 		bmmh1.get(0).setLfmng("1");
 		bmmh1.get(0).setScmng("1");
 		//todo
-		bmmh1.get(0).setMtpos("");
+		bmmh1.get(0).setMtpos(getMtpos(model));
 		bmmh1.get(0).setProdh(model.getPRODHIERCD());
-
 		
-			if ("Yes".equals(model.getPCTOFCMPLTINDC()))
-			bmmh1.get(0).setPrat1("X");
+		if (materialID.endsWith("NEW")) {
+			bmmh1.get(0).setKtgrm("01");
+		}else if (materialID.endsWith("UPG")||materialID.endsWith("MTC")) {
+			bmmh1.get(0).setKtgrm("29");
+
+		}
+		else if ("ZPRT".equals(materialType)) {
+			bmmh1.get(0).setKtgrm(model.getACCTASGNGRP());
+
+		}
+		
 
 		List<TAXCODE> taxcodes = model.getTAXCODELIST();
 		if (taxcodes != null && taxcodes.size() > 0) {
 			bmmh1.get(0).setMvgr5(taxcodes.get(0).getTAXCODE());
 		}
+		bmmh1.get(0).setXeib1("X");
 		// bmmh1.get(0).setp;
-
+		 if ("ZMAT".equals(materialType))
+		 {
+			bmmh1.get(0).setKzkfg("X");
+			if("Y".equals(model.getDEFAULTCUSTOMIZEABLE())) {
+				bmmh1.get(0).setZconf("E");
+			}
+			else if("N".equals(model.getDEFAULTCUSTOMIZEABLE())) {
+				bmmh1.get(0).setZconf("E");
+			}
+			
+		}
+		 bmm00.get(0).setXeib1("X");
+		 bmm00.get(0).setXeid1("X");
+		 bmm00.get(0).setXeik1("X");
+		 bmm00.get(0).setXeiv1("X");
+		 bmm00.get(0).setXeie1("X");
 		List<LANGUAGE> languages = model.getLANGUAGELIST();
 		if (languages != null && languages.size() > 0) {
-			bmmh5.get(0).setSpras("E");
-			bmmh5.get(0).setMaktx(languages.get(0).getINVNAME());
-			bmmh5.get(0).setTdline(languages.get(0).getMKTGNAME());
+			String nlsid = languages.get(0).getNLSID();
+			if("1".equals(nlsid)) {
+				bmmh5.get(0).setSpras("E");
+			}else if ("2".equals(nlsid)) {
+				bmmh5.get(0).setSpras("D");
+			}
+			else if ("11".equals(nlsid)) {
+				bmmh5.get(0).setSpras("1");
+			}
+			
+			if (materialID.endsWith("NEW")) {
+				bmmh5.get(0).setMaktx("MACHINE TYPE "+model.getMACHTYPE()+" - Model NEW");
+				bmmh5.get(0).setTdline("MACHINE TYPE "+model.getMACHTYPE()+" - Model NEW");
+
+			}
+			else if (materialID.endsWith("UPG")) {
+				bmmh5.get(0).setMaktx("MACHINE TYPE "+model.getMACHTYPE()+" - Model UPG");
+				bmmh5.get(0).setTdline("MACHINE TYPE "+model.getMACHTYPE()+" - Model UPG");
+			}else if (materialID.endsWith("MTC")) {
+				bmmh5.get(0).setMaktx("MACHINE TYPE "+model.getMACHTYPE()+" - Model MTC");
+				bmmh5.get(0).setTdline("MACHINE TYPE "+model.getMACHTYPE()+" - Model MTC");
+			}else {
+				bmmh5.get(0).setMaktx(languages.get(0).getINVNAME());
+				bmmh5.get(0).setTdline(languages.get(0).getMKTGNAME());
+
+			}
 		} else {
 			bmmh5.get(0).setSpras("E");
 		}
@@ -513,39 +567,49 @@ public class ChwMatmCreate extends RdhBase {
 
 	}
 
-	private String getMtpos(SVCMOD svcmod) {
+	private String getMtpos(MODEL model) {
 		// TODO Auto-generated method stub
 		String result = "";
-		if (svcmod == null)
-			return result;
-		if ("Service".equals(svcmod.getCATEGORY())) {
-			if ("Custom".equals(svcmod.getSUBCATEGORY())) {
-				if ("Project Based".equals(svcmod.getGROUP()) || "Operation Based".equals(svcmod.getGROUP())) {
-					result = "ZSV1";
-				}
-
-			} else if ("Facility".equals(svcmod.getSUBCATEGORY())) {
-				/**
-				 * SMG0003 (Penalty) SMG0004 (Incident) SMG0005 (Travel) SMG006 (Activity)
-				 */
-				if ("Penalty".equals(svcmod.getGROUP())) {
-					result = "ZSV4";
-				} else if ("Incident".equals(svcmod.getGROUP())) {
-					result = "ZSV5";
-				} else if ("Travel".equals(svcmod.getGROUP())) {
-					result = "ZSTE";
-				} else if ("Activity".equals(svcmod.getGROUP())) {
-					result = "ZSA1";
-				}else if ("OEM".equals(svcmod.getGROUP())) {
-					result = "ZSOE";
-				}
-			} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())
-					&& "Non-Federated".equals(svcmod.getGROUP())) {
-				result = "ZSA1";
+		String var = model.getPHANTOMMODINDC()==null?"":model.getPHANTOMMODINDC().toUpperCase();
+		String materialID = bmm00.get(0).getMatnr();
+		
+		if(materialID.endsWith("NEW")) {
+			if ("NORM".equals(var)) {
+				result="ZPT1";
+			}else if ("REACH".equals(var)) {
+				result ="ZPT2";
 			}
-		} else if ("IP".equals(svcmod.getCATEGORY()) && "SC".equals(svcmod.getSUBCATEGORY())) {
-			result = "ZSV1";
+		else if ("'6661', '6662', '6663', '6664', '6665', '6668', '6669', '4586', '4663', '4665', '4673', '9255', '9601', '9665')".contains(model.getMACHTYPE())) {
+			result="ZPT4";
 		}
+			else if ("LBS".equals(var)) {
+				result="ZPT3";
+			}
+			else {
+				result="Z002";
+			}
+			if ("P1030".equals(model.getPRFTCTR())) {
+				result="ZHCR";
+			}
+		}else if (materialID.endsWith("UPG")||materialID.endsWith("MTC")) {
+			if ("NORM".equals(var)) {
+				result="ZPT1";
+			}else if ("REACH".equals(var)) {
+				result ="ZPT2";
+			}
+			else if ("LBS".equals(var)) {
+				result="ZPT3";
+			}
+			else {
+				result="Z002";
+			}	
+		}
+		else if("ZPRT".equals(bmm00.get(0).getMtart())) {
+		   if("Hardware".equals(model.getCATEGORY())) {
+			   result ="ZSUP";
+		   }
+		}
+		
 		return result;
 	}
 
