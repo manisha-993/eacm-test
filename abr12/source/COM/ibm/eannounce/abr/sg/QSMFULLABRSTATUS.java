@@ -1913,7 +1913,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		 * "select  pentityid,T1.entityid, prod.attributevalue from temp1 t1  inner join opicm.text prod on t1.pentityid=prod.entityid and PROD.attributecode='WTHDRWEFFCTVDATE' AND PROD.entitytype = 'PRODSTRUCT' AND prod.EFFTO >CURRENT TIMESTAMP AND prod.valto>current TIMESTAMP\n"
 		 * + "union all\n" + "select DISTINCT pentityid,entityid,null from temp2 t2";
 		 */
-		String sql = "SELECT  FR.ENTITY1ID AS ENTITYID ,FR.ENTITYID as RENTITYID,AT.ATTRIBUTEVALUE AS EFFECTIVEDATE ,T1.ATTRIBUTEVALUE ,F1.ATTRIBUTEVALUE ,mf.ATTRIBUTEVALUE as MACHTYPEATR FROM OPICM.RELATOR FR \n"
+		String sql = "SELECT  FR.ENTITY1ID AS ENTITYID ,FR.ENTITYID as RENTITYID,AT.ATTRIBUTEVALUE AS EFFECTIVEDATE ,T1.ATTRIBUTEVALUE as GEO,F1.ATTRIBUTEVALUE as type,mf.ATTRIBUTEVALUE as MACHTYPEATR FROM OPICM.RELATOR FR \n"
 				+ "JOIN OPICM.FLAG MF ON MF.ENTITYTYPE ='MODEL' AND mf.attributecode='MACHTYPEATR'  AND mf.entityid=fr.ENTITY2ID AND mf.VALTO >CURRENT TIMESTAMP  AND mf.EFFTO >CURRENT TIMESTAMP \n"
 				+ "LEFT JOIN OPICM.RELATOR ar ON AR.ENTITYTYPE ='OOFAVAIL' AND FR.ENTITYID = AR.ENTITY1ID AND AR.VALTO>CURRENT TIMESTAMP AND AR.EFFTO > CURRENT TIMESTAMP\n"
 				+ "LEFT JOIN OPICM.flag T1 ON T1.ATTRIBUTECODE ='QSMGEO' AND T1.ATTRIBUTEVALUE ='6221' AND T1.ENTITYID =AR.ENTITY2ID AND T1.ENTITYTYPE ='AVAIL' AND T1.VALTO >CURRENT  timestamp AND T1.EFFTO > CURRENT timestamp \n"
@@ -1932,26 +1932,35 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 			String date = rs.getString("EFFECTIVEDATE");
 			String id = rs.getString("entityid");
 			String atr = rs.getString("MACHTYPEATR");
+			String geo = rs.getString("GEO");
+			String type = rs.getString("TYPE");
 			if (date == null || date.trim().equals(""))
 				fidMap.put(id+atr, "2050-12-31");
-			else if (fidMap.get(id+atr) == null) {
-				fidMap.put(id+atr, date);
+			else if ("6221".equals(geo)&&"149".equals(type)) {
+				if(fidMap.get(id+atr) == null)
+				{
+					fidMap.put(id+atr, date);
+					
+				}
+				else {
+					try {
+						oldestDate = df.parse(fidMap.get(id+atr).toString());
+						psDate = df.parse(date);
+						if ((oldestDate == null) || (psDate.after(oldestDate))) {
+							addDebug("*****mlm setting odlestdate to psWdDate");
+							fidMap.put(id+atr, date);
+						}
+					} catch (ParseException e) {
+						addDebug(e.toString());
+						addDebug("*****mlm error: ParseException, setting date to 2050-12-31 - end");
+
+						fidMap.put(id+atr, "2050-12-31");
+						break;
+					}
+				}
 			} else {
 
-				try {
-					oldestDate = df.parse(fidMap.get(id+atr).toString());
-					psDate = df.parse(date);
-					if ((oldestDate == null) || (psDate.after(oldestDate))) {
-						addDebug("*****mlm setting odlestdate to psWdDate");
-						fidMap.put(id+atr, date);
-					}
-				} catch (ParseException e) {
-					addDebug(e.toString());
-					addDebug("*****mlm error: ParseException, setting date to 2050-12-31 - end");
-
-					fidMap.put(id+atr, "2050-12-31");
-					break;
-				}
+				fidMap.put(id+atr, "2050-12-31");
 			}
 			// list.add(rs.getString("ATTRIBUTEVALUE"));
 		}
