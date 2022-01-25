@@ -234,6 +234,8 @@ public class ChwMatmCreate extends RdhBase {
 			}
 		} 
 		List<AVAILABILITY> availabilities = model.getAVAILABILITYLIST();
+		List<TAXCATEGORY> taxcategories = model.getTAXCATEGORYLIST();
+
 		RdhMatm_geo geo = new RdhMatm_geo();
 		geo.setName("WW1");
 		geo.setVmsta("Z0");
@@ -246,17 +248,15 @@ public class ChwMatmCreate extends RdhBase {
 			geo.setVmstd(pubfrom.replace("-", ""));
 		}
 		
+		Set<SLEORGNPLNTCODE> sset  = new HashSet<SLEORGNPLNTCODE>();
+		Set<TAXCATEGORY> cset = new HashSet<TAXCATEGORY>();
 		if (availabilities != null && availabilities.size() > 0) {
 
 			for (int i = 0; i < availabilities.size(); i++) {
-				Set<SLEORGNPLNTCODE> sset = sMap.get(availabilities.get(i).getPUBFROM());
-				
+			
 				sset.addAll(availabilities.get(i).getSLEORGNPLNTCODELIST());
 
-				Set<TAXCATEGORY> cset = cMap.get(availabilities.get(i).getPUBFROM());
-				if (cset == null) {
-					cset = new HashSet<TAXCATEGORY>();
-				}
+				
 				if (taxcategories != null) {
 					for (int j = 0; j < taxcategories.size(); j++) {
 						if (taxcategories.get(j) != null && taxcategories.get(j).getCOUNTRYLIST() != null
