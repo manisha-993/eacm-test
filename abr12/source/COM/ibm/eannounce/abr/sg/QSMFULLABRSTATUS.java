@@ -1958,10 +1958,11 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 						break;
 					}
 				}
-			} else {
-
-				fidMap.put(id+atr, "2050-12-31");
-			}
+			} /*
+				 * else {
+				 * 
+				 * fidMap.put(id+atr, "2050-12-31"); }
+				 */
 			// list.add(rs.getString("ATTRIBUTEVALUE"));
 		}
 		rs.close();
