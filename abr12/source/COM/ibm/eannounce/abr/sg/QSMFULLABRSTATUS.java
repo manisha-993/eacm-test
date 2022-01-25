@@ -1898,18 +1898,29 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		 * ")  AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP  and prod.nlsid=1"
 		 * ;
 		 */
-		String sql ="with temp1(pentityid,entityid) as(\n"
-				+ "select R.entityid as pentityid,R.entity1id as entityid from opicm.Relator R\n"
-				+ "left join OPICM.text prod on prod.entityid= R.entityid AND PROD.attributecode='WTHDRWEFFCTVDATE' where R.entitytype='PRODSTRUCT' AND PROD.entitytype = r.ENTITYTYPE AND R.ENTITY1ID in ("+ids+")\n"
-				+ "AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP AND prod.EFFTO >CURRENT TIMESTAMP AND prod.valto>current TIMESTAMP)\n"
-				+ ",temp2(pentityid,entityid) as (select R.entityid as pentityid,R.entity1id as entityid from opicm.Relator R\n"
-				+ " where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID in ("+ids+")\n"
-				+ "AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP AND R.entityid not in (select pentityid from temp1)\n"
-				+ ")\n"
-				+ "select  pentityid,T1.entityid, prod.attributevalue from temp1 t1  inner join opicm.text prod on t1.pentityid=prod.entityid and PROD.attributecode='WTHDRWEFFCTVDATE' AND PROD.entitytype = 'PRODSTRUCT' AND prod.EFFTO >CURRENT TIMESTAMP AND prod.valto>current TIMESTAMP\n"
-				+ "union all\n"
-				+ "select DISTINCT pentityid,entityid,null from temp2 t2";
-		addDebug("sql:"+sql);
+		/*
+		 * String sql ="with temp1(pentityid,entityid) as(\n" +
+		 * "select R.entityid as pentityid,R.entity1id as entityid from opicm.Relator R\n"
+		 * +
+		 * "left join OPICM.text prod on prod.entityid= R.entityid AND PROD.attributecode='WTHDRWEFFCTVDATE' where R.entitytype='PRODSTRUCT' AND PROD.entitytype = r.ENTITYTYPE AND R.ENTITY1ID in ("
+		 * +ids+")\n" +
+		 * "AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP AND prod.EFFTO >CURRENT TIMESTAMP AND prod.valto>current TIMESTAMP)\n"
+		 * +
+		 * ",temp2(pentityid,entityid) as (select R.entityid as pentityid,R.entity1id as entityid from opicm.Relator R\n"
+		 * + " where R.entitytype='PRODSTRUCT' AND R.ENTITY1ID in ("+ids+")\n" +
+		 * "AND R.EFFTO >CURRENT TIMESTAMP AND R.valto>current TIMESTAMP AND R.entityid not in (select pentityid from temp1)\n"
+		 * + ")\n" +
+		 * "select  pentityid,T1.entityid, prod.attributevalue from temp1 t1  inner join opicm.text prod on t1.pentityid=prod.entityid and PROD.attributecode='WTHDRWEFFCTVDATE' AND PROD.entitytype = 'PRODSTRUCT' AND prod.EFFTO >CURRENT TIMESTAMP AND prod.valto>current TIMESTAMP\n"
+		 * + "union all\n" + "select DISTINCT pentityid,entityid,null from temp2 t2";
+		 */
+		String sql = "SELECT  FR.ENTITY1ID AS ENTITYID ,FR.ENTITYID as RENTITYID,AT.ATTRIBUTEVALUE AS EFFECTIVEDATE ,T1.ATTRIBUTEVALUE ,F1.ATTRIBUTEVALUE ,mf.ATTRIBUTEVALUE as MACHTYPEATR FROM OPICM.RELATOR FR \n"
+				+ "JOIN OPICM.FLAG MF ON MF.ENTITYTYPE ='MODEL' AND mf.attributecode='MACHTYPEATR'  AND mf.entityid=fr.ENTITY2ID AND mf.VALTO >CURRENT TIMESTAMP  AND mf.EFFTO >CURRENT TIMESTAMP \n"
+				+ "LEFT JOIN OPICM.RELATOR ar ON AR.ENTITYTYPE ='OOFAVAIL' AND FR.ENTITYID = AR.ENTITY1ID AND AR.VALTO>CURRENT TIMESTAMP AND AR.EFFTO > CURRENT TIMESTAMP\n"
+				+ "LEFT JOIN OPICM.flag T1 ON T1.ATTRIBUTECODE ='QSMGEO' AND T1.ATTRIBUTEVALUE ='6221' AND T1.ENTITYID =AR.ENTITY2ID AND T1.ENTITYTYPE ='AVAIL' AND T1.VALTO >CURRENT  timestamp AND T1.EFFTO > CURRENT timestamp \n"
+				+ "LEFT JOIN opicm.FLAG f1  ON f1.ENTITYTYPE='AVAIL' AND ar.ENTITY2ID =f1.ENTITYID AND F1.ATTRIBUTECODE ='AVAILTYPE' AND  F1.ATTRIBUTEVALUE ='149' AND F1.VALTO >CURRENT  timestamp AND F1.EFFTO > CURRENT timestamp \n"
+				+ "LEFT JOIN OPICM.TEXT AT ON AT.ENTITYID =ar.ENTITY2ID AND AT.ENTITYTYPE ='AVAIL' and at.attributecode='EFFECTIVEDATE' AND AT.VALTO >CURRENT  timestamp AND AT.EFFTO > CURRENT timestamp \n"
+				+ "WHERE FR.ENTITYTYPE ='PRODSTRUCT' AND FR.ENTITY1ID IN (23906) AND FR.VALTO >CURRENT TIMESTAMP AND FR.EFFTO > CURRENT TIMESTAMP WITH UR";
+		addDebug("sql:"+sql );
 		Connection conn = m_db.getPDHConnection();
 		PreparedStatement ps = conn.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
 				ResultSet.CONCUR_READ_ONLY);
@@ -1918,26 +1929,27 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 
 		List list = new ArrayList();
 		while (rs.next()) {
-			String date = rs.getString("ATTRIBUTEVALUE");
+			String date = rs.getString("EFFECTIVEDATE");
 			String id = rs.getString("entityid");
+			String atr = rs.getString("MACHTYPEATR");
 			if (date == null || date.trim().equals(""))
-				fidMap.put(id, "2050-12-31");
-			else if (fidMap.get(id) == null) {
-				fidMap.put(id, date);
+				fidMap.put(id+atr, "2050-12-31");
+			else if (fidMap.get(id+atr) == null) {
+				fidMap.put(id+atr, date);
 			} else {
 
 				try {
-					oldestDate = df.parse(fidMap.get(id).toString());
+					oldestDate = df.parse(fidMap.get(id+atr).toString());
 					psDate = df.parse(date);
 					if ((oldestDate == null) || (psDate.after(oldestDate))) {
 						addDebug("*****mlm setting odlestdate to psWdDate");
-						fidMap.put(id, date);
+						fidMap.put(id+atr, date);
 					}
 				} catch (ParseException e) {
 					addDebug(e.toString());
 					addDebug("*****mlm error: ParseException, setting date to 2050-12-31 - end");
 
-					fidMap.put(id, "2050-12-31");
+					fidMap.put(id+atr, "2050-12-31");
 					break;
 				}
 			}
@@ -1947,14 +1959,14 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 
 	}
 
-	private String validateProdstructsDate(EntityItem eiFeature) {
-		String resutl = fidMap.get(eiFeature.getEntityID() +"")==null?"":fidMap.get(eiFeature.getEntityID() +"").toString();
+	private String validateProdstructsDate(String key) {
+		String resutl = fidMap.get(key)==null?"2050-12-31":fidMap.get(key).toString();
 
 		return resutl;
 	
 	}
 
-	private String validateProdstructs(EntityItem eiFeature)
+	private String validateProdstructs3(EntityItem eiFeature)
 			throws MiddlewareRequestException, SQLException, MiddlewareException {
 
 		String strReturnDate = "";
@@ -2007,6 +2019,40 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 				break;
 			}
 		}
+
+		return strReturnDate;
+	}
+	
+	private String validateProdstructs(EntityItem eiFeature)
+			throws MiddlewareRequestException, SQLException, MiddlewareException {
+
+		String strReturnDate = null;
+		Date oldestDate = null;
+		Date psDate = null;
+
+		/*
+		 * ExtractActionItem eaItem = new ExtractActionItem(null, m_db, m_prof,
+		 * getT006FeatureVEName());
+		 * 
+		 * EntityList list = m_db.getEntityList(m_prof, eaItem, new EntityItem[]
+		 * { new EntityItem(null, m_prof, eiFeature.getEntityType(),
+		 * eiFeature.getEntityID()) });
+		 */
+		Vector prodStructGrp = getTMFFromFeature(eiFeature);
+		addDebug("Featue:" + eiFeature.getEntityID() + "-PRODUCT size:" + prodStructGrp.size());
+		addDebug("Featue uplink:" + eiFeature.getUpLinkCount());
+		for (int i = 0; i < prodStructGrp.size(); i++) {
+			if(strReturnDate==null)
+			{
+				strReturnDate = getTMFWDDate((EntityItem)prodStructGrp.get(i));
+			}
+			else {
+				String temp = getTMFWDDate((EntityItem)prodStructGrp.get(i));
+				strReturnDate=strReturnDate.compareTo(temp)>0?strReturnDate:temp;
+			}
+			
+		}
+		
 
 		return strReturnDate;
 	}
@@ -2392,8 +2438,10 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 			sb.append(getValue(QSMEDMW, "2050-12-31"));
 			sb.append(getValue(DSLMMVA, PokUtils.getAttributeValue(rootEntity, "ANNDATE", ",", "", false)));
 
-			//strDSLMWDN = validateProdstructsDate(eiFeature);
-			strDSLMWDN=getTMFWDDateForFeature(eiProdstruct);
+			strDSLMWDN = validateProdstructsDate(eiFeature.getEntityID()+PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", ",", "", false));
+			//strDSLMWDN=getTMFWDDateForFeature(eiProdstruct);
+			//strDSLMWDN=validateProdstructs(eiFeature);
+			//validateProdstructs2(eiFeature);
 			sb.append(getValue(DSLMWDN, strDSLMWDN));
 
 			strPricedFeature = PokUtils.getAttributeValue(eiFeature, "PRICEDFEATURE", ",", "", false);
@@ -3588,8 +3636,8 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 						// "EPICNUMBER", "", "");
 						strISLMRFA = getRFANumber(rootEntity, isEpic, availEI);
 						addDebug("*****mlm ISLMRFA=" + strISLMRFA);
-						sb.append(getValue(ISLMPAL, strISLMPAL));
 						sb.append(getValue(IOPUCTY, "897"));
+						sb.append(getValue(ISLMPAL, strISLMPAL));
 						sb.append(getValue(ISLMRFA, strISLMRFA));
 						sb.append(getValue(ISLMTYP, PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", "", "")));
 						sb.append(getValue(ISLMMOD, PokUtils.getAttributeValue(eiModel, "MODELATR", "", "")));
@@ -3661,6 +3709,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 					EANFlagAttribute qsmGeoList = (EANFlagAttribute) eiAvail.getAttribute("QSMGEO");
 					if (qsmGeoList != null) {
 						if (qsmGeoList.isSelected("6221")) {
+							addDebug("EFFECTIVEDATE:"+PokUtils.getAttributeValue(eiAvail, "EFFECTIVEDATE", ",", "", false));
 					return PokUtils.getAttributeValue(eiAvail, "EFFECTIVEDATE", ",", "", false);
 						}
 					}
@@ -3688,15 +3737,17 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 						if (qsmGeoList.isSelected("6221")) {
 							if(result==null)
 								result = PokUtils.getAttributeValue(eiAvail, "EFFECTIVEDATE", ",", "", false);
+							else {
+								result=result.compareTo(PokUtils.getAttributeValue(eiAvail, "EFFECTIVEDATE", ",", "", false))>0?result:PokUtils.getAttributeValue(eiAvail, "EFFECTIVEDATE", ",", "", false);
+							}
 						}
-						else {
-							result=result.compareTo(PokUtils.getAttributeValue(eiAvail, "EFFECTIVEDATE", ",", "", false))>0?result:PokUtils.getAttributeValue(eiAvail, "EFFECTIVEDATE", ",", "", false);
-						}
+						
 					}
 				} 
 			}
 		}
-		return result;
+		
+		return result==null?"2050-12-31":result;
 	}
 	private String getRFANumber(EntityItem rootEntity, boolean isEpic, EntityItem availEI) {
 		String strISLMRFA;
