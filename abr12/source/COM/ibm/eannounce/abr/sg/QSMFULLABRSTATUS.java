@@ -1928,15 +1928,23 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		ResultSet rs = ps.executeQuery();
 
 		List list = new ArrayList();
+		Set<String> pidSet = new HashSet<String>();
+		Set<String> pidSet2 = new HashSet<String>();
+		Map<String, String> map = new HashMap<String, String>();
 		while (rs.next()) {
 			String date = rs.getString("EFFECTIVEDATE");
 			String id = rs.getString("entityid");
 			String atr = rs.getString("MACHTYPEATR");
 			String geo = rs.getString("GEO");
 			String type = rs.getString("TYPE");
+			String pid = rs.getString("RENTITYID");
+			map.put(pid, id+atr);
 			if (date == null || date.trim().equals(""))
-				fidMap.put(id+atr, "2050-12-31");
+				{
+				//fidMap.put(id+atr, "2050-12-31");
+				}
 			else if ("6221".equals(geo)&&"149".equals(type)) {
+				pidSet.add(pid);
 				if(fidMap.get(id+atr) == null)
 				{
 					fidMap.put(id+atr, date);
@@ -1958,13 +1966,22 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 						break;
 					}
 				}
-			} /*
-				 * else {
-				 * 
-				 * fidMap.put(id+atr, "2050-12-31"); }
-				 */
-			// list.add(rs.getString("ATTRIBUTEVALUE"));
+			} else {
+				pidSet2.add(pid);
+			}
+			
 		}
+		
+		pidSet2.removeAll(pidSet);
+		if(pidSet2.size()>0) {
+			Iterator<String> iterator = pidSet2.iterator();
+			while (iterator.hasNext()) {
+				String pid = (String) iterator.next();
+				fidMap.put(map.get(pid), "2050-12-31");
+				
+			}
+		}
+		
 		rs.close();
 
 	}
