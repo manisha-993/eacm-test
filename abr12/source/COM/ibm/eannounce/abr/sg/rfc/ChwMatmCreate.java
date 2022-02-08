@@ -250,34 +250,81 @@ public class ChwMatmCreate extends RdhBase {
 		
 		Set<SLEORGNPLNTCODE> sset  = new HashSet<SLEORGNPLNTCODE>();
 		Set<TAXCATEGORY> cset = new HashSet<TAXCATEGORY>();
+		Set<String> slorgSet = new HashSet<String>();
+		Set<String> plntSet = new HashSet<String>();
+
 		if (availabilities != null && availabilities.size() > 0) {
 
 			for (int i = 0; i < availabilities.size(); i++) {
-			
-				sset.addAll(availabilities.get(i).getSLEORGNPLNTCODELIST());
-
 				
-				if (taxcategories != null) {
-					for (int j = 0; j < taxcategories.size(); j++) {
-						if (taxcategories.get(j) != null && taxcategories.get(j).getCOUNTRYLIST() != null
-								&& taxcategories.get(j).getCOUNTRYLIST().size() > 0) {
-							if (availabilities.get(i).getCOUNTRY_FC()
-									.equals(taxcategories.get(j).getCOUNTRYLIST().get(0).getCOUNTRY_FC())) {
-								cset.add(taxcategories.get(j));
-								groupSet.add(taxcategories.get(j));
-							}
-
-						}
-					}
+				List<SLEORGNPLNTCODE> list = availabilities.get(i).getSLEORGNPLNTCODELIST();
+				for (int j = 0; j < list.size(); j++) {
+					slorgSet.add(list.get(j).getSLEORG());
+					plntSet.add(list.get(j).getPLNTCD());
 				}
-		
-		
-		
+			}
+		}
+		List<RdhMatm_sales_org> sales_orgList = new ArrayList<RdhMatm_sales_org>();
+		List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
+		Iterator<String> pIterator = plntSet.iterator();
+		while (pIterator.hasNext()) {
+			String plntcd = (String) pIterator.next();
+			
+			RdhMatm_plant plant = new RdhMatm_plant();
+			plant.setWerks(plntcd);
+			plant.setEkgrp("ZZZ");
+			plantList.add(plant);
+		}
+		Iterator<String> slorgIterator = slorgSet.iterator();
+		while (slorgIterator.hasNext()) {
+			String slorg = (String) slorgIterator.next();
+			
+			RdhMatm_sales_org sales_org = new RdhMatm_sales_org();
+			sales_org.setVkorg(slorg);
+			sales_org.setDwerk(slorg);
+			if(RFCConfig.getDwerk("6",sales_org.getVkorg())!=null)
+			{
+				sales_org.setDwerk(RFCConfig.getDwerk("2",sales_org.getVkorg()));
+				
+				if("0147".equals(sales_org.getVkorg())){
+					sales_org.setZtaxclsf("1");
+					sales_org.setZsabrtax("01");
+				}else if ("0026".equals(sales_org.getVkorg())) {
+					sales_org.setZsabrtax("HW");
+				}
+				sales_orgList.add(sales_org);
+			}
+		}
+		if (taxcategories != null) {
+			for (int k = 0; k < taxcategories.size(); k++) {
+				List<COUNTRY> countries = taxcategories.get(k).getCOUNTRYLIST();
+				RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
+				countries.get(1).g
+				tax_country.setTaty1(taxcList.get(k).getTAXCATEGORYVALUE());
+				tax_country.setTaxm1(taxcList.get(k).getTAXCLASSIFICATION());
+				// tax_country.setAland("US");
+				/*
+				 * tax_country.setAland(RfcConfigProperties
+				 * .getCountry(taxcList.get(k).getCOUNTRYLIST().get(0).getCOUNTRY_FC()));
+				 */
+				tax_country.setAland(RFCConfig.getAland(taxcList.get(k).getCOUNTRYLIST().get(0).getCOUNTRY_FC()));
+				tax_country.setTaxm2("1");
+				tax_country.setTaxm3("1");
+				tax_country.setTaxm4("1");
+				tax_country.setTaxm5("1");
+				tax_country.setTaxm6("1");
+				tax_country.setTaxm7("1");
+				tax_country.setTaxm8("1");
+				tax_country.setTaxm9("1");
+
+				if(tax_country.getAland()!=null) {
+				tax_countries.add(tax_country);
+				}
+			}
 		}
 		
-		
-		
-		List<TAXCATEGORY> taxcategories = model.getTAXCATEGORYLIST();
+			
+				
 		Set<TAXCATEGORY> allSet = new HashSet<TAXCATEGORY>(taxcategories);
 		Set<TAXCATEGORY> groupSet = new HashSet<TAXCATEGORY>();
 		String groupName = null;
@@ -338,8 +385,7 @@ public class ChwMatmCreate extends RdhBase {
 
 				List<SLEORGNPLNTCODE> sleorggrps = new ArrayList(sMap.get(pubfrom));
 				List<TAXCATEGORY> taxcList = new ArrayList<TAXCATEGORY>(cMap.get(pubfrom));
-				List<RdhMatm_sales_org> sales_orgList = new ArrayList<RdhMatm_sales_org>();
-				List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
+				
 				List<RdhMatm_tax_country> tax_countries = new ArrayList<RdhMatm_tax_country>();
 
 				Set<String> plantSet = new HashSet<String>();
