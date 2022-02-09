@@ -12,12 +12,17 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
+import COM.ibm.eannounce.abr.sg.rfc.entity.CountryPlantTax;
+import COM.ibm.eannounce.abr.sg.rfc.entity.Generalarea;
+
 public class RFCConfig {
 
 	static List<CountryPlantTax> countryPlantTaxs = new ArrayList<CountryPlantTax>();
 	static Map<String, String> orgplntMap = new HashMap<String, String>();
 	static Map<String, String> geneMap = new HashMap<String, String>();
 	static Map<String, Map<String, String>> orgpntMaps = new HashMap<String, Map<String,String>>();
+	static List<CountryPlantTax> taxs = new ArrayList<CountryPlantTax>();
+	static List<Generalarea> generalareas = new ArrayList<Generalarea>();
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
@@ -51,6 +56,9 @@ public class RFCConfig {
 					tax.setSALES_ORG(getCellData(row.getCell((short)1)));
 					tax.setPLNT_CD(getCellData(row.getCell((short)2)));
 					tax.setDEL_PLNT(getCellData(row.getCell((short)3)));
+					tax.setTAX_COUNTRY(getCellData(row.getCell((short)4)));
+					tax.setTAX_CAT((getCellData(row.getCell((short)7))));
+					tax.setTAX_CLAS((getCellData(row.getCell((short)8))));
 					if(tax.getINTERFACE_ID()==null||"".equals(tax.getINTERFACE_ID()))
 						break;
 					orgplntMap = orgpntMaps.get(tax.getINTERFACE_ID());
@@ -59,6 +67,7 @@ public class RFCConfig {
 						orgpntMaps.put(tax.getINTERFACE_ID(), orgplntMap);
 					}
 					orgplntMap.put(tax.getSALES_ORG(), tax.getDEL_PLNT());
+					taxs.add(tax);
 					
 				}
 				}else {
@@ -92,6 +101,12 @@ public class RFCConfig {
 	public static String getAland(String key) {
 		return geneMap.get(key);
 	}
+	public static List<CountryPlantTax> getTaxs(){
+		return taxs;
+	}
+	public static List<Generalarea> getGeneralareas() {
+		return generalareas;
+	}
 	public static void loadGeneralarea() {
 		//GENERALAREA_UPDATE_CBSE
 		try {
@@ -118,6 +133,7 @@ public class RFCConfig {
 						break;
 					//tax.setSALES_ORG(row.getCell((short)1).getStringCellValue());
 					geneMap.put(generalarea.getGENAREANAME_FC(), generalarea.getGENAREACODE());
+					generalareas.add(generalarea);
 				}
 				}else {
 					System.out.println("File type error!");
@@ -132,65 +148,6 @@ public class RFCConfig {
 		}
 
 	}
-	static class CountryPlantTax{
-		String INTERFACE_ID = null;
-		String SALES_ORG = null;
-		String PLNT_CD = null;
-		String DEL_PLNT = null;
-		String TAX_CAT = null;
-		String TAX_CLAS = null;
-		public String getINTERFACE_ID() {
-			return INTERFACE_ID;
-		}
-		public void setINTERFACE_ID(String iNTERFACE_ID) {
-			INTERFACE_ID = iNTERFACE_ID;
-		}
-		public String getSALES_ORG() {
-			return SALES_ORG;
-		}
-		public void setSALES_ORG(String sALES_ORG) {
-			SALES_ORG = sALES_ORG;
-		}
-		public String getPLNT_CD() {
-			return PLNT_CD;
-		}
-		public void setPLNT_CD(String pLNT_CD) {
-			PLNT_CD = pLNT_CD;
-		}
-		public String getDEL_PLNT() {
-			return DEL_PLNT;
-		}
-		public void setDEL_PLNT(String dEL_PLNT) {
-			DEL_PLNT = dEL_PLNT;
-		}
-		public String getTAX_CAT() {
-			return TAX_CAT;
-		}
-		public void setTAX_CAT(String tAX_CAT) {
-			TAX_CAT = tAX_CAT;
-		}
-		public String getTAX_CLAS() {
-			return TAX_CLAS;
-		}
-		public void setTAX_CLAS(String tAX_CLAS) {
-			TAX_CLAS = tAX_CLAS;
-		}
-	}
-	static class Generalarea{
-		String GENAREACODE;
-		String GENAREANAME_FC;
-		public String getGENAREACODE() {
-			return GENAREACODE;
-		}
-		public void setGENAREACODE(String gENAREACODE) {
-			GENAREACODE = gENAREACODE;
-		}
-		public String getGENAREANAME_FC() {
-			return GENAREANAME_FC;
-		}
-		public void setGENAREANAME_FC(String gENAREANAME_FC) {
-			GENAREANAME_FC = gENAREANAME_FC;
-		}
-		
-	}
+	
+	
 }
