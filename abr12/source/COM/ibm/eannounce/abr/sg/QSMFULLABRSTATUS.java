@@ -1934,7 +1934,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		while (rs.next()) {
 			String date = rs.getString("EFFECTIVEDATE");
 			String id = rs.getString("entityid");
-			String atr = rs.getString("MACHTYPEATR");
+			String atr = rs.getString("MACHTYPEATR").trim();
 			String geo = rs.getString("GEO");
 			String type = rs.getString("TYPE");
 			String pid = rs.getString("RENTITYID");
@@ -1967,11 +1967,11 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 					}
 				}
 			} else {
+				addDebug("ddd3:pid" +pid+"-"+id+atr+"-"+date);
 				pidSet2.add(pid);
 			}
 			
 		}
-		
 		pidSet2.removeAll(pidSet);
 		if(pidSet2.size()>0) {
 			Iterator<String> iterator = pidSet2.iterator();
@@ -1981,7 +1981,6 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 				
 			}
 		}
-		
 		rs.close();
 
 	}
@@ -2464,7 +2463,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 
 			sb.append(getValue(QSMEDMW, "2050-12-31"));
 			sb.append(getValue(DSLMMVA, PokUtils.getAttributeValue(rootEntity, "ANNDATE", ",", "", false)));
-
+			
 			strDSLMWDN = validateProdstructsDate(eiFeature.getEntityID()+PokUtils.getAttributeValue(eiModel, "MACHTYPEATR", ",", "", false));
 			//strDSLMWDN=getTMFWDDateForFeature(eiProdstruct);
 			//strDSLMWDN=validateProdstructs(eiFeature);
