@@ -1875,7 +1875,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		return strReturnDate;
 	}
 
-	private void validateProdstructsSQL(String ids)
+	private void validateProdstructsSQL(String ids,String tgeo)
 			throws MiddlewareRequestException, SQLException, MiddlewareException {
 		fidMap.clear();
 		if(ids.length()<1)
@@ -1943,7 +1943,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 				{
 				//fidMap.put(id+atr, "2050-12-31");
 				}
-			else if ("6221".equals(geo)&&"149".equals(type)) {
+			else if (tgeo.equals(geo)&&"149".equals(type)) {
 				pidSet.add(pid);
 				if(fidMap.get(id+atr) == null)
 				{
@@ -2126,21 +2126,21 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 				qsmGeoList = (EANFlagAttribute) availEI.getAttribute("QSMGEO");
 				if (qsmGeoList != null) {
 					if (qsmGeoList.isSelected("6199")) {
-						createT006FeatureRecords(rootEntity, wOut, availEI, "Asia Pacific", strAvailType, isEpic);
+						createT006FeatureRecords(rootEntity, wOut, availEI, "Asia Pacific", strAvailType, isEpic,"6199");
 					}
 					if (qsmGeoList.isSelected("6200")) {
 						createT006FeatureRecords(rootEntity, wOut, availEI, "Canada and Caribbean North", strAvailType,
-								isEpic);
+								isEpic,"6200");
 					}
 					if (qsmGeoList.isSelected("6198")) {
 						createT006FeatureRecords(rootEntity, wOut, availEI, "Europe/Middle East/Africa", strAvailType,
-								isEpic);
+								isEpic,"6198");
 					}
 					if (qsmGeoList.isSelected("6204")) {
-						createT006FeatureRecords(rootEntity, wOut, availEI, "Latin America", strAvailType, isEpic);
+						createT006FeatureRecords(rootEntity, wOut, availEI, "Latin America", strAvailType, isEpic,"6204");
 					}
 					if (qsmGeoList.isSelected("6221")) {
-						createT006FeatureRecords(rootEntity, wOut, availEI, "US Only", strAvailType, isEpic);
+						createT006FeatureRecords(rootEntity, wOut, availEI, "US Only", strAvailType, isEpic,"6221");
 					}
 				}
 			}
@@ -2158,7 +2158,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 	 * @throws MiddlewareException
 	 */
 	private void createT006FeatureRecords(EntityItem rootEntity, OutputStreamWriter wOut, EntityItem availEI,
-			String strAvailGenAreaSel, String strMainAvailType, boolean isEpic)
+			String strAvailGenAreaSel, String strMainAvailType, boolean isEpic,String geo)
 			throws IOException, SQLException, MiddlewareException {
 
 		StringBuffer sb;
@@ -2198,6 +2198,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		String strCSLMWCD;
 		String strWARRSVCCOVR;
 
+		
 		// int batch =0;
 
 		// int total = prodVect.size() / chunkSize;
@@ -2239,7 +2240,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 				fids += ',';
 			fids += feature.getEntityItem(fi).getEntityID();
 		}
-		validateProdstructsSQL(fids);
+		validateProdstructsSQL(fids,geo);
 
 		for (int i = 0; i < prodVect.size(); i++) {
 
