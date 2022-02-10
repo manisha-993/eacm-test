@@ -24,14 +24,6 @@ public class ChwCharMaintain extends RdhBase {
 	private List<Char_valsTable> CHAR_VALS = new ArrayList<Char_valsTable>();
 	private List<Chv_descrTable> CHV_DESCR = new ArrayList<Chv_descrTable>();
 	
-	
-//	@SerializedName("TBL_MODEL")
-//	private List<RdhChwFcProd_Model> tbl_model;
-//	@SerializedName("TBL_TMF_C")
-//	private List<RdhChwFcProd_TMF> tbl_tmf_c;
-//	@SerializedName("TBL_FEATURE")
-//	private List<RdhChwFcProd_FEATURE> tbl_feature;
-
 	public ChwCharMaintain (
 			String obj_id, String charact, String datatype, int charnumber, 
 			String decplaces, String casesens, 	String neg_vals, String group, 
