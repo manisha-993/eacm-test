@@ -19,10 +19,10 @@ import org.w3c.dom.Document;
 public class XMLParse {
 	
 	@SuppressWarnings("unchecked")
-	private static <T> T getObjFromDoc(Document doc, Class<SVCMOD> class1) throws JAXBException {
+	private static <T> T getObjFromDoc(Document doc, Class<T> class1) throws JAXBException {
 
 		try {
-			JAXBContext context = JAXBContext.newInstance(SVCMOD.class);
+			JAXBContext context = JAXBContext.newInstance(class1);
 			Unmarshaller unMarshaller = context.createUnmarshaller();
 			return (T) unMarshaller.unmarshal(doc);
 		} catch (JAXBException e) {
@@ -352,6 +352,22 @@ public class XMLParse {
 		}  
 		
 		return svcObj;
+	}
+	
+	public static <T> T getObjectFromXml(String xml, Class<T> class1) {
+		  T object =null;
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); 		
+			factory.setNamespaceAware(false);
+		    DocumentBuilder builder = factory.newDocumentBuilder();
+		    Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));		 
+		    object = getObjFromDoc(doc, class1);
+		     //695561U.xml
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}  
+		
+		return object;
 	}
 	
 	
