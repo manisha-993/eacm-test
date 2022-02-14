@@ -45,6 +45,7 @@ public class XMLParse {
 				try {
 					
 					RdhMatmCreate create = new RdhMatmCreate(svcmod);
+					System.out.println(create.getEarliestAnnDate(svcmod));
 					create.execute();
 					if (create.getRfcrc() == 0) {
 					} else {

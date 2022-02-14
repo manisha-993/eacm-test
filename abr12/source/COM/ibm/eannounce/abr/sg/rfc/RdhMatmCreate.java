@@ -52,6 +52,10 @@ public class RdhMatmCreate extends RdhBase {
 	private String is_multi_plants;
 	@Foo
 	SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd" );
+	@Foo
+	SimpleDateFormat sdfANNDATE =   new SimpleDateFormat( "ddMMyy" );
+	@Foo
+	String annnumber = null;
 	public RdhMatmCreate(SVCMOD svcmod) {
 		super(svcmod.getMACHTYPE() + svcmod.getMODEL(), "Z_DM_SAP_MATM_CREATE".toLowerCase(), null);
 		// RdhMatm_bmm00 matnr Copy from <SoftwareProduct.productIdentifier>.
@@ -64,9 +68,10 @@ public class RdhMatmCreate extends RdhBase {
 		bmm00.get(0).setXeiv1("X");
 		bmmh1.get(0).setMatkl("000");
 		bmmh1.get(0).setMeins(getMeins(svcmod));
-		bmmh1.get(0).setZeinr("");
+		
 		bmmh1.get(0).setZeiar("RFA");
 		bmmh1.get(0).setAeszn(getEarliestAnnDate(svcmod));
+		bmmh1.get(0).setZeinr(annnumber);
 		bmmh1.get(0).setGewei("");
 		bmmh1.get(0).setSpart("00");
 		bmmh1.get(0).setProdh(svcmod.getPRODHIERCD());
@@ -665,23 +670,26 @@ public class RdhMatmCreate extends RdhBase {
 	 * @param product
 	 * @return
 	 */
-	private String getEarliestAnnDate(SVCMOD svcmod) {
+	public String getEarliestAnnDate(SVCMOD svcmod) {
 		Date annDate = null;
+		Date annTemp = null;
 		String result = "";
 		List<AVAILABILITY> list = svcmod.getAVAILABILITYLIST();
 		if (list != null && list.size() > 0) {
 			for (int i = 0; i < list.size(); i++) {
 				try {
 					if (annDate == null) {
-						result = list.get(i).getANNDATE();
-						 
-						 annDate= sdf.parse(result);
+						//result = list.get(i).getANNDATE();
+						annnumber= list.get(i).getANNNUMBER();
+						 annDate= sdf.parse(list.get(i).getANNDATE());
 
 					} else {
-						annDate = sdf.parse(list.get(i).getANNDATE());;
+						annTemp = sdf.parse(list.get(i).getANNDATE());;
 
-						if (annDate.after(sdf.parse(result))) {
-							result = list.get(i).getANNDATE();
+						if (annTemp.after(annDate)) {
+							annDate = annTemp;
+							//result = list.get(i).getANNDATE();
+							annnumber= list.get(i).getANNNUMBER();
 						}
 					}
 				} catch (Exception e) {
@@ -691,13 +699,11 @@ public class RdhMatmCreate extends RdhBase {
 			}
 
 		}
-
-		if (result != null)
-			result = result.replace("-", "");
-		if (result != null && result.length() > 6) {
-			result = result.substring(result.length() - 6);
-		}
-		return result;
+		/*
+		 * if (result != null) result = result.replace("-", ""); if (result != null &&
+		 * result.length() > 6) { result = result.substring(result.length() - 6); }
+		 */
+		return sdfANNDATE.format(annDate);
 	}
 
 	/*
