@@ -1939,6 +1939,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 			String type = rs.getString("TYPE");
 			String pid = rs.getString("RENTITYID");
 			map.put(pid, id+atr);
+			addDebug("ddd:pid:" +pid+"-fid:"+id+"ATR:"+atr+"-date:"+date+"geo:"+geo);
 			if (date == null || date.trim().equals(""))
 				{
 				//fidMap.put(id+atr, "2050-12-31");
@@ -1972,7 +1973,11 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 			}
 			
 		}
+		addDebug(map.toString());
+		addDebug(pidSet.toString());
+		addDebug(pidSet2.toString());
 		pidSet2.removeAll(pidSet);
+		addDebug(pidSet2.toString());
 		if(pidSet2.size()>0) {
 			Iterator<String> iterator = pidSet2.iterator();
 			while (iterator.hasNext()) {
