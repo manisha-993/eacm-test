@@ -1928,6 +1928,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		ResultSet rs = ps.executeQuery();
 
 		List list = new ArrayList();
+		Set<String> fmSet = new HashSet<String>();
 		Set<String> pidSet = new HashSet<String>();
 		Set<String> pidSet2 = new HashSet<String>();
 		Map<String, String> map = new HashMap<String, String>();
@@ -1939,13 +1940,14 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 			String type = rs.getString("TYPE");
 			String pid = rs.getString("RENTITYID");
 			map.put(pid, id+atr);
-			addDebug("ddd:pid:" +pid+"-fid:"+id+"ATR:"+atr+"-date:"+date+"geo:"+geo);
+			//addDebug("ddd:pid:" +pid+"-fid:"+id+"ATR:"+atr+"-date:"+date+"geo:"+geo);
 			if (date == null || date.trim().equals(""))
 				{
 				//fidMap.put(id+atr, "2050-12-31");
 				}
 			else if (tgeo.equals(geo)&&"149".equals(type)) {
 				pidSet.add(pid);
+				fmSet.add(id+atr);
 				if(fidMap.get(id+atr) == null)
 				{
 					fidMap.put(id+atr, date);
@@ -1968,22 +1970,18 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 					}
 				}
 			} else {
-				addDebug("ddd3:pid" +pid+"-"+id+atr+"-"+date);
+				//addDebug("ddd3:pid" +pid+"-"+id+atr+"-"+date);
 				pidSet2.add(pid);
 			}
 			
 		}
-		addDebug(map.toString());
-		addDebug(pidSet.toString());
-		addDebug(pidSet2.toString());
 		pidSet2.removeAll(pidSet);
-		addDebug(pidSet2.toString());
 		if(pidSet2.size()>0) {
 			Iterator<String> iterator = pidSet2.iterator();
 			while (iterator.hasNext()) {
-				String pid = (String) iterator.next();
+				String pid = (String) iterator.next();	
 				fidMap.put(map.get(pid), "2050-12-31");
-				
+								
 			}
 		}
 		rs.close();
