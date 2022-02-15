@@ -1928,7 +1928,6 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		ResultSet rs = ps.executeQuery();
 
 		List list = new ArrayList();
-		Set<String> fmSet = new HashSet<String>();
 		Set<String> pidSet = new HashSet<String>();
 		Set<String> pidSet2 = new HashSet<String>();
 		Map<String, String> map = new HashMap<String, String>();
@@ -1947,7 +1946,6 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 				}
 			else if (tgeo.equals(geo)&&"149".equals(type)) {
 				pidSet.add(pid);
-				fmSet.add(id+atr);
 				if(fidMap.get(id+atr) == null)
 				{
 					fidMap.put(id+atr, date);
