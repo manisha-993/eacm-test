@@ -118,6 +118,32 @@ public class RdhClassificationMaint extends RdhBase
     }
     
     /**
+     * Constructor
+     *  add pims_identity 
+     * @param enablementprocess
+     */
+    public RdhClassificationMaint (String obj_id, String class_name, String class_type, String pims_identity)
+    {
+    	super(obj_id,"Z_DM_SAP_CLASSIFICATION_MAINT".toLowerCase(),null);
+    	this.pims_identity = pims_identity;
+    	charval_refresh = "1";
+    	object_key = new RdhClaf_object_key();
+    	object_key.setKey_feld("MATNR");
+    	object_key.setKpara_valu(obj_id);
+    	object_keys = new ArrayList<RdhClaf_object_key>();
+    	object_keys.add(object_key);
+    	klah = new RdhClaf_klah();
+    	klah.set_class(class_name);
+    	klahs = new ArrayList<RdhClaf_klah>();
+    	klahs.add(klah);
+    	kssk = new RdhClaf_kssk();
+    	kssk.setKlart(class_type);
+    	kssks = new ArrayList<RdhClaf_kssk>();
+    	kssks.add(kssk);
+    	api_ausp = new ArrayList<RdhClaf_api_ausp>();
+    }
+    
+    /**
      * Adds a characteristic and its value to an SAP classification.
      * @param charact Characteristic name
      * @param value Characteristic value

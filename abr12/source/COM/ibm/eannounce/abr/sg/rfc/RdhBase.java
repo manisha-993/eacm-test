@@ -30,7 +30,7 @@ public abstract class RdhBase
     @SerializedName("RFA_NUM")
     protected String rfa_num;
     @SerializedName("DEFAULT_MANDT")
-    private String default_mandt;
+    protected String default_mandt;
     @SerializedName("CLIENT_NAME")
     private String client_name;
     @Foo
