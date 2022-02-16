@@ -117,6 +117,10 @@ public class RdhMatm_bmmh1
     private String mvgr3;
     @SerializedName("MVGR4")
     private String mvgr4;
+    @SerializedName("XEIB1")
+    private String xeib1;
+    @SerializedName("KZKFG")
+    private String kzkfg;
     @SerializedName("ZZPHT")
     private String zzpht;
     @SerializedName("ZZTRM")
@@ -139,7 +143,8 @@ public class RdhMatm_bmmh1
     private String prat1;
     @SerializedName("PRDHA")
     private String prdha;
-      
+    @SerializedName("BWTTY")
+    private String bwtty ;
     /**
      * @return the meins
      */
@@ -1016,6 +1021,24 @@ public class RdhMatm_bmmh1
 	}
 	public void setPrdha(String prdha) {
 		this.prdha = prdha;
+	}
+	public String getBwtty() {
+		return bwtty;
+	}
+	public void setBwtty(String bwtty) {
+		this.bwtty = bwtty;
+	}
+	public String getXeib1() {
+		return xeib1;
+	}
+	public void setXeib1(String xeib1) {
+		this.xeib1 = xeib1;
+	}
+	public String getKzkfg() {
+		return kzkfg;
+	}
+	public void setKzkfg(String kzkfg) {
+		this.kzkfg = kzkfg;
 	}
     
     
