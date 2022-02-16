@@ -4,146 +4,159 @@ package COM.ibm.eannounce.abr.sg.rfc;
 import java.util.ArrayList;
 import java.util.List;
 
-import COM.ibm.eannounce.abr.sg.adsxmlbh1.ADSABRSTATUS;
-import COM.ibm.eannounce.abr.sg.rfc.entity.ChwClas_cla_ch_atr;
-import COM.ibm.eannounce.abr.sg.rfc.entity.ChwClas_cla_descr;
-import COM.ibm.eannounce.abr.sg.rfc.entity.ChwClas_clclasses;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_api_ausp;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_klah;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_kssk;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_mara;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_object_key;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClaf_rcuco;
+import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClas_cla_ch_atr;
+import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClas_cla_descr;
+import COM.ibm.eannounce.abr.sg.rfc.entity.RdhClas_clclasses;
 import COM.ibm.eannounce.abr.util.DateUtility;
 
 import com.google.gson.annotations.SerializedName;
 
 
 /**
- * The RdhClassificationMaint java class assigns a classification definition (ex. "MM_FIELDS") to a material master.  
- * If characteristics and values are supplied with the RFC call, this remote function will assign the attributes 
- * associated with a characteristic.
- * @author will
+ * creates a classification definition (ex. "MK_5655DB2_001").
+ * @author wangyul
  *
  */
 public class ChwClassMaintain extends RdhBase
 {
-   @Foo
-   private String class_name;
+
+    // private ProductSchedule productSchedule;
+    // private String class_;
+    // private String class_desc;
     @SerializedName("CLCLASSES")
-    ChwClas_clclasses chwClas_clclasses;
+    private List<RdhClas_clclasses> clclasses_list;
+    @Foo
+    private RdhClas_clclasses clclasses;
     @SerializedName("CLA_DESCR")
-    ChwClas_cla_descr chwClas_cla_descr;
+    private List<RdhClas_cla_descr> cla_descr_list;
+    @Foo
+    private RdhClas_cla_descr cla_descr;
     @SerializedName("CLA_CH_ATR")
-    List<ChwClas_cla_ch_atr> ChwClas =null;
-   /* *//**
-     * Constructor
-     * @param productSchedule
-     * @param obj_id
-     * @param class_name
-     * @param class_type
-     *//*
-    public RdhClassificationMaint ( String obj_id, String class_name, String class_type ){
-        super("",
-                "Z_DM_SAP_CLASSIFICATION_MAINT".toLowerCase(), null);
-       
-        charval_refresh="1";
-        
-        
-        object_key = new RdhClaf_object_key();
-        object_key.setKey_feld("MATNR");
-        object_key.setKpara_valu(obj_id);
-        object_keys = new ArrayList<RdhClaf_object_key>();
-        object_keys.add(object_key);
-        
-        klah = new RdhClaf_klah();
-        klah.set_class(class_name);
-        kssk = new RdhClaf_kssk();
-        kssk.setKlart(class_type);
-        
-        rcuco= new RdhClaf_rcuco();
-        rcuco.s
-        klahs = new ArrayList<RdhClaf_klah>();
-        klahs.add(klah);
-       
-        kssks = new ArrayList<RdhClaf_kssk>();
-        kssks.add(kssk);
-        api_ausp = new ArrayList<RdhClaf_api_ausp>();
-    }*/
+    private List<RdhClas_cla_ch_atr> cla_ch_atr;
+
     /**
-     * Constructor
-     * @param productSchedule
-     * @param obj_id
-     * @param class_name
-     * @param class_type
-     * @param enablementprocess
+     * @param productSchedule The product schedule which supplies the handle and
+     * details of the product data feed.
+     * @param class Classification name (ex. "MK_5655DB2_001").
+     * @param class_desc Descriptive name of classification (ex.
+     * "Class for SWO 5655DB2").
      */
-    public ChwClassMaintain (String obj_id, String class_name, String class_desc  )
-    {
-    	super(obj_id,"Z_DM_SAP_CLASS_MAINTAIN".toLowerCase(),null);
-    	 ChwClas = new ArrayList<ChwClas_cla_ch_atr>();
-    	pims_identity="C";
-    	this.class_name=class_name;
-    	chwClas_clclasses.set_class(class_name);
-    	chwClas_clclasses.setClass_type("300");
-    	chwClas_clclasses.setStatus("1");
-    	chwClas_clclasses.setVal_from(DateUtility.getTodayStringWithSimpleFormat());
-		chwClas_clclasses.setVal_to("99991231");
-		chwClas_clclasses.setCheck_no("X");
-		chwClas_clclasses.setOrg_area("PM");
+    public ChwClassMaintain (String obj_id, String class_, String class_desc){
+
+        super(obj_id, "Z_DM_SAP_CLASS_MAINTAIN".toLowerCase(),null);
+        this.rfa_num = obj_id;   
+        this.pims_identity = "H";
+        this.default_mandt = "10H";
 		
-		chwClas_cla_descr.set_class(class_name);
-		chwClas_cla_descr.setClass_type("300");
-		chwClas_cla_descr.setLanguage("E");
-		chwClas_cla_descr.setCatchword(class_desc);
-    	/*
-		 * object_key = new RdhClaf_object_key(); object_key.setKey_feld("MATNR");
-		 * object_key.setKpara_valu(obj_id); object_keys = new
-		 * ArrayList<RdhClaf_object_key>(); object_keys.add(object_key); klah = new
-		 * RdhClaf_klah(); klah.set_class(class_name); klahs = new
-		 * ArrayList<RdhClaf_klah>(); klahs.add(klah); kssk = new RdhClaf_kssk();
-		 * kssk.setKlart(class_type); kssks = new ArrayList<RdhClaf_kssk>();
-		 * kssks.add(kssk); api_ausp = new ArrayList<RdhClaf_api_ausp>();
-		 */
+
+        clclasses.set_class(class_);
+        cla_descr.set_class(class_);
+        cla_descr.setCatchword(class_desc);
     }
-    
-    /**
-     * Adds a characteristic and its value to an SAP classification.
-     * @param charact Characteristic name
-     * @param value Characteristic value
-     * @param abr 
-     */
-    public void addCharacteristic (String charact)
-    {
-    	ChwClas_cla_ch_atr atr = new ChwClas_cla_ch_atr();
-        
-		 atr.set_class(class_name);
-		 atr.setCharact(charact);
-		 atr.setClass_type("300");
-		  ChwClas.add(atr);
-		 
-    }
-    
-  
-    /* (non-Javadoc)
-     * @see com.ibm.sdpi.cmd.interfaces.rdh.esw.caller.RdhBase#setDefaultValues()
-     */
+
     @Override
     protected void setDefaultValues()
     {
         super.setDefaultValues();
-       
-        chwClas_clclasses = new ChwClas_clclasses();
-        chwClas_cla_descr = new ChwClas_cla_descr();
+        clclasses = new RdhClas_clclasses();
+        cla_descr = new RdhClas_cla_descr();
+        cla_ch_atr = new ArrayList<RdhClas_cla_ch_atr>();
+        clclasses_list = new ArrayList<RdhClas_clclasses>();
+        clclasses_list.add(clclasses);
+        cla_descr_list = new ArrayList<RdhClas_cla_descr>();
+        cla_descr_list.add(cla_descr);
+        // RdhClas_clclasses status Set to "1".
+        clclasses.setStatus("1");
+        // RdhClas_clclasses class_type Set to "300".
+        clclasses.setClass_type("300");
+        // RdhClas_clclasses org_area Set to "PM".
+        clclasses.setOrg_area("PM");
+        // RdhClas_clclasses val_from Set to current date. Format is YYYYMMDD.
+        clclasses.setVal_from(DateUtility.getTodayStringWithSapFormat());
+        // RdhClas_clclasses val_to Set to "99991231".
+        clclasses.setVal_to("99991231");
+        // RdhClas_clclasses check_no Set to "X".
+        clclasses.setCheck_no("X");
+        
+        // RdhClas_cla_descr class_type Set to "300.
+        cla_descr.setClass_type("300");
+        // RdhClas_cla_descr language Set to "E"
+        cla_descr.setLanguage("E");
+    }
+
+    /**
+     * Create an RdhClas_cla_ch_atr object and add to the
+     * RdhClassMaintain.cla_ch_atr collection.
+     * 
+     * @param charact
+     */
+    public void addCharacteristic(String charact)
+    {
+        RdhClas_cla_ch_atr chatr = new RdhClas_cla_ch_atr();
+        chatr.set_class(clclasses.get_class());
+        chatr.setClass_type(clclasses.getClass_type());
+        chatr.setCharact(charact);
+        cla_ch_atr.add(chatr);
     }
 
     @Override
     protected boolean isReadyToExecute()
     {
-    	return checkFieldsNotEmplyOrNull(chwClas_clclasses, "cLASS")&&
-    	checkFieldsNotEmplyOrNull(chwClas_cla_descr, "catchword")&&
-    	checkFieldsNotEmplyOrNullInCollection(ChwClas, "charact");
-
+        // The following attributes must have string values with length > 0:
+        // RdhClas_clclasses.class
+        // RdhClas_cla_descr.catch_word
+        // RdhClas_cla_ch_atr.charact for each RdhClas_cla_ch_atr object
+        // If all of the above attributes meet the validation requirements, then
+        // return TRUE.
+        // If any of the above attributes fail the validation requirements:
+        // Set the <RdhBase.rfcrc> attribute to '8'.
+        // Set the <RdhBase.error_text> attribute to an error message. The error
+        // message text should identify the attribute and the reason for the
+        // failure (ex. "The zzfv_obj attribute is not set to a value").
+        // Return FALSE.
+        
+        if(this.checkFieldsNotEmplyOrNull(clclasses, "cLASS"))
+        {
+            if(this.checkFieldsNotEmplyOrNull(cla_descr, "catchword"))
+            {
+                for (RdhClas_cla_ch_atr atr : cla_ch_atr)
+                {
+                    if (isNullOrBlank(atr.getCharact()))
+                    {
+                        this.setRfcrc(8);
+                        this.setError_text("One RdhClas_cla_ch_atr.charact attribute is not set to a value(class="
+                                + atr.get_class() + " classtype=" + atr.getClass_type() + ")");
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+        
+//        if (isNullOrBlank(clclasses.get_class()))
+//        {
+//            this.setRfcrc(8);
+//            this.setError_text("The RdhClas_clclasses.class attribute is not set to a value");
+//            return false;
+//        }
+//        if (isNullOrBlank(this.cla_descr.getCatchword()))
+//        {
+//            this.setRfcrc(8);
+//            this.setError_text("The RdhClas_cla_descr.catch_word attribute is not set to a value");
+//            return false;
+//        }
+//        for (RdhClas_cla_ch_atr atr : cla_ch_atr)
+//        {
+//            if (isNullOrBlank(atr.getCharact()))
+//            {
+//                this.setRfcrc(8);
+//                this.setError_text("One RdhClas_cla_ch_atr.charact attribute is not set to a value(class="
+//                        + atr.get_class() + " classtype=" + atr.getClass_type() + ")");
+//                return false;
+//            }
+//        }
+//        return true;
     }
 
 }

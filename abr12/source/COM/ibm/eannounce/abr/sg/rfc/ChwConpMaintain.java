@@ -4,13 +4,12 @@ package COM.ibm.eannounce.abr.sg.rfc;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.annotations.SerializedName;
-
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhConp_cpdep_dat;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhConp_cpro_attr;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhConp_object_key;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhConp_rcuco;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhDepd_dep_ident;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  * creates a configuration profile for a material master

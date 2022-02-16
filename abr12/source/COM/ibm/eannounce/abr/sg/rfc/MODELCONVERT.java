@@ -9,7 +9,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
-
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "MODELCONVERT_UPDATE")
 public class MODELCONVERT {
@@ -22,6 +21,15 @@ public class MODELCONVERT {
 	
 	@XmlElement(name = "FROMMACHTYPE")
 	private String FROMMACHTYPE;
+	
+	@XmlElement(name = "FROMMODEL")
+	private String FROMMODEL;
+	
+	@XmlElement(name = "TOMODEL")
+	private String TOMODEL;
+	
+	@XmlElement(name = "TOMODELTYPE")
+	private String TOMODELTYPE;
 	
 	@XmlElement(name = "TOMACHTYPE")
 	private String TOMACHTYPE;
@@ -67,6 +75,30 @@ public class MODELCONVERT {
 
 	public void setAVAILABILITYLIST(List<AVAILABILITYLIST> aVAILABILITYLIST) {
 		AVAILABILITYLIST = aVAILABILITYLIST;
+	}
+
+	public String getFROMMODEL() {
+		return FROMMODEL;
+	}
+
+	public void setFROMMODEL(String fROMMODEL) {
+		FROMMODEL = fROMMODEL;
+	}
+
+	public String getTOMODEL() {
+		return TOMODEL;
+	}
+
+	public void setTOMODEL(String tOMODEL) {
+		TOMODEL = tOMODEL;
+	}
+
+	public String getTOMODELTYPE() {
+		return TOMODELTYPE;
+	}
+
+	public void setTOMODELTYPE(String tOMODELTYPE) {
+		TOMODELTYPE = tOMODELTYPE;
 	}
 	
 	
@@ -194,6 +226,7 @@ class AVAILABILITYELEMENT {
 	public void setLASTORDER(String lASTORDER) {
 		LASTORDER = lASTORDER;
 	}
+	
 	
 	
 }
