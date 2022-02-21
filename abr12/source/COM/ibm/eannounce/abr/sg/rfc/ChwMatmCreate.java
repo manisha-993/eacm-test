@@ -27,9 +27,9 @@ import COM.ibm.eannounce.abr.util.RfcConfigProperties;
 import com.google.gson.annotations.SerializedName;
 
 /**
- * Creates or updates an SAP material master.
+ * ChwMatmCreate.
  * 
- * @author will
+ * @author wangyul
  *
  */
 public class ChwMatmCreate extends RdhBase {
@@ -239,12 +239,15 @@ public class ChwMatmCreate extends RdhBase {
 		geo.setName("WW1");
 		geo.setVmsta("Z0");
 		if(materialID.endsWith("NEW")) {
-		
-			geo.setVmstd(DateUtility.getTodayStringWithSimpleFormat());
+			String pubfrom = DateUtility.getTodayStringWithSapFormat();
+			System.out.println("pubfrom=" + pubfrom);
+			geo.setVmstd(pubfrom);
 		}else {
 			String pubfrom = availabilities.get(0).getPUBFROM();
+			System.out.println("pubfrom=" + pubfrom);
+			geo.setVmstd(pubfrom);
 			
-			geo.setVmstd(pubfrom.replace("-", ""));
+			//geo.setVmstd(pubfrom.replace("-", ""));
 		}
 		
 		Set<SLEORGNPLNTCODE> sset  = new HashSet<SLEORGNPLNTCODE>();

@@ -1,6 +1,10 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
 import java.io.ByteArrayInputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,33 +19,67 @@ import org.w3c.dom.Document;
 
 public class Chw001ClfCreate {
 	MODEL chwModel;
-	MODELCONVERT chwMODELCONVERT;
+	
 	FCTRANSACTION chwFCTRANSACTION;
 	
 	String materialType;
 	String materialID;
+	Connection rdhConnection;
+	Connection odsConnection;
 	
 	
-	public Chw001ClfCreate (String chwProduct, String materialType, String materialID, String entityType ){
+	
+	public Chw001ClfCreate (String chwProduct, String materialType, String materialID, String entityType, Connection rdhConnection, Connection odsConnection) throws SQLException{
 		if("MODEL".equalsIgnoreCase(entityType)){
 			this.chwModel = CommonEntities.getModelFromXml(chwProduct);
 		} else if("MODELCONVERT".equalsIgnoreCase(entityType)){
 			//TODO should get the model from modelIERPAbrStatus.java 
 			//If <entityType> = "MODELCONVERT", then set chwProduct to the XML of MODEL 
-			//where MODEL/MACHTYPE = MODELCONVERT/TOMACHTYPE and MODEL/MODEL = MODELCONVERT/TOMODEL?? 
+			//where MODEL/MACHTYPE = MODELCONVERT/TOMACHTYPE and MODEL/MODEL = MODELCONVERT/TOMODEL
+			/**
+			 * MODELCONVERT  
+			 ODS xml query SQL: 
+			 select XMLMESSAGE from cache.XMLIDLCACHE where XMLCACHEVALIDTO > current timestamp and  XMLENTITYTYPE = 'MODEL'
+			 and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE";
+			  $i/MODEL_UPDATE[MACHTYPE/text() = "6758" and MODEL/text() = "059"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") ORDER BY XMLCACHEDTS 
+			  with ur
+			 */
 			
-			this.chwModel = CommonEntities.getModelFromXml(chwProduct);
+			MODELCONVERT chwMODELCONVERT = CommonEntities.getModelConvertFromXml(chwProduct);
+			String TOMACHTYPE = chwMODELCONVERT.getTOMACHTYPE();
+			String TOMODEL = chwMODELCONVERT.getTOMODEL();
+			String xml = getModelXMLByCondition(odsConnection, TOMACHTYPE, TOMODEL);
+			this.chwModel = CommonEntities.getModelFromXml(xml);
+			
 		}else if("FCTRANSACTION".equalsIgnoreCase(entityType)){
 			//TODO
 			//If <entityType> = "FCTRANSACTION", then set chwProduct to the XML of MODEL 
 			//where MODEL/MACHTYPE = FCTRANSACTION/TOMACHTYPE and MODEL/MODEL = FCTRANSACTION/TOMODEL
-			this.chwModel = CommonEntities.getModelFromXml(chwProduct);
+			/**
+			 * FCTRANSACTION  
+			 ODS xml query SQL: 
+			 select XMLMESSAGE from cache.XMLIDLCACHE where XMLCACHEVALIDTO > current timestamp and  XMLENTITYTYPE = 'MODEL'
+			 and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE";
+			  $i/MODEL_UPDATE[MACHTYPE/text() = "6758" and MODEL/text() = "059"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") ORDER BY XMLCACHEDTS 
+			  with ur
+			 */
+			FCTRANSACTION chwFCTRANSACTION = CommonEntities.getFctransactionFromXml(chwProduct);
+			String TOMACHTYPE = chwFCTRANSACTION.getTOMACHTYPE();
+			String TOMODEL = chwFCTRANSACTION.getTOMODEL();
+			String xml = getModelXMLByCondition(odsConnection, TOMACHTYPE, TOMODEL);
+			this.chwModel = CommonEntities.getModelFromXml(xml);
+			
 		}
 		
 		this.materialType = materialType;
 		this.materialID = materialID;
+		this.rdhConnection = rdhConnection;
+		this.odsConnection = odsConnection;
 		
 	}
+
+
+	
 	
 	
 	public void execute(){
@@ -300,49 +338,173 @@ public class Chw001ClfCreate {
 				COVRPRIOD.put("THREE MONTHS", "3");
 				COVRPRIOD.put("3 MONTHS", "3");
 				value = COVRPRIOD.get(var);
+				//TODO add the char firstly
 				TssClassificationMaint.addCharacteristic("MM_HW_SPTERM", value);
-				//3.i Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_COVHRS characteristic to the MM_SERVICEPAC classification.
-				//TODO value Copy from SVCLEV_UPDATE/COVRSHRTDESC where SVCLEV_UPDATE/SVCLEVCD = hwProduct/SVCLEVCD
-				//TODO no SVCLEV sql query the cache, get the xml to SVCLEV
-				value = chwModel.getSVCLEVCD();
-				TssClassificationMaint.addCharacteristic("MM_SP_COVHRS", value);
-				//3. j Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_SDM characteristic to the MM_SERVICEPAC classification.
 				
-				//TODO VF! no SVCLEV sql query the cache, get the xml to SVCLEV 
-				value = chwModel.getSVCLEVCD();
-				TssClassificationMaint.addCharacteristic("MM_SP_SDM", value);
-				//3.k Call the TssClassificationMaint.addCharacteristic() method to add the MM_SPFIXEDTIME characteristic to the MM_SERVICEPAC classification.
-				//TODO no SVCLEV sql query the cache, get the xml to SVCLEV
-				value = chwModel.getSVCLEVCD();
-				TssClassificationMaint.addCharacteristic("MM_SPFIXEDTIME", value);
-				//3.l Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_OSRESPTIME characteristic to the MM_SERVICEPAC classification. 
-				//TODO no SVCLEV sql query the cache, get the xml to SVCLEV
-				value = chwModel.getSVCLEVCD();
-				TssClassificationMaint.addCharacteristic("MM_SP_OSRESPTIME", value);
-				//3.m Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_CNTACTIME characteristic to the MM_SERVICEPAC classification. 
-				value = chwModel.getSVCLEVCD();
-				TssClassificationMaint.addCharacteristic("MM_SP_CNTACTIME", value);
-				//3.n Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_PARIVTIME characteristic to the MM_SERVICEPAC classification.//3.m Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_CNTACTIME characteristic to the MM_SERVICEPAC classification. 
-				value = chwModel.getSVCLEVCD();
-				TssClassificationMaint.addCharacteristic("MM_SP_PARIVTIME", value);
-				//3.o Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_TARNDTIME characteristic to the MM_SERVICEPAC classification.
-				value = chwModel.getSVCLEVCD();
-				TssClassificationMaint.addCharacteristic("MM_SP_TARNDTIME", value);
+				
+				//value Copy from SVCLEV_UPDATE/COVRSHRTDESC where SVCLEV_UPDATE/SVCLEVCD = hwProduct/SVCLEVCD
+				//sql query the cache, get the xml to SVCLEV
+				String SVCLEVCD = chwModel.getSVCLEVCD();
+				String xml = getSVCLEVFromXML(SVCLEVCD);
+				if(!"".equals(xml)){
+					SVCLEV SVCLEV = CommonEntities.getSVCLEVFromXml(xml);
+					
+					
+					//3.i Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_COVHRS characteristic to the MM_SERVICEPAC classification.//3.i Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_COVHRS characteristic to the MM_SERVICEPAC classification.
+					value = SVCLEV.getCOVRSHRTDESC();
+					TssClassificationMaint.addCharacteristic("MM_SP_COVHRS", value);
+					//3. j Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_SDM characteristic to the MM_SERVICEPAC classification.
+					value = SVCLEV.getSVCDELIVMETH();
+					TssClassificationMaint.addCharacteristic("MM_SP_SDM", value);
+					//3.k Call the TssClassificationMaint.addCharacteristic() method to add the MM_SPFIXEDTIME characteristic to the MM_SERVICEPAC classification.
+					/**
+					 * If SVCLEV_UPDATE/FIXTME=''" or SVCLEV_UPDATE/FIXTMEUOM=''" or SVCLEV_UPDATE/FIXTMEOBJIVE=''", then
+					 * set the value to "";
+					 *	Else set the value to SVCLEV_UPDATE/FIXTME||' '||SVCLEV_UPDATE/FIXTMEUOM||' '||SVCLEV_UPDATE/FIXTMEOBJIVE.
+					 */
+					String FIXTME = SVCLEV.getFIXTME();
+					String FIXTMEUOM = SVCLEV.getFIXTMEUOM();
+					String FIXTMEOBJIVE = SVCLEV.getFIXTMEOBJIVE();
+					if("".equals(FIXTME) || "".equals(FIXTMEUOM) || "".equals(FIXTMEOBJIVE)){
+						value ="";
+					}else{
+						value = FIXTME + " " + FIXTMEUOM + " " + FIXTMEOBJIVE;
+					}					
+					TssClassificationMaint.addCharacteristic("MM_SPFIXEDTIME", value);
+					//3.l Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_OSRESPTIME characteristic to the MM_SERVICEPAC classification.
+					/**
+					 * If SVCLEV_UPDATE/ONSITERESP=''" or SVCLEV_UPDATE/ONSITERESPUOM=''" or f SVCLEV_UPDATE/ONSITERESPOBJIVE=''", then
+					 * set the value to "";
+					 * Else set the value to SVCLEV_UPDATE/ONSITERESP||' '||SVCLEV_UPDATE/ONSITERESPUOM||' '||SUBSTRING (SVCLEV_UPDATE/ONSITERESPOBJIVE FROM 0 FOR 2)
+					 */
+					String ONSITERESP = SVCLEV.getONSITERESP();					
+					String ONSITERESPUOM = SVCLEV.getONSITERESPUOM();
+					String ONSITERESPOBJIVE = SVCLEV.getONSITERESPOBJIVE();
+					if("".equals(ONSITERESP) || "".equals(ONSITERESPUOM) || "".equals(ONSITERESPOBJIVE)){
+						value ="";
+					}else{
+						value = ONSITERESP + " " + ONSITERESPUOM + " " + CommonUtils.getFirstSubString(ONSITERESPOBJIVE, 2);
+					}	
+					TssClassificationMaint.addCharacteristic("MM_SP_OSRESPTIME", value);
+					//3.m Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_CNTACTIME characteristic to the MM_SERVICEPAC classification.
+					/**
+					 * If SVCLEV_UPDATE/CONTTME=''" or f SVCLEV_UPDATE/CONTTMEUOM=''" or SVCLEV_UPDATE/CONTTMEOBJIVE=''", then
+					 * set the value to "";
+					 * Else set the value to SVCLEV_UPDATE/CONTTME||' '||SVCLEV_UPDATE/CONTTMEUOM||' '||SVCLEV_UPDATE/CONTTMEOBJIVE.
+					 */
+					String CONTTME = SVCLEV.getCONTTME();					
+					String CONTTMEUOM = SVCLEV.getCONTTMEUOM();
+					String CONTTMEOBJIVE = SVCLEV.getCONTTMEOBJIVE();
+					if("".equals(CONTTME) || "".equals(CONTTMEUOM) || "".equals(CONTTMEOBJIVE)){
+						value ="";
+					}else{
+						value = CONTTME + " " + CONTTMEUOM + " " + CONTTMEOBJIVE;
+					}
+					TssClassificationMaint.addCharacteristic("MM_SP_CNTACTIME", value);
+					//3.n Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_PARIVTIME characteristic to the MM_SERVICEPAC classification.//3.m Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_CNTACTIME characteristic to the MM_SERVICEPAC classification.
+					/**
+					 * If SVCLEV_UPDATE/PARTARRVTME=''" or SVCLEV_UPDATE/PARTARRVTMEUOM=''" or SVCLEV_UPDATE/PARTARRVTMEOBJIVE=''", then
+						     set the value to "";
+						Else {
+						     If UPPER(SVCLEV_UPDATE/PARTARRVTMEUOM)="HOURS" , then
+						          set the value to "hrs";
+						     Else
+						          set the value to SVCLEV_UPDATE/PARTARRVTMEUOM;
+						
+						     If SVCLEV_UPDATE/PARTARRVTMEOBJIVE="T (Target)", then
+						          set the value = value+ " Target";
+						     Else
+						          set the value =value + " " + SVCLEV_UPDATE/PARTARRVTMEOBJIVE;
+						             
+						      set the value = SVCLEV_UPDATE/PARTARRVTME + " " + value.
+						             }
+					 */
+					String PARTARRVTME = SVCLEV.getPARTARRVTME();					
+					String PARTARRVTMEUOM = SVCLEV.getPARTARRVTMEUOM();
+					String PARTARRVTMEOBJIVE = SVCLEV.getPARTARRVTMEOBJIVE();
+					if("".equals(PARTARRVTME) || "".equals(PARTARRVTMEUOM) || "".equals(PARTARRVTMEOBJIVE)){
+						value ="";
+					}else {
+						if("HOURS".equals(PARTARRVTMEUOM.toUpperCase())){
+							value = "hrs";
+						}else{
+							value = PARTARRVTMEUOM;
+						}
+						if("T (Target)".equalsIgnoreCase(PARTARRVTMEOBJIVE)){
+							value = value + " " + "Target";
+						}else{
+							value = value + " " + PARTARRVTMEOBJIVE;
+						}
+						value = PARTARRVTME + " " + value;
+					}
+					TssClassificationMaint.addCharacteristic("MM_SP_PARIVTIME", value);
+					//3.o Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_TARNDTIME characteristic to the MM_SERVICEPAC classification.
+					/**
+					 * If SVCLEV_UPDATE/TRNARNDTME=''" or SVCLEV_UPDATE/TRNARNDTMEUOM=''" or SVCLEV_UPDATE/TRNARNDTMEOBJIVE=''", then
+					 * set the value to "";
+					 * Else set the value to SVCLEV_UPDATE/TRNARNDTME||' '||SVCLEV_UPDATE/TRNARNDTMEUOM||' '||SVCLEV_UPDATE/TRNARNDTMEOBJIVE;
+					 */
+					String TRNARNDTME = SVCLEV.getTRNARNDTME();					
+					String TRNARNDTMEUOM = SVCLEV.getTRNARNDTMEUOM();
+					String TRNARNDTMEOBJIVE = SVCLEV.getTRNARNDTMEOBJIVE();
+					if("".equals(TRNARNDTME) || "".equals(TRNARNDTMEUOM) || "".equals(TRNARNDTMEOBJIVE)){
+						value ="";
+					}else{
+						value = TRNARNDTME + " " + TRNARNDTMEUOM + " " + TRNARNDTMEOBJIVE;
+					}
+					TssClassificationMaint.addCharacteristic("MM_SP_TARNDTIME", value);
+					
+				}				
+				
 				TssClassificationMaint.execute();
-				
-			}
-			
-			
-			
-			
-			
-			
+			}			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
+		}		
+		
+	}
+
+
+	private String getSVCLEVFromXML(String SVCLEVCD) throws SQLException {
+		System.out.println("SVCLEVCD=" + SVCLEVCD);
+		/**
+		 * 
+		 *	select xmlentitytype,xmlentityid,xmlmessage,xmlcachedts from cache.XMLIDLCACHE 
+		 *		where XMLCACHEVALIDTO > current timestamp and  XMLENTITYTYPE = 'SVCLEV'
+		 *	and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/SVCLEV_UPDATE"; 
+		 *      $i/SVCLEV_UPDATE[SVCLEVCD/text() = "M19"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") ORDER BY XMLCACHEDTS with ur
+		 */
+		String cacheSql = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLCACHEVALIDTO > current timestamp and  XMLENTITYTYPE = 'SVCLEV'"
+				+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/SVCLEV_UPDATE\";"
+				+ " $i/SVCLEV_UPDATE[SVCLEVCD/text() = \""+SVCLEVCD+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\") ORDER BY XMLCACHEDTS with ur";
+		
+		PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
+		//statement.setString(1, SVCLEVCD);
+		ResultSet resultSet = statement.executeQuery();
+		String xml = "";
+		while (resultSet.next()) {
+			xml = resultSet.getString("XMLMESSAGE");
+			System.out.println("xml=" + xml);
+			break; //only can get one SVCLEV				
 		}
-		
-		
+		return xml;
+	}
+	
+	private String getModelXMLByCondition(Connection odsConnection, String MACHTYPE,
+			String MODEL) throws SQLException {
+		String cacheSql = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLCACHEVALIDTO > current timestamp and  XMLENTITYTYPE = 'MODEL'"
+				+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\";"
+				+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+MACHTYPE+"\" and MODEL/text() = \""+MODEL+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\") ORDER BY XMLCACHEDTS with ur";
+		PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
+		ResultSet resultSet = statement.executeQuery();
+		String xml = "";
+		while (resultSet.next()) {
+			xml = resultSet.getString("XMLMESSAGE");
+			System.out.println("xml=" + xml);
+			break; //only can get one MODEL				
+		}
+		return xml;
 	}
 
 	public static void main(String[] args) {

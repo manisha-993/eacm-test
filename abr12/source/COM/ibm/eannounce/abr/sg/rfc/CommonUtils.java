@@ -1,5 +1,11 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
+/**
+ * CommonUtils 
+ * 
+ * @author wangyul
+ *
+ */
 public class CommonUtils {
 	
 	public static String getFirstSubString(String input, int length){		

@@ -1,47 +1,56 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 public class ChwMachTypeMtc {
 	
 	private MODEL chwModel;
 //	private SVCMOD svcmod;
 	private String chwProduct;
+	private Connection rdhConnection;
+	private Connection odsConnection;
 	
-	public ChwMachTypeMtc(String chwProduct) {	
+	public ChwMachTypeMtc(String chwProduct,Connection rdhConnection, Connection odsConnection) {	
 		this.chwModel = CommonEntities.getModelFromXml(chwProduct);	
 		this.chwProduct = chwProduct;
+		this.rdhConnection = rdhConnection;
+		this.odsConnection = odsConnection;
 	}
-	public void excute(){
+	public void execute(){
 		try {
 			String empty ="";
 			String obj_id = chwModel.getMACHTYPE() + "MTC";
 			//1. Call ChwMatmCreate to create the material master for the product object.
-			//TODO VF model type  from BOB
-//			ChwMatmCreate chwMatmCreate = new RdhMatmCreate(chwProduct,"ZMAT",chwProduct.machineType + "MTC");
-//			ChwMatmCreate chwMatmCreate = new ChwMatmCreate(svcmod);
-//			chwMatmCreate.execute();
+			ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwModel,"ZMAT",chwModel.getMACHTYPE() + "MTC");
+			chwMatmCreate.execute();
 			
 			//2. Call Chw001ClfCreate to create the standard 001 classifications and characteristics 
 			//   which are tied to the offering's material master record.
-			Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(chwProduct,"ZMAT",chwModel.getMACHTYPE()+ "MTC","MODEL");
+			Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(chwProduct,"ZMAT",chwModel.getMACHTYPE()+ "MTC","MODEL",rdhConnection, odsConnection);
 			chw001ClfCreate.execute();
 			
 			//3. Call the TssClassificationMaint constructor to associate the MK_REFERENCE class to the product's material master record
-			new RdhClassificationMaint(obj_id,"MK_REFERENCE","300").execute();
+			new RdhClassificationMaint(obj_id,"MK_REFERENCE","300","H").execute();
 			
 			//4. Call the TssClassificationMaint constructor to associate the MK_T_VAO_NEW class to the product's material master record
-			new RdhClassificationMaint(obj_id,"MK_T_VAO_NEW","300").execute();	
+			new RdhClassificationMaint(obj_id,"MK_T_VAO_NEW","300","H").execute();	
 			
 			//5. Call the TssClassificationMaint constructor to associate the MK_D_VAO_NEW class to the product's material master record
-			new RdhClassificationMaint(obj_id,"MK_D_VAO_NEW","300").execute();
+			new RdhClassificationMaint(obj_id,"MK_D_VAO_NEW","300","H").execute();
 			
 			//6.Call the TssClassificationMaint constructor to associate the MK_FC_EXCH class to the product's material master record.
-			new RdhClassificationMaint(obj_id,"MK_FC_EXCH","300").execute();
+			new RdhClassificationMaint(obj_id,"MK_FC_EXCH","300","H").execute();
 			
 			//7.Call the TssClassificationMaint constructor to associate the MK_FC_CONV class to the product's material master record.
-			new RdhClassificationMaint(obj_id,"MK_FC_CONV","300").execute();
+			new RdhClassificationMaint(obj_id,"MK_FC_CONV","300","H").execute();
 			//8.Create the MK_machineType_MOD class and MK_T_machineType_MOD characteristic if it does not exist.  
 			//	Assign the MK_machineType_MOD class to the product's material master record.
 			
@@ -116,13 +125,14 @@ public class ChwMachTypeMtc {
 					);
 			//9.B For each MODELCONVERT which meets all of conditions below 
 			//TODO get the MODELCONVERTList from MODEL
-			List<MODELCONVERT> chwMODELCONVERTList = new ArrayList<MODELCONVERT>(); 
+			String machtype = chwModel.getMACHTYPE();
+			ArrayList<HashMap<String, String>> recordArray = getModelConvert(machtype);
 			
-			for(MODELCONVERT chwMODELCONVERT: chwMODELCONVERTList){
-				String modelconvert_value = chwMODELCONVERT.getFROMMACHTYPE() + chwMODELCONVERT.getFROMMODEL() 
-						+ "_" + chwMODELCONVERT.getTOMACHTYPE() + chwMODELCONVERT.getTOMODEL();
-				String modelConvert_desc  = chwMODELCONVERT.getFROMMACHTYPE() + chwMODELCONVERT.getFROMMODEL() 
-						+ " to " + chwMODELCONVERT.getTOMACHTYPE() + chwMODELCONVERT.getTOMODEL();
+			for(HashMap<String, String> modelConvertMap: recordArray){				
+				String modelconvert_value = modelConvertMap.get("FROMMACHTYPE") + modelConvertMap.get("FROMMODEL")
+						+ "_" + modelConvertMap.get("TOMACHTYPE") + modelConvertMap.get("TOMODEL");
+				String modelConvert_desc  = modelConvertMap.get("FROMMACHTYPE") + modelConvertMap.get("FROMMODEL")
+						+ " to " + modelConvertMap.get("TOMACHTYPE") + modelConvertMap.get("TOMODEL");
 				ChwCharMaintain.addValue(modelconvert_value, modelConvert_desc);
 			}			
 			//9.c Call the ChwClassMaintain constructor to create the MK_machineType_MTC class. 
@@ -153,7 +163,8 @@ public class ChwMachTypeMtc {
 					, "2"				//String bomexpl Set to "2".
 					, chwModel.getMACHTYPE() +	"MTCUI"		//String design	 Set to Set to concatenation of chwProduct.machineType + "MTCUI" 
 					);
-			//10.b Call the ChwConpMaintain.addConfigDependency() method.			
+			//10.b Call the ChwConpMaintain.addConfigDependency() method.	
+			//TODO add dependency firstly
 			ChwConpMaintain.addConfigDependency("E2E", empty); //Set to "E2E".
 			//10.c 
 			ChwConpMaintain.addConfigDependency("PR_"+chwModel.getMACHTYPE()+"_SET_MODEL", empty);  //Set to "PR_<chwProduct.machineType>_SET_MODEL"
@@ -171,6 +182,71 @@ public class ChwMachTypeMtc {
 			e.printStackTrace();
 		}		
 		
+	}
+	private ArrayList<HashMap<String, String>> getModelConvert(String machtype) throws SQLException {
+		
+		ArrayList<HashMap<String, String>> recordArray = new ArrayList<HashMap<String, String>>();
+		String modelConvertQuery ="SELECT MT.ENTITYID FROM OPICM.TEXT AS MT "
+				+ " JOIN  OPICM.TEXT AS MF "
+				+ " ON MT.ENTITYTYPE = MF.ENTITYTYPE "
+				+ " and MT.ENTITYID = MF.ENTITYID "
+				+ " WHERE MT.EFFTO >current timestamp "
+				+ " AND MT.VALTO >current timestamp "
+				+ " AND MF.EFFTO >current timestamp "
+				+ " AND MF.VALTO >current timestamp "
+				+ " AND MT.ENTITYTYPE ='MODELCONVERT' "
+				+ " AND MT.ATTRIBUTECODE ='TOMACHTYPE' "
+				+ " AND MF.ATTRIBUTECODE ='FROMMACHTYPE' "
+				+ " AND MT.ATTRIBUTEVALUE <> MF.ATTRIBUTEVALUE "
+				+ " AND MT.ATTRIBUTEVALUE =? "
+				+ " AND MT.ENTITYID IN (  SELECT ENTITYID FROM OPICM.FLAG "
+				+ " WHERE ENTITYTYPE ='MODELCONVERT' "
+				+ " AND ((ATTRIBUTECODE ='ADSABRSTATUS' AND ATTRIBUTEVALUE = '0040') "
+				+ " OR (ATTRIBUTECODE ='MODELCONVERTIERPABRSTATUS' AND ATTRIBUTEVALUE = '0040')) "
+				+ " AND EFFTO >current timestamp "
+				+ " AND VALTO > current timestamp )"
+				+ " WITH ur";
+		PreparedStatement statement = rdhConnection.prepareStatement(modelConvertQuery);
+		statement.setString(1, machtype);
+		ResultSet resultSet = statement.executeQuery();
+		Map<String,String> attributeMap = new HashMap<String,String>();
+		attributeMap.put("FROMMACHTYPE", "");
+		attributeMap.put("FROMMODEL", "");
+		attributeMap.put("TOMACHTYPE", "");
+		attributeMap.put("TOMODEL ", "");
+		
+		while(resultSet.next()){
+			int entityid = resultSet.getInt("ENTITYID");
+			String modelConvert = "SELECT ATTRIBUTECODE,ATTRIBUTEVALUE FROM OPICM.TEXT "
+					+ " WHERE ENTITYTYPE ='MODELCONVERT' "
+					+ " AND ENTITYID=? "
+					+ " AND EFFTO >current timestamp "
+					+ " AND VALTO > current timestamp WITH ur";
+			PreparedStatement attributeStatement = rdhConnection.prepareStatement(modelConvert);
+			statement.setInt(1, entityid);
+			ResultSet attributeResultSet = attributeStatement.executeQuery();
+			HashMap<String,String> modelConvertMap = new HashMap<String,String>();
+			while(attributeResultSet.next()){
+				String attributecode = attributeResultSet.getString("ATTRIBUTECODE");
+				if(attributeMap.containsKey(attributecode)){
+					modelConvertMap.put(attributecode, attributeResultSet.getString("ATTRIBUTEVALUE"));					
+				}
+			}
+			if(!modelConvertMap.containsKey("FROMMACHTYPE")){
+				modelConvertMap.put("FROMMACHTYPE", "");
+			}
+			if(!modelConvertMap.containsKey("FROMMODEL")){
+				modelConvertMap.put("FROMMODEL", "");
+			}
+			if(!modelConvertMap.containsKey("TOMACHTYPE")){
+				modelConvertMap.put("TOMACHTYPE", "");
+			}
+			if(!modelConvertMap.containsKey("TOMODEL")){
+				modelConvertMap.put("TOMODEL", "");
+			}
+			recordArray.add(modelConvertMap);			
+		}
+		return recordArray;
 	}
 	
 
