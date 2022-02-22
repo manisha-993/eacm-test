@@ -8,9 +8,11 @@ import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.Hashtable;
 
-
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
+import COM.ibm.eannounce.abr.sg.rfc.Chw001ClfCreate;
+import COM.ibm.eannounce.abr.sg.rfc.ChwDepdMaintain;
+import COM.ibm.eannounce.abr.sg.rfc.ChwMatmCreate;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.RdhMatmCreate;
@@ -460,5 +462,172 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
         setReturnCode(FAIL);
     }
 
+    public void processChwMatmCreate (MODEL model) throws Exception {
+    	
+    	ChwMatmCreate caller = new ChwMatmCreate(model, "ZPRT", model.getMACHTYPE()+model.getMODEL());
+    	this.addDebug("Calling " + caller.getRFCName());
+    	caller.execute();
+		this.addDebug(caller.createLogEntry());
+		if (caller.getRfcrc() == 0) {
+			this.addOutput(caller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(caller.getRFCName() + " called  faild!");
+			this.addOutput(caller.getError_text());
+		}
+		//Chw001ClfCreate 
+		
+		String obj_id=model.getMACHTYPE()+model.getMODEL();
+		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
+		String dep_type="7"; 
+		String descript=model.getMACHTYPE()+" Set Model";
+		String sourceLine = "$self.mk_model2 =$self.mk_t_"+model.getMACHTYPE()+"_mod";
+		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(xml, navName, NEWLINE, CACEHSQL)	;
+		chwDepdCaller.addSourceLineCondition(sourceLine);
+		this.addDebug("Calling " + chwDepdCaller.getRFCName());
+		chwDepdCaller.execute();
+		this.addDebug(chwDepdCaller.createLogEntry());
+		if (chwDepdCaller.getRfcrc() == 0) {
+			this.addOutput(chwDepdCaller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(chwDepdCaller.getRFCName() + " called  faild!");
+			this.addOutput(chwDepdCaller.getError_text());
+		}
+		dep_extern = "SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
+		dep_type="5"; 
+		descript="SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
+		sourceLine = "$PARENT.MK_T_"+model.getMACHTYPE()+"_MOD='"+model.getMODEL()+"'";
+		 chwDepdCaller	=new ChwDepdMaintain(xml, navName, NEWLINE, CACEHSQL)	;
+		chwDepdCaller.addSourceLineCondition(sourceLine);
+		this.addDebug("Calling " + chwDepdCaller.getRFCName());
+		chwDepdCaller.execute();
+		this.addDebug(chwDepdCaller.createLogEntry());
+		if (chwDepdCaller.getRfcrc() == 0) {
+			this.addOutput(chwDepdCaller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(chwDepdCaller.getRFCName() + " called  faild!");
+			this.addOutput(chwDepdCaller.getError_text());
+		}
+		 //ChwDepdMaintain 
+    	
+    }
+    public void processMachTypeNew(MODEL model) throws Exception {
+    	String materialType="ZMAT";
+    	String  materialID =model.getMACHTYPE()+"NEW";
+    	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID);
+    	this.addDebug("Calling " + chwCreateCaller.getRFCName());
+    	chwCreateCaller.execute();
+		this.addDebug(chwCreateCaller.createLogEntry());
+		if (chwCreateCaller.getRfcrc() == 0) {
+			this.addOutput(chwCreateCaller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(chwCreateCaller.getRFCName() + " called  faild!");
+			this.addOutput(chwCreateCaller.getError_text());
+		}
+		 Chw001ClfCreate createCaller = new Chw001ClfCreate(model, materialType, materialID, "MODEL");
+		
+    	String obj_id = materialID;
+		String class_name="MK_REFERENCE";
+		String class_type="300";
+		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		this.addDebug("Calling " + cMaintCaller.getRFCName());
+		cMaintCaller.execute();
+		this.addDebug(cMaintCaller.createLogEntry());
+		if (chwCreateCaller.getRfcrc() == 0) {
+			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
+			this.addOutput(cMaintCaller.getError_text());
+		}
+		class_name = "MK_T_VAO_NEW";
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		this.addDebug("Calling " + cMaintCaller.getRFCName());
+		cMaintCaller.execute();
+		this.addDebug(cMaintCaller.createLogEntry());
+		if (chwCreateCaller.getRfcrc() == 0) {
+			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
+			this.addOutput(cMaintCaller.getError_text());
+		}
+		
+		//5.
+    }
+    
+    public void processMachTypeUpg(MODEL model) throws Exception {
+    	String materialType="ZMAT";
+    	String  materialID =model.getMACHTYPE()+"UPG";
+    	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID);
+    	this.addDebug("Calling " + chwCreateCaller.getRFCName());
+    	chwCreateCaller.execute();
+		this.addDebug(chwCreateCaller.createLogEntry());
+		if (chwCreateCaller.getRfcrc() == 0) {
+			this.addOutput(chwCreateCaller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(chwCreateCaller.getRFCName() + " called  faild!");
+			this.addOutput(chwCreateCaller.getError_text());
+		}
+    	String obj_id = materialID;
+		String class_name="MK_REFERENCE";
+		String class_type="300";
+		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		this.addDebug("Calling " + cMaintCaller.getRFCName());
+		cMaintCaller.execute();
+		this.addDebug(cMaintCaller.createLogEntry());
+		if (chwCreateCaller.getRfcrc() == 0) {
+			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
+			this.addOutput(cMaintCaller.getError_text());
+		}
+		class_name = "MK_T_VAO_NEW";
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		this.addDebug("Calling " + cMaintCaller.getRFCName());
+		cMaintCaller.execute();
+		this.addDebug(cMaintCaller.createLogEntry());
+		if (chwCreateCaller.getRfcrc() == 0) {
+			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
+			this.addOutput(cMaintCaller.getError_text());
+		}
+		class_name = "MK_D_VAO_NEW";
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		this.addDebug("Calling " + cMaintCaller.getRFCName());
+		cMaintCaller.execute();
+		this.addDebug(cMaintCaller.createLogEntry());
+		if (chwCreateCaller.getRfcrc() == 0) {
+			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
+			this.addOutput(cMaintCaller.getError_text());
+		}
+		class_name = "MK_FC_EXCH";
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		this.addDebug("Calling " + cMaintCaller.getRFCName());
+		cMaintCaller.execute();
+		this.addDebug(cMaintCaller.createLogEntry());
+		if (chwCreateCaller.getRfcrc() == 0) {
+			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
+			this.addOutput(cMaintCaller.getError_text());
+		}
+		class_name = "MK_FC_CONV";
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		this.addDebug("Calling " + cMaintCaller.getRFCName());
+		cMaintCaller.execute();
+		this.addDebug(cMaintCaller.createLogEntry());
+		if (chwCreateCaller.getRfcrc() == 0) {
+			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
+			this.addOutput(cMaintCaller.getError_text());
+		}
+		
+		//5.
+    }
+    public void processMachTypeMODEL_Svc() {
+    	
+    }
 	
 }
