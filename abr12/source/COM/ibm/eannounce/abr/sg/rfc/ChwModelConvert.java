@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import COM.ibm.eannounce.abr.sg.rfc.entity.ModelConvertTable;
+import COM.ibm.eannounce.abr.util.RfcConfigProperties;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -32,15 +33,16 @@ public class ChwModelConvert extends RdhBase {
 					modelConvertTable.setMODELUPGRADEENTITYID(modelConvert.getMODELUPGRADEENTITYID());
 					modelConvertTable.setFROMMACHTYPE(modelConvert.getFROMMACHTYPE());
 					modelConvertTable.setTOMACHTYPE(modelConvert.getTOMACHTYPE());
-					modelConvertTable.setCOUNTRY_FC(availablityelement.getCOUNTRY_FC());
+					modelConvertTable.setCOUNTRY_FC(RfcConfigProperties.getCountry(availablityelement.getCOUNTRY_FC()));
 					modelConvertTable.setAVAILABILITYACTION(availablityelement.getAVAILABILITYACTION());
-					modelConvertTable.setANNDATE(availablityelement.getANNDATE());
-					modelConvertTable.setFIRSTORDER(availablityelement.getFIRSTORDER());
-					modelConvertTable.setPLANNEDAVAILABILITY(availablityelement.getPLANNEDAVAILABILITY());
-					modelConvertTable.setPUBFROM(availablityelement.getPUBFROM());
-					modelConvertTable.setPUBTO(availablityelement.getPUBTO());
-					modelConvertTable.setWDANNDATE(availablityelement.getWDANNDATE());					
-					modelConvertTable.setLASTORDER(availablityelement.getLASTORDER());	
+					
+					modelConvertTable.setANNDATE(availablityelement.getANNDATE().replaceAll("-", ""));
+					modelConvertTable.setFIRSTORDER(availablityelement.getFIRSTORDER().replaceAll("-", ""));
+					modelConvertTable.setPLANNEDAVAILABILITY(availablityelement.getPLANNEDAVAILABILITY().replaceAll("-", ""));
+					modelConvertTable.setPUBFROM(availablityelement.getPUBFROM().replaceAll("-", ""));
+					modelConvertTable.setPUBTO(availablityelement.getPUBTO().replaceAll("-", ""));
+					modelConvertTable.setWDANNDATE(availablityelement.getWDANNDATE().replaceAll("-", ""));					
+					modelConvertTable.setLASTORDER(availablityelement.getLASTORDER().replaceAll("-", ""));	
 					tbl_modelconvert.add(modelConvertTable);
 				}
 			}

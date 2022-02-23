@@ -15,10 +15,6 @@ public class ChwDepdMaintainTest
     @BeforeClass
     public static void setUpBeforeClass() {
         obj_id = "5689R1N";
-//        SoftwareProduct prod = new SoftwareProduct();
-//        obj_id.setMainProduct(prod);
-//        prod.setProductIdentifier("5609-M03");
-//        obj_id.setId("ST00001Y");
     }
 
     @Test

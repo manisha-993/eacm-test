@@ -86,7 +86,9 @@ public class Chw001ClfCreate {
 		
 		try {
 			//1. Assign the MG_COMMON classification and its characteristics to the product's material master record:
-			//1.a Call the TssClassificationMaint constructor to assign the MG_COMMON classification to the product. 
+			//1.a Call the TssClassificationMaint constructor to assign the MG_COMMON classification to the product.
+			if(chwModel==null) return;
+			
 			RdhClassificationMaint rdhClassificationMaint = 
 			new RdhClassificationMaint(
 					materialID 							//Copy from <materialID>
