@@ -703,6 +703,8 @@ public class RdhMatmCreate extends RdhBase {
 		 * if (result != null) result = result.replace("-", ""); if (result != null &&
 		 * result.length() > 6) { result = result.substring(result.length() - 6); }
 		 */
+		if(annDate==null)
+			return null;
 		return sdfANNDATE.format(annDate);
 	}
 
