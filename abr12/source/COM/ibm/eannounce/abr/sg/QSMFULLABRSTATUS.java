@@ -20,7 +20,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import COM.ibm.eannounce.abr.util.*;
-import COM.ibm.eannounce.objects.EANEntity;
 import COM.ibm.eannounce.objects.EANFlagAttribute;
 import COM.ibm.eannounce.objects.EANList;
 import COM.ibm.eannounce.objects.EANMetaAttribute;
@@ -1768,7 +1767,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		out = out.replaceAll("/", "");
 		out = out.replaceAll("'", "");
 		out = out.replaceAll("\"", "");
-		out = out.replaceAll("â€“", "");
+		out = out.replaceAll("–", "");
 
 		return out;
 
@@ -2320,14 +2319,14 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 			EntityGroup modelStdMaintGrp1 = list.getEntityGroup("STDMAINT");
 
 			/*
-			 * addDebug("sgmntAcrnymGrp sizeï¼š" + (sgmntAcrnymGrp == null ?
+			 * addDebug("sgmntAcrnymGrp size：" + (sgmntAcrnymGrp == null ?
 			 * 0 : sgmntAcrnymGrp.size())); addDebug("geoModGrp" + (geoModGrp ==
 			 * null ? 0 : geoModGrp.size())); addDebug("modelWarrGrp" +
 			 * (modelWarrGrp == null ? 0 : modelWarrGrp.size()));
 			 * addDebug("modelStdMaintGrp" + (modelStdMaintGrp == null ? 0 :
 			 * modelStdMaintGrp.size()));
 			 * 
-			 * addDebug("sgmntAcrnymGrp1 sizeï¼š" +
+			 * addDebug("sgmntAcrnymGrp1 size：" +
 			 * sgmntAcrnymGrp1.getEntityItemCount()); addDebug("geoModGrp1 size"
 			 * + geoModGrp1.getEntityItemCount()); addDebug("modelWarrGrp1 size"
 			 * + modelWarrGrp1.getEntityItemCount());
@@ -2537,7 +2536,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 				strMaintElig = PokUtils.getAttributeValue(eiStdMaint, "MAINTELIG", "", "");
 			}
 
-			// addDebug("strAvailGenAreaSelï¼š" + strAvailGenAreaSel);
+			// addDebug("strAvailGenAreaSel：" + strAvailGenAreaSel);
 			if (strAvailGenAreaSel.equals("Asia Pacific")) {
 				strCINCC = "Y";
 			} else if (strAvailGenAreaSel.equals("US Only")
@@ -3030,7 +3029,7 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 			}
 			sb.append(getValue(QUSAPOP, "00.0"));
 			sb.append(getValue(FSLMRFM, ""));
-			addDebug(sb.toString() + " AVAIL：" + avail.getEntityID() + " FEATURE：" + eiFeature.getEntityID()
+			addDebug(sb.toString() + " AVAIL:" + avail.getEntityID() + " FEATURE:" + eiFeature.getEntityID()
 					+ " PRODUCT:" + eiProdstruct.getEntityID());
 			sb.append(NEWLINE);
 			wOut.write(sb.toString());
