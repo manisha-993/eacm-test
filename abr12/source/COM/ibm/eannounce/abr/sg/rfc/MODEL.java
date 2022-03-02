@@ -110,6 +110,8 @@ public class MODEL {
 	@XmlElementWrapper(name = "TAXCATEGORYLIST")
 	@XmlElement(name = "TAXCATEGORYELEMENT")
 	private List<TAXCATEGORY> TAXCATEGORYLIST;
+	@XmlElement(name = "INVNAME")
+	private String INVNAME ;
 	public String getPDHDOMAIN() {
 		return PDHDOMAIN;
 	}
@@ -379,6 +381,12 @@ public class MODEL {
 	}
 	public void setTAXCATEGORYLIST(List<TAXCATEGORY> tAXCATEGORYLIST) {
 		TAXCATEGORYLIST = tAXCATEGORYLIST;
+	}
+	public String getINVNAME() {
+		return INVNAME;
+	}
+	public void setINVNAME(String iNVNAME) {
+		INVNAME = iNVNAME;
 	}
 
 

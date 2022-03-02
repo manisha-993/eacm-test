@@ -11,6 +11,10 @@ import java.util.Hashtable;
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
 import COM.ibm.eannounce.abr.sg.rfc.Chw001ClfCreate;
+import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintain;
+import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintainTest;
+import COM.ibm.eannounce.abr.sg.rfc.ChwClassMaintain;
+import COM.ibm.eannounce.abr.sg.rfc.ChwConpMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwDepdMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMatmCreate;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
@@ -462,9 +466,11 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
         setReturnCode(FAIL);
     }
 
-    public void processChwMatmCreate (MODEL model) throws Exception {
+    public void processMachTypeMODEL (MODEL model,String xml) throws Exception {
+    	String materialType="ZPRT";
+    	String  materialID =model.getMACHTYPE()+model.getMODEL();
     	
-    	ChwMatmCreate caller = new ChwMatmCreate(model, "ZPRT", model.getMACHTYPE()+model.getMODEL());
+    	ChwMatmCreate caller = new ChwMatmCreate(model, materialType, materialID);
     	this.addDebug("Calling " + caller.getRFCName());
     	caller.execute();
 		this.addDebug(caller.createLogEntry());
@@ -475,6 +481,8 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(caller.getError_text());
 		}
 		//Chw001ClfCreate 
+		 Chw001ClfCreate createCaller = new Chw001ClfCreate(xml, materialType, materialID, "MODEL");
+		 createCaller.execute();
 		
 		String obj_id=model.getMACHTYPE()+model.getMODEL();
 		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
@@ -510,7 +518,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		 //ChwDepdMaintain 
     	
     }
-    public void processMachTypeNew(MODEL model) throws Exception {
+    public void processMachTypeNew(MODEL model,String xml) throws Exception {
     	String materialType="ZMAT";
     	String  materialID =model.getMACHTYPE()+"NEW";
     	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID);
@@ -523,8 +531,11 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(chwCreateCaller.getRFCName() + " called  faild!");
 			this.addOutput(chwCreateCaller.getError_text());
 		}
-		 Chw001ClfCreate createCaller = new Chw001ClfCreate(model, materialType, materialID, "MODEL");
 		
+		
+		 Chw001ClfCreate createCaller = new Chw001ClfCreate(xml, materialType, materialID, "MODEL");
+		 createCaller.execute();
+		 
     	String obj_id = materialID;
 		String class_name="MK_REFERENCE";
 		String class_type="300";
@@ -553,7 +564,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		//5.
     }
     
-    public void processMachTypeUpg(MODEL model) throws Exception {
+    public void processMachTypeUpg(MODEL model,String xml) throws Exception {
     	String materialType="ZMAT";
     	String  materialID =model.getMACHTYPE()+"UPG";
     	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID);
@@ -566,6 +577,8 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(chwCreateCaller.getRFCName() + " called  faild!");
 			this.addOutput(chwCreateCaller.getError_text());
 		}
+		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(xml, materialType, materialID, materialID);
+		chw001ClfCreate.execute();
     	String obj_id = materialID;
 		String class_name="MK_REFERENCE";
 		String class_type="300";
@@ -624,9 +637,72 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(cMaintCaller.getError_text());
 		}
 		
-		//5.
+		//Set to  "MK_T_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
+		String charact = "MK_T_"+model.getMACHTYPE()+"_MOD";
+		String datatype="CHAR";
+		int charnumber=6;
+		String decplaces=""; 
+		String casesens="";
+		String neg_vals="";
+		String group="";
+		String valassignm="-";
+		String no_entry="";
+		String no_display="";
+		String addit_vals="X";
+		String chdescr=model.getMACHTYPE()+" Model Characteristic";
+		ChwCharMaintain charMaintain = new ChwCharMaintain(obj_id, charact, datatype, charnumber, decplaces, casesens, neg_vals, group, valassignm, no_entry, no_display, addit_vals, chdescr);
+    
+		charMaintain.addValue(model.getMODEL(), model.getINVNAME().substring(0, 24)+" "+model.getMODEL());
+		this.addDebug("Calling " + charMaintain.getRFCName());
+		charMaintain.execute();
+		this.addDebug(charMaintain.createLogEntry());
+		if (charMaintain.getRfcrc() == 0) {
+			this.addOutput(charMaintain.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(charMaintain.getRFCName() + " called  faild!");
+			this.addOutput(charMaintain.getError_text());
+		}
+		class_name = "MK_"+model.getMACHTYPE()+"_MOD";
+		class_type = class_name;
+		ChwClassMaintain chwClassMaintain = new ChwClassMaintain(obj_id, class_name, class_type);
+		this.addDebug("Calling " + chwClassMaintain.getRFCName());
+		chwClassMaintain.addCharacteristic("MK_T_"+model.getMODEL()+"_MOD");
+		chwClassMaintain.execute();
+		this.addDebug(chwClassMaintain.createLogEntry());
+		if (chwClassMaintain.getRfcrc() == 0) {
+			this.addOutput(chwClassMaintain.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(chwClassMaintain.getRFCName() + " called  faild!");
+			this.addOutput(chwClassMaintain.getError_text());
+		}
+		class_type="300";
+		RdhClassificationMaint classificationMaint = new RdhClassificationMaint(obj_id, class_name, class_type);
+		this.addDebug("Calling " + classificationMaint.getRFCName());
+		classificationMaint.execute();
+		this.addDebug(classificationMaint.createLogEntry());
+		if (classificationMaint.getRfcrc() == 0) {
+			this.addOutput(classificationMaint.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(classificationMaint.getRFCName() + " called  faild!");
+			this.addOutput(classificationMaint.getError_text());
+		}
+		String c_profile = "INITIAL"; 
+		String bomappl="SD01";
+		String bomexpl="2";
+		String design=model.getMACHTYPE()+"UPGUI";
+		ChwConpMaintain chwConpMaintain = new ChwConpMaintain(obj_id, c_profile, bomappl, bomexpl, design);
+		chwConpMaintain.addConfigDependency("E2E", "");
+		chwConpMaintain.addConfigDependency("PR_"+model.getMACHTYPE()+"_SET_MODEL", "");
+		chwConpMaintain.addConfigDependency("PR_E2E_SET_MTM", "");
+		chwConpMaintain.addConfigDependency("PR_E2E_PRICING_HW", "");
+		chwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", "");
+		
     }
-    public void processMachTypeMODEL_Svc() {
+    public void processMachTypeMODEL_Svc(MODEL model,String xml) {
+    	String materialType = "ZPRT";
+    	String materialID = model.getMACHTYPE()+model.getMODEL();
+    	Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(xml, materialType, materialID, materialID);
+		chw001ClfCreate.execute();
     	
     }
 	
