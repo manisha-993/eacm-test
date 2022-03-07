@@ -481,15 +481,17 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(caller.getError_text());
 		}
 		//Chw001ClfCreate 
-		 Chw001ClfCreate createCaller = new Chw001ClfCreate(xml, materialType, materialID, "MODEL");
-		 createCaller.execute();
+		/*
+		 * Chw001ClfCreate createCaller = new Chw001ClfCreate(xml, materialType,
+		 * materialID, "MODEL"); createCaller.execute();
+		 */
 		
 		String obj_id=model.getMACHTYPE()+model.getMODEL();
 		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
 		String dep_type="7"; 
 		String descript=model.getMACHTYPE()+" Set Model";
 		String sourceLine = "$self.mk_model2 =$self.mk_t_"+model.getMACHTYPE()+"_mod";
-		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(xml, navName, NEWLINE, CACEHSQL)	;
+		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(xml, dep_extern, dep_type, descript)	;
 		chwDepdCaller.addSourceLineCondition(sourceLine);
 		this.addDebug("Calling " + chwDepdCaller.getRFCName());
 		chwDepdCaller.execute();
@@ -504,7 +506,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		dep_type="5"; 
 		descript="SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
 		sourceLine = "$PARENT.MK_T_"+model.getMACHTYPE()+"_MOD='"+model.getMODEL()+"'";
-		 chwDepdCaller	=new ChwDepdMaintain(xml, navName, NEWLINE, CACEHSQL)	;
+		 chwDepdCaller	=new ChwDepdMaintain(xml, dep_extern, dep_type, descript)	;
 		chwDepdCaller.addSourceLineCondition(sourceLine);
 		this.addDebug("Calling " + chwDepdCaller.getRFCName());
 		chwDepdCaller.execute();
@@ -533,8 +535,10 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		}
 		
 		
-		 Chw001ClfCreate createCaller = new Chw001ClfCreate(xml, materialType, materialID, "MODEL");
-		 createCaller.execute();
+		/*
+		 * Chw001ClfCreate createCaller = new Chw001ClfCreate(xml, materialType,
+		 * materialID, "MODEL"); createCaller.execute();
+		 */
 		 
     	String obj_id = materialID;
 		String class_name="MK_REFERENCE";
@@ -577,8 +581,10 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(chwCreateCaller.getRFCName() + " called  faild!");
 			this.addOutput(chwCreateCaller.getError_text());
 		}
-		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(xml, materialType, materialID, materialID);
-		chw001ClfCreate.execute();
+		/*
+		 * Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(xml, materialType,
+		 * materialID, materialID); chw001ClfCreate.execute();
+		 */
     	String obj_id = materialID;
 		String class_name="MK_REFERENCE";
 		String class_type="300";
@@ -702,8 +708,10 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     	String materialType = "ZPRT";
     	
     	String materialID = model.getMACHTYPE()+model.getMODEL();
-    	Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(xml, materialType, materialID, materialID);
-		chw001ClfCreate.execute();
+		/*
+		 * Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(xml, materialType,
+		 * materialID, materialID); chw001ClfCreate.execute();
+		 */
     	
     }
 	
