@@ -700,6 +700,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     }
     public void processMachTypeMODEL_Svc(MODEL model,String xml) {
     	String materialType = "ZPRT";
+    	
     	String materialID = model.getMACHTYPE()+model.getMODEL();
     	Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(xml, materialType, materialID, materialID);
 		chw001ClfCreate.execute();
