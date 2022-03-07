@@ -101,7 +101,7 @@ public class ChwMatmCreate extends RdhBase {
 		//prdha
 		bmmh1.get(0).setPrdha(model.getPRODHIERCD());
 		bmmh1.get(0).setMaabc("A");
-		bmmh1.get(0).setEkgrp("ZZZ");
+		//bmmh1.get(0).setEkgrp("ZZZ");
 		bmmh1.get(0).setDismm("PD");
 		bmmh1.get(0).setDispo("000");
 		bmmh1.get(0).setPerkz("M");
