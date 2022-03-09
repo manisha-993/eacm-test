@@ -31,7 +31,11 @@ public class RdhSvcMatmCreate extends RdhBase {
 	private List<RdhMatm_geo> geos;
 	@SerializedName("IS_MULTI_PLANTS")
 	private String is_multi_plants;
-
+/**
+ * 
+ * @param model
+ * @throws ParseException
+ */
 	public RdhSvcMatmCreate(MODEL model) throws ParseException {
 		super(model.getMACHTYPE() + model.getMODEL(), "Z_DM_SAP_MATM_CREATE".toLowerCase(), null);
 
