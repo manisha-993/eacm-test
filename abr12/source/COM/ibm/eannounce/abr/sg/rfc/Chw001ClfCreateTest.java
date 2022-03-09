@@ -20,8 +20,11 @@ public class Chw001ClfCreateTest {
 		
 		String odsconnect= "fvtcloudods";
 		Connection ods_connection = ConnectionFactory.getConnection(odsconnect);
+		
+		MODEL chwModel = CommonEntities.getModelFromXml(xml)
+		
 		//
-        Chw001ClfCreate Chw001ClfCreate = new Chw001ClfCreate(xml,"ZPRT","5773E53","MODEL",pdh_connection,ods_connection);
+        Chw001ClfCreate Chw001ClfCreate = new Chw001ClfCreate(chwModel,"ZPRT","5773E53",ods_connection);
         Chw001ClfCreate.execute();
         System.out.println("------------- Test Chw001ClfCreate end -------------");
     }

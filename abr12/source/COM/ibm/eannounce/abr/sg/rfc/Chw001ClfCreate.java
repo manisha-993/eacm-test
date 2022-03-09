@@ -16,71 +16,41 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 
+import COM.ibm.opicmpdh.middleware.D;
+
 
 public class Chw001ClfCreate {
+	
 	MODEL chwModel;
-	
-	FCTRANSACTION chwFCTRANSACTION;
-	
 	String materialType;
 	String materialID;
-	Connection rdhConnection;
 	Connection odsConnection;
 	
 	
+	public StringBuffer rptSb = new StringBuffer();
+	private static final char[] FOOL_JTEST = { '\n' };
+	private int abr_debuglvl = D.EBUG_ERR;
+	static final String NEWLINE = new String(FOOL_JTEST);
+	public StringBuffer getRptSb() {
+		return rptSb;
+	}	
 	
-	public Chw001ClfCreate (String chwProduct, String materialType, String materialID, String entityType, Connection rdhConnection, Connection odsConnection) throws SQLException{
-		if("MODEL".equalsIgnoreCase(entityType)){
-			this.chwModel = CommonEntities.getModelFromXml(chwProduct);
-		} else if("MODELCONVERT".equalsIgnoreCase(entityType)){
-			//TODO should get the model from modelIERPAbrStatus.java 
-			//If <entityType> = "MODELCONVERT", then set chwProduct to the XML of MODEL 
-			//where MODEL/MACHTYPE = MODELCONVERT/TOMACHTYPE and MODEL/MODEL = MODELCONVERT/TOMODEL
-			/**
-			 * MODELCONVERT  
-			 ODS xml query SQL: 
-			 select XMLMESSAGE from cache.XMLIDLCACHE where XMLCACHEVALIDTO > current timestamp and  XMLENTITYTYPE = 'MODEL'
-			 and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE";
-			  $i/MODEL_UPDATE[MACHTYPE/text() = "6758" and MODEL/text() = "059"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") ORDER BY XMLCACHEDTS 
-			  with ur
-			 */
-			
-			MODELCONVERT chwMODELCONVERT = CommonEntities.getModelConvertFromXml(chwProduct);
-			String TOMACHTYPE = chwMODELCONVERT.getTOMACHTYPE();
-			String TOMODEL = chwMODELCONVERT.getTOMODEL();
-			String xml = getModelXMLByCondition(odsConnection, TOMACHTYPE, TOMODEL);
-			this.chwModel = CommonEntities.getModelFromXml(xml);
-			
-		}else if("FCTRANSACTION".equalsIgnoreCase(entityType)){
-			//TODO
-			//If <entityType> = "FCTRANSACTION", then set chwProduct to the XML of MODEL 
-			//where MODEL/MACHTYPE = FCTRANSACTION/TOMACHTYPE and MODEL/MODEL = FCTRANSACTION/TOMODEL
-			/**
-			 * FCTRANSACTION  
-			 ODS xml query SQL: 
-			 select XMLMESSAGE from cache.XMLIDLCACHE where XMLCACHEVALIDTO > current timestamp and  XMLENTITYTYPE = 'MODEL'
-			 and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE";
-			  $i/MODEL_UPDATE[MACHTYPE/text() = "6758" and MODEL/text() = "059"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") ORDER BY XMLCACHEDTS 
-			  with ur
-			 */
-			FCTRANSACTION chwFCTRANSACTION = CommonEntities.getFctransactionFromXml(chwProduct);
-			String TOMACHTYPE = chwFCTRANSACTION.getTOMACHTYPE();
-			String TOMODEL = chwFCTRANSACTION.getTOMODEL();
-			String xml = getModelXMLByCondition(odsConnection, TOMACHTYPE, TOMODEL);
-			this.chwModel = CommonEntities.getModelFromXml(xml);
-			
-		}
-		
+	
+	public Chw001ClfCreate (MODEL model, String materialType, String materialID,  Connection odsConnection ) {
+		this.chwModel = model;
 		this.materialType = materialType;
 		this.materialID = materialID;
-		this.rdhConnection = rdhConnection;
 		this.odsConnection = odsConnection;
 		
 	}
 
-
+	protected void addDebug(String msg) {
+		if (D.EBUG_DETAIL <= abr_debuglvl) {
+		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
+		}
+	}
 	
-	
+	protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
 	
 	public void execute(){
 		
@@ -96,6 +66,7 @@ public class Chw001ClfCreate {
 					, "001"  							//String class_type   Set to "001"
 					, "H"
 					);
+			this.addDebug("Calling " + rdhClassificationMaint.getRFCName());
 			//1.b Call the TssClassificationMaint.addCharacteristic() method to add the MG_PRODUCTTYPE characteristic to the MG_COMMON classification and indicate the product type.
 			String value ="";
 			if("Hardware".equalsIgnoreCase(chwModel.getCATEGORY())){
@@ -105,6 +76,14 @@ public class Chw001ClfCreate {
 			}			
 			rdhClassificationMaint.addCharacteristic("MG_PRODUCTTYPE", value);
 			rdhClassificationMaint.execute();
+			this.addDebug(rdhClassificationMaint.createLogEntry());
+			if (rdhClassificationMaint.getRfcrc() == 0) {
+				this.addOutput(rdhClassificationMaint.getRFCName() + " called successfully!");
+			} else {
+				this.addOutput(rdhClassificationMaint.getRFCName() + " called  faild!");
+				this.addOutput(rdhClassificationMaint.getError_text());
+			}
+			
 			//rdhClassificationMaint.execute();
 			//2.a Call the TssClassificationMaint constructor to assign the MM_FIELDS classification to the product
 			rdhClassificationMaint = 
@@ -114,6 +93,7 @@ public class Chw001ClfCreate {
 							, "001"  							//String class_type   Set to "001"
 							, "H"
 							);
+			this.addDebug("Calling " + rdhClassificationMaint.getRFCName());
 			//2.b Call the TssClassificationMaint.addCharacteristic() method to add the MM_MACH_TYPE characteristic to the MM_FIELDS classification.
 			//Set to first 4 characters of <materialID>. Example: If <materialID> == "9080HC1", then set to "9080".
 			value = CommonUtils.getFirstSubString(materialID,4);
@@ -270,6 +250,13 @@ public class Chw001ClfCreate {
 			rdhClassificationMaint.addCharacteristic("MM_ACQ_COMPANY", value);
 			//2.final 
 			rdhClassificationMaint.execute();
+			this.addDebug(rdhClassificationMaint.createLogEntry());
+			if (rdhClassificationMaint.getRfcrc() == 0) {
+				this.addOutput(rdhClassificationMaint.getRFCName() + " called successfully!");
+			} else {
+				this.addOutput(rdhClassificationMaint.getRFCName() + " called  faild!");
+				this.addOutput(rdhClassificationMaint.getError_text());
+			}
 			
 			//3. If <chwProduct/CATEGORY>="Service", assign the MM_SERVICEPAC classification and its characteristics to the product's material master record
 			if("Service".equalsIgnoreCase(chwModel.getCATEGORY())){
@@ -281,6 +268,7 @@ public class Chw001ClfCreate {
 								, "001"  							//String class_type   Set to "001"
 								, "H"
 								);
+				this.addDebug("Calling " + TssClassificationMaint.getRFCName());
 				//3.b Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_MTM characteristic to the MM_SERVICEPAC classification.
 				value = materialID;
 				TssClassificationMaint.addCharacteristic("MM_SP_MTM", value);
@@ -459,6 +447,13 @@ public class Chw001ClfCreate {
 				}				
 				
 				TssClassificationMaint.execute();
+				this.addDebug(TssClassificationMaint.createLogEntry());
+				if (TssClassificationMaint.getRfcrc() == 0) {
+					this.addOutput(TssClassificationMaint.getRFCName() + " called successfully!");
+				} else {
+					this.addOutput(TssClassificationMaint.getRFCName() + " called  faild!");
+					this.addOutput(TssClassificationMaint.getError_text());
+				}
 			}			
 			
 		} catch (Exception e) {
@@ -489,22 +484,6 @@ public class Chw001ClfCreate {
 			xml = resultSet.getString("XMLMESSAGE");
 			System.out.println("xml=" + xml);
 			break; //only can get one SVCLEV				
-		}
-		return xml;
-	}
-	
-	private String getModelXMLByCondition(Connection odsConnection, String MACHTYPE,
-			String MODEL) throws SQLException {
-		String cacheSql = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLCACHEVALIDTO > current timestamp and  XMLENTITYTYPE = 'MODEL'"
-				+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\";"
-				+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+MACHTYPE+"\" and MODEL/text() = \""+MODEL+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\") ORDER BY XMLCACHEDTS with ur";
-		PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
-		ResultSet resultSet = statement.executeQuery();
-		String xml = "";
-		while (resultSet.next()) {
-			xml = resultSet.getString("XMLMESSAGE");
-			System.out.println("xml=" + xml);
-			break; //only can get one MODEL				
 		}
 		return xml;
 	}

@@ -3,6 +3,7 @@ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
@@ -22,6 +23,7 @@ import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.RdhMatmCreate;
 import COM.ibm.eannounce.abr.sg.rfc.RdhTssFcProd;
 import COM.ibm.eannounce.abr.sg.rfc.RdhTssMatChar;
+import COM.ibm.eannounce.abr.sg.rfc.SVCLEV;
 import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
 import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
@@ -442,6 +444,8 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     }
     
 	 protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
+	 
+	 protected void addMsg(StringBuffer msg) { rptSb.append(msg.toString()+NEWLINE);}
 
 
 		/**********************************
@@ -704,7 +708,8 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		chwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", "");
 		
     }
-    public void processMachTypeMODEL_Svc(MODEL model,String xml) {
+    public void processMachTypeMODEL_Svc(MODEL model,Connection odsConnection) {
+    	MODEL chwModel = model;
     	String materialType = "ZPRT";
     	
     	String materialID = model.getMACHTYPE()+model.getMODEL();
@@ -712,6 +717,12 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		 * Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(xml, materialType,
 		 * materialID, materialID); chw001ClfCreate.execute();
 		 */
+    	Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialID,materialType, odsConnection); 
+    	chw001ClfCreate.execute();
+    	this.addMsg(chw001ClfCreate.getRptSb());
+    	
+    	
+    	
     	
     }
 	
