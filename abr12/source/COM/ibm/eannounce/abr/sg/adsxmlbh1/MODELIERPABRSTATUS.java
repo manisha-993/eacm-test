@@ -3,7 +3,6 @@ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
@@ -13,19 +12,14 @@ import com.ibm.transform.oim.eacm.util.PokUtils;
 
 import COM.ibm.eannounce.abr.sg.rfc.Chw001ClfCreate;
 import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintain;
-import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintainTest;
 import COM.ibm.eannounce.abr.sg.rfc.ChwClassMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwConpMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwDepdMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMatmCreate;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
-import COM.ibm.eannounce.abr.sg.rfc.RdhMatmCreate;
-import COM.ibm.eannounce.abr.sg.rfc.RdhTssFcProd;
-import COM.ibm.eannounce.abr.sg.rfc.RdhTssMatChar;
-import COM.ibm.eannounce.abr.sg.rfc.SVCLEV;
+import COM.ibm.eannounce.abr.sg.rfc.RdhSvcMatmCreate;
 import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
-import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
@@ -127,7 +121,16 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			}
 			if (xml != null) {
 			
-					MODEL model = XMLParse.getObjectFromXml(xml,MODEL.class);
+				MODEL model = XMLParse.getObjectFromXml(xml,MODEL.class);
+				
+				
+				if("Service".equals(model.getCATEGORY())) {
+					processMachTypeMODEL_Svc(model, connection);
+				}
+				else if ("SoftdWare".equals(model.getCATEGORY())) {
+					throw new Exception("Not support SoftWare");
+				}
+					
 				
 			}	
 			
@@ -708,11 +711,20 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		chwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", "");
 		
     }
-    public void processMachTypeMODEL_Svc(MODEL model,Connection odsConnection) {
-    	MODEL chwModel = model;
+    public void processMachTypeMODEL_Svc(MODEL model,Connection odsConnection) throws Exception {
     	String materialType = "ZPRT";
-    	
     	String materialID = model.getMACHTYPE()+model.getMODEL();
+
+    	RdhSvcMatmCreate svcMatmCreate = new RdhSvcMatmCreate(model);
+    	this.addDebug("Calling " + svcMatmCreate.getRFCName());
+    	svcMatmCreate.execute();
+		this.addDebug(svcMatmCreate.createLogEntry());
+		if (svcMatmCreate.getRfcrc() == 0) {
+			this.addOutput(svcMatmCreate.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(svcMatmCreate.getRFCName() + " called  faild!");
+			this.addOutput(svcMatmCreate.getError_text());
+		}
 		/*
 		 * Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(xml, materialType,
 		 * materialID, materialID); chw001ClfCreate.execute();
@@ -720,7 +732,6 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     	Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialID,materialType, odsConnection); 
     	chw001ClfCreate.execute();
     	this.addMsg(chw001ClfCreate.getRptSb());
-    	
     	
     	
     	

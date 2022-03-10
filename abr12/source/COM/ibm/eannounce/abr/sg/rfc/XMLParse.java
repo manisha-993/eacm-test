@@ -2,9 +2,12 @@ package COM.ibm.eannounce.abr.sg.rfc;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -38,12 +41,14 @@ public class XMLParse {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); 		
 			factory.setNamespaceAware(false);
 		    DocumentBuilder builder = factory.newDocumentBuilder();
+		    RdhSvcMatmCreate svcMatmCreate = new RdhSvcMatmCreate(null);
 		    //Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));		 
 		    //SVCMOD svcObj = getObjFromDoc(doc, SVCMOD.class);
-		    SVCMOD svcmod = getSvcmodFromXml( loadXml(""));
+		    SVCMOD svcmod = null;//getSvcmodFromXml( loadXml(""));
+		    MODEL model = getObjectFromXml(loadModelXml(null), MODEL.class);
 		    if (xml != null) {
 				try {
-					
+					//RdhSvcMatmCreate svcMatmCreate = new RdhSvcMatmCreate(model);
 					RdhMatmCreate create = new RdhMatmCreate(svcmod);
 					System.out.println(create.getEarliestAnnDate(svcmod));
 					create.execute();
@@ -360,7 +365,7 @@ public class XMLParse {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); 		
 			factory.setNamespaceAware(false);
 		    DocumentBuilder builder = factory.newDocumentBuilder();
-		    Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));		 
+		    Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));		 
 		    object = getObjFromDoc(doc, class1);
 		     //695561U.xml
 		} catch (Throwable e) {
@@ -396,6 +401,34 @@ public class XMLParse {
 		return stringBuffer.toString();
 		
 	}
+	
+	public static String loadModelXml(String xmlPath){
+		
+		xmlPath = "C:\\Users\\JianBoXu\\Desktop\\eacm\\model.xml";
+
+		StringBuffer stringBuffer = new StringBuffer();
+		try {
+			BufferedReader reader;
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(xmlPath)));
+		
+			String line = null;
+			while ((line=reader.readLine())!=null) {
+				stringBuffer.append(line);
+				
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
+		
+		return stringBuffer.toString();
+		
+	}
+	
 	
 	
 	}

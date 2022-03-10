@@ -2,7 +2,6 @@ package COM.ibm.eannounce.abr.sg.rfc;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -10,6 +9,7 @@ import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
 
+import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmm00;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh1;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh5;
@@ -31,12 +31,18 @@ public class RdhSvcMatmCreate extends RdhBase {
 	private List<RdhMatm_geo> geos;
 	@SerializedName("IS_MULTI_PLANTS")
 	private String is_multi_plants;
+	@Foo
+	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+	@Foo
+	SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd" );
+	@Foo
+	SimpleDateFormat sdfANNDATE =   new SimpleDateFormat( "ddMMyy" );
 /**
  * 
  * @param model
  * @throws ParseException
  */
-	public RdhSvcMatmCreate(MODEL model) throws ParseException {
+	public RdhSvcMatmCreate(MODEL model)  {
 		super(model.getMACHTYPE() + model.getMODEL(), "Z_DM_SAP_MATM_CREATE".toLowerCase(), null);
 
 		bmm00.get(0).setMatnr(model.getMACHTYPE() + model.getMODEL());
@@ -100,13 +106,15 @@ public class RdhSvcMatmCreate extends RdhBase {
 		List<AVAILABILITY> availabilities = model.getAVAILABILITYLIST();
 		List<Date> dates = new ArrayList<Date>();
 
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+		
 		if (availabilities != null && availabilities.size() > 0) {
 			for (int i = 0; i < availabilities.size(); i++) {
 				AVAILABILITY avail = availabilities.get(i);
-				dates.add(formatter.parse(avail.getPUBFROM()));
+				Date date = praseDate(avail.getPUBFROM());
+				if(date!=null)
+				dates.add(date);
 
-				System.out.println(formatter.parse(avail.getPUBFROM()));
+				//System.out.println(formatter.parse(avail.getPUBFROM()));
 				List<SLEORGNPLNTCODE> sleorggrps = avail.getSLEORGNPLNTCODELIST();
 				if (sleorggrps != null && sleorggrps.size() > 0) {
 					for (int j = 0; j < sleorggrps.size(); j++) {
@@ -227,35 +235,41 @@ public class RdhSvcMatmCreate extends RdhBase {
 	}
 
 	private String getEarliestAnnDate(MODEL model) {
-		LocalDate annDate = null;
+		Date annDate = null;
+		Date annTemp = null;
 		String result = "";
 		List<AVAILABILITY> list = model.getAVAILABILITYLIST();
 		if (list != null && list.size() > 0) {
 			for (int i = 0; i < list.size(); i++) {
 				try {
 					if (annDate == null) {
-						result = list.get(i).getANNDATE();
-						annDate = LocalDate.parse(result);
+						//result = list.get(i).getANNDATE();
+						//annnumber= list.get(i).getANNNUMBER();
+						annDate= sdf.parse(list.get(i).getANNDATE());
 
 					} else {
-						annDate = LocalDate.parse(list.get(i).getANNDATE());
+						annTemp = sdf.parse(list.get(i).getANNDATE());;
 
-						if (annDate.isAfter(LocalDate.parse(result))) {
-							result = list.get(i).getANNDATE();
+						if (annTemp.after(annDate)) {
+							annDate = annTemp;
+							//result = list.get(i).getANNDATE();
+							//annnumber= list.get(i).getANNNUMBER();
 						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			}
-		}
 
-		if (result != null)
-			result = result.replace("-", "");
-		if (result != null && result.length() > 6) {
-			result = result.substring(result.length() - 6);
+			}
+
 		}
-		return result;
+		/*
+		 * if (result != null) result = result.replace("-", ""); if (result != null &&
+		 * result.length() > 6) { result = result.substring(result.length() - 6); }
+		 */
+		if(annDate==null)
+			return null;
+		return sdfANNDATE.format(annDate);
 	}
 
 	@Override
@@ -283,6 +297,15 @@ public class RdhSvcMatmCreate extends RdhBase {
 			return false;
 		} else {
 			return true;
+		}
+	}
+	public Date praseDate(String strDate) {
+		try {
+			Date date =  formatter.parse(strDate);
+			return date;
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			return null;
 		}
 	}
 

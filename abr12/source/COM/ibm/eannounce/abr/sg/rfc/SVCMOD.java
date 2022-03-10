@@ -12,6 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
+
 
 @XmlAccessorType(XmlAccessType.FIELD)
 //@XmlRootElement(name = "SVCMOD_UPDATE", namespace="http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/SVCMOD_UPDATE")
@@ -546,26 +548,7 @@ class SEOAVAILABILITY {
 
 }
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-@XmlAccessorType(XmlAccessType.FIELD)
-class LANGUAGE {
-	@XmlElement(name = "NLSID")
-	private String NLSID;
-	@XmlElement(name = "INVNAME")
-	private String INVNAME;
-	@XmlElement(name = "MKTGNAME")
-	private String MKTGNAME;
-	public String getNLSID() {
-		return NLSID;
-	}
-	public String getINVNAME() {
-		return INVNAME;
-	}
-	public String getMKTGNAME() {
-		return MKTGNAME;
-	}
 
-}
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @XmlAccessorType(XmlAccessType.FIELD)
