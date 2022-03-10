@@ -1,7 +1,5 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
-import static org.junit.Assert.assertEquals;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -21,7 +19,7 @@ public class Chw001ClfCreateTest {
 		String odsconnect= "fvtcloudods";
 		Connection ods_connection = ConnectionFactory.getConnection(odsconnect);
 		
-		MODEL chwModel = CommonEntities.getModelFromXml(xml)
+		MODEL chwModel = CommonEntities.getModelFromXml(xml);
 		
 		//
         Chw001ClfCreate Chw001ClfCreate = new Chw001ClfCreate(chwModel,"ZPRT","5773E53",ods_connection);

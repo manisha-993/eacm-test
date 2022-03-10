@@ -287,6 +287,7 @@ public abstract class RdhBase
                     Object object = field.get(obj);
                     if(object == null || object.toString().length() == 0)
                     {
+                    	//invalid data issue ,set RFC return code to 8
                         this.setRfcrc(8);
                         String header = "The ";
                         if(!isSingle)

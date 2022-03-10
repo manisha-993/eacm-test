@@ -1,6 +1,5 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
-import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,32 +7,13 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.w3c.dom.Document;
-
-import COM.ibm.opicmpdh.middleware.D;
-
-
-public class Chw001ClfCreate {
+public class Chw001ClfCreate extends RfcCallerBase{
 	
 	MODEL chwModel;
 	String materialType;
 	String materialID;
-	Connection odsConnection;
-	
-	
-	public StringBuffer rptSb = new StringBuffer();
-	private static final char[] FOOL_JTEST = { '\n' };
-	private int abr_debuglvl = D.EBUG_ERR;
-	static final String NEWLINE = new String(FOOL_JTEST);
-	public StringBuffer getRptSb() {
-		return rptSb;
-	}	
+	Connection odsConnection;	
 	
 	
 	public Chw001ClfCreate (MODEL model, String materialType, String materialID,  Connection odsConnection ) {
@@ -44,17 +24,9 @@ public class Chw001ClfCreate {
 		
 	}
 
-	protected void addDebug(String msg) {
-		if (D.EBUG_DETAIL <= abr_debuglvl) {
-		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
-		}
-	}
 	
-	protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
 	
 	public void execute(){
-		
-		try {
 			//1. Assign the MG_COMMON classification and its characteristics to the product's material master record:
 			//1.a Call the TssClassificationMaint constructor to assign the MG_COMMON classification to the product.
 			if(chwModel==null) return;
@@ -66,7 +38,7 @@ public class Chw001ClfCreate {
 					, "001"  							//String class_type   Set to "001"
 					, "H"
 					);
-			this.addDebug("Calling " + rdhClassificationMaint.getRFCName());
+			this.addRfcName(rdhClassificationMaint);
 			//1.b Call the TssClassificationMaint.addCharacteristic() method to add the MG_PRODUCTTYPE characteristic to the MG_COMMON classification and indicate the product type.
 			String value ="";
 			if("Hardware".equalsIgnoreCase(chwModel.getCATEGORY())){
@@ -75,17 +47,16 @@ public class Chw001ClfCreate {
 				value = "SP";
 			}			
 			rdhClassificationMaint.addCharacteristic("MG_PRODUCTTYPE", value);
-			rdhClassificationMaint.execute();
-			this.addDebug(rdhClassificationMaint.createLogEntry());
-			if (rdhClassificationMaint.getRfcrc() == 0) {
-				this.addOutput(rdhClassificationMaint.getRFCName() + " called successfully!");
-			} else {
-				this.addOutput(rdhClassificationMaint.getRFCName() + " called  faild!");
-				this.addOutput(rdhClassificationMaint.getError_text());
+			try {
+				rdhClassificationMaint.execute();
+				this.addRfcResult(rdhClassificationMaint);
+			} catch (Exception e) {
+				this.addRfcResult(rdhClassificationMaint);
 			}
 			
 			//rdhClassificationMaint.execute();
 			//2.a Call the TssClassificationMaint constructor to assign the MM_FIELDS classification to the product
+			rdhClassificationMaint = null;
 			rdhClassificationMaint = 
 					new RdhClassificationMaint(
 							materialID 								//Copy from <materialID>
@@ -93,7 +64,8 @@ public class Chw001ClfCreate {
 							, "001"  							//String class_type   Set to "001"
 							, "H"
 							);
-			this.addDebug("Calling " + rdhClassificationMaint.getRFCName());
+			this.addRfcName(rdhClassificationMaint);
+			
 			//2.b Call the TssClassificationMaint.addCharacteristic() method to add the MM_MACH_TYPE characteristic to the MM_FIELDS classification.
 			//Set to first 4 characters of <materialID>. Example: If <materialID> == "9080HC1", then set to "9080".
 			value = CommonUtils.getFirstSubString(materialID,4);
@@ -149,12 +121,14 @@ public class Chw001ClfCreate {
 				Else if var = 'DOES NOT APPLY', then set value to ''.
 			 */
 			value ="";
-			var = chwModel.getINSTALL();
-			if("CIF".equalsIgnoreCase(var)){
-				value = "1";
-			} else if("N/A".equalsIgnoreCase(var)){
+			var = chwModel.getINSTALL().toUpperCase();
+			if("CIF".equals(var)){
+				value = "C";
+			} else if("CE".equals(var)){
+				value = "I";
+			} else if("N/A".equals(var)){
 				value = "";
-			} else if("DOES NOT APPLY".equalsIgnoreCase(var)){
+			} else if("DOES NOT APPLY".equals(var)){
 				value = "";
 			}			
 			rdhClassificationMaint.addCharacteristic("MM_FG_INSTALLABLE", value);
@@ -165,6 +139,7 @@ public class Chw001ClfCreate {
 			rdhClassificationMaint.addCharacteristic("MM_UNSPSC", value);
 			
 			//2.h Call the TssClassificationMaint.addCharacteristic() method to add the MM_AMORTLENGTH characteristic to the MM_FIELDS classification.
+			//TODO confirm with carol of the design  N or empty
 			//value If containsLetter(chwProduct/AMRTZTNLNGTH)='N', then set value to chwProduct/AMRTZTNLNGTH
 			//Else set value to "".
 			value = chwModel.getAMRTZTNLNGTH().contains("N")? chwModel.getAMRTZTNLNGTH() : "";
@@ -249,13 +224,11 @@ public class Chw001ClfCreate {
 			value = chwModel.getACQRCOCD();
 			rdhClassificationMaint.addCharacteristic("MM_ACQ_COMPANY", value);
 			//2.final 
-			rdhClassificationMaint.execute();
-			this.addDebug(rdhClassificationMaint.createLogEntry());
-			if (rdhClassificationMaint.getRfcrc() == 0) {
-				this.addOutput(rdhClassificationMaint.getRFCName() + " called successfully!");
-			} else {
-				this.addOutput(rdhClassificationMaint.getRFCName() + " called  faild!");
-				this.addOutput(rdhClassificationMaint.getError_text());
+			try {
+				rdhClassificationMaint.execute();
+				this.addRfcResult(rdhClassificationMaint);
+			} catch (Exception e) {
+				this.addRfcResult(rdhClassificationMaint);
 			}
 			
 			//3. If <chwProduct/CATEGORY>="Service", assign the MM_SERVICEPAC classification and its characteristics to the product's material master record
@@ -268,7 +241,7 @@ public class Chw001ClfCreate {
 								, "001"  							//String class_type   Set to "001"
 								, "H"
 								);
-				this.addDebug("Calling " + TssClassificationMaint.getRFCName());
+				this.addRfcName(TssClassificationMaint);
 				//3.b Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_MTM characteristic to the MM_SERVICEPAC classification.
 				value = materialID;
 				TssClassificationMaint.addCharacteristic("MM_SP_MTM", value);
@@ -328,14 +301,17 @@ public class Chw001ClfCreate {
 				COVRPRIOD.put("THREE MONTHS", "3");
 				COVRPRIOD.put("3 MONTHS", "3");
 				value = COVRPRIOD.get(var);
-				//TODO add the char firstly
 				TssClassificationMaint.addCharacteristic("MM_HW_SPTERM", value);
 				
 				
 				//value Copy from SVCLEV_UPDATE/COVRSHRTDESC where SVCLEV_UPDATE/SVCLEVCD = hwProduct/SVCLEVCD
 				//sql query the cache, get the xml to SVCLEV
 				String SVCLEVCD = chwModel.getSVCLEVCD();
-				String xml = getSVCLEVFromXML(SVCLEVCD);
+				String xml ="";
+				try {
+					xml = getSVCLEVFromXML(SVCLEVCD);
+				} catch (SQLException e) {
+				}
 				if(!"".equals(xml)){
 					SVCLEV SVCLEV = CommonEntities.getSVCLEVFromXml(xml);
 					
@@ -446,19 +422,13 @@ public class Chw001ClfCreate {
 					
 				}				
 				
-				TssClassificationMaint.execute();
-				this.addDebug(TssClassificationMaint.createLogEntry());
-				if (TssClassificationMaint.getRfcrc() == 0) {
-					this.addOutput(TssClassificationMaint.getRFCName() + " called successfully!");
-				} else {
-					this.addOutput(TssClassificationMaint.getRFCName() + " called  faild!");
-					this.addOutput(TssClassificationMaint.getError_text());
+				try {
+					TssClassificationMaint.execute();
+					this.addRfcResult(TssClassificationMaint);
+				} catch (Exception e) {
+					this.addRfcResult(TssClassificationMaint);
 				}
-			}			
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}		
+			}
 		
 	}
 
