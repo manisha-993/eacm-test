@@ -285,7 +285,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 	}
 	
 	public void CreateAlphaGroupChar (String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc){
-		//TODO this is the new RFC and caller
+		//this is the new RFC and caller
 		String suffix = getSuffix(obj_id, target_indc, feature_code, "G");
 		
 		//b. Call ChwCharMaintain to create the group characteristic for the alphanumeric feature code.
@@ -385,7 +385,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		} catch (Exception e) {
 			this.addRfcResult(chwCharMaintain);
 		}
-		//b. TODO Call BapiClassCharRead to see if MK_target_machineType_featurecode_QTY characteristic exists for MachineTypeNew material
+		//b. Call BapiClassCharRead to see if MK_target_machineType_featurecode_QTY characteristic exists for MachineTypeNew material
 		//String suffix ="003";
 		String suffix = getSuffix(obj_id, target_indc, feature_code, "Q");
 		
@@ -411,7 +411,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				obj_id 		//String obj_id
 				, charactc 	//String clazz
 				, charactc 	//String characteristic
-				, "US"		//TODO String org_area				
+				, "WW"		//String org_area				
 		);
 		this.addRfcName(ChwAssignCharToClass);
 		try {
@@ -455,7 +455,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 					obj_id 		//String obj_id
 					, charact2 	//String clazz
 					, charact 	//String characteristic
-					, "US"		//TODO String org_area				
+					, "WW"		//String org_area				
 			);
 			this.addRfcName(ChwAssignCharToClass2);
 			try {
@@ -495,7 +495,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 //					obj_id 		//String obj_id
 //					, charact2 	//String clazz
 //					, charact 	//String characteristic
-//					, "US"		//TODO String org_area				
+//					, "US"		//String org_area				
 //			);
 //			RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(
 //					obj_id 		//String obj_id

@@ -1,5 +1,8 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * CommonUtils 
  * 
@@ -25,6 +28,20 @@ public class CommonUtils {
 		return  newString;		
 	}
 	
+	public static String getNoLetter(String input){
+		String sReturn ="";
+		if(input==null) return "";		
+		String regex=".*[a-zA-Z]+.*";  
+        Matcher m=Pattern.compile(regex).matcher(input);
+        if(m.matches()) {
+        	sReturn= "";
+        }else{
+        	sReturn= input;
+        }
+        
+		return sReturn;
+	}
+	
 	public static void main(String[] args) {
 		String model="mod12345";
 		
@@ -37,6 +54,10 @@ public class CommonUtils {
 		int istr2 = Integer.parseInt(str2);
 		System.out.println("istr2=" +istr2);
 		
+		System.out.println("null case" + getNoLetter(null));
+		System.out.println("1234 case" + getNoLetter("1234"));
+		System.out.println("1234 case" + getNoLetter("12a4"));
+		System.out.println("1234 case" + getNoLetter("001Z"));		
 		
 	}
 

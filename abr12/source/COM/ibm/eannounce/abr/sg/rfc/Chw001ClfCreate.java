@@ -139,16 +139,18 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			rdhClassificationMaint.addCharacteristic("MM_UNSPSC", value);
 			
 			//2.h Call the TssClassificationMaint.addCharacteristic() method to add the MM_AMORTLENGTH characteristic to the MM_FIELDS classification.
-			//TODO confirm with carol of the design  N or empty
-			//value If containsLetter(chwProduct/AMRTZTNLNGTH)='N', then set value to chwProduct/AMRTZTNLNGTH
+			//confirm with carol of the design  N or empty  
+			//value If containsLetter , then set value to chwProduct/AMRTZTNLNGTH
 			//Else set value to "".
-			value = chwModel.getAMRTZTNLNGTH().contains("N")? chwModel.getAMRTZTNLNGTH() : "";
+			String input = chwModel.getAMRTZTNLNGTH();			
+			value = CommonUtils.getNoLetter(input);
 			rdhClassificationMaint.addCharacteristic("MM_AMORTLENGTH", value);
 			
 			//2.i Call the TssClassificationMaint.addCharacteristic() method to add the MM_AMORTSTART characteristic to the MM_FIELDS classification.
 			//value If containsLetter(chwProduct/AMRTZTNSTRT)='N', then set value to chwProduct/AMRTZTNSTRT
 			//Else set value to "".
-			value = chwModel.getAMRTZTNSTRT().contains("N")? chwModel.getAMRTZTNSTRT() : "";
+			input = chwModel.getAMRTZTNSTRT();			
+			value = CommonUtils.getNoLetter(input);
 			rdhClassificationMaint.addCharacteristic("MM_AMORTSTART", value);
 			
 			//2.j Call the TssClassificationMaint.addCharacteristic() method to add the MM_IDENTITY characteristic to the MM_FIELDS classification.
