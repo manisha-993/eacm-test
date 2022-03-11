@@ -26,7 +26,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 
 	
 	
-	public void execute(){
+	public void execute() throws Exception {
 			//1. Assign the MG_COMMON classification and its characteristics to the product's material master record:
 			//1.a Call the TssClassificationMaint constructor to assign the MG_COMMON classification to the product.
 			if(chwModel==null) return;
@@ -47,12 +47,9 @@ public class Chw001ClfCreate extends RfcCallerBase{
 				value = "SP";
 			}			
 			rdhClassificationMaint.addCharacteristic("MG_PRODUCTTYPE", value);
-			try {
-				rdhClassificationMaint.execute();
-				this.addRfcResult(rdhClassificationMaint);
-			} catch (Exception e) {
-				this.addRfcResult(rdhClassificationMaint);
-			}
+			rdhClassificationMaint.execute();
+			this.addRfcResult(rdhClassificationMaint);
+			
 			
 			//rdhClassificationMaint.execute();
 			//2.a Call the TssClassificationMaint constructor to assign the MM_FIELDS classification to the product
@@ -226,12 +223,9 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			value = chwModel.getACQRCOCD();
 			rdhClassificationMaint.addCharacteristic("MM_ACQ_COMPANY", value);
 			//2.final 
-			try {
-				rdhClassificationMaint.execute();
-				this.addRfcResult(rdhClassificationMaint);
-			} catch (Exception e) {
-				this.addRfcResult(rdhClassificationMaint);
-			}
+			rdhClassificationMaint.execute();
+			this.addRfcResult(rdhClassificationMaint);
+			
 			
 			//3. If <chwProduct/CATEGORY>="Service", assign the MM_SERVICEPAC classification and its characteristics to the product's material master record
 			if("Service".equalsIgnoreCase(chwModel.getCATEGORY())){
@@ -424,12 +418,8 @@ public class Chw001ClfCreate extends RfcCallerBase{
 					
 				}				
 				
-				try {
-					TssClassificationMaint.execute();
-					this.addRfcResult(TssClassificationMaint);
-				} catch (Exception e) {
-					this.addRfcResult(TssClassificationMaint);
-				}
+				TssClassificationMaint.execute();
+				this.addRfcResult(TssClassificationMaint);
 			}
 		
 	}

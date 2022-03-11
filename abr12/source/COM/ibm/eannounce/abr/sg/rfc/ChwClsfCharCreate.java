@@ -5,7 +5,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 	
 	
 	
-	public void  CreateGroupChar(String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc) {
+	public void  CreateGroupChar(String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc) throws Exception {
 		
 		//a.Call the ChwCharMaintain constructor to create the group characteristic
 		/**
@@ -41,12 +41,9 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		this.addRfcName(chwCharMaintain);
 		//b.Call the ChwCharMaintain.addValue() method to add the feature code to the group characteristic.
 		chwCharMaintain.addValue(feature_code,feature_code_desc);
-		try {
-			chwCharMaintain.execute();
-			this.addRfcResult(chwCharMaintain);
-		} catch (Exception e1) {
-			this.addRfcResult(chwCharMaintain);
-		}
+		chwCharMaintain.execute();
+		this.addRfcResult(chwCharMaintain);
+		
 		//c.Call the ChwClassMaintain constructor to create the MK_target_machineType_FC_n000 class.
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
 				obj_id //String obj_id
@@ -57,12 +54,9 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		//d. Call the ChwClassMaintain.addCharacteristic() method to add the MK_target_machineType_FC_n000 
 		//			characteristic to the MK_target_machineType_FC_n000 class
 		chwClassMaintain.addCharacteristic(charact);
-		try {
-			chwClassMaintain.execute();
-			this.addRfcResult(chwClassMaintain);
-		} catch (Exception e1) {
-			this.addRfcResult(chwClassMaintain);
-		}
+		chwClassMaintain.execute();
+		this.addRfcResult(chwClassMaintain);
+		
 		//e. TssClassificationMaint 
 		RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(
 				obj_id 		//String obj_id
@@ -72,14 +66,8 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				);
 		this.addRfcName(rdhClassificationMaint);
 		System.out.println("100");
-		try {
-			rdhClassificationMaint.execute();
-			this.addRfcResult(rdhClassificationMaint);
-		} catch (Exception e) {
-			System.out.println("20E");
-			this.addRfcResult(rdhClassificationMaint);
-			System.out.println("30E");
-		}	
+		rdhClassificationMaint.execute();
+		this.addRfcResult(rdhClassificationMaint);
 		
 		
 		
@@ -87,7 +75,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 
 	
 	
-	public void CreateQTYChar (String obj_id, String target_indc, String mach_type, String feature_code) {
+	public void CreateQTYChar (String obj_id, String target_indc, String mach_type, String feature_code) throws Exception {
 		//String chdescr = "";
 		String characta ="MK_" + target_indc + "_" + mach_type + "_"+feature_code+"_QTY";
 		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(
@@ -106,12 +94,9 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				, characta	//String chdescr
 				);
 		this.addRfcName(chwCharMaintain);
-		try {
-			chwCharMaintain.execute();
-			this.addRfcResult(chwCharMaintain);
-		} catch (Exception e) {
-			this.addRfcResult(chwCharMaintain);
-		}
+		chwCharMaintain.execute();
+		this.addRfcResult(chwCharMaintain);
+		
 		
 		//b.Call the ChwClassMaintain constructor to create the MK_target_machineType_FC_n000 class
 		String charactb = "MK_" + target_indc + "_" + mach_type + "_FC_" + CommonUtils.getFirstSubString(feature_code, 1) +"000";
@@ -125,12 +110,9 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		//Set to  "MK_target_machineType_featurecode_QTY"
 		String charactd = "MK_" + target_indc + "_" + mach_type + "_" + feature_code +"_QTY";
 		chwClassMaintain.addCharacteristic(charactd);
-		try {
-			chwClassMaintain.execute();
-			this.addRfcResult(chwClassMaintain);
-		} catch (Exception e) {
-			this.addRfcResult(chwClassMaintain);
-		}
+		chwClassMaintain.execute();
+		this.addRfcResult(chwClassMaintain);
+		
 		//e. Call the TssClassificationMaint constructor to associate the MK_target_machineType_FC_n000 class to the product's material master record
 		RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(
 				obj_id 		//String obj_id
@@ -139,16 +121,13 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				, "H"		//String pims_identity
 				);
 		this.addRfcName(rdhClassificationMaint);
-		try {
-			rdhClassificationMaint.execute();
-			this.addRfcResult(rdhClassificationMaint);
-		} catch (Exception e) {
-			this.addRfcResult(rdhClassificationMaint);
-		}
+		rdhClassificationMaint.execute();
+		this.addRfcResult(rdhClassificationMaint);
+		
 		
 	}
 	
-	public void CreateRPQGroupChar(String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc) {
+	public void CreateRPQGroupChar(String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc) throws Exception {
 		String chdescr = "";
 		if("T".equalsIgnoreCase(target_indc)){
 			chdescr = "RPQ Features Target";
@@ -175,12 +154,9 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		this.addRfcName(chwCharMaintain);
 		//b.Call the ChwCharMaintain.addValue() method to add the feature code to the group characteristic.
 		chwCharMaintain.addValue(feature_code,feature_code_desc);
-		try {
-			chwCharMaintain.execute();
-			this.addRfcResult(chwCharMaintain);
-		} catch (Exception e) {
-			this.addRfcResult(chwCharMaintain);
-		}
+		chwCharMaintain.execute();
+		this.addRfcResult(chwCharMaintain);
+		
 		//c.Call the ChwClassMaintain constructor to create the MK_target_machineType_RPQ class.
 		String charactc = "MK_" + target_indc + "_" + mach_type + "_RPQ";
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
@@ -192,12 +168,9 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		//d. Call the ChwClassMaintain.addCharacteristic() method to add the MK_target_machineType_FC_n000 
 		//			characteristic to the MK_target_machineType_FC_n000 class
 		chwClassMaintain.addCharacteristic(charact);
-		try {
-			chwClassMaintain.execute();
-			this.addRfcResult(chwClassMaintain);
-		} catch (Exception e) {
-			this.addRfcResult(chwClassMaintain);
-		}
+		chwClassMaintain.execute();
+		this.addRfcResult(chwClassMaintain);
+		
 		//e. TssClassificationMaint 
 		RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(
 				obj_id 		//String obj_id
@@ -206,15 +179,13 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				, "H"		//String pims_identity
 				);
 		this.addRfcName(rdhClassificationMaint);
-		try {
-			rdhClassificationMaint.execute();
-			this.addRfcResult(rdhClassificationMaint);
-		} catch (Exception e) {
-			this.addRfcResult(rdhClassificationMaint);
-		}
+		
+		rdhClassificationMaint.execute();
+		this.addRfcResult(rdhClassificationMaint);
+		
 	}
 	
-	public void CreateRPQQTYChar(String obj_id, String target_indc, String mach_type, String feature_code) {
+	public void CreateRPQQTYChar(String obj_id, String target_indc, String mach_type, String feature_code) throws Exception {
 		String chdescr = "";
 		if("T".equalsIgnoreCase(target_indc)){
 			chdescr = "RPQ Features Target";
@@ -239,14 +210,11 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				, "X"		//String addit_vals Set to NULL or empty string ("X").
 				, charact	//String chdescr
 				);
-		this.addRfcName(chwCharMaintain);
+		this.addRfcName(chwCharMaintain);		
 		
-		try {
-			chwCharMaintain.execute();
-			this.addRfcResult(chwCharMaintain);
-		} catch (Exception e) {
-			this.addRfcResult(chwCharMaintain);
-		}
+		chwCharMaintain.execute();
+		this.addRfcResult(chwCharMaintain);
+		
 		//b.Call the ChwClassMaintain constructor to create the MK_target_machineType_RPQ class.
 		String charactb = "MK_" + target_indc + "_" + mach_type + "_RPQ";
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
@@ -260,12 +228,9 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		//Set to  "MK_target_machineType_RPQ_featurecode_QTY"
 		//String charact3 = "MK_" + target_indc + "_" + mach_type + "_RPQ_" + feature_code +"_QTY";
 		chwClassMaintain.addCharacteristic(charact);
-		try {
-			chwClassMaintain.execute();
-			this.addRfcResult(chwClassMaintain);
-		} catch (Exception e) {
-			this.addRfcResult(chwClassMaintain);
-		}
+		chwClassMaintain.execute();
+		this.addRfcResult(chwClassMaintain);
+		
 		//e. TssClassificationMaint 
 		RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(
 				obj_id 		//String obj_id
@@ -275,16 +240,13 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				);
 		this.addRfcName(rdhClassificationMaint);
 		
-		try {
-			rdhClassificationMaint.execute();
-			this.addRfcResult(rdhClassificationMaint);
-		} catch (Exception e) {
-			this.addRfcResult(rdhClassificationMaint);
-		}
+		rdhClassificationMaint.execute();
+		this.addRfcResult(rdhClassificationMaint);
+		
 		
 	}
 	
-	public void CreateAlphaGroupChar (String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc){
+	public void CreateAlphaGroupChar (String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc) throws Exception{
 		//this is the new RFC and caller
 		String suffix = getSuffix(obj_id, target_indc, feature_code, "G");
 		
@@ -317,12 +279,8 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		this.addRfcName(chwCharMaintain);
 		//c. Call the ChwCharMaintain.addValue() method to add the feature code to the alpha group characteristic.
 		chwCharMaintain.addValue(feature_code,feature_code_desc);
-		try {
-			chwCharMaintain.execute();
-			this.addRfcResult(chwCharMaintain);
-		} catch (Exception e) {
-			this.addRfcResult(chwCharMaintain);
-		}
+		chwCharMaintain.execute();
+		this.addRfcResult(chwCharMaintain);
 		//d. Call the ChwClassMaintain to create the alpha group classification.
 		String charactd = "MK_" + CommonUtils.getFirstSubString(obj_id, 4) + "_ALPH_" + suffix;
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
@@ -333,12 +291,8 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		this.addRfcName(chwClassMaintain);
 		//e. Call the ChwClassMaintain.addCharacteristic() method to add the MK_target_machineType_FC_ALPH_suffix characteristic
 		chwClassMaintain.addCharacteristic(charactd);
-		try {
-			chwClassMaintain.execute();
-			this.addRfcResult(chwClassMaintain);
-		} catch (Exception e) {
-			this.addRfcResult(chwClassMaintain);
-		}
+		chwClassMaintain.execute();
+		this.addRfcResult(chwClassMaintain);
 		//f. TssClassificationMaint 
 		RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(
 				obj_id 		//String obj_id
@@ -347,19 +301,14 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				, "H"		//String pims_identity
 				);
 		this.addRfcName(rdhClassificationMaint);
-		try {
-			rdhClassificationMaint.execute();
-			this.addRfcResult(rdhClassificationMaint);
-		} catch (Exception e) {
-			this.addRfcResult(rdhClassificationMaint);
-		}
-		
+		rdhClassificationMaint.execute();
+		this.addRfcResult(rdhClassificationMaint);		
 		
 	}
 
 	
 	
-	public void CreateAlphaQTYChar(String obj_id, String target_indc, String mach_type, String feature_code) {
+	public void CreateAlphaQTYChar(String obj_id, String target_indc, String mach_type, String feature_code) throws Exception {
 		//a.
 		String charact ="MK_" + target_indc + "_" + feature_code + "_QTY";
 		
@@ -379,12 +328,9 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				, charact	//String chdescr
 				);
 		this.addRfcName(chwCharMaintain);
-		try {
-			chwCharMaintain.execute();
-			this.addRfcResult(chwCharMaintain);
-		} catch (Exception e) {
-			this.addRfcResult(chwCharMaintain);
-		}
+		chwCharMaintain.execute();
+		this.addRfcResult(chwCharMaintain);
+		
 		//b. Call BapiClassCharRead to see if MK_target_machineType_featurecode_QTY characteristic exists for MachineTypeNew material
 		//String suffix ="003";
 		String suffix = getSuffix(obj_id, target_indc, feature_code, "Q");
@@ -400,12 +346,9 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		this.addRfcName(chwClassMaintain);
 		
 		chwClassMaintain.addCharacteristic(charact);
-		try {
-			chwClassMaintain.execute();
-			this.addRfcResult(chwClassMaintain);
-		} catch (Exception e) {
-			this.addRfcResult(chwClassMaintain);
-		}
+		chwClassMaintain.execute();
+		this.addRfcResult(chwClassMaintain);
+		
 		//d.Call ChwAssignCharToClass to add the MK_target_machineType_featurecode_QTY characteristic to MK_target_machineType_ALPH_suffix class
 		ChwAssignCharToClass ChwAssignCharToClass = new ChwAssignCharToClass(
 				obj_id 		//String obj_id
@@ -424,12 +367,8 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 					, "H"		//String pims_identity
 					);
 			this.addRfcName(rdhClassificationMaint);
-			try{
-				rdhClassificationMaint.execute();
-				this.addRfcResult(rdhClassificationMaint);
-			} catch (Exception e) {
-				this.addRfcResult(rdhClassificationMaint);
-			}
+			rdhClassificationMaint.execute();
+			this.addRfcResult(rdhClassificationMaint);
 			
 		} catch (Exception e) {
 			this.addRfcResult(ChwAssignCharToClass);
@@ -444,12 +383,9 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 					, charact2 //String class_desc
 				);
 			this.addRfcName(chwClassMaintain2);
-			try {
-				chwClassMaintain2.execute();
-				this.addRfcResult(chwClassMaintain2);
-			} catch (Exception e1) {
-				this.addRfcResult(chwClassMaintain2);
-			}
+			chwClassMaintain2.execute();
+			this.addRfcResult(chwClassMaintain2);
+			
 			
 			ChwAssignCharToClass ChwAssignCharToClass2 = new ChwAssignCharToClass(
 					obj_id 		//String obj_id
@@ -458,12 +394,9 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 					, "WW"		//String org_area				
 			);
 			this.addRfcName(ChwAssignCharToClass2);
-			try {
-				ChwAssignCharToClass.execute();
-				this.addRfcResult(ChwAssignCharToClass2);
-			} catch (Exception e1) {
-				this.addRfcResult(ChwAssignCharToClass2);
-			}
+			ChwAssignCharToClass.execute();
+			this.addRfcResult(ChwAssignCharToClass2);
+			
 			
 			RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(
 					obj_id 		//String obj_id
@@ -472,12 +405,9 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 					, "H"		//String pims_identity
 					);
 			this.addRfcName(rdhClassificationMaint);
-			try {
-				rdhClassificationMaint.execute();
-				this.addRfcResult(rdhClassificationMaint);
-			} catch (Exception e1) {
-				this.addRfcResult(rdhClassificationMaint);
-			}
+			rdhClassificationMaint.execute();
+			this.addRfcResult(rdhClassificationMaint);
+			
 		}
 		
 //		int iRFC = ChwAssignCharToClass.getRfcrc();
