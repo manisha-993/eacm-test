@@ -13,12 +13,15 @@ public class RfcCallerBase {
 	}	
 	
 	protected void addDebug(String msg) {
-		if (D.EBUG_DETAIL <= abr_debuglvl || isdebug) {
+		//if (D.EBUG_DETAIL <= abr_debuglvl || isdebug) {
+		if (D.EBUG_DETAIL <= abr_debuglvl) {
 		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
 		}
 	}
 	
-	protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
+	protected void addOutput(String msg) { 
+		rptSb.append("<p>"+msg+"</p>"+NEWLINE);
+	}
 	
 	protected void addRfcName(RdhBase rdhBase){
 		this.addDebug("Calling " + rdhBase.getRFCName());
