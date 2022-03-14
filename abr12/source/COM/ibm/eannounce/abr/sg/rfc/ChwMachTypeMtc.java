@@ -10,47 +10,65 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-public class ChwMachTypeMtc {
+import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
+
+public class ChwMachTypeMtc extends RfcCallerBase {
 	
 	private MODEL chwModel;
-//	private SVCMOD svcmod;
-	private String chwProduct;
 	private Connection rdhConnection;
 	private Connection odsConnection;
 	
-	public ChwMachTypeMtc(String chwProduct,Connection rdhConnection, Connection odsConnection) {	
-		this.chwModel = CommonEntities.getModelFromXml(chwProduct);	
-		this.chwProduct = chwProduct;
+	public ChwMachTypeMtc(MODEL chwProduct,Connection rdhConnection, Connection odsConnection) {	
+		this.chwModel = chwProduct;
 		this.rdhConnection = rdhConnection;
 		this.odsConnection = odsConnection;
 	}
-	public void execute(){
-		try {
+	public void execute() throws Exception{
+
 			String empty ="";
 			String obj_id = chwModel.getMACHTYPE() + "MTC";
 			//1. Call ChwMatmCreate to create the material master for the product object.
 			ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwModel,"ZMAT",chwModel.getMACHTYPE() + "MTC");
+			this.addRfcName(chwMatmCreate);			
 			chwMatmCreate.execute();
+			this.addRfcResult(chwMatmCreate);
 			
 			//2. Call Chw001ClfCreate to create the standard 001 classifications and characteristics 
 			//   which are tied to the offering's material master record.
-			Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(chwProduct,"ZMAT",chwModel.getMACHTYPE()+ "MTC","MODEL",rdhConnection, odsConnection);
+			
+			Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(chwModel,"ZMAT",chwModel.getMACHTYPE()+ "MTC", odsConnection);
 			chw001ClfCreate.execute();
+			this.addMsg(chw001ClfCreate.getRptSb());
 			
 			//3. Call the TssClassificationMaint constructor to associate the MK_REFERENCE class to the product's material master record
-			new RdhClassificationMaint(obj_id,"MK_REFERENCE","300","H").execute();
+			RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_REFERENCE","300","H");
+			this.addRfcName(rdhClassificationMaint);
+			rdhClassificationMaint.execute();
+			this.addRfcResult(rdhClassificationMaint);
 			
 			//4. Call the TssClassificationMaint constructor to associate the MK_T_VAO_NEW class to the product's material master record
-			new RdhClassificationMaint(obj_id,"MK_T_VAO_NEW","300","H").execute();	
+			rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_T_VAO_NEW","300","H");
+			this.addRfcName(rdhClassificationMaint);
+			rdhClassificationMaint.execute();
+			this.addRfcResult(rdhClassificationMaint);	
 			
 			//5. Call the TssClassificationMaint constructor to associate the MK_D_VAO_NEW class to the product's material master record
-			new RdhClassificationMaint(obj_id,"MK_D_VAO_NEW","300","H").execute();
+			rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_D_VAO_NEW","300","H");
+			this.addRfcName(rdhClassificationMaint);
+			rdhClassificationMaint.execute();
+			this.addRfcResult(rdhClassificationMaint);
 			
 			//6.Call the TssClassificationMaint constructor to associate the MK_FC_EXCH class to the product's material master record.
-			new RdhClassificationMaint(obj_id,"MK_FC_EXCH","300","H").execute();
+			rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_FC_EXCH","300","H");
+			this.addRfcName(rdhClassificationMaint);
+			rdhClassificationMaint.execute();
+			this.addRfcResult(rdhClassificationMaint);
 			
 			//7.Call the TssClassificationMaint constructor to associate the MK_FC_CONV class to the product's material master record.
-			new RdhClassificationMaint(obj_id,"MK_FC_CONV","300","H").execute();
+			rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_FC_CONV","300","H");
+			this.addRfcName(rdhClassificationMaint);
+			rdhClassificationMaint.execute();
+			this.addRfcResult(rdhClassificationMaint);
 			//8.Create the MK_machineType_MOD class and MK_T_machineType_MOD characteristic if it does not exist.  
 			//	Assign the MK_machineType_MOD class to the product's material master record.
 			
@@ -70,6 +88,7 @@ public class ChwMachTypeMtc {
 								, "X" 				//String addit_vals Set to "X".
 								, chwModel.getMACHTYPE() +" Model Characteristic" //String chdescr  Set to "<machine_type> Model Characteristic" where <machine_type> is chwProduct.machineType
 								);
+			this.addRfcName(chwCharMaintain);
 			//8.b Call the ChwCharMaintain.addValue() method to add the model with its description to the MK_T_machineType_MOD characteristic
 			String invname = "";
 			List<LANGUAGE> languagesList = chwModel.getLANGUAGELIST();
@@ -84,6 +103,7 @@ public class ChwMachTypeMtc {
 			String valdescr = CommonUtils.getFirstSubString(invname,25) + " " + chwModel.getMODEL();
 			chwCharMaintain.addValue(chwModel.getMODEL(), valdescr);
 			chwCharMaintain.execute();
+			this.addRfcResult(chwCharMaintain);
 			//8.c Call the ChwClassMaintain constructor to create the MK_machineType_MOD class. 
 			ChwClassMaintain ChwClassMaintain = 
 			new ChwClassMaintain(
@@ -91,10 +111,11 @@ public class ChwMachTypeMtc {
 					, "MK_"+chwModel.getMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
 					, "MK_"+chwModel.getMACHTYPE()+"_MOD"  //String class_type   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
 					);
+			this.addRfcName(ChwClassMaintain);
 			//8.d Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class
 			ChwClassMaintain.addCharacteristic("MK_"+chwModel.getMACHTYPE()+"_MOD"); 
 			ChwClassMaintain.execute();
-			
+			this.addRfcResult(ChwClassMaintain);
 			//8.e Call the TssClassificationMaint constructor to associate the MK_machineType_MOD class to the product's material master record
 			//reuse ==>no TssClassificationMaint but RdhClassificationMaint 
 			RdhClassificationMaint TssClassificationMaint = 
@@ -104,7 +125,9 @@ public class ChwMachTypeMtc {
 					, "300"  							//String class_type   Set to "300"
 					, "H"
 					);
+			this.addRfcName(TssClassificationMaint);
 			TssClassificationMaint.execute();
+			this.addRfcResult(TssClassificationMaint);
 			//9.Create the MK_machineType_MTC class and MK_machineType_MTC characteristic if it does not exist.
 			//9.a Call the ChwCharMaintain constructor to create the MK_machineType_MTC characteristic.
 			ChwCharMaintain ChwCharMaintain = 
@@ -123,8 +146,8 @@ public class ChwMachTypeMtc {
 					, "X" 			//String addit_vals   Set to "X".
 					, "Machine Type Conversions" + chwModel.getMACHTYPE()	//String chdescr	Set to "Machine Type Conversions <machine_type>" 				
 					);
+			this.addRfcName(ChwCharMaintain);
 			//9.B For each MODELCONVERT which meets all of conditions below 
-			//TODO get the MODELCONVERTList from MODEL
 			String machtype = chwModel.getMACHTYPE();
 			ArrayList<HashMap<String, String>> recordArray = getModelConvert(machtype);
 			
@@ -134,7 +157,9 @@ public class ChwMachTypeMtc {
 				String modelConvert_desc  = modelConvertMap.get("FROMMACHTYPE") + modelConvertMap.get("FROMMODEL")
 						+ " to " + modelConvertMap.get("TOMACHTYPE") + modelConvertMap.get("TOMODEL");
 				ChwCharMaintain.addValue(modelconvert_value, modelConvert_desc);
-			}			
+			}	
+			ChwCharMaintain.execute();
+			this.addRfcResult(ChwCharMaintain);
 			//9.c Call the ChwClassMaintain constructor to create the MK_machineType_MTC class. 
 			ChwClassMaintain =
 			new ChwClassMaintain(
@@ -142,9 +167,11 @@ public class ChwMachTypeMtc {
 					, "MK_"+chwModel.getMACHTYPE()+"_MTC"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
 					, "MK_"+chwModel.getMACHTYPE()+"_MTC"  //String class_type   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
 					);
+			this.addRfcName(ChwClassMaintain);
 //			//9.d Call the ChwClassMaintain.addCharacteristic() method to add the MK_machineType_MTC characteristic to the MK_machineType_MTC  class
 			ChwClassMaintain.addCharacteristic("MK_"+chwModel.getMACHTYPE()+"_MTC");
 			ChwClassMaintain.execute();
+			this.addRfcResult(ChwClassMaintain);
 			//9.e Call the TssClassificationMaint constructor to associate the MK_machineType_MOD class to the product's material master record
 			TssClassificationMaint = 
 			new RdhClassificationMaint(
@@ -153,6 +180,11 @@ public class ChwMachTypeMtc {
 					, "300"  							//String class_type   Set to "300"
 					, "H"
 					);
+			this.addRfcName(TssClassificationMaint);
+			TssClassificationMaint.execute();
+			this.addRfcResult(TssClassificationMaint);
+			
+			
 			//10.Call the ChwConpMaintain to create a configuration profile for the product's material master record
 			//10.a Call the ChwConpMaintain constructor.
 			ChwConpMaintain ChwConpMaintain  = 
@@ -163,8 +195,9 @@ public class ChwMachTypeMtc {
 					, "2"				//String bomexpl Set to "2".
 					, chwModel.getMACHTYPE() +	"MTCUI"		//String design	 Set to Set to concatenation of chwProduct.machineType + "MTCUI" 
 					);
-			//10.b Call the ChwConpMaintain.addConfigDependency() method.	
-			//TODO add dependency firstly
+			this.addRfcName(ChwConpMaintain);
+			
+			//10.b Call the ChwConpMaintain.addConfigDependency() method.
 			ChwConpMaintain.addConfigDependency("E2E", empty); //Set to "E2E".
 			//10.c 
 			ChwConpMaintain.addConfigDependency("PR_"+chwModel.getMACHTYPE()+"_SET_MODEL", empty);  //Set to "PR_<chwProduct.machineType>_SET_MODEL"
@@ -176,11 +209,7 @@ public class ChwMachTypeMtc {
 			ChwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", empty);  //Set to "PR_E2E_PRICING_HW".
 			
 			ChwConpMaintain.execute();// excute 1 time 
-			
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}		
+			this.addRfcResult(ChwConpMaintain);
 		
 	}
 	private ArrayList<HashMap<String, String>> getModelConvert(String machtype) throws SQLException {

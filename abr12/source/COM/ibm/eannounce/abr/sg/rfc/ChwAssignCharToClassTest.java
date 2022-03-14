@@ -80,7 +80,7 @@ public class ChwAssignCharToClassTest
     }
 
 	@Test
-	public void testIsReadyToExecuteWithoutJCLASS()
+	public void testIsReadyToExecuteWithoutJCLASS2()
 	{
 	    System.out.println("-------------  testIsReadyToExecuteWithoutJCLASS start -------------");
 	    ChwAssignCharToClass charToClass =new ChwAssignCharToClass(obj_id, "", "CLSNAME", "CLSTYPE");

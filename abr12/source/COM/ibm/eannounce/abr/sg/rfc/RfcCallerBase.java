@@ -23,6 +23,11 @@ public class RfcCallerBase {
 		rptSb.append("<p>"+msg+"</p>"+NEWLINE);
 	}
 	
+	protected void addMsg(StringBuffer msg) { 
+		rptSb.append(msg.toString()+NEWLINE);
+	}
+	
+	
 	protected void addRfcName(RdhBase rdhBase){
 		this.addDebug("Calling " + rdhBase.getRFCName());
 	}
