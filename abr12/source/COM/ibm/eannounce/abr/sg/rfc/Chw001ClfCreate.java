@@ -220,8 +220,13 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			value = chwModel.getWWOCCODE();
 			rdhClassificationMaint.addCharacteristic("MM_OPPORTUNITY_CODE", value);
 			//2.w If <materialType> = "ZPRT", then call the TssClassificationMaint.addCharacteristic() method to add the MM_ACQ_COMPANY characteristic to the MM_FIELDS classification.
-			value = chwModel.getACQRCOCD();
-			rdhClassificationMaint.addCharacteristic("MM_ACQ_COMPANY", value);
+			if("ZPRT".equalsIgnoreCase(materialType)){
+				value = chwModel.getACQRCOCD();
+				rdhClassificationMaint.addCharacteristic("MM_ACQ_COMPANY", value);
+			}
+			//2.x Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_MTM characteristic to the MM_FIELDS classification.
+			value = materialID;
+			rdhClassificationMaint.addCharacteristic("MM_SP_MTM", value);
 			//2.final 
 			rdhClassificationMaint.execute();
 			this.addRfcResult(rdhClassificationMaint);
@@ -238,9 +243,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 								, "H"
 								);
 				this.addRfcName(TssClassificationMaint);
-				//3.b Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_MTM characteristic to the MM_SERVICEPAC classification.
-				value = materialID;
-				TssClassificationMaint.addCharacteristic("MM_SP_MTM", value);
+				
 				//3.c Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_SDF characteristic to the MM_SERVICEPAC classification.
 				value = chwModel.getSDFCD();
 				TssClassificationMaint.addCharacteristic("MM_SP_SDF", value);
