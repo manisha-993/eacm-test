@@ -4206,9 +4206,11 @@ ADSATTRIBUTE    40  WARRTYPE
 //    		insertinto XMLIDLCache()
         	insertIntoCache(rootEntity, xml, t2, entityType, entityID, ps);
         }	
-        
+        addDebug("put cache:"+m_abri.getABRCode()+"-"+getEntityType());
         if("SVCMOD".equals(getEntityType())&&!m_abri.getABRCode().equals("SVCMODIERPABRSTATUS")){
         	setFlagValue("SVCMODIERPABRSTATUS", "0020");
+        }else if("MODEL".equals(getEntityType())){
+        	setFlagValue("MODELIERPABRSTATUS", "0020");
         }
     }finally{   
 		try {
