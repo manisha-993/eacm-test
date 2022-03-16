@@ -267,7 +267,8 @@ public class Chw001ClfCreate extends RfcCallerBase{
 				}
 				TssClassificationMaint.addCharacteristic("MM_HW_SPTYPE", value);
 				//3.g Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_IDENTIFIER characteristic to the MM_SERVICEPAC classification.
-				value = chwModel.getSUBCATEGORY();
+				input = chwModel.getSUBCATEGORY();
+				value = ATWRTforService(input);
 				TssClassificationMaint.addCharacteristic("MM_SP_IDENTIFIER", value);
 				//3.h Call the TssClassificationMaint.addCharacteristic() method to add the MM_HW_SPTERM characteristic to the MM_SERVICEPAC classification.
 				/**
@@ -428,6 +429,85 @@ public class Chw001ClfCreate extends RfcCallerBase{
 	}
 
 
+	private String ATWRTforService(String input) {
+		Map<String,String> valueMap = new HashMap<String,String>();
+		valueMap.put("EURBUNSP", "OTHER");
+		valueMap.put("EUREMXSP", "OTHER");
+		valueMap.put("EUREXSP", "OTHER");
+		valueMap.put("EURMIGSP", "OTHER");
+		valueMap.put("EURMVSSP", "OTHER");
+		valueMap.put("GENERICHW1", "OTHER");
+		valueMap.put("GENERICHW3", "OTHER");
+		valueMap.put("GENERICHW5", "OTHER");
+		valueMap.put("GENERICHW7", "OTHER");
+		valueMap.put("HELPDESK", "OTHER");
+		
+		valueMap.put("INSTALL", "OTHER");
+		valueMap.put("IPSINSTALL", "OTHER");
+		valueMap.put("IPSMA", "OTHER");
+		valueMap.put("IPSMAEXT", "OTHER");
+		valueMap.put("IPSWAMO", "OTHER");
+		valueMap.put("IPSWMOEXT", "OTHER");
+		valueMap.put("ITESEDUC", "OTHER");
+		valueMap.put("LENINSTL", "OTHER");
+		valueMap.put("LENPWUPG", "OTHER");
+		valueMap.put("LENTPPOF", "OTHER");
+		
+		valueMap.put("LENWAUPG", "OTHER");
+		valueMap.put("N/A", "OTHER");
+		valueMap.put("SBUNDLE", "OTHER");
+		valueMap.put("SBUNDLE1", "OTHER");
+		valueMap.put("SBUNDLE2", "OTHER");
+		valueMap.put("SBUNDLE3", "OTHER");
+		valueMap.put("SBUNDLE4", "OTHER");
+		valueMap.put("SBUNDLE5", "OTHER");
+		valueMap.put("SBUNDLE6", "OTHER");
+		valueMap.put("SERVACCT", "OTHER");
+		
+		valueMap.put("STG LAB SERVICES", "OTHER");
+		
+		valueMap.put("ENSPEURP", "HW");
+		valueMap.put("EURETSSWU", "HW");
+		valueMap.put("GENERICHW4", "HW");
+		valueMap.put("MAINONLY", "HW");
+		valueMap.put("MAINSWSUPP", "HW");
+		valueMap.put("MEMEAMAP", "HW");
+		valueMap.put("MEMEAWMO", "HW");
+		valueMap.put("WMAINOCS", "HW");
+		valueMap.put("WMAINTOPT", "HW");
+		valueMap.put("GTMSEUR", "HW");
+		
+		valueMap.put("PROACTSYS", "HW");
+		
+		
+		valueMap.put("GENERICHW2", "SW");
+		valueMap.put("PSSWSUPP", "SW");
+		valueMap.put("RTECHSUPEU", "SW");
+		valueMap.put("RTECHSUPP", "SW");
+		valueMap.put("RTSOS", "SW");
+		valueMap.put("RTSSWEU", "SW");
+		valueMap.put("RTSXSERIES", "SW");
+		valueMap.put("SLEMEASW", "SW");
+		valueMap.put("SMOOTHSTRT", "SW");
+		valueMap.put("STRTUPSUP", "SW");
+		
+		valueMap.put("STRUPSUPEU", "SW");
+		valueMap.put("SUPLINEEU", "SW");
+		valueMap.put("SUPPORTLN", "SW");
+		valueMap.put("SYSEXPERT", "SW");
+		valueMap.put("TSEMEASW", "SW");
+		valueMap.put("ETSAAEUR", "SW");
+		
+		
+		String value = valueMap.get(input.toUpperCase());
+		
+		if(value ==null) value ="OTHER";
+		
+		return value;
+	}
+
+
+
 	private String getSVCLEVFromXML(String SVCLEVCD) throws SQLException {
 		System.out.println("SVCLEVCD=" + SVCLEVCD);
 		/**
@@ -454,6 +534,17 @@ public class Chw001ClfCreate extends RfcCallerBase{
 	}
 
 	public static void main(String[] args) {
+		Map<String,String> valueMap = new HashMap<String,String>();
+		valueMap.put("EURBUNSP", "OTHER");
+		valueMap.put("EUREMXSP", "OTHER");
+		valueMap.put("EUREXSP", "OTHER");
+		valueMap.put("EURMIGSP", "OTHER");
+		String value = valueMap.get("123");
+		System.out.println("value=" + value);
+		value = valueMap.get("EURBUNSP");
+		System.out.println("value=" + value);
+		value = valueMap.get(null);
+		System.out.println("value=" + value);
 
 	}
 
