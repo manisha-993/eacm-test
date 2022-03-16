@@ -130,10 +130,22 @@ public class RdhMatmCreate extends RdhBase {
 			// Set<SLEORGNPLNTCODE>>();
 
 			for (int i = 0; i < availabilities.size(); i++) {
-				Set<SLEORGNPLNTCODE> sset = sMap.get(availabilities.get(i).getPUBFROM());
+				Set<SLEORGNPLNTCODE> sset = null;
+				String key = null;
+				if(availabilities.get(i).getPUBTO()!=null||!"".equals(availabilities.get(i).getPUBTO())) {
+					key = "PUBTO"+availabilities.get(i).getPUBTO();
+					sset = sMap.get(key);
+					if (sset == null) {
+						sset = new HashSet<SLEORGNPLNTCODE>();
+						sMap.put(key, sset);
+					}
+				}else {
+					key ="PUBFROM"+availabilities.get(i).getPUBFROM();
+				sset = sMap.get(key);
 				if (sset == null) {
 					sset = new HashSet<SLEORGNPLNTCODE>();
-					sMap.put(availabilities.get(i).getPUBFROM(), sset);
+					sMap.put(key, sset);
+					}
 				}
 				sset.addAll(availabilities.get(i).getSLEORGNPLNTCODELIST());
 
@@ -143,7 +155,7 @@ public class RdhMatmCreate extends RdhBase {
 					aMap.put(availabilities.get(i).getPUBFROM(), aset);
 				}
 				aset.add(availabilities.get(i));
-				Set<TAXCATEGORY> cset = cMap.get(availabilities.get(i).getPUBFROM());
+				Set<TAXCATEGORY> cset = cMap.get(key);
 				if (cset == null) {
 					cset = new HashSet<TAXCATEGORY>();
 				}
@@ -161,8 +173,8 @@ public class RdhMatmCreate extends RdhBase {
 					}
 				}
 				if(groupName==null)
-					groupName = availabilities.get(i).getPUBFROM();
-				cMap.put(availabilities.get(i).getPUBFROM(), cset);
+					groupName = key;
+				cMap.put(key, cset);
 				// taxcategories.get(i).getCOUNTRYLIST().contains("");
 
 			}
@@ -177,15 +189,21 @@ public class RdhMatmCreate extends RdhBase {
 
 			Iterator<String> iterator = sMap.keySet().iterator();
 			while (iterator.hasNext()) {
-				String pubfrom = iterator.next();
+				String key = iterator.next();
 
 				RdhMatm_geo geo = new RdhMatm_geo();
+				
 				geo.setName("WW" + index++);
+				if(key.startsWith("PUBFROM")) {
 				geo.setVmsta("Z0");
-				geo.setVmstd(pubfrom);
+				geo.setVmstd(key.replace("PUBFROM", ""));
+				}else {
+					geo.setVmsta("ZJ");
+					geo.setVmstd(key.replace("PUBTO", ""));
+				}
 
-				List<SLEORGNPLNTCODE> sleorggrps = new ArrayList(sMap.get(pubfrom));
-				List<TAXCATEGORY> taxcList = new ArrayList<TAXCATEGORY>(cMap.get(pubfrom));
+				List<SLEORGNPLNTCODE> sleorggrps = new ArrayList(sMap.get(key));
+				List<TAXCATEGORY> taxcList = new ArrayList<TAXCATEGORY>(cMap.get(key));
 				List<RdhMatm_sales_org> sales_orgList = new ArrayList<RdhMatm_sales_org>();
 				List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
 				List<RdhMatm_tax_country> tax_countries = new ArrayList<RdhMatm_tax_country>();
