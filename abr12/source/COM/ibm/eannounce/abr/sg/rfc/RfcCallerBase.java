@@ -13,9 +13,9 @@ public class RfcCallerBase {
 	}	
 	
 	protected void addDebug(String msg) {
-		//if (D.EBUG_DETAIL <= abr_debuglvl || isdebug) {
-		if (D.EBUG_DETAIL <= abr_debuglvl) {
-		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
+		if (D.EBUG_DETAIL <= abr_debuglvl || isdebug) {
+		//if (D.EBUG_DETAIL <= abr_debuglvl) {
+			rptSb.append("<!-- " + msg + " -->" + NEWLINE);
 		}
 	}
 	

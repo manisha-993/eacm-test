@@ -155,14 +155,16 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 					 */
 			
 					if(exist(COVNOTEQUALSQL, model.getMACHTYPE())) {
-						ChwMachTypeMtc chwMachTypeMtc =new ChwMachTypeMtc(model, m_db.getPDHConnection(), connection);				
+						ChwMachTypeMtc chwMachTypeMtc =new ChwMachTypeMtc(model, m_db.getPDHConnection(), connection);
+						chwMachTypeMtc.execute();
 				    	this.addMsg(chwMachTypeMtc.getRptSb());
 					}
 					if(!"Maintenance,MaintFeature".contains(model.getSUBCATEGORY())) {
 						
 						if(exist(COVEQUALSQL, model.getMACHTYPE())||exist(FCTEQUALSQL, model.getMACHTYPE())) {
-						ChwMachTypeUpg chwMachTypeUpg = new ChwMachTypeUpg(model, m_db.getPDHConnection(), connection);
-						this.addMsg(chwMachTypeUpg.getRptSb());
+							ChwMachTypeUpg chwMachTypeUpg = new ChwMachTypeUpg(model, m_db.getPDHConnection(), connection);
+							chwMachTypeUpg.execute();
+							this.addMsg(chwMachTypeUpg.getRptSb());
 						}
 					}else if("M,B".contains(model.getORDERCODE())) {
 						processMachTypeUpg(model, connection);	
