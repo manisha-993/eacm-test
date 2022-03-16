@@ -268,7 +268,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 				TssClassificationMaint.addCharacteristic("MM_HW_SPTYPE", value);
 				//3.g Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_IDENTIFIER characteristic to the MM_SERVICEPAC classification.
 				value = chwModel.getSUBCATEGORY();
-				TssClassificationMaint.addCharacteristic("MM_HW_SPTERM", value);
+				TssClassificationMaint.addCharacteristic("MM_SP_IDENTIFIER", value);
 				//3.h Call the TssClassificationMaint.addCharacteristic() method to add the MM_HW_SPTERM characteristic to the MM_SERVICEPAC classification.
 				/**
 				 * Set var=UPPER(hwProduct/COVRPRIOD);
