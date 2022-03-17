@@ -8,21 +8,27 @@ import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.Hashtable;
+import java.util.List;
 
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
 import COM.ibm.eannounce.abr.sg.rfc.Chw001ClfCreate;
 import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwClassMaintain;
+import COM.ibm.eannounce.abr.sg.rfc.ChwClsfCharCreate;
 import COM.ibm.eannounce.abr.sg.rfc.ChwConpMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwDepdMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeMtc;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeUpg;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMatmCreate;
+import COM.ibm.eannounce.abr.sg.rfc.CommonUtils;
+import COM.ibm.eannounce.abr.sg.rfc.FEATURE;
+import COM.ibm.eannounce.abr.sg.rfc.LANGUAGEELEMENT_FEATURE;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.RdhSvcMatmCreate;
 import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
+import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
@@ -34,14 +40,14 @@ import COM.ibm.eannounce.objects.ExtractActionItem;
 import COM.ibm.opicmpdh.middleware.D;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
 
-public class MODELIERPABRSTATUS extends PokBaseABR {
+public class TMFIERPABRSTATUS extends PokBaseABR {
 	private StringBuffer rptSb = new StringBuffer();
 	private static final char[] FOOL_JTEST = { '\n' };
 	static final String NEWLINE = new String(FOOL_JTEST);
 	private int abr_debuglvl = D.EBUG_ERR;
 	private String navName = "";
 	private Hashtable metaTbl = new Hashtable();
-	private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
+	private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'PRODSTRUCT' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
 	private String COVEQUALSQL="SELECT count(*) FROM OPICM.flag F\n"
 			+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.ATTRIBUTEVALUE ='?' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
 			+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
@@ -97,10 +103,10 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			args[0] = getShortClassName(getClass());
 			args[1] = "ABR";
 			header1 = msgf.format(args);
-			setDGTitle("MODELIERPABRSTATUS report");
+			setDGTitle("TMFIERPABRSTATUS report");
 			setDGString(getABRReturnCode());
-			setDGRptName("MODELIERPABRSTATUS"); // Set the report name
-			setDGRptClass("MODELIERPABRSTATUS"); // Set the report class
+			setDGRptName("TMFIERPABRSTATUS"); // Set the report name
+			setDGRptClass("TMFIERPABRSTATUS"); // Set the report class
 			// Default set to pass
 			setReturnCode(PASS);
 
@@ -111,7 +117,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 
 			// get the root entity using current timestamp, need this to get the
 			// timestamps or info for VE pulls
-			  m_elist = m_db.getEntityList(m_prof,
+			m_elist = m_db.getEntityList(m_prof,
                     new ExtractActionItem(null, m_db, m_prof,"dummy"),
                     new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
 			/*
@@ -130,7 +136,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			// build the text file
 
 			Connection connection = m_db.getODSConnection();
-			PreparedStatement statement = connection.prepareStatement(CACEHSQL);
+			PreparedStatement statement = connection.prepareStatement(CACEHSQL); //TODO change the SQL
 			statement.setInt(1, rootEntity.getEntityID());
 			ResultSet resultSet = statement.executeQuery();
 		
@@ -138,47 +144,51 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 				xml = resultSet.getString("XMLMESSAGE");
 			}
 			if (xml != null) {
-			
-				MODEL model = XMLParse.getObjectFromXml(xml,MODEL.class);
+				//step1 Execute the steps described in the section Create SAP characteristics and classes for MachineTypeNEW material 
+				//to create the SAP characteristics and classes of the feature code for MachineTypeNEW material. 
+				TMF_UPDATE tmf = XMLParse.getObjectFromXml(xml,TMF_UPDATE.class);
+				MachineTypeNEW(tmf,null,rptSb);//TODO get the feature
 				
-				if("Hardware".equals(model.getCATEGORY())) {
-					processMachTypeMODEL(model, connection);
-					processMachTypeNew(model, connection);
-					
-					/**
-					 * 
-            If there is a MODELCONVERT which meets all of conditions below,
-                tomachtype = chwProduct.machineType
-                frommachtype !=tomachtype
-                past passed ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
-            then execute the steps described in the document MachTypeMTC RDH Feed to iERP to populate data elements for MachineTypeMTC material.
-					 */
-			
-					if(exist(COVNOTEQUALSQL, model.getMACHTYPE())) {
-						ChwMachTypeMtc chwMachTypeMtc =new ChwMachTypeMtc(model, m_db.getPDHConnection(), connection);
-						chwMachTypeMtc.execute();
-				    	this.addMsg(chwMachTypeMtc.getRptSb());
-					}
-					if(!"Maintenance,MaintFeature".contains(model.getSUBCATEGORY())) {
-						
-						if(exist(COVEQUALSQL, model.getMACHTYPE())||exist(FCTEQUALSQL, model.getMACHTYPE())) {
-							ChwMachTypeUpg chwMachTypeUpg = new ChwMachTypeUpg(model, m_db.getPDHConnection(), connection);
-							chwMachTypeUpg.execute();
-							this.addMsg(chwMachTypeUpg.getRptSb());
-						}
-					}else if("M,B".contains(model.getORDERCODE())) {
-						processMachTypeUpg(model, connection);	
-					}
-					
-					
-					
-				}
-				else if("Service".equals(model.getCATEGORY())) {
-					processMachTypeMODEL_Svc(model, connection);
-				}
-				else if ("SoftdWare".equals(model.getCATEGORY())) {
-					throw new Exception("Not support SoftWare");
-				}
+//			
+//				TMF_UPDATE tmf = XMLParse.getObjectFromXml(xml,TMF_UPDATE.class);
+//				
+//				if("Hardware".equals(model.getCATEGORY())) {
+//					processMachTypeMODEL(model, connection);
+//					processMachTypeNew(model, connection);
+//					
+//					/**
+//					 * 
+//            If there is a MODELCONVERT which meets all of conditions below,
+//                tomachtype = chwProduct.machineType
+//                frommachtype !=tomachtype
+//                past passed ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
+//            then execute the steps described in the document MachTypeMTC RDH Feed to iERP to populate data elements for MachineTypeMTC material.
+//					 */
+//			
+//					if(exist(COVNOTEQUALSQL, model.getMACHTYPE())) {
+//						ChwMachTypeMtc chwMachTypeMtc =new ChwMachTypeMtc(model, m_db.getPDHConnection(), connection);	
+//						chwMachTypeMtc.execute();
+//				    	this.addMsg(chwMachTypeMtc.getRptSb());
+//					}
+//					if(!"Maintenance,MaintFeature".contains(model.getSUBCATEGORY())) {
+//						
+//						if(exist(COVEQUALSQL, model.getMACHTYPE())||exist(FCTEQUALSQL, model.getMACHTYPE())) {
+//						ChwMachTypeUpg chwMachTypeUpg = new ChwMachTypeUpg(model, m_db.getPDHConnection(), connection);
+//						this.addMsg(chwMachTypeUpg.getRptSb());
+//						}
+//					}else if("M,B".contains(model.getORDERCODE())) {
+//						processMachTypeUpg(model, connection);	
+//					}
+//					
+//					
+//					
+//				}
+//				else if("Service".equals(model.getCATEGORY())) {
+//					processMachTypeMODEL_Svc(model, connection);
+//				}
+//				else if ("SoftdWare".equals(model.getCATEGORY())) {
+//					throw new Exception("Not support SoftWare");
+//				}
 					
 				
 			}	
@@ -202,10 +212,10 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			e.printStackTrace(new java.io.PrintWriter(exBuf));
 			// Put exception into document
 			args[0] = e.getMessage();
-			rptSb.append(convertToHTML(msgf.format(args)) + NEWLINE);
+			rptSb.append(msgf.format(args) + NEWLINE);
 			msgf = new MessageFormat(Error_STACKTRACE);
 			args[0] = exBuf.getBuffer().toString();
-			rptSb.append(convertToHTML(msgf.format(args)) + NEWLINE);
+			rptSb.append(msgf.format(args) + NEWLINE);
 			logError("Exception: " + e.getMessage());
 			logError(exBuf.getBuffer().toString());
 			// was an error make sure user gets report
@@ -237,6 +247,47 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 
 
 	
+
+	private void MachineTypeNEW(TMF_UPDATE chwTMF, FEATURE feature, StringBuffer rptSb) throws Exception {
+		
+		//step1 If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED")
+		String feature_code = chwTMF.getFEATURECODE();
+		String FCTYPE = chwTMF.getFCTYPE();
+		if(CommonUtils.isNoLetter(feature_code) && !"RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE)){
+			ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
+			//String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
+			String obj_id = chwTMF.getMACHTYPE() + "NEW";
+			String target_indc = "T";
+			String mach_type = chwTMF.getMACHTYPE();
+			
+			//List lfList = feature.getLANGUAGELIST();
+			
+			//feature.getLANGUAGELIST().get(0).getBHINVNAME()
+			String BHINVNAME ="";
+			for (LANGUAGEELEMENT_FEATURE languageElement : feature.getLANGUAGELIST())
+			{
+				if ("1".equals(languageElement.getNLSID()))
+				{
+					BHINVNAME= languageElement.getBHINVNAME();
+				}
+			}
+			String feature_code_desc = CommonUtils.getFirstSubString(BHINVNAME, 30);			
+			try{
+				ChwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				this.addMsg(ChwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(ChwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			
+			
+			
+			
+		}
+		
+		
+		
+	}
 
 	/*
 	 * Get Name based on navigation attributes for root entity
@@ -783,13 +834,9 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		 */
 		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
 		this.addDebug("Calling " + "Chw001ClfCreate");
-		try{
-			chw001ClfCreate.execute();
-			this.addMsg(chw001ClfCreate.getRptSb());
-		}catch (Exception e) {
-			this.addMsg(chw001ClfCreate.getRptSb());
-			throw e;
-		}
+		chw001ClfCreate.execute();
+    	this.addMsg(chw001ClfCreate.getRptSb());
+    	
     	
     	
     }

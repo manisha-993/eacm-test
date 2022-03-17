@@ -10,6 +10,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
+import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "SVCLEV_UPDATE")
 public class SVCLEV {

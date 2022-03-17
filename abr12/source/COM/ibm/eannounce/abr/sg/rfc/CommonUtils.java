@@ -42,6 +42,20 @@ public class CommonUtils {
 		return sReturn;
 	}
 	
+	public static boolean isNoLetter(String input){
+		boolean isNoletter = true;
+		if(input==null) return true;		
+		String regex=".*[a-zA-Z]+.*";  
+        Matcher m=Pattern.compile(regex).matcher(input);
+        if(m.matches()) {
+        	isNoletter= false;
+        }else{
+        	isNoletter = true;
+        }
+        
+		return isNoletter;
+	}
+	
 	public static void main(String[] args) {
 		String model="mod12345";
 		

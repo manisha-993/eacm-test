@@ -177,6 +177,12 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			
 			//2.n Call the TssClassificationMaint.addCharacteristic() method to add the MM_BP_CERT_SPECBID characteristic to the MM_FIELDS classification 
 			value = chwModel.getBPCERTSPECBID();
+			if("YES".equalsIgnoreCase(value)){
+				value = "Y";
+			}else if("NO".equalsIgnoreCase(value)){
+				value = "N";
+			}		
+			
 			rdhClassificationMaint.addCharacteristic("MM_BP_CERT_SPECBID", value);
 			
 			//2.O Call the TssClassificationMaint.addCharacteristic() method to add the MM_RPQTYPE characteristic to the MM_FIELDS classification
