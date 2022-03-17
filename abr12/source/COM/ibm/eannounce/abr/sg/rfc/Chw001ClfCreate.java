@@ -82,7 +82,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			value ="";
 			if("SIU-CPU".equalsIgnoreCase(chwModel.getUNITCLASS())){
 				value = "1";
-			} else if("Non SIU-CPU".equalsIgnoreCase(chwModel.getUNITCLASS())){
+			} else if("Non SIU- CPU".equalsIgnoreCase(chwModel.getUNITCLASS())){
 				value = "0";
 			} else if("SIU-Non CPU".equalsIgnoreCase(chwModel.getUNITCLASS())){
 				value = "2";
@@ -100,7 +100,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			 */
 			value = "";
 			String var= chwModel.getPRICEDIND().toUpperCase();
-			String var1= chwModel.getPRICEDIND().toUpperCase();
+			String var1= chwModel.getZEROPRICE().toUpperCase();
 			if("YES".equals(var) && "YES".equals(var1)){
 				value ="Z";
 			}else if("NO".equals(var) && "NO".equals(var1)){
@@ -220,7 +220,16 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			value = "Yes";
 			rdhClassificationMaint.addCharacteristic("REMARKETER_REPORTER", value);
 			//2.u Call the TssClassificationMaint.addCharacteristic() method to add the MM_PHYSICAL_RETURN characteristic to the MM_FIELDS classification.
-			value ="Hardware".equalsIgnoreCase(chwModel.getCATEGORY()) ? "1": "";
+			//value ="Hardware".equalsIgnoreCase(chwModel.getCATEGORY()) ? "1": "1";
+			if("ZPRT".equalsIgnoreCase(materialType)){
+				if("Hardware".equalsIgnoreCase(chwModel.getCATEGORY())){
+					value="1";
+				}else{
+					value ="";
+				}
+			}else{
+				value ="1";
+			}
 			rdhClassificationMaint.addCharacteristic("MM_PHYSICAL_RETURN", value);
 			//2. v Call the TssClassificationMaint.addCharacteristic() method to add the MM_OPPORTUNITY_CODE characteristic to the MM_FIELDS classification. 
 			value = chwModel.getWWOCCODE();
