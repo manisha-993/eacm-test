@@ -783,9 +783,13 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		 */
 		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
 		this.addDebug("Calling " + "Chw001ClfCreate");
-		chw001ClfCreate.execute();
-    	this.addMsg(chw001ClfCreate.getRptSb());
-    	
+		try{
+			chw001ClfCreate.execute();
+			this.addMsg(chw001ClfCreate.getRptSb());
+		}catch (Exception e) {
+			this.addMsg(chw001ClfCreate.getRptSb());
+			throw e;
+		}
     	
     	
     }
