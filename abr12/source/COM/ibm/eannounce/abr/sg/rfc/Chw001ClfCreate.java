@@ -318,9 +318,13 @@ public class Chw001ClfCreate extends RfcCallerBase{
 					xml = getSVCLEVFromXML(SVCLEVCD);
 				} catch (SQLException e) {
 				}
+				
+				SVCLEV SVCLEV = null;
 				if(!"".equals(xml)){
-					SVCLEV SVCLEV = CommonEntities.getSVCLEVFromXml(xml);
-					
+					SVCLEV = CommonEntities.getSVCLEVFromXml(xml);
+				}
+				
+				if(SVCLEV!=null){					
 					
 					//3.i Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_COVHRS characteristic to the MM_SERVICEPAC classification.//3.i Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_COVHRS characteristic to the MM_SERVICEPAC classification.
 					value = SVCLEV.getCOVRSHRTDESC();
@@ -424,8 +428,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 					}else{
 						value = TRNARNDTME + " " + TRNARNDTMEUOM + " " + TRNARNDTMEOBJIVE;
 					}
-					TssClassificationMaint.addCharacteristic("MM_SP_TARNDTIME", value);
-					
+					TssClassificationMaint.addCharacteristic("MM_SP_TARNDTIME", value);					
 				}				
 				
 				TssClassificationMaint.execute();
