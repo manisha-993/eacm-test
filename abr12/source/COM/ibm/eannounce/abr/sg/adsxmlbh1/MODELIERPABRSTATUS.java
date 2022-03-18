@@ -156,15 +156,27 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			
 					if(exist(COVNOTEQUALSQL, model.getMACHTYPE())) {
 						ChwMachTypeMtc chwMachTypeMtc =new ChwMachTypeMtc(model, m_db.getPDHConnection(), connection);
-						chwMachTypeMtc.execute();
-				    	this.addMsg(chwMachTypeMtc.getRptSb());
+						this.addDebug("Calling " + "ChwMachTypeMtc");
+						try{
+							chwMachTypeMtc.execute();
+							this.addMsg(chwMachTypeMtc.getRptSb());
+						}catch (Exception e) {
+							this.addMsg(chwMachTypeMtc.getRptSb());
+							throw e;
+						}
 					}
 					if(!"Maintenance,MaintFeature".contains(model.getSUBCATEGORY())) {
 						
 						if(exist(COVEQUALSQL, model.getMACHTYPE())||exist(FCTEQUALSQL, model.getMACHTYPE())) {
 							ChwMachTypeUpg chwMachTypeUpg = new ChwMachTypeUpg(model, m_db.getPDHConnection(), connection);
-							chwMachTypeUpg.execute();
-							this.addMsg(chwMachTypeUpg.getRptSb());
+							this.addDebug("Calling " + "ChwMachTypeMtc");
+							try{
+								chwMachTypeUpg.execute();
+								this.addMsg(chwMachTypeUpg.getRptSb());
+							}catch (Exception e) {
+								this.addMsg(chwMachTypeUpg.getRptSb());
+								throw e;
+							}
 						}
 					}else if("M,B".contains(model.getORDERCODE())) {
 						processMachTypeUpg(model, connection);	
@@ -540,8 +552,13 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		
 		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
 		this.addDebug("Calling " + "Chw001ClfCreate");
-		chw001ClfCreate.execute();
-    	this.addMsg(chw001ClfCreate.getRptSb());
+		try{
+			chw001ClfCreate.execute();
+			this.addMsg(chw001ClfCreate.getRptSb());
+		}catch (Exception e) {
+			this.addMsg(chw001ClfCreate.getRptSb());
+			throw e;
+		}
 		 
 		
 		String obj_id=model.getMACHTYPE()+model.getMODEL();
@@ -594,8 +611,13 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		
 		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
 		this.addDebug("Calling " + "Chw001ClfCreate");
-		chw001ClfCreate.execute();
-    	this.addMsg(chw001ClfCreate.getRptSb());
+		try{
+			chw001ClfCreate.execute();
+			this.addMsg(chw001ClfCreate.getRptSb());
+		}catch (Exception e) {
+			this.addMsg(chw001ClfCreate.getRptSb());
+			throw e;
+		}
 		/*
 		 * Chw001ClfCreate createCaller = new Chw001ClfCreate(xml, materialType,
 		 * materialID, "MODEL"); createCaller.execute();
@@ -642,8 +664,13 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		}
 		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
 		this.addDebug("Calling " + "Chw001ClfCreate");
-		chw001ClfCreate.execute();
-    	this.addMsg(chw001ClfCreate.getRptSb());
+		try{
+			chw001ClfCreate.execute();
+			this.addMsg(chw001ClfCreate.getRptSb());
+		}catch (Exception e) {
+			this.addMsg(chw001ClfCreate.getRptSb());
+			throw e;
+		}
     	String obj_id = materialID;
 		String class_name="MK_REFERENCE";
 		String class_type="300";

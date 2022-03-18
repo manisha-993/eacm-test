@@ -25,6 +25,7 @@ import COM.ibm.eannounce.abr.sg.rfc.CommonUtils;
 import COM.ibm.eannounce.abr.sg.rfc.FEATURE;
 import COM.ibm.eannounce.abr.sg.rfc.LANGUAGEELEMENT_FEATURE;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
+import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.RdhSvcMatmCreate;
 import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
@@ -147,48 +148,41 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				//step1 Execute the steps described in the section Create SAP characteristics and classes for MachineTypeNEW material 
 				//to create the SAP characteristics and classes of the feature code for MachineTypeNEW material. 
 				TMF_UPDATE tmf = XMLParse.getObjectFromXml(xml,TMF_UPDATE.class);
-				MachineTypeNEW(tmf,null,rptSb);//TODO get the feature
+				//TODO get chwFeature and chwModel from tmf
+				FEATURE chwFeature = null;
+				MODEL chwModel = null;
+				MachineTypeNEW(tmf,chwFeature,chwModel);
+				//step2 TODO
+				/**
+				 * If there is a MODELCONVERT which meets all of conditions below,
+				 *  tomachtype = chwTMF/MACHTYPE
+				 *  frommachtype !=tomachtype
+				 *  past ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
+				 */
+				//execute the steps described in the section Create SAP characteristics and classes for MachineTypeMTC material 
+				// to create the SAP characteristics and classes of the feature code for MachineTypeMTC material.
+				MachineTypeMTC(tmf,chwFeature,chwModel);
+				//step3 TODO
+				/**
+				 *  If SUBCATEGORY of parent MODEL is not in (''Maintenance'',''MaintFeature"),
+			        If there is a MODELCONVERT which meets all of conditions below, 
+			            tomachtype = chwTMF/MACHTYPE
+			            frommachtype=tomachtype
+			            past ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
+			
+			        or if there is a FCTRANSACTION which meets all of conditions below,
+			            tomachtype = chwTMF/MACHTYPE
+			            frommachtype=tomachtyp
+			            past ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
+			        or if ORDERCODE of parent MODEL is  in ("M",  "B")
+				 */
+				MachineTypeUPG(tmf,chwFeature,chwModel);
 				
-//			
-//				TMF_UPDATE tmf = XMLParse.getObjectFromXml(xml,TMF_UPDATE.class);
-//				
-//				if("Hardware".equals(model.getCATEGORY())) {
-//					processMachTypeMODEL(model, connection);
-//					processMachTypeNew(model, connection);
-//					
-//					/**
-//					 * 
-//            If there is a MODELCONVERT which meets all of conditions below,
-//                tomachtype = chwProduct.machineType
-//                frommachtype !=tomachtype
-//                past passed ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
-//            then execute the steps described in the document MachTypeMTC RDH Feed to iERP to populate data elements for MachineTypeMTC material.
-//					 */
-//			
-//					if(exist(COVNOTEQUALSQL, model.getMACHTYPE())) {
-//						ChwMachTypeMtc chwMachTypeMtc =new ChwMachTypeMtc(model, m_db.getPDHConnection(), connection);	
-//						chwMachTypeMtc.execute();
-//				    	this.addMsg(chwMachTypeMtc.getRptSb());
-//					}
-//					if(!"Maintenance,MaintFeature".contains(model.getSUBCATEGORY())) {
-//						
-//						if(exist(COVEQUALSQL, model.getMACHTYPE())||exist(FCTEQUALSQL, model.getMACHTYPE())) {
-//						ChwMachTypeUpg chwMachTypeUpg = new ChwMachTypeUpg(model, m_db.getPDHConnection(), connection);
-//						this.addMsg(chwMachTypeUpg.getRptSb());
-//						}
-//					}else if("M,B".contains(model.getORDERCODE())) {
-//						processMachTypeUpg(model, connection);	
-//					}
-//					
-//					
-//					
-//				}
-//				else if("Service".equals(model.getCATEGORY())) {
-//					processMachTypeMODEL_Svc(model, connection);
-//				}
-//				else if ("SoftdWare".equals(model.getCATEGORY())) {
-//					throw new Exception("Not support SoftWare");
-//				}
+				//step4 Call CHWYMDMFCMaint to populate iERP user-defined tables (UDTs) with the availability status 
+				//of PRODSTRUCT by setting the input parameter for tbl_tmf_c structure
+				//CHWYMDMFCMaint CHWYMDMFCMaint = new CHWYMDMFCMaint();
+				
+
 					
 				
 			}	
@@ -248,45 +242,589 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 
 	
 
-	private void MachineTypeNEW(TMF_UPDATE chwTMF, FEATURE feature, StringBuffer rptSb) throws Exception {
+	private void MachineTypeUPG(TMF_UPDATE chwTMF, FEATURE chwFeature,	MODEL chwModel) throws Exception{
+		String feature_code = chwTMF.getFEATURECODE();
+		String FCTYPE = chwTMF.getFCTYPE();
+		String obj_id = chwTMF.getMACHTYPE() + "UPG";
+		String target_indc = "T";
+		String mach_type = chwTMF.getMACHTYPE();
+		String feature_code_desc = getFeatureCodeDesc(chwFeature);
+		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
+		//step1 If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED"), then
+		if(CommonUtils.isNoLetter(feature_code) && !"RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE)){
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			//1.1String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
+			try{
+				target_indc = "T";
+				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			//String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
+			try{
+				target_indc = "D";
+				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			//step 1.2 If MODEL_UPDATE/UNITCLASS = "Non SIU- CPU" or chwTMF/SYSTEMMAX > 1 or chwTMF/ORDERCODE = "B", then		
+			String UNITCLASS = chwModel.getUNITCLASS();
+			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
+			String ORDERCODE = chwTMF.getORDERCODE();
+			if("Non SIU- CPU".equalsIgnoreCase(UNITCLASS) || SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
+				chwClsfCharCreate = new ChwClsfCharCreate();
+				//String obj_id, String target_indc, String mach_type, String feature_code
+				try{
+					target_indc = "T";
+					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+				try{
+					target_indc = "D";
+					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+				
+			}
+		}
+		//step2 If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE in ("RPQ-PLISTED","RPQ-ILISTED"), then
+		if(CommonUtils.hasLetter(feature_code) && "RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE)){
+			//2.1.1 Call ChwClsfCharCreate.CreateRPQGroupChar() to create the Target group characteristic and class for the RPQ feature code.
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			try{
+				target_indc = "T";
+				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			//2.1.2 D
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			try{
+				target_indc = "D";
+				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			//2.2 If MODEL_UPDATE/UNITCLASS = "Non SIU- CPU" or chwTMF/SYSTEMMAX > 1 or chwTMF/ORDERCODE = "B", then
+			String UNITCLASS = chwModel.getUNITCLASS();
+			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
+			String ORDERCODE = chwTMF.getORDERCODE();
+			if("Non SIU- CPU".equalsIgnoreCase(UNITCLASS) || SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
+				//Call ChwClsfCharCreate.CreateRPQQTYChar() to create the Target QTY characteristic and class for the RPQ feature code.
+				chwClsfCharCreate = new ChwClsfCharCreate();
+				//String obj_id, String target_indc, String mach_type, String feature_code
+				try{
+					target_indc = "T";
+					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+				try{
+					target_indc = "D";
+					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+				
+			}
+		}
+		//step3 If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED") 
+		//and the first 3 characters of chwTMF/FEATURECODE <> "NEW",
+		if(CommonUtils.hasLetter(feature_code) 
+				   && !"RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE) 
+				   && !CommonUtils.getFirstSubString(feature_code, 3).equalsIgnoreCase("NEW")){
+			//3.1 call ChwClsfCharCreate.CreateAlphaGroupChar() to create the Target characteristic and class for the alpah feature code.
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			try{
+				target_indc = "T";
+				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code,feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			//D
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			try{
+				target_indc = "D";
+				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code,feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			//3.2 If chwTMF/SYSTEMMAX > 1 or chwTMF/ORDERCODE = "B", then 
+			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
+			String ORDERCODE = chwTMF.getORDERCODE();
+			if(SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
+				//3.2.1 call ChwClsfCharCreate.CreateAlphaQTYChar() to create the Target QTY characteristic and class for the alpha feature code
+				chwClsfCharCreate = new ChwClsfCharCreate();
+				try{
+					target_indc = "T";
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+				chwClsfCharCreate = new ChwClsfCharCreate();
+				try{
+					target_indc = "D";
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+			}
+			
+		}
+		
+		//step4 Call the ChwCharMaintain constructor to create the MK_D_machineType_REM_FC characteristic.  
+		String empty ="";
+		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(obj_id  //String obj_id Set to concatenation of chwProduct.machineType + "UPG"
+				,"MK_D_"+mach_type+"_REM_FC" //String charact  Set to  "MK_T_<machine_type>_MOD"
+				, "CHAR" 			//String datatype
+				, 12 				//int charnumber
+				, empty				//String decplaces
+				, empty				//String casesens
+				, empty				//String neg_vals
+				, empty				//String group
+				, "-"				//String valassignm  Set to "-".
+				, empty				//String no_entry
+				, empty				//String no_display
+				, "X" 				//String addit_vals Set to "X".
+				, "Removed Features " + mach_type //String chdescr  Set to "<machine_type> Model Characteristic" where <machine_type> is chwProduct.machineType
+				);	
+		this.addDebug("Calling " + chwCharMaintain.getRFCName());
+		chwCharMaintain.execute();
+		this.addRfcResult(chwCharMaintain);
+		//step5 Call the ChwClassMaintain constructor to create the MK_D_machineType_REM_FC class. 
+		obj_id = chwTMF.getMACHTYPE() + "MTC";  //TODO why only MTC
+		String charactd = "MK_D_" + mach_type + "_REM_FC";
+		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
+				obj_id //String obj_id
+				, charactd //String class_
+				, charactd //String class_desc
+			);
+		this.addDebug("Calling " + chwClassMaintain.getRFCName());
+		//step6. Call the ChwClassMaintain.addCharacteristic() method to add the MK_D_machineType_REM_FC characteristic to the MK_D_machineType_REM_FC class.
+		chwClassMaintain.addCharacteristic(charactd);		
+		chwClassMaintain.execute();
+		this.addRfcResult(chwClassMaintain);
+		//step 7 Call the TssClassificationMaint constructor to associate the MK_machineType_MTC class to the product's material master record.
+		obj_id = chwTMF.getMACHTYPE() + "UPG";  
+		callRdhClassificationMaint(obj_id, "MK_D_" + mach_type + "_REM_FC");
+		//step8 Call the TssClassificationMaint constructor to associate the MK_REFERENCE class to the product's material master record. 
+		callRdhClassificationMaint(obj_id, "MK_REFERENCE");
+		//step9 Call the TssClassificationMaint to associate the MK_T_VAO_NEW class to the product's material master record. 
+		callRdhClassificationMaint(obj_id, "MK_T_VAO_NEW");
+		//step 10 Call the TssClassificationMaint to associate the MK_D_VAO_NEW class to the product's material master record.
+		callRdhClassificationMaint(obj_id, "MK_D_VAO_NEW");
+		//step 11 Call the TssClassificationMaint to associate the MK_FC_EXCH class to the product's material master record.
+		callRdhClassificationMaint(obj_id, "MK_FC_EXCH");
+		//step 12 Call the TssClassificationMaint to associate the MK_FC_CONV class to the product's material master record.
+		callRdhClassificationMaint(obj_id, "MK_FC_CONV");
+		
+		
+		
+	}
+
+	private void MachineTypeMTC(TMF_UPDATE chwTMF, FEATURE chwFeature, MODEL chwModel) throws Exception {
+		
+		String feature_code = chwTMF.getFEATURECODE();
+		String FCTYPE = chwTMF.getFCTYPE();
+		String obj_id = chwTMF.getMACHTYPE() + "MTC";
+		String target_indc = "T";
+		String mach_type = chwTMF.getMACHTYPE();
+		String feature_code_desc = getFeatureCodeDesc(chwFeature);
+		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
+		//step1 .If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED"), then
+		if(CommonUtils.isNoLetter(feature_code) && !"RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE)){
+			//1.1 Call ChwClsfCharCreate.CreateGroupChar() method to create the Target group characteristic and class
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			//String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
+			try{
+				target_indc = "T";
+				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			//1.2 Call ChwClsfCharCreate.CreateGroupChar() method to create the Delta group characteristic and class
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			try{
+				target_indc ="D";
+				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			//1.3 If MODEL_UPDATE/UNITCLASS = "Non SIU- CPU" or chwTMF/SYSTEMMAX > 1 or chwTMF/ORDERCODE = "B", then
+			String UNITCLASS = chwModel.getUNITCLASS();
+			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
+			String ORDERCODE = chwTMF.getORDERCODE();
+			if("Non SIU- CPU".equalsIgnoreCase(UNITCLASS) || SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
+				chwClsfCharCreate = new ChwClsfCharCreate();
+				//String obj_id, String target_indc, String mach_type, String feature_code
+				try{
+					target_indc = "T";
+					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+				
+				chwClsfCharCreate = new ChwClsfCharCreate();
+				//String obj_id, String target_indc, String mach_type, String feature_code
+				try{
+					target_indc = "D";
+					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+			}
+		}
+		//step2 : If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE in ("RPQ-PLISTED","RPQ-ILISTED"), then
+		if(CommonUtils.hasLetter(feature_code) && "RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE)){
+			//2.11 Call ChwClsfCharCreate.CreateRPQGroupChar() to create the Target group characteristic and class for the RPQ feature code
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			try{
+				target_indc = "T";
+				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			//2.12 D
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			try{
+				target_indc = "D";
+				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			//2.2 If MODEL_UPDATE/UNITCLASS = "Non SIU- CPU" or chwTMF/SYSTEMMAX > 1 or chwTMF/ORDERCODE = "B", then 
+			String UNITCLASS = chwModel.getUNITCLASS();
+			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
+			String ORDERCODE = chwTMF.getORDERCODE();
+			if("Non SIU- CPU".equalsIgnoreCase(UNITCLASS) || SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
+				chwClsfCharCreate = new ChwClsfCharCreate();
+				//String obj_id, String target_indc, String mach_type, String feature_code
+				try{
+					target_indc = "T";
+					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+				try{
+					target_indc = "D";
+					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+				
+			}
+		}
+		//3. If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED") 
+		//and the first 3 characters of chwTMF/FEATURECODE <> "NEW", 
+		if(CommonUtils.hasLetter(feature_code) 
+				   && !"RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE) 
+				   && !CommonUtils.getFirstSubString(feature_code, 3).equalsIgnoreCase("NEW")){
+			//3.1 call ChwClsfCharCreate.CreateAlphaGroupChar() to create the Target characteristic and class for the alpah feature code.
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			try{
+				target_indc = "T";
+				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code,feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			//D
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			try{
+				target_indc = "D";
+				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code,feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			//3.2 If chwTMF/SYSTEMMAX > 1 or chwTMF/ORDERCODE = "B", then 
+			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
+			String ORDERCODE = chwTMF.getORDERCODE();
+			if(SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
+				//3.21 call ChwClsfCharCreate.CreateAlphaQTYChar() to create the Target QTY characteristic and class for the alpha feature code.
+				chwClsfCharCreate = new ChwClsfCharCreate();
+				try{
+					target_indc = "T";
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+				chwClsfCharCreate = new ChwClsfCharCreate();
+				try{
+					target_indc = "D";
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+			}
+			
+		}
+		//step 4 Call the ChwCharMaintain constructor to create the MK_machineType_MTC_REM_FC characteristic.  Set the constructor's parameters as follows.
+		String empty ="";
+		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(obj_id  //String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+				,"MK_T_"+mach_type+"_MTC_REM_FC" //String charact  Set to  "MK_T_<machine_type>_MOD"
+				, "CHAR" 			//String datatype
+				, 12 				//int charnumber
+				, empty				//String decplaces
+				, empty				//String casesens
+				, empty				//String neg_vals
+				, empty				//String group
+				, "-"				//String valassignm  Set to "-".
+				, empty				//String no_entry
+				, empty				//String no_display
+				, "X" 				//String addit_vals Set to "X".
+				, "MTC Features Removed " + mach_type //String chdescr  Set to "<machine_type> Model Characteristic" where <machine_type> is chwProduct.machineType
+				);	
+		this.addDebug("Calling " + chwCharMaintain.getRFCName());
+		chwCharMaintain.execute();
+		this.addRfcResult(chwCharMaintain);
+		//step5 Call the ChwClassMaintain constructor to create the MK_machineType_MTC class. Set the constructor's input parameters as follows.
+		String charactd = "MK_" + mach_type + "_MTC";
+		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
+				obj_id //String obj_id
+				, charactd //String class_
+				, charactd //String class_desc
+			);
+		this.addDebug("Calling " + chwClassMaintain.getRFCName());
+		//step6. Call the ChwClassMaintain.addCharacteristic() method to add the MK_machineType_MTC_REM_FC characteristic to the MK_machineType_MTC class.
+		chwClassMaintain.addCharacteristic("MK_"+ mach_type+ "_MTC_REM_FC");		
+		chwClassMaintain.execute();
+		this.addRfcResult(chwClassMaintain);
+		
+		//step7 Call the TssClassificationMaint constructor to associate the MK_machineType_MTC class to the product's material master record.
+		//RdhClassificationMaint rdhClassificationMaint;
+		callRdhClassificationMaint(obj_id, "MK_" + mach_type + "_MTC");
+		//step8 Call the TssClassificationMaint constructor to associate the MK_REFERENCE class to the product's material master record.
+		callRdhClassificationMaint(obj_id, "MK_REFERENCE");
+		//step 9 Call the TssClassificationMaint to associate the MK_T_VAO_NEW class to the product's material master record
+		callRdhClassificationMaint(obj_id, "MK_T_VAO_NEW");
+		//step 10 Call the TssClassificationMaint to associate the MK_D_VAO_NEW class to the product's material master record.
+		callRdhClassificationMaint(obj_id, "MK_D_VAO_NEW");
+		//step11 Call the TssClassificationMaint to associate the MK_FC_EXCH class to the product's material master record.
+		callRdhClassificationMaint(obj_id, "MK_FC_EXCH");
+		//step 12 Call the TssClassificationMaint to associate the MK_FC_CONV class to the product's material master record
+		callRdhClassificationMaint(obj_id, "MK_FC_CONV");
+		
+		
+	}
+
+	protected void callRdhClassificationMaint(String obj_id, String class_name)
+			throws Exception {
+		RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(
+				obj_id 		//String obj_id
+				, class_name  	//String class_name
+				, "300" 	//String class_type
+				, "H"		//String pims_identity
+				);		
+		this.addDebug("Calling " + rdhClassificationMaint.getRFCName());
+		rdhClassificationMaint.execute();
+		this.addRfcResult(rdhClassificationMaint);
+	}
+
+	private void MachineTypeNEW(TMF_UPDATE chwTMF, FEATURE chwFeature, MODEL chwModel) throws Exception {
 		
 		//step1 If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED")
 		String feature_code = chwTMF.getFEATURECODE();
 		String FCTYPE = chwTMF.getFCTYPE();
+		String obj_id = chwTMF.getMACHTYPE() + "NEW";
+		String target_indc = "T";
+		String mach_type = chwTMF.getMACHTYPE();
+		String feature_code_desc = getFeatureCodeDesc(chwFeature);
+		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
+		
 		if(CommonUtils.isNoLetter(feature_code) && !"RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE)){
-			ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
+			//1.1 Call ChwClsfCharCreate.CreateGroupChar() method to create the group characteristic and class.
+			chwClsfCharCreate = new ChwClsfCharCreate();
 			//String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
-			String obj_id = chwTMF.getMACHTYPE() + "NEW";
-			String target_indc = "T";
-			String mach_type = chwTMF.getMACHTYPE();
-			
-			//List lfList = feature.getLANGUAGELIST();
-			
-			//feature.getLANGUAGELIST().get(0).getBHINVNAME()
-			String BHINVNAME ="";
-			for (LANGUAGEELEMENT_FEATURE languageElement : feature.getLANGUAGELIST())
-			{
-				if ("1".equals(languageElement.getNLSID()))
-				{
-					BHINVNAME= languageElement.getBHINVNAME();
-				}
-			}
-			String feature_code_desc = CommonUtils.getFirstSubString(BHINVNAME, 30);			
 			try{
-				ChwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
-				this.addMsg(ChwClsfCharCreate.getRptSb());
+				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
-				this.addMsg(ChwClsfCharCreate.getRptSb());
+				this.addMsg(chwClsfCharCreate.getRptSb());
 				throw e;
 			}
-			
-			
-			
+			//1.2. If MODEL_UPDATE/UNITCLASS = "Non SIU- CPU" or chwTMF/SYSTEMMAX > 1 or chwTMF/ORDERCODE = "B", 
+			//then call ChwClsfCharCreate.CreateQTYChar() method to create the QTY characteristic and class.
+			String UNITCLASS = chwModel.getUNITCLASS();
+			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
+			String ORDERCODE = chwTMF.getORDERCODE();
+			if("Non SIU- CPU".equalsIgnoreCase(UNITCLASS) || SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
+				
+				chwClsfCharCreate = new ChwClsfCharCreate();
+				//String obj_id, String target_indc, String mach_type, String feature_code
+				try{
+					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+				
+				
+			}			
+		}
+		//step2 If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE in ("RPQ-PLISTED","RPQ-ILISTED"), then
+		if(CommonUtils.hasLetter(feature_code) && "RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE)){
+			//2.1 Call ChwClsfCharCreate.CreateRPQGroupChar() to create the group characteristic and class for the RPQ feature code.
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			//feature_code_desc = getFeatureCodeDesc(feature);
+			try{
+				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			//2.2 If MODEL_UPDATE/UNITCLASS = "Non SIU- CPU" or chwTMF/SYSTEMMAX > 1 or chwTMF/ORDERCODE = "B", 
+			//then call ChwClsfCharCreate.CreateRPQQTYChar() to create the QTY characteristic and class for the RPQ feature code.
+			String UNITCLASS = chwModel.getUNITCLASS();
+			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
+			String ORDERCODE = chwTMF.getORDERCODE();
+			if("Non SIU- CPU".equalsIgnoreCase(UNITCLASS) || SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
+				
+				chwClsfCharCreate = new ChwClsfCharCreate();
+				//String obj_id, String target_indc, String mach_type, String feature_code
+				try{
+					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+			}	
 			
 		}
+		//step3. If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED") 
+		//and the first 3 characters of chwTMF/FEATURECODE <> "NEW",
+		if(CommonUtils.hasLetter(feature_code) 
+		   && !"RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE) 
+		   && !CommonUtils.getFirstSubString(feature_code, 3).equalsIgnoreCase("NEW")){
+			//3.1 call ChwClsfCharCreate.CreateAlphaGroupChar() to create the group characteristic and class for the alpah feature code.
+			chwClsfCharCreate = new ChwClsfCharCreate();
+			//feature_code_desc = getFeatureCodeDesc(feature);
+			try{
+				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				this.addMsg(chwClsfCharCreate.getRptSb());
+			} catch(Exception e){
+				this.addMsg(chwClsfCharCreate.getRptSb());
+				throw e;
+			}
+			//3.2 If chwTMF/SYSTEMMAX > 1 or chwTMF/ORDERCODE = "B", 
+			//then call ChwClsfCharCreate.CreateAlphaQTYChar() to create the QTY characteristic and class for the alpha feature code.
+			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
+			String ORDERCODE = chwTMF.getORDERCODE();
+			if(SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
+				chwClsfCharCreate = new ChwClsfCharCreate();
+				try{
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code);
+					this.addMsg(chwClsfCharCreate.getRptSb());
+				} catch(Exception e){
+					this.addMsg(chwClsfCharCreate.getRptSb());
+					throw e;
+				}
+			}
+		}
+		//step5 Call the TssClassificationMaint constructor to associate the MK_target_machineType_FC_n000 class 
+		// to the product's material master record. Set the constructor's input parameters as follows.
+		
+		RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(
+				obj_id 		//String obj_id
+				, "MK_REFERENCE" 	//String class_name
+				, "300" 	//String class_type
+				, "H"		//String pims_identity
+				);		
+		this.addDebug("Calling " + rdhClassificationMaint.getRFCName());
+		rdhClassificationMaint.execute();
+		this.addRfcResult(rdhClassificationMaint);
+		//step 6. Call the TssClassificationMaint to associate the MK_T_VAO_NEW class to the product's material master record.
+		rdhClassificationMaint = new RdhClassificationMaint(
+				obj_id 		//String obj_id
+				, "MK_T_VAO_NEW" 	//String class_name
+				, "300" 	//String class_type
+				, "H"		//String pims_identity
+				);		
+		this.addDebug("Calling " + rdhClassificationMaint.getRFCName());
+		rdhClassificationMaint.execute();
+		this.addRfcResult(rdhClassificationMaint);
+		
+		 
+
 		
 		
 		
+	}
+
+	protected void addRfcResult(RdhBase rdhBase) {
+		this.addDebug(rdhBase.createLogEntry());
+		if (rdhBase.getRfcrc() == 0) {
+			this.addOutput(rdhBase.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(rdhBase.getRFCName() + " called  faild!");
+			this.addOutput("return code is " + rdhBase.getRfcrc());
+			this.addOutput(rdhBase.getError_text());
+		}
+	}
+
+	protected String getFeatureCodeDesc(FEATURE feature) {
+		String BHINVNAME ="";
+		for (LANGUAGEELEMENT_FEATURE languageElement : feature.getLANGUAGELIST())
+		{
+			if ("1".equals(languageElement.getNLSID()))
+			{
+				BHINVNAME= languageElement.getBHINVNAME();
+			}
+		}
+		String feature_code_desc = CommonUtils.getFirstSubString(BHINVNAME, 30);
+		return feature_code_desc;
 	}
 
 	/*
@@ -323,176 +861,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		}
 		return navName.toString();
 	}
-	private String getTableMapingDate(String key, SVCMOD svcmod) {
-		String value = null;
-		if ("MG_PRODUCTTYPE".equals(key)) {
-			if ("Service".equals(svcmod.getCATEGORY())) {
-				if ("Custom".equals(svcmod.getSUBCATEGORY())) {
-					if ("Project Based".equals(svcmod.getGROUP()) || "Operation Based".equals(svcmod.getGROUP())) {
-						value = "S3";
-					}
-				} else if ("Facility".equals(svcmod.getSUBCATEGORY())) {
-					if ("Penalty".equals(svcmod.getGROUP())) {
-						value = "S6";
-					} else if ("Incident".equals(svcmod.getGROUP())) {
-						value = "S7";
-					} else if ("Travel".equals(svcmod.getGROUP())) {
-						value = "S5";
-					} else if ("Activity".equals(svcmod.getGROUP())) {
-						value = "S4";
-					} else if ("OEM".equals(svcmod.getGROUP())) {
-						value = "S4";
-					}
-					else if ("ICA/NEC".equals(svcmod.getGROUP())) {
-						value = "S2";
-					}
-
-				} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())) {
-					if ("Non-Federated".equals(svcmod.getGROUP())) {
-						value = "S2";
-					}
-				}
-			} else if ("IP".equals(svcmod.getCATEGORY())) {
-				if ("SC".equals(svcmod.getSUBCATEGORY())) {
-					value = "S8";
-				}
-			}
-		} else if ("MM_CUSTOM_TYPE".equals(key)) {
-
-			if ("Service".equals(svcmod.getCATEGORY())) {
-				if ("Custom".equals(svcmod.getSUBCATEGORY())) {
-					if ("Project Based".equals(svcmod.getGROUP()) || "Operation Based".equals(svcmod.getGROUP())) {
-						value = "OCI";
-					}
-				} else if ("Facility".equals(svcmod.getSUBCATEGORY())) {
-					if ("Penalty".equals(svcmod.getGROUP())) {
-						value = "PC";
-					} else if ("Incident".equals(svcmod.getGROUP())) {
-						value = "IC";
-					} else if ("Travel".equals(svcmod.getGROUP())) {
-						value = "TE";
-					} else if ("Activity".equals(svcmod.getGROUP())) {
-						value = "SA";
-					}else if ("OEM".equals(svcmod.getGROUP())) {
-						value = "SA";
-					} else if ("ICA/NEC".equals(svcmod.getGROUP())) {
-						value = "No characteristic";
-					}
-
-				} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())) {
-					if ("Non-Federated".equals(svcmod.getGROUP())) {
-						value = "SPI";
-					}
-				}
-			} else if ("IP".equals(svcmod.getCATEGORY())) {
-				if ("SC".equals(svcmod.getSUBCATEGORY())) {
-					value = "IPSC";
-				}
-			}
-
-		} else if ("MM_CUSTOM_COSTING".equals(key)) {
-
-			if ("Service".equals(svcmod.getCATEGORY())) {
-				if ("Custom".equals(svcmod.getSUBCATEGORY())) {
-					if ("Project Based".equals(svcmod.getGROUP()) || "Operation Based".equals(svcmod.getGROUP())) {
-						value = "WBS";
-					}
-				} else if ("Facility".equals(svcmod.getSUBCATEGORY())) {
-					if ("Penalty".equals(svcmod.getGROUP())) {
-						value = "WBS";
-					} else if ("Incident".equals(svcmod.getGROUP())) {
-						value = "WBS";
-					} else if ("Travel".equals(svcmod.getGROUP())) {
-						value = "WBS";
-					} else if ("Activity".equals(svcmod.getGROUP())) {
-						value = "WBS";
-					}else if ("OEM".equals(svcmod.getGROUP())) {
-						value = "WBS";
-					} else if ("ICA/NEC".equals(svcmod.getGROUP())) {
-						value = "No characteristic";
-					}
-
-				} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())) {
-					if ("Non-Federated".equals(svcmod.getGROUP())) {
-						value = "WBS";
-					}
-				}
-			} else if ("IP".equals(svcmod.getCATEGORY())) {
-				if ("SC".equals(svcmod.getSUBCATEGORY())) {
-					value = "No characteristic";
-				}
-			}
-
-		} else if ("MM_PROFIT_CENTER".equals(key)) {
-
-			if ("Service".equals(svcmod.getCATEGORY())) {
-				if ("Custom".equals(svcmod.getSUBCATEGORY())) {
-					if ("Project Based".equals(svcmod.getGROUP()) || "Operation Based".equals(svcmod.getGROUP())) {
-						value = "D";
-					}
-				} else if ("Facility".equals(svcmod.getSUBCATEGORY())) {
-					if ("Penalty".equals(svcmod.getGROUP())) {
-						value = "C";
-					} else if ("Incident".equals(svcmod.getGROUP())) {
-						value = "C";
-					} else if ("Travel".equals(svcmod.getGROUP())) {
-						value = "C";
-					} else if ("Activity".equals(svcmod.getGROUP())) {
-						value = "C";
-					}else if ("OEM".equals(svcmod.getGROUP())) {
-						value = "C";
-					} else if ("ICA/NEC".equals(svcmod.getGROUP())) {
-						value = "No characteristic";
-					}
-
-				} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())) {
-					if ("Non-Federated".equals(svcmod.getGROUP())) {
-						value = "C";
-					}
-				}
-			} else if ("IP".equals(svcmod.getCATEGORY())) {
-				if ("SC".equals(svcmod.getSUBCATEGORY())) {
-					value = "No characteristic";
-				}
-			}
-
-		} else if ("MM_TAX_CATEGORY".equals(key)) {
-
-			if ("Service".equals(svcmod.getCATEGORY())) {
-				if ("Custom".equals(svcmod.getSUBCATEGORY())) {
-					if ("Project Based".equals(svcmod.getGROUP()) || "Operation Based".equals(svcmod.getGROUP())) {
-						value = "D";
-					}
-				} else if ("Facility".equals(svcmod.getSUBCATEGORY())) {
-					if ("Penalty".equals(svcmod.getGROUP())) {
-						value = "C";
-					} else if ("Incident".equals(svcmod.getGROUP())) {
-						value = "C";
-					} else if ("Travel".equals(svcmod.getGROUP())) {
-						value = "C";
-					} else if ("Activity".equals(svcmod.getGROUP())) {
-						value = "C";
-					}else if ("OEM".equals(svcmod.getGROUP())) {
-						value = "C";
-					} else if ("ICA/NEC".equals(svcmod.getGROUP())) {
-						value = "No characteristic";
-					}
-
-				} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())) {
-					if ("Non-Federated".equals(svcmod.getGROUP())) {
-						value = "C";
-					}
-				}
-			} else if ("IP".equals(svcmod.getCATEGORY())) {
-				if ("SC".equals(svcmod.getSUBCATEGORY())) {
-					value = "No characteristic";
-				}
-			}
-
-		}
-		// MM_PROFIT_CENTER
-		return value;
-	}
+	
 	
 	 /********************************************************************************
      * Convert string into valid html.  Special HTML characters are converted.
@@ -572,298 +941,4 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
         addOutput(msg);
         setReturnCode(FAIL);
     }
-
-    public void processMachTypeMODEL (MODEL model,Connection odsConnection) throws Exception {
-    	String materialType="ZPRT";
-    	String  materialID =model.getMACHTYPE()+model.getMODEL();
-    	
-    	ChwMatmCreate caller = new ChwMatmCreate(model, materialType, materialID);
-    	this.addDebug("Calling " + caller.getRFCName());
-    	caller.execute();
-		this.addDebug(caller.createLogEntry());
-		if (caller.getRfcrc() == 0) {
-			this.addOutput(caller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(caller.getRFCName() + " called  faild!");
-			this.addOutput(caller.getError_text());
-		}
-		//Chw001ClfCreate 
-		
-		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
-		this.addDebug("Calling " + "Chw001ClfCreate");
-		chw001ClfCreate.execute();
-    	this.addMsg(chw001ClfCreate.getRptSb());
-		 
-		
-		String obj_id=model.getMACHTYPE()+model.getMODEL();
-		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
-		String dep_type="7"; 
-		String descript=model.getMACHTYPE()+" Set Model";
-		String sourceLine = "$self.mk_model2 =$self.mk_t_"+model.getMACHTYPE()+"_mod";
-		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(xml, dep_extern, dep_type, descript)	;
-		chwDepdCaller.addSourceLineCondition(sourceLine);
-		this.addDebug("Calling " + chwDepdCaller.getRFCName());
-		chwDepdCaller.execute();
-		this.addDebug(chwDepdCaller.createLogEntry());
-		if (chwDepdCaller.getRfcrc() == 0) {
-			this.addOutput(chwDepdCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(chwDepdCaller.getRFCName() + " called  faild!");
-			this.addOutput(chwDepdCaller.getError_text());
-		}
-		dep_extern = "SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
-		dep_type="5"; 
-		descript="SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
-		sourceLine = "$PARENT.MK_T_"+model.getMACHTYPE()+"_MOD='"+model.getMODEL()+"'";
-		 chwDepdCaller	=new ChwDepdMaintain(xml, dep_extern, dep_type, descript)	;
-		chwDepdCaller.addSourceLineCondition(sourceLine);
-		this.addDebug("Calling " + chwDepdCaller.getRFCName());
-		chwDepdCaller.execute();
-		this.addDebug(chwDepdCaller.createLogEntry());
-		if (chwDepdCaller.getRfcrc() == 0) {
-			this.addOutput(chwDepdCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(chwDepdCaller.getRFCName() + " called  faild!");
-			this.addOutput(chwDepdCaller.getError_text());
-		}
-		 //ChwDepdMaintain 
-    	
-    }
-    public void processMachTypeNew(MODEL model,Connection odsConnection) throws Exception {
-    	String materialType="ZMAT";
-    	String  materialID =model.getMACHTYPE()+"NEW";
-    	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID);
-    	this.addDebug("Calling " + chwCreateCaller.getRFCName());
-    	chwCreateCaller.execute();
-		this.addDebug(chwCreateCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(chwCreateCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(chwCreateCaller.getRFCName() + " called  faild!");
-			this.addOutput(chwCreateCaller.getError_text());
-		}
-		
-		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
-		this.addDebug("Calling " + "Chw001ClfCreate");
-		chw001ClfCreate.execute();
-    	this.addMsg(chw001ClfCreate.getRptSb());
-		/*
-		 * Chw001ClfCreate createCaller = new Chw001ClfCreate(xml, materialType,
-		 * materialID, "MODEL"); createCaller.execute();
-		 */
-		 
-    	String obj_id = materialID;
-		String class_name="MK_REFERENCE";
-		String class_type="300";
-		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
-		}
-		class_name = "MK_T_VAO_NEW";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
-		}
-    }
-    
-    public void processMachTypeUpg(MODEL model,Connection odsConnection) throws Exception {
-    	String materialType="ZMAT";
-    	String  materialID =model.getMACHTYPE()+"UPG";
-    	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID);
-    	this.addDebug("Calling " + chwCreateCaller.getRFCName());
-    	chwCreateCaller.execute();
-		this.addDebug(chwCreateCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(chwCreateCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(chwCreateCaller.getRFCName() + " called  faild!");
-			this.addOutput(chwCreateCaller.getError_text());
-		}
-		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
-		this.addDebug("Calling " + "Chw001ClfCreate");
-		chw001ClfCreate.execute();
-    	this.addMsg(chw001ClfCreate.getRptSb());
-    	String obj_id = materialID;
-		String class_name="MK_REFERENCE";
-		String class_type="300";
-		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
-		}
-		class_name = "MK_T_VAO_NEW";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
-		}
-		class_name = "MK_D_VAO_NEW";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
-		}
-		class_name = "MK_FC_EXCH";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
-		}
-		class_name = "MK_FC_CONV";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
-		}
-		
-		//Set to  "MK_T_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
-		String charact = "MK_T_"+model.getMACHTYPE()+"_MOD";
-		String datatype="CHAR";
-		int charnumber=6;
-		String decplaces=""; 
-		String casesens="";
-		String neg_vals="";
-		String group="";
-		String valassignm="-";
-		String no_entry="";
-		String no_display="";
-		String addit_vals="X";
-		String chdescr=model.getMACHTYPE()+" Model Characteristic";
-		ChwCharMaintain charMaintain = new ChwCharMaintain(obj_id, charact, datatype, charnumber, decplaces, casesens, neg_vals, group, valassignm, no_entry, no_display, addit_vals, chdescr);
-    
-		charMaintain.addValue(model.getMODEL(), model.getINVNAME().substring(0, 24)+" "+model.getMODEL());
-		this.addDebug("Calling " + charMaintain.getRFCName());
-		charMaintain.execute();
-		this.addDebug(charMaintain.createLogEntry());
-		if (charMaintain.getRfcrc() == 0) {
-			this.addOutput(charMaintain.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(charMaintain.getRFCName() + " called  faild!");
-			this.addOutput(charMaintain.getError_text());
-		}
-		class_name = "MK_"+model.getMACHTYPE()+"_MOD";
-		class_type = class_name;
-		ChwClassMaintain chwClassMaintain = new ChwClassMaintain(obj_id, class_name, class_type);
-		this.addDebug("Calling " + chwClassMaintain.getRFCName());
-		chwClassMaintain.addCharacteristic("MK_T_"+model.getMODEL()+"_MOD");
-		chwClassMaintain.execute();
-		this.addDebug(chwClassMaintain.createLogEntry());
-		if (chwClassMaintain.getRfcrc() == 0) {
-			this.addOutput(chwClassMaintain.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(chwClassMaintain.getRFCName() + " called  faild!");
-			this.addOutput(chwClassMaintain.getError_text());
-		}
-		class_type="300";
-		RdhClassificationMaint classificationMaint = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + classificationMaint.getRFCName());
-		classificationMaint.execute();
-		this.addDebug(classificationMaint.createLogEntry());
-		if (classificationMaint.getRfcrc() == 0) {
-			this.addOutput(classificationMaint.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(classificationMaint.getRFCName() + " called  faild!");
-			this.addOutput(classificationMaint.getError_text());
-		}
-		String c_profile = "INITIAL"; 
-		String bomappl="SD01";
-		String bomexpl="2";
-		String design=model.getMACHTYPE()+"UPGUI";
-		ChwConpMaintain chwConpMaintain = new ChwConpMaintain(obj_id, c_profile, bomappl, bomexpl, design);
-		chwConpMaintain.addConfigDependency("E2E", "");
-		chwConpMaintain.addConfigDependency("PR_"+model.getMACHTYPE()+"_SET_MODEL", "");
-		chwConpMaintain.addConfigDependency("PR_E2E_SET_MTM", "");
-		chwConpMaintain.addConfigDependency("PR_E2E_PRICING_HW", "");
-		chwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", "");
-		
-    }
-    public void processMachTypeMODEL_Svc(MODEL model,Connection odsConnection) throws Exception {
-    	String materialType = "ZPRT";
-    	String materialID = model.getMACHTYPE()+model.getMODEL();
-
-    	RdhSvcMatmCreate svcMatmCreate = new RdhSvcMatmCreate(model);
-    	this.addDebug("Calling " + svcMatmCreate.getRFCName());
-    	svcMatmCreate.execute();
-		this.addDebug(svcMatmCreate.createLogEntry());
-		if (svcMatmCreate.getRfcrc() == 0) {
-			this.addOutput(svcMatmCreate.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(svcMatmCreate.getRFCName() + " called  faild!");
-			this.addOutput(svcMatmCreate.getError_text());
-		}
-		/*
-		 * Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(xml, materialType,
-		 * materialID, materialID); chw001ClfCreate.execute();
-		 */
-		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
-		this.addDebug("Calling " + "Chw001ClfCreate");
-		chw001ClfCreate.execute();
-    	this.addMsg(chw001ClfCreate.getRptSb());
-    	
-    	
-    	
-    }
-    
-    public boolean exist(String sql,String type) {
-    	boolean flag = false;
-    	try {
-		Connection connection = m_db.getPDHConnection();
-		PreparedStatement statement = connection.prepareStatement(sql);
-		statement.setString(1, type);
-		
-		ResultSet resultSet = statement.executeQuery();
-		while (resultSet.next()) {
-			flag = true;
-			
-		}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MiddlewareException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-			
-    	
-    	return flag;
-    	
-    }
-	
 }

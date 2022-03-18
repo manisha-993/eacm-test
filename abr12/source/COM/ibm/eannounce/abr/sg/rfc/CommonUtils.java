@@ -56,6 +56,20 @@ public class CommonUtils {
 		return isNoletter;
 	}
 	
+	public static boolean hasLetter(String input) {
+		boolean hasletter = false;
+		if(input==null) return false;
+		String regex=".*[a-zA-Z]+.*";  
+        Matcher m=Pattern.compile(regex).matcher(input);
+        if(m.matches()) {
+        	hasletter= true;
+        }else{
+        	hasletter = false;
+        }
+		return hasletter;
+	}
+	
+	
 	public static void main(String[] args) {
 		String model="mod12345";
 		
@@ -74,5 +88,7 @@ public class CommonUtils {
 		System.out.println("1234 case" + getNoLetter("001Z"));		
 		
 	}
+
+	
 
 }

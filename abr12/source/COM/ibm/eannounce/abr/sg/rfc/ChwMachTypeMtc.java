@@ -37,8 +37,14 @@ public class ChwMachTypeMtc extends RfcCallerBase {
 			//   which are tied to the offering's material master record.
 			
 			Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(chwModel,"ZMAT",chwModel.getMACHTYPE()+ "MTC", odsConnection);
-			chw001ClfCreate.execute();
-			this.addMsg(chw001ClfCreate.getRptSb());
+			this.addDebug("Calling " + "Chw001ClfCreate");
+			try{
+				chw001ClfCreate.execute();
+				this.addMsg(chw001ClfCreate.getRptSb());
+			}catch (Exception e) {
+				this.addMsg(chw001ClfCreate.getRptSb());
+				throw e;
+			}
 			
 			//3. Call the TssClassificationMaint constructor to associate the MK_REFERENCE class to the product's material master record
 			RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_REFERENCE","300","H");
