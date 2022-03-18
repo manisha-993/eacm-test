@@ -305,10 +305,12 @@ public class Chw001ClfCreate extends RfcCallerBase{
 				var = chwModel.getCOVRPRIOD().toUpperCase();
 				Map<String, String> COVRPRIOD = new HashMap<String, String>();
 				COVRPRIOD.put("FIVE YEARS", "60");
+				COVRPRIOD.put("FIVE YEAR PARTS AND LABOR", "60");
 				COVRPRIOD.put("FOUR YEARS", "48");
 				COVRPRIOD.put("ONE YEAR", "12");
 				COVRPRIOD.put("FOUR YEAR PARTS AND LABOR", "48");
 				COVRPRIOD.put("THREE YEARS", "36");
+				COVRPRIOD.put("THREE YEAR PARTS AND LABOR", "36");
 				COVRPRIOD.put("TWO YEARS", "24");
 				COVRPRIOD.put("TWO YEAR PARTS AND LABOR (EXTENDS EXISTING 3 YEAR COVERAGE)", "24");
 				COVRPRIOD.put("SIX YEARS", "72");
@@ -519,7 +521,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 		
 		String value = valueMap.get(input.toUpperCase());
 		
-		if(value ==null) value ="OTHER";
+		if(value ==null) value ="";
 		
 		return value;
 	}

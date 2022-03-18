@@ -3,32 +3,20 @@ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.Hashtable;
-import java.util.List;
 
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
-import COM.ibm.eannounce.abr.sg.rfc.Chw001ClfCreate;
 import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwClassMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwClsfCharCreate;
-import COM.ibm.eannounce.abr.sg.rfc.ChwConpMaintain;
-import COM.ibm.eannounce.abr.sg.rfc.ChwDepdMaintain;
-import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeMtc;
-import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeUpg;
-import COM.ibm.eannounce.abr.sg.rfc.ChwMatmCreate;
 import COM.ibm.eannounce.abr.sg.rfc.CommonUtils;
 import COM.ibm.eannounce.abr.sg.rfc.FEATURE;
 import COM.ibm.eannounce.abr.sg.rfc.LANGUAGEELEMENT_FEATURE;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
-import COM.ibm.eannounce.abr.sg.rfc.RdhSvcMatmCreate;
-import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
 import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
@@ -40,6 +28,8 @@ import COM.ibm.eannounce.objects.EntityItem;
 import COM.ibm.eannounce.objects.ExtractActionItem;
 import COM.ibm.opicmpdh.middleware.D;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
+
+import com.ibm.transform.oim.eacm.util.PokUtils;
 
 public class TMFIERPABRSTATUS extends PokBaseABR {
 	private StringBuffer rptSb = new StringBuffer();
@@ -69,13 +59,10 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 	
 
 	public String getDescription() {
-		// TODO Auto-generated method stub
 		return "MODELIERPABRSTATUS";
 	}
 
 	public String getABRVersion() {
-		// TODO Auto-generated method stub
-
 		return "1.0";
 	}
 
@@ -137,7 +124,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			// build the text file
 
 			Connection connection = m_db.getODSConnection();
-			PreparedStatement statement = connection.prepareStatement(CACEHSQL); //TODO change the SQL
+			PreparedStatement statement = connection.prepareStatement(CACEHSQL); 
 			statement.setInt(1, rootEntity.getEntityID());
 			ResultSet resultSet = statement.executeQuery();
 		
@@ -186,15 +173,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 					
 				
 			}	
-			
-			// exeFtpShell(ffPathName);
-			// ftpFile();
-			/*
-			 * } catch (Exception e) { // TODO Auto-generated catch block
-			 * e.printStackTrace(); this.addError(e.getMessage()); setReturnCode(FAIL); }
-			 */
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			// println(e.toString());
 			setReturnCode(FAIL);
@@ -775,31 +754,9 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		}
 		//step5 Call the TssClassificationMaint constructor to associate the MK_target_machineType_FC_n000 class 
 		// to the product's material master record. Set the constructor's input parameters as follows.
-		
-		RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(
-				obj_id 		//String obj_id
-				, "MK_REFERENCE" 	//String class_name
-				, "300" 	//String class_type
-				, "H"		//String pims_identity
-				);		
-		this.addDebug("Calling " + rdhClassificationMaint.getRFCName());
-		rdhClassificationMaint.execute();
-		this.addRfcResult(rdhClassificationMaint);
+		callRdhClassificationMaint(obj_id, "MK_REFERENCE");
 		//step 6. Call the TssClassificationMaint to associate the MK_T_VAO_NEW class to the product's material master record.
-		rdhClassificationMaint = new RdhClassificationMaint(
-				obj_id 		//String obj_id
-				, "MK_T_VAO_NEW" 	//String class_name
-				, "300" 	//String class_type
-				, "H"		//String pims_identity
-				);		
-		this.addDebug("Calling " + rdhClassificationMaint.getRFCName());
-		rdhClassificationMaint.execute();
-		this.addRfcResult(rdhClassificationMaint);
-		
-		 
-
-		
-		
+		callRdhClassificationMaint(obj_id, "MK_T_VAO_NEW");		
 		
 	}
 
