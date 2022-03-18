@@ -32,8 +32,6 @@ public class RdhSvcMatmCreate extends RdhBase {
 	@SerializedName("IS_MULTI_PLANTS")
 	private String is_multi_plants;
 	@Foo
-	SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
-	@Foo
 	SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd" );
 	@Foo
 	SimpleDateFormat sdfANNDATE =   new SimpleDateFormat( "ddMMyy" );
@@ -66,6 +64,7 @@ public class RdhSvcMatmCreate extends RdhBase {
 		bmmh1.get(0).setSbdkz("1");
 		bmmh1.get(0).setFhori("000");
 		bmmh1.get(0).setMtvfp("KP");
+		bmmh1.get(0).setKautb("X");
 		bmmh1.get(0).setPrctr(model.getPRFTCTR());
 		bmmh1.get(0).setFxhor("0");
 		bmmh1.get(0).setDisgr("Z010");
@@ -105,7 +104,9 @@ public class RdhSvcMatmCreate extends RdhBase {
 
 		List<AVAILABILITY> availabilities = model.getAVAILABILITYLIST();
 		List<Date> dates = new ArrayList<Date>();
-
+		List<RdhMatm_sales_org> sales_orgList = new ArrayList<RdhMatm_sales_org>();
+		List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
+		List<RdhMatm_tax_country> tax_countries = new ArrayList<RdhMatm_tax_country>();
 		
 		if (availabilities != null && availabilities.size() > 0) {
 			for (int i = 0; i < availabilities.size(); i++) {
@@ -128,6 +129,7 @@ public class RdhSvcMatmCreate extends RdhBase {
 							RdhMatm_plant plant = new RdhMatm_plant();
 							plant.setWerks(sleo.getPLNTCD());
 							plant.setEkgrp("ZZZ");
+							plantList.add(plant);
 						}
 						// validate if
 						// MODEL_UPDATE/AVAILABILITYLIST/AVAILABILITYELEMENT/SLEORGNPLNTCODELIST/SLEORGNPLNTCODEELEMENT/SLEORG
@@ -138,14 +140,17 @@ public class RdhSvcMatmCreate extends RdhBase {
 							sales_org.setVkorg(sleo.getSLEORG());
 							// DEL_PLNT of table COUNTRY_PLANT_TAX matched with the vkorg.
 							sales_org.setDwerk(RFCConfig.getDwerk("2", sleo.getSLEORG()));
+							sales_orgList.add(sales_org);
 						}
 					}
 				}
 			}
-			SimpleDateFormat formatter2 = new SimpleDateFormat("YYYY-MM-DD");
+			
 			geos.get(0).setName("WW1");
 			geos.get(0).setVmsta("Z0");
-			geos.get(0).setVmstd(formatter2.format(Collections.min(dates)));
+			geos.get(0).setVmstd(sdf.format(Collections.min(dates)));
+			geos.get(0).setSales_orgs(sales_orgList);
+			geos.get(0).setPlants(plantList);
 		}
 
 		List<TAXCATEGORY> taxcategories = model.getTAXCATEGORYLIST();
@@ -170,9 +175,11 @@ public class RdhSvcMatmCreate extends RdhBase {
 						tax_country.setTaxm7(taxcat.getTAXCLASSIFICATION());
 						tax_country.setTaxm8(taxcat.getTAXCLASSIFICATION());
 						tax_country.setTaxm9(taxcat.getTAXCLASSIFICATION());
+						tax_countries.add(tax_country);
 					}
 				}
 			}
+		geos.get(0).setTax_countries(tax_countries);
 		}
 	}
 
@@ -194,7 +201,7 @@ public class RdhSvcMatmCreate extends RdhBase {
 		if (model == null)
 			return result;
 		if (postn > 0) {
-			result = MTARTforService(model.getSUBCATEGORY().substring(1, postn).toUpperCase());
+			result = MTARTforService(model.getSUBCATEGORY().substring(0, postn).toUpperCase());
 		} else {
 			result = MTARTforService(model.getSUBCATEGORY().toUpperCase());
 		}
@@ -301,7 +308,7 @@ public class RdhSvcMatmCreate extends RdhBase {
 	}
 	public Date praseDate(String strDate) {
 		try {
-			Date date =  formatter.parse(strDate);
+			Date date =  sdf.parse(strDate);
 			return date;
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
