@@ -214,10 +214,10 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			e.printStackTrace(new java.io.PrintWriter(exBuf));
 			// Put exception into document
 			args[0] = e.getMessage();
-			rptSb.append(convertToHTML(msgf.format(args)) + NEWLINE);
+			rptSb.append(convertToTag(msgf.format(args)) + NEWLINE);
 			msgf = new MessageFormat(Error_STACKTRACE);
 			args[0] = exBuf.getBuffer().toString();
-			rptSb.append(convertToHTML(msgf.format(args)) + NEWLINE);
+			rptSb.append(convertToTag(msgf.format(args)) + NEWLINE);
 			logError("Exception: " + e.getMessage());
 			logError(exBuf.getBuffer().toString());
 			// was an error make sure user gets report
@@ -495,6 +495,43 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
                     //htmlSB.append("&#"+((int)ch)+";");
                     //  htmlSB.append("&amp;");
                     //    break;
+                default:
+                    htmlSB.append(ch);
+                break;
+                }
+                ch = sci.next();
+            }
+            retVal = htmlSB.toString();
+        }
+
+        return retVal;
+    }
+    
+    /********************************************************************************
+     * Convert string into valid html.  Special HTML characters are converted.
+     *
+     * @param txt    String to convert
+     * @return String
+     */
+    protected static String convertToTag(String txt)
+    {
+        String retVal="";
+        StringBuffer htmlSB = new StringBuffer();
+        StringCharacterIterator sci = null;
+        char ch = ' ';
+        if (txt != null) {
+            sci = new StringCharacterIterator(txt);
+            ch = sci.first();
+            while(ch != CharacterIterator.DONE)
+            {
+                switch(ch)
+                {
+                case '<':
+                    htmlSB.append("&lt;");
+                break;
+                case '>':
+                    htmlSB.append("&gt;");
+                    break;
                 default:
                     htmlSB.append(ch);
                 break;
