@@ -1,8 +1,8 @@
 #!/bin/sh
 
 DBASE=opicmpdh
-USER=opicmadm
-PASSWD=cat9tail
+USER=
+PASSWD=
 
 WHERE="WHERE 1=1"
 DIR="/mnt/gis80/"

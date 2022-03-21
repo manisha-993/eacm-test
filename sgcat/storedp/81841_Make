@@ -496,8 +496,8 @@ threadsafe_on="THREADSAFE"
 threadsafe_off=""
 
 PDH_DBASE="opicmpdh"
-PDH_USER="opicmadm"
-PDH_PASSWD="cat9tail"
+PDH_USER=""
+PDH_PASSWD=""
 PDH_INSTALLDIR="/home/opicmdb2/sqllib/"
 
 ODS_DBASE="opicmods"
