@@ -49,8 +49,8 @@ Init for FM Chg Log application
   <target name="ftp" depends="jar2">
     <ftp server="pokxea8.pok.ibm.com"
        remotedir="/home/opicmadm/FMChgLog_drop"
-       userid="opicmadm"
-       password="cat9tail"
+       userid=""
+       password=""
        binary="yes"
     >
       <fileset dir=".">
