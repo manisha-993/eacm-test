@@ -7,8 +7,8 @@ threadsafe_on="THREADSAFE"
 threadsafe_off=""
 
 BASE="pdhalias"
-USER="opicmadm"
-PASSWD="cat9tail"
+USER=""
+PASSWD=""
 
 GBL81841:
 	# start the process

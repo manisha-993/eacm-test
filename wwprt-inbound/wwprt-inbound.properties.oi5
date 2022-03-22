@@ -1,8 +1,8 @@
 #DATABASE SERVER
 server = b01cxnt12080.gho.pok.ibm.com:60001
 database = bhods 
-username = opicmadm
-password = one9help 
+username = 
+password =  
 
 #TABLE NAMES
 table.WWPRTXML = PRICE.WWPRTXML
@@ -23,8 +23,8 @@ log.Level = 2
 #DATABASE SERVER
 server = b01cxnt12080.gho.pok.ibm.com:60001
 database = bhods
-username = opicmadm
-password = one9help
+username = 
+password = 
 
 #TABLE NAMES
 table.WWPRTXML = PRICE.WWPRTXML

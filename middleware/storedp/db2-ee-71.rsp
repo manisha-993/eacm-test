@@ -61,7 +61,7 @@ COMP                      = JAVA_SUPPORT
 DB2.USER_NAME                          = opici11
 DB2.GROUP_NAME                         = opici11g
 DB2.HOME_DIRECTORY                     = /home/opici11
-DB2.PASSWORD                           = cat9tail
+DB2.PASSWORD                           = 
 DB2.AUTHENTICATION                     = SERVER
 
 DB2.SAMPLE                             = NO

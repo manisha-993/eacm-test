@@ -24,7 +24,7 @@ ECCMODS=eccmbrio
 export ECCMODS
 USERCODE=opicmadm
 export USERCODE
-PASSWORD=cat9tail
+PASSWORD=
 export PASSWORD
 
 #/bin/sh

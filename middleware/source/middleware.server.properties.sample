@@ -1,7 +1,7 @@
 #OPICM Middleware Server Properties
 pdh_database_url=jdbc\:db2\:PDH11A
 pdh_database_user=opica10
-pdh_database_password=cat9tail
+pdh_database_password=
 pdh_database_connections=8
 
 ods_database_url=jdbc\:db2\:v02pdh

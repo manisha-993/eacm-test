@@ -1,8 +1,8 @@
 #!/bin/ksh
 
 DBASE=opicmpdh
-USER=opicmadm
-PASSWD=cat9tail
+USER=
+PASSWD=
 
 DIR="/data/"
 BLOB_DIR="/data/blobfiles/"
