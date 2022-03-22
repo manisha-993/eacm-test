@@ -315,52 +315,6 @@ public class ConnectionFactory {
 	    //return conn;
 	}
 	
-	//jdbc:db2://rdtst1e4.sby.ibm.com:60021/PPRDSHAD:sslConnection=true;sslTrustStoreLocation=C:/EACM_OIMS_ESW_DOC/SSL/rdxsitkeystore.jks;sslTrustStorePassword=DB2RDX;
-//	public static void main(String[] args){
-//		//String jdbc_url = "jdbc:db2://rdtst1e4.sby.ibm.com:60021/pprdshad:sslConnection=true;sslTrustStoreLocation=./rdxsitkeystore.jks;sslTrustStorePassword=DB2RDX;";
-//		String jdbc_url = "jdbc:db2://rdtst1e4.sby.ibm.com:60021/pprdshad";
-//        String jdbc_user = "oimdev";
-//        String jdbc_password = "2016oimdev";
-//        String jdbc_driver = "com.ibm.db2.jcc.DB2Driver";
-//        Connection conn = null;
-//	    try {
-//	        Class.forName(jdbc_driver);
-////	        conn = DriverManager.getConnection(jdbc_url, jdbc_user,jdbc_password);
-//	        java.util.Properties properties = new java.util.Properties(); 
-//	        properties.put("user", jdbc_user);
-//	        properties.put("password", jdbc_password);
-//	        properties.put("sslConnection", "true"); 
-////	        properties.put("javax.net.ssl.trustStore","C:/EACM_OIMS_ESW_DOC/SSL/rdxsitkeystore.jks");   
-////	        properties.put("javax.net.ssl.trustStorePassword", "DB2RDX");
-//	        com.ibm.db2.jcc.DB2SimpleDataSource ds = new
-//	        		com.ibm.db2.jcc.DB2SimpleDataSource();
-//	        
-//	        ds.setDriverType(4);                           
-//	        ds.setDatabaseName("pprdshad");    
-//	        ds.setServerName("rdtst1e4.sby.ibm.com");      
-//	        ds.setPortNumber(60021);          
-//	        ds.setUser(jdbc_user);                           
-//	        ds.setPassword(jdbc_password);
-//	        ds.setSslConnection(true);
-////	        ds.setSslTrustStoreType("JCERACFKS");
-//	        
-//	        
-//	        ds.setSslTrustStoreLocation("C:/EACM_OIMS_ESW_DOC/SSL/rdxsitkeystore.jks");
-//	        ds.setSslTrustStorePassword("DB2RDX");
-////	        ds.setSslConnection("TLSv1.2");
-//	        System.out.print("get ds");
-//	        conn = ds.getConnection();
-//	        if(conn!=null){
-//	        	System.out.print("connect to the databse successfully");
-//	        }
-//	    }
-//	    catch (ClassNotFoundException cne) {
-//	       cne.printStackTrace();
-//	    }
-//	    catch (SQLException se) {
-//	        se.printStackTrace();
-//	    }
-//	    //return conn;
-//	}
+
 
 }
