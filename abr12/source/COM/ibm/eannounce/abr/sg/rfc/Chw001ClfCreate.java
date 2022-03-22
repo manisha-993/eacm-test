@@ -1,6 +1,5 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
-import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,32 +7,13 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.w3c.dom.Document;
-
-import COM.ibm.opicmpdh.middleware.D;
-
-
-public class Chw001ClfCreate {
+public class Chw001ClfCreate extends RfcCallerBase{
 	
 	MODEL chwModel;
 	String materialType;
 	String materialID;
-	Connection odsConnection;
-	
-	
-	public StringBuffer rptSb = new StringBuffer();
-	private static final char[] FOOL_JTEST = { '\n' };
-	private int abr_debuglvl = D.EBUG_ERR;
-	static final String NEWLINE = new String(FOOL_JTEST);
-	public StringBuffer getRptSb() {
-		return rptSb;
-	}	
+	Connection odsConnection;	
 	
 	
 	public Chw001ClfCreate (MODEL model, String materialType, String materialID,  Connection odsConnection ) {
@@ -44,17 +24,9 @@ public class Chw001ClfCreate {
 		
 	}
 
-	protected void addDebug(String msg) {
-		if (D.EBUG_DETAIL <= abr_debuglvl) {
-		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
-		}
-	}
 	
-	protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
 	
-	public void execute(){
-		
-		try {
+	public void execute() throws Exception {
 			//1. Assign the MG_COMMON classification and its characteristics to the product's material master record:
 			//1.a Call the TssClassificationMaint constructor to assign the MG_COMMON classification to the product.
 			if(chwModel==null) return;
@@ -66,7 +38,7 @@ public class Chw001ClfCreate {
 					, "001"  							//String class_type   Set to "001"
 					, "H"
 					);
-			this.addDebug("Calling " + rdhClassificationMaint.getRFCName());
+			this.addRfcName(rdhClassificationMaint);
 			//1.b Call the TssClassificationMaint.addCharacteristic() method to add the MG_PRODUCTTYPE characteristic to the MG_COMMON classification and indicate the product type.
 			String value ="";
 			if("Hardware".equalsIgnoreCase(chwModel.getCATEGORY())){
@@ -76,16 +48,12 @@ public class Chw001ClfCreate {
 			}			
 			rdhClassificationMaint.addCharacteristic("MG_PRODUCTTYPE", value);
 			rdhClassificationMaint.execute();
-			this.addDebug(rdhClassificationMaint.createLogEntry());
-			if (rdhClassificationMaint.getRfcrc() == 0) {
-				this.addOutput(rdhClassificationMaint.getRFCName() + " called successfully!");
-			} else {
-				this.addOutput(rdhClassificationMaint.getRFCName() + " called  faild!");
-				this.addOutput(rdhClassificationMaint.getError_text());
-			}
+			this.addRfcResult(rdhClassificationMaint);
+			
 			
 			//rdhClassificationMaint.execute();
 			//2.a Call the TssClassificationMaint constructor to assign the MM_FIELDS classification to the product
+			rdhClassificationMaint = null;
 			rdhClassificationMaint = 
 					new RdhClassificationMaint(
 							materialID 								//Copy from <materialID>
@@ -93,7 +61,8 @@ public class Chw001ClfCreate {
 							, "001"  							//String class_type   Set to "001"
 							, "H"
 							);
-			this.addDebug("Calling " + rdhClassificationMaint.getRFCName());
+			this.addRfcName(rdhClassificationMaint);
+			
 			//2.b Call the TssClassificationMaint.addCharacteristic() method to add the MM_MACH_TYPE characteristic to the MM_FIELDS classification.
 			//Set to first 4 characters of <materialID>. Example: If <materialID> == "9080HC1", then set to "9080".
 			value = CommonUtils.getFirstSubString(materialID,4);
@@ -113,7 +82,7 @@ public class Chw001ClfCreate {
 			value ="";
 			if("SIU-CPU".equalsIgnoreCase(chwModel.getUNITCLASS())){
 				value = "1";
-			} else if("Non SIU-CPU".equalsIgnoreCase(chwModel.getUNITCLASS())){
+			} else if("Non SIU- CPU".equalsIgnoreCase(chwModel.getUNITCLASS())){
 				value = "0";
 			} else if("SIU-Non CPU".equalsIgnoreCase(chwModel.getUNITCLASS())){
 				value = "2";
@@ -131,7 +100,7 @@ public class Chw001ClfCreate {
 			 */
 			value = "";
 			String var= chwModel.getPRICEDIND().toUpperCase();
-			String var1= chwModel.getPRICEDIND().toUpperCase();
+			String var1= chwModel.getZEROPRICE().toUpperCase();
 			if("YES".equals(var) && "YES".equals(var1)){
 				value ="Z";
 			}else if("NO".equals(var) && "NO".equals(var1)){
@@ -149,12 +118,14 @@ public class Chw001ClfCreate {
 				Else if var = 'DOES NOT APPLY', then set value to ''.
 			 */
 			value ="";
-			var = chwModel.getINSTALL();
-			if("CIF".equalsIgnoreCase(var)){
-				value = "1";
-			} else if("N/A".equalsIgnoreCase(var)){
+			var = chwModel.getINSTALL().toUpperCase();
+			if("CIF".equals(var)){
+				value = "C";
+			} else if("CE".equals(var)){
+				value = "I";
+			} else if("N/A".equals(var)){
 				value = "";
-			} else if("DOES NOT APPLY".equalsIgnoreCase(var)){
+			} else if("DOES NOT APPLY".equals(var)){
 				value = "";
 			}			
 			rdhClassificationMaint.addCharacteristic("MM_FG_INSTALLABLE", value);
@@ -165,15 +136,18 @@ public class Chw001ClfCreate {
 			rdhClassificationMaint.addCharacteristic("MM_UNSPSC", value);
 			
 			//2.h Call the TssClassificationMaint.addCharacteristic() method to add the MM_AMORTLENGTH characteristic to the MM_FIELDS classification.
-			//value If containsLetter(chwProduct/AMRTZTNLNGTH)='N', then set value to chwProduct/AMRTZTNLNGTH
+			//confirm with carol of the design  N or empty  
+			//value If containsLetter , then set value to chwProduct/AMRTZTNLNGTH
 			//Else set value to "".
-			value = chwModel.getAMRTZTNLNGTH().contains("N")? chwModel.getAMRTZTNLNGTH() : "";
+			String input = chwModel.getAMRTZTNLNGTH();			
+			value = CommonUtils.getNoLetter(input);
 			rdhClassificationMaint.addCharacteristic("MM_AMORTLENGTH", value);
 			
 			//2.i Call the TssClassificationMaint.addCharacteristic() method to add the MM_AMORTSTART characteristic to the MM_FIELDS classification.
 			//value If containsLetter(chwProduct/AMRTZTNSTRT)='N', then set value to chwProduct/AMRTZTNSTRT
 			//Else set value to "".
-			value = chwModel.getAMRTZTNSTRT().contains("N")? chwModel.getAMRTZTNSTRT() : "";
+			input = chwModel.getAMRTZTNSTRT();			
+			value = CommonUtils.getNoLetter(input);
 			rdhClassificationMaint.addCharacteristic("MM_AMORTSTART", value);
 			
 			//2.j Call the TssClassificationMaint.addCharacteristic() method to add the MM_IDENTITY characteristic to the MM_FIELDS classification.
@@ -195,14 +169,20 @@ public class Chw001ClfCreate {
 			
 			//2.l Call the TssClassificationMaint.addCharacteristic() method to add the MM_SOM_FAMILY characteristic to the MM_FIELDS classification.
 			value = chwModel.getSOMFAMILY();
-			rdhClassificationMaint.addCharacteristic("MM_SOM_FAMILY", value);
+			rdhClassificationMaint.addCharacteristic("MM_SOM_FAMILY", CommonUtils.getFirstSubString(value, 2));
 			
 			//2.m Call the TssClassificationMaint.addCharacteristic() method to add the MM_LIC characteristic to the MM_FIELDS classification. 
 			value = chwModel.getLIC();
-			rdhClassificationMaint.addCharacteristic("MM_LIC", value);
+			rdhClassificationMaint.addCharacteristic("MM_LIC", CommonUtils.getFirstSubString(value, 3));
 			
 			//2.n Call the TssClassificationMaint.addCharacteristic() method to add the MM_BP_CERT_SPECBID characteristic to the MM_FIELDS classification 
 			value = chwModel.getBPCERTSPECBID();
+			if("YES".equalsIgnoreCase(value)){
+				value = "Y";
+			}else if("NO".equalsIgnoreCase(value)){
+				value = "N";
+			}		
+			
 			rdhClassificationMaint.addCharacteristic("MM_BP_CERT_SPECBID", value);
 			
 			//2.O Call the TssClassificationMaint.addCharacteristic() method to add the MM_RPQTYPE characteristic to the MM_FIELDS classification
@@ -227,36 +207,45 @@ public class Chw001ClfCreate {
 			
 			//2.Q Call the TssClassificationMaint.addCharacteristic() method to add the MM_PRODUCT_SUPPORT_CODE characteristic to the MM_FIELDS classification
 			value = chwModel.getPRODSUPRTCD();
-			rdhClassificationMaint.addCharacteristic("MM_PRODUCT_SUPPORT_CODE", value);
+			rdhClassificationMaint.addCharacteristic("MM_PRODUCT_SUPPORT_CODE", CommonUtils.getFirstSubString(value, 3));
 			//2.r Call the TssClassificationMaint.addCharacteristic() method to add the MM_SYSTEM_TYPE characteristic to the MM_FIELDS classification.
 			value = chwModel.getSYSTEMTYPE();
 			rdhClassificationMaint.addCharacteristic("MM_SYSTEM_TYPE", value);
 			//2.s If <materialType> = "ZPRT", then call the TssClassificationMaint.addCharacteristic() method to add the MM_PHANTOM_IND characteristic to the MM_FIELDS classification
 			if("ZPRT".equalsIgnoreCase(materialType)){
 				value = chwModel.getPHANTOMMODINDC();
-				rdhClassificationMaint.addCharacteristic("MM_PHANTOM_IND", value);
+				rdhClassificationMaint.addCharacteristic("MM_PHANTOM_IND", CommonUtils.getFirstSubString(value, 5));
 			}
 			//2.t Call the TssClassificationMaint.addCharacteristic() method to add the REMARKETER_REPORTER characteristic to the MM_FIELDS classification
 			value = "Yes";
 			rdhClassificationMaint.addCharacteristic("REMARKETER_REPORTER", value);
 			//2.u Call the TssClassificationMaint.addCharacteristic() method to add the MM_PHYSICAL_RETURN characteristic to the MM_FIELDS classification.
-			value ="Hardware".equalsIgnoreCase(chwModel.getCATEGORY()) ? "1": "";
+			//value ="Hardware".equalsIgnoreCase(chwModel.getCATEGORY()) ? "1": "1";
+			if("ZPRT".equalsIgnoreCase(materialType)){
+				if("Hardware".equalsIgnoreCase(chwModel.getCATEGORY())){
+					value="1";
+				}else{
+					value ="";
+				}
+			}else{
+				value ="1";
+			}
 			rdhClassificationMaint.addCharacteristic("MM_PHYSICAL_RETURN", value);
 			//2. v Call the TssClassificationMaint.addCharacteristic() method to add the MM_OPPORTUNITY_CODE characteristic to the MM_FIELDS classification. 
 			value = chwModel.getWWOCCODE();
-			rdhClassificationMaint.addCharacteristic("MM_OPPORTUNITY_CODE", value);
+			rdhClassificationMaint.addCharacteristic("MM_OPPORTUNITY_CODE", CommonUtils.getFirstSubString(value, 5));
 			//2.w If <materialType> = "ZPRT", then call the TssClassificationMaint.addCharacteristic() method to add the MM_ACQ_COMPANY characteristic to the MM_FIELDS classification.
-			value = chwModel.getACQRCOCD();
-			rdhClassificationMaint.addCharacteristic("MM_ACQ_COMPANY", value);
+			if("ZPRT".equalsIgnoreCase(materialType)){
+				value = chwModel.getACQRCOCD();
+				rdhClassificationMaint.addCharacteristic("MM_ACQ_COMPANY", CommonUtils.getFirstSubString(value, 3));
+			}
+			//2.x Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_MTM characteristic to the MM_FIELDS classification.
+			value = materialID;
+			rdhClassificationMaint.addCharacteristic("MM_SP_MTM", value);
 			//2.final 
 			rdhClassificationMaint.execute();
-			this.addDebug(rdhClassificationMaint.createLogEntry());
-			if (rdhClassificationMaint.getRfcrc() == 0) {
-				this.addOutput(rdhClassificationMaint.getRFCName() + " called successfully!");
-			} else {
-				this.addOutput(rdhClassificationMaint.getRFCName() + " called  faild!");
-				this.addOutput(rdhClassificationMaint.getError_text());
-			}
+			this.addRfcResult(rdhClassificationMaint);
+			
 			
 			//3. If <chwProduct/CATEGORY>="Service", assign the MM_SERVICEPAC classification and its characteristics to the product's material master record
 			if("Service".equalsIgnoreCase(chwModel.getCATEGORY())){
@@ -268,19 +257,17 @@ public class Chw001ClfCreate {
 								, "001"  							//String class_type   Set to "001"
 								, "H"
 								);
-				this.addDebug("Calling " + TssClassificationMaint.getRFCName());
-				//3.b Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_MTM characteristic to the MM_SERVICEPAC classification.
-				value = materialID;
-				TssClassificationMaint.addCharacteristic("MM_SP_MTM", value);
+				this.addRfcName(TssClassificationMaint);
+				
 				//3.c Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_SDF characteristic to the MM_SERVICEPAC classification.
 				value = chwModel.getSDFCD();
-				TssClassificationMaint.addCharacteristic("MM_SP_SDF", value);
+				TssClassificationMaint.addCharacteristic("MM_SP_SDF", CommonUtils.getFirstSubString(value, 10));
 				//3.d Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_SLC characteristic to the MM_SERVICEPAC classification
 				value = chwModel.getSVCLEVCD();
-				TssClassificationMaint.addCharacteristic("MM_SP_SLC", value);
+				TssClassificationMaint.addCharacteristic("MM_SP_SLC", CommonUtils.getFirstSubString(value, 10));
 				//3.e Call the TssClassificationMaint.addCharacteristic() method to add the MM_HW_SPMACHBRAND characteristic to the MM_SERVICEPAC classification. 
 				value = chwModel.getSVCPACMACHBRAND();
-				TssClassificationMaint.addCharacteristic("MM_HW_SPMACHBRAND", value);
+				TssClassificationMaint.addCharacteristic("MM_HW_SPMACHBRAND", CommonUtils.getFirstSubString(value, 5));
 				//3.f Call the TssClassificationMaint.addCharacteristic() method to add the MM_HW_SPTYPE characteristic to the MM_SERVICEPAC classification 
 				/**
 				 * Set postn=POSITION(' ' in wProduct/SUBCATEGORY;
@@ -293,10 +280,11 @@ public class Chw001ClfCreate {
 				}else{
 					value = chwModel.getSUBCATEGORY();
 				}
-				TssClassificationMaint.addCharacteristic("MM_HW_SPTYPE", value);
+				TssClassificationMaint.addCharacteristic("MM_HW_SPTYPE", CommonUtils.getFirstSubString(value, 10));
 				//3.g Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_IDENTIFIER characteristic to the MM_SERVICEPAC classification.
-				value = chwModel.getSUBCATEGORY();
-				TssClassificationMaint.addCharacteristic("MM_HW_SPTERM", value);
+				input = chwModel.getSUBCATEGORY();
+				value = ATWRTforService(input);
+				TssClassificationMaint.addCharacteristic("MM_SP_IDENTIFIER", value);
 				//3.h Call the TssClassificationMaint.addCharacteristic() method to add the MM_HW_SPTERM characteristic to the MM_SERVICEPAC classification.
 				/**
 				 * Set var=UPPER(hwProduct/COVRPRIOD);
@@ -317,10 +305,12 @@ public class Chw001ClfCreate {
 				var = chwModel.getCOVRPRIOD().toUpperCase();
 				Map<String, String> COVRPRIOD = new HashMap<String, String>();
 				COVRPRIOD.put("FIVE YEARS", "60");
+				COVRPRIOD.put("FIVE YEAR PARTS AND LABOR", "60");
 				COVRPRIOD.put("FOUR YEARS", "48");
 				COVRPRIOD.put("ONE YEAR", "12");
 				COVRPRIOD.put("FOUR YEAR PARTS AND LABOR", "48");
 				COVRPRIOD.put("THREE YEARS", "36");
+				COVRPRIOD.put("THREE YEAR PARTS AND LABOR", "36");
 				COVRPRIOD.put("TWO YEARS", "24");
 				COVRPRIOD.put("TWO YEAR PARTS AND LABOR (EXTENDS EXISTING 3 YEAR COVERAGE)", "24");
 				COVRPRIOD.put("SIX YEARS", "72");
@@ -328,23 +318,31 @@ public class Chw001ClfCreate {
 				COVRPRIOD.put("THREE MONTHS", "3");
 				COVRPRIOD.put("3 MONTHS", "3");
 				value = COVRPRIOD.get(var);
-				//TODO add the char firstly
 				TssClassificationMaint.addCharacteristic("MM_HW_SPTERM", value);
 				
 				
 				//value Copy from SVCLEV_UPDATE/COVRSHRTDESC where SVCLEV_UPDATE/SVCLEVCD = hwProduct/SVCLEVCD
 				//sql query the cache, get the xml to SVCLEV
 				String SVCLEVCD = chwModel.getSVCLEVCD();
-				String xml = getSVCLEVFromXML(SVCLEVCD);
+				String xml ="";
+				try {
+					xml = getSVCLEVFromXML(SVCLEVCD);
+				} catch (SQLException e) {
+				}
+				
+				SVCLEV SVCLEV = null;
 				if(!"".equals(xml)){
-					SVCLEV SVCLEV = CommonEntities.getSVCLEVFromXml(xml);
-					
+					SVCLEV = CommonEntities.getSVCLEVFromXml(xml);
+				}
+				
+				if(SVCLEV!=null){					
 					
 					//3.i Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_COVHRS characteristic to the MM_SERVICEPAC classification.//3.i Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_COVHRS characteristic to the MM_SERVICEPAC classification.
 					value = SVCLEV.getCOVRSHRTDESC();
-					TssClassificationMaint.addCharacteristic("MM_SP_COVHRS", value);
+					TssClassificationMaint.addCharacteristic("MM_SP_COVHRS", CommonUtils.getFirstSubString(value, 5));
 					//3. j Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_SDM characteristic to the MM_SERVICEPAC classification.
-					value = SVCLEV.getSVCDELIVMETH();
+					input = SVCLEV.getSVCDELIVMETH();					
+					value = getMM_SP_SDMValue(input);
 					TssClassificationMaint.addCharacteristic("MM_SP_SDM", value);
 					//3.k Call the TssClassificationMaint.addCharacteristic() method to add the MM_SPFIXEDTIME characteristic to the MM_SERVICEPAC classification.
 					/**
@@ -352,45 +350,45 @@ public class Chw001ClfCreate {
 					 * set the value to "";
 					 *	Else set the value to SVCLEV_UPDATE/FIXTME||' '||SVCLEV_UPDATE/FIXTMEUOM||' '||SVCLEV_UPDATE/FIXTMEOBJIVE.
 					 */
-					String FIXTME = SVCLEV.getFIXTME();
-					String FIXTMEUOM = SVCLEV.getFIXTMEUOM();
-					String FIXTMEOBJIVE = SVCLEV.getFIXTMEOBJIVE();
+					String FIXTME = SVCLEV.getFIXTME()==null ? "":SVCLEV.getFIXTME();
+					String FIXTMEUOM = SVCLEV.getFIXTMEUOM()==null ? "":SVCLEV.getFIXTMEUOM();
+					String FIXTMEOBJIVE = SVCLEV.getFIXTMEOBJIVE()==null ? "": SVCLEV.getFIXTMEOBJIVE();
 					if("".equals(FIXTME) || "".equals(FIXTMEUOM) || "".equals(FIXTMEOBJIVE)){
 						value ="";
 					}else{
 						value = FIXTME + " " + FIXTMEUOM + " " + FIXTMEOBJIVE;
 					}					
-					TssClassificationMaint.addCharacteristic("MM_SPFIXEDTIME", value);
+					TssClassificationMaint.addCharacteristic("MM_SPFIXEDTIME", CommonUtils.getFirstSubString(value, 30));
 					//3.l Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_OSRESPTIME characteristic to the MM_SERVICEPAC classification.
 					/**
 					 * If SVCLEV_UPDATE/ONSITERESP=''" or SVCLEV_UPDATE/ONSITERESPUOM=''" or f SVCLEV_UPDATE/ONSITERESPOBJIVE=''", then
 					 * set the value to "";
 					 * Else set the value to SVCLEV_UPDATE/ONSITERESP||' '||SVCLEV_UPDATE/ONSITERESPUOM||' '||SUBSTRING (SVCLEV_UPDATE/ONSITERESPOBJIVE FROM 0 FOR 2)
 					 */
-					String ONSITERESP = SVCLEV.getONSITERESP();					
-					String ONSITERESPUOM = SVCLEV.getONSITERESPUOM();
-					String ONSITERESPOBJIVE = SVCLEV.getONSITERESPOBJIVE();
-					if("".equals(ONSITERESP) || "".equals(ONSITERESPUOM) || "".equals(ONSITERESPOBJIVE)){
+					String ONSITERESPTME = SVCLEV.getONSITERESPTME()==null ? "": SVCLEV.getONSITERESPTME();					
+					String ONSITERESPTMEUOM = SVCLEV.getONSITERESPTMEUOM()==null ? "": SVCLEV.getONSITERESPTMEUOM();
+					String ONSITERESPTMEOBJIVE = SVCLEV.getONSITERESPTMEOBJIVE()==null ? "":SVCLEV.getONSITERESPTMEOBJIVE();
+					if("".equals(ONSITERESPTME) || "".equals(ONSITERESPTMEUOM) || "".equals(ONSITERESPTMEOBJIVE)){
 						value ="";
 					}else{
-						value = ONSITERESP + " " + ONSITERESPUOM + " " + CommonUtils.getFirstSubString(ONSITERESPOBJIVE, 2);
+						value = ONSITERESPTME + " " + ONSITERESPTMEUOM + " " + CommonUtils.getSubstrToChar(ONSITERESPTMEOBJIVE, "(");
 					}	
-					TssClassificationMaint.addCharacteristic("MM_SP_OSRESPTIME", value);
+					TssClassificationMaint.addCharacteristic("MM_SP_OSRESPTIME", CommonUtils.getFirstSubString(value, 16));
 					//3.m Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_CNTACTIME characteristic to the MM_SERVICEPAC classification.
 					/**
 					 * If SVCLEV_UPDATE/CONTTME=''" or f SVCLEV_UPDATE/CONTTMEUOM=''" or SVCLEV_UPDATE/CONTTMEOBJIVE=''", then
 					 * set the value to "";
 					 * Else set the value to SVCLEV_UPDATE/CONTTME||' '||SVCLEV_UPDATE/CONTTMEUOM||' '||SVCLEV_UPDATE/CONTTMEOBJIVE.
 					 */
-					String CONTTME = SVCLEV.getCONTTME();					
-					String CONTTMEUOM = SVCLEV.getCONTTMEUOM();
-					String CONTTMEOBJIVE = SVCLEV.getCONTTMEOBJIVE();
+					String CONTTME = SVCLEV.getCONTTME()==null ? "": SVCLEV.getCONTTME();					
+					String CONTTMEUOM = SVCLEV.getCONTTMEUOM()==null ? "": SVCLEV.getCONTTMEUOM();
+					String CONTTMEOBJIVE = SVCLEV.getCONTTMEOBJIVE() ==null ? "" : SVCLEV.getCONTTMEOBJIVE();
 					if("".equals(CONTTME) || "".equals(CONTTMEUOM) || "".equals(CONTTMEOBJIVE)){
 						value ="";
 					}else{
 						value = CONTTME + " " + CONTTMEUOM + " " + CONTTMEOBJIVE;
 					}
-					TssClassificationMaint.addCharacteristic("MM_SP_CNTACTIME", value);
+					TssClassificationMaint.addCharacteristic("MM_SP_CNTACTIME", CommonUtils.getFirstSubString(value, 30));
 					//3.n Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_PARIVTIME characteristic to the MM_SERVICEPAC classification.//3.m Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_CNTACTIME characteristic to the MM_SERVICEPAC classification.
 					/**
 					 * If SVCLEV_UPDATE/PARTARRVTME=''" or SVCLEV_UPDATE/PARTARRVTMEUOM=''" or SVCLEV_UPDATE/PARTARRVTMEOBJIVE=''", then
@@ -409,9 +407,9 @@ public class Chw001ClfCreate {
 						      set the value = SVCLEV_UPDATE/PARTARRVTME + " " + value.
 						             }
 					 */
-					String PARTARRVTME = SVCLEV.getPARTARRVTME();					
-					String PARTARRVTMEUOM = SVCLEV.getPARTARRVTMEUOM();
-					String PARTARRVTMEOBJIVE = SVCLEV.getPARTARRVTMEOBJIVE();
+					String PARTARRVTME = SVCLEV.getPARTARRVTME() ==null ? "": SVCLEV.getPARTARRVTME();					
+					String PARTARRVTMEUOM = SVCLEV.getPARTARRVTMEUOM() ==null ? "":SVCLEV.getPARTARRVTMEUOM();
+					String PARTARRVTMEOBJIVE = SVCLEV.getPARTARRVTMEOBJIVE() ==null ? "" : SVCLEV.getPARTARRVTMEOBJIVE();
 					if("".equals(PARTARRVTME) || "".equals(PARTARRVTMEUOM) || "".equals(PARTARRVTMEOBJIVE)){
 						value ="";
 					}else {
@@ -427,40 +425,121 @@ public class Chw001ClfCreate {
 						}
 						value = PARTARRVTME + " " + value;
 					}
-					TssClassificationMaint.addCharacteristic("MM_SP_PARIVTIME", value);
+					TssClassificationMaint.addCharacteristic("MM_SP_PARIVTIME", CommonUtils.getFirstSubString(value, 15));
 					//3.o Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_TARNDTIME characteristic to the MM_SERVICEPAC classification.
 					/**
 					 * If SVCLEV_UPDATE/TRNARNDTME=''" or SVCLEV_UPDATE/TRNARNDTMEUOM=''" or SVCLEV_UPDATE/TRNARNDTMEOBJIVE=''", then
 					 * set the value to "";
 					 * Else set the value to SVCLEV_UPDATE/TRNARNDTME||' '||SVCLEV_UPDATE/TRNARNDTMEUOM||' '||SVCLEV_UPDATE/TRNARNDTMEOBJIVE;
 					 */
-					String TRNARNDTME = SVCLEV.getTRNARNDTME();					
-					String TRNARNDTMEUOM = SVCLEV.getTRNARNDTMEUOM();
-					String TRNARNDTMEOBJIVE = SVCLEV.getTRNARNDTMEOBJIVE();
+					String TRNARNDTME = SVCLEV.getTRNARNDTME()==null ? "": SVCLEV.getTRNARNDTME();					
+					String TRNARNDTMEUOM = SVCLEV.getTRNARNDTMEUOM()==null ? "": SVCLEV.getTRNARNDTMEUOM();
+					String TRNARNDTMEOBJIVE = SVCLEV.getTRNARNDTMEOBJIVE() ==null ? "": SVCLEV.getTRNARNDTMEOBJIVE();
 					if("".equals(TRNARNDTME) || "".equals(TRNARNDTMEUOM) || "".equals(TRNARNDTMEOBJIVE)){
 						value ="";
 					}else{
 						value = TRNARNDTME + " " + TRNARNDTMEUOM + " " + TRNARNDTMEOBJIVE;
 					}
-					TssClassificationMaint.addCharacteristic("MM_SP_TARNDTIME", value);
-					
+					TssClassificationMaint.addCharacteristic("MM_SP_TARNDTIME", CommonUtils.getFirstSubString(value, 30));					
 				}				
 				
 				TssClassificationMaint.execute();
-				this.addDebug(TssClassificationMaint.createLogEntry());
-				if (TssClassificationMaint.getRfcrc() == 0) {
-					this.addOutput(TssClassificationMaint.getRFCName() + " called successfully!");
-				} else {
-					this.addOutput(TssClassificationMaint.getRFCName() + " called  faild!");
-					this.addOutput(TssClassificationMaint.getError_text());
-				}
-			}			
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}		
+				this.addRfcResult(TssClassificationMaint);
+			}
 		
 	}
+
+
+	private String getMM_SP_SDMValue(String input) {
+		Map<String,String> valueMap = new HashMap<String,String>();
+		valueMap.put("CCR", "CCR");
+		valueMap.put("IOE", "IOE");
+		valueMap.put("IOR", "IOR");
+		valueMap.put("LOR", "LOR");
+		String value = valueMap.get(input.toUpperCase());		
+		if(value ==null) value ="";		
+		return value;
+	}
+
+
+
+	private String ATWRTforService(String input) {
+		Map<String,String> valueMap = new HashMap<String,String>();
+		valueMap.put("EURBUNSP", "OTHER");
+		valueMap.put("EUREMXSP", "OTHER");
+		valueMap.put("EUREXSP", "OTHER");
+		valueMap.put("EURMIGSP", "OTHER");
+		valueMap.put("EURMVSSP", "OTHER");
+		valueMap.put("GENERICHW1", "OTHER");
+		valueMap.put("GENERICHW3", "OTHER");
+		valueMap.put("GENERICHW5", "OTHER");
+		valueMap.put("GENERICHW7", "OTHER");
+		valueMap.put("HELPDESK", "OTHER");
+		
+		valueMap.put("INSTALL", "OTHER");
+		valueMap.put("IPSINSTALL", "OTHER");
+		valueMap.put("IPSMA", "OTHER");
+		valueMap.put("IPSMAEXT", "OTHER");
+		valueMap.put("IPSWAMO", "OTHER");
+		valueMap.put("IPSWMOEXT", "OTHER");
+		valueMap.put("ITESEDUC", "OTHER");
+		valueMap.put("LENINSTL", "OTHER");
+		valueMap.put("LENPWUPG", "OTHER");
+		valueMap.put("LENTPPOF", "OTHER");
+		
+		valueMap.put("LENWAUPG", "OTHER");
+		valueMap.put("N/A", "OTHER");
+		valueMap.put("SBUNDLE", "OTHER");
+		valueMap.put("SBUNDLE1", "OTHER");
+		valueMap.put("SBUNDLE2", "OTHER");
+		valueMap.put("SBUNDLE3", "OTHER");
+		valueMap.put("SBUNDLE4", "OTHER");
+		valueMap.put("SBUNDLE5", "OTHER");
+		valueMap.put("SBUNDLE6", "OTHER");
+		valueMap.put("SERVACCT", "OTHER");
+		
+		valueMap.put("STG LAB SERVICES", "OTHER");
+		
+		valueMap.put("ENSPEURP", "HW");
+		valueMap.put("EURETSSWU", "HW");
+		valueMap.put("GENERICHW4", "HW");
+		valueMap.put("MAINONLY", "HW");
+		valueMap.put("MAINSWSUPP", "HW");
+		valueMap.put("MEMEAMAP", "HW");
+		valueMap.put("MEMEAWMO", "HW");
+		valueMap.put("WMAINOCS", "HW");
+		valueMap.put("WMAINTOPT", "HW");
+		valueMap.put("GTMSEUR", "HW");
+		
+		valueMap.put("PROACTSYS", "HW");
+		
+		
+		valueMap.put("GENERICHW2", "SW");
+		valueMap.put("PSSWSUPP", "SW");
+		valueMap.put("RTECHSUPEU", "SW");
+		valueMap.put("RTECHSUPP", "SW");
+		valueMap.put("RTSOS", "SW");
+		valueMap.put("RTSSWEU", "SW");
+		valueMap.put("RTSXSERIES", "SW");
+		valueMap.put("SLEMEASW", "SW");
+		valueMap.put("SMOOTHSTRT", "SW");
+		valueMap.put("STRTUPSUP", "SW");
+		
+		valueMap.put("STRUPSUPEU", "SW");
+		valueMap.put("SUPLINEEU", "SW");
+		valueMap.put("SUPPORTLN", "SW");
+		valueMap.put("SYSEXPERT", "SW");
+		valueMap.put("TSEMEASW", "SW");
+		valueMap.put("ETSAAEUR", "SW");
+		
+		
+		String value = valueMap.get(input.toUpperCase());
+		
+		if(value ==null) value ="";
+		
+		return value;
+	}
+
 
 
 	private String getSVCLEVFromXML(String SVCLEVCD) throws SQLException {
@@ -489,6 +568,17 @@ public class Chw001ClfCreate {
 	}
 
 	public static void main(String[] args) {
+		Map<String,String> valueMap = new HashMap<String,String>();
+		valueMap.put("EURBUNSP", "OTHER");
+		valueMap.put("EUREMXSP", "OTHER");
+		valueMap.put("EUREXSP", "OTHER");
+		valueMap.put("EURMIGSP", "OTHER");
+		String value = valueMap.get("123");
+		System.out.println("value=" + value);
+		value = valueMap.get("EURBUNSP");
+		System.out.println("value=" + value);
+		value = valueMap.get(null);
+		System.out.println("value=" + value);
 
 	}
 

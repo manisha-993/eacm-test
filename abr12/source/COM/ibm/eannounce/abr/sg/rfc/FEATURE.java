@@ -59,7 +59,7 @@ public class FEATURE {
 	
 	@XmlElementWrapper(name = "LANGUAGELIST")
 	@XmlElement(name = "LANGUAGEELEMENT")
-	private List<LANGUAGEELEMENT_FEATURE> LANGUAGELIST;
+	public List<LANGUAGEELEMENT_FEATURE> LANGUAGELIST;
 	@XmlElementWrapper(name = "COUNTRYLIST")
 	@XmlElement(name = "COUNTRYELEMENT")
 	private List<COUNTRYELEMENT_FEATURE> COUNTRYLIST;
@@ -141,36 +141,7 @@ public class FEATURE {
 	}
 }
 
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-@XmlAccessorType(XmlAccessType.FIELD)
-class LANGUAGEELEMENT_FEATURE {
-	@XmlElement(name = "NLSID")
-	private String NLSID;
-	@XmlElement(name = "MKTGDESC")
-	private String MKTGDESC;
-	@XmlElement(name = "MKTGNAME")
-	private String MKTGNAME;
-	@XmlElement(name = "INVNAME")
-	private String INVNAME;
-	@XmlElement(name = "BHINVNAME")
-	private String BHINVNAME;
-	
-	public String getNLSID() {
-		return NLSID;
-	}
-	public String getMKTGDESC() {
-		return MKTGDESC;
-	}
-	public String getMKTGNAME() {
-		return MKTGNAME;
-	}
-	public String getINVNAME() {
-		return INVNAME;
-	}
-	public String getBHINVNAME() {
-		return BHINVNAME;
-	}
-}
+
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @XmlAccessorType(XmlAccessType.FIELD)
