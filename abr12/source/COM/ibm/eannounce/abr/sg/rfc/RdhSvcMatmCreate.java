@@ -34,7 +34,7 @@ public class RdhSvcMatmCreate extends RdhBase {
 	@Foo
 	SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd" );
 	@Foo
-	SimpleDateFormat sdfANNDATE =   new SimpleDateFormat( "ddMMyy" );
+	SimpleDateFormat sdfANNDATE =   new SimpleDateFormat( "yyMMdd" );
 /**
  * 
  * @param model
@@ -125,7 +125,7 @@ public class RdhSvcMatmCreate extends RdhBase {
 						// is a value of colunm PLNT_CD in table country_plant_tax where INTERFACE_ID =
 						// "2".
 
-						if (RFCConfig.getDwerk("2", sleo.getPLNTCD()) != null) {
+						if (RFCConfig.getPlant("2", sleo.getPLNTCD()) != null) {
 							RdhMatm_plant plant = new RdhMatm_plant();
 							plant.setWerks(sleo.getPLNTCD());
 							plant.setEkgrp("ZZZ");
@@ -166,15 +166,15 @@ public class RdhSvcMatmCreate extends RdhBase {
 						RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
 						tax_country.setAland(RFCConfig.getAland(countries.get(j).getCOUNTRY_FC()));
 						tax_country.setTaty1(taxcat.getTAXCATEGORYVALUE());
-						tax_country.setTaxm1(taxcat.getTAXCLASSIFICATION());
-						tax_country.setTaxm2(taxcat.getTAXCLASSIFICATION());
-						tax_country.setTaxm3(taxcat.getTAXCLASSIFICATION());
-						tax_country.setTaxm4(taxcat.getTAXCLASSIFICATION());
-						tax_country.setTaxm5(taxcat.getTAXCLASSIFICATION());
-						tax_country.setTaxm6(taxcat.getTAXCLASSIFICATION());
-						tax_country.setTaxm7(taxcat.getTAXCLASSIFICATION());
-						tax_country.setTaxm8(taxcat.getTAXCLASSIFICATION());
-						tax_country.setTaxm9(taxcat.getTAXCLASSIFICATION());
+						tax_country.setTaxm1("1");
+						tax_country.setTaxm2("1");
+						tax_country.setTaxm3("1");
+						tax_country.setTaxm4("1");
+						tax_country.setTaxm5("1");
+						tax_country.setTaxm6("1");
+						tax_country.setTaxm7("1");
+						tax_country.setTaxm8("1");
+						tax_country.setTaxm9("1");
 						tax_countries.add(tax_country);
 					}
 				}

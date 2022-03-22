@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -97,6 +98,16 @@ public class RFCConfig {
 	}
 	public static String getDwerk(String  intID,String salesOrg ) {
 		return orgpntMaps.get(intID)==null?null:orgpntMaps.get(intID).get(salesOrg);
+	}
+	public static String getPlant(String intID, String plant) {
+		Iterator iter = orgpntMaps.get(intID).entrySet().iterator();
+		while (iter.hasNext()) {
+			Map.Entry entry = (Map.Entry) iter.next();
+			String key = (String) entry.getKey();
+			String value = (String) entry.getValue();
+			if(plant.equals(value)) return key;
+		}
+		return null;
 	}
 	public static String getAland(String key) {
 		return geneMap.get(key);
