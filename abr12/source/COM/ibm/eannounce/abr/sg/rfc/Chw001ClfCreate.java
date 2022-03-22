@@ -371,7 +371,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 					if("".equals(ONSITERESPTME) || "".equals(ONSITERESPTMEUOM) || "".equals(ONSITERESPTMEOBJIVE)){
 						value ="";
 					}else{
-						value = ONSITERESPTME + " " + ONSITERESPTMEUOM + " " + CommonUtils.getFirstSubString(ONSITERESPTMEOBJIVE, 2);
+						value = ONSITERESPTME + " " + ONSITERESPTMEUOM + " " + CommonUtils.getSubstrToChar(ONSITERESPTMEOBJIVE, "(");
 					}	
 					TssClassificationMaint.addCharacteristic("MM_SP_OSRESPTIME", CommonUtils.getFirstSubString(value, 16));
 					//3.m Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_CNTACTIME characteristic to the MM_SERVICEPAC classification.

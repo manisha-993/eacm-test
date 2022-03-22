@@ -63,12 +63,6 @@ public class SVCLEV {
 	
 	@XmlElement(name = "PARTARRVTMEOBJIVE")
 	private String PARTARRVTMEOBJIVE;
-	@XmlElement(name = "ONSITERESP")
-	private String ONSITERESP;
-	@XmlElement(name = "ONSITERESPUOM")
-	private String ONSITERESPUOM;
-	@XmlElement(name = "ONSITERESPOBJIVE")
-	private String ONSITERESPOBJIVE;
 	
 	@XmlElementWrapper(name = "LANGUAGELIST")
 	@XmlElement(name = "LANGUAGEELEMENT")
@@ -298,47 +292,6 @@ public class SVCLEV {
 		LANGUAGELIST = lANGUAGELIST;
 	}
 
-
-//	public List<SLCNTRYCOND> getSLCNTRYCONDLIST() {
-//		return SLCNTRYCONDLIST;
-//	}
-//
-//
-//	public void setSLCNTRYCONDLIST(List<SLCNTRYCOND> sLCNTRYCONDLIST) {
-//		SLCNTRYCONDLIST = sLCNTRYCONDLIST;
-//	}
-	
-	
-
-
-	public String getONSITERESP() {
-		return ONSITERESP;
-	}
-
-
-	public void setONSITERESP(String oNSITERESP) {
-		ONSITERESP = oNSITERESP;
-	}
-
-
-	public String getONSITERESPUOM() {
-		return ONSITERESPUOM;
-	}
-
-
-	public void setONSITERESPUOM(String oNSITERESPUOM) {
-		ONSITERESPUOM = oNSITERESPUOM;
-	}
-
-
-	public String getONSITERESPOBJIVE() {
-		return ONSITERESPOBJIVE;
-	}
-
-
-	public void setONSITERESPOBJIVE(String oNSITERESPOBJIVE) {
-		ONSITERESPOBJIVE = oNSITERESPOBJIVE;
-	}
 
 
 

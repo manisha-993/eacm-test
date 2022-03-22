@@ -69,9 +69,23 @@ public class CommonUtils {
 		return hasletter;
 	}
 	
+	public static String getSubstrToChar(String input, String chr){		
+		if(input==null) return "";
+		if(chr==null) return "";
+		int endIndex = input.indexOf(chr);
+		if(endIndex==-1) return "";
+		input = input.substring(0, endIndex).trim();		
+		return input;	
+	}
+	
 	
 	public static void main(String[] args) {
+		
+		
+		
 		String model="mod12345";
+		
+		
 		
 		System.out.println("first 3=" + getFirstSubString(model,3));
 		System.out.println("last 3=" + getLastSubString(model,3));
@@ -85,7 +99,11 @@ public class CommonUtils {
 		System.out.println("null case" + getNoLetter(null));
 		System.out.println("1234 case" + getNoLetter("1234"));
 		System.out.println("1234 case" + getNoLetter("12a4"));
-		System.out.println("1234 case" + getNoLetter("001Z"));		
+		System.out.println("1234 case" + getNoLetter("001Z"));	
+		
+		String input ="C12 (common";
+		System.out.println("substrtochar =#" + getSubstrToChar(input,"?")+"#");
+		
 		
 	}
 
