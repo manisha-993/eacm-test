@@ -146,7 +146,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				String featurexml = getXMLByID(FEATURESQL, Integer.parseInt(tmf.getFEATUREENTITYID()));
 				String modelxml = getXMLByID(MODELSQL, Integer.parseInt(tmf.getMODELENTITYID()));				
 				//java.password = cat9tail
-				
+devcloudods_rdh.Password=Orbslmrkukszkxbv9of				
 				FEATURE chwFeature = XMLParse.getObjectFromXml(featurexml,FEATURE.class);
 				MODEL chwModel = XMLParse.getObjectFromXml(modelxml,MODEL.class);
 				MachineTypeNEW(tmf,chwFeature,chwModel);
