@@ -107,6 +107,9 @@ public class RdhSvcMatmCreate extends RdhBase {
 		List<RdhMatm_sales_org> sales_orgList = new ArrayList<RdhMatm_sales_org>();
 		List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
 		List<RdhMatm_tax_country> tax_countries = new ArrayList<RdhMatm_tax_country>();
+		List salesKey = new ArrayList();
+		List plantKey = new ArrayList();
+		List taxKey = new ArrayList();
 		
 		if (availabilities != null && availabilities.size() > 0) {
 			for (int i = 0; i < availabilities.size(); i++) {
@@ -124,23 +127,30 @@ public class RdhSvcMatmCreate extends RdhBase {
 						// MODEL_UPDATE/AVAILABILITYLIST/AVAILABILITYELEMENT/SLEORGNPLNTCODELIST/SLEORGNPLNTCODEELEMENT/PLNTCD
 						// is a value of colunm PLNT_CD in table country_plant_tax where INTERFACE_ID =
 						// "2".
+						String plantcd = sleo.getPLNTCD();
 
-						if (RFCConfig.getPlant("2", sleo.getPLNTCD()) != null) {
+						if (RFCConfig.getPlant("2", sleo.getPLNTCD()) != null && !plantKey.contains(plantcd)) {
 							RdhMatm_plant plant = new RdhMatm_plant();
-							plant.setWerks(sleo.getPLNTCD());
+							plant.setWerks(plantcd);
 							plant.setEkgrp("ZZZ");
 							plantList.add(plant);
+							plantKey.add(plantcd);
 						}
 						// validate if
 						// MODEL_UPDATE/AVAILABILITYLIST/AVAILABILITYELEMENT/SLEORGNPLNTCODELIST/SLEORGNPLNTCODEELEMENT/SLEORG
 						// is a value of colunm SALES_ORG in table country_plant_tax where INTERFACE_ID
 						// = "2".
-						if (RFCConfig.getDwerk("2", sleo.getSLEORG()) != null) {
-							RdhMatm_sales_org sales_org = new RdhMatm_sales_org();
-							sales_org.setVkorg(sleo.getSLEORG());
-							// DEL_PLNT of table COUNTRY_PLANT_TAX matched with the vkorg.
-							sales_org.setDwerk(RFCConfig.getDwerk("2", sleo.getSLEORG()));
-							sales_orgList.add(sales_org);
+						String dwerk = RFCConfig.getDwerk("2", sleo.getSLEORG());
+						String saleorg = sleo.getSLEORG();
+						if (dwerk != null) {
+							if(!salesKey.contains(saleorg+dwerk)) {
+								RdhMatm_sales_org sales_org = new RdhMatm_sales_org();
+								sales_org.setVkorg(saleorg);
+								// DEL_PLNT of table COUNTRY_PLANT_TAX matched with the vkorg.
+								sales_org.setDwerk(dwerk);
+								sales_orgList.add(sales_org);
+								salesKey.add(saleorg+dwerk);
+							}
 						}
 					}
 				}
@@ -162,10 +172,12 @@ public class RdhSvcMatmCreate extends RdhBase {
 					// validate if
 					// MODEL_UPDATE/TAXCATEGORYLIST/TAXCATEGORYELEMENT/COUNTRYLIST/COUNTRYELEMENT/COUNTRY_FC
 					// is existing in table GENERALAREA_UPDATE_CBSE
-					if (RFCConfig.getAland(countries.get(j).getCOUNTRY_FC()) != null) {
+					String aland = RFCConfig.getAland(countries.get(j).getCOUNTRY_FC());
+					String taxcav = taxcat.getTAXCATEGORYVALUE();
+					if (aland != null&&!taxKey.contains(aland+taxcav)) {
 						RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
-						tax_country.setAland(RFCConfig.getAland(countries.get(j).getCOUNTRY_FC()));
-						tax_country.setTaty1(taxcat.getTAXCATEGORYVALUE());
+						tax_country.setAland(aland);
+						tax_country.setTaty1(taxcav);
 						tax_country.setTaxm1("1");
 						tax_country.setTaxm2("1");
 						tax_country.setTaxm3("1");
@@ -176,6 +188,7 @@ public class RdhSvcMatmCreate extends RdhBase {
 						tax_country.setTaxm8("1");
 						tax_country.setTaxm9("1");
 						tax_countries.add(tax_country);
+						taxKey.add(aland+taxcav);
 					}
 				}
 			}
