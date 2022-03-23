@@ -20,8 +20,10 @@ import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeMtc;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeUpg;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMatmCreate;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
+import COM.ibm.eannounce.abr.sg.rfc.RdhChwFcProd;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.RdhSvcMatmCreate;
+import COM.ibm.eannounce.abr.sg.rfc.RdhTssFcProd;
 import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
@@ -191,8 +193,16 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 				else if ("SoftdWare".equals(model.getCATEGORY())) {
 					throw new Exception("Not support SoftWare");
 				}
-					
-				
+			RdhChwFcProd prod = new RdhChwFcProd(model, null, null);
+			this.addDebug("Calling " + prod.getRFCName());
+			prod.execute();
+			this.addDebug(prod.createLogEntry());
+			if (prod.getRfcrc() == 0) {
+				this.addOutput(prod.getRFCName() + " called successfully!");
+			} else {
+				this.addOutput(prod.getRFCName() + " called  faild!");
+				this.addOutput(prod.getError_text());
+			}
 			}	
 			
 			// exeFtpShell(ffPathName);
