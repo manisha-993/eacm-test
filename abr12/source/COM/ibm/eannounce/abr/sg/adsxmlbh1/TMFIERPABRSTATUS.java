@@ -145,7 +145,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				if(tmf==null) return;
 				String featurexml = getXMLByID(FEATURESQL, Integer.parseInt(tmf.getFEATUREENTITYID()));
 				String modelxml = getXMLByID(MODELSQL, Integer.parseInt(tmf.getMODELENTITYID()));				
-				
+				//java.password = cat9tail
 				
 				FEATURE chwFeature = XMLParse.getObjectFromXml(featurexml,FEATURE.class);
 				MODEL chwModel = XMLParse.getObjectFromXml(modelxml,MODEL.class);
