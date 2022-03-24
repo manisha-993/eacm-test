@@ -71,7 +71,7 @@ public class RdhChwFcProdTest
     {
         System.out.println("------------- Test RdhChwFcProd start -------------");
 	    
-        RdhChwFcProd fcProd = new RdhChwFcProd(model, null, null);
+        RdhChwFcProd fcProd = new RdhChwFcProd(model);
 
 		try {
 			String json = fcProd.generateJson();
