@@ -133,7 +133,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			//2.g Call the TssClassificationMaint.addCharacteristic() method to add the MM_UNSPSC characteristic to the MM_FIELDS classification
 			//value  Copy from chwProduct/UNSPSC
 			value = chwModel.getUNSPSC();
-			rdhClassificationMaint.addCharacteristic("MM_UNSPSC", value);
+			rdhClassificationMaint.addCharacteristic("MM_UNSPSC", CommonUtils.getFirstSubString(value, 8));
 			
 			//2.h Call the TssClassificationMaint.addCharacteristic() method to add the MM_AMORTLENGTH characteristic to the MM_FIELDS classification.
 			//confirm with carol of the design  N or empty  
@@ -163,9 +163,9 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			} 
 			rdhClassificationMaint.addCharacteristic("MM_IDENTITY", value);
 			//2.K Call the TssClassificationMaint.addCharacteristic() method to add the MM_ROYALTY_BEAR_IND characteristic to the MM_FIELDS classification.
-			//value 	Copy from chwProduct/SWROYALBEARING
+			//value 	Copy from chwProduct/SWROYALBEARING  --YES NO
 			value = chwModel.getSWROYALBEARING();
-			rdhClassificationMaint.addCharacteristic("MM_ROYALTY_BEAR_IND", value);
+			rdhClassificationMaint.addCharacteristic("MM_ROYALTY_BEAR_IND", CommonUtils.getFirstSubString(value, 20));
 			
 			//2.l Call the TssClassificationMaint.addCharacteristic() method to add the MM_SOM_FAMILY characteristic to the MM_FIELDS classification.
 			value = chwModel.getSOMFAMILY();
@@ -210,7 +210,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			rdhClassificationMaint.addCharacteristic("MM_PRODUCT_SUPPORT_CODE", CommonUtils.getFirstSubString(value, 3));
 			//2.r Call the TssClassificationMaint.addCharacteristic() method to add the MM_SYSTEM_TYPE characteristic to the MM_FIELDS classification.
 			value = chwModel.getSYSTEMTYPE();
-			rdhClassificationMaint.addCharacteristic("MM_SYSTEM_TYPE", value);
+			rdhClassificationMaint.addCharacteristic("MM_SYSTEM_TYPE", CommonUtils.getFirstSubString(value, 30));
 			//2.s If <materialType> = "ZPRT", then call the TssClassificationMaint.addCharacteristic() method to add the MM_PHANTOM_IND characteristic to the MM_FIELDS classification
 			if("ZPRT".equalsIgnoreCase(materialType)){
 				value = chwModel.getPHANTOMMODINDC();
@@ -241,7 +241,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			}
 			//2.x Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_MTM characteristic to the MM_FIELDS classification.
 			value = materialID;
-			rdhClassificationMaint.addCharacteristic("MM_SP_MTM", value);
+			rdhClassificationMaint.addCharacteristic("MM_SP_MTM", CommonUtils.getFirstSubString(value, 7));
 			//2.final 
 			rdhClassificationMaint.execute();
 			this.addRfcResult(rdhClassificationMaint);
@@ -284,7 +284,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 				//3.g Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_IDENTIFIER characteristic to the MM_SERVICEPAC classification.
 				input = chwModel.getSUBCATEGORY();
 				value = ATWRTforService(input);
-				TssClassificationMaint.addCharacteristic("MM_SP_IDENTIFIER", value);
+				TssClassificationMaint.addCharacteristic("MM_SP_IDENTIFIER", CommonUtils.getFirstSubString(value, 5));
 				//3.h Call the TssClassificationMaint.addCharacteristic() method to add the MM_HW_SPTERM characteristic to the MM_SERVICEPAC classification.
 				/**
 				 * Set var=UPPER(hwProduct/COVRPRIOD);
@@ -343,7 +343,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 					//3. j Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_SDM characteristic to the MM_SERVICEPAC classification.
 					input = SVCLEV.getSVCDELIVMETH();					
 					value = getMM_SP_SDMValue(input);
-					TssClassificationMaint.addCharacteristic("MM_SP_SDM", value);
+					TssClassificationMaint.addCharacteristic("MM_SP_SDM", CommonUtils.getFirstSubString(value, 10));
 					//3.k Call the TssClassificationMaint.addCharacteristic() method to add the MM_SPFIXEDTIME characteristic to the MM_SERVICEPAC classification.
 					/**
 					 * If SVCLEV_UPDATE/FIXTME=''" or SVCLEV_UPDATE/FIXTMEUOM=''" or SVCLEV_UPDATE/FIXTMEOBJIVE=''", then

@@ -3,10 +3,13 @@ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwClassMaintain;
@@ -16,6 +19,7 @@ import COM.ibm.eannounce.abr.sg.rfc.FEATURE;
 import COM.ibm.eannounce.abr.sg.rfc.LANGUAGEELEMENT_FEATURE;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
+import COM.ibm.eannounce.abr.sg.rfc.RdhChwFcProd;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
@@ -38,7 +42,12 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 	private int abr_debuglvl = D.EBUG_ERR;
 	private String navName = "";
 	private Hashtable metaTbl = new Hashtable();
-	private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'PRODSTRUCT' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
+	private String PRODSTRUCTSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'PRODSTRUCT' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
+	
+	private String MODELSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
+	
+	private String FEATURESQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'FEATURE' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
+	
 	private String COVEQUALSQL="SELECT count(*) FROM OPICM.flag F\n"
 			+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.ATTRIBUTEVALUE ='?' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
 			+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
@@ -55,7 +64,11 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			+ "WHERE f.ENTITYTYPE ='FCTRANSACTION' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'FCTRANSACTIONIERPABRSTATUS')  AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' WITH UR"
 			;
 	String xml = null;
-
+	Map<String,String> FctypeEMap = new HashMap<String,String>();
+	{
+		FctypeEMap.put("RPQ-PLISTED", "");
+		FctypeEMap.put("RPQ-ILISTED", "");
+	}
 	
 
 	public String getDescription() {
@@ -123,33 +136,34 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			addDebug("rootDesc" + rootDesc);
 			// build the text file
 
-			Connection connection = m_db.getODSConnection();
-			PreparedStatement statement = connection.prepareStatement(CACEHSQL); 
-			statement.setInt(1, rootEntity.getEntityID());
-			ResultSet resultSet = statement.executeQuery();
-		
-			while (resultSet.next()) {
-				xml = resultSet.getString("XMLMESSAGE");
-			}
-			if (xml != null) {
+			String prodstuctxml = getXMLByID(PRODSTRUCTSQL, rootEntity.getEntityID());
+			
+			if (prodstuctxml != null) {
 				//step1 Execute the steps described in the section Create SAP characteristics and classes for MachineTypeNEW material 
 				//to create the SAP characteristics and classes of the feature code for MachineTypeNEW material. 
-				TMF_UPDATE tmf = XMLParse.getObjectFromXml(xml,TMF_UPDATE.class);
-				//TODO get chwFeature and chwModel from tmf
-				FEATURE chwFeature = null;
-				MODEL chwModel = null;
+				TMF_UPDATE tmf = XMLParse.getObjectFromXml(prodstuctxml,TMF_UPDATE.class);
+				//get chwFeature and chwModel from tmf
+				if(tmf==null) return;
+				String featurexml = getXMLByID(FEATURESQL, Integer.parseInt(tmf.getFEATUREENTITYID()));
+				String modelxml = getXMLByID(MODELSQL, Integer.parseInt(tmf.getMODELENTITYID()));				
+		
+				FEATURE chwFeature = XMLParse.getObjectFromXml(featurexml,FEATURE.class);
+				MODEL chwModel = XMLParse.getObjectFromXml(modelxml,MODEL.class);
 				MachineTypeNEW(tmf,chwFeature,chwModel);
-				//step2 TODO
+				//step2 
 				/**
 				 * If there is a MODELCONVERT which meets all of conditions below,
 				 *  tomachtype = chwTMF/MACHTYPE
 				 *  frommachtype !=tomachtype
 				 *  past ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
-				 */
+				 */				
 				//execute the steps described in the section Create SAP characteristics and classes for MachineTypeMTC material 
 				// to create the SAP characteristics and classes of the feature code for MachineTypeMTC material.
-				MachineTypeMTC(tmf,chwFeature,chwModel);
-				//step3 TODO
+				if(exist(COVNOTEQUALSQL, tmf.getMACHTYPE())) {
+					MachineTypeMTC(tmf,chwFeature,chwModel);
+				}
+				
+				//step3 
 				/**
 				 *  If SUBCATEGORY of parent MODEL is not in (''Maintenance'',''MaintFeature"),
 			        If there is a MODELCONVERT which meets all of conditions below, 
@@ -163,13 +177,18 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			            past ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
 			        or if ORDERCODE of parent MODEL is  in ("M",  "B")
 				 */
-				MachineTypeUPG(tmf,chwFeature,chwModel);
+				if(!"Maintenance,MaintFeature".contains(chwModel.getSUBCATEGORY())) {
+					if(exist(COVEQUALSQL, tmf.getMACHTYPE())||exist(FCTEQUALSQL, tmf.getMACHTYPE()) ||"M,B".contains(chwModel.getORDERCODE())) {
+						MachineTypeUPG(tmf,chwFeature,chwModel);
+					}					
+				}
 				
 				//step4 Call CHWYMDMFCMaint to populate iERP user-defined tables (UDTs) with the availability status 
 				//of PRODSTRUCT by setting the input parameter for tbl_tmf_c structure
+				//TODO there is no CHWYMDMFCMaint caller
 				//CHWYMDMFCMaint CHWYMDMFCMaint = new CHWYMDMFCMaint();
-				
-
+				RdhChwFcProd caller = new RdhChwFcProd(null, tmf, null);
+				runRfcCaller(caller);
 					
 				
 			}	
@@ -185,10 +204,10 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			e.printStackTrace(new java.io.PrintWriter(exBuf));
 			// Put exception into document
 			args[0] = e.getMessage();
-			rptSb.append(msgf.format(args) + NEWLINE);
+			rptSb.append(convertToTag(msgf.format(args)) + NEWLINE);
 			msgf = new MessageFormat(Error_STACKTRACE);
 			args[0] = exBuf.getBuffer().toString();
-			rptSb.append(msgf.format(args) + NEWLINE);
+			rptSb.append(convertToTag(msgf.format(args)) + NEWLINE);
 			logError("Exception: " + e.getMessage());
 			logError(exBuf.getBuffer().toString());
 			// was an error make sure user gets report
@@ -216,12 +235,40 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		}
 	}
 
+	protected void runRfcCaller(RdhBase caller) throws Exception {
+		this.addDebug("Calling " + caller.getRFCName());
+		caller.execute();
+		this.addDebug(caller.createLogEntry());
+		if (caller.getRfcrc() == 0) {
+			this.addOutput(caller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(caller.getRFCName() + " called  faild!");
+			this.addOutput(caller.getError_text());
+		}
+	}
+
+	protected String getXMLByID(String SQL ,int entityId)
+			throws MiddlewareException, SQLException {
+		String sReturn = "";
+		Connection connection = m_db.getODSConnection();
+		PreparedStatement statement = connection.prepareStatement(SQL); 
+		statement.setInt(1, entityId);
+		ResultSet resultSet = statement.executeQuery();
+
+		while (resultSet.next()) {
+			sReturn = resultSet.getString("XMLMESSAGE");
+		}
+		return sReturn;
+	}
+
 	
 
 
 	
 
 	private void MachineTypeUPG(TMF_UPDATE chwTMF, FEATURE chwFeature,	MODEL chwModel) throws Exception{
+		if(chwFeature==null) return;
+		if(chwModel==null) return;
 		String feature_code = chwTMF.getFEATURECODE();
 		String FCTYPE = chwTMF.getFCTYPE();
 		String obj_id = chwTMF.getMACHTYPE() + "UPG";
@@ -230,7 +277,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		//step1 If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED"), then
-		if(CommonUtils.isNoLetter(feature_code) && !"RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE)){
+		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			//1.1String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
 			try{
@@ -278,7 +325,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			}
 		}
 		//step2 If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE in ("RPQ-PLISTED","RPQ-ILISTED"), then
-		if(CommonUtils.hasLetter(feature_code) && "RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE)){
+		if(CommonUtils.hasLetter(feature_code) && FctypeEMap.containsKey(FCTYPE)){
 			//2.1.1 Call ChwClsfCharCreate.CreateRPQGroupChar() to create the Target group characteristic and class for the RPQ feature code.
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			try{
@@ -329,7 +376,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		//step3 If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED") 
 		//and the first 3 characters of chwTMF/FEATURECODE <> "NEW",
 		if(CommonUtils.hasLetter(feature_code) 
-				   && !"RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE) 
+				   && !FctypeEMap.containsKey(FCTYPE) 
 				   && !CommonUtils.getFirstSubString(feature_code, 3).equalsIgnoreCase("NEW")){
 			//3.1 call ChwClsfCharCreate.CreateAlphaGroupChar() to create the Target characteristic and class for the alpah feature code.
 			chwClsfCharCreate = new ChwClsfCharCreate();
@@ -430,6 +477,9 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 
 	private void MachineTypeMTC(TMF_UPDATE chwTMF, FEATURE chwFeature, MODEL chwModel) throws Exception {
 		
+		if(chwFeature==null) return;
+		if(chwModel==null) return;
+		
 		String feature_code = chwTMF.getFEATURECODE();
 		String FCTYPE = chwTMF.getFCTYPE();
 		String obj_id = chwTMF.getMACHTYPE() + "MTC";
@@ -438,7 +488,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		//step1 .If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED"), then
-		if(CommonUtils.isNoLetter(feature_code) && !"RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE)){
+		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
 			//1.1 Call ChwClsfCharCreate.CreateGroupChar() method to create the Target group characteristic and class
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			//String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
@@ -489,7 +539,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			}
 		}
 		//step2 : If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE in ("RPQ-PLISTED","RPQ-ILISTED"), then
-		if(CommonUtils.hasLetter(feature_code) && "RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE)){
+		if(CommonUtils.hasLetter(feature_code) && FctypeEMap.containsKey(FCTYPE)){
 			//2.11 Call ChwClsfCharCreate.CreateRPQGroupChar() to create the Target group characteristic and class for the RPQ feature code
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			try{
@@ -539,7 +589,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		//3. If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED") 
 		//and the first 3 characters of chwTMF/FEATURECODE <> "NEW", 
 		if(CommonUtils.hasLetter(feature_code) 
-				   && !"RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE) 
+				   && !FctypeEMap.containsKey(FCTYPE) 
 				   && !CommonUtils.getFirstSubString(feature_code, 3).equalsIgnoreCase("NEW")){
 			//3.1 call ChwClsfCharCreate.CreateAlphaGroupChar() to create the Target characteristic and class for the alpah feature code.
 			chwClsfCharCreate = new ChwClsfCharCreate();
@@ -652,15 +702,20 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 	private void MachineTypeNEW(TMF_UPDATE chwTMF, FEATURE chwFeature, MODEL chwModel) throws Exception {
 		
 		//step1 If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED")
-		String feature_code = chwTMF.getFEATURECODE();
+		
+		if(chwFeature==null) return;
+		if(chwModel==null) return;
+		
 		String FCTYPE = chwTMF.getFCTYPE();
 		String obj_id = chwTMF.getMACHTYPE() + "NEW";
 		String target_indc = "T";
 		String mach_type = chwTMF.getMACHTYPE();
+		String feature_code = chwTMF.getFEATURECODE();
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		
-		if(CommonUtils.isNoLetter(feature_code) && !"RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE)){
+		
+		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
 			//1.1 Call ChwClsfCharCreate.CreateGroupChar() method to create the group characteristic and class.
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			//String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
@@ -692,7 +747,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			}			
 		}
 		//step2 If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE in ("RPQ-PLISTED","RPQ-ILISTED"), then
-		if(CommonUtils.hasLetter(feature_code) && "RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE)){
+		if(CommonUtils.hasLetter(feature_code) && FctypeEMap.containsKey(FCTYPE)){
 			//2.1 Call ChwClsfCharCreate.CreateRPQGroupChar() to create the group characteristic and class for the RPQ feature code.
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			//feature_code_desc = getFeatureCodeDesc(feature);
@@ -725,7 +780,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		//step3. If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED") 
 		//and the first 3 characters of chwTMF/FEATURECODE <> "NEW",
 		if(CommonUtils.hasLetter(feature_code) 
-		   && !"RPQ-PLISTED,RPQ-ILISTED".contains(FCTYPE) 
+		   && !FctypeEMap.containsKey(FCTYPE) 
 		   && !CommonUtils.getFirstSubString(feature_code, 3).equalsIgnoreCase("NEW")){
 			//3.1 call ChwClsfCharCreate.CreateAlphaGroupChar() to create the group characteristic and class for the alpah feature code.
 			chwClsfCharCreate = new ChwClsfCharCreate();
@@ -819,6 +874,64 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		return navName.toString();
 	}
 	
+	public boolean exist(String sql,String type) {
+    	boolean flag = false;
+    	try {
+		Connection connection = m_db.getPDHConnection();
+		PreparedStatement statement = connection.prepareStatement(sql);
+		statement.setString(1, type);
+		
+		ResultSet resultSet = statement.executeQuery();
+		while (resultSet.next()) {
+			flag = true;
+			
+		}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (MiddlewareException e) {
+			e.printStackTrace();
+		}
+    	
+    	return flag;
+    	
+    }
+	
+	 /********************************************************************************
+     * Convert string into valid html.  Special HTML characters are converted.
+     *
+     * @param txt    String to convert
+     * @return String
+     */
+    protected static String convertToTag(String txt)
+    {
+        String retVal="";
+        StringBuffer htmlSB = new StringBuffer();
+        StringCharacterIterator sci = null;
+        char ch = ' ';
+        if (txt != null) {
+            sci = new StringCharacterIterator(txt);
+            ch = sci.first();
+            while(ch != CharacterIterator.DONE)
+            {
+                switch(ch)
+                {
+                case '<':
+                    htmlSB.append("&lt;");
+                break;
+                case '>':
+                    htmlSB.append("&gt;");
+                    break;
+                default:
+                    htmlSB.append(ch);
+                break;
+                }
+                ch = sci.next();
+            }
+            retVal = htmlSB.toString();
+        }
+
+        return retVal;
+    }
 	
 	 /********************************************************************************
      * Convert string into valid html.  Special HTML characters are converted.
