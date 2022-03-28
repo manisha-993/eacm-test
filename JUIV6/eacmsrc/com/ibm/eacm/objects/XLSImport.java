@@ -22,6 +22,12 @@ import javax.swing.JFileChooser;
 
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import COM.ibm.eannounce.objects.EANBusinessRuleException;
 import com.ibm.eacm.edit.Importable;
@@ -76,7 +82,7 @@ public class XLSImport implements EACMGlobals, Importable
 		logger.setLevel(PrefMgr.getLoggerLevel(EDIT_PKG_NAME, Level.INFO));
 	}
 	
-	private HSSFWorkbook hssfworkbook = null;
+	private Workbook workbook = null;	
 	private Vector<String> warningMsgsVct = new Vector<String>(1);
 
 	/**
@@ -91,16 +97,21 @@ public class XLSImport implements EACMGlobals, Importable
 	public XLSImport(String filename)
 	throws IOException
 	{
-		POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(filename));
-
-		hssfworkbook = new HSSFWorkbook(fs);
+		String[] split = filename.toLowerCase().split("\\."); 
+		
+		if("xlsx".equals(split[1])) {
+			workbook = new XSSFWorkbook(new FileInputStream(filename));
+		}else if("xls".equals(split[1])) {
+			POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(filename));
+			workbook = new HSSFWorkbook(fs);
+		}
 	}
 
 	/**
 	 * release memory
 	 */
 	public void dereference() {
-		hssfworkbook = null;
+		workbook = null;
 		warningMsgsVct.clear();
 		warningMsgsVct = null;
 	}
@@ -147,7 +158,7 @@ public class XLSImport implements EACMGlobals, Importable
 	/**
 	 * Formats a number or date cell
 	 */
-	private static String formatNumberDateCell(HSSFCell cell, String attrCode) {
+	private static String formatNumberDateCell(Cell cell, String attrCode) {
 		short formatIndex = cell.getCellStyle().getDataFormat();
 		double value = cell.getNumericCellValue();
 		String format = "0.0"; // maintain leading 0 before decimal point
@@ -158,7 +169,7 @@ public class XLSImport implements EACMGlobals, Importable
 		}
 
 		// Is it a date?
-		if(HSSFDateUtil.isADateFormat(formatIndex,format) &&
+		if(DateUtil.isADateFormat(formatIndex,format) &&
 				HSSFDateUtil.isValidExcelDate(value)) {
 			// Format as a EACM date
 			Date d = HSSFDateUtil.getJavaDate(value, false);
@@ -199,20 +210,19 @@ public class XLSImport implements EACMGlobals, Importable
 	 * Read in the workbook and create new entities
 	 *
 	 */
-	public void process(Importable importable) throws IOException
-	{
-		if(hssfworkbook.getNumberOfSheets()>1){
+	public void process(Importable importable) throws IOException {
+		if(workbook.getNumberOfSheets()>1){
 			addWarning("More than one sheet found.  Only the first one will be used.");
 		}
 
-		HSSFSheet sheet = hssfworkbook.getSheetAt(0);
+		Sheet sheet = workbook.getSheetAt(0);
 		String attrCodes[] = null; // first row in ss must be the attribute codes
 
 		Iterator<?> rowItr = sheet.rowIterator();
 		int rowCount = -1;
 		while (rowItr.hasNext()) {
 			boolean getAttrCodes = false;
-			HSSFRow row  = (HSSFRow)rowItr.next();
+			Row row  = (Row)rowItr.next();
 			int rowNum = row.getRowNum()+1; // +1 for logical location
 			int firstCell = -1;
 			String valueArray[] = null;
@@ -236,8 +246,8 @@ public class XLSImport implements EACMGlobals, Importable
 			}
 			Iterator<?> cellItr = row.cellIterator();
 			while (cellItr.hasNext()) {
-				HSSFCell cell  = (HSSFCell)cellItr.next();
-				int cellNum = cell.getCellNum(); // must use physical location
+				Cell cell  = (Cell)cellItr.next();
+				int cellNum = cell.getColumnIndex(); // must use physical location
 				String value = null;
 
 				if (getAttrCodes){
@@ -256,17 +266,17 @@ public class XLSImport implements EACMGlobals, Importable
 
 				switch (cell.getCellType())
 				{
-				case HSSFCell.CELL_TYPE_NUMERIC:
+				case Cell.CELL_TYPE_NUMERIC:
 					logger.log(Level.FINE, "numeric "+rowNum+" cell: "+(cellNum+1));
 					value = formatNumberDateCell(cell,attrCodes[cellNum]+"["+rowNum+"]");
 					break;
-				case HSSFCell.CELL_TYPE_STRING:
+				case Cell.CELL_TYPE_STRING:
 					logger.log(Level.FINE, "string "+rowNum+" cell: "+(cellNum+1));
 					value = cell.getRichStringCellValue().getString();
 					break;
-				case HSSFCell.CELL_TYPE_BLANK:
+				case Cell.CELL_TYPE_BLANK:
 					continue;
-				case HSSFCell.CELL_TYPE_FORMULA:
+				case Cell.CELL_TYPE_FORMULA:
 					addWarning("Unsupported FORMULA cell type found in row: "+rowNum+" cell: "+(cellNum+1));
 					String formula = "formula";;
 					try{
@@ -452,4 +462,5 @@ public class XLSImport implements EACMGlobals, Importable
         }
 	}
 }
+
 
