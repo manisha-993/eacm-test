@@ -19,6 +19,7 @@ import COM.ibm.eannounce.abr.sg.rfc.FEATURE;
 import COM.ibm.eannounce.abr.sg.rfc.LANGUAGEELEMENT_FEATURE;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
+import COM.ibm.eannounce.abr.sg.rfc.RdhChwFcProd;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
@@ -141,26 +142,28 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				//step1 Execute the steps described in the section Create SAP characteristics and classes for MachineTypeNEW material 
 				//to create the SAP characteristics and classes of the feature code for MachineTypeNEW material. 
 				TMF_UPDATE tmf = XMLParse.getObjectFromXml(prodstuctxml,TMF_UPDATE.class);
-				//TODO get chwFeature and chwModel from tmf
+				//get chwFeature and chwModel from tmf
 				if(tmf==null) return;
 				String featurexml = getXMLByID(FEATURESQL, Integer.parseInt(tmf.getFEATUREENTITYID()));
 				String modelxml = getXMLByID(MODELSQL, Integer.parseInt(tmf.getMODELENTITYID()));				
-				
-				
+		
 				FEATURE chwFeature = XMLParse.getObjectFromXml(featurexml,FEATURE.class);
 				MODEL chwModel = XMLParse.getObjectFromXml(modelxml,MODEL.class);
 				MachineTypeNEW(tmf,chwFeature,chwModel);
-				//step2 TODO
+				//step2 
 				/**
 				 * If there is a MODELCONVERT which meets all of conditions below,
 				 *  tomachtype = chwTMF/MACHTYPE
 				 *  frommachtype !=tomachtype
 				 *  past ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
-				 */
+				 */				
 				//execute the steps described in the section Create SAP characteristics and classes for MachineTypeMTC material 
 				// to create the SAP characteristics and classes of the feature code for MachineTypeMTC material.
-				MachineTypeMTC(tmf,chwFeature,chwModel);
-				//step3 TODO
+				if(exist(COVNOTEQUALSQL, tmf.getMACHTYPE())) {
+					MachineTypeMTC(tmf,chwFeature,chwModel);
+				}
+				
+				//step3 
 				/**
 				 *  If SUBCATEGORY of parent MODEL is not in (''Maintenance'',''MaintFeature"),
 			        If there is a MODELCONVERT which meets all of conditions below, 
@@ -174,13 +177,18 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			            past ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
 			        or if ORDERCODE of parent MODEL is  in ("M",  "B")
 				 */
-				MachineTypeUPG(tmf,chwFeature,chwModel);
+				if(!"Maintenance,MaintFeature".contains(chwModel.getSUBCATEGORY())) {
+					if(exist(COVEQUALSQL, tmf.getMACHTYPE())||exist(FCTEQUALSQL, tmf.getMACHTYPE()) ||"M,B".contains(chwModel.getORDERCODE())) {
+						MachineTypeUPG(tmf,chwFeature,chwModel);
+					}					
+				}
 				
 				//step4 Call CHWYMDMFCMaint to populate iERP user-defined tables (UDTs) with the availability status 
 				//of PRODSTRUCT by setting the input parameter for tbl_tmf_c structure
+				//TODO there is no CHWYMDMFCMaint caller
 				//CHWYMDMFCMaint CHWYMDMFCMaint = new CHWYMDMFCMaint();
-				
-
+				RdhChwFcProd caller = new RdhChwFcProd(null, tmf, null);
+				runRfcCaller(caller);
 					
 				
 			}	
@@ -196,10 +204,10 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			e.printStackTrace(new java.io.PrintWriter(exBuf));
 			// Put exception into document
 			args[0] = e.getMessage();
-			rptSb.append(msgf.format(args) + NEWLINE);
+			rptSb.append(convertToTag(msgf.format(args)) + NEWLINE);
 			msgf = new MessageFormat(Error_STACKTRACE);
 			args[0] = exBuf.getBuffer().toString();
-			rptSb.append(msgf.format(args) + NEWLINE);
+			rptSb.append(convertToTag(msgf.format(args)) + NEWLINE);
 			logError("Exception: " + e.getMessage());
 			logError(exBuf.getBuffer().toString());
 			// was an error make sure user gets report
@@ -224,6 +232,18 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 
 			println(EACustom.getTOUDiv());
 			buildReportFooter(); // Print </html>
+		}
+	}
+
+	protected void runRfcCaller(RdhBase caller) throws Exception {
+		this.addDebug("Calling " + caller.getRFCName());
+		caller.execute();
+		this.addDebug(caller.createLogEntry());
+		if (caller.getRfcrc() == 0) {
+			this.addOutput(caller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(caller.getRFCName() + " called  faild!");
+			this.addOutput(caller.getError_text());
 		}
 	}
 
@@ -854,6 +874,64 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		return navName.toString();
 	}
 	
+	public boolean exist(String sql,String type) {
+    	boolean flag = false;
+    	try {
+		Connection connection = m_db.getPDHConnection();
+		PreparedStatement statement = connection.prepareStatement(sql);
+		statement.setString(1, type);
+		
+		ResultSet resultSet = statement.executeQuery();
+		while (resultSet.next()) {
+			flag = true;
+			
+		}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (MiddlewareException e) {
+			e.printStackTrace();
+		}
+    	
+    	return flag;
+    	
+    }
+	
+	 /********************************************************************************
+     * Convert string into valid html.  Special HTML characters are converted.
+     *
+     * @param txt    String to convert
+     * @return String
+     */
+    protected static String convertToTag(String txt)
+    {
+        String retVal="";
+        StringBuffer htmlSB = new StringBuffer();
+        StringCharacterIterator sci = null;
+        char ch = ' ';
+        if (txt != null) {
+            sci = new StringCharacterIterator(txt);
+            ch = sci.first();
+            while(ch != CharacterIterator.DONE)
+            {
+                switch(ch)
+                {
+                case '<':
+                    htmlSB.append("&lt;");
+                break;
+                case '>':
+                    htmlSB.append("&gt;");
+                    break;
+                default:
+                    htmlSB.append(ch);
+                break;
+                }
+                ch = sci.next();
+            }
+            retVal = htmlSB.toString();
+        }
+
+        return retVal;
+    }
 	
 	 /********************************************************************************
      * Convert string into valid html.  Special HTML characters are converted.
