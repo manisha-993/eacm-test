@@ -193,7 +193,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 				else if ("SoftdWare".equals(model.getCATEGORY())) {
 					throw new Exception("Not support SoftWare");
 				}
-			RdhChwFcProd prod = new RdhChwFcProd(model, null, null);
+			RdhChwFcProd prod = new RdhChwFcProd(model);
 			this.addDebug("Calling " + prod.getRFCName());
 			prod.execute();
 			this.addDebug(prod.createLogEntry());

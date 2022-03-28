@@ -187,7 +187,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				//of PRODSTRUCT by setting the input parameter for tbl_tmf_c structure
 				//TODO there is no CHWYMDMFCMaint caller
 				//CHWYMDMFCMaint CHWYMDMFCMaint = new CHWYMDMFCMaint();
-				RdhChwFcProd caller = new RdhChwFcProd(null, tmf, null);
+				RdhChwFcProd caller = new RdhChwFcProd(tmf);
 				runRfcCaller(caller);
 					
 				

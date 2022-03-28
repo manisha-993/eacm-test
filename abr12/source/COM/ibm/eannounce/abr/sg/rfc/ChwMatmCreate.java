@@ -259,8 +259,11 @@ public class ChwMatmCreate extends RdhBase {
 		Set<TAXCATEGORY> cset = new HashSet<TAXCATEGORY>();
 		Set<String> slorgSet = new HashSet<String>();
 		Set<String> plntSet = new HashSet<String>();
+		List<RdhMatm_sales_org> sales_orgList = new ArrayList<RdhMatm_sales_org>();
+		List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
+		Set<String> set = new HashSet<String>();
 
-		if (availabilities != null && availabilities.size() > 0) {
+		/*if (availabilities != null && availabilities.size() > 0) {
 
 			for (int i = 0; i < availabilities.size(); i++) {
 				
@@ -271,8 +274,7 @@ public class ChwMatmCreate extends RdhBase {
 				}
 			}
 		}
-		List<RdhMatm_sales_org> sales_orgList = new ArrayList<RdhMatm_sales_org>();
-		List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
+		
 		Iterator<String> pIterator = plntSet.iterator();
 		while (pIterator.hasNext()) {
 			String plntcd = (String) pIterator.next();
@@ -283,7 +285,6 @@ public class ChwMatmCreate extends RdhBase {
 			plantList.add(plant);
 		}
 		Iterator<String> slorgIterator = slorgSet.iterator();
-		Set<String> set = new HashSet<String>();
 		while (slorgIterator.hasNext()) {
 			String slorg = (String) slorgIterator.next();
 			
@@ -306,7 +307,7 @@ public class ChwMatmCreate extends RdhBase {
 					set.add(sales_org.getVkorg()+sales_org.getDwerk());
 				}
 			}
-		}
+		}*/
 		
 		List<RdhMatm_tax_country> tax_countries = new  ArrayList<RdhMatm_tax_country>();
 		List<CountryPlantTax> taxs = RFCConfig.getTaxs();
