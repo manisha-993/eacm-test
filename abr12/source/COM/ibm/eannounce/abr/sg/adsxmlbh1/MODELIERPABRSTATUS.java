@@ -607,7 +607,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
 		String dep_type="7"; 
 		String descript=model.getMACHTYPE()+" Set Model";
-		String sourceLine = "$self.mk_model2 =$self.mk_t_"+model.getMACHTYPE()+"_mod";
+		String sourceLine = "$self.mk_model2 = mk_t_"+model.getMACHTYPE()+"_mod";
 		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id, dep_extern, dep_type, descript)	;
 		chwDepdCaller.addSourceLineCondition(sourceLine);
 		runRfcCaller(caller);
@@ -706,8 +706,18 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 						, "H"
 						);
 		runRfcCaller(TssClassificationMaint);
+		//step 6 Create the PR_machinetype_SET_MODEL object dependency:
+		//6 a Call the ChwDepdMaintain constructor to create the PR_machinetype_SET_MODEL dependency.
+		String obj_id_depd=model.getMACHTYPE()+"NEW";
+		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
+		String dep_type="7"; 
+		String descript=model.getMACHTYPE()+" Set Model";
+		String sourceLine = "$self.mk_model2 = mk_t_"+model.getMACHTYPE()+"_mod";
+		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id_depd, dep_extern, dep_type, descript)	;
+		chwDepdCaller.addSourceLineCondition(sourceLine);
+		runRfcCaller(chwDepdCaller);
 		
-		//step6 Call the ChwConpMaintain to create a configuration profile for the product's material master record
+		//step7 Call the ChwConpMaintain to create a configuration profile for the product's material master record
 		ChwConpMaintain ChwConpMaintain  = 
 				new ChwConpMaintain(
 						obj_id 				//String obj_id  Set to concatenation of chwProduct.machineType + "MTC"
@@ -717,15 +727,15 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 						, model.getMACHTYPE() +	"NEWUI"		//String design	 Set to Set to concatenation of chwProduct.machineType + "NEWUI" 
 						);
 		
-		//6.b Call the ChwConpMaintain.addConfigDependency() method.
+		//7.b Call the ChwConpMaintain.addConfigDependency() method.
 		ChwConpMaintain.addConfigDependency("E2E", empty); //Set to "E2E".
-		//6.c 
+		//7.c 
 		ChwConpMaintain.addConfigDependency("PR_"+model.getMACHTYPE()+"_SET_MODEL", empty);  //Set to "PR_<chwProduct.machineType>_SET_MODEL"
-		//6.d
+		//7.d
 		ChwConpMaintain.addConfigDependency("PR_E2E_SET_MTM", empty);  //Set to "PR_E2E_SET_MTM".
-		//6.e 
+		//7.e 
 		ChwConpMaintain.addConfigDependency("PR_E2E_PRICING_HW", empty);  //Set to "PR_E2E_PRICING_HW".
-		//6.f 
+		//7.f 
 		ChwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", empty);  //Set to "PR_E2E_PRICING_HW"		
 		runRfcCaller(ChwConpMaintain);
 		

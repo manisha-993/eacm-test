@@ -72,7 +72,7 @@ public class ChwClassMaintain extends RdhBase
         // RdhClas_clclasses org_area Set to "PM".
         clclasses.setOrg_area("PM");
         // RdhClas_clclasses val_from Set to current date. Format is YYYYMMDD.
-        clclasses.setVal_from(DateUtility.getTodayStringWithSapFormat());
+        clclasses.setVal_from(DateUtility.getTodayStringWithSimpleFormat());
         // RdhClas_clclasses val_to Set to "99991231".
         clclasses.setVal_to("99991231");
         // RdhClas_clclasses check_no Set to "X".

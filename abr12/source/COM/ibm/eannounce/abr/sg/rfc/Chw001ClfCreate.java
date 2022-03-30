@@ -39,13 +39,22 @@ public class Chw001ClfCreate extends RfcCallerBase{
 					, "H"
 					);
 			this.addRfcName(rdhClassificationMaint);
-			//1.b Call the TssClassificationMaint.addCharacteristic() method to add the MG_PRODUCTTYPE characteristic to the MG_COMMON classification and indicate the product type.
-			String value ="";
-			if("Hardware".equalsIgnoreCase(chwModel.getCATEGORY())){
-				value = "HW";
-			}else if ("Service".equalsIgnoreCase(chwModel.getCATEGORY())){
-				value = "SP";
-			}			
+			//1.b Call the TssClassificationMaint.addCharacteristic() method to add the
+			//MG_PRODUCTTYPE characteristic to the MG_COMMON classification and indicate the product type.
+			/**
+			 * If <materialType> = "ZPRT", then
+				    If <chwProduct/CATEGORY>='Hardware' , then set to "HW".    
+				    else if <chwProduct/CATEGORY>='Service', then set to "SP".
+				Else set to "CH".
+			 */
+			String value ="CH";
+			if("ZPRT".equalsIgnoreCase(materialType)){
+				if("Hardware".equalsIgnoreCase(chwModel.getCATEGORY())){
+					value = "HW";
+				}else if ("Service".equalsIgnoreCase(chwModel.getCATEGORY())){
+					value = "SP";
+				}	
+			}
 			rdhClassificationMaint.addCharacteristic("MG_PRODUCTTYPE", value);
 			rdhClassificationMaint.execute();
 			this.addRfcResult(rdhClassificationMaint);
