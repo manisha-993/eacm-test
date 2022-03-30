@@ -86,7 +86,6 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 				+ NEWLINE;
 
 		String header1 = "";
-	
 
 		MessageFormat msgf;
 		String abrversion = "";
@@ -144,8 +143,9 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 				MODEL model = XMLParse.getObjectFromXml(xml,MODEL.class);
 				
 				if("Hardware".equals(model.getCATEGORY())) {
-					processMachTypeMODEL(model, connection);
 					processMachTypeNew(model, connection);
+					processMachTypeMODEL(model, connection);
+					
 					
 					/**
 					 * 
@@ -613,7 +613,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		String dep_type="7"; 
 		String descript=model.getMACHTYPE()+" Set Model";
 		String sourceLine = "$self.mk_model2 =$self.mk_t_"+model.getMACHTYPE()+"_mod";
-		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(xml, dep_extern, dep_type, descript)	;
+		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id, dep_extern, dep_type, descript)	;
 		chwDepdCaller.addSourceLineCondition(sourceLine);
 		this.addDebug("Calling " + chwDepdCaller.getRFCName());
 		chwDepdCaller.execute();
@@ -673,7 +673,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     	String obj_id = materialID;
 		String class_name="MK_REFERENCE";
 		String class_type="300";
-		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
 		this.addDebug("Calling " + cMaintCaller.getRFCName());
 		cMaintCaller.execute();
 		this.addDebug(cMaintCaller.createLogEntry());
@@ -684,7 +684,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(cMaintCaller.getError_text());
 		}
 		class_name = "MK_T_VAO_NEW";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
 		this.addDebug("Calling " + cMaintCaller.getRFCName());
 		cMaintCaller.execute();
 		this.addDebug(cMaintCaller.createLogEntry());
@@ -721,7 +721,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     	String obj_id = materialID;
 		String class_name="MK_REFERENCE";
 		String class_type="300";
-		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
 		this.addDebug("Calling " + cMaintCaller.getRFCName());
 		cMaintCaller.execute();
 		this.addDebug(cMaintCaller.createLogEntry());
@@ -732,7 +732,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(cMaintCaller.getError_text());
 		}
 		class_name = "MK_T_VAO_NEW";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
 		this.addDebug("Calling " + cMaintCaller.getRFCName());
 		cMaintCaller.execute();
 		this.addDebug(cMaintCaller.createLogEntry());
@@ -743,7 +743,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(cMaintCaller.getError_text());
 		}
 		class_name = "MK_D_VAO_NEW";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
 		this.addDebug("Calling " + cMaintCaller.getRFCName());
 		cMaintCaller.execute();
 		this.addDebug(cMaintCaller.createLogEntry());
@@ -754,7 +754,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(cMaintCaller.getError_text());
 		}
 		class_name = "MK_FC_EXCH";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
 		this.addDebug("Calling " + cMaintCaller.getRFCName());
 		cMaintCaller.execute();
 		this.addDebug(cMaintCaller.createLogEntry());
@@ -765,7 +765,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(cMaintCaller.getError_text());
 		}
 		class_name = "MK_FC_CONV";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
 		this.addDebug("Calling " + cMaintCaller.getRFCName());
 		cMaintCaller.execute();
 		this.addDebug(cMaintCaller.createLogEntry());
@@ -815,7 +815,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(chwClassMaintain.getError_text());
 		}
 		class_type="300";
-		RdhClassificationMaint classificationMaint = new RdhClassificationMaint(obj_id, class_name, class_type);
+		RdhClassificationMaint classificationMaint = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
 		this.addDebug("Calling " + classificationMaint.getRFCName());
 		classificationMaint.execute();
 		this.addDebug(classificationMaint.createLogEntry());
