@@ -27,7 +27,7 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 			String empty ="";
 			String obj_id = chwModel.getMACHTYPE() + "UPG";
 			//1. Call ChwMatmCreate to create the material master for the product object.
-			ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwModel,"ZMAT",chwModel.getMACHTYPE() + "MTC");
+			ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwModel,"ZMAT",chwModel.getMACHTYPE() + "UPG");
 			this.addRfcName(chwMatmCreate);
 			chwMatmCreate.execute();
 			this.addRfcResult(chwMatmCreate);

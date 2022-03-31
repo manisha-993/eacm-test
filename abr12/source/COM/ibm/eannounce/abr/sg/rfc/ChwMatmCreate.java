@@ -106,7 +106,7 @@ public class ChwMatmCreate extends RdhBase {
 		//prdha
 		//bmmh1.get(0).setPrdha(model.getPRODHIERCD());
 		bmmh1.get(0).setMaabc("A");
-		//bmmh1.get(0).setEkgrp("ZZZ");
+		bmmh1.get(0).setEkgrp("ZZZ");
 		bmmh1.get(0).setDismm("PD");
 		bmmh1.get(0).setDispo("000");
 		bmmh1.get(0).setPerkz("M");
@@ -199,7 +199,7 @@ public class ChwMatmCreate extends RdhBase {
 				bmmh1.get(0).setZconf("E");
 			}
 			else if("N".equals(model.getDEFAULTCUSTOMIZEABLE())) {
-				bmmh1.get(0).setZconf("E");
+				bmmh1.get(0).setZconf("F");
 			}
 			
 		}
@@ -250,8 +250,7 @@ public class ChwMatmCreate extends RdhBase {
 		}else {
 			String pubfrom = availabilities.get(0).getPUBFROM();
 			System.out.println("pubfrom=" + pubfrom);
-			geo.setVmstd(pubfrom);
-			
+			geo.setVmstd(this.getEarliestPUBFROM(model));			
 			//geo.setVmstd(pubfrom.replace("-", ""));
 		}
 		
@@ -732,6 +731,45 @@ public class ChwMatmCreate extends RdhBase {
 		if (result != null && result.length() > 6) {
 			result = result.substring(result.length() - 6);
 		}
+		return result;
+	}
+	
+	
+	/**
+	 * 
+	 * @param product
+	 * @return
+	 */
+	private String getEarliestPUBFROM(MODEL model) {
+		Date PUBFROM = null;
+		String result = "";
+		List<AVAILABILITY> list = model.getAVAILABILITYLIST();
+		if (list != null && list.size() > 0) {
+			for (int i = 0; i < list.size(); i++) {
+				try {
+					if (PUBFROM == null) {
+						result = list.get(i).getPUBFROM();						 
+						PUBFROM= sdf.parse(result);
+
+					} else {
+						PUBFROM = sdf.parse(list.get(i).getPUBFROM());
+						if (PUBFROM.before(sdf.parse(result))) {
+							result = list.get(i).getPUBFROM();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+
+		}
+
+//		if (result != null)
+//			result = result.replace("-", "");
+//		if (result != null && result.length() > 6) {
+//			result = result.substring(result.length() - 6);
+//		}
 		return result;
 	}
 

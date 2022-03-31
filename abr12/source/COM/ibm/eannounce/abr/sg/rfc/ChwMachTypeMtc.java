@@ -119,7 +119,7 @@ public class ChwMachTypeMtc extends RfcCallerBase {
 					);
 			this.addRfcName(ChwClassMaintain);
 			//8.d Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class
-			ChwClassMaintain.addCharacteristic("MK_"+chwModel.getMACHTYPE()+"_MOD"); 
+			ChwClassMaintain.addCharacteristic("MK_T_"+chwModel.getMACHTYPE()+"_MOD"); 
 			ChwClassMaintain.execute();
 			this.addRfcResult(ChwClassMaintain);
 			//8.e Call the TssClassificationMaint constructor to associate the MK_machineType_MOD class to the product's material master record

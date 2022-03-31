@@ -47,21 +47,49 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 	private String navName = "";
 	private Hashtable metaTbl = new Hashtable();
 	private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
-	private String COVEQUALSQL="SELECT count(*) FROM OPICM.flag F\n"
-			+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.ATTRIBUTEVALUE ='?' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
-			+ "WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS')  AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' WITH UR"
-			;
-	private String COVNOTEQUALSQL="SELECT count(*) FROM OPICM.flag F\n"
-			+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.ATTRIBUTEVALUE ='?' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
-			+ "WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS')  AND T1.ATTRIBUTEVALUE !=T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' WITH UR"
-			;
-	private String FCTEQUALSQL="SELECT count(*) FROM OPICM.flag F\n"
-			+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.ATTRIBUTEVALUE ='?' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
-			+ "WHERE f.ENTITYTYPE ='FCTRANSACTION' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'FCTRANSACTIONIERPABRSTATUS')  AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' WITH UR"
-			;
+//	private String COVNOTEQUALSQL=""SELECT count(*) FROM OPICM.flag F\n"
+//				+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.ATTRIBUTEVALUE ='?' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
+//				+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
+//				+ "WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS')  AND T1.ATTRIBUTEVALUE !=T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' WITH UR"
+//				;	
+	private String COVNOTEQUALSQL = "SELECT count(*) FROM OPICM.flag F\n"
+			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE = ? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP "
+			+ " WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS') "
+			+ " AND T1.ATTRIBUTEVALUE !=T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION= ? WITH UR";
+	
+	
+//	private String COVEQUALSQL="SELECT count(*) FROM OPICM.flag F\n"
+//			+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.ATTRIBUTEVALUE ='?' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
+//			+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
+//			+ "WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS')  AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' WITH UR"
+//			;
+	
+	private String COVEQUALSQL = "SELECT count(*) FROM OPICM.flag F\n"
+			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT TIMESTAMP AND T1.EFFTO > CURRENT TIMESTAMP "
+			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE = ? and T2.VALTO > CURRENT TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT TIMESTAMP "
+			+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT TIMESTAMP AND M.EFFTO > CURRENT TIMESTAMP "
+			+ " WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS') "
+			+ " AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION= ? WITH UR";
+			
+
+			
+//	private String FCTEQUALSQL="SELECT count(*) FROM OPICM.flag F\n"
+//			+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.ATTRIBUTEVALUE ='?' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
+//			+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
+//			+ "WHERE f.ENTITYTYPE ='FCTRANSACTION' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'FCTRANSACTIONIERPABRSTATUS')  AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' WITH UR"
+//			;
+	private String FCTEQUALSQL= "SELECT count(*) FROM OPICM.flag F\n"
+			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT TIMESTAMP "
+			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE = ? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP "
+			+ " WHERE f.ENTITYTYPE ='FCTRANSACTION' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'FCTRANSACTIONIERPABRSTATUS') "
+			+ " AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION= ? WITH UR";
+	
 	String xml = null;
 
 	
@@ -148,15 +176,17 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 					
 					
 					/**
-					 * 
-            If there is a MODELCONVERT which meets all of conditions below,
-                tomachtype = chwProduct.machineType
-                frommachtype !=tomachtype
-                past passed ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
-            then execute the steps described in the document MachTypeMTC RDH Feed to iERP to populate data elements for MachineTypeMTC material.
+					 *  step c
+			            If there is a MODELCONVERT which meets all of conditions below,
+			                tomachtype = chwProduct.machineType
+			                frommachtype !=tomachtype
+			                pdhdomain = chwProduct.pdhdomain -- new add 
+			                past passed ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
+			            then execute the steps described in the document MachTypeMTC RDH Feed to iERP to populate data elements for MachineTypeMTC material.
 					 */
 			
-					if(exist(COVNOTEQUALSQL, model.getMACHTYPE())) {
+					if(exist(COVNOTEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())) {
+						this.addDebug("Calling " + "ChwMachTypeMtc");
 						ChwMachTypeMtc chwMachTypeMtc =new ChwMachTypeMtc(model, m_db.getPDHConnection(), connection);
 						this.addDebug("Calling " + "ChwMachTypeMtc");
 						try{
@@ -167,9 +197,12 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 							throw e;
 						}
 					}
+					//step d
+					
 					if(!"Maintenance,MaintFeature".contains(model.getSUBCATEGORY())) {
 						
-						if(exist(COVEQUALSQL, model.getMACHTYPE())||exist(FCTEQUALSQL, model.getMACHTYPE())) {
+						if(exist(COVEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())||exist(FCTEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())) {
+							this.addDebug("Calling " + "ChwMachTypeMtc");
 							ChwMachTypeUpg chwMachTypeUpg = new ChwMachTypeUpg(model, m_db.getPDHConnection(), connection);
 							this.addDebug("Calling " + "ChwMachTypeMtc");
 							try{
@@ -181,6 +214,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 							}
 						}
 					}else if("M,B".contains(model.getORDERCODE())) {
+						this.addDebug("Calling " + "processMachTypeUpg");
 						processMachTypeUpg(model, connection);	
 					}
 					
@@ -602,23 +636,26 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			throw e;
 		}
 		 
+		//step 3 Create the SC_machinetype_MOD_model object dependency:
+//		String obj_id=model.getMACHTYPE()+model.getMODEL();
+//		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
+//		String dep_type="7"; 
+//		String descript=model.getMACHTYPE()+" Set Model";
+//		String sourceLine = "$self.mk_model2 = mk_t_"+model.getMACHTYPE()+"_mod";
+//		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id, dep_extern, dep_type, descript)	;
+//		chwDepdCaller.addSourceLineCondition(sourceLine);
+//		runRfcCaller(chwDepdCaller);
 		
+		//step 4 Create the SC_machinetype_MOD_model object dependency:
 		String obj_id=model.getMACHTYPE()+model.getMODEL();
-		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
-		String dep_type="7"; 
-		String descript=model.getMACHTYPE()+" Set Model";
-		String sourceLine = "$self.mk_model2 = mk_t_"+model.getMACHTYPE()+"_mod";
+		String dep_extern = "SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
+		String dep_type="5"; 
+		String descript="SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
+		//TODO $PARENT  --> self
+		String sourceLine = "$PARENT.MK_T_"+model.getMACHTYPE()+"_MOD='"+model.getMODEL()+"'";
 		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id, dep_extern, dep_type, descript)	;
 		chwDepdCaller.addSourceLineCondition(sourceLine);
-		runRfcCaller(caller);
-		
-		dep_extern = "SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
-		dep_type="5"; 
-		descript="SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
-		sourceLine = "$PARENT.MK_T_"+model.getMACHTYPE()+"_MOD='"+model.getMODEL()+"'";
-		 chwDepdCaller	=new ChwDepdMaintain(obj_id, dep_extern, dep_type, descript)	;
-		chwDepdCaller.addSourceLineCondition(sourceLine);
-		runRfcCaller(caller);
+		runRfcCaller(chwDepdCaller);
 		 //ChwDepdMaintain 
 		
 		
@@ -712,7 +749,8 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
 		String dep_type="7"; 
 		String descript=model.getMACHTYPE()+" Set Model";
-		String sourceLine = "$self.mk_model2 = mk_t_"+model.getMACHTYPE()+"_mod";
+		//TODO self.xxx = $self.char
+		String sourceLine = "$self.mk_model2 = $self.mk_t_"+model.getMACHTYPE()+"_mod";
 		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id_depd, dep_extern, dep_type, descript)	;
 		chwDepdCaller.addSourceLineCondition(sourceLine);
 		runRfcCaller(chwDepdCaller);
@@ -843,25 +881,24 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     	
     }
     
-    public boolean exist(String sql,String type) {
+    public boolean exist(String sql,String type,String pdhdomain) {
     	boolean flag = false;
     	try {
-		Connection connection = m_db.getPDHConnection();
-		PreparedStatement statement = connection.prepareStatement(sql);
-		statement.setString(1, type);
-		
-		ResultSet resultSet = statement.executeQuery();
-		while (resultSet.next()) {
-			flag = true;
+			Connection connection = m_db.getPDHConnection();
+			PreparedStatement statement = connection.prepareStatement(sql);
+			statement.setString(1, type);
+			statement.setString(2, pdhdomain);
 			
-		}
+			ResultSet resultSet = statement.executeQuery();
+			while (resultSet.next()) {
+				flag = true;
+				
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (MiddlewareException e) {
 			e.printStackTrace();
-		}
-			
-    	
+		}    	
     	return flag;
     	
     }
