@@ -150,7 +150,7 @@ public class ChwMachTypeMtc extends RfcCallerBase {
 					, empty 		//String no_entry
 					, empty 		//String no_display
 					, "X" 			//String addit_vals   Set to "X".
-					, "Machine Type Conversions" + chwModel.getMACHTYPE()	//String chdescr	Set to "Machine Type Conversions <machine_type>" 				
+					, "Machine Type Conversions " + chwModel.getMACHTYPE()	//String chdescr	Set to "Machine Type Conversions <machine_type>" 				
 					);
 			this.addRfcName(ChwCharMaintain);
 			//9.B For each MODELCONVERT which meets all of conditions below 

@@ -885,14 +885,17 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     	boolean flag = false;
     	try {
 			Connection connection = m_db.getPDHConnection();
+			this.addDebug("type=" + type);
+			this.addDebug("pdhdomain=" + pdhdomain);
+			this.addDebug(sql);
 			PreparedStatement statement = connection.prepareStatement(sql);
 			statement.setString(1, type);
 			statement.setString(2, pdhdomain);
 			
 			ResultSet resultSet = statement.executeQuery();
-			while (resultSet.next()) {
-				flag = true;
-				
+			if(resultSet.next()) {
+				int count = resultSet.getInt(1);
+				flag = count>0 ? true: false;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
