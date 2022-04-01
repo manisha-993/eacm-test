@@ -194,10 +194,10 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 								this.addMsg(chwMachTypeUpg.getRptSb());
 								throw e;
 							}
+						}else if("M,B".contains(model.getORDERCODE())) {
+							this.addDebug("Calling " + "processMachTypeUpg");
+							processMachTypeUpg(model, connection);	
 						}
-					}else if("M,B".contains(model.getORDERCODE())) {
-						this.addDebug("Calling " + "processMachTypeUpg");
-						processMachTypeUpg(model, connection);	
 					}
 					
 					
