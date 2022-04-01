@@ -279,9 +279,14 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 	
 	private List<String> getFromModelToModel(String sql,String type,String pdhdomain) throws SQLException {
 		List<String> fromModelToModelList = new ArrayList<String>();
-		this.addDebug("type=" + type);
-		this.addDebug("pdhdomain=" + pdhdomain);
-		this.addDebug(sql);
+		Object[] params = new String[4]; 
+		params[0] =type;
+		params[1] =pdhdomain;	
+		params[2] =type;
+		params[3] =pdhdomain;
+		String realSql = CommonUtils.getPreparedSQL(sql, params);
+		this.addDebug("querySql=" + realSql);
+		
 		PreparedStatement statement = rdhConnection.prepareStatement(sql);
 		statement.setString(1, type);
 		statement.setString(2, pdhdomain);
@@ -298,9 +303,12 @@ public class ChwMachTypeUpg extends RfcCallerBase{
     	boolean flag = false;
     	try {
 			Connection connection = rdhConnection;
-			this.addDebug("type=" + type);
-			this.addDebug("pdhdomain=" + pdhdomain);
-			this.addDebug(sql);
+			Object[] params = new String[2]; 
+			params[0] =type;
+			params[1] =pdhdomain;
+			String realSql = CommonUtils.getPreparedSQL(sql, params);
+			this.addDebug("querySql=" + realSql);
+			
 			PreparedStatement statement = connection.prepareStatement(sql);
 			statement.setString(1, type);
 			statement.setString(2, pdhdomain);

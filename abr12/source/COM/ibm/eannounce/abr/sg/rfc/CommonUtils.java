@@ -79,14 +79,27 @@ public class CommonUtils {
 	}
 	
 	
+	public static String getPreparedSQL(String sql, Object[] params) {
+        int paramNum = 0;
+        if (null != params)  paramNum = params.length;
+        if (1 > paramNum) return sql;
+        StringBuffer returnSQL = new StringBuffer();
+        String[] subSQL = sql.split("\\?");
+        for (int i = 0; i < paramNum; i++) {
+        	returnSQL.append(subSQL[i]).append(" '").append(params[i]).append("' ");
+        }
+        if (subSQL.length > params.length) {
+            returnSQL.append(subSQL[subSQL.length - 1]);
+        }
+        return returnSQL.toString();
+    }
+	
+	
 	public static void main(String[] args) {
 		
 		
 		
-		String model="mod12345";
-		
-		
-		
+		String model="mod12345";		
 		System.out.println("first 3=" + getFirstSubString(model,3));
 		System.out.println("last 3=" + getLastSubString(model,3));
 		System.out.println("last 3=" + getLastSubString("12",3));
