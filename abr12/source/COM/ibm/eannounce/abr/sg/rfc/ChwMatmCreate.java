@@ -69,21 +69,24 @@ public class ChwMatmCreate extends RdhBase {
 		bmmh1.get(0).setMeins("EA");
 		//If <materialID> like "%UPG", then copy from MODEL_UPDATE/AVAILABILITYLIST/AVAILABILITYELEMENT/ANNNUMBER.
 		//Else set to blank.
-		if(materialID.endsWith("UPG")) {
-			bmmh1.get(0).setStprs("0.00");
-			bmmh1.get(0).setZeinr(model.getAVAILABILITYLIST().get(0).getANNNUMBER());
-		
-			if(model.getAVAILABILITYLIST().get(0).getANNNUMBER()!=null) {
-				bmmh1.get(0).setZeiar("RFA");
-
-			}else if ("Yes".equals(model.getPRPQINDC())) {
-				bmmh1.get(0).setZeiar("SPB");
+		for(int i=0;i<model.getAVAILABILITYLIST().size();i++) {
+			String ann = model.getAVAILABILITYLIST().get(i).getANNNUMBER();
+			if(ann!=null&&ann.trim().length()>0) {
+				bmmh1.get(0).setZeinr(ann);
+				break;
 			}
-		
-		}
-		else {
+			
+		}if(bmmh1.get(0).getZeinr()==null) {
 			bmmh1.get(0).setZeinr("");
 			bmmh1.get(0).setZeiar("");
+		}
+		else {
+			bmmh1.get(0).setZeiar("RFA");
+		}
+		if(materialID.endsWith("UPG")) {
+			bmmh1.get(0).setStprs("0.00");
+		}
+		else {
 			bmmh1.get(0).setStprs("0.01");
 
 		}
@@ -101,9 +104,9 @@ public class ChwMatmCreate extends RdhBase {
 		bmmh1.get(0).setTragr("0001");
 		bmmh1.get(0).setSpart("00");
 		//prdha
-		bmmh1.get(0).setPrdha(model.getPRODHIERCD());
+		//bmmh1.get(0).setPrdha(model.getPRODHIERCD());
 		bmmh1.get(0).setMaabc("A");
-		//bmmh1.get(0).setEkgrp("ZZZ");
+		bmmh1.get(0).setEkgrp("ZZZ");
 		bmmh1.get(0).setDismm("PD");
 		bmmh1.get(0).setDispo("000");
 		bmmh1.get(0).setPerkz("M");
@@ -187,7 +190,7 @@ public class ChwMatmCreate extends RdhBase {
 		if (taxcodes != null && taxcodes.size() > 0) {
 			bmmh1.get(0).setMvgr5(taxcodes.get(0).getTAXCODE());
 		}
-		bmmh1.get(0).setXeib1("X");
+		//bmmh1.get(0).setXeib1("X");
 		// bmmh1.get(0).setp;
 		 if ("ZMAT".equals(materialType))
 		 {
@@ -196,7 +199,7 @@ public class ChwMatmCreate extends RdhBase {
 				bmmh1.get(0).setZconf("E");
 			}
 			else if("N".equals(model.getDEFAULTCUSTOMIZEABLE())) {
-				bmmh1.get(0).setZconf("E");
+				bmmh1.get(0).setZconf("F");
 			}
 			
 		}
@@ -247,8 +250,7 @@ public class ChwMatmCreate extends RdhBase {
 		}else {
 			String pubfrom = availabilities.get(0).getPUBFROM();
 			System.out.println("pubfrom=" + pubfrom);
-			geo.setVmstd(pubfrom);
-			
+			geo.setVmstd(this.getEarliestPUBFROM(model));			
 			//geo.setVmstd(pubfrom.replace("-", ""));
 		}
 		
@@ -256,8 +258,11 @@ public class ChwMatmCreate extends RdhBase {
 		Set<TAXCATEGORY> cset = new HashSet<TAXCATEGORY>();
 		Set<String> slorgSet = new HashSet<String>();
 		Set<String> plntSet = new HashSet<String>();
+		List<RdhMatm_sales_org> sales_orgList = new ArrayList<RdhMatm_sales_org>();
+		List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
+		Set<String> set = new HashSet<String>();
 
-		if (availabilities != null && availabilities.size() > 0) {
+		/*if (availabilities != null && availabilities.size() > 0) {
 
 			for (int i = 0; i < availabilities.size(); i++) {
 				
@@ -268,8 +273,7 @@ public class ChwMatmCreate extends RdhBase {
 				}
 			}
 		}
-		List<RdhMatm_sales_org> sales_orgList = new ArrayList<RdhMatm_sales_org>();
-		List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
+		
 		Iterator<String> pIterator = plntSet.iterator();
 		while (pIterator.hasNext()) {
 			String plntcd = (String) pIterator.next();
@@ -296,9 +300,13 @@ public class ChwMatmCreate extends RdhBase {
 				}else if ("0026".equals(sales_org.getVkorg())) {
 					sales_org.setZsabrtax("HW");
 				}
-				sales_orgList.add(sales_org);
+				if(!set.contains(sales_org.getVkorg()+sales_org.getDwerk()))
+				{
+					sales_orgList.add(sales_org);
+					set.add(sales_org.getVkorg()+sales_org.getDwerk());
+				}
 			}
-		}
+		}*/
 		
 		List<RdhMatm_tax_country> tax_countries = new  ArrayList<RdhMatm_tax_country>();
 		List<CountryPlantTax> taxs = RFCConfig.getTaxs();
@@ -335,7 +343,11 @@ public class ChwMatmCreate extends RdhBase {
 					}else if ("0026".equals(sales_org.getVkorg())) {
 						sales_org.setZsabrtax("HW");
 					}
-					sales_orgList.add(sales_org);
+					if(!set.contains(sales_org.getVkorg()+sales_org.getDwerk()))
+					{
+						sales_orgList.add(sales_org);
+						set.add(sales_org.getVkorg()+sales_org.getDwerk());
+					}
 				}
 			}
 			
@@ -702,7 +714,7 @@ public class ChwMatmCreate extends RdhBase {
 					} else {
 						annDate = sdf.parse(list.get(i).getANNDATE());;
 
-						if (annDate.after(sdf.parse(result))) {
+						if (annDate.before(sdf.parse(result))) {
 							result = list.get(i).getANNDATE();
 						}
 					}
@@ -719,6 +731,45 @@ public class ChwMatmCreate extends RdhBase {
 		if (result != null && result.length() > 6) {
 			result = result.substring(result.length() - 6);
 		}
+		return result;
+	}
+	
+	
+	/**
+	 * 
+	 * @param product
+	 * @return
+	 */
+	private String getEarliestPUBFROM(MODEL model) {
+		Date PUBFROM = null;
+		String result = "";
+		List<AVAILABILITY> list = model.getAVAILABILITYLIST();
+		if (list != null && list.size() > 0) {
+			for (int i = 0; i < list.size(); i++) {
+				try {
+					if (PUBFROM == null) {
+						result = list.get(i).getPUBFROM();						 
+						PUBFROM= sdf.parse(result);
+
+					} else {
+						PUBFROM = sdf.parse(list.get(i).getPUBFROM());
+						if (PUBFROM.before(sdf.parse(result))) {
+							result = list.get(i).getPUBFROM();
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+
+		}
+
+//		if (result != null)
+//			result = result.replace("-", "");
+//		if (result != null && result.length() > 6) {
+//			result = result.substring(result.length() - 6);
+//		}
 		return result;
 	}
 

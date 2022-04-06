@@ -8,8 +8,7 @@ import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.Hashtable;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
+import java.util.List;
 
 import COM.ibm.eannounce.abr.sg.rfc.Chw001ClfCreate;
 import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintain;
@@ -19,11 +18,15 @@ import COM.ibm.eannounce.abr.sg.rfc.ChwDepdMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeMtc;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeUpg;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMatmCreate;
+import COM.ibm.eannounce.abr.sg.rfc.CommonUtils;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
+import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
+import COM.ibm.eannounce.abr.sg.rfc.RdhChwFcProd;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.RdhSvcMatmCreate;
 import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
+import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
 import COM.ibm.eannounce.objects.EANList;
@@ -34,6 +37,8 @@ import COM.ibm.eannounce.objects.ExtractActionItem;
 import COM.ibm.opicmpdh.middleware.D;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
 
+import com.ibm.transform.oim.eacm.util.PokUtils;
+
 public class MODELIERPABRSTATUS extends PokBaseABR {
 	private StringBuffer rptSb = new StringBuffer();
 	private static final char[] FOOL_JTEST = { '\n' };
@@ -42,33 +47,40 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 	private String navName = "";
 	private Hashtable metaTbl = new Hashtable();
 	private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
-	private String COVEQUALSQL="SELECT count(*) FROM OPICM.flag F\n"
-			+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.ATTRIBUTEVALUE ='?' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
-			+ "WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS')  AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' WITH UR"
-			;
-	private String COVNOTEQUALSQL="SELECT count(*) FROM OPICM.flag F\n"
-			+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.ATTRIBUTEVALUE ='?' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
-			+ "WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS')  AND T1.ATTRIBUTEVALUE !=T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' WITH UR"
-			;
-	private String FCTEQUALSQL="SELECT count(*) FROM OPICM.flag F\n"
-			+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.ATTRIBUTEVALUE ='?' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
-			+ "WHERE f.ENTITYTYPE ='FCTRANSACTION' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'FCTRANSACTIONIERPABRSTATUS')  AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' WITH UR"
-			;
+	
+	private String COVNOTEQUALSQL = "SELECT count(*) FROM OPICM.flag F\n"
+			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE = ? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP "
+			+ " WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS') "
+			+ " AND T1.ATTRIBUTEVALUE !=T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION= ? WITH UR";
+	
+	private String COVEQUALSQL = "SELECT count(*) FROM OPICM.flag F\n"
+			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT TIMESTAMP AND T1.EFFTO > CURRENT TIMESTAMP "
+			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE = ? and T2.VALTO > CURRENT TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT TIMESTAMP "
+			+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT TIMESTAMP AND M.EFFTO > CURRENT TIMESTAMP "
+			+ " WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS') "
+			+ " AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION= ? WITH UR";
+
+	private String FCTEQUALSQL= "SELECT count(*) FROM OPICM.flag F\n"
+			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT TIMESTAMP "
+			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE = ? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP "
+			+ " WHERE f.ENTITYTYPE ='FCTRANSACTION' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'FCTRANSACTIONIERPABRSTATUS') "
+			+ " AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION= ? WITH UR";
+	
 	String xml = null;
 
 	
 
 	public String getDescription() {
-		// TODO Auto-generated method stub
 		return "MODELIERPABRSTATUS";
 	}
 
 	public String getABRVersion() {
-		// TODO Auto-generated method stub
-
 		return "1.0";
 	}
 
@@ -84,7 +96,6 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 				+ NEWLINE;
 
 		String header1 = "";
-	
 
 		MessageFormat msgf;
 		String abrversion = "";
@@ -142,19 +153,22 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 				MODEL model = XMLParse.getObjectFromXml(xml,MODEL.class);
 				
 				if("Hardware".equals(model.getCATEGORY())) {
-					processMachTypeMODEL(model, connection);
 					processMachTypeNew(model, connection);
+					processMachTypeMODEL(model, connection);
+					
 					
 					/**
-					 * 
-            If there is a MODELCONVERT which meets all of conditions below,
-                tomachtype = chwProduct.machineType
-                frommachtype !=tomachtype
-                past passed ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
-            then execute the steps described in the document MachTypeMTC RDH Feed to iERP to populate data elements for MachineTypeMTC material.
+					 *  step c
+			            If there is a MODELCONVERT which meets all of conditions below,
+			                tomachtype = chwProduct.machineType
+			                frommachtype !=tomachtype
+			                pdhdomain = chwProduct.pdhdomain -- new add 
+			                past passed ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
+			            then execute the steps described in the document MachTypeMTC RDH Feed to iERP to populate data elements for MachineTypeMTC material.
 					 */
 			
-					if(exist(COVNOTEQUALSQL, model.getMACHTYPE())) {
+					if(exist(COVNOTEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())) {
+						this.addDebug("Calling " + "ChwMachTypeMtc");
 						ChwMachTypeMtc chwMachTypeMtc =new ChwMachTypeMtc(model, m_db.getPDHConnection(), connection);
 						this.addDebug("Calling " + "ChwMachTypeMtc");
 						try{
@@ -165,9 +179,12 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 							throw e;
 						}
 					}
+					//step d
+					
 					if(!"Maintenance,MaintFeature".contains(model.getSUBCATEGORY())) {
 						
-						if(exist(COVEQUALSQL, model.getMACHTYPE())||exist(FCTEQUALSQL, model.getMACHTYPE())) {
+						if(exist(COVEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())||exist(FCTEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())) {
+							this.addDebug("Calling " + "ChwMachTypeMtc");
 							ChwMachTypeUpg chwMachTypeUpg = new ChwMachTypeUpg(model, m_db.getPDHConnection(), connection);
 							this.addDebug("Calling " + "ChwMachTypeMtc");
 							try{
@@ -177,9 +194,10 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 								this.addMsg(chwMachTypeUpg.getRptSb());
 								throw e;
 							}
+						}else if("M,B".contains(model.getORDERCODE())) {
+							this.addDebug("Calling " + "processMachTypeUpg");
+							processMachTypeUpg(model, connection);	
 						}
-					}else if("M,B".contains(model.getORDERCODE())) {
-						processMachTypeUpg(model, connection);	
 					}
 					
 					
@@ -191,18 +209,17 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 				else if ("SoftdWare".equals(model.getCATEGORY())) {
 					throw new Exception("Not support SoftWare");
 				}
-					
-				
+				RdhChwFcProd prod = new RdhChwFcProd(model);
+				runRfcCaller(prod);
 			}	
 			
 			// exeFtpShell(ffPathName);
 			// ftpFile();
 			/*
-			 * } catch (Exception e) { // TODO Auto-generated catch block
+			 * } catch (Exception e) { 
 			 * e.printStackTrace(); this.addError(e.getMessage()); setReturnCode(FAIL); }
 			 */
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			// println(e.toString());
 			setReturnCode(FAIL);
@@ -570,14 +587,10 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
         addOutput(msg);
         setReturnCode(FAIL);
     }
-
-    public void processMachTypeMODEL (MODEL model,Connection odsConnection) throws Exception {
-    	String materialType="ZPRT";
-    	String  materialID =model.getMACHTYPE()+model.getMODEL();
-    	
-    	ChwMatmCreate caller = new ChwMatmCreate(model, materialType, materialID);
-    	this.addDebug("Calling " + caller.getRFCName());
-    	caller.execute();
+    
+    protected void runRfcCaller(RdhBase caller) throws Exception {
+		this.addDebug("Calling " + caller.getRFCName());
+		caller.execute();
 		this.addDebug(caller.createLogEntry());
 		if (caller.getRfcrc() == 0) {
 			this.addOutput(caller.getRFCName() + " called successfully!");
@@ -585,6 +598,14 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(caller.getRFCName() + " called  faild!");
 			this.addOutput(caller.getError_text());
 		}
+	}
+
+    public void processMachTypeMODEL (MODEL model,Connection odsConnection) throws Exception {
+    	String materialType="ZPRT";
+    	String  materialID =model.getMACHTYPE()+model.getMODEL();
+    	
+    	ChwMatmCreate caller = new ChwMatmCreate(model, materialType, materialID);
+    	runRfcCaller(caller);
 		//Chw001ClfCreate 
 		
 		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
@@ -597,55 +618,39 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			throw e;
 		}
 		 
+		//step 3 Create the SC_machinetype_MOD_model object dependency:
+//		String obj_id=model.getMACHTYPE()+model.getMODEL();
+//		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
+//		String dep_type="7"; 
+//		String descript=model.getMACHTYPE()+" Set Model";
+//		String sourceLine = "$self.mk_model2 = mk_t_"+model.getMACHTYPE()+"_mod";
+//		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id, dep_extern, dep_type, descript)	;
+//		chwDepdCaller.addSourceLineCondition(sourceLine);
+//		runRfcCaller(chwDepdCaller);
 		
+		//step 4 Create the SC_machinetype_MOD_model object dependency:
 		String obj_id=model.getMACHTYPE()+model.getMODEL();
-		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
-		String dep_type="7"; 
-		String descript=model.getMACHTYPE()+" Set Model";
-		String sourceLine = "$self.mk_model2 =$self.mk_t_"+model.getMACHTYPE()+"_mod";
-		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(xml, dep_extern, dep_type, descript)	;
+		String dep_extern = "SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
+		String dep_type="5"; 
+		String descript="SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
+		String sourceLine = "$PARENT.MK_T_"+model.getMACHTYPE()+"_MOD='"+model.getMODEL()+"'";
+		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id, dep_extern, dep_type, descript)	;
 		chwDepdCaller.addSourceLineCondition(sourceLine);
-		this.addDebug("Calling " + chwDepdCaller.getRFCName());
-		chwDepdCaller.execute();
-		this.addDebug(chwDepdCaller.createLogEntry());
-		if (chwDepdCaller.getRfcrc() == 0) {
-			this.addOutput(chwDepdCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(chwDepdCaller.getRFCName() + " called  faild!");
-			this.addOutput(chwDepdCaller.getError_text());
-		}
-		dep_extern = "SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
-		dep_type="5"; 
-		descript="SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
-		sourceLine = "$PARENT.MK_T_"+model.getMACHTYPE()+"_MOD='"+model.getMODEL()+"'";
-		 chwDepdCaller	=new ChwDepdMaintain(xml, dep_extern, dep_type, descript)	;
-		chwDepdCaller.addSourceLineCondition(sourceLine);
-		this.addDebug("Calling " + chwDepdCaller.getRFCName());
-		chwDepdCaller.execute();
-		this.addDebug(chwDepdCaller.createLogEntry());
-		if (chwDepdCaller.getRfcrc() == 0) {
-			this.addOutput(chwDepdCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(chwDepdCaller.getRFCName() + " called  faild!");
-			this.addOutput(chwDepdCaller.getError_text());
-		}
+		runRfcCaller(chwDepdCaller);
 		 //ChwDepdMaintain 
+		
+		
+		
     	
     }
     public void processMachTypeNew(MODEL model,Connection odsConnection) throws Exception {
+    	//step 1 Call ChwMatmCreate to create the material master for the product object
     	String materialType="ZMAT";
     	String  materialID =model.getMACHTYPE()+"NEW";
     	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID);
-    	this.addDebug("Calling " + chwCreateCaller.getRFCName());
-    	chwCreateCaller.execute();
-		this.addDebug(chwCreateCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(chwCreateCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(chwCreateCaller.getRFCName() + " called  faild!");
-			this.addOutput(chwCreateCaller.getError_text());
-		}
+    	runRfcCaller(chwCreateCaller);
 		
+    	//step2 Call Chw001ClfCreate to create the standard 001 classifications and characteristics which are tied to the offering's material master record.
 		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
 		this.addDebug("Calling " + "Chw001ClfCreate");
 		try{
@@ -655,50 +660,111 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addMsg(chw001ClfCreate.getRptSb());
 			throw e;
 		}
-		/*
-		 * Chw001ClfCreate createCaller = new Chw001ClfCreate(xml, materialType,
-		 * materialID, "MODEL"); createCaller.execute();
-		 */
-		 
+		
+		//step3 Call the TssClassificationMaint to associate the MK_REFERENCE class to the product's material master record
     	String obj_id = materialID;
 		String class_name="MK_REFERENCE";
 		String class_type="300";
-		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
-		}
+		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		runRfcCaller(cMaintCaller);
+		
+		//step4 Call the TssClassificationMaint to associate the MK_T_VAO_NEW class to the product's material master record. 
 		class_name = "MK_T_VAO_NEW";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		runRfcCaller(cMaintCaller);
+		
+		//step 5 Create the MK_machineType_MOD class and MK_T_machineType_MOD characteristic
+		String empty ="";
+		ChwCharMaintain chwCharMaintain = 
+		new ChwCharMaintain(obj_id  //String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+							,"MK_T_"+model.getMACHTYPE()+"_MOD" //String charact  Set to  "MK_T_<machine_type>_MOD"
+							, "CHAR" 			//String datatype
+							, 6 				//int charnumber
+							, empty				//String decplaces
+							, empty				//String casesens
+							, empty				//String neg_vals
+							, empty				//String group
+							, "-"				//String valassignm  Set to "-".
+							, empty				//String no_entry
+							, empty				//String no_display
+							, "X" 				//String addit_vals Set to "X".
+							, model.getMACHTYPE() +" Model Characteristic" //String chdescr  Set to "<machine_type> Model Characteristic" where <machine_type> is chwProduct.machineType
+							);
+		//5.b Call the ChwCharMaintain.addValue() method Set to SUBSTRING(chwProduct/INVNAME FROM 1 FOR 25)||' '||chwProduct/MODEL;
+		String invname = "";
+		List<LANGUAGE> languagesList = model.getLANGUAGELIST();
+		for(LANGUAGE language : languagesList){
+			String nlsid = language.getNLSID();
+			if("1".equals(nlsid)){					//<NLSID>1</NLSID>
+				invname = language.getINVNAME();
+				break;
+			}
 		}
+		String valdescr = CommonUtils.getFirstSubString(invname,25) + " " + model.getMODEL();
+		chwCharMaintain.addValue(model.getMODEL(), valdescr);
+		runRfcCaller(chwCharMaintain);
+		
+		//5.c Call the ChwClassMaintain constructor to create the MK_machineType_MOD class.
+		ChwClassMaintain ChwClassMaintain = 
+				new ChwClassMaintain(
+						obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+						, "MK_"+model.getMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
+						, "MK_"+model.getMACHTYPE()+"_MOD"  //String class_type   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
+						);
+		//5.d Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class
+		ChwClassMaintain.addCharacteristic("MK_T_"+model.getMACHTYPE()+"_MOD"); 
+		runRfcCaller(ChwClassMaintain);
+		
+		//5.e Call the TssClassificationMaint constructor to associate the MK_machineType_MOD class to the product's material master record. 
+		RdhClassificationMaint TssClassificationMaint = 
+				new RdhClassificationMaint(
+						obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+						, "MK_"+model.getMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
+						, "300"  							//String class_type   Set to "300"
+						, "H"
+						);
+		runRfcCaller(TssClassificationMaint);
+		//step 6 Create the PR_machinetype_SET_MODEL object dependency:
+		//6 a Call the ChwDepdMaintain constructor to create the PR_machinetype_SET_MODEL dependency.
+		String obj_id_depd=model.getMACHTYPE()+"NEW";
+		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
+		String dep_type="7"; 
+		String descript=model.getMACHTYPE()+" Set Model";
+		String sourceLine = "$self.mk_model2 = $self.mk_t_"+model.getMACHTYPE()+"_mod";
+		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id_depd, dep_extern, dep_type, descript)	;
+		chwDepdCaller.addSourceLineCondition(sourceLine);
+		runRfcCaller(chwDepdCaller);
+		
+		//step7 Call the ChwConpMaintain to create a configuration profile for the product's material master record
+		ChwConpMaintain ChwConpMaintain  = 
+				new ChwConpMaintain(
+						obj_id 				//String obj_id  Set to concatenation of chwProduct.machineType + "MTC"
+						, "INITIAL"         //String c_profile Set to "INITIAL".
+						, "SD01"			//String bomappl Set to "SD01".
+						, "2"				//String bomexpl Set to "2".
+						, model.getMACHTYPE() +	"NEWUI"		//String design	 Set to Set to concatenation of chwProduct.machineType + "NEWUI" 
+						);
+		
+		//7.b Call the ChwConpMaintain.addConfigDependency() method.
+		ChwConpMaintain.addConfigDependency("E2E", empty); //Set to "E2E".
+		//7.c 
+		ChwConpMaintain.addConfigDependency("PR_"+model.getMACHTYPE()+"_SET_MODEL", empty);  //Set to "PR_<chwProduct.machineType>_SET_MODEL"
+		//7.d
+		ChwConpMaintain.addConfigDependency("PR_E2E_SET_MTM", empty);  //Set to "PR_E2E_SET_MTM".
+		//7.e 
+		ChwConpMaintain.addConfigDependency("PR_E2E_PRICING_HW", empty);  //Set to "PR_E2E_PRICING_HW".
+		//7.f 
+		ChwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", empty);  //Set to "PR_E2E_PRICING_HW"		
+		runRfcCaller(ChwConpMaintain);
+		
     }
     
     public void processMachTypeUpg(MODEL model,Connection odsConnection) throws Exception {
     	String materialType="ZMAT";
     	String  materialID =model.getMACHTYPE()+"UPG";
     	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID);
-    	this.addDebug("Calling " + chwCreateCaller.getRFCName());
-    	chwCreateCaller.execute();
-		this.addDebug(chwCreateCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(chwCreateCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(chwCreateCaller.getRFCName() + " called  faild!");
-			this.addOutput(chwCreateCaller.getError_text());
-		}
+    	runRfcCaller(chwCreateCaller);
+    	
 		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
 		this.addDebug("Calling " + "Chw001ClfCreate");
 		try{
@@ -711,60 +777,24 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     	String obj_id = materialID;
 		String class_name="MK_REFERENCE";
 		String class_type="300";
-		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
-		}
+		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		runRfcCaller(cMaintCaller);
+		
 		class_name = "MK_T_VAO_NEW";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
-		}
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		runRfcCaller(cMaintCaller);
+		
 		class_name = "MK_D_VAO_NEW";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
-		}
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		runRfcCaller(cMaintCaller);
+		
 		class_name = "MK_FC_EXCH";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
-		}
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		runRfcCaller(cMaintCaller);
+		
 		class_name = "MK_FC_CONV";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + cMaintCaller.getRFCName());
-		cMaintCaller.execute();
-		this.addDebug(cMaintCaller.createLogEntry());
-		if (chwCreateCaller.getRfcrc() == 0) {
-			this.addOutput(cMaintCaller.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(cMaintCaller.getRFCName() + " called  faild!");
-			this.addOutput(cMaintCaller.getError_text());
-		}
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		runRfcCaller(cMaintCaller);
 		
 		//Set to  "MK_T_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
 		String charact = "MK_T_"+model.getMACHTYPE()+"_MOD";
@@ -782,39 +812,19 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		ChwCharMaintain charMaintain = new ChwCharMaintain(obj_id, charact, datatype, charnumber, decplaces, casesens, neg_vals, group, valassignm, no_entry, no_display, addit_vals, chdescr);
     
 		charMaintain.addValue(model.getMODEL(), model.getINVNAME().substring(0, 24)+" "+model.getMODEL());
-		this.addDebug("Calling " + charMaintain.getRFCName());
-		charMaintain.execute();
-		this.addDebug(charMaintain.createLogEntry());
-		if (charMaintain.getRfcrc() == 0) {
-			this.addOutput(charMaintain.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(charMaintain.getRFCName() + " called  faild!");
-			this.addOutput(charMaintain.getError_text());
-		}
+		runRfcCaller(charMaintain);
+		
 		class_name = "MK_"+model.getMACHTYPE()+"_MOD";
 		class_type = class_name;
 		ChwClassMaintain chwClassMaintain = new ChwClassMaintain(obj_id, class_name, class_type);
-		this.addDebug("Calling " + chwClassMaintain.getRFCName());
 		chwClassMaintain.addCharacteristic("MK_T_"+model.getMODEL()+"_MOD");
-		chwClassMaintain.execute();
-		this.addDebug(chwClassMaintain.createLogEntry());
-		if (chwClassMaintain.getRfcrc() == 0) {
-			this.addOutput(chwClassMaintain.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(chwClassMaintain.getRFCName() + " called  faild!");
-			this.addOutput(chwClassMaintain.getError_text());
-		}
+		runRfcCaller(chwClassMaintain);
+		
 		class_type="300";
-		RdhClassificationMaint classificationMaint = new RdhClassificationMaint(obj_id, class_name, class_type);
-		this.addDebug("Calling " + classificationMaint.getRFCName());
-		classificationMaint.execute();
-		this.addDebug(classificationMaint.createLogEntry());
-		if (classificationMaint.getRfcrc() == 0) {
-			this.addOutput(classificationMaint.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(classificationMaint.getRFCName() + " called  faild!");
-			this.addOutput(classificationMaint.getError_text());
-		}
+		RdhClassificationMaint classificationMaint = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		runRfcCaller(classificationMaint);
+
+
 		String c_profile = "INITIAL"; 
 		String bomappl="SD01";
 		String bomexpl="2";
@@ -825,6 +835,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		chwConpMaintain.addConfigDependency("PR_E2E_SET_MTM", "");
 		chwConpMaintain.addConfigDependency("PR_E2E_PRICING_HW", "");
 		chwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", "");
+		runRfcCaller(chwConpMaintain);
 		
     }
     public void processMachTypeMODEL_Svc(MODEL model,Connection odsConnection) throws Exception {
@@ -832,15 +843,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     	String materialID = model.getMACHTYPE()+model.getMODEL();
 
     	RdhSvcMatmCreate svcMatmCreate = new RdhSvcMatmCreate(model);
-    	this.addDebug("Calling " + svcMatmCreate.getRFCName());
-    	svcMatmCreate.execute();
-		this.addDebug(svcMatmCreate.createLogEntry());
-		if (svcMatmCreate.getRfcrc() == 0) {
-			this.addOutput(svcMatmCreate.getRFCName() + " called successfully!");
-		} else {
-			this.addOutput(svcMatmCreate.getRFCName() + " called  faild!");
-			this.addOutput(svcMatmCreate.getError_text());
-		}
+    	runRfcCaller(svcMatmCreate);
 		/*
 		 * Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(xml, materialType,
 		 * materialID, materialID); chw001ClfCreate.execute();
@@ -858,27 +861,29 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     	
     }
     
-    public boolean exist(String sql,String type) {
+    public boolean exist(String sql,String type,String pdhdomain) {
     	boolean flag = false;
     	try {
-		Connection connection = m_db.getPDHConnection();
-		PreparedStatement statement = connection.prepareStatement(sql);
-		statement.setString(1, type);
-		
-		ResultSet resultSet = statement.executeQuery();
-		while (resultSet.next()) {
-			flag = true;
+			Connection connection = m_db.getPDHConnection();
+			Object[] params = new String[2]; 
+			params[0] =type;
+			params[1] =pdhdomain;			
+			String realSql = CommonUtils.getPreparedSQL(sql, params);
+			this.addDebug("querySql=" + realSql);
+			PreparedStatement statement = connection.prepareStatement(sql);
+			statement.setString(1, type);
+			statement.setString(2, pdhdomain);
 			
-		}
+			ResultSet resultSet = statement.executeQuery();
+			if(resultSet.next()) {
+				int count = resultSet.getInt(1);
+				flag = count>0 ? true: false;
+			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (MiddlewareException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-			
-    	
+		}    	
     	return flag;
     	
     }

@@ -119,7 +119,7 @@ public class ChwMachTypeMtc extends RfcCallerBase {
 					);
 			this.addRfcName(ChwClassMaintain);
 			//8.d Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class
-			ChwClassMaintain.addCharacteristic("MK_"+chwModel.getMACHTYPE()+"_MOD"); 
+			ChwClassMaintain.addCharacteristic("MK_T_"+chwModel.getMACHTYPE()+"_MOD"); 
 			ChwClassMaintain.execute();
 			this.addRfcResult(ChwClassMaintain);
 			//8.e Call the TssClassificationMaint constructor to associate the MK_machineType_MOD class to the product's material master record
@@ -150,7 +150,7 @@ public class ChwMachTypeMtc extends RfcCallerBase {
 					, empty 		//String no_entry
 					, empty 		//String no_display
 					, "X" 			//String addit_vals   Set to "X".
-					, "Machine Type Conversions" + chwModel.getMACHTYPE()	//String chdescr	Set to "Machine Type Conversions <machine_type>" 				
+					, "Machine Type Conversions " + chwModel.getMACHTYPE()	//String chdescr	Set to "Machine Type Conversions <machine_type>" 				
 					);
 			this.addRfcName(ChwCharMaintain);
 			//9.B For each MODELCONVERT which meets all of conditions below 

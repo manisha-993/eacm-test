@@ -43,5 +43,17 @@ public class RfcCallerBase {
 		}
 	}
 	
+	protected void runRfcCaller(RdhBase caller) throws Exception {
+		this.addDebug("Calling " + caller.getRFCName());
+		caller.execute();
+		this.addDebug(caller.createLogEntry());
+		if (caller.getRfcrc() == 0) {
+			this.addOutput(caller.getRFCName() + " called successfully!");
+		} else {
+			this.addOutput(caller.getRFCName() + " called  faild!");
+			this.addOutput(caller.getError_text());
+		}
+	}
+	
 
 }

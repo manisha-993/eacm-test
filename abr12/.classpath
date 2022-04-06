@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="source"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="source/poi-2.5.1-final-20040804.jar"/>
-	<classpathentry kind="lib" path="PokUtils.jar"/>
-	<classpathentry kind="lib" path="com.ibm.mq.jar"/>
+	<classpathentry kind="lib" path="C:/EACM_OIMS_ESW_GIT/OIMSimpCleanUp/lib/db2jcc_license_cu.jar"/>
 	<classpathentry kind="lib" path="middleware.jar"/>
+	<classpathentry kind="lib" path="C:/EACM_OIMS_ESW_GIT/OIMSimpCleanUp/lib/db2jcc.jar"/>
+	<classpathentry kind="lib" path="C:/EACM_OIMS_ESW_GIT/OIMSimpCleanUp/lib/db2jcc_license_cisuz.jar"/>
+	<classpathentry kind="lib" path="C:/EACM_DEV/lib/gson-2.3.1.jar"/>
+	<classpathentry kind="lib" path="C:/EACM_DEV/lib/junit-4.8.jar"/>
+	<classpathentry kind="lib" path="C:/EACM_DEV/lib/mail.jar"/>
+	<classpathentry kind="lib" path="C:/EACM_DEV/lib/jackson-mapper-asl-1.9.2.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="C:/EACM_DEV/lib/abr.jar"/>
+	<classpathentry kind="lib" path="C:/EACM_DEV/lib/abr_lib/com.ibm.mq.jmqi.jar"/>
+	<classpathentry kind="lib" path="C:/EACM_DEV/lib/abr_lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="C:/EACM_DEV/lib/com.ibm.mq.jar"/>
+	<classpathentry kind="lib" path="C:/EACM_DEV/lib/OIMJavaClient.jar"/>
+	<classpathentry kind="lib" path="C:/EACM_DEV/lib/abr_lib/PokUtils.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/OIMSimpCHWPrototype"/>
+	<classpathentry kind="lib" path="C:/EACM_DEV/lib/abr_lib/poi-3.0.1-FINAL-20070705.jar"/>
+	<classpathentry kind="lib" path="source/poi-2.5.1-final-20040804.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

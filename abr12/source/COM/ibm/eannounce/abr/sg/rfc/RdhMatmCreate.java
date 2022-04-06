@@ -132,7 +132,7 @@ public class RdhMatmCreate extends RdhBase {
 			for (int i = 0; i < availabilities.size(); i++) {
 				Set<SLEORGNPLNTCODE> sset = null;
 				String key = null;
-				if(availabilities.get(i).getPUBTO()!=null||!"".equals(availabilities.get(i).getPUBTO())) {
+				if(availabilities.get(i).getPUBTO()!=null&&!"".equals(availabilities.get(i).getPUBTO())) {
 					key = "PUBTO"+availabilities.get(i).getPUBTO();
 					sset = sMap.get(key);
 					if (sset == null) {
@@ -288,7 +288,8 @@ public class RdhMatmCreate extends RdhBase {
 							continue; 
 						RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
 						tax_country.setTaty1(taxcList.get(k).getTAXCATEGORYVALUE());
-						tax_country.setTaxm1(taxcList.get(k).getTAXCLASSIFICATION());
+						//tax_country.setTaxm1(taxcList.get(k).getTAXCLASSIFICATION());
+						tax_country.setTaxm1("1");
 						// tax_country.setAland("US");
 						/*
 						 * tax_country.setAland(RfcConfigProperties

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
+import COM.ibm.opicmpdh.middleware.MiddlewareException;
 
 public class ChwMachTypeUpg extends RfcCallerBase{
 	
@@ -17,6 +18,57 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 	private String chwProduct;
 	private Connection rdhConnection;
 	private Connection odsConnection;
+	
+	private String MODELCONVERTSQL = " SELECT count(*) FROM OPICM.flag F"
+			    + " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP"
+			    + " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE =? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP"
+			    + " INNER JOIN opicm.text t3 ON f.ENTITYID =t3.ENTITYID AND f.ENTITYTYPE =t3.ENTITYTYPE AND t3.ATTRIBUTECODE ='FROMMODEL' AND T3.VALTO > CURRENT  TIMESTAMP AND T3.EFFTO > CURRENT  TIMESTAMP"
+			    + " INNER JOIN opicm.text t4 ON f.ENTITYID =t4.ENTITYID AND f.ENTITYTYPE =t4.ENTITYTYPE AND t4.ATTRIBUTECODE ='TOMODEL' AND T4.VALTO > CURRENT  TIMESTAMP AND T4.EFFTO > CURRENT  TIMESTAMP"
+			    + " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP"
+			    + " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP"
+			    + " WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS') " 
+			    + " AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION=? "
+			    + " AND T3.ATTRIBUTEVALUE!=T4.ATTRIBUTEVALUE"
+			    + " WITH UR";
+	
+	private String FCTRANSACTIONSQL = " SELECT count(*) FROM OPICM.flag F"
+		    + " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE =? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN opicm.text t3 ON f.ENTITYID =t3.ENTITYID AND f.ENTITYTYPE =t3.ENTITYTYPE AND t3.ATTRIBUTECODE ='FROMMODEL' AND T3.VALTO > CURRENT  TIMESTAMP AND T3.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN opicm.text t4 ON f.ENTITYID =t4.ENTITYID AND f.ENTITYTYPE =t4.ENTITYTYPE AND t4.ATTRIBUTECODE ='TOMODEL' AND T4.VALTO > CURRENT  TIMESTAMP AND T4.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP"
+		    + " WHERE f.ENTITYTYPE ='FCTRANSACTION' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'FCTRANSACTIONIERPABRSTATUS') " 
+		    + " AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION=? "
+		    + " AND T3.ATTRIBUTEVALUE!=T4.ATTRIBUTEVALUE"
+		    + " WITH UR";
+	
+	private String FROMMODELTOMODEL = "SELECT DISTINCT FROMMODEL||'_'||TOMODEL AS FromModelToModel FROM ("
+		    + " SELECT DISTINCT t3.ATTRIBUTEVALUE AS FROMMODEL, t4.ATTRIBUTEVALUE AS TOMODEL FROM OPICM.flag F"
+		    + " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE =? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN opicm.text t3 ON f.ENTITYID =t3.ENTITYID AND f.ENTITYTYPE =t3.ENTITYTYPE AND t3.ATTRIBUTECODE ='FROMMODEL' AND T3.VALTO > CURRENT  TIMESTAMP AND T3.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN opicm.text t4 ON f.ENTITYID =t4.ENTITYID AND f.ENTITYTYPE =t4.ENTITYTYPE AND t4.ATTRIBUTECODE ='TOMODEL' AND T4.VALTO > CURRENT  TIMESTAMP AND T4.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP"
+		    + " WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS')  "
+		    + " AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION=? "
+		    + " AND T3.ATTRIBUTEVALUE!=T4.ATTRIBUTEVALUE"
+		    + " UNION all"
+		    + " SELECT DISTINCT t3.ATTRIBUTEVALUE AS FROMMODEL, t4.ATTRIBUTEVALUE AS TOMODEL FROM OPICM.flag F"
+		    + " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE =? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN opicm.text t3 ON f.ENTITYID =t3.ENTITYID AND f.ENTITYTYPE =t3.ENTITYTYPE AND t3.ATTRIBUTECODE ='FROMMODEL' AND T3.VALTO > CURRENT  TIMESTAMP AND T3.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN opicm.text t4 ON f.ENTITYID =t4.ENTITYID AND f.ENTITYTYPE =t4.ENTITYTYPE AND t4.ATTRIBUTECODE ='TOMODEL' AND T4.VALTO > CURRENT  TIMESTAMP AND T4.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP"
+		    + " WHERE f.ENTITYTYPE ='FCTRANSACTION' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'FCTRANSACTIONIERPABRSTATUS')  "
+		    + " AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION=? "
+		    + " AND T3.ATTRIBUTEVALUE!=T4.ATTRIBUTEVALUE"
+		    + " ) AS TT"
+		    + " WITH UR";
+	
+	
 	
 	public ChwMachTypeUpg(MODEL chwModel,Connection rdhConnection, Connection odsConnection) {	
 		this.chwModel = chwModel;
@@ -27,7 +79,7 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 			String empty ="";
 			String obj_id = chwModel.getMACHTYPE() + "UPG";
 			//1. Call ChwMatmCreate to create the material master for the product object.
-			ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwModel,"ZMAT",chwModel.getMACHTYPE() + "MTC");
+			ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwModel,"ZMAT",chwModel.getMACHTYPE() + "UPG");
 			this.addRfcName(chwMatmCreate);
 			chwMatmCreate.execute();
 			this.addRfcResult(chwMatmCreate);
@@ -120,7 +172,7 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 							);
 			this.addRfcName(ChwClassMaintain);
 			//8.d Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class
-			ChwClassMaintain.addCharacteristic("MK_"+chwModel.getMACHTYPE()+"_MOD"); 
+			ChwClassMaintain.addCharacteristic("MK_T_"+chwModel.getMACHTYPE()+"_MOD"); 
 			ChwClassMaintain.execute();
 			this.addRfcResult(ChwClassMaintain);
 						
@@ -139,78 +191,63 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 			//9.Create the MK_machineType_MTC class and MK_machineType_MTC characteristic if it does not exist.
 			//9.a Call the ChwCharMaintain constructor to create the MK_machineType_MTC characteristic.
 			//TODO get the MODELCONVERTList and FCTRANSACTIONList from MODEL
-			String machtype = chwModel.getMACHTYPE();
-			ArrayList<HashMap<String, String>> recordArray = getEntityList(machtype,"MODELCONVERT");
-			ArrayList<HashMap<String, String>> FCArray = getEntityList(machtype,"FCTRANSACTION");
-			
-			//List<MODELCONVERT> chwMODELCONVERTList = new ArrayList<MODELCONVERT>(); 
-			//List<FCTRANSACTION> chwFCTRANSACTIONList = new ArrayList<FCTRANSACTION>();
-			ChwCharMaintain ChwCharMaintain = 
-			new ChwCharMaintain(
-					obj_id				 				//String obj_id  Set to concatenation of chwProduct.machineType + "UPG"
-					, "MK_"+chwModel.getMACHTYPE()+"_MOD_CONV"	//String charact  Set to  "MK_D_machineType_MOD_CONV" where <machine_type> is chwProduct.machineType
-					, "CHAR" 							//String datatype  Set to "CHAR".
-					, 9 								//int charnumber  Set to "15".
-					, empty 		//String decplaces
-					, empty 		//String casesens
-					, empty 		//String neg_vals
-					, empty 		//String group
-					, "-" 			//String valassignm  Set to "-".
-					, empty 		//String no_entry
-					, empty 		//String no_display
-					, "X" 			//String addit_vals   Set to "X".
-					, "Machine Type Conversions" + chwModel.getMACHTYPE()	//String chdescr	Set to "Machine Type Conversions <machine_type>" 				
-					);
-			this.addRfcName(ChwCharMaintain);
-			
-			//9.B Create an array variable <FromModelToModel> 
-			List<String> FromModelToModel = new ArrayList<String>();
-			
-			for(HashMap<String, String> modelConvertMap: recordArray){
-				String modelconvert_value = modelConvertMap.get("FROMMODEL") + "_" + modelConvertMap.get("TOMODEL");
-				if(!FromModelToModel.contains(modelconvert_value)){
-					FromModelToModel.add(modelconvert_value);
-				}
-			}
-			for(HashMap<String, String> modelConvertMap: FCArray){
-				String modelconvert_value = modelConvertMap.get("FROMMODEL") + "_" + modelConvertMap.get("TOMODEL");
-				if(!FromModelToModel.contains(modelconvert_value)){
-					FromModelToModel.add(modelconvert_value);
-				}
-			}			
-            //9.c  For each entry in the array <FromModelToModel>, call the ChwCharMaintain.addValue() method to add the value
-			for(String value : FromModelToModel){
-				String value_descr = "From " + chwModel.getMACHTYPE() + " Model" + CommonUtils.getFirstSubString(value, 3) + CommonUtils.getLastSubString(value, 3);
-				ChwCharMaintain.addValue(value, value_descr);
-			}			
-			ChwCharMaintain.execute();
-			this.addRfcResult(ChwCharMaintain);
-			
-			//9.d Call the ChwClassMaintain constructor to create the MK_D_machineType_MOD_CONV class
-			ChwClassMaintain = 
-					new ChwClassMaintain(
-							obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
-							, "MK_D_"+chwModel.getMACHTYPE()+"_MOD_CONV"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
-							, "MK_D_"+chwModel.getMACHTYPE()+"_MOD_CONV"  //String class_type   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
-							);	
-			this.addRfcName(ChwClassMaintain);
-			//9.e Call the ChwClassMaintain.addCharacteristic() method to add the MK_D_machineType_MOD_CONV characteristic to the MK_D_machineType_MOD_CONV class.			
-			ChwClassMaintain.addCharacteristic("MK_D_"+chwModel.getMACHTYPE()+"_MOD_CONV");
-			ChwClassMaintain.execute();
-			this.addRfcResult(ChwCharMaintain);
-			
+			if(exist(MODELCONVERTSQL, chwModel.getMACHTYPE(),chwModel.getPDHDOMAIN())||exist(FCTRANSACTIONSQL, chwModel.getMACHTYPE(),chwModel.getPDHDOMAIN())) {
+				String machtype = chwModel.getMACHTYPE();
+				List<String> FromModelToModel = this.getFromModelToModel(FROMMODELTOMODEL, chwModel.getMACHTYPE(),chwModel.getPDHDOMAIN());				
+				ChwCharMaintain ChwCharMaintain = 
+				new ChwCharMaintain(
+						obj_id				 				//String obj_id  Set to concatenation of chwProduct.machineType + "UPG"
+						, "MK_D_"+chwModel.getMACHTYPE()+"_MOD_CONV"	//String charact  Set to  "MK_D_machineType_MOD_CONV" where <machine_type> is chwProduct.machineType
+						, "CHAR" 							//String datatype  Set to "CHAR".
+						, 9 								//int charnumber  Set to "15".
+						, empty 		//String decplaces
+						, empty 		//String casesens
+						, empty 		//String neg_vals
+						, empty 		//String group
+						, "-" 			//String valassignm  Set to "-".
+						, empty 		//String no_entry
+						, empty 		//String no_display
+						, "X" 			//String addit_vals   Set to "X".
+						, "Machine Type Conversions " + chwModel.getMACHTYPE()	//String chdescr	Set to "Machine Type Conversions <machine_type>" 				
+						);
+				this.addRfcName(ChwCharMaintain);
+				
+				//9.B Create an array variable <FromModelToModel> in the SQL
+	            //9.c For each entry in the array <FromModelToModel>, call the ChwCharMaintain.addValue() method to add the value
+				for(String value : FromModelToModel){
+					String value_descr = "From " + chwModel.getMACHTYPE() + " Model" + CommonUtils.getFirstSubString(value, 3) + CommonUtils.getLastSubString(value, 3);
+					ChwCharMaintain.addValue(value, value_descr);
+				}			
+				ChwCharMaintain.execute();
+				this.addRfcResult(ChwCharMaintain);
+				
+				//9.d Call the ChwClassMaintain constructor to create the MK_D_machineType_MOD_CONV class
+				ChwClassMaintain = 
+						new ChwClassMaintain(
+								obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+								, "MK_D_"+chwModel.getMACHTYPE()+"_MOD_CONV"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
+								, "MK_D_"+chwModel.getMACHTYPE()+"_MOD_CONV"  //String class_type   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
+								);	
+				this.addRfcName(ChwClassMaintain);
+				//9.e Call the ChwClassMaintain.addCharacteristic() method to add the MK_D_machineType_MOD_CONV characteristic to the MK_D_machineType_MOD_CONV class.			
+				ChwClassMaintain.addCharacteristic("MK_D_"+chwModel.getMACHTYPE()+"_MOD_CONV");
+				ChwClassMaintain.execute();
+				this.addRfcResult(ChwClassMaintain);
+				
 
-			//9.f Call the TssClassificationMaint constructor to associate the MK_D_machineType_MOD_CONV class to the product's material master record.
-			TssClassificationMaint = 
-			new RdhClassificationMaint(
-					obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "UPG"
-					, "MK_D_"+chwModel.getMACHTYPE()+"_MOD_CONV"  //String class_name   Set to  "MK_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType
-					, "300"  							//String class_type   Set to "300"
-					, "H"
-					);
-			this.addRfcName(TssClassificationMaint);
-			TssClassificationMaint.execute();
-			this.addRfcResult(TssClassificationMaint);
+				//9.f Call the TssClassificationMaint constructor to associate the MK_D_machineType_MOD_CONV class to the product's material master record.
+				TssClassificationMaint = 
+				new RdhClassificationMaint(
+						obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "UPG"
+						, "MK_D_"+chwModel.getMACHTYPE()+"_MOD_CONV"  //String class_name   Set to  "MK_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType
+						, "300"  							//String class_type   Set to "300"
+						, "H"
+						);
+				this.addRfcName(TssClassificationMaint);
+				TssClassificationMaint.execute();
+				this.addRfcResult(TssClassificationMaint);
+			}
+			
 			
 			//10.Call the ChwConpMaintain to create a configuration profile for the product's material master record
 			//10.a Call the ChwConpMaintain constructor.
@@ -240,73 +277,53 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 		
 	}
 	
-	private ArrayList<HashMap<String, String>> getEntityList(String machtype, String entityType) throws SQLException {
+	private List<String> getFromModelToModel(String sql,String type,String pdhdomain) throws SQLException {
+		List<String> fromModelToModelList = new ArrayList<String>();
+		Object[] params = new String[4]; 
+		params[0] =type;
+		params[1] =pdhdomain;	
+		params[2] =type;
+		params[3] =pdhdomain;
+		String realSql = CommonUtils.getPreparedSQL(sql, params);
+		this.addDebug("querySql=" + realSql);
 		
-		ArrayList<HashMap<String, String>> recordArray = new ArrayList<HashMap<String, String>>();
-		String modelConvertQuery ="SELECT MT.ENTITYID FROM OPICM.TEXT AS MT "
-				+ " JOIN  OPICM.TEXT AS MF "
-				+ " ON MT.ENTITYTYPE = MF.ENTITYTYPE "
-				+ " and MT.ENTITYID = MF.ENTITYID "
-				+ " WHERE MT.EFFTO >current timestamp "
-				+ " AND MT.VALTO >current timestamp "
-				+ " AND MF.EFFTO >current timestamp "
-				+ " AND MF.VALTO >current timestamp "
-				+ " AND MT.ENTITYTYPE ='"+entityType+"' "
-				+ " AND MT.ATTRIBUTECODE ='TOMACHTYPE' "
-				+ " AND MF.ATTRIBUTECODE ='FROMMACHTYPE' "
-				+ " AND MT.ATTRIBUTEVALUE <> MF.ATTRIBUTEVALUE "
-				+ " AND MT.ATTRIBUTEVALUE =? "
-				+ " AND MT.ENTITYID IN (  SELECT ENTITYID FROM OPICM.FLAG "
-				+ " WHERE ENTITYTYPE ='"+entityType+"' "
-				+ " AND ((ATTRIBUTECODE ='ADSABRSTATUS' AND ATTRIBUTEVALUE = '0040') "
-				+ " OR (ATTRIBUTECODE ='MODELCONVERTIERPABRSTATUS' AND ATTRIBUTEVALUE = '0040')) "
-				+ " AND EFFTO >current timestamp "
-				+ " AND VALTO > current timestamp )"
-				+ " WITH ur";
-		PreparedStatement statement = rdhConnection.prepareStatement(modelConvertQuery);
-		statement.setString(1, machtype);
+		PreparedStatement statement = rdhConnection.prepareStatement(sql);
+		statement.setString(1, type);
+		statement.setString(2, pdhdomain);
+		statement.setString(3, type);
+		statement.setString(4, pdhdomain);
 		ResultSet resultSet = statement.executeQuery();
-		Map<String,String> attributeMap = new HashMap<String,String>();
-//		attributeMap.put("FROMMACHTYPE", "");
-		attributeMap.put("FROMMODEL", "");
-//		attributeMap.put("TOMACHTYPE", "");
-		attributeMap.put("TOMODEL ", "");
-		
 		while(resultSet.next()){
-			int entityid = resultSet.getInt("ENTITYID");
-			String modelConvert = "SELECT ATTRIBUTECODE,ATTRIBUTEVALUE FROM OPICM.TEXT "
-					+ " WHERE ENTITYTYPE ='"+entityType+"' "
-					+ " AND ENTITYID=? "
-					+ " AND EFFTO >current timestamp "
-					+ " AND VALTO > current timestamp WITH ur";
-			PreparedStatement attributeStatement = rdhConnection.prepareStatement(modelConvert);
-			statement.setInt(1, entityid);
-			ResultSet attributeResultSet = attributeStatement.executeQuery();
-			HashMap<String,String> modelConvertMap = new HashMap<String,String>();
-			while(attributeResultSet.next()){
-				String attributecode = attributeResultSet.getString("ATTRIBUTECODE");
-				if(attributeMap.containsKey(attributecode)){
-					modelConvertMap.put(attributecode, attributeResultSet.getString("ATTRIBUTEVALUE"));					
-				}
-			}
-//			if(!modelConvertMap.containsKey("FROMMACHTYPE")){
-//				modelConvertMap.put("FROMMACHTYPE", "");
-//			}
-			if(!modelConvertMap.containsKey("FROMMODEL")){
-				modelConvertMap.put("FROMMODEL", "");
-			}
-//			if(!modelConvertMap.containsKey("TOMACHTYPE")){
-//				modelConvertMap.put("TOMACHTYPE", "");
-//			}
-			if(!modelConvertMap.containsKey("TOMODEL")){
-				modelConvertMap.put("TOMODEL", "");
-			}
-			recordArray.add(modelConvertMap);			
-		}
-		return recordArray;
+			fromModelToModelList.add(resultSet.getString("FromModelToModel"));
+		}		
+		return fromModelToModelList;
 	}
 	
-	
+	public boolean exist(String sql,String type,String pdhdomain) {
+    	boolean flag = false;
+    	try {
+			Connection connection = rdhConnection;
+			Object[] params = new String[2]; 
+			params[0] =type;
+			params[1] =pdhdomain;
+			String realSql = CommonUtils.getPreparedSQL(sql, params);
+			this.addDebug("querySql=" + realSql);
+			
+			PreparedStatement statement = connection.prepareStatement(sql);
+			statement.setString(1, type);
+			statement.setString(2, pdhdomain);
+			
+			ResultSet resultSet = statement.executeQuery();
+			while (resultSet.next()) {
+				int count = resultSet.getInt(1);
+				flag = count>0 ? true: false;				
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}    	
+    	return flag;
+    	
+    }
 	
 
 	public static void main(String[] args) {
