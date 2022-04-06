@@ -98,7 +98,7 @@ public class RdhMatm_bmmh1
     private String fhori;
     @SerializedName("DISGR")
     private String disgr;
-    
+     
     @SerializedName("ERSDA")
     private String ersda;
     @SerializedName("LABOR")
@@ -145,7 +145,15 @@ public class RdhMatm_bmmh1
     private String prdha;
     @SerializedName("BWTTY")
     private String bwtty ;
-    /**
+    @SerializedName("XCHPF")
+    private String xchpf;
+    public String getXchpf() {
+		return xchpf;
+	}
+	public void setXchpf(String xchpf) {
+		this.xchpf = xchpf;
+	}
+	/**
      * @return the meins
      */
     public String getMeins()

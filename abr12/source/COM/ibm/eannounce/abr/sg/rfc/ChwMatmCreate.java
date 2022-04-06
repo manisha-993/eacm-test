@@ -56,7 +56,7 @@ public class ChwMatmCreate extends RdhBase {
 	@Foo
 	SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd" );
 	public ChwMatmCreate(MODEL model, String materialType,String materialID) {
-		super(model.getMACHTYPE() + model.getMODEL(), "Z_DM_SAP_MATM_CREATE".toLowerCase(), null);
+		super(materialID, "Z_DM_SAP_MATM_CREATE".toLowerCase(), null);
 		// RdhMatm_bmm00 matnr Copy from <SoftwareProduct.productIdentifier>.
 		pims_identity="H";
 		bmm00.get(0).setMatnr(materialID);
@@ -118,6 +118,11 @@ public class ChwMatmCreate extends RdhBase {
 		if("Hardware".equals(model.getCATEGORY()))
 		{
 			bmmh1.get(0).setLadgr("H001");
+			if("ZMAT".equals(materialType))
+			{
+				bmmh1.get(0).setXchpf("X");
+			}
+			
 		}
 		bmmh1.get(0).setMtvfp("ZE");
 		bmmh1.get(0).setKautb("X");
@@ -243,13 +248,11 @@ public class ChwMatmCreate extends RdhBase {
 		RdhMatm_geo geo = new RdhMatm_geo();
 		geo.setName("WW1");
 		geo.setVmsta("Z0");
-		if(materialID.endsWith("NEW")) {
+		if(materialID.endsWith("UPG")) {
 			String pubfrom = DateUtility.getTodayStringWithSapFormat();
 			System.out.println("pubfrom=" + pubfrom);
 			geo.setVmstd(pubfrom);
 		}else {
-			String pubfrom = availabilities.get(0).getPUBFROM();
-			System.out.println("pubfrom=" + pubfrom);
 			geo.setVmstd(this.getEarliestPUBFROM(model));			
 			//geo.setVmstd(pubfrom.replace("-", ""));
 		}
@@ -801,16 +804,15 @@ public class ChwMatmCreate extends RdhBase {
 		// sales_orgs = new ArrayList<RdhMatm_sales_org>();
 		// tax_countries = new ArrayList<RdhMatm_tax_country>();
 	}
-
+ 
 	@Override
 	protected boolean isReadyToExecute() {
 		if (this.getRfcrc() != 0) {
-			return false;
-		} else {
+			return false; 
+		} else { 
 			return true;
 		}
-	}
-
+	} 
 	/**
 	 * Change add_date to yyyy-MM-dd
 	 * 

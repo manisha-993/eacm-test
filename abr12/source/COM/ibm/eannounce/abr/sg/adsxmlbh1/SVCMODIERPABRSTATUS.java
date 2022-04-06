@@ -295,7 +295,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 					
 				}
 			} else {
-				this.addOutput("XML file not exeit in cache,RFC caller not called!");
+				this.addOutput("XML file not exist in cache,RFC caller not called!");
 				//return;
 			}
 			
