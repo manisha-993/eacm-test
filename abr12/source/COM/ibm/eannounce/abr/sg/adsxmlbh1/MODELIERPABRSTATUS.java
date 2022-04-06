@@ -194,7 +194,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 								this.addMsg(chwMachTypeUpg.getRptSb());
 								throw e;
 							}
-						}else if("M,B".contains(model.getORDERCODE())) {
+						}else if(model.getORDERCODE()!=null&&model.getORDERCODE().trim().length()>0&&"M,B".contains(model.getORDERCODE())) {
 							this.addDebug("Calling " + "processMachTypeUpg");
 							processMachTypeUpg(model, connection);	
 						}
@@ -280,7 +280,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 	 * Get Name based on navigation attributes for specified entity
 	 *
 	 * @return java.lang.String
-	 */
+	 */ 
 	private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException {
 		StringBuffer navName = new StringBuffer();
 		// NAME is navigate attributes
@@ -810,14 +810,23 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		String addit_vals="X";
 		String chdescr=model.getMACHTYPE()+" Model Characteristic";
 		ChwCharMaintain charMaintain = new ChwCharMaintain(obj_id, charact, datatype, charnumber, decplaces, casesens, neg_vals, group, valassignm, no_entry, no_display, addit_vals, chdescr);
-    
-		charMaintain.addValue(model.getMODEL(), model.getINVNAME().substring(0, 24)+" "+model.getMODEL());
+		String valdescr = null;
+		List<LANGUAGE> languages =model.getLANGUAGELIST();
+		String invname = null;
+		for (int i = 0; i < languages.size(); i++) {
+			if("1".equals(languages.get(i).getNLSID())){
+				invname= languages.get(i).getINVNAME();
+			}
+		}
+		
+		valdescr =  invname==null? "":invname.substring(0, Math.min(invname.length(),24))+" "+model.getMODEL();
+		charMaintain.addValue(model.getMODEL(),valdescr);
 		runRfcCaller(charMaintain);
 		
 		class_name = "MK_"+model.getMACHTYPE()+"_MOD";
 		class_type = class_name;
 		ChwClassMaintain chwClassMaintain = new ChwClassMaintain(obj_id, class_name, class_type);
-		chwClassMaintain.addCharacteristic("MK_T_"+model.getMODEL()+"_MOD");
+		chwClassMaintain.addCharacteristic("MK_T_"+model.getMACHTYPE()+"_MOD");
 		runRfcCaller(chwClassMaintain);
 		
 		class_type="300";
