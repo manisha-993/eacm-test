@@ -5,10 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
 
@@ -17,6 +14,20 @@ public class ChwMachTypeMtc extends RfcCallerBase {
 	private MODEL chwModel;
 	private Connection rdhConnection;
 	private Connection odsConnection;
+	
+	private String FROMMODELTOMODEL = "SELECT FROMMACHTYPE||FROMMODEL||'_'||TOMACHTYPE||TOMODEL AS FromModelToModel FROM ("
+		    + " SELECT DISTINCT t1.ATTRIBUTEVALUE AS FROMMACHTYPE, t3.ATTRIBUTEVALUE AS FROMMODEL, t2.ATTRIBUTEVALUE AS TOMACHTYPE, t4.ATTRIBUTEVALUE AS TOMODEL FROM OPICM.flag F"
+		    + " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE =? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN opicm.text t3 ON f.ENTITYID =t3.ENTITYID AND f.ENTITYTYPE =t3.ENTITYTYPE AND t3.ATTRIBUTECODE ='FROMMODEL' AND T3.VALTO > CURRENT  TIMESTAMP AND T3.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN opicm.text t4 ON f.ENTITYID =t4.ENTITYID AND f.ENTITYTYPE =t4.ENTITYTYPE AND t4.ATTRIBUTECODE ='TOMODEL' AND T4.VALTO > CURRENT  TIMESTAMP AND T4.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP"
+		    + " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP"
+		    + " WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS')  "
+		    + " AND T1.ATTRIBUTEVALUE !=T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION=? "
+		    + " ) AS TT"
+		    + " WITH UR";
+	
 	
 	public ChwMachTypeMtc(MODEL chwProduct,Connection rdhConnection, Connection odsConnection) {	
 		this.chwModel = chwProduct;
@@ -155,15 +166,19 @@ public class ChwMachTypeMtc extends RfcCallerBase {
 			this.addRfcName(ChwCharMaintain);
 			//9.B For each MODELCONVERT which meets all of conditions below 
 			String machtype = chwModel.getMACHTYPE();
-			ArrayList<HashMap<String, String>> recordArray = getModelConvert(machtype);
-			
-			for(HashMap<String, String> modelConvertMap: recordArray){				
-				String modelconvert_value = modelConvertMap.get("FROMMACHTYPE") + modelConvertMap.get("FROMMODEL")
-						+ "_" + modelConvertMap.get("TOMACHTYPE") + modelConvertMap.get("TOMODEL");
-				String modelConvert_desc  = modelConvertMap.get("FROMMACHTYPE") + modelConvertMap.get("FROMMODEL")
-						+ " to " + modelConvertMap.get("TOMACHTYPE") + modelConvertMap.get("TOMODEL");
-				ChwCharMaintain.addValue(modelconvert_value, modelConvert_desc);
-			}	
+			//ArrayList<HashMap<String, String>> recordArray = getModelConvert(machtype);
+			List<String> FromModelToModel = this.getFromModelToModel(FROMMODELTOMODEL, chwModel.getMACHTYPE(),chwModel.getPDHDOMAIN());	
+			for(String value : FromModelToModel){
+				String value_descr = value.replace("_", " to ");
+				ChwCharMaintain.addValue(value, value_descr);
+			}				
+//			for(HashMap<String, String> modelConvertMap: recordArray){				
+//				String modelconvert_value = modelConvertMap.get("FROMMACHTYPE") + modelConvertMap.get("FROMMODEL")
+//						+ "_" + modelConvertMap.get("TOMACHTYPE") + modelConvertMap.get("TOMODEL");
+//				String modelConvert_desc  = modelConvertMap.get("FROMMACHTYPE") + modelConvertMap.get("FROMMODEL")
+//						+ " to " + modelConvertMap.get("TOMACHTYPE") + modelConvertMap.get("TOMODEL");
+//				ChwCharMaintain.addValue(modelconvert_value, modelConvert_desc);
+//			}	
 			ChwCharMaintain.execute();
 			this.addRfcResult(ChwCharMaintain);
 			//9.c Call the ChwClassMaintain constructor to create the MK_machineType_MTC class. 
@@ -218,73 +233,91 @@ public class ChwMachTypeMtc extends RfcCallerBase {
 			this.addRfcResult(ChwConpMaintain);
 		
 	}
-	private ArrayList<HashMap<String, String>> getModelConvert(String machtype) throws SQLException {
-		
-		ArrayList<HashMap<String, String>> recordArray = new ArrayList<HashMap<String, String>>();
-		String modelConvertQuery ="SELECT MT.ENTITYID FROM OPICM.TEXT AS MT "
-				+ " JOIN  OPICM.TEXT AS MF "
-				+ " ON MT.ENTITYTYPE = MF.ENTITYTYPE "
-				+ " and MT.ENTITYID = MF.ENTITYID "
-				+ " WHERE MT.EFFTO >current timestamp "
-				+ " AND MT.VALTO >current timestamp "
-				+ " AND MF.EFFTO >current timestamp "
-				+ " AND MF.VALTO >current timestamp "
-				+ " AND MT.ENTITYTYPE ='MODELCONVERT' "
-				+ " AND MT.ATTRIBUTECODE ='TOMACHTYPE' "
-				+ " AND MF.ATTRIBUTECODE ='FROMMACHTYPE' "
-				+ " AND MT.ATTRIBUTEVALUE <> MF.ATTRIBUTEVALUE "
-				+ " AND MT.ATTRIBUTEVALUE =? "
-				+ " AND MT.ENTITYID IN (  SELECT ENTITYID FROM OPICM.FLAG "
-				+ " WHERE ENTITYTYPE ='MODELCONVERT' "
-				+ " AND ((ATTRIBUTECODE ='ADSABRSTATUS' AND ATTRIBUTEVALUE = '0040') "
-				+ " OR (ATTRIBUTECODE ='MODELCONVERTIERPABRSTATUS' AND ATTRIBUTEVALUE = '0040')) "
-				+ " AND EFFTO >current timestamp "
-				+ " AND VALTO > current timestamp )"
-				+ " WITH ur";
-		PreparedStatement statement = rdhConnection.prepareStatement(modelConvertQuery);
-		statement.setString(1, machtype);
-		ResultSet resultSet = statement.executeQuery();
-		Map<String,String> attributeMap = new HashMap<String,String>();
-		attributeMap.put("FROMMACHTYPE", "");
-		attributeMap.put("FROMMODEL", "");
-		attributeMap.put("TOMACHTYPE", "");
-		attributeMap.put("TOMODEL ", "");
-		
-		while(resultSet.next()){
-			int entityid = resultSet.getInt("ENTITYID");
-			String modelConvert = "SELECT ATTRIBUTECODE,ATTRIBUTEVALUE FROM OPICM.TEXT "
-					+ " WHERE ENTITYTYPE ='MODELCONVERT' "
-					+ " AND ENTITYID=? "
-					+ " AND EFFTO >current timestamp "
-					+ " AND VALTO > current timestamp WITH ur";
-			PreparedStatement attributeStatement = rdhConnection.prepareStatement(modelConvert);
-			statement.setInt(1, entityid);
-			ResultSet attributeResultSet = attributeStatement.executeQuery();
-			HashMap<String,String> modelConvertMap = new HashMap<String,String>();
-			while(attributeResultSet.next()){
-				String attributecode = attributeResultSet.getString("ATTRIBUTECODE");
-				if(attributeMap.containsKey(attributecode)){
-					modelConvertMap.put(attributecode, attributeResultSet.getString("ATTRIBUTEVALUE"));					
-				}
-			}
-			if(!modelConvertMap.containsKey("FROMMACHTYPE")){
-				modelConvertMap.put("FROMMACHTYPE", "");
-			}
-			if(!modelConvertMap.containsKey("FROMMODEL")){
-				modelConvertMap.put("FROMMODEL", "");
-			}
-			if(!modelConvertMap.containsKey("TOMACHTYPE")){
-				modelConvertMap.put("TOMACHTYPE", "");
-			}
-			if(!modelConvertMap.containsKey("TOMODEL")){
-				modelConvertMap.put("TOMODEL", "");
-			}
-			recordArray.add(modelConvertMap);			
-		}
-		return recordArray;
-	}
+	
+//	private ArrayList<HashMap<String, String>> getModelConvert(String machtype) throws SQLException {
+//		
+//		ArrayList<HashMap<String, String>> recordArray = new ArrayList<HashMap<String, String>>();
+//		String modelConvertQuery ="SELECT MT.ENTITYID FROM OPICM.TEXT AS MT "
+//				+ " JOIN  OPICM.TEXT AS MF "
+//				+ " ON MT.ENTITYTYPE = MF.ENTITYTYPE "
+//				+ " and MT.ENTITYID = MF.ENTITYID "
+//				+ " WHERE MT.EFFTO >current timestamp "
+//				+ " AND MT.VALTO >current timestamp "
+//				+ " AND MF.EFFTO >current timestamp "
+//				+ " AND MF.VALTO >current timestamp "
+//				+ " AND MT.ENTITYTYPE ='MODELCONVERT' "
+//				+ " AND MT.ATTRIBUTECODE ='TOMACHTYPE' "
+//				+ " AND MF.ATTRIBUTECODE ='FROMMACHTYPE' "
+//				+ " AND MT.ATTRIBUTEVALUE <> MF.ATTRIBUTEVALUE "
+//				+ " AND MT.ATTRIBUTEVALUE =? "
+//				+ " AND MT.ENTITYID IN (  SELECT ENTITYID FROM OPICM.FLAG "
+//				+ " WHERE ENTITYTYPE ='MODELCONVERT' "
+//				+ " AND ((ATTRIBUTECODE ='ADSABRSTATUS' AND ATTRIBUTEVALUE = '0040') "
+//				+ " OR (ATTRIBUTECODE ='MODELCONVERTIERPABRSTATUS' AND ATTRIBUTEVALUE = '0040')) "
+//				+ " AND EFFTO >current timestamp "
+//				+ " AND VALTO > current timestamp )"
+//				+ " WITH ur";
+//		PreparedStatement statement = rdhConnection.prepareStatement(modelConvertQuery);
+//		statement.setString(1, machtype);
+//		ResultSet resultSet = statement.executeQuery();
+//		Map<String,String> attributeMap = new HashMap<String,String>();
+//		attributeMap.put("FROMMACHTYPE", "");
+//		attributeMap.put("FROMMODEL", "");
+//		attributeMap.put("TOMACHTYPE", "");
+//		attributeMap.put("TOMODEL ", "");
+//		
+//		while(resultSet.next()){
+//			int entityid = resultSet.getInt("ENTITYID");
+//			String modelConvert = "SELECT ATTRIBUTECODE,ATTRIBUTEVALUE FROM OPICM.TEXT "
+//					+ " WHERE ENTITYTYPE ='MODELCONVERT' "
+//					+ " AND ENTITYID=? "
+//					+ " AND EFFTO >current timestamp "
+//					+ " AND VALTO > current timestamp WITH ur";
+//			PreparedStatement attributeStatement = rdhConnection.prepareStatement(modelConvert);
+//			statement.setInt(1, entityid);
+//			ResultSet attributeResultSet = attributeStatement.executeQuery();
+//			HashMap<String,String> modelConvertMap = new HashMap<String,String>();
+//			while(attributeResultSet.next()){
+//				String attributecode = attributeResultSet.getString("ATTRIBUTECODE");
+//				if(attributeMap.containsKey(attributecode)){
+//					modelConvertMap.put(attributecode, attributeResultSet.getString("ATTRIBUTEVALUE"));					
+//				}
+//			}
+//			if(!modelConvertMap.containsKey("FROMMACHTYPE")){
+//				modelConvertMap.put("FROMMACHTYPE", "");
+//			}
+//			if(!modelConvertMap.containsKey("FROMMODEL")){
+//				modelConvertMap.put("FROMMODEL", "");
+//			}
+//			if(!modelConvertMap.containsKey("TOMACHTYPE")){
+//				modelConvertMap.put("TOMACHTYPE", "");
+//			}
+//			if(!modelConvertMap.containsKey("TOMODEL")){
+//				modelConvertMap.put("TOMODEL", "");
+//			}
+//			recordArray.add(modelConvertMap);			
+//		}
+//		return recordArray;
+//	}
 	
 
+	private List<String> getFromModelToModel(String sql,String type,String pdhdomain) throws SQLException {
+		List<String> fromModelToModelList = new ArrayList<String>();
+		Object[] params = new String[2]; 
+		params[0] =type;
+		params[1] =pdhdomain;
+		String realSql = CommonUtils.getPreparedSQL(sql, params);
+		this.addDebug("querySql=" + realSql);
+		
+		PreparedStatement statement = rdhConnection.prepareStatement(sql);
+		statement.setString(1, type);
+		statement.setString(2, pdhdomain);
+		ResultSet resultSet = statement.executeQuery();
+		while(resultSet.next()){
+			fromModelToModelList.add(resultSet.getString("FromModelToModel"));
+		}		
+		return fromModelToModelList;
+	}
 	public static void main(String[] args) {
 		MODEL model = new MODEL();
 		model.setMACHTYPE("UTC");

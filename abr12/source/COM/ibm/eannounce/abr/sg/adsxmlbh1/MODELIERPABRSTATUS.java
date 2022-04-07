@@ -170,7 +170,6 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 					 */
 			
 					if(exist(COVNOTEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())) {
-						this.addDebug("Calling " + "ChwMachTypeMtc");
 						ChwMachTypeMtc chwMachTypeMtc =new ChwMachTypeMtc(model, m_db.getPDHConnection(), connection);
 						this.addDebug("Calling " + "ChwMachTypeMtc");
 						try{
@@ -186,9 +185,8 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 					if(!"Maintenance,MaintFeature".contains(model.getSUBCATEGORY())) {
 						
 						if(exist(COVEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())||exist(FCTEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())) {
-							this.addDebug("Calling " + "ChwMachTypeMtc");
 							ChwMachTypeUpg chwMachTypeUpg = new ChwMachTypeUpg(model, m_db.getPDHConnection(), connection);
-							this.addDebug("Calling " + "ChwMachTypeMtc");
+							this.addDebug("Calling " + "ChwMachTypeUpg");
 							try{
 								chwMachTypeUpg.execute();
 								this.addMsg(chwMachTypeUpg.getRptSb());

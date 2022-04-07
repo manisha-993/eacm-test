@@ -5,12 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
-import COM.ibm.opicmpdh.middleware.MiddlewareException;
 
 public class ChwMachTypeUpg extends RfcCallerBase{
 	
@@ -215,7 +212,8 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 				//9.B Create an array variable <FromModelToModel> in the SQL
 	            //9.c For each entry in the array <FromModelToModel>, call the ChwCharMaintain.addValue() method to add the value
 				for(String value : FromModelToModel){
-					String value_descr = "From " + chwModel.getMACHTYPE() + " Model" + CommonUtils.getFirstSubString(value, 3) + CommonUtils.getLastSubString(value, 3);
+					//"From <chwProduct.machineType> Model LEFT(value in <FromModelToModel>,1,3) to RIGHT(value in <FromModelToModel>,1,3)"
+					String value_descr = "From " + chwModel.getMACHTYPE() + " Model " + CommonUtils.getFirstSubString(value, 3) + " to " + CommonUtils.getLastSubString(value, 3);
 					ChwCharMaintain.addValue(value, value_descr);
 				}			
 				ChwCharMaintain.execute();
