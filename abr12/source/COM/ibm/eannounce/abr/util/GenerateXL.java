@@ -230,7 +230,7 @@ public class GenerateXL {
                         String ei_Parent = eiParent.getEntityType();
                         System.out.println("Working with _eg: " + ii + ": " + _eg.getLongDescription() + "count: " + count + ei_Parent + "tabName" + tabName); //This is the name of the tab
                         wbs = wb.createSheet(Filename);
-                        wb.setSheetName(count, tabName, HSSFWorkbook.ENCODING_UTF_16);
+                        wb.setSheetName(count, tabName);
                         count++;
 
                 //need to check the root entity
@@ -569,7 +569,7 @@ public class GenerateXL {
                 System.out.println("Working with eg: " + eg.getLongDescription() + "Count: " + Count + ei_Parent + "tabName" + tabName);
                 wbs = wb.createSheet(Filename);
                 //This is the name of the tab
-                wb.setSheetName(Count, tabName, HSSFWorkbook.ENCODING_UTF_16);
+                wb.setSheetName(Count, tabName);
                 Count++;
 
                 if (sAtt.equals("*")) {
