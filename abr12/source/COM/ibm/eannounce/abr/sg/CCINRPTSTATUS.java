@@ -17,6 +17,7 @@ import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
 
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
@@ -195,13 +196,12 @@ public class CCINRPTSTATUS extends PokBaseABR {
 	}
 	
 	public static  boolean createExcel(List list, String filepath) {
-
         HSSFWorkbook wb = new HSSFWorkbook();
         HSSFSheet sheet = wb.createSheet("sheet1");    
         HSSFRow row = sheet.createRow((int) 0);
         HSSFCellStyle style = wb.createCellStyle();
-        style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-
+        //style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
         HSSFCell cell = null;
         for (int i = 0; i < COLUMN_ARR.length; i++) {
             cell = row.createCell((short) i);

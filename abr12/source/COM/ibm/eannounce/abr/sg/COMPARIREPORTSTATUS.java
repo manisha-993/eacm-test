@@ -29,6 +29,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.ss.usermodel.FillPatternType;
 
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
@@ -484,16 +485,16 @@ public class COMPARIREPORTSTATUS extends PokBaseABR {
 		StringBuffer report = new StringBuffer();
 		HSSFRow row = sheet.createRow(rows++);
 		HSSFCellStyle yellow = workbook.createCellStyle();
-		yellow.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND); 
+		yellow.setFillPattern(FillPatternType.SOLID_FOREGROUND); 
 		yellow.setFillForegroundColor(HSSFColor.YELLOW.index);
 		HSSFCellStyle green = workbook.createCellStyle();
-		green.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND); 
+		green.setFillPattern(FillPatternType.SOLID_FOREGROUND); 
 		green.setFillForegroundColor(HSSFColor.GREEN.index);
 		HSSFCellStyle red = workbook.createCellStyle();
-		red.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND); 
+		red.setFillPattern(FillPatternType.SOLID_FOREGROUND); 
 		red.setFillForegroundColor(HSSFColor.RED.index);
 		HSSFCellStyle blue = workbook.createCellStyle();
-		blue.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND); 
+		blue.setFillPattern(FillPatternType.SOLID_FOREGROUND); 
 		blue.setFillForegroundColor(HSSFColor.BLUE.index);
 		
 		HSSFCell cell = row.createCell((short) 0);

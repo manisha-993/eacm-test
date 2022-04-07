@@ -1,8 +1,8 @@
 #!/bin/ksh
 
 DBASE=pdh12
-USER=opica12
-PASSWD=cat9tail
+USER=
+PASSWD=
 
 WHERE="WHERE 1=1"
 DIR="/db2/opicmpdh/fs0/export/"

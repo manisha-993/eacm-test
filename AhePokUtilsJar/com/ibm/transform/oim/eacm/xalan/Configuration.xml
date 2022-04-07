@@ -457,8 +457,8 @@
 	</Enterprise>
 	<Enterprise code="SG">
 		<Connection id="PDH">
-			<UserID>opicmadm</UserID>
-			<Password>mice8chs</Password>
+			<UserID></UserID>
+			<Password></Password>
 			<Database>opicmpdh</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:pdhalias</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
@@ -466,8 +466,8 @@
 			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
 		</Connection>
 		<Connection id="ODS">
-			<UserID>opicmadm</UserID>
-			<Password>one2help</Password>
+			<UserID></UserID>
+			<Password></Password>
 			<Database>bldods</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:bldods</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
@@ -2614,16 +2614,16 @@
 	<Enterprise code="LN">
 		<Connection id="PDH">
 			<UserID>opicmadm</UserID>
-			<Password>mice8chs</Password>
-			<Database>opicmpdh</Database>
+			<Password></Password>
+			<Database></Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:pdhalias</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
 			<DatabaseURL>jdbc:db2://127.0.0.1:50001/PDHALIAS</DatabaseURL>
 			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
 		</Connection>
 		<Connection id="ODS">
-			<UserID>opicmadm</UserID>
-			<Password>one2help</Password>
+			<UserID></UserID>
+			<Password></Password>
 			<Database>bldods</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:bldods</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->

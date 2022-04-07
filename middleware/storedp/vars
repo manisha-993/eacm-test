@@ -6,7 +6,7 @@
 
 DBASE=opicmpdh
 USER=`whoami`
-PASSWD=mice8chs
+PASSWD=
 SPSOURCE="/home/"$USER"/storedp/"
 SQLLIB="/home/"$DB2INSTANCE"/sqllib/"
 
