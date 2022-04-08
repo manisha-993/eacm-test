@@ -160,7 +160,12 @@ public class ChwMatmCreate extends RdhBase {
 				bmmh1.get(0).setSernp("ZZ06");
 			}
 		}else if (materialID.endsWith("MTC")||materialID.endsWith("UPG")) {
-			bmmh1.get(0).setSernp("ZZ06");
+			if("LBS".equals(model.getPHANTOMMODINDC())){
+				bmmh1.get(0).setSernp("NONE");
+			}
+			else {
+				bmmh1.get(0).setSernp("ZZ06");
+			}
 		}
 		else if ("ZPRT".equals(materialType)) {
 			bmmh1.get(0).setSernp("NONE");
@@ -250,11 +255,10 @@ public class ChwMatmCreate extends RdhBase {
 		geo.setVmsta("Z0");
 		if(materialID.endsWith("UPG")) {
 			String pubfrom = DateUtility.getTodayStringWithSapFormat();
-			System.out.println("pubfrom=" + pubfrom);
 			geo.setVmstd(pubfrom);
 		}else {
 			geo.setVmstd(this.getEarliestPUBFROM(model));			
-			//geo.setVmstd(pubfrom.replace("-", ""));
+			//geo.setVmstd(pubfrom.replace("-", "")); 
 		}
 		
 		Set<SLEORGNPLNTCODE> sset  = new HashSet<SLEORGNPLNTCODE>();
@@ -316,7 +320,7 @@ public class ChwMatmCreate extends RdhBase {
 		List<Generalarea> generalareas = RFCConfig.getGeneralareas();
 		Set<String> plntcdtSet = new HashSet<String>();
 		Set<String> saleorgSet = new HashSet<String>();
-
+		Set<String> countrySet = new HashSet<String>();
 		for (int i = 0; i < taxs.size(); i++) {
 			
 			CountryPlantTax tax = taxs.get(i);
@@ -361,6 +365,9 @@ public class ChwMatmCreate extends RdhBase {
 			CountryPlantTax tax = taxs.get(i);
 			
 			if("2".equals(tax.getINTERFACE_ID())) {
+				if(countrySet.contains(tax.getTAX_COUNTRY()))
+					continue;
+				countrySet.add(tax.getTAX_COUNTRY());
 				RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
 				tax_country.setAland(tax.getTAX_COUNTRY());
 				tax_country.setTaty1(tax.getTAX_CAT());
@@ -380,8 +387,8 @@ public class ChwMatmCreate extends RdhBase {
 				
 			}
 		}
-		}else if (materialID.endsWith("UPG")||"ZPRT".equals(type)) {
-			Set<String> countrySet = new HashSet<String>();
+		}else if (materialID.endsWith("NEW")||"ZPRT".equals(materialType)) {
+			//Set<String> countrySet = new HashSet<String>();
 			
 			for (int i = 0; i <taxcategories.size(); i++) {
 				TAXCATEGORY taxcategory = taxcategories.get(i);
