@@ -219,7 +219,9 @@ public class ADSPRODSTRUCTABR extends XMLMQRoot {
 
 		//Add	CQ36617	22.40		1	1.0	<WARRSVCCOVR>	</WARRSVCCOVR>
 		XMLMAP.addChild(new XMLElem("WARRSVCCOVR", "WARRSVCCOVR", XMLElem.ATTRVAL));
-		
+
+		XMLMAP.addChild(new XMLElem("RETURNEDPARTS", "RETURNEDPARTS", XMLElem.ATTRVAL));
+
 		//<OSLIST>
 		XMLElem list = new XMLElem("OSLIST");
 		XMLMAP.addChild(list);
