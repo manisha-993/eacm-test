@@ -63,7 +63,6 @@ public class ADSREFOFERABR extends XMLMQRoot
         //XMLMAP.addChild(new XMLElem("FSLMCPU","FSLMCPU"));//no this column on the GUI
         XMLMAP.addChild(new XMLElem("PRODSUPRTCD","PRODSUPRTCD"));//no this column on the GUI
 
-        XMLMAP.addChild(new XMLElem("DOMAIN","DOMAIN"));
         //level 2 LANGUAGELIST
         XMLElem langlist = new XMLElem("LANGUAGELIST");
         XMLMAP.addChild(langlist);
