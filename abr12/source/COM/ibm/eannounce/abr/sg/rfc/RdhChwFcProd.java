@@ -79,7 +79,7 @@ public class RdhChwFcProd extends RdhBase {
 				rdhChwFcProd_TMF.setNoCstShip(tmf.getNOCSTSHIP());
 				rdhChwFcProd_TMF.setInstall(tmf.getINSTALL());
 				rdhChwFcProd_TMF.setConfiguratorFlag(tmf.getCONFIGURATORFLAG());
-				rdhChwFcProd_TMF.setBulkMesIndc(tmf.getBULKMESINDC());
+				rdhChwFcProd_TMF.setBulkMesIndc(CommonUtils.getFirstSubString(tmf.getBULKMESINDC(),1));
 				rdhChwFcProd_TMF.setOrderCode(tmf.getORDERCODE());
 				rdhChwFcProd_TMF.setSystemMax(tmf.getSYSTEMMAX());
 				tbl_tmf_c.add(rdhChwFcProd_TMF);

@@ -80,7 +80,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 	
 
 	public String getDescription() {
-		return "MODELIERPABRSTATUS";
+		return "TMFIERPABRSTATUS";
 	}
 
 	public String getABRVersion() {
@@ -136,7 +136,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			 */
 
 			EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-			addDebug("*****mlm rootEntity = " + rootEntity.getEntityType() + rootEntity.getEntityID());
+			addDebug("*****mlm rootEntity TMFIERPABRSTATUS = " + rootEntity.getEntityType() + rootEntity.getEntityID());
 			// NAME is navigate attributes - only used if error rpt is generated
 			navName = getNavigationName();
 			rootDesc = m_elist.getParentEntityGroup().getLongDescription();
@@ -144,19 +144,25 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			addDebug("rootDesc" + rootDesc);
 			// build the text file
 
-			String prodstuctxml = getXMLByID(PRODSTRUCTSQL, rootEntity.getEntityID());
+			xml = getXMLByID(PRODSTRUCTSQL, rootEntity.getEntityID());
 			
-			if (prodstuctxml != null) {
+			
+			if (xml != null) {
 				//step1 Execute the steps described in the section Create SAP characteristics and classes for MachineTypeNEW material 
 				//to create the SAP characteristics and classes of the feature code for MachineTypeNEW material. 
-				TMF_UPDATE tmf = XMLParse.getObjectFromXml(prodstuctxml,TMF_UPDATE.class);
+				TMF_UPDATE tmf = XMLParse.getObjectFromXml(xml,TMF_UPDATE.class);
+				addDebug("get the tmf!");
 				//get chwFeature and chwModel from tmf
 				if(tmf==null) return;
 				String featurexml = getXMLByID(FEATURESQL, Integer.parseInt(tmf.getFEATUREENTITYID()));
-				String modelxml = getXMLByID(MODELSQL, Integer.parseInt(tmf.getMODELENTITYID()));				
+				//addDebug("featurexml=" + featurexml);
+				String modelxml = getXMLByID(MODELSQL, Integer.parseInt(tmf.getMODELENTITYID()));	
+				//addDebug("modelxml=" + modelxml);
 		
 				FEATURE chwFeature = XMLParse.getObjectFromXml(featurexml,FEATURE.class);
+				addDebug("get the chwFeature=" + chwFeature);
 				MODEL chwModel = XMLParse.getObjectFromXml(modelxml,MODEL.class);
+				addDebug("get the chwModel=" + chwModel);
 				MachineTypeNEW(tmf,chwFeature,chwModel);
 				//step2 
 				/**
@@ -199,6 +205,8 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				runRfcCaller(caller);
 					
 				
+			}else{
+				addDebug("no xml found in the ODS database");
 			}	
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -259,6 +267,10 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			throws MiddlewareException, SQLException {
 		String sReturn = "";
 		Connection connection = m_db.getODSConnection();
+		Object[] params = new String[1]; 
+		params[0] =String.valueOf(entityId);			
+		String realSql = CommonUtils.getPreparedSQL(SQL, params);
+		this.addDebug("querySql=" + realSql);		
 		PreparedStatement statement = connection.prepareStatement(SQL); 
 		statement.setInt(1, entityId);
 		ResultSet resultSet = statement.executeQuery();
@@ -710,9 +722,12 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 	private void MachineTypeNEW(TMF_UPDATE chwTMF, FEATURE chwFeature, MODEL chwModel) throws Exception {
 		
 		//step1 If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED")
-		
-		if(chwFeature==null) return;
-		if(chwModel==null) return;
+		if(chwFeature==null) {			
+			return;
+		}
+		if(chwModel==null) {
+			return;
+		}
 		
 		String FCTYPE = chwTMF.getFCTYPE();
 		String obj_id = chwTMF.getMACHTYPE() + "NEW";
@@ -722,8 +737,10 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		
-		
+		this.addDebug("TMF param feature_code=" + feature_code);
+		this.addDebug("TMF param FCTYPE=" + FCTYPE);
 		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
+			this.addDebug("1.1 TMF Calling Call ChwClsfCharCreate.CreateGroupChar()");
 			//1.1 Call ChwClsfCharCreate.CreateGroupChar() method to create the group characteristic and class.
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			//String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
@@ -739,8 +756,12 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			String UNITCLASS = chwModel.getUNITCLASS();
 			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
 			String ORDERCODE = chwTMF.getORDERCODE();
+			this.addDebug("TMF param UNITCLASS=" + UNITCLASS);
+			this.addDebug("TMF param SYSTEMMAX=" + SYSTEMMAX);
+			this.addDebug("TMF param ORDERCODE=" + ORDERCODE);
+			
 			if("Non SIU- CPU".equalsIgnoreCase(UNITCLASS) || SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
-				
+				this.addDebug("1.2 TMF Calling Call ChwClsfCharCreate.CreateQTYChar()");
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				//String obj_id, String target_indc, String mach_type, String feature_code
 				try{
@@ -755,7 +776,10 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			}			
 		}
 		//step2 If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE in ("RPQ-PLISTED","RPQ-ILISTED"), then
+		this.addDebug("TMF param feature_code=" + feature_code);
+		this.addDebug("TMF param FCTYPE=" + FCTYPE);
 		if(CommonUtils.hasLetter(feature_code) && FctypeEMap.containsKey(FCTYPE)){
+			this.addDebug("2.1 TMF Calling Call ChwClsfCharCreate.CreateRPQGroupChar()");
 			//2.1 Call ChwClsfCharCreate.CreateRPQGroupChar() to create the group characteristic and class for the RPQ feature code.
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			//feature_code_desc = getFeatureCodeDesc(feature);
@@ -772,7 +796,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
 			String ORDERCODE = chwTMF.getORDERCODE();
 			if("Non SIU- CPU".equalsIgnoreCase(UNITCLASS) || SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
-				
+				this.addDebug("2.2 TMF Calling Call ChwClsfCharCreate.CreateRPQQTYChar()");
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				//String obj_id, String target_indc, String mach_type, String feature_code
 				try{
@@ -787,9 +811,12 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		}
 		//step3. If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED") 
 		//and the first 3 characters of chwTMF/FEATURECODE <> "NEW",
+		this.addDebug("TMF param feature_code=" + feature_code);
+		this.addDebug("TMF param FCTYPE=" + FCTYPE);
 		if(CommonUtils.hasLetter(feature_code) 
 		   && !FctypeEMap.containsKey(FCTYPE) 
 		   && !CommonUtils.getFirstSubString(feature_code, 3).equalsIgnoreCase("NEW")){
+			this.addDebug("3.1 TMF Calling Call ChwClsfCharCreate.CreateAlphaGroupChar()");
 			//3.1 call ChwClsfCharCreate.CreateAlphaGroupChar() to create the group characteristic and class for the alpah feature code.
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			//feature_code_desc = getFeatureCodeDesc(feature);
@@ -805,6 +832,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
 			String ORDERCODE = chwTMF.getORDERCODE();
 			if(SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
+				this.addDebug("3.2 TMF Calling Call ChwClsfCharCreate.CreateAlphaQTYChar()");
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code);
@@ -817,6 +845,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		}
 		//step5 Call the TssClassificationMaint constructor to associate the MK_target_machineType_FC_n000 class 
 		// to the product's material master record. Set the constructor's input parameters as follows.
+		this.addDebug("5 TMF Calling Call TssClassificationMaint");
 		callRdhClassificationMaint(obj_id, "MK_REFERENCE");
 		//step 6. Call the TssClassificationMaint to associate the MK_T_VAO_NEW class to the product's material master record.
 		callRdhClassificationMaint(obj_id, "MK_T_VAO_NEW");		
@@ -836,14 +865,18 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 
 	protected String getFeatureCodeDesc(FEATURE feature) {
 		String BHINVNAME ="";
+		addDebug("TMF getFeatureCodeDesc start");
 		for (LANGUAGEELEMENT_FEATURE languageElement : feature.getLANGUAGELIST())
 		{
 			if ("1".equals(languageElement.getNLSID()))
 			{
 				BHINVNAME= languageElement.getBHINVNAME();
+				break;
 			}
 		}
+		addDebug("TMF getFeatureCodeDesc ...");
 		String feature_code_desc = CommonUtils.getFirstSubString(BHINVNAME, 30);
+		addDebug("TMF getFeatureCodeDesc End");
 		return feature_code_desc;
 	}
 
@@ -892,8 +925,8 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			
 			ResultSet resultSet = statement.executeQuery();
 			while (resultSet.next()) {
-				flag = true;
-				
+				int count = resultSet.getInt(1);
+				flag = count>0 ? true: false;				
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
