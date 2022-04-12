@@ -83,7 +83,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 	}
 
 	public String getABRVersion() {
-		return "1.0";
+		return "1.1";
 	}
 
 	public void execute_run() {
@@ -200,16 +200,19 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 						}
 					}
 					
-					
+					RdhChwFcProd prod = new RdhChwFcProd(model);
+					runRfcCaller(prod);
 				}
 				else if("Service".equals(model.getCATEGORY())) {
 					processMachTypeMODEL_Svc(model, connection);
+					RdhChwFcProd prod = new RdhChwFcProd(model);
+					runRfcCaller(prod);
 				}
-				else if ("SoftdWare".equals(model.getCATEGORY())) {
-					throw new Exception("Not support SoftWare");
+				else if ("Software".equals(model.getCATEGORY())) {
+					this.addError("It is not supported to feed software Model to iERP");
+					//throw new Exception("Not support SoftWare");
 				}
-				RdhChwFcProd prod = new RdhChwFcProd(model);
-				runRfcCaller(prod);
+				
 			}	
 			
 			// exeFtpShell(ffPathName);
