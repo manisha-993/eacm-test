@@ -2,11 +2,12 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" output="test_bin" path="test"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.4"/>
-	<classpathentry kind="lib" path="libs/com.ibm.mq5.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="lib" path="libs/j2ee.jar"/>
 	<classpathentry kind="lib" path="libs/xerces.jar"/>
-	<classpathentry kind="lib" path="C:/EACM_DEV/mydev_lib/middleware.jar" sourcepath="C:/EACM_PROJECT/middleware/source"/>
+	<classpathentry kind="lib" path="libs/com.ibm.mq.jar"/>
+	<classpathentry kind="lib" path="libs/middleware.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3.8.1"/>
+	<classpathentry kind="lib" path="/abr12Old/com.ibm.mq.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
