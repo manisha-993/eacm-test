@@ -18,6 +18,7 @@ import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwClassMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwConpMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwDepdMaintain;
+import COM.ibm.eannounce.abr.sg.rfc.ChwMTCYMDMFCMaint;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeMtc;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeUpg;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMatmCreate;
@@ -339,6 +340,10 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				//11.f 
 				ChwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", empty);  //Set to "PR_E2E_PRICING_HW".
 				this.runRfcCaller(ChwConpMaintain);
+				
+				//12. TODO
+//				ChwMTCYMDMFCMaint caller = new ChwMTCYMDMFCMaint(fctransaction);
+//				runRfcCaller(caller);
 				
 
 			}	
