@@ -177,7 +177,8 @@
 			</xsd:element>
             <xsd:element name="NOCSTSHIP" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
             <xsd:element name="WARRSVCCOVR" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
-            <xsd:element name="OSLIST" type="OSLISTTYPE" minOccurs="1"
+			<xsd:element name="RETURNEDPARTS" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element name="OSLIST" type="OSLISTTYPE" minOccurs="1"
 				maxOccurs="1">
 			</xsd:element>
             <xsd:element name="LANGUAGELIST" type="LANGUAGELISTTYPE"
