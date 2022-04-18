@@ -21,7 +21,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		}else if("D".equalsIgnoreCase(target_indc)){
 			chdescr = CommonUtils.getFirstSubString(feature_code, 1)+"000 Features Delta";
 		}
-		String charact ="MK_" + target_indc + "_" + mach_type + "_FC" + CommonUtils.getFirstSubString(feature_code, 1) +"000";
+		String charact ="MK_" + target_indc + "_" + mach_type + "_FC_" + CommonUtils.getFirstSubString(feature_code, 1) +"000";
 		
 		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(
 				obj_id

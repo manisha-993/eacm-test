@@ -4211,6 +4211,8 @@ ADSATTRIBUTE    40  WARRTYPE
         	setFlagValue("SVCMODIERPABRSTATUS", "0020");
         }else if("MODEL".equals(getEntityType())){
         	setFlagValue("MODELIERPABRSTATUS", "0020");
+        }else if("PRODSTRUCT".equals(getEntityType())){
+        	setFlagValue("TMFIERPABRSTATUS", "0020");
         }
     }finally{   
 		try {
