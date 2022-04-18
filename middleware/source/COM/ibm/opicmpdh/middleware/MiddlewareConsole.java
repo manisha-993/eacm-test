@@ -38,25 +38,40 @@ public class MiddlewareConsole {
 
       while (true) {
         System.out.print("@");
+        boolean valid = false;
+       
         strCommand = readInput.readLine();
         if (strCommand.equalsIgnoreCase("quit") || strCommand.equalsIgnoreCase("exit") || strCommand.equalsIgnoreCase("stop")) {
           Middleware.disconnect(roOPICM);
           System.exit(0);
         }
-
+        try
+        {
+            validate( strCommand );
+            valid = true;
+        }
+        catch ( RuntimeException e )
+        {
+        	System.exit(0);
+        }
+        if(valid) {
         timeIt.start();
         astrOutput = roOPICM.command(strCommand);
         for (int i = 0; i < astrOutput.length; i++) {
           System.out.println(astrOutput[i]);
-        }
-
+        } 
         System.out.println(timeIt.lap());
+        }
       }
     } catch (Exception x) {
       System.out.println(x);
     }
   }
-
+  public static boolean validate(String strCommand ){
+	  if(strCommand.length()>100)
+		  throw new RuntimeException("Length limit to less than 100");
+	  return true;
+  }
 /**
  * Return the date/time this class was generated
  * @return the date/time this class was generated
