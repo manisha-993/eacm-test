@@ -182,7 +182,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 					}
 					//step d
 					
-					if(!"Maintenance,MaintFeature".contains(model.getSUBCATEGORY())) {
+					if(!CommonUtils.contains("Maintenance,MaintFeature",model.getSUBCATEGORY())) {
 						
 						if(exist(COVEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())||exist(FCTEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())) {
 							ChwMachTypeUpg chwMachTypeUpg = new ChwMachTypeUpg(model, m_db.getPDHConnection(), connection);
@@ -194,7 +194,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 								this.addMsg(chwMachTypeUpg.getRptSb());
 								throw e;
 							}
-						}else if(model.getORDERCODE()!=null&&model.getORDERCODE().trim().length()>0&&"M,B".contains(model.getORDERCODE())) {
+						}else if(model.getORDERCODE()!=null&&model.getORDERCODE().trim().length()>0&&CommonUtils.contains("M,B",model.getORDERCODE())) {
 							this.addDebug("Calling " + "processMachTypeUpg");
 							processMachTypeUpg(model, connection);	
 						}
