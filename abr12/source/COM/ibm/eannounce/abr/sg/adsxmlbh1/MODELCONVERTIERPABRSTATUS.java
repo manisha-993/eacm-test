@@ -167,7 +167,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 						throw e;
 					}
 				}
-				/* MTCYMDMFCMaint maint = new MTCYMDMFCMaint(modelconvert);
+				 MTCYMDMFCMaint maint = new MTCYMDMFCMaint(modelconvert);
 				 
 				 this.addDebug("Calling " + maint.getRFCName());
 				 if(maint.getTbl_model().size()>0) {
@@ -182,7 +182,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				 }else {
 					 addOutput("No Tbl_model in the MTCYMDMFCMaint, will not call the RFC");
 				 }
-				 */
+
 
 				//MTCYMDMFCMa
 				//ChwMachTypeMtc
