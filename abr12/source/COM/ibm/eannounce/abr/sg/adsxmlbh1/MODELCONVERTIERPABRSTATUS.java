@@ -13,6 +13,8 @@ import java.util.List;
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
 import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeMtc;
+import COM.ibm.eannounce.abr.sg.rfc.ChwModelConvert;
+import COM.ibm.eannounce.abr.sg.rfc.ChwModelConvertMtc;
 import COM.ibm.eannounce.abr.sg.rfc.FEATURE;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.MODELCONVERT;
@@ -128,7 +130,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				 MODELCONVERT modelconvert = XMLParse.getObjectFromXml(xml, MODELCONVERT.class); 
 				
 				 if (modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())) {
-					
+					 ChwModelConvertMtc mtc = new ChwModelConvertMtc(modelconvert);
 				}
 			//MTCYMDMFCMa
 			//ChwMachTypeMtc 
