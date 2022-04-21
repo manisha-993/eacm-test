@@ -20,13 +20,35 @@ public class ChwFCTYMDMFCMaint extends RdhBase {
 	
 	
 	
-	public ChwFCTYMDMFCMaint(FCTRANSACTION fctransaction) {
+	public ChwFCTYMDMFCMaint(TMF_UPDATE tmf, FCTRANSACTION fctransaction) {
 		
 		super(fctransaction.getFROMMACHTYPE()==fctransaction.getTOMACHTYPE() ? fctransaction.getTOMACHTYPE() + "UPG": fctransaction.getTOMACHTYPE() + "MTC",
 				"RDH_YMDMFC_FCT".toLowerCase(), null);
 		this.pims_identity = "H";
 		
-		//TODO tbl_fctransaction_c
+		//tbl_fctransaction_c
+		if (tmf.getAVAILABILITYLIST()!=null && !tmf.getAVAILABILITYLIST().isEmpty())
+		{
+			for (AVAILABILITYELEMENT_TMF availabilityElement : tmf.getAVAILABILITYLIST())
+			{
+				RdhChwFcProd_FCTRANSACTION_C rdhChwFcProd_FCTRANSACTION_C = new RdhChwFcProd_FCTRANSACTION_C();
+				rdhChwFcProd_FCTRANSACTION_C.setFROMMACHTYPE(fctransaction.getFROMMACHTYPE());
+				rdhChwFcProd_FCTRANSACTION_C.setTOMACHTYPE(fctransaction.getTOMACHTYPE());
+				rdhChwFcProd_FCTRANSACTION_C.setCOUNTRY_FC(availabilityElement.getCOUNTRY_FC());
+				rdhChwFcProd_FCTRANSACTION_C.setAVAILABILITYACTION(availabilityElement.getAVAILABILITYACTION());
+				rdhChwFcProd_FCTRANSACTION_C.setANNDATE(availabilityElement.getANNDATE().replaceAll("-", ""));
+				rdhChwFcProd_FCTRANSACTION_C.setFIRSTORDER(availabilityElement.getFIRSTORDER().replaceAll("-", ""));				
+				rdhChwFcProd_FCTRANSACTION_C.setPLANNEDAVAILABILITY(availabilityElement.getPLANNEDAVAILABILITY().replaceAll("-", ""));				
+				rdhChwFcProd_FCTRANSACTION_C.setPUBFROM(availabilityElement.getPUBFROM().replaceAll("-", ""));
+				rdhChwFcProd_FCTRANSACTION_C.setPUBTO(availabilityElement.getPUBTO().replaceAll("-", ""));
+				rdhChwFcProd_FCTRANSACTION_C.setWDANNDATE(availabilityElement.getWDANNDATE().replaceAll("-", ""));
+				rdhChwFcProd_FCTRANSACTION_C.setPUBTO(availabilityElement.getPUBTO().replaceAll("-", ""));
+				rdhChwFcProd_FCTRANSACTION_C.setLASTORDER(availabilityElement.getLASTORDER().replaceAll("-", ""));
+				rdhChwFcProd_FCTRANSACTION_C.setEOSANNDATE(availabilityElement.getEOSANNDATE().replaceAll("-", ""));
+				rdhChwFcProd_FCTRANSACTION_C.setENDOFSERVICEDATE(availabilityElement.getENDOFSERVICEDATE().replaceAll("-", ""));
+				tbl_fctransaction_c.add(rdhChwFcProd_FCTRANSACTION_C);
+			}
+		}
 		
 		
 		//set tbl_fctransaction  Structure		
@@ -40,36 +62,7 @@ public class ChwFCTYMDMFCMaint extends RdhBase {
 		rdhChwFcProd_FCTRANSACTION.setFEATURETRANSCAT(fctransaction.getFEATURETRANSACTIONCATEGORY());
 		rdhChwFcProd_FCTRANSACTION.setRETURNEDPARTSMES(fctransaction.getRETURNEDPARTSMES());	
 		tbl_fctransaction.add(rdhChwFcProd_FCTRANSACTION);
-		
-		
-		
-//		if (fctransaction.getAVAILABILITYLIST()!=null && !fctransaction.getAVAILABILITYLIST().isEmpty())
-//		{
-//			for (AVAILABILITYLIST availabilitylist : fctransaction.getAVAILABILITYLIST())	
-//			{
-//				if (availabilitylist.getAVAILABILITYELEMENT()!=null && !availabilitylist.getAVAILABILITYELEMENT().isEmpty())
-//				{
-//					for (AVAILABILITYELEMENT availabilityElement : availabilitylist.getAVAILABILITYELEMENT())	
-//					{
-//						RdhChwFcProd_MODELCONVERT rdhChwFcProd_Modelconvert = new RdhChwFcProd_MODELCONVERT();
-//						rdhChwFcProd_Modelconvert.setMODELUPGRADEENTITYTYPE(fctransaction.getMODELUPGRADEENTITYTYPE());
-//						rdhChwFcProd_Modelconvert.setMODELUPGRADEENTITYID(fctransaction.getMODELUPGRADEENTITYID());
-//						rdhChwFcProd_Modelconvert.setFROMMACHTYPE(fctransaction.getFROMMACHTYPE());
-//						rdhChwFcProd_Modelconvert.setTOMACHTYPE(fctransaction.getTOMACHTYPE());
-//						rdhChwFcProd_Modelconvert.setCOUNTRY_FC(availabilityElement.getCOUNTRY_FC());
-//						rdhChwFcProd_Modelconvert.setAVAILABILITYACTION(availabilityElement.getAVAILABILITYACTION());
-//						rdhChwFcProd_Modelconvert.setANNDATE(availabilityElement.getANNDATE().replaceAll("-", ""));
-//						rdhChwFcProd_Modelconvert.setFIRSTORDER(availabilityElement.getFIRSTORDER().replaceAll("-", ""));
-//						rdhChwFcProd_Modelconvert.setPLANNEDAVAILABILITY(availabilityElement.getPLANNEDAVAILABILITY().replaceAll("-", ""));
-//						rdhChwFcProd_Modelconvert.setWDANNDATE(availabilityElement.getWDANNDATE().replaceAll("-", ""));
-//						rdhChwFcProd_Modelconvert.setLASTORDER(availabilityElement.getLASTORDER().replaceAll("-", ""));
-//						rdhChwFcProd_Modelconvert.setPUBFROM(availabilityElement.getPUBFROM().replaceAll("-", ""));
-//						rdhChwFcProd_Modelconvert.setPUBTO(availabilityElement.getPUBTO().replaceAll("-", ""));
-//						tbl_fctransaction.add(rdhChwFcProd_Modelconvert);
-//					}
-//				}
-//			}
-//		}
+
 	}
 
 

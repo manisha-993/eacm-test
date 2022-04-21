@@ -13,7 +13,7 @@ import com.google.gson.annotations.SerializedName;
 
 
 public class ChwCharMaintain extends RdhBase {
-	 
+	@SerializedName("REFRESH_VALS") 
 	private String REFRESH_VALS;
 	@SerializedName("CHARACT")
 	private String charact;

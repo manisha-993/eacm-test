@@ -2,8 +2,11 @@ package COM.ibm.eannounce.abr.sg.rfc;
 
 import COM.ibm.eannounce.abr.sg.rfc.entity.MTCYMDMFCMaint_Model;
 import COM.ibm.eannounce.abr.util.RfcConfigProperties;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.gson.annotations.SerializedName;
 
 public class MTCYMDMFCMaint extends RdhBase{
 
