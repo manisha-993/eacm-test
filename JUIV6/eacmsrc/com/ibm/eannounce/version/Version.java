@@ -8,9 +8,9 @@
 package com.ibm.eannounce.version; 
 public class Version { 
 
-public static final String BUILD_DATE = "Fri 12/16/2022 17:18:02.21";
+public static final String BUILD_DATE = "Fri 12/17/2022 17:18:02.21";
 public static String getVersion() { 
-return "Built on Fri 12/16/2022 at  17:18:02.21";
+return "Built on Fri 12/17/2022 at  17:18:02.21";
 
 } 
 public static String getDate() { 
