@@ -468,7 +468,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		chwCharMaintain.execute();
 		this.addRfcResult(chwCharMaintain);
 		//step5 Call the ChwClassMaintain constructor to create the MK_D_machineType_REM_FC class. 
-		obj_id = chwTMF.getMACHTYPE() + "MTC"; 
+		obj_id = chwTMF.getMACHTYPE() + "UPG"; 
 		String charactd = "MK_D_" + mach_type + "_REM_FC";
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
 				obj_id //String obj_id

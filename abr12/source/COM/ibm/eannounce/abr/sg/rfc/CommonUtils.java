@@ -118,6 +118,9 @@ public class CommonUtils {
 		System.out.println(contains("M,B","A"));
 		System.out.println(contains("M,B","b"));
 		System.out.println(contains("M,B","M"));
+		int input =1;
+		String subffix = frontCompWithZore(input,3);
+		System.out.println("subffix=" + subffix);
 		
 		
 	}
