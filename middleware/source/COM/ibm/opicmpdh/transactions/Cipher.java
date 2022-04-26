@@ -40,8 +40,8 @@ import COM.ibm.opicmpdh.middleware.MiddlewareException;
 
 public class Cipher
 {
-	private static final String KEY_ALGO = "DES";
-	private static final String CIPHER_ALGO = "DES/ECB/PKCS5Padding";
+	private static final String KEY_ALGO = "AES";
+	private static final String CIPHER_ALGO = "AES/CBC/NoPadding";
 	private static final HashMap encryptionHashMap;
 	static{
 		encryptionHashMap = new HashMap();	// create a new hashmap and

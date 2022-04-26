@@ -462,16 +462,16 @@
 			<Database>opicmpdh</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:pdhalias</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
-			<DatabaseURL>jdbc:db2://127.0.0.1:50001/PDHALIAS</DatabaseURL>
+			<DatabaseURL>jdbc:db2://g51pa00002662.az11.dal.cpc.ibm.com:60000/OPICMPDH</DatabaseURL>
 			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
 		</Connection>
 		<Connection id="ODS">
 			<UserID></UserID>
 			<Password></Password>
-			<Database>bldods</Database>
+			<Database>opicmods</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:bldods</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
-			<DatabaseURL>jdbc:db2://b01cxnp11082.gho.pok.ibm.com:3702/OPICMODS</DatabaseURL>
+			<DatabaseURL>jdbc:db2://g51pa00002662.az11.dal.cpc.ibm.com:60006/OPICMODS</DatabaseURL>
 			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
 		</Connection>
 		<Entity type="EXTSTORAGE">

@@ -430,6 +430,8 @@ public final class Expando {
     List lReturn = new ArrayList();
 
     while ((strLine = readTemplate(bfr)) != null) {
+    	boolean valid = pathTranelVaild(strLine);
+    	if(valid) {
       File f = new File(strLine);
 
       // if not a directory, save it
@@ -438,8 +440,14 @@ public final class Expando {
         lReturn.add(f);
       }
     }
+    	}
 
     return lReturn;
+  }
+  public static boolean pathTranelVaild(String path) {
+	  if(path==null||path.contains(".."))
+		  return false;
+	  return true;
   }
   public static String readTemplate(BufferedReader _brTemplate) throws IOException {
     return _brTemplate.readLine();
