@@ -258,7 +258,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 			chdescr = suffix + " Alpha Features Delta";
 		}
 		//"MK_T_" + first 4 characters of <obj_id> + "_FC_ALPH_" + <suffix>
-		String charactb ="MK_T_" + CommonUtils.getFirstSubString(obj_id, 4) + "_FC_ALPH_" + suffix;
+		String charactb ="MK_" + target_indc+ "_" + CommonUtils.getFirstSubString(obj_id, 4) + "_FC_ALPH_" + suffix;
 		
 		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(
 				obj_id
@@ -281,7 +281,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		chwCharMaintain.execute();
 		this.addRfcResult(chwCharMaintain);
 		//d. Call the ChwClassMaintain to create the alpha group classification.
-		String classd = "MK_" + CommonUtils.getFirstSubString(obj_id, 4) + "_ALPH_" + suffix;
+		String classd = "MK_" + target_indc+ "_" + CommonUtils.getFirstSubString(obj_id, 4) + "_ALPH_" + suffix;
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
 				obj_id //String obj_id
 				, classd //String class_
@@ -309,7 +309,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 	
 	public void CreateAlphaQTYChar(String obj_id, String target_indc, String mach_type, String feature_code) throws Exception {
 		//a.
-		String charact ="MK_" + target_indc + "_" + feature_code + "_QTY";
+		String charact ="MK_" + target_indc + "_" + mach_type +"_" + feature_code + "_QTY";
 		
 		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(
 				obj_id
@@ -344,7 +344,6 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 			);
 		this.addRfcName(chwClassMaintain);
 		
-		chwClassMaintain.addCharacteristic(charact);
 		chwClassMaintain.execute();
 		this.addRfcResult(chwClassMaintain);
 		//d. Call TssClassificationMaint to assign the classification to the product's material master record. 
@@ -440,6 +439,9 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				ChwGetMaxClass300Suffix.execute();
 				this.addRfcResult(ChwGetMaxClass300Suffix);
 				suffix = CommonUtils.frontCompWithZore(ChwGetMaxClass300Suffix.getMax_suffix(),3);
+				if("000".equals(suffix)){
+					suffix = "001";
+				}
 			} catch (Exception e) {
 				this.addRfcResult(ChwGetMaxClass300Suffix);
 				suffix = "001";
