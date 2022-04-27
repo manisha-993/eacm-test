@@ -107,7 +107,7 @@ public class RdhChwFcProd extends RdhBase {
 			}
 		}
 		String priced = feature.getPRICEDFEATURE()==null||feature.getPRICEDFEATURE().length()<1?
-				"Y":feature.getPRICEDFEATURE().substring(0, 1).toUpperCase();
+				"" :feature.getPRICEDFEATURE().substring(0, 1).toUpperCase();
 		
 		rdhChwFcProd_FEATURE.setFcType(feature.getFCTYPE());
 		rdhChwFcProd_FEATURE.setFcSubcat(feature.getFCSUBCAT());

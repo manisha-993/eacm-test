@@ -237,6 +237,8 @@ public class RdhMatmCreate extends RdhBase {
 								sales_org.setZsabrtax("SWMA");
 							} else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
 								sales_org.setZsabrtax("HWMA");
+							}else {
+								sales_org.setZsabrtax(" ");
 							}
 						}
 					}

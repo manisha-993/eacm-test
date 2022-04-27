@@ -3,6 +3,7 @@ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
@@ -15,9 +16,11 @@ import com.ibm.transform.oim.eacm.util.PokUtils;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeMtc;
 import COM.ibm.eannounce.abr.sg.rfc.ChwModelConvert;
 import COM.ibm.eannounce.abr.sg.rfc.ChwModelConvertMtc;
+import COM.ibm.eannounce.abr.sg.rfc.ChwModelConvertUpg;
 import COM.ibm.eannounce.abr.sg.rfc.FEATURE;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.MODELCONVERT;
+import COM.ibm.eannounce.abr.sg.rfc.MTCYMDMFCMaint;
 import COM.ibm.eannounce.abr.sg.rfc.RdhChwFcProd;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.RdhMatmCreate;
@@ -118,6 +121,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 			// build the text file
 
 			Connection connection = m_db.getODSConnection();
+			Connection odsConnection = m_db.getODSConnection();
 			PreparedStatement statement = connection.prepareStatement(CACEHSQL);
 			statement.setInt(1, rootEntity.getEntityID());
 			ResultSet resultSet = statement.executeQuery();
@@ -128,9 +132,38 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 			if (xml != null) {
 				
 				 MODELCONVERT modelconvert = XMLParse.getObjectFromXml(xml, MODELCONVERT.class); 
-				
+				String modelXML = getModelFromXML(abrversion, rootDesc, odsConnection);
+				 	MODEL model = XMLParse.getObjectFromXml(modelXML,MODEL.class );
 				 if (modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())) {
-					 ChwModelConvertMtc mtc = new ChwModelConvertMtc(modelconvert);
+					 ChwModelConvertMtc mtc = new ChwModelConvertMtc(model,modelconvert,connection,odsConnection);
+					try {
+						mtc.execute();	
+						addOutput(mtc.getRptSb().toString());
+					} catch (Exception e) {
+						// TODO: handle exception
+						 addError(mtc.getRptSb().toString());
+						throw e;
+					} 
+				}else {
+					 ChwModelConvertUpg mUpg = new ChwModelConvertUpg(model,modelconvert,connection,odsConnection);
+					 try{
+						 mUpg.execute();
+					 }catch (Exception e) {
+						// TODO: handle exception
+						 addError(mUpg.getRptSb().toString());
+						 throw e;
+					}
+				}
+				 MTCYMDMFCMaint maint = new MTCYMDMFCMaint(modelconvert);
+				 
+				 this.addDebug("Calling " + maint.getRFCName());
+				 maint.execute();
+				this.addDebug(maint.createLogEntry());
+				if (maint.getRfcrc() == 0) {
+						this.addOutput(maint.getRFCName() + " called successfully!");
+				} else {
+						this.addOutput(maint.getRFCName() + " called  faild!");
+						this.addOutput(maint.getError_text());
 				}
 			//MTCYMDMFCMa
 			//ChwMachTypeMtc 
@@ -206,7 +239,30 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 	
 
 
-	
+	 private String getModelFromXML(String TOMACHTYPE, String TOMODEL,Connection odsConnection) throws SQLException {
+			/**
+			 * 
+			 * select XMLMESSAGE from cache.XMLIDLCACHE 
+	         * where XMLCACHEVALIDTO > current timestamp 
+	         * and  XMLENTITYTYPE = 'MODEL'
+	         * and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE"; $i/MODEL_UPDATE[MACHTYPE/text() = "7954" and MODEL/text() ="24X"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") 
+	         * with ur;
+			 */
+	    	String cacheSql = "select XMLMESSAGE from cache.XMLIDLCACHE "
+	    			+ " where XMLCACHEVALIDTO > current timestamp "
+	    			+ " and  XMLENTITYTYPE = 'MODEL'"
+	    			+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
+	    			+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\" and MODEL/text() =\""+TOMODEL+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")" 
+	                + " FETCH FIRST 1 ROWS ONLY with ur";		
+			PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
+			ResultSet resultSet = statement.executeQuery();
+			String xml = "";
+			if (resultSet.next()) {
+				xml = resultSet.getString("XMLMESSAGE");
+				addDebug("getModelFromXML xml=" + xml);		
+			}
+			return xml;
+		}
 
 	/*
 	 * Get Name based on navigation attributes for root entity
