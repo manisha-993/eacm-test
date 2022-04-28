@@ -4219,6 +4219,9 @@ ADSATTRIBUTE    40  WARRTYPE
         else if ("FCTRANSACTION".equals(getEntityType())) {
         	setFlagValue("FCTRANSACTIONIERPABRSTATUS", "0020");
 
+		} else if ("MODELCONVERT".equals(getEntityType())) {
+        	setFlagValue("MODELCONVERTIERPABRSTATUS", "0020");
+
 		}
     }finally{   
 		try {

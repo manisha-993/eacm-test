@@ -1,5 +1,7 @@
 package COM.ibm.eannounce.abr.sg.rfc.entity;
 
+import com.google.gson.annotations.SerializedName;
+
 public class MTCYMDMFCMaint_Model {
 
     @SerializedName("MODELUPGRADEENTITYTYPE")
