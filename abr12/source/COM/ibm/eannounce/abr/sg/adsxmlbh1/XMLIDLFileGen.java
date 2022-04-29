@@ -206,7 +206,6 @@ public class XMLIDLFileGen {
 			log("Creating a connection to the queue manager");
 			
 			MQQueueManager qMgr = new MQQueueManager(strMQManager);
-
 			// Set up the options on the queue we wish to open...
 			// Note. All MQSeries Options are prefixed with MQC in Java.
 			// int openOptions = MQC.MQOO_INPUT_AS_Q_DEF | MQC.MQOO_OUTPUT ;
@@ -229,7 +228,7 @@ public class XMLIDLFileGen {
 				Hashtable countTab = new Hashtable();
 				MessageDigest md = null;
 				try{
-					md = MessageDigest.getInstance("SHA1");
+					md = MessageDigest.getInstance("SHA-256");
 				}catch(Exception e){
 					log(e.getMessage());
 				}
