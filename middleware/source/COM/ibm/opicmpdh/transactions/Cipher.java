@@ -36,12 +36,14 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
 
 public class Cipher
 {
 	private static final String KEY_ALGO = "AES";
-	private static final String CIPHER_ALGO = "AES/CBC/NoPadding";
+	private static final String CIPHER_ALGO = "AES/CBC/PKCS5Padding";
 	private static final HashMap encryptionHashMap;
 	static{
 		encryptionHashMap = new HashMap();	// create a new hashmap and
@@ -224,8 +226,9 @@ public class Cipher
 		// convert back to a SecretKey - must use same key that was used for encryption
 		javax.crypto.SecretKey key = new javax.crypto.spec.SecretKeySpec(keyBytes, KEY_ALGO);
 		javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CIPHER_ALGO);
-
-		cipher.init(javax.crypto.Cipher.DECRYPT_MODE, key);
+		byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		IvParameterSpec ivspec = new IvParameterSpec(iv);
+		cipher.init(javax.crypto.Cipher.DECRYPT_MODE, key,iv);
 		byte[] original = cipher.doFinal(result);
 
 		// Decode using utf-8
