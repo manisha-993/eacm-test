@@ -3,38 +3,15 @@ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
 
-import COM.ibm.eannounce.abr.sg.rfc.Chw001ClfCreate;
-import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintain;
-import COM.ibm.eannounce.abr.sg.rfc.ChwClassMaintain;
-import COM.ibm.eannounce.abr.sg.rfc.ChwConpMaintain;
-import COM.ibm.eannounce.abr.sg.rfc.ChwDepdMaintain;
-import COM.ibm.eannounce.abr.sg.rfc.ChwFCTYMDMFCMaint;
-import COM.ibm.eannounce.abr.sg.rfc.ChwMTCYMDMFCMaint;
-import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeMtc;
-import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeUpg;
-import COM.ibm.eannounce.abr.sg.rfc.ChwMatmCreate;
-import COM.ibm.eannounce.abr.sg.rfc.CommonUtils;
-import COM.ibm.eannounce.abr.sg.rfc.FCTRANSACTION;
+import COM.ibm.eannounce.abr.sg.rfc.ChwYMdmOthWarranty;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
-import COM.ibm.eannounce.abr.sg.rfc.RdhChwFcProd;
-import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
-import COM.ibm.eannounce.abr.sg.rfc.RdhSvcMatmCreate;
-import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
-import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
-import COM.ibm.eannounce.abr.sg.rfc.WARR;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
-import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
 import COM.ibm.eannounce.objects.EANList;
@@ -53,6 +30,7 @@ public class MODELWARRABRSTATUS extends PokBaseABR {
 	static final String NEWLINE = new String(FOOL_JTEST);
 	private int abr_debuglvl = D.EBUG_ERR;
 	private String navName = "";
+	@SuppressWarnings("rawtypes")
 	private Hashtable metaTbl = new Hashtable();
 	private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
 		
@@ -124,8 +102,6 @@ public class MODELWARRABRSTATUS extends PokBaseABR {
 			rootDesc = m_elist.getParentEntityGroup().getLongDescription();
 			addDebug("navName=" + navName);
 			addDebug("rootDesc" + rootDesc);
-			// build the text file
-			String empty = "";
 			Connection connection = m_db.getODSConnection();
 			PreparedStatement statement = connection.prepareStatement(CACEHSQL);
 			statement.setInt(1, rootEntity.getEntityID());
@@ -141,19 +117,11 @@ public class MODELWARRABRSTATUS extends PokBaseABR {
 				//step1     Search for all of <WARRELEMENT> under MODEL_UPDATE/WARRLIST.
 		        //If no <WARRELEMENT> found, then throw message in report "No warranty linked to the MODEL, so nothing to promote."
 		        //Else, call ChwYMdmOthWarranty to populate iERP custom tables with warranty master data by setting the input parameter as below.
-				//TODO call ChwYMdmOthWarranty	
-				
-				
-				
+				//call ChwYMdmOthWarranty	
+				ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(model);
+				this.runRfcCaller(chwYMdmOthWarranty);
 
 			}	
-			
-			// exeFtpShell(ffPathName);
-			// ftpFile();
-			/*
-			 * } catch (Exception e) { 
-			 * e.printStackTrace(); this.addError(e.getMessage()); setReturnCode(FAIL); }
-			 */
 		} catch (Exception e) {
 			e.printStackTrace();
 			// println(e.toString());
@@ -216,6 +184,7 @@ public class MODELWARRABRSTATUS extends PokBaseABR {
 	 *
 	 * @return java.lang.String
 	 */ 
+	@SuppressWarnings("unchecked")
 	private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException {
 		StringBuffer navName = new StringBuffer();
 		// NAME is navigate attributes
