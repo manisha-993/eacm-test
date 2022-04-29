@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.BadPaddingException;
@@ -228,7 +229,11 @@ public class Cipher
 		javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CIPHER_ALGO);
 		byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		IvParameterSpec ivspec = new IvParameterSpec(iv);
-		cipher.init(javax.crypto.Cipher.DECRYPT_MODE, key,iv);
+		try{
+			cipher.init(javax.crypto.Cipher.DECRYPT_MODE, key,iv);
+		}catch (InvalidAlgorithmParameterException e) {
+			throw new RuntimeException(e);
+		}
 		byte[] original = cipher.doFinal(result);
 
 		// Decode using utf-8
