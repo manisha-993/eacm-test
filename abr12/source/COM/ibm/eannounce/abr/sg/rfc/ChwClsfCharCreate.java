@@ -247,6 +247,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 	
 	public void CreateAlphaGroupChar (String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc) throws Exception{
 		//this is the new RFC and caller
+		this.addOutput("CreateAlphaGroupChar obj_id" + obj_id);
 		String suffix = getSuffix(obj_id, target_indc, feature_code, "G");
 		
 		//b. Call ChwCharMaintain to create the group characteristic for the alphanumeric feature code.
@@ -332,6 +333,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		
 		//b. Call BapiClassCharRead to see if MK_target_machineType_featurecode_QTY characteristic exists for MachineTypeNew material
 		//String suffix ="003";
+		this.addOutput("CreateAlphaQTYChar obj_id" + obj_id);
 		String suffix = getSuffix(obj_id, target_indc, feature_code, "Q");
 		
 		//c. Call the ChwClassMaintain to create the alpha group classification.
@@ -365,15 +367,18 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				, "WW"		//String org_area				
 		);
 		this.addRfcName(ChwAssignCharToClass);
-		try {
+//		try {
 			ChwAssignCharToClass.execute();
 			this.addRfcResult(ChwAssignCharToClass);
-		} catch (Exception e) {	
-			if (ChwAssignCharToClass.getRfcrc() == 8) {
+			this.addOutput("ChwAssignCharToClass.getRfcrc()11=" + ChwAssignCharToClass.getRfcrc());
+			if (ChwAssignCharToClass.getRfcrc() == 2) {
 				int isuffix = Integer.parseInt(suffix);
+				this.addOutput("isuffix=" + isuffix);
 				isuffix = isuffix + 1;
+				this.addOutput("isuffix=" + isuffix);
 				suffix = CommonUtils.frontCompWithZore(isuffix, 3);
 				//String classc = "MK_" + target_indc + "_" + CommonUtils.getFirstSubString(obj_id, 4) + "_ALPH_" + suffix;
+				this.addOutput("suffix=" + suffix);
 				String class2 = "MK_" + target_indc + "_" + CommonUtils.getFirstSubString(obj_id, 4) + "_ALPH_" + suffix;
 				ChwClassMaintain chwClassMaintain2  = new ChwClassMaintain(
 						obj_id //String obj_id
@@ -384,6 +389,15 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				chwClassMaintain2.execute();
 				this.addRfcResult(chwClassMaintain2);
 				
+				RdhClassificationMaint rdhClassificationMaint2 = new RdhClassificationMaint(
+						obj_id 		//String obj_id
+						, class2 	//String class_name
+						, "300" 	//String class_type
+						, "H"		//String pims_identity
+						);
+				this.addRfcName(rdhClassificationMaint2);
+				rdhClassificationMaint2.execute();
+				this.addRfcResult(rdhClassificationMaint2);				
 				
 				ChwAssignCharToClass ChwAssignCharToClass2 = new ChwAssignCharToClass(
 						obj_id 		//String obj_id
@@ -396,20 +410,57 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				this.addRfcResult(ChwAssignCharToClass2);
 				
 				
-				RdhClassificationMaint rdhClassificationMaint2 = new RdhClassificationMaint(
-						obj_id 		//String obj_id
-						, class2 	//String class_name
-						, "300" 	//String class_type
-						, "H"		//String pims_identity
-						);
-				this.addRfcName(rdhClassificationMaint2);
-				rdhClassificationMaint2.execute();
-				this.addRfcResult(rdhClassificationMaint2);
+				
 			}
 			
-				
-			
-		}
+//		} catch (Exception e) {	
+//			this.addOutput("ChwAssignCharToClass.getRfcrc()22=" + ChwAssignCharToClass.getRfcrc());
+//			this.addOutput("ChwAssignCharToClass.getRfcrc()22=" + ChwAssignCharToClass.getRfcrc());
+//			
+////			if (ChwAssignCharToClass.getRfcrc() == 2) {
+////				int isuffix = Integer.parseInt(suffix);
+////				this.addOutput("isuffix=" + isuffix);
+////				isuffix = isuffix + 1;
+////				this.addOutput("isuffix=" + isuffix);
+////				suffix = CommonUtils.frontCompWithZore(isuffix, 3);
+////				//String classc = "MK_" + target_indc + "_" + CommonUtils.getFirstSubString(obj_id, 4) + "_ALPH_" + suffix;
+////				this.addOutput("suffix=" + suffix);
+////				String class2 = "MK_" + target_indc + "_" + CommonUtils.getFirstSubString(obj_id, 4) + "_ALPH_" + suffix;
+////				ChwClassMaintain chwClassMaintain2  = new ChwClassMaintain(
+////						obj_id //String obj_id
+////						, class2 //String class_
+////						, class2 //String class_desc
+////					);
+////				this.addRfcName(chwClassMaintain2);
+////				chwClassMaintain2.execute();
+////				this.addRfcResult(chwClassMaintain2);
+////				
+////				
+////				ChwAssignCharToClass ChwAssignCharToClass2 = new ChwAssignCharToClass(
+////						obj_id 		//String obj_id
+////						, class2 	//String clazz
+////						, charact 	//String characteristic
+////						, "WW"		//String org_area				
+////				);
+////				this.addRfcName(ChwAssignCharToClass2);
+////				ChwAssignCharToClass2.execute();
+////				this.addRfcResult(ChwAssignCharToClass2);
+////				
+////				
+////				RdhClassificationMaint rdhClassificationMaint2 = new RdhClassificationMaint(
+////						obj_id 		//String obj_id
+////						, class2 	//String class_name
+////						, "300" 	//String class_type
+////						, "H"		//String pims_identity
+////						);
+////				this.addRfcName(rdhClassificationMaint2);
+////				rdhClassificationMaint2.execute();
+////				this.addRfcResult(rdhClassificationMaint2);
+////			}
+//			
+//				
+//			
+//		}
 		
 			
 		
@@ -424,11 +475,24 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		this.addRfcName(bapiClassCharRead);
 		try {
 			bapiClassCharRead.execute();
-			suffix = CommonUtils.frontCompWithZore(Integer.parseInt(bapiClassCharRead.getSuffix()),3);
 			this.addRfcResult(bapiClassCharRead);
+			this.addOutput("bapiClassCharRead target_indc = "+target_indc+"; and char_type="+char_type+"; rc="+ bapiClassCharRead.getRfcrc());
+			String bapi_suffix = bapiClassCharRead.getSuffix();
+			this.addOutput("bapiClassCharRead bapi_suffix="+ bapi_suffix);
+			suffix = CommonUtils.frontCompWithZore(Integer.parseInt(bapiClassCharRead.getSuffix()),3);	
+			this.addOutput("bapiClassCharRead suffix="+ suffix);
 		} catch (Exception e) {
 			this.addRfcResult(bapiClassCharRead);
-			RFC = 4;
+			String message = bapiClassCharRead.getError_text();
+			if(message.contains("The feature code is not associated")
+			||message.contains("The QTY characteristic is not associated")){
+				this.addOutput("change the RFC code to 4");
+				RFC = 4;
+				this.addOutput("bapiClassCharRead exception target_indc = "+target_indc+"; and char_type="+char_type+"; rc="+ RFC);
+			}else{
+				RFC = bapiClassCharRead.getRfcrc();
+				this.addOutput("bapiClassCharRead exception target_indc = "+target_indc+"; and char_type="+char_type+"; rc="+ RFC);
+			}			
 		}
 		if(RFC==4){
 			//Set to "MK_" + <target_indc> + "_" + first 4 characters of <obj_id> + "_ALPH_".
@@ -438,13 +502,16 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 			try {
 				ChwGetMaxClass300Suffix.execute();
 				this.addRfcResult(ChwGetMaxClass300Suffix);
+				this.addOutput("ChwGetMaxClass300Suffix target_indc = "+target_indc+"; and char_type="+char_type+"; rc="+ ChwGetMaxClass300Suffix.getRfcrc());
 				suffix = CommonUtils.frontCompWithZore(ChwGetMaxClass300Suffix.getMax_suffix(),3);
 				if("000".equals(suffix)){
 					suffix = "001";
 				}
+				this.addOutput("ChwGetMaxClass300Suffix target_indc = "+target_indc+"; and char_type="+char_type+"; max_suffix ="+ suffix);
 			} catch (Exception e) {
 				this.addRfcResult(ChwGetMaxClass300Suffix);
 				suffix = "001";
+				this.addOutput("ChwGetMaxClass300Suffix exception target_indc = "+target_indc+"; and char_type="+char_type+"; max_suffix ="+ suffix +"; rc="+ ChwGetMaxClass300Suffix.getRfcrc());
 			}
 		}
 		return suffix;

@@ -136,7 +136,7 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 								, empty				//String casesens
 								, empty				//String neg_vals
 								, empty				//String group
-								, "-"				//String valassignm  Set to "-".
+								, "S"				//String valassignm  Set to "-".
 								, empty				//String no_entry
 								, empty				//String no_display
 								, "X" 				//String addit_vals Set to "X".
