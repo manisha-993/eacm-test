@@ -230,7 +230,7 @@ public class Cipher
 		byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		IvParameterSpec ivspec = new IvParameterSpec(iv);
 		try{
-			cipher.init(javax.crypto.Cipher.DECRYPT_MODE, key,iv);
+			cipher.init(javax.crypto.Cipher.DECRYPT_MODE, key,ivspec);
 		}catch (InvalidAlgorithmParameterException e) {
 			throw new RuntimeException(e);
 		}
