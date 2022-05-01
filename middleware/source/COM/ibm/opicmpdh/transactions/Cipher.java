@@ -201,7 +201,14 @@ public class Cipher
 		byte[] data = str.getBytes("UTF8");
 
 		// Initialize the cipher for encryption
-		cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, key);
+		//cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, key);
+		byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		IvParameterSpec ivspec = new IvParameterSpec(iv);
+		try{
+			cipher.init(javax.crypto.Cipher.DECRYPT_MODE, key,ivspec);
+		}catch (InvalidAlgorithmParameterException e) {
+			throw new RuntimeException(e);
+		}
 		byte[] result = cipher.doFinal(data);
 		byte[][] byteArray = {result,key.getEncoded()};
 		return byteArray;
