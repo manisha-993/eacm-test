@@ -17,7 +17,7 @@ public class ChwGetMaxClass300SuffixTest
     @Test
     public void testGetMax_suffix() throws Exception
     {
-        ChwGetMaxClass300Suffix getMaxClassSuffix = new ChwGetMaxClass300Suffix(obj_id,"MK_5655DB2_");
+        ChwGetMaxClass300Suffix getMaxClassSuffix = new ChwGetMaxClass300Suffix(obj_id,"MK_T_7778_ALPH_");
         try{
             getMaxClassSuffix.execute();
         } catch (Exception e)

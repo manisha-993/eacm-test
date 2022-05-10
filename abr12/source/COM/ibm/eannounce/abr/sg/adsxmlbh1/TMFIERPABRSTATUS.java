@@ -41,7 +41,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 	static final String NEWLINE = new String(FOOL_JTEST);
 	private int abr_debuglvl = D.EBUG_ERR;
 	private String navName = "";
-	private Hashtable metaTbl = new Hashtable();
+	private Hashtable<String, EANList> metaTbl = new Hashtable<String, EANList>();
 	private String PRODSTRUCTSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'PRODSTRUCT' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
 	
 	private String MODELSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
@@ -49,28 +49,28 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 	private String FEATURESQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'FEATURE' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
 	
 	private String COVNOTEQUALSQL = "SELECT count(*) FROM OPICM.flag F\n"
-			+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE =? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP"
-			+ "WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS') "
-			+ "AND T1.ATTRIBUTEVALUE !=T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION=? WITH UR";
+			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE =? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP"
+			+ " WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS') "
+			+ " AND T1.ATTRIBUTEVALUE !=T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION=? WITH UR";
 	
 	private String COVEQUALSQL = "SELECT count(*) FROM OPICM.flag F\n"
-			+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE =? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP"
-			+ "WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS') "
-			+ "AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION=? WITH UR";
+			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE =? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP "
+			+ " WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS') "
+			+ " AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION=? WITH UR";
 	
 	private String FCTEQUALSQL= "SELECT count(*) FROM OPICM.flag F\n"
-			+ "INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE =? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP "
-			+ "INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP"
-			+ "WHERE f.ENTITYTYPE ='FCTRANSACTION' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'FCTRANSACTIONIERPABRSTATUS') "
-			+ "AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION=? WITH UR";
+			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE =? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP "
+			+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP "
+			+ " WHERE f.ENTITYTYPE ='FCTRANSACTION' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'FCTRANSACTIONIERPABRSTATUS') "
+			+ " AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION=? WITH UR";
 	String xml = null;
 	Map<String,String> FctypeEMap = new HashMap<String,String>();
 	{
@@ -80,7 +80,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 	
 
 	public String getDescription() {
-		return "MODELIERPABRSTATUS";
+		return "TMFIERPABRSTATUS";
 	}
 
 	public String getABRVersion() {
@@ -136,7 +136,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			 */
 
 			EntityItem rootEntity = m_elist.getParentEntityGroup().getEntityItem(0);
-			addDebug("*****mlm rootEntity = " + rootEntity.getEntityType() + rootEntity.getEntityID());
+			addDebug("*****mlm rootEntity TMFIERPABRSTATUS = " + rootEntity.getEntityType() + rootEntity.getEntityID());
 			// NAME is navigate attributes - only used if error rpt is generated
 			navName = getNavigationName();
 			rootDesc = m_elist.getParentEntityGroup().getLongDescription();
@@ -144,19 +144,25 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			addDebug("rootDesc" + rootDesc);
 			// build the text file
 
-			String prodstuctxml = getXMLByID(PRODSTRUCTSQL, rootEntity.getEntityID());
+			xml = getXMLByID(PRODSTRUCTSQL, rootEntity.getEntityID());
 			
-			if (prodstuctxml != null) {
+			
+			if (xml != null) {
 				//step1 Execute the steps described in the section Create SAP characteristics and classes for MachineTypeNEW material 
 				//to create the SAP characteristics and classes of the feature code for MachineTypeNEW material. 
-				TMF_UPDATE tmf = XMLParse.getObjectFromXml(prodstuctxml,TMF_UPDATE.class);
+				TMF_UPDATE tmf = XMLParse.getObjectFromXml(xml,TMF_UPDATE.class);
+				addDebug("get the tmf!");
 				//get chwFeature and chwModel from tmf
 				if(tmf==null) return;
 				String featurexml = getXMLByID(FEATURESQL, Integer.parseInt(tmf.getFEATUREENTITYID()));
-				String modelxml = getXMLByID(MODELSQL, Integer.parseInt(tmf.getMODELENTITYID()));				
+				//addDebug("featurexml=" + featurexml);
+				String modelxml = getXMLByID(MODELSQL, Integer.parseInt(tmf.getMODELENTITYID()));	
+				//addDebug("modelxml=" + modelxml);
 		
 				FEATURE chwFeature = XMLParse.getObjectFromXml(featurexml,FEATURE.class);
+				addDebug("get the chwFeature=" + chwFeature);
 				MODEL chwModel = XMLParse.getObjectFromXml(modelxml,MODEL.class);
+				addDebug("get the chwModel=" + chwModel);
 				MachineTypeNEW(tmf,chwFeature,chwModel);
 				//step2 
 				/**
@@ -185,20 +191,23 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			            past ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
 			        or if ORDERCODE of parent MODEL is  in ("M",  "B")
 				 */
-				if(!"Maintenance,MaintFeature".contains(chwModel.getSUBCATEGORY())) {
-					if(exist(COVEQUALSQL, tmf.getMACHTYPE(),tmf.getPDHDOMAIN())||exist(FCTEQUALSQL, tmf.getMACHTYPE(),tmf.getPDHDOMAIN()) ||"M,B".contains(chwModel.getORDERCODE())) {
+				if(!CommonUtils.contains("Maintenance,MaintFeature",chwModel.getSUBCATEGORY())) {
+					if(exist(COVEQUALSQL, tmf.getMACHTYPE(),tmf.getPDHDOMAIN()) 
+					|| exist(FCTEQUALSQL, tmf.getMACHTYPE(),tmf.getPDHDOMAIN()) 
+					|| CommonUtils.contains("M,B",chwModel.getORDERCODE())) {
 						MachineTypeUPG(tmf,chwFeature,chwModel);
 					}					
 				}
 				
 				//step4 Call CHWYMDMFCMaint to populate iERP user-defined tables (UDTs) with the availability status 
 				//of PRODSTRUCT by setting the input parameter for tbl_tmf_c structure
-				//TODO there is no CHWYMDMFCMaint caller
 				//CHWYMDMFCMaint CHWYMDMFCMaint = new CHWYMDMFCMaint();
 				RdhChwFcProd caller = new RdhChwFcProd(tmf);
 				runRfcCaller(caller);
 					
 				
+			}else{
+				addDebug("no xml found in the ODS database");
 			}	
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -259,6 +268,10 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			throws MiddlewareException, SQLException {
 		String sReturn = "";
 		Connection connection = m_db.getODSConnection();
+		Object[] params = new String[1]; 
+		params[0] =String.valueOf(entityId);			
+		String realSql = CommonUtils.getPreparedSQL(SQL, params);
+		this.addDebug("querySql=" + realSql);		
 		PreparedStatement statement = connection.prepareStatement(SQL); 
 		statement.setInt(1, entityId);
 		ResultSet resultSet = statement.executeQuery();
@@ -321,6 +334,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 					this.addMsg(chwClsfCharCreate.getRptSb());
 					throw e;
 				}
+				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "D";
 					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code);
@@ -370,6 +384,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 					this.addMsg(chwClsfCharCreate.getRptSb());
 					throw e;
 				}
+				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "D";
 					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code);
@@ -453,7 +468,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		chwCharMaintain.execute();
 		this.addRfcResult(chwCharMaintain);
 		//step5 Call the ChwClassMaintain constructor to create the MK_D_machineType_REM_FC class. 
-		obj_id = chwTMF.getMACHTYPE() + "MTC";  //TODO why only MTC
+		obj_id = chwTMF.getMACHTYPE() + "UPG"; 
 		String charactd = "MK_D_" + mach_type + "_REM_FC";
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
 				obj_id //String obj_id
@@ -484,7 +499,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 	}
 
 	private void MachineTypeMTC(TMF_UPDATE chwTMF, FEATURE chwFeature, MODEL chwModel) throws Exception {
-		
+		this.addDebug("case TMF Calling MachineTypeMTC");
 		if(chwFeature==null) return;
 		if(chwModel==null) return;
 		
@@ -583,6 +598,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 					this.addMsg(chwClsfCharCreate.getRptSb());
 					throw e;
 				}
+				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "D";
 					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code);
@@ -648,7 +664,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		//step 4 Call the ChwCharMaintain constructor to create the MK_machineType_MTC_REM_FC characteristic.  Set the constructor's parameters as follows.
 		String empty ="";
 		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(obj_id  //String obj_id Set to concatenation of chwProduct.machineType + "MTC"
-				,"MK_T_"+mach_type+"_MTC_REM_FC" //String charact  Set to  "MK_T_<machine_type>_MOD"
+				,"MK_"+mach_type+"_MTC_REM_FC" //String charact  Set to  "MK_T_<machine_type>_MOD"
 				, "CHAR" 			//String datatype
 				, 12 				//int charnumber
 				, empty				//String decplaces
@@ -710,9 +726,12 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 	private void MachineTypeNEW(TMF_UPDATE chwTMF, FEATURE chwFeature, MODEL chwModel) throws Exception {
 		
 		//step1 If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED")
-		
-		if(chwFeature==null) return;
-		if(chwModel==null) return;
+		if(chwFeature==null) {			
+			return;
+		}
+		if(chwModel==null) {
+			return;
+		}
 		
 		String FCTYPE = chwTMF.getFCTYPE();
 		String obj_id = chwTMF.getMACHTYPE() + "NEW";
@@ -722,8 +741,10 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		
-		
+		this.addDebug("TMF param feature_code=" + feature_code);
+		this.addDebug("TMF param FCTYPE=" + FCTYPE);
 		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
+			this.addDebug("1.1 TMF Calling Call ChwClsfCharCreate.CreateGroupChar()");
 			//1.1 Call ChwClsfCharCreate.CreateGroupChar() method to create the group characteristic and class.
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			//String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
@@ -739,8 +760,12 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			String UNITCLASS = chwModel.getUNITCLASS();
 			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
 			String ORDERCODE = chwTMF.getORDERCODE();
+			this.addDebug("TMF param UNITCLASS=" + UNITCLASS);
+			this.addDebug("TMF param SYSTEMMAX=" + SYSTEMMAX);
+			this.addDebug("TMF param ORDERCODE=" + ORDERCODE);
+			
 			if("Non SIU- CPU".equalsIgnoreCase(UNITCLASS) || SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
-				
+				this.addDebug("1.2 TMF Calling Call ChwClsfCharCreate.CreateQTYChar()");
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				//String obj_id, String target_indc, String mach_type, String feature_code
 				try{
@@ -755,7 +780,10 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			}			
 		}
 		//step2 If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE in ("RPQ-PLISTED","RPQ-ILISTED"), then
+		this.addDebug("TMF param feature_code=" + feature_code);
+		this.addDebug("TMF param FCTYPE=" + FCTYPE);
 		if(CommonUtils.hasLetter(feature_code) && FctypeEMap.containsKey(FCTYPE)){
+			this.addDebug("2.1 TMF Calling Call ChwClsfCharCreate.CreateRPQGroupChar()");
 			//2.1 Call ChwClsfCharCreate.CreateRPQGroupChar() to create the group characteristic and class for the RPQ feature code.
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			//feature_code_desc = getFeatureCodeDesc(feature);
@@ -772,7 +800,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
 			String ORDERCODE = chwTMF.getORDERCODE();
 			if("Non SIU- CPU".equalsIgnoreCase(UNITCLASS) || SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
-				
+				this.addDebug("2.2 TMF Calling Call ChwClsfCharCreate.CreateRPQQTYChar()");
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				//String obj_id, String target_indc, String mach_type, String feature_code
 				try{
@@ -787,9 +815,12 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		}
 		//step3. If chwTMF/FEATURECODE contain letters and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED") 
 		//and the first 3 characters of chwTMF/FEATURECODE <> "NEW",
+		this.addDebug("TMF param feature_code=" + feature_code);
+		this.addDebug("TMF param FCTYPE=" + FCTYPE);
 		if(CommonUtils.hasLetter(feature_code) 
 		   && !FctypeEMap.containsKey(FCTYPE) 
 		   && !CommonUtils.getFirstSubString(feature_code, 3).equalsIgnoreCase("NEW")){
+			this.addDebug("3.1 TMF Calling Call ChwClsfCharCreate.CreateAlphaGroupChar()");
 			//3.1 call ChwClsfCharCreate.CreateAlphaGroupChar() to create the group characteristic and class for the alpah feature code.
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			//feature_code_desc = getFeatureCodeDesc(feature);
@@ -805,6 +836,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			String SYSTEMMAX = chwTMF.getSYSTEMMAX();
 			String ORDERCODE = chwTMF.getORDERCODE();
 			if(SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
+				this.addDebug("3.2 TMF Calling Call ChwClsfCharCreate.CreateAlphaQTYChar()");
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code);
@@ -817,6 +849,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		}
 		//step5 Call the TssClassificationMaint constructor to associate the MK_target_machineType_FC_n000 class 
 		// to the product's material master record. Set the constructor's input parameters as follows.
+		this.addDebug("5 TMF Calling Call TssClassificationMaint");
 		callRdhClassificationMaint(obj_id, "MK_REFERENCE");
 		//step 6. Call the TssClassificationMaint to associate the MK_T_VAO_NEW class to the product's material master record.
 		callRdhClassificationMaint(obj_id, "MK_T_VAO_NEW");		
@@ -836,14 +869,18 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 
 	protected String getFeatureCodeDesc(FEATURE feature) {
 		String BHINVNAME ="";
+		addDebug("TMF getFeatureCodeDesc start");
 		for (LANGUAGEELEMENT_FEATURE languageElement : feature.getLANGUAGELIST())
 		{
 			if ("1".equals(languageElement.getNLSID()))
 			{
 				BHINVNAME= languageElement.getBHINVNAME();
+				break;
 			}
 		}
+		addDebug("TMF getFeatureCodeDesc ...");
 		String feature_code_desc = CommonUtils.getFirstSubString(BHINVNAME, 30);
+		addDebug("TMF getFeatureCodeDesc End");
 		return feature_code_desc;
 	}
 
@@ -886,14 +923,19 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
     	boolean flag = false;
     	try {
 			Connection connection = m_db.getPDHConnection();
+			Object[] params = new String[2]; 
+			params[0] =type;
+			params[1] =pdhdomain;			
+			String realSql = CommonUtils.getPreparedSQL(sql, params);
+			this.addDebug("querySql=" + realSql);
 			PreparedStatement statement = connection.prepareStatement(sql);
 			statement.setString(1, type);
 			statement.setString(2, pdhdomain);
 			
 			ResultSet resultSet = statement.executeQuery();
-			while (resultSet.next()) {
-				flag = true;
-				
+			if(resultSet.next()) {
+				int count = resultSet.getInt(1);
+				flag = count>0 ? true: false;				
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

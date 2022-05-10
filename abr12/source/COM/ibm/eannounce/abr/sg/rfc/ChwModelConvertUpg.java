@@ -41,9 +41,7 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 			String obj_id = chwModelConvert.getTOMACHTYPE() + "UPG";
 			//1. Call ChwMatmCreate to create the material master for the product object.
 			ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwMODEL,"ZMAT",obj_id);
-			this.addRfcName(chwMatmCreate);			
-			chwMatmCreate.execute();
-			this.addRfcResult(chwMatmCreate);
+			this.runRfcCaller(chwMatmCreate);
 			
 			//2. Call Chw001ClfCreate to create the standard 001 classifications and characteristics 
 			//   which are tied to the offering's material master record.
@@ -70,13 +68,12 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 								, empty				//String casesens
 								, empty				//String neg_vals
 								, empty				//String group
-								, "-"				//String valassignm  Set to "-".
+								, "S"				//String valassignm  Set to "-".
 								, empty				//String no_entry
 								, empty				//String no_display
 								, "X" 				//String addit_vals Set to "X".
 								, chwModelConvert.getTOMACHTYPE() +" Model Characteristic" //String chdescr  Set to "<machine_type> Model Characteristic" where <machine_type> is chwProduct.machineType
 								);
-			this.addRfcName(chwCharMaintain);
 			//3.b For each MODEL with MODEL/MACHTYPE = MODELCONVERT/TOMACHTYPE, call the ChwCharMaintain.addValue() method to 
 			//add the model with its description to the MK_T_machineType_MOD characteristic.
 			//ArrayList<HashMap<String, String>> recordArray = getModelConvert(machtype);
@@ -88,9 +85,9 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 				value = map.get("MODEL");				
 				value_descr = CommonUtils.getFirstSubString(map.get("INVNAME"),25) + " " + map.get("MODEL");
 				chwCharMaintain.addValue(value, value_descr);
-			}	
-			chwCharMaintain.execute();
-			this.addRfcResult(chwCharMaintain);
+			}
+			this.runRfcCaller(chwCharMaintain);
+			
 			//3.c Call the ChwClassMaintain constructor to create the MK_machineType_MTC class.
 			ChwClassMaintain ChwClassMaintain = 
 			new ChwClassMaintain(
@@ -98,7 +95,6 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 					, "MK_"+chwModelConvert.getTOMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
 					, "MK_"+chwModelConvert.getTOMACHTYPE()+"_MOD"  //String class_type   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
 					);
-			this.addRfcName(ChwClassMaintain);
 			//3.d Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class. 
 			ChwClassMaintain.addCharacteristic("MK_T_"+chwModelConvert.getTOMACHTYPE()+"_MOD"); 
 			ChwClassMaintain.execute();
@@ -111,9 +107,7 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 					, "300"  							//String class_type   Set to "300"
 					, "H"
 					);
-			this.addRfcName(TssClassificationMaint);
-			TssClassificationMaint.execute();
-			this.addRfcResult(TssClassificationMaint);
+			this.runRfcCaller(TssClassificationMaint);
 			
 			//4.Create the MK_D_machineType_MOD_CONV class and MK_D_machineType_MOD_CONV characteristic   
 			//4.a Call the ChwCharMaintain constructor to create the MK_D_machineType_MOD_CONV characteristic. 
@@ -138,8 +132,10 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 			//Set to MODELCONVERT/FROMMODEL+"_"+MODELCONVERT/TOMODEL (ex: "E12_E26")
 			value = chwModelConvert.getFROMMODEL() + "_" + chwModelConvert.getTOMODEL();
 			//Set to "From <MODELCONVERT/TOMACHTYPE> Model <MODELCONVERT/FROMMODEL> to <MODELCONVERT/TOMODEL>"
-			String valdescr = "From " + chwModelConvert.getTOMODELTYPE() + "Model" + chwModelConvert.getFROMMODEL() + " to " + chwModelConvert.getTOMODEL();
+			String valdescr = "From " + chwModelConvert.getTOMODELTYPE() + " Model " + chwModelConvert.getFROMMODEL() + " to " + chwModelConvert.getTOMODEL();
 			ChwCharMaintain.addValue(value, valdescr);
+			this.runRfcCaller(ChwCharMaintain);
+			
 			
 			//4.d Call the ChwClassMaintain constructor to create the MK_D_machineType_MOD_CONV class. 
 			ChwClassMaintain =
@@ -148,11 +144,9 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 					, "MK_D_"+chwModelConvert.getTOMACHTYPE()+"_MOD_CONV"  //String class_name   Set to  "MK_D_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType
 					, "MK_D_"+chwModelConvert.getTOMACHTYPE()+"_MOD_CONV"  //String class_type   Set to  "MK_D_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType.
 					);
-			this.addRfcName(ChwClassMaintain);
-//			//4.e Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class.
+			//4.e Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class.
 			ChwClassMaintain.addCharacteristic("MK_D_"+chwModelConvert.getTOMACHTYPE()+"_MOD_CONV");
-			ChwClassMaintain.execute();
-			this.addRfcResult(ChwClassMaintain);
+			this.runRfcCaller(ChwClassMaintain);
 			//4.f Call the TssClassificationMaint constructor to associate the MK_D_machineType_MOD_CONV class to the product's material master record
 			TssClassificationMaint = 
 			new RdhClassificationMaint(
@@ -161,9 +155,7 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 					, "300"  							//String class_type   Set to "300"
 					, "H"
 					);
-			this.addRfcName(TssClassificationMaint);
-			TssClassificationMaint.execute();
-			this.addRfcResult(TssClassificationMaint);
+			this.runRfcCaller(TssClassificationMaint);
 			
 			
 			//5. Call the TssClassificationMaint constructor to associate the MK_REFERENCE class to the product's material master record.
@@ -210,7 +202,6 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 					, "2"				//String bomexpl Set to "2".
 					, chwModelConvert.getTOMACHTYPE() +	"UPGUI"		//String design	 Set to Set to concatenation of chwProduct.machineType + "MTCUI" 
 					);
-			this.addRfcName(ChwConpMaintain);
 			//11.b Call the ChwConpMaintain.addConfigDependency() method.
 			ChwConpMaintain.addConfigDependency("E2E", empty); //Set to "E2E".
 			//11.c 
@@ -221,9 +212,7 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 			ChwConpMaintain.addConfigDependency("PR_E2E_PRICING_HW", empty);  //Set to "PR_E2E_PRICING_HW".
 			//11.f 
 			ChwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", empty);  //Set to "PR_E2E_PRICING_HW".
-			
-			ChwConpMaintain.execute();// excute 1 time 
-			this.addRfcResult(ChwConpMaintain);
+			this.runRfcCaller(ChwConpMaintain);
 		
 	}
 	

@@ -83,7 +83,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 	}
 
 	public String getABRVersion() {
-		return "1.0";
+		return "1.1";
 	}
 
 	public void execute_run() {
@@ -182,7 +182,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 					}
 					//step d
 					
-					if(!"Maintenance,MaintFeature".contains(model.getSUBCATEGORY())) {
+					if(!CommonUtils.contains("Maintenance,MaintFeature",model.getSUBCATEGORY())) {
 						
 						if(exist(COVEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())||exist(FCTEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())) {
 							ChwMachTypeUpg chwMachTypeUpg = new ChwMachTypeUpg(model, m_db.getPDHConnection(), connection);
@@ -194,22 +194,25 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 								this.addMsg(chwMachTypeUpg.getRptSb());
 								throw e;
 							}
-						}else if(model.getORDERCODE()!=null&&model.getORDERCODE().trim().length()>0&&"M,B".contains(model.getORDERCODE())) {
+						}else if(model.getORDERCODE()!=null&&model.getORDERCODE().trim().length()>0&&CommonUtils.contains("M,B",model.getORDERCODE())) {
 							this.addDebug("Calling " + "processMachTypeUpg");
 							processMachTypeUpg(model, connection);	
 						}
 					}
 					
-					
+					RdhChwFcProd prod = new RdhChwFcProd(model);
+					runRfcCaller(prod);
 				}
 				else if("Service".equals(model.getCATEGORY())) {
 					processMachTypeMODEL_Svc(model, connection);
+					RdhChwFcProd prod = new RdhChwFcProd(model);
+					runRfcCaller(prod);
 				}
-				else if ("SoftdWare".equals(model.getCATEGORY())) {
-					throw new Exception("Not support SoftWare");
+				else if ("Software".equals(model.getCATEGORY())) {
+					this.addError("It is not supported to feed software Model to iERP");
+					//throw new Exception("Not support SoftWare");
 				}
-				RdhChwFcProd prod = new RdhChwFcProd(model);
-				runRfcCaller(prod);
+				
 			}	
 			
 			// exeFtpShell(ffPathName);
@@ -683,7 +686,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 							, empty				//String casesens
 							, empty				//String neg_vals
 							, empty				//String group
-							, "-"				//String valassignm  Set to "-".
+							, "S"				//String valassignm  Set to "-".
 							, empty				//String no_entry
 							, empty				//String no_display
 							, "X" 				//String addit_vals Set to "X".
@@ -803,7 +806,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		String casesens="";
 		String neg_vals="";
 		String group="";
-		String valassignm="-";
+		String valassignm="S";
 		String no_entry="";
 		String no_display="";
 		String addit_vals="X";

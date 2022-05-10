@@ -94,28 +94,33 @@ public class CommonUtils {
         return returnSQL.toString();
     }
 	
+	public static boolean contains(String input, String container){
+		boolean isContains = false;
+		if(input==null) return false;
+		if(container==null) return false;
+		if("".equals(container.trim())) return false;
+		isContains = input.contains(container);
+		return isContains;
+		
+	}
+	
 	
 	public static void main(String[] args) {
 		
 		
 		
 		String model="mod12345";		
-		System.out.println("first 3=" + getFirstSubString(model,3));
-		System.out.println("last 3=" + getLastSubString(model,3));
-		System.out.println("last 3=" + getLastSubString("12",3));
-		int str = 1;
-		System.out.println("format zer0 3=" +frontCompWithZore(str,3));
-		String str2 ="002";
-		int istr2 = Integer.parseInt(str2);
-		System.out.println("istr2=" +istr2);
+		System.out.println("isNoLetter 1=" + isNoLetter(model));
+		model="12345";		
+		System.out.println("isNoLetter 2=" + isNoLetter(model));
 		
-		System.out.println("null case" + getNoLetter(null));
-		System.out.println("1234 case" + getNoLetter("1234"));
-		System.out.println("1234 case" + getNoLetter("12a4"));
-		System.out.println("1234 case" + getNoLetter("001Z"));	
-		
-		String input ="C12 (common";
-		System.out.println("substrtochar =#" + getSubstrToChar(input,"?")+"#");
+		System.out.println(contains("M,B",""));
+		System.out.println(contains("M,B","A"));
+		System.out.println(contains("M,B","b"));
+		System.out.println(contains("M,B","M"));
+		int input =1;
+		String subffix = frontCompWithZore(input,3);
+		System.out.println("subffix=" + subffix);
 		
 		
 	}

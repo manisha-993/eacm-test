@@ -18,7 +18,7 @@ public class LANGUAGEELEMENT_FEATURE {
 	@XmlElement(name = "INVNAME")
 	private String INVNAME;
 	@XmlElement(name = "BHINVNAME")
-	private String BHINVNAME;
+	private String BHINVNAME; 
 	
 	public String getNLSID() {
 		return NLSID;
