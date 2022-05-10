@@ -4222,6 +4222,9 @@ ADSATTRIBUTE    40  WARRTYPE
 		} else if ("MODELCONVERT".equals(getEntityType())) {
         	setFlagValue("MODELCONVERTIERPABRSTATUS", "0020");
 
+		}else if ("WARR".equals(getEntityType())) {
+        	setFlagValue("WARRIERPABRSTATUS", "0020");
+
 		}
     }finally{   
 		try {
