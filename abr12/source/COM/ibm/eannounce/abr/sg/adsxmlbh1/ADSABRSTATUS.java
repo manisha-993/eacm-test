@@ -4207,12 +4207,29 @@ ADSATTRIBUTE    40  WARRTYPE
         	insertIntoCache(rootEntity, xml, t2, entityType, entityID, ps);
         }	
         addDebug("put cache:"+m_abri.getABRCode()+"-"+getEntityType());
+
+
         if("SVCMOD".equals(getEntityType())&&!m_abri.getABRCode().equals("SVCMODIERPABRSTATUS")){
         	setFlagValue("SVCMODIERPABRSTATUS", "0020");
         }else if("MODEL".equals(getEntityType())){
         	setFlagValue("MODELIERPABRSTATUS", "0020");
+            EntityItem[] tmfs = m_elist.getEntityGroup("PRODSTRUCT").getEntityItemsAsArray();
+            for(EntityItem tmf:tmfs){
+                String BULKMESINDC  = PokUtils.getAttributeFlagValue(tmf, "BULKMESINDC");
+                if("MES0001".equals(BULKMESINDC)){
+                    //PRODSTRUCT.BULKMESINDC = "MES0001" (Yes)
+                    setFlagValue("MODELBULKABRSTATUS", "0020");
+                    break;
+                }
+            }
+
         }else if("PRODSTRUCT".equals(getEntityType())){
         	setFlagValue("TMFIERPABRSTATUS", "0020");
+            String BULKMESINDC  = PokUtils.getAttributeFlagValue(rootEntity, "BULKMESINDC");
+            if("MES0001".equals(BULKMESINDC)){
+                //PRODSTRUCT.BULKMESINDC = "MES0001" (Yes)
+                setFlagValue("TMFBULKABRSTATUS", "0020");
+            }
         }
     }finally{   
 		try {
