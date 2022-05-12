@@ -68,7 +68,7 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 								, empty				//String casesens
 								, empty				//String neg_vals
 								, empty				//String group
-								, "-"				//String valassignm  Set to "-".
+								, "S"				//String valassignm  Set to "-".
 								, empty				//String no_entry
 								, empty				//String no_display
 								, "X" 				//String addit_vals Set to "X".
@@ -220,7 +220,7 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 
 	private List<Map<String,String>> getFromModelToModel(String sql,String type,String pdhdomain) throws SQLException {
 		List<Map<String,String>> fromModelToModelList = new ArrayList<Map<String,String>>();
-		Object[] params = new String[4]; 
+		Object[] params = new String[2]; 
 		params[0] =type;
 		params[1] =pdhdomain;
 		String realSql = CommonUtils.getPreparedSQL(sql, params);

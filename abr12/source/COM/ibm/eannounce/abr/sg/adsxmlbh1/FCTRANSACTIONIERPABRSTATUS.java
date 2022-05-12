@@ -18,20 +18,15 @@ import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwClassMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwConpMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwDepdMaintain;
-import COM.ibm.eannounce.abr.sg.rfc.ChwMTCYMDMFCMaint;
-import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeMtc;
-import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeUpg;
+import COM.ibm.eannounce.abr.sg.rfc.ChwFCTYMDMFCMaint;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMatmCreate;
 import COM.ibm.eannounce.abr.sg.rfc.CommonUtils;
 import COM.ibm.eannounce.abr.sg.rfc.FCTRANSACTION;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
-import COM.ibm.eannounce.abr.sg.rfc.RdhChwFcProd;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
-import COM.ibm.eannounce.abr.sg.rfc.RdhSvcMatmCreate;
-import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
+import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
-import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
 import COM.ibm.eannounce.objects.EANList;
@@ -176,10 +171,18 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					 with ur;
 				 */
 				String modelxml = getModelFromXML(fctransaction.getTOMACHTYPE(),fctransaction.getTOMODEL(),connection);
-				MODEL chwMODEL =  XMLParse.getObjectFromXml(modelxml,MODEL.class);
-				
+				if("".equals(modelxml)) {
+					addOutput("modelxml is empty");	
+					return;				
+				}
+				MODEL chwMODEL =  XMLParse.getObjectFromXml(modelxml,MODEL.class);				
+				if(chwMODEL==null) {
+					addOutput("MODEL is Null");	
+					return;	
+				}			
 				String obj_id = fctransaction.getTOMACHTYPE() + "UPG";
 				//1. Call ChwMatmCreate to create the material master for the product object. 
+				addDebug("FCTRANSACTION ChwMatmCreate ");	
 				ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwMODEL,"ZMAT",obj_id);
 				this.runRfcCaller(chwMatmCreate);
 				//2. Call Chw001ClfCreate to create the standard 001 classifications and characteristics which are tied to the offering's material master record.
@@ -202,7 +205,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 									, empty				//String casesens
 									, empty				//String neg_vals
 									, empty				//String group
-									, "-"				//String valassignm  Set to "-".
+									, "S"				//String valassignm  Set to "-".
 									, empty				//String no_entry
 									, empty				//String no_display
 									, "X" 				//String addit_vals Set to "X".
@@ -342,8 +345,10 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				this.runRfcCaller(ChwConpMaintain);
 				
 				//12. TODO
-//				ChwMTCYMDMFCMaint caller = new ChwMTCYMDMFCMaint(fctransaction);
-//				runRfcCaller(caller);
+				String tmf_xml = getTMFFromXML(fctransaction.getTOMACHTYPE(),fctransaction.getTOMODEL(),fctransaction.getTOFEATURECODE(), connection);
+				TMF_UPDATE tmf = XMLParse.getObjectFromXml(tmf_xml,TMF_UPDATE.class);				
+				ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(tmf,fctransaction);
+				this.runRfcCaller(caller);
 				
 
 			}	
@@ -567,7 +572,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
     
     private List<Map<String,String>> getFromModelToModel(String sql,String type,String pdhdomain, Connection rdhConnection) throws SQLException {
 		List<Map<String,String>> fromModelToModelList = new ArrayList<Map<String,String>>();
-		Object[] params = new String[4]; 
+		Object[] params = new String[2]; 
 		params[0] =type;
 		params[1] =pdhdomain;
 		String realSql = CommonUtils.getPreparedSQL(sql, params);
@@ -600,14 +605,43 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
     			+ " and  XMLENTITYTYPE = 'MODEL'"
     			+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
     			+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\" and MODEL/text() =\""+TOMODEL+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")" 
-                + " with ur";		
+                + " FETCH FIRST 1 ROWS ONLY with ur";	
+    	addDebug("cacheSql=" + cacheSql);
 		PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
 		ResultSet resultSet = statement.executeQuery();
 		String xml = "";
-		while (resultSet.next()) {
+		if (resultSet.next()) {
 			xml = resultSet.getString("XMLMESSAGE");
-			System.out.println("xml=" + xml);
-			break; //only can get one SVCLEV				
+			addDebug("getModelFromXML xml=" + xml);		
+		}
+		return xml;
+	}
+    /**
+     * TMF. Search for TMF where FCTRANSACTION.TOMACHTYPE = TMF.MACHTYPE 
+     *                       and FCTRANSACTION.TOMODEL= TMF.MODEL 
+     *                       and FCTRANSACTION.TOFEATURECODE = TMF.FEATURECODE.
+     */
+    private String getTMFFromXML(String TOMACHTYPE, String TOMODEL,String TOFEATURECODE, Connection odsConnection) throws SQLException {
+		/**
+		 * 
+		 * select XMLMESSAGE from cache.XMLIDLCACHE 
+ 		 *	where XMLCACHEVALIDTO > current timestamp 
+ 		 *	and  XMLENTITYTYPE = 'PRODSTRUCT'
+ 		 *	and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/TMF_UPDATE"; $i/TMF_UPDATE[MACHTYPE/text() = "7031" and MODEL/text() ="D24" and FEATURECODE/text() ="0002"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") 
+ 		 *	FETCH FIRST 1 ROWS ONLY with ur;
+		 */
+    	String cacheSql = "select XMLMESSAGE from cache.XMLIDLCACHE "
+    			+ " where XMLCACHEVALIDTO > current timestamp "
+    			+ " and  XMLENTITYTYPE = 'PRODSTRUCT'"
+    			+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/TMF_UPDATE\"; "
+    			+ " $i/TMF_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\" and MODEL/text() =\""+TOMODEL+"\" and FEATURECODE/text() =\""+TOFEATURECODE+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")" 
+                + " FETCH FIRST 1 ROWS ONLY with ur";		
+		PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
+		ResultSet resultSet = statement.executeQuery();
+		String xml = "";
+		if (resultSet.next()) {
+			xml = resultSet.getString("XMLMESSAGE");
+			addDebug("getTMFFromXML");			
 		}
 		return xml;
 	}

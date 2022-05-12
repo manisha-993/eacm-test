@@ -197,7 +197,7 @@ ACTION_FINAL_RESEND = Final - Resend
 //Fix Defect 598849 Invalid countrylist for PRODSTRUCT with no AVAIL. VE  PRODSTRUCT2 don't need to check Planed AVAIL
 //
 //Revision 1.57  2011/10/26 08:03:06  guobin
-// Final 閿燂拷 support for old data 閿燂拷 CQ 67890  Changed to handle offerings that have an AVAIL left in Draft where the data is older than 閿燂拷2010-03-01閿燂拷.
+// Final é–¿ç‡‚æ‹· support for old data é–¿ç‡‚æ‹· CQ 67890  Changed to handle offerings that have an AVAIL left in Draft where the data is older than é–¿ç‡‚æ‹·2010-03-01é–¿ç‡‚æ‹·.
 //
 //Revision 1.56  2011/10/17 13:29:18  guobin
 //Support both 0.5 and 1.0 XML together
@@ -946,13 +946,13 @@ ADSATTRIBUTE    40  WARRTYPE
                         }else if(isSystemResendCache){
                         	/**
                         	 BH FS ABR XML System Feed 20130904.doc Page 51
-                        	 IF the value of 閳ユ穾DS XML Feed ABR閳ワ拷 (ADSABRSTATUS) is set to 閳ユ法ueued閳ワ拷 (0020) and 閳ユ藩ystem Feed Resend閳ワ拷 (SYSFEEDRESEND) = 閳ユ珐esend Cache閳ワ拷 (CACHE) THEN
+                        	 IF the value of é–³ãƒ¦ç©¾DS XML Feed ABRé–³ãƒ¯æ‹· (ADSABRSTATUS) is set to é–³ãƒ¦æ³•ueuedé–³ãƒ¯æ‹· (0020) and é–³ãƒ¦è—©ystem Feed Resendé–³ãƒ¯æ‹· (SYSFEEDRESEND) = é–³ãƒ¦ç��esend Cacheé–³ãƒ¯æ‹· (CACHE) THEN
 								IF the XML message is NOT available in CACHE THEN
-									This is the same as the preceding section on 閳ユ阀roduction (Triggered)閳ワ拷 when sending 閳ユ窋ull閳ワ拷 XML. It never sends 閳ユ窉elta閳ワ拷 XML.
+									This is the same as the preceding section on é–³ãƒ¦é˜€roduction (Triggered)é–³ãƒ¯æ‹· when sending é–³ãƒ¦çª‹ullé–³ãƒ¯æ‹· XML. It never sends é–³ãƒ¦çª‰eltaé–³ãƒ¯æ‹· XML.
 								ELSE
 									Use the XML found in Cache and send it to downstream systems.
 									Do NOT update cache
-									Set ADSABRSTATUS = 閳ユ阀assed Resend Cache閳ワ拷 (XMLCACHE)
+									Set ADSABRSTATUS = é–³ãƒ¦é˜€assed Resend Cacheé–³ãƒ¯æ‹· (XMLCACHE)
 								END IF							
 							End of Section E.	Resend Cache
                         	 */
@@ -960,7 +960,7 @@ ADSATTRIBUTE    40  WARRTYPE
                     	    if(isSystemResendCacheExist){
                     	    	setReturnCode(RESENDCACHE);
                     	    }else{
-                    	    	//the same as the preceding section on 閳ユ阀roduction (Triggered)閳ワ拷 when sending 閳ユ窋ull閳ワ拷 XML. It never sends 閳ユ窉elta閳ワ拷 XML.                   	    	
+                    	    	//the same as the preceding section on é–³ãƒ¦é˜€roduction (Triggered)é–³ãƒ¯æ‹· when sending é–³ãƒ¦çª‹ullé–³ãƒ¯æ‹· XML. It never sends é–³ãƒ¦çª‰eltaé–³ãƒ¯æ‹· XML.                   	    	
                     	    }                        	
                         } else if (!isXMLIDLABR){
                             // running in ADSABR
@@ -1368,19 +1368,19 @@ ADSATTRIBUTE    40  WARRTYPE
 
 	/**
 	 BH FS ABR XML System Feed 20130904.doc Page52
-	 1.	IF root entity STATUS <> 閳ユ窋inal閳ワ拷 (0020) THEN
+	 1.	IF root entity STATUS <> é–³ãƒ¦çª‹inalé–³ãƒ¯æ‹· (0020) THEN
 			a.	Do NOT create XML
 			b.	Produce a report with the following message:
-				Error: A 閳ユ珐esend RFR閳ワ拷 request is not valid since the data must be "Final".
-			c.	Set ABR return code to 閳ユ窋ailed閳ワ拷 (0040)
+				Error: A é–³ãƒ¦ç��esend RFRé–³ãƒ¯æ‹· request is not valid since the data must be "Final".
+			c.	Set ABR return code to é–³ãƒ¦çª‹ailedé–³ãƒ¯æ‹· (0040)
 			d.	Exit
 		END IF
 
 	2.	IF STATUS = "Final" (0020) AND "ADS XML Feed ABR" (ADSABRSTATUS) was ever "Passed" (0030) THEN 
 			a.	Do NOT create XML
 			b.	Produce a report with the following message:
-				Error: A 閳ユ珐esend RFR閳ワ拷 request is not valid since XML was previously created successfully.
-			c.	Set ABR return code to 閳ユ窋ailed閳ワ拷 (0040)
+				Error: A é–³ãƒ¦ç��esend RFRé–³ãƒ¯æ‹· request is not valid since XML was previously created successfully.
+			c.	Set ABR return code to é–³ãƒ¦çª‹ailedé–³ãƒ¯æ‹· (0040)
 			d.	Exit
 		END IF
 	3.	IF STATUS = "Final" (0020) AND "ADS XML Feed ABR" (ADSABRSTATUS) was never "Passed" (0030) THEN
@@ -1848,29 +1848,29 @@ ADSATTRIBUTE    40  WARRTYPE
                         	String filter_status = root_status;
                         	// BH FS ABR XML System Feed Mapping 20121001.doc For TMF Filter AVAIL base on the FEATURE is RPQ or GA
                         	//AVAILs are filtered based on whether the FEATURE is a RPQ (i.e. PRODSTRUCT-u: FEATURE. FCTYPE <> Primary FC (100) | "Secondary FC" (110)) or has General Availability (i.e. not a RPQ)
-                        	//If the FEATURE is an RPQ, then the 閳ユ窋ilter Value閳ワ拷 is based on the value of PRODSTRUCT.STATUS.
-//                        	IF PRODSTRUCT: PRODSTUCTAVAIL-d: AVAIL.AVAILTPE = 閳ユ阀lanned Availability閳ワ拷
+                        	//If the FEATURE is an RPQ, then the é–³ãƒ¦çª‹ilter Valueé–³ãƒ¯æ‹· is based on the value of PRODSTRUCT.STATUS.
+//                        	IF PRODSTRUCT: PRODSTUCTAVAIL-d: AVAIL.AVAILTPE = é–³ãƒ¦é˜€lanned Availabilityé–³ãƒ¯æ‹·
 //                        	THEN
 //                        	Note: this is the GA logic
-//                        	IF the AVAILANNA-d: ANNOUNCEMENT.ANNSTATUS = 閳ユ窋inal閳ワ拷 (0020)
+//                        	IF the AVAILANNA-d: ANNOUNCEMENT.ANNSTATUS = é–³ãƒ¦çª‹inalé–³ãƒ¯æ‹· (0020)
 //                        	THEN
-//                        	Filter Value = 閳ユ窋inal閳ワ拷 (0020)
+//                        	Filter Value = é–³ãƒ¦çª‹inalé–³ãƒ¯æ‹· (0020)
 //                        	ELSE 
-//                        	IF the ANNOUNCEMENT.ANNSTATUS = 閳ユ珐eady for Review閳ワ拷 (0040)
+//                        	IF the ANNOUNCEMENT.ANNSTATUS = é–³ãƒ¦ç��eady for Reviewé–³ãƒ¯æ‹· (0040)
 //                        	THEN
 //                        	Filter Value = {"Ready for Review" (0040) | "Final" (0020)}
 //                        	ELSE
 //                        	Note: supports AVAILs without an ANNOUNCEMENT
-//                        	IF AVAIL.STATUS = 閳ユ窋inal閳ワ拷 (0020)
+//                        	IF AVAIL.STATUS = é–³ãƒ¦çª‹inalé–³ãƒ¯æ‹· (0020)
 //                        	THEN
-//                        	Filter Value = 閳ユ窋inal閳ワ拷 (0020)
+//                        	Filter Value = é–³ãƒ¦çª‹inalé–³ãƒ¯æ‹· (0020)
 //                        	ELSE 
 //                        	Filter Value = {"Ready for Review" (0040) | "Final" (0020)}
 //                        	END
 //                        	END
 //                        	END
 //                        	ELSE
-//                        	Note: this is the RPQ or 閳ユ笝ld data閳ワ拷 logic
+//                        	Note: this is the RPQ or é–³ãƒ¦ç¬�ld dataé–³ãƒ¯æ‹· logic
 //                        	IF PRODSTRUCT.STATUS = "Final" (0020)
 //                        	THEN
 //                        	Filter Value = "Final" (0020)
@@ -1948,9 +1948,9 @@ ADSATTRIBUTE    40  WARRTYPE
                             
                             // update the following requirement according to spec Data Transformation System Feed 20111020.doc
                             //For filtering AVAIL and ANNOUNCEMENT, there is an exception to this filtering.
-                            // 閳ワ拷	IF AVAIL EFFECTIVEDATE <= 2010-03-01, then it is included without looking at STATUS
+                            // é–³ãƒ¯æ‹·	IF AVAIL EFFECTIVEDATE <= 2010-03-01, then it is included without looking at STATUS
                           //remove this announcement anndate checking based on document update - BH FS ABR XML System Feed Mapping 20120705.doc
-                            //閳ワ拷	IF ANNOUNCEMENT ANNDATE <= 2010-03-01, then it is included without looking at STATUS
+                            //é–³ãƒ¯æ‹·	IF ANNOUNCEMENT ANNDATE <= 2010-03-01, then it is included without looking at STATUS
                             //old data, we think it meet the status checking.
                             addDebugComment(D.EBUG_INFO, (String)ITEM_STATUS_ATTR_TBL.get(item_type)+ " is "+item_status);
                             if ("AVAIL".equals(item_type)){
@@ -2092,9 +2092,9 @@ ADSATTRIBUTE    40  WARRTYPE
     }
     
     /**********************************************************************************
-    10.	DTS9 = VALFROM of "Queued" (0020) for ADSABRSTATUS < DTS1 (VALFROM of current value 閳ユ窔n Process閳ワ拷 (0050) for ADSABRSTATUS)
+    10.	DTS9 = VALFROM of "Queued" (0020) for ADSABRSTATUS < DTS1 (VALFROM of current value é–³ãƒ¦çª”n Processé–³ãƒ¯æ‹· (0050) for ADSABRSTATUS)
 	11.	Obtain the value of STATUS where VALFROM <= DTS9 < VALTO					
-	12.	If this value of STATUS = 閳ユ珐eady for Review閳ワ拷 (0040) AND the value of ADSABRSTATUS was never Passed (0030), THEN
+	12.	If this value of STATUS = é–³ãƒ¦ç��eady for Reviewé–³ãƒ¯æ‹· (0040) AND the value of ADSABRSTATUS was never Passed (0030), THEN
 			Send the Full XML to downstream systems.
 		END IF
 	13.	If this value STATUS = "Final"  (0020) AND there is no prior value of STATUS = "Final" for which ADSABRSTATUS is "Passed" (0030), THEN
@@ -2104,10 +2104,10 @@ ADSATTRIBUTE    40  WARRTYPE
 	15.	If DTS3 not found, THEN
 		Send the Full XML to downstream systems.
 		END IF
-	16.	DTS4 = VALTO for the value {"Final"  (0020) | 閳ユ珐eady for Review閳ワ拷 (0040)} of STATUS where VALFROM < DTS3					
-	17.	DTS6 = VALFROM for the value {"Final"  (0020) | 閳ユ珐eady for Review閳ワ拷 (0040)} of STATUS where VALFROM < DTS3					
+	16.	DTS4 = VALTO for the value {"Final"  (0020) | é–³ãƒ¦ç��eady for Reviewé–³ãƒ¯æ‹· (0040)} of STATUS where VALFROM < DTS3					
+	17.	DTS6 = VALFROM for the value {"Final"  (0020) | é–³ãƒ¦ç��eady for Reviewé–³ãƒ¯æ‹· (0040)} of STATUS where VALFROM < DTS3					
 	18.	DTS4 = DTS4 - 30 seconds					
-	19.	DTS5 = VALFROM for the most recent value (latest) 閳ユ窔n Process閳ワ拷 (0050) of ADSABRSTATUS where DTS6 < VALFROM < DTS3					
+	19.	DTS5 = VALFROM for the most recent value (latest) é–³ãƒ¦çª”n Processé–³ãƒ¯æ‹· (0050) of ADSABRSTATUS where DTS6 < VALFROM < DTS3					
 	20.	T1 = MIN(DTS4 | DTS5)  
      * @throws SQLException 
      */
@@ -2159,13 +2159,13 @@ ADSATTRIBUTE    40  WARRTYPE
             			t1DTS = m_strEpoch; 
             			addDebug("getT1 isXMLADSABR fullXML=" + fullXML + "T1=" + t1DTS);
             		}else{
-            			//16.	DTS4 = VALTO for the value {"Final"  (0020) | 閳ユ珐eady for Review閳ワ拷 (0040)} of STATUS where VALFROM < DTS3
+            			//16.	DTS4 = VALTO for the value {"Final"  (0020) | é–³ãƒ¦ç��eady for Reviewé–³ãƒ¯æ‹· (0040)} of STATUS where VALFROM < DTS3
             			DTS4 = getValtoCompareValFromInStatusHistory(rootEntity, statusHistory, DTS3);
             			addDebug("getT1 isXMLADSABR fullXML=" + fullXML + "DTS4=" + DTS4);
-            			//17.	DTS6 = VALFROM for the value {"Final"  (0020) | 閳ユ珐eady for Review閳ワ拷 (0040)} of STATUS where VALFROM < DTS3
+            			//17.	DTS6 = VALFROM for the value {"Final"  (0020) | é–³ãƒ¦ç��eady for Reviewé–³ãƒ¯æ‹· (0040)} of STATUS where VALFROM < DTS3
             			DTS6 = getValFromInStatusHistory("statusHistory", statusHistory, null, DTS3);  
             			addDebug("getT1 isXMLADSABR fullXML=" + fullXML + "DTS6=" + DTS6);
-            			//19.	DTS5 = VALFROM for the most recent value (latest) 閳ユ窔n Process閳ワ拷 (0050) of ADSABRSTATUS where DTS6 < VALFROM < DTS3
+            			//19.	DTS5 = VALFROM for the most recent value (latest) é–³ãƒ¦çª”n Processé–³ãƒ¯æ‹· (0050) of ADSABRSTATUS where DTS6 < VALFROM < DTS3
             			DTS5 = getValFromInStatusHistory(adsStatusHistory,STATUS_CHGREQ, DTS6, DTS3);
             			addDebug("getT1 isXMLADSABR fullXML=" + fullXML + "DTS5=" + DTS5);
             			//20.	T1 = MIN(DTS4 | DTS5)
@@ -2320,116 +2320,116 @@ ADSATTRIBUTE    40  WARRTYPE
      *  BH FS ABR XML System Feed 20130904.doc from Page 43 to Page 53
      *  get the T2 time for the XML Generation
         //case A.	Initialize Cache with Full XML    	
-    	 IF the value of 閳ユ反ML IDL ABRSTATUS閳ワ拷 (XMLIDLABRSTATUS) is set to 閳ユ法ueued閳ワ拷 (0020) 
+    	 IF the value of é–³ãƒ¦å��ML IDL ABRSTATUSé–³ãƒ¯æ‹· (XMLIDLABRSTATUS) is set to é–³ãƒ¦æ³•ueuedé–³ãƒ¯æ‹· (0020) 
     	  and "System Feed Resend" (SYSFEEDRESEND) is set to "Initialize Cache" (CACHE) THEN
-    	   1.	Find the most recent value of 閳ユ穾DS XML Feed ABR閳ワ拷 (ADSABRSTATUS) = 閳ユ阀assed閳ワ拷 (0030)
+    	   1.	Find the most recent value of é–³ãƒ¦ç©¾DS XML Feed ABRé–³ãƒ¯æ‹· (ADSABRSTATUS) = é–³ãƒ¦é˜€assedé–³ãƒ¯æ‹· (0030)
 			2.	IF not found THEN
 				a.	Notes: 
 					XML was never created for this.
-					This is the same as 閳ユ窔nitialize Cache Current閳ワ拷 (CUR).
-				b.	DTS2 = VALTO for the most current value of 閳ユ藩tatus閳ワ拷 (STATUS) = {"Final"  (0020) | 閳ユ珐eady for Review閳ワ拷 (0040)}
+					This is the same as é–³ãƒ¦çª”nitialize Cache Currenté–³ãƒ¯æ‹· (CUR).
+				b.	DTS2 = VALTO for the most current value of é–³ãƒ¦è—©tatusé–³ãƒ¯æ‹· (STATUS) = {"Final"  (0020) | é–³ãƒ¦ç��eady for Reviewé–³ãƒ¯æ‹· (0040)}
 				c.	IF DTS2 is not found THEN
 						1)	Do not create XML
 						2)	Produce a report with the following message:
 						Error: A request is not valid since the data was never "Ready for Review" or "Final"
-						3)	Set ABR return code 閳ユ穾DS XML Feed ABR閳ワ拷 (ADSABRSTATUS) to 閳ユ窋ailed閳ワ拷 (0040)
+						3)	Set ABR return code é–³ãƒ¦ç©¾DS XML Feed ABRé–³ãƒ¯æ‹· (ADSABRSTATUS) to é–³ãƒ¦çª‹ailedé–³ãƒ¯æ‹· (0040)
 						4)	Exit
 					END IF
-				d.	DTS2 = DTS2 閳ワ拷 30 seconds
+				d.	DTS2 = DTS2 é–³ãƒ¯æ‹· 30 seconds
 				e.	T2 = MIN(DTS2, VALFROM of the current value In Process" (0050) for XMLIDLABRSTATUS)
 				f.	Extract the data for T2 using the VE defined in the spreadsheet at the end of this document
-				g.	Check 閳ユ穾vailability閳ワ拷 (AVAIL)
+				g.	Check é–³ãƒ¦ç©¾vailabilityé–³ãƒ¯æ‹· (AVAIL)
 				h.	Create Full XML using this data
-					See the section 閳ユ阀roduction (Triggered)閳ワ拷
+					See the section é–³ãƒ¦é˜€roduction (Triggered)é–³ãƒ¯æ‹·
 				i.	Update Cache with this XML
 				j.	Do NOT send this XML to downstream systems.
-				k.	Set XMLIDLABRSTATUS = 閳ユ阀assed閳ワ拷 (0030)
+				k.	Set XMLIDLABRSTATUS = é–³ãƒ¦é˜€assedé–³ãƒ¯æ‹· (0030)
 			END IF			
 			 
 			3.	IF found THEN 
 				a.	Notes: 
 				XML was created for this and probably sent downstream.
-				This is 閳ユ窔nitialize Cache閳ワ拷
+				This is é–³ãƒ¦çª”nitialize Cacheé–³ãƒ¯æ‹·
 				The ABR needs to produce Full XML consistent with the last XML produced and update Cache.
 				b.	DTS1 = VALFROM of the current value "In Process" (0050) for XMLIDLABRSTATUS
 				c.	DTS2 = VALFROM of the prior value (earlier than DTS1) of "Passed"" (0030) for ADSABRSTATUS
-				d.	DTS1 = VALFROM of the prior value (earlier than DTS2) of 闁炽儲绐攏 Process闁炽儻鎷�(0050) for ADSABRSTATUS 
-				e.	DTS2 = VALTO of the prior value (earlier than DTS1) of {"Final"  (0020) | 闁炽儲鐝恊ady for Review闁炽儻鎷�(0040)} for STATUS
+				d.	DTS1 = VALFROM of the prior value (earlier than DTS2) of é—�ç‚½å„²ç»�æ”� Processé—�ç‚½å„»éŽ·ï¿½(0050) for ADSABRSTATUS 
+				e.	DTS2 = VALTO of the prior value (earlier than DTS1) of {"Final"  (0020) | é—�ç‚½å„²é��æ�Šady for Reviewé—�ç‚½å„»éŽ·ï¿½(0040)} for STATUS
 				f.	DTS2 = VALTO - 30 seconds
 				g.	T2 = MIN(DTS1 | DTS2) 
 				h.	Extract the data for T2 using the VE defined in the spreadsheet at the end of this document
-				i.	Check 闁炽儲绌緑ailability闁炽儻鎷�(AVAIL)
+				i.	Check é—�ç‚½å„²ç»Œç·‘ailabilityé—�ç‚½å„»éŽ·ï¿½(AVAIL)
 				j.	Create Full XML using this data 
-					See the section 闁炽儲闃�roduction (Triggered)闁炽儻鎷�
+					See the section é—�ç‚½å„²é—ƒï¿½roduction (Triggered)é—�ç‚½å„»éŽ·ï¿½
 				k.	Update Cache with this XML
 				l.	Do NOT send this XML to downstream systems.
-				m.	Set XMLIDLABRSTATUS = 闁炽儲闃�assed闁炽儻鎷�(0030)
+				m.	Set XMLIDLABRSTATUS = é—�ç‚½å„²é—ƒï¿½assedé—�ç‚½å„»éŽ·ï¿½(0030)
 			END IF
     	 //case B. Initialize Cache Current
-    	 IF the value of 闁炽儲鍙峂L IDL ABRSTATUS闁炽儻鎷�(XMLIDLABRSTATUS) is set to 闁炽儲娉晆eued闁炽儻鎷�(0020) and 闁炽儲钘﹜stem Feed Resend闁炽儻鎷�(SYSFEEDRESEND) = 闁炽儲绐攏itialize Cache Current闁炽儻鎷�(CUR) THEN
-			1.	DTS2 = VALTO for most current value of {"Final"  (0020) | 闁炽儲鐝恊ady for Review闁炽儻鎷�(0040)} for STATUS
+    	 IF the value of é—�ç‚½å„²é�™å³‚L IDL ABRSTATUSé—�ç‚½å„»éŽ·ï¿½(XMLIDLABRSTATUS) is set to é—�ç‚½å„²å¨‰æ™†euedé—�ç‚½å„»éŽ·ï¿½(0020) and é—�ç‚½å„²é’˜ï¹œstem Feed Resendé—�ç‚½å„»éŽ·ï¿½(SYSFEEDRESEND) = é—�ç‚½å„²ç»�æ”�itialize Cache Currenté—�ç‚½å„»éŽ·ï¿½(CUR) THEN
+			1.	DTS2 = VALTO for most current value of {"Final"  (0020) | é—�ç‚½å„²é��æ�Šady for Reviewé—�ç‚½å„»éŽ·ï¿½(0040)} for STATUS
 			2.	If DTS2 not found THEN
 					a.	Do not create XML
 					b.	Produce a report with the following message:
 						Error: A request is not valid since the data was never "Ready for Review" or "Final"
-					c.	Set ABR return code to 闁炽儲绐媋iled闁炽儻鎷�(0040)
+					c.	Set ABR return code to é—�ç‚½å„²ç»�åª‹iledé—�ç‚½å„»éŽ·ï¿½(0040)
 					d.	Exit
 				END IF
 			3.	DTS2 = DTS2 - 30 seconds	
 			4.	T2 = MIN(DTS2, VALFROM of the current value of "In Process" (0050) for XMLIDLABRSTATUS
 			5.	Extract the data for T2 using the VE defined in the spreadsheet at the end of this document 
-			6.	Check 闁炽儲绌緑ailability闁炽儻鎷�(AVAIL)
+			6.	Check é—�ç‚½å„²ç»Œç·‘ailabilityé—�ç‚½å„»éŽ·ï¿½(AVAIL)
 			7.	Create Full XML using this data 
-				See the section 闁炽儲闃�roduction (Triggered)闁炽儻鎷�
+				See the section é—�ç‚½å„²é—ƒï¿½roduction (Triggered)é—�ç‚½å„»éŽ·ï¿½
 			8.	Update Cache with this XML
 			9.	Do NOT send this XML to downstream systems.
-			10.	Set ADSTATUSVAR = 闁炽儲闃�assed闁炽儻鎷�(0030)
+			10.	Set ADSTATUSVAR = é—�ç‚½å„²é—ƒï¿½assedé—�ç‚½å„»éŽ·ï¿½(0030)
     	//case C. Production (Triggered)
-    	 IF the value of 闁炽儲绌綝S XML Feed ABR闁炽儻鎷�(ADSABRSTATUS) is set to 闁炽儲娉晆eued闁炽儻鎷�(0020) and 闁炽儲钘﹜stem Feed Resend闁炽儻鎷�(SYSFEEDRESEND) = 闁炽儲缃歰闁炽儻鎷�(No) THEN
-    	    1.	DTS1 = VALFROM of current value 闁炽儲绐攏 Process闁炽儻鎷�(0050) for ADSABRSTATUS
-			2.	DTS2 = VALTO for most current value (VALFROM earlier that DTS1) of {"Final"  (0020) | 闁炽儲鐝恊ady for Review闁炽儻鎷�(0040)} for STATUS			
+    	 IF the value of é—�ç‚½å„²ç»Œç¶�S XML Feed ABRé—�ç‚½å„»éŽ·ï¿½(ADSABRSTATUS) is set to é—�ç‚½å„²å¨‰æ™†euedé—�ç‚½å„»éŽ·ï¿½(0020) and é—�ç‚½å„²é’˜ï¹œstem Feed Resendé—�ç‚½å„»éŽ·ï¿½(SYSFEEDRESEND) = é—�ç‚½å„²ç¼ƒæ­°é—�ç‚½å„»éŽ·ï¿½(No) THEN
+    	    1.	DTS1 = VALFROM of current value é—�ç‚½å„²ç»�æ”� Processé—�ç‚½å„»éŽ·ï¿½(0050) for ADSABRSTATUS
+			2.	DTS2 = VALTO for most current value (VALFROM earlier that DTS1) of {"Final"  (0020) | é—�ç‚½å„²é��æ�Šady for Reviewé—�ç‚½å„»éŽ·ï¿½(0040)} for STATUS			
 			3.	If DTS2 not found THEN 
 				a.	Do not create XML
 				b.	Produce a report with the following message:
 				Error: A request is not valid since the data was never "Ready for Review" or "Final"
-				c.	Set ABR return code to 闁炽儲绐媋iled闁炽儻鎷�(0040)
+				c.	Set ABR return code to é—�ç‚½å„²ç»�åª‹iledé—�ç‚½å„»éŽ·ï¿½(0040)
 				d.	Exit
 				END IF			
-			4.	DTS2 = DTS2 闁炽儻鎷�30 seconds			
+			4.	DTS2 = DTS2 é—�ç‚½å„»éŽ·ï¿½30 seconds			
 			5.	T2 = MIN(DTS1 | DTS2)			
 			6.	Extract the data for T2 using the VE defined in the spreadsheet at the end of this document			
-			7.	Check 闁炽儲绌緑ailability闁炽儻鎷�(AVAIL)			
+			7.	Check é—�ç‚½å„²ç»Œç·‘ailabilityé—�ç‚½å„»éŽ·ï¿½(AVAIL)			
 			8.	Create Full XML using this data  			
 			9.	Update Cache with this XML
 	    //case D. Resend 
-    	 IF the value of 闁炽儲绌綝S XML Feed ABR闁炽儻鎷�(ADSABRSTATUS) is set to 闁炽儲娉晆eued闁炽儻鎷�(0020) and 闁炽儲钘﹜stem Feed Resend闁炽儻鎷�(SYSFEEDRESEND) = 闁炽儲鐝恊send闁炽儻鎷�(Yes) THEN
-			This is the same as the preceding section on 闁炽儲闃�roduction (Triggered)闁炽儻鎷穡hen sending 闁炽儲绐媢ll闁炽儻鎷稾ML. It never sends 闁炽儲绐塭lta闁炽儻鎷稾ML.
+    	 IF the value of é—�ç‚½å„²ç»Œç¶�S XML Feed ABRé—�ç‚½å„»éŽ·ï¿½(ADSABRSTATUS) is set to é—�ç‚½å„²å¨‰æ™†euedé—�ç‚½å„»éŽ·ï¿½(0020) and é—�ç‚½å„²é’˜ï¹œstem Feed Resendé—�ç‚½å„»éŽ·ï¿½(SYSFEEDRESEND) = é—�ç‚½å„²é��æ�Šsendé—�ç‚½å„»éŽ·ï¿½(Yes) THEN
+			This is the same as the preceding section on é—�ç‚½å„²é—ƒï¿½roduction (Triggered)é—�ç‚½å„»éŽ·ç©¡hen sending é—�ç‚½å„²ç»�åª¢llé—�ç‚½å„»éŽ·ç¨¾ML. It never sends é—�ç‚½å„²ç»�å¡­ltaé—�ç‚½å„»éŽ·ç¨¾ML.
 		 END IF
     	//case E. Resend Cache
-    	IF the value of 闁炽儲绌綝S XML Feed ABR闁炽儻鎷�(ADSABRSTATUS) is set to 闁炽儲娉晆eued闁炽儻鎷�(0020) and 闁炽儲钘﹜stem Feed Resend闁炽儻鎷�(SYSFEEDRESEND) = 闁炽儲鐝恊send Cache闁炽儻鎷�(CACHE) THEN
+    	IF the value of é—�ç‚½å„²ç»Œç¶�S XML Feed ABRé—�ç‚½å„»éŽ·ï¿½(ADSABRSTATUS) is set to é—�ç‚½å„²å¨‰æ™†euedé—�ç‚½å„»éŽ·ï¿½(0020) and é—�ç‚½å„²é’˜ï¹œstem Feed Resendé—�ç‚½å„»éŽ·ï¿½(SYSFEEDRESEND) = é—�ç‚½å„²é��æ�Šsend Cacheé—�ç‚½å„»éŽ·ï¿½(CACHE) THEN
 			IF the XML message is NOT available in CACHE THEN
-				This is the same as the preceding section on 闁炽儲闃�roduction (Triggered)闁炽儻鎷穡hen sending 闁炽儲绐媢ll闁炽儻鎷稾ML. It never sends 闁炽儲绐塭lta闁炽儻鎷稾ML.
+				This is the same as the preceding section on é—�ç‚½å„²é—ƒï¿½roduction (Triggered)é—�ç‚½å„»éŽ·ç©¡hen sending é—�ç‚½å„²ç»�åª¢llé—�ç‚½å„»éŽ·ç¨¾ML. It never sends é—�ç‚½å„²ç»�å¡­ltaé—�ç‚½å„»éŽ·ç¨¾ML.
 			ELSE
 				Use the XML found in Cache and send it to downstream systems.
 				Do NOT update cache
-				Set ADSABRSTATUS = 闁炽儲闃�assed Resend Cache闁炽儻鎷�(XMLCACHE)
+				Set ADSABRSTATUS = é—�ç‚½å„²é—ƒï¿½assed Resend Cacheé—�ç‚½å„»éŽ·ï¿½(XMLCACHE)
 			END IF		
 		End of Section E
     	//case F. Resend RFR
-    	IF the value of 闁炽儲绌綝S XML Feed ABR闁炽儻鎷�(ADSABRSTATUS) is set to 闁炽儲娉晆eued闁炽儻鎷�(0020) and 闁炽儲钘﹜stem Feed Resend闁炽儻鎷�(SYSFEEDRESEND) = 闁炽儲鐝恊send RFR闁炽儻鎷�(RFR)
-    	   1.IF root entity STATUS <> 闁炽儲绐媔nal闁炽儻鎷�(0020) THEN
+    	IF the value of é—�ç‚½å„²ç»Œç¶�S XML Feed ABRé—�ç‚½å„»éŽ·ï¿½(ADSABRSTATUS) is set to é—�ç‚½å„²å¨‰æ™†euedé—�ç‚½å„»éŽ·ï¿½(0020) and é—�ç‚½å„²é’˜ï¹œstem Feed Resendé—�ç‚½å„»éŽ·ï¿½(SYSFEEDRESEND) = é—�ç‚½å„²é��æ�Šsend RFRé—�ç‚½å„»éŽ·ï¿½(RFR)
+    	   1.IF root entity STATUS <> é—�ç‚½å„²ç»�åª”nalé—�ç‚½å„»éŽ·ï¿½(0020) THEN
 				a.	Do NOT create XML
 				b.	Produce a report with the following message:
-				Error: A 闁炽儲鐝恊send RFR闁炽儻鎷穜equest is not valid since the data must be "Final".
-				c.	Set ABR return code to 闁炽儲绐媋iled闁炽儻鎷�(0040)
+				Error: A é—�ç‚½å„²é��æ�Šsend RFRé—�ç‚½å„»éŽ·ç©œequest is not valid since the data must be "Final".
+				c.	Set ABR return code to é—�ç‚½å„²ç»�åª‹iledé—�ç‚½å„»éŽ·ï¿½(0040)
 				d.	Exit
 			 END IF
 				
 			2. IF STATUS = "Final" (0020) AND "ADS XML Feed ABR" (ADSABRSTATUS) was ever "Passed" (0030) THEN 
 				a.	Do NOT create XML
 				b.	Produce a report with the following message:
-					Error: A 闁炽儲鐝恊send RFR闁炽儻鎷穜equest is not valid since XML was previously created successfully.
-				c.	Set ABR return code to 闁炽儲绐媋iled闁炽儻鎷�(0040)
+					Error: A é—�ç‚½å„²é��æ�Šsend RFRé—�ç‚½å„»éŽ·ç©œequest is not valid since XML was previously created successfully.
+				c.	Set ABR return code to é—�ç‚½å„²ç»�åª‹iledé—�ç‚½å„»éŽ·ï¿½(0040)
 				d.	Exit
 			END IF
 				
@@ -2449,7 +2449,7 @@ ADSATTRIBUTE    40  WARRTYPE
 		//String ADSABRSTATUS = getAttributeFlagEnabledValue(rootEntity, "ADSABRSTATUS");
     	if (isXMLIDLABR && isSystemResendCurrent){  
     		addDebug("CASE B Initialize Cache Current ");
-			//DTS2 = VALTO for the most current value of 闁炽儲钘﹖atus闁炽儻鎷�(STATUS) = {"Final"  (0020) | 闁炽儲鐝恊ady for Review闁炽儻鎷�(0040)}    			
+			//DTS2 = VALTO for the most current value of é—�ç‚½å„²é’˜ï¹–atusé—�ç‚½å„»éŽ·ï¿½(STATUS) = {"Final"  (0020) | é—�ç‚½å„²é��æ�Šady for Reviewé—�ç‚½å„»éŽ·ï¿½(0040)}    			
 			String DTS2 = getValtoInStatusHistory(rootEntity, statusHistory, null);
 			//DTS1 = VALFROM of the current value In Process" (0050) for XMLIDLABRSTATUS    			 
 			String DTS1 = getValFromInStatusHistory("xmlIDLStatusHistory", xmlIDLStatusHistory, STATUS_CHGREQ, null);
@@ -2460,7 +2460,7 @@ ADSATTRIBUTE    40  WARRTYPE
     		if(!existBefore(adsStatusHistory, STATUS_PASSED)){
     			addDebug("CASE A Initialize Cache when (ADSABRSTATUS) = Passed (0030) is not found ");
     			//not foud
-    			//DTS2 = VALTO for the most current value of 闁炽儲钘﹖atus闁炽儻鎷�(STATUS) = {"Final"  (0020) | 闁炽儲鐝恊ady for Review闁炽儻鎷�(0040)}    			
+    			//DTS2 = VALTO for the most current value of é—�ç‚½å„²é’˜ï¹–atusé—�ç‚½å„»éŽ·ï¿½(STATUS) = {"Final"  (0020) | é—�ç‚½å„²é��æ�Šady for Reviewé—�ç‚½å„»éŽ·ï¿½(0040)}    			
     			String DTS2 = getValtoInStatusHistory(rootEntity, statusHistory, null);
     			//DTS1 = VALFROM of the current value In Process" (0050) for XMLIDLABRSTATUS    			 
     			String DTS1 = getValFromInStatusHistory("xmlIDLStatusHistory", xmlIDLStatusHistory, STATUS_CHGREQ, null);
@@ -2473,9 +2473,9 @@ ADSATTRIBUTE    40  WARRTYPE
     			String DTS1 = getValFromInStatusHistory("xmlIDLStatusHistory", xmlIDLStatusHistory, STATUS_CHGREQ, null);
     			//DTS2 = VALFROM of the prior value (valfrom earlier than DTS1) of "Passed" (0030) for ADSABRSTATUS
     			String DTS2 = getValFromInStatusHistory("adsStatusHistory", adsStatusHistory, STATUS_PASSED, DTS1);
-    			//DTS1 = VALFROM of the prior value (valfrom earlier than DTS2) of 闁炽儲绐攏 Process闁炽儻鎷�(0050) for ADSABRSTATUS
+    			//DTS1 = VALFROM of the prior value (valfrom earlier than DTS2) of é—�ç‚½å„²ç»�æ”� Processé—�ç‚½å„»éŽ·ï¿½(0050) for ADSABRSTATUS
     			DTS1 =  getValFromInStatusHistory("adsStatusHistory", adsStatusHistory, STATUS_CHGREQ, DTS2);
-    			//DTS2 = VALTO of the prior value (VALFROM earlier than DTS1) of {"Final"  (0020) | 闁炽儲鐝恊ady for Review闁炽儻鎷�(0040)} for STATUS
+    			//DTS2 = VALTO of the prior value (VALFROM earlier than DTS1) of {"Final"  (0020) | é—�ç‚½å„²é��æ�Šady for Reviewé—�ç‚½å„»éŽ·ï¿½(0040)} for STATUS
     			DTS2 =  getValtoCompareValFromInStatusHistory(rootEntity, statusHistory, DTS1);
     			t2DTS = getMinTime(DTS1, DTS2);
     			addDebug("CASE A Initialize Cache (ADSABRSTATUS) = Passed (0030) is found T2=" + t2DTS);
@@ -2529,9 +2529,9 @@ ADSATTRIBUTE    40  WARRTYPE
     		}else{
     			//processSystemResendRFR and  processSystemResend have handled the difference for the  Resend & Resend Cache
     			addDebug("CASE C Production & D Resend & E Resend Cache");
-    			//DTS1 = VALFROM of current value 闁炽儲绐攏 Process闁炽儻鎷�(0050) for ADSABRSTATUS
+    			//DTS1 = VALFROM of current value é—�ç‚½å„²ç»�æ”� Processé—�ç‚½å„»éŽ·ï¿½(0050) for ADSABRSTATUS
     			String DTS1 = getValFromInStatusHistory("adsStatusHistory", adsStatusHistory, STATUS_CHGREQ, null);
-    			//DTS2 = VALTO for most current value (VALFROM earlier that DTS1) of {"Final"  (0020) | 闁炽儲鐝恊ady for Review闁炽儻鎷�(0040)} for STATUS
+    			//DTS2 = VALTO for most current value (VALFROM earlier that DTS1) of {"Final"  (0020) | é—�ç‚½å„²é��æ�Šady for Reviewé—�ç‚½å„»éŽ·ï¿½(0040)} for STATUS
     			String DTS2 = getValtoCompareValFromInStatusHistory(rootEntity, statusHistory, DTS1);
     			t2DTS = getMinTime(DTS1, DTS2);
     			addDebug("CASE C Production & D Resend & E Resend Cache T2=" + t2DTS);    			
@@ -2577,11 +2577,11 @@ ADSATTRIBUTE    40  WARRTYPE
 						}         									
 					}
 					if(achi != null && achi.getFlagCode().equals(STATUS_R4REVIEW) && foundFinal){
-						//Set T2 = VALTO of this STATUS = 闁炽儲鐝恊ady for Review闁炽儻鎷�(0040)						
+						//Set T2 = VALTO of this STATUS = é—�ç‚½å„²é��æ�Šady for Reviewé—�ç‚½å„»éŽ·ï¿½(0040)						
 						AttributeChangeHistoryItem nextachi = (AttributeChangeHistoryItem) statusHistory.getChangeHistoryItem(i + 1);
 						if (nextachi != null) {
 							t2DTS = nextachi.getChangeDate();
-							//Set T2 = T2 闁炽儻鎷�30 seconds
+							//Set T2 = T2 é—�ç‚½å„»éŽ·ï¿½30 seconds
 							t2DTS = adjustTimeSecond(t2DTS,-30);
 							foundR4review = true;
                             priorStatus = "Ready for Review";
@@ -2605,7 +2605,7 @@ ADSATTRIBUTE    40  WARRTYPE
 	}
 
 	/**
-	 * get the VALTO for the most current value of 闁炽儲钘﹖atus闁炽儻鎷�(STATUS) = {"Final"  (0020) | 闁炽儲鐝恊ady for Review闁炽儻鎷�(0040)} 
+	 * get the VALTO for the most current value of é—�ç‚½å„²é’˜ï¹–atusé—�ç‚½å„»éŽ·ï¿½(STATUS) = {"Final"  (0020) | é—�ç‚½å„²é��æ�Šady for Reviewé—�ç‚½å„»éŽ·ï¿½(0040)} 
 	 * get thte VALTO value of the achi, we need get the valfrom of nextachi which is the same value with the valto value of this achi 
 	 * @param rootEntity
 	 * @param statusHistory
@@ -2925,13 +2925,13 @@ ADSATTRIBUTE    40  WARRTYPE
 						if (nextachi != null) {
 							//DTS2 is valto of the tostatus
 							DTS2 = nextachi.getChangeDate();
-							//Set DTS2 = DTS2 闁炽儻鎷�30 seconds
+							//Set DTS2 = DTS2 é—�ç‚½å„»éŽ·ï¿½30 seconds
 	                    	DTS2 = adjustTimeSecond(DTS2,-30);
 						}else{
 							addDebug("existDeltaT1 for STATUS has no valto value of the stauts of " + tostatus);
 						}
 						addDebug("getDeltaT1 DTS1= " + DTS1 + " and  DTS2 = " + DTS2);
-						//Let T1 equal to the VALFROM of  the first ADSABRSTATUS = 闁炽儲绐攏 process闁炽儻鎷�(0050) where DTS1 <= VALFROM <= DTS2
+						//Let T1 equal to the VALFROM of  the first ADSABRSTATUS = é—�ç‚½å„²ç»�æ”� processé—�ç‚½å„»éŽ·ï¿½(0050) where DTS1 <= VALFROM <= DTS2
 						if(DTS2 != null &&  DTS1!= null){
 			            	if (adsStatusHistory != null && adsStatusHistory.getChangeHistoryItemCount() > 0) {
 			            		for (int j = adsStatusHistory.getChangeHistoryItemCount() - 1; j >= 0; j--) {
@@ -2970,18 +2970,18 @@ ADSATTRIBUTE    40  WARRTYPE
             addDebug("getDeltaT1 for STATUS has no changed history!");
         }
     	if(T1.equals(m_strEpoch)){
-    		addDebug("getDeltaT1 not find the VALFROM of the first ADSABRSTATUS = 闁炽儲绐攏 process闁炽儻鎷�(0050) where DTS1 <= VALFROM <= DTS2");
+    		addDebug("getDeltaT1 not find the VALFROM of the first ADSABRSTATUS = é—�ç‚½å„²ç»�æ”� processé—�ç‚½å„»éŽ·ï¿½(0050) where DTS1 <= VALFROM <= DTS2");
     	}    	
     	return foundT1;
     }
     
     /**
      * BH FS ABR XML System Feed 20121009b.doc
-     * 1. Starting at the current value of STATUS = 闁炽儲鐝恊ady for Review/Final闁炽儻鎷�(0040/0020), Let DTS1 equal to VALFROM and DTS2 = VALTO of 
-     * the prior value of  STATUS = 闁炽儲鐝恊ady for Review/Final闁炽儻鎷�(0040/0020) 
-     * 2. Set DTS2 = DTS2 闁炽儻鎷�30 seconds
+     * 1. Starting at the current value of STATUS = é—�ç‚½å„²é��æ�Šady for Review/Finalé—�ç‚½å„»éŽ·ï¿½(0040/0020), Let DTS1 equal to VALFROM and DTS2 = VALTO of 
+     * the prior value of  STATUS = é—�ç‚½å„²é��æ�Šady for Review/Finalé—�ç‚½å„»éŽ·ï¿½(0040/0020) 
+     * 2. Set DTS2 = DTS2 é—�ç‚½å„»éŽ·ï¿½30 seconds
      * Note: this supports Revision Number 5
-     * 3. Let T1 equal to the VALFROM of  the first ADSABRSTATUS = 闁炽儲绐攏 process闁炽儻鎷�(0050) where DTS1 <= VALFROM <= DTS2
+     * 3. Let T1 equal to the VALFROM of  the first ADSABRSTATUS = é—�ç‚½å„²ç»�æ”� processé—�ç‚½å„»éŽ·ï¿½(0050) where DTS1 <= VALFROM <= DTS2
      */
     private String getDeltaT1(AttributeChangeHistoryGroup adsStatusHistory, AttributeChangeHistoryGroup statusHistory, String tostatus)
     {
@@ -3008,13 +3008,13 @@ ADSATTRIBUTE    40  WARRTYPE
 						if (nextachi != null) {
 							//DTS2 is valto of the tostatus
 							DTS2 = nextachi.getChangeDate();
-							//Set DTS2 = DTS2 闁炽儻鎷�30 seconds
+							//Set DTS2 = DTS2 é—�ç‚½å„»éŽ·ï¿½30 seconds
 	                    	DTS2 = adjustTimeSecond(DTS2,-30);
 						}else{
 							addDebug("getDeltaT1 for STATUS has no valto value of the stauts of " + tostatus);
 						}
 						addDebug("getDeltaT1 DTS1= " + DTS1 + " and  DTS2 = " + DTS2);
-						//Let T1 equal to the VALFROM of  the first ADSABRSTATUS = 闁炽儲绐攏 process闁炽儻鎷�(0050) where DTS1 <= VALFROM <= DTS2
+						//Let T1 equal to the VALFROM of  the first ADSABRSTATUS = é—�ç‚½å„²ç»�æ”� processé—�ç‚½å„»éŽ·ï¿½(0050) where DTS1 <= VALFROM <= DTS2
 						if(DTS2 != null &&  DTS1!= null){
 			            	if (adsStatusHistory != null && adsStatusHistory.getChangeHistoryItemCount() > 0) {
 			            		for (int j = adsStatusHistory.getChangeHistoryItemCount() - 1; j >= 0; j--) {
@@ -3053,7 +3053,7 @@ ADSATTRIBUTE    40  WARRTYPE
             addDebug("getDeltaT1 for STATUS has no changed history!");
         }
     	if(T1.equals(m_strEpoch)){
-    		addDebug("getDeltaT1 not find the VALFROM of the first ADSABRSTATUS = 闁炽儲绐攏 process闁炽儻鎷�(0050) where DTS1 <= VALFROM <= DTS2");
+    		addDebug("getDeltaT1 not find the VALFROM of the first ADSABRSTATUS = é—�ç‚½å„²ç»�æ”� processé—�ç‚½å„»éŽ·ï¿½(0050) where DTS1 <= VALFROM <= DTS2");
     	}    	
     	return T1;
     }
@@ -4063,7 +4063,7 @@ ADSATTRIBUTE    40  WARRTYPE
     }
     /***************************************************************************
      * Add 40 second to T1 and T2 according to the Doc 
-     *  if T1 = 闁炽儻鎷�980-01-01闁炽儻鎷�(i.e. a complete refresh), then a single extract for T2 is sufficient since the data is all changed?? and is the current values. In order to allow for the ENTITY update (VALFROM) and the ATTRIBTE update (VALFROM) occuring at slightly different times, the T1 and T2 Data Time Stamps from the prior section need to be adjusted as follows:
+     *  if T1 = é—�ç‚½å„»éŽ·ï¿½980-01-01é—�ç‚½å„»éŽ·ï¿½(i.e. a complete refresh), then a single extract for T2 is sufficient since the data is all changed?? and is the current values. In order to allow for the ENTITY update (VALFROM) and the ATTRIBTE update (VALFROM) occuring at slightly different times, the T1 and T2 Data Time Stamps from the prior section need to be adjusted as follows:
      * T1 = T1 + 40 Seconds
      * T2 = T2 + 40 Seconds
      * 
@@ -4099,9 +4099,9 @@ ADSATTRIBUTE    40  WARRTYPE
 		a.	If so, checks the DTS of the replacement versus the current cache DTS
 		i.	If it is greater (newer) than the current record, then 
 		1.	set XMLCACHEVALIDTO = the DTS found in Step 2 of the XML generation without the addition of the 30 seconds defined in step 3.
-		2.	insert a new Record with XMLCACHEVALIDTO = 9999-12-31 00:00:00.000000 and XMLCACHEDTS = VALFROM of XMLIDLABRSTATUS = Queued (0020) (i.e. when this ABR was queued) 闁炽儻鎷穞he value prior to In Process (0050)).
+		2.	insert a new Record with XMLCACHEVALIDTO = 9999-12-31 00:00:00.000000 and XMLCACHEDTS = VALFROM of XMLIDLABRSTATUS = Queued (0020) (i.e. when this ABR was queued) é—�ç‚½å„»éŽ·ç©žhe value prior to In Process (0050)).
 		ii.	If it is not greater (older) than the current record, then do nothing (i.e. do not insert a new record and do not update current record)
-		b.	If not, then insert the new Record with XMLCACHEVALIDTO = 9999-12-31 00:00:00.000000  and XMLCACHEDTS = VALFROM of XMLIDLABRSTATUS = Queued (0020) (i.e. when this ABR was queued 闁炽儻鎷穞he value prior to In Process (0050)).
+		b.	If not, then insert the new Record with XMLCACHEVALIDTO = 9999-12-31 00:00:00.000000  and XMLCACHEDTS = VALFROM of XMLIDLABRSTATUS = Queued (0020) (i.e. when this ABR was queued é—�ç‚½å„»éŽ·ç©žhe value prior to In Process (0050)).
 
 
      * @param rootType
@@ -4207,30 +4207,25 @@ ADSATTRIBUTE    40  WARRTYPE
         	insertIntoCache(rootEntity, xml, t2, entityType, entityID, ps);
         }	
         addDebug("put cache:"+m_abri.getABRCode()+"-"+getEntityType());
-
-
         if("SVCMOD".equals(getEntityType())&&!m_abri.getABRCode().equals("SVCMODIERPABRSTATUS")){
         	setFlagValue("SVCMODIERPABRSTATUS", "0020");
         }else if("MODEL".equals(getEntityType())){
         	setFlagValue("MODELIERPABRSTATUS", "0020");
-            EntityItem[] tmfs = m_elist.getEntityGroup("PRODSTRUCT").getEntityItemsAsArray();
-            for(EntityItem tmf:tmfs){
-                String BULKMESINDC  = PokUtils.getAttributeFlagValue(tmf, "BULKMESINDC");
-                if("MES0001".equals(BULKMESINDC)){
-                    //PRODSTRUCT.BULKMESINDC = "MES0001" (Yes)
-                    setFlagValue("MODELBULKABRSTATUS", "0020");
-                    break;
-                }
-            }
-
         }else if("PRODSTRUCT".equals(getEntityType())){
         	setFlagValue("TMFIERPABRSTATUS", "0020");
-            String BULKMESINDC  = PokUtils.getAttributeFlagValue(rootEntity, "BULKMESINDC");
-            if("MES0001".equals(BULKMESINDC)){
-                //PRODSTRUCT.BULKMESINDC = "MES0001" (Yes)
-                setFlagValue("TMFBULKABRSTATUS", "0020");
-            }
-        }
+        }else if ("FEATURE".equals(getEntityType())) {
+        	setFlagValue("FEATUREIERPABRSTATUS", "0020");
+		}
+        else if ("FCTRANSACTION".equals(getEntityType())) {
+        	setFlagValue("FCTRANSACTIONIERPABRSTATUS", "0020");
+
+		} else if ("MODELCONVERT".equals(getEntityType())) {
+        	setFlagValue("MODELCONVERTIERPABRSTATUS", "0020");
+
+		}else if ("WARR".equals(getEntityType())) {
+        	setFlagValue("WARRIERPABRSTATUS", "0020");
+
+		}
     }finally{   
 		try {
 			m_db.commit();

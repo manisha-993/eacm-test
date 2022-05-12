@@ -15,14 +15,14 @@ public class ChwBapiClassCharReadTest
     @BeforeClass
     public static void setUpBeforeClass()
     {
-    	obj_id = "9080NEW";
+    	obj_id = "7778NEW";
     }
     
     @Test
     public void testConstructor()
     {
         System.out.println("-------------  testConstructor start -------------");
-        ChwBapiClassCharRead charToClass =new ChwBapiClassCharRead(obj_id, "ESKT", "T", "G");
+        ChwBapiClassCharRead charToClass =new ChwBapiClassCharRead(obj_id, "EB26", "T", "Q");
         try{
            charToClass.execute();
         } catch (Exception e)

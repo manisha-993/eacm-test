@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+
 import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -112,6 +114,12 @@ public class MODEL {
 	@XmlElementWrapper(name = "TAXCATEGORYLIST")
 	@XmlElement(name = "TAXCATEGORYELEMENT")
 	private List<TAXCATEGORY> TAXCATEGORYLIST;
+	
+	//add WARRLIST
+	@XmlElementWrapper(name = "WARRLIST")
+	@XmlElement(name = "WARRELEMENT")
+	private List<WARRELEMENTTYPE> WARRLIST;
+	
 	@XmlElement(name = "INVNAME")
 	private String INVNAME ;
 	@XmlElement(name = "MEASUREMETRIC")
@@ -401,6 +409,99 @@ public class MODEL {
 	public void setINVNAME(String iNVNAME) {
 		INVNAME = iNVNAME;
 	}
+	public List<WARRELEMENTTYPE> getWARRLIST() {
+		return WARRLIST;
+	}
+	public void setWARRLIST(List<WARRELEMENTTYPE> wARRLIST) {
+		WARRLIST = wARRLIST;
+	}
+	
+	
 
 
+}
+
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@XmlAccessorType(XmlAccessType.FIELD)
+class WARRELEMENTTYPE {
+	@XmlElement(name = "WARRACTION")
+	private String WARRACTION;
+	@XmlElement(name = "WARRENTITYTYPE")
+	private String WARRENTITYTYPE;
+	@XmlElement(name = "WARRENTITYID")
+	private String WARRENTITYID;
+	@XmlElement(name = "WARRID")
+	private String WARRID;
+	@XmlElement(name = "WARRPRIOD")
+	private String WARRPRIOD;
+	@XmlElement(name = "PUBFROM")
+	private String PUBFROM;
+	@XmlElement(name = "PUBTO")
+	private String PUBTO;
+	@XmlElement(name = "DEFWARR")
+	private String DEFWARR;
+	
+	@XmlElementWrapper(name = "COUNTRYLIST")
+	@XmlElement(name = "COUNTRYELEMENT")
+	private List<COUNTRY> COUNTRYLIST;
+	
+	public String getWARRACTION() {
+		return WARRACTION;
+	}
+	public void setWARRACTION(String wARRACTION) {
+		WARRACTION = wARRACTION;
+	}
+	public String getWARRENTITYTYPE() {
+		return WARRENTITYTYPE;
+	}
+	public void setWARRENTITYTYPE(String wARRENTITYTYPE) {
+		WARRENTITYTYPE = wARRENTITYTYPE;
+	}
+	public String getWARRENTITYID() {
+		return WARRENTITYID;
+	}
+	public void setWARRENTITYID(String wARRENTITYID) {
+		WARRENTITYID = wARRENTITYID;
+	}
+	public String getWARRID() {
+		return WARRID;
+	}
+	public void setWARRID(String wARRID) {
+		WARRID = wARRID;
+	}
+	public String getWARRPRIOD() {
+		return WARRPRIOD;
+	}
+	public void setWARRPRIOD(String wARRPRIOD) {
+		WARRPRIOD = wARRPRIOD;
+	}
+	public String getPUBFROM() {
+		return PUBFROM;
+	}
+	public void setPUBFROM(String pUBFROM) {
+		PUBFROM = pUBFROM;
+	}
+	public String getPUBTO() {
+		return PUBTO;
+	}
+	public void setPUBTO(String pUBTO) {
+		PUBTO = pUBTO;
+	}
+	public String getDEFWARR() {
+		return DEFWARR;
+	}
+	public void setDEFWARR(String dEFWARR) {
+		DEFWARR = dEFWARR;
+	}
+	
+	public List<COUNTRY> getCOUNTRYLIST() {
+		return COUNTRYLIST;
+	}
+	public void setCOUNTRYLIST(List<COUNTRY> cOUNTRYLIST) {
+		COUNTRYLIST = cOUNTRYLIST;
+	}
+	
+	
+	
+	
 }

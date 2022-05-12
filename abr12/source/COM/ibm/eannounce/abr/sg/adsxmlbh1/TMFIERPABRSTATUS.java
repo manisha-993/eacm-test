@@ -41,7 +41,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 	static final String NEWLINE = new String(FOOL_JTEST);
 	private int abr_debuglvl = D.EBUG_ERR;
 	private String navName = "";
-	private Hashtable metaTbl = new Hashtable();
+	private Hashtable<String, EANList> metaTbl = new Hashtable<String, EANList>();
 	private String PRODSTRUCTSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'PRODSTRUCT' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
 	
 	private String MODELSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
@@ -191,8 +191,10 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			            past ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
 			        or if ORDERCODE of parent MODEL is  in ("M",  "B")
 				 */
-				if(!"Maintenance,MaintFeature".contains(chwModel.getSUBCATEGORY())) {
-					if(exist(COVEQUALSQL, tmf.getMACHTYPE(),tmf.getPDHDOMAIN())||exist(FCTEQUALSQL, tmf.getMACHTYPE(),tmf.getPDHDOMAIN()) ||"M,B".contains(chwModel.getORDERCODE())) {
+				if(!CommonUtils.contains("Maintenance,MaintFeature",chwModel.getSUBCATEGORY())) {
+					if(exist(COVEQUALSQL, tmf.getMACHTYPE(),tmf.getPDHDOMAIN()) 
+					|| exist(FCTEQUALSQL, tmf.getMACHTYPE(),tmf.getPDHDOMAIN()) 
+					|| CommonUtils.contains("M,B",chwModel.getORDERCODE())) {
 						MachineTypeUPG(tmf,chwFeature,chwModel);
 					}					
 				}
@@ -466,7 +468,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		chwCharMaintain.execute();
 		this.addRfcResult(chwCharMaintain);
 		//step5 Call the ChwClassMaintain constructor to create the MK_D_machineType_REM_FC class. 
-		obj_id = chwTMF.getMACHTYPE() + "MTC"; 
+		obj_id = chwTMF.getMACHTYPE() + "UPG"; 
 		String charactd = "MK_D_" + mach_type + "_REM_FC";
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
 				obj_id //String obj_id

@@ -41,11 +41,13 @@ public class XMLParse {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance(); 		
 			factory.setNamespaceAware(false);
 		    DocumentBuilder builder = factory.newDocumentBuilder();
-		    RdhSvcMatmCreate svcMatmCreate = new RdhSvcMatmCreate(null);
+		   // RdhSvcMatmCreate svcMatmCreate = new RdhSvcMatmCreate(null);
 		    //Document doc = builder.parse(new ByteArrayInputStream(xml.getBytes()));		 
 		    //SVCMOD svcObj = getObjFromDoc(doc, SVCMOD.class);
 		    SVCMOD svcmod = null;//getSvcmodFromXml( loadXml(""));
 		    MODEL model = getObjectFromXml(loadModelXml(null), MODEL.class);
+		    System.out.println(model);
+		    System.exit(0);
 		    if (xml != null) {
 				try {
 					//RdhSvcMatmCreate svcMatmCreate = new RdhSvcMatmCreate(model);
@@ -403,8 +405,8 @@ public class XMLParse {
 	}
 	
 	public static String loadModelXml(String xmlPath){
-		
-		xmlPath = "C:\\Users\\JianBoXu\\Desktop\\eacm\\model.xml";
+		xmlPath="C:\\Users\\058241672\\Desktop\\backup\\model.txt";
+		//xmlPath = "C:\\Users\\JianBoXu\\Desktop\\eacm\\model.xml";
 
 		StringBuffer stringBuffer = new StringBuffer();
 		try {

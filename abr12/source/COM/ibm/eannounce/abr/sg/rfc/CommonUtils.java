@@ -94,6 +94,16 @@ public class CommonUtils {
         return returnSQL.toString();
     }
 	
+	public static boolean contains(String input, String container){
+		boolean isContains = false;
+		if(input==null) return false;
+		if(container==null) return false;
+		if("".equals(container.trim())) return false;
+		isContains = input.contains(container);
+		return isContains;
+		
+	}
+	
 	
 	public static void main(String[] args) {
 		
@@ -103,6 +113,14 @@ public class CommonUtils {
 		System.out.println("isNoLetter 1=" + isNoLetter(model));
 		model="12345";		
 		System.out.println("isNoLetter 2=" + isNoLetter(model));
+		
+		System.out.println(contains("M,B",""));
+		System.out.println(contains("M,B","A"));
+		System.out.println(contains("M,B","b"));
+		System.out.println(contains("M,B","M"));
+		int input =1;
+		String subffix = frontCompWithZore(input,3);
+		System.out.println("subffix=" + subffix);
 		
 		
 	}

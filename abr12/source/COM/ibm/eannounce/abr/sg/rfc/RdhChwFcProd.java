@@ -106,9 +106,12 @@ public class RdhChwFcProd extends RdhBase {
 				}
 			}
 		}
+		String priced = feature.getPRICEDFEATURE()==null||feature.getPRICEDFEATURE().length()<1?
+				"" :feature.getPRICEDFEATURE().substring(0, 1).toUpperCase();
+		
 		rdhChwFcProd_FEATURE.setFcType(feature.getFCTYPE());
 		rdhChwFcProd_FEATURE.setFcSubcat(feature.getFCSUBCAT());
-		rdhChwFcProd_FEATURE.setPricedFeature(feature.getPRICEDFEATURE());
+		rdhChwFcProd_FEATURE.setPricedFeature(priced);
 		rdhChwFcProd_FEATURE.setFcCat(feature.getFCCAT());
 		rdhChwFcProd_FEATURE.setConfiguratorFlag(feature.getCONFIGURATORFLAG());
 		rdhChwFcProd_FEATURE.setChargeOption(feature.getCHARGEOPTION());

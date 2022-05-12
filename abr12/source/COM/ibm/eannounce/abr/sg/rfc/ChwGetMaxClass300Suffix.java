@@ -30,6 +30,7 @@ public class ChwGetMaxClass300Suffix extends RdhBase
                 "RDH_GET_MAX_CLASS300_SUFFIX".toLowerCase(),null);
         this.pims_identity = "H";
         this.class_name_stem = class_name_stem;
+        this.default_mandt = "10H";
         
     }
 
