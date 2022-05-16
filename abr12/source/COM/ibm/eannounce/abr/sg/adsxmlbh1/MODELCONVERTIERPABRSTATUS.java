@@ -132,16 +132,17 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				
 				 MODELCONVERT modelconvert = XMLParse.getObjectFromXml(xml, MODELCONVERT.class); 
 				String modelXML = getModelFromXML(modelconvert.getTOMACHTYPE(), modelconvert.getTOMODEL(), connection);
-						addDebug("MODEL xml:"+convertToHTML(modelXML));
+					//addOutput("MODEL xml:"+convertToHTML(modelXML));
 				if(modelXML==null) {
 					throw new RuntimeException("MODEL xml not found in cache fro MODEL:"+modelconvert.getTOMODEL()+" MACHTYPE:"+modelconvert.getTOMACHTYPE());
 				}
 				MODEL model = XMLParse.getObjectFromXml(modelXML,MODEL.class );
+				//addDebug("Model:"+model);
 				 if (modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())) {
 					 ChwModelConvertMtc mtc = new ChwModelConvertMtc(model,modelconvert,m_db.getPDHConnection(),connection);
 					try {
 						mtc.execute();	
-						addOutput(mtc.getRptSb().toString());
+					    addOutput(mtc.getRptSb().toString());
 					} catch (Exception e) {
 						// TODO: handle exception
 						 addError(mtc.getRptSb().toString());
@@ -151,6 +152,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 					 ChwModelConvertUpg mUpg = new ChwModelConvertUpg(model,modelconvert,m_db.getPDHConnection(),connection);
 					 try{
 						 mUpg.execute();
+							addOutput(mUpg.getRptSb().toString());
 					 }catch (Exception e) {
 						// TODO: handle exception
 						 addError(mUpg.getRptSb().toString());

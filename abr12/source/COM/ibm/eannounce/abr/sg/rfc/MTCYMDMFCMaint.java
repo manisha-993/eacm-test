@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class MTCYMDMFCMaint extends RdhBase{
 
-    @SerializedName("TBL_MODEL")
+    @SerializedName("TBL_MODELCONVERT")
     private List<MTCYMDMFCMaint_Model> tbl_model;
     public MTCYMDMFCMaint(MODELCONVERT modelconvert) {
         super(modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())?modelconvert.getTOMACHTYPE()+"UPG":modelconvert.getTOMACHTYPE()+"MTC",
@@ -19,7 +19,7 @@ public class MTCYMDMFCMaint extends RdhBase{
 
         if (modelconvert.getAVAILABILITYLIST()!=null && !modelconvert.getAVAILABILITYLIST().isEmpty()) {
             for (AVAILABILITYELEMENT avail: modelconvert.getAVAILABILITYLIST().get(0).getAVAILABILITYELEMENT()) {
-                MTCYMDMFCMaint_Model model = new MTCYMDMFCMaint_Model();
+            	MTCYMDMFCMaint_Model model = new MTCYMDMFCMaint_Model();
                 model.setModelEntitytype(modelconvert.getMODELUPGRADEENTITYTYPE());
                 model.setModelEntityid(modelconvert.getMODELUPGRADEENTITYID());
                 model.setFromMachtype(modelconvert.getFROMMACHTYPE());
@@ -27,17 +27,24 @@ public class MTCYMDMFCMaint extends RdhBase{
                 model.setCountry_fc(RfcConfigProperties
                         .getCountry(avail.getCOUNTRY_FC()));
                 model.setAvailAction(avail.getAVAILABILITYACTION());
-                model.setAnnDate(avail.getANNDATE());
-                model.setFirstOrder(avail.getFIRSTORDER());
-                model.setPlanAvail(avail.getPLANNEDAVAILABILITY());
-                model.setPubFrom(avail.getPUBFROM());
-                model.setPubTo(avail.getPUBTO());
-                model.setWdAnndate(avail.getWDANNDATE());
-                model.setLastOrder(avail.getLASTORDER());
+                model.setAnnDate(getDate(avail.getANNDATE()));
+                model.setFirstOrder(getDate(avail.getFIRSTORDER()));
+                model.setPlanAvail(getDate(avail.getPLANNEDAVAILABILITY()));
+                model.setPubFrom(getDate(avail.getPUBFROM()));
+                model.setPubTo(getDate(avail.getPUBTO()));
+                model.setWdAnndate(getDate(avail.getWDANNDATE()));
+                model.setLastOrder(getDate(avail.getLASTORDER()));
 
                 tbl_model.add(model);
             }
         }
+    }
+    public String getDate(String date) {
+    	if(date==null)
+    		return date;
+    	else {
+			return date.replaceAll("-", "");
+		}
     }
 
     @Override
