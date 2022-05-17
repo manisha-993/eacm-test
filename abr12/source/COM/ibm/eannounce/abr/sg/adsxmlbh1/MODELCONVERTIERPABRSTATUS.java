@@ -139,16 +139,6 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				MODEL model = XMLParse.getObjectFromXml(modelXML,MODEL.class );
 				//addDebug("Model:"+model);
 				 if (modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())) {
-					 ChwModelConvertMtc mtc = new ChwModelConvertMtc(model,modelconvert,m_db.getPDHConnection(),connection);
-					try {
-						mtc.execute();	
-					    addOutput(mtc.getRptSb().toString());
-					} catch (Exception e) {
-						// TODO: handle exception
-						 addError(mtc.getRptSb().toString());
-						throw e;
-					} 
-				}else {
 					 ChwModelConvertUpg mUpg = new ChwModelConvertUpg(model,modelconvert,m_db.getPDHConnection(),connection);
 					 try{
 						 mUpg.execute();
@@ -157,7 +147,17 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 						// TODO: handle exception
 						 addError(mUpg.getRptSb().toString());
 						 throw e;
-					}
+					} 
+				}else {					 
+					ChwModelConvertMtc mtc = new ChwModelConvertMtc(model,modelconvert,m_db.getPDHConnection(),connection);
+					try {
+						mtc.execute();	
+					    addOutput(mtc.getRptSb().toString());
+					} catch (Exception e) {
+						// TODO: handle exception
+						 addError(mtc.getRptSb().toString());
+						throw e;
+					} 
 				}
 				 MTCYMDMFCMaint maint = new MTCYMDMFCMaint(modelconvert);
 				 

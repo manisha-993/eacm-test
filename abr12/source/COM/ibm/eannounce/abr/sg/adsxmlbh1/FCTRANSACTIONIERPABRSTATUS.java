@@ -610,7 +610,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
          * and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE"; $i/MODEL_UPDATE[MACHTYPE/text() = "7954" and MODEL/text() ="24X"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") 
          * with ur;
 		 */
-    	String cacheSql = "select XMLMESSAGE from cache.XMLIDLCACHE "
+    	String cacheSql = "select XMLMESSAGE,XMLENTITYID from cache.XMLIDLCACHE "
     			+ " where XMLCACHEVALIDTO > current timestamp "
     			+ " and  XMLENTITYTYPE = 'MODEL'"
     			+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
@@ -620,9 +620,28 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 		PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
 		ResultSet resultSet = statement.executeQuery();
 		String xml = "";
+		String xmlentityid ="";
 		if (resultSet.next()) {
 			xml = resultSet.getString("XMLMESSAGE");
-			addDebug("getModelFromXML for MODEL");		
+			xmlentityid = resultSet.getString("XMLENTITYID");
+			addDebug("getModelFromXML for MODEL TOMACHTYPE="+TOMACHTYPE+" and TOMODEL="+TOMODEL+" and XMLENTITYID=" + xmlentityid);		
+		}else{
+			String TOMACHTYPE_Sql = "select XMLMESSAGE,XMLENTITYID from cache.XMLIDLCACHE "
+	    			+ " where XMLCACHEVALIDTO > current timestamp "
+	    			+ " and  XMLENTITYTYPE = 'MODEL'"
+	    			+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
+	    			+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")" 
+	                + " FETCH FIRST 1 ROWS ONLY with ur";
+			PreparedStatement statement2 = odsConnection.prepareStatement(TOMACHTYPE_Sql);
+			ResultSet resultSet2 = statement2.executeQuery();
+			if (resultSet2.next()) {
+				xml = resultSet2.getString("XMLMESSAGE");
+				xmlentityid = resultSet2.getString("XMLENTITYID");
+				addDebug("getModelFromXML for MODEL only TOMACHTYPE=" + TOMACHTYPE +" and XMLENTITYID=" + xmlentityid);		
+			}else{
+				addDebug("getModelFromXML for MODEL no XML");
+			}			
+			
 		}
 		return xml;
 	}
