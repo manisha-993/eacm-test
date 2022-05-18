@@ -220,7 +220,7 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 
 	private List<Map<String,String>> getFromModelToModel(String sql,String type,String pdhdomain) throws SQLException {
 		List<Map<String,String>> fromModelToModelList = new ArrayList<Map<String,String>>();
-		Object[] params = new String[4]; 
+		Object[] params = new String[2]; 
 		params[0] =type;
 		params[1] =pdhdomain;
 		String realSql = CommonUtils.getPreparedSQL(sql, params);

@@ -122,6 +122,17 @@ public class MODEL {
 	
 	@XmlElement(name = "INVNAME")
 	private String INVNAME ;
+	@XmlElement(name = "MEASUREMETRIC")
+	private String MEASUREMETRIC;
+
+	public String getMEASUREMETRIC() {
+		return MEASUREMETRIC;
+	}
+
+	public void setMEASUREMETRIC(String MEASUREMETRIC) {
+		this.MEASUREMETRIC = MEASUREMETRIC;
+	}
+
 	public String getPDHDOMAIN() {
 		return PDHDOMAIN;
 	}

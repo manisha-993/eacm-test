@@ -243,43 +243,47 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 						);
 				this.runRfcCaller(TssClassificationMaint);
 				
-				//4.a Call the ChwCharMaintain constructor to create the MK_D_machineType_MOD_CONV characteristic.
-				ChwCharMaintain ChwCharMaintain = 
-				new ChwCharMaintain(
-						obj_id				 				//String obj_id  Set to concatenation of chwProduct.machineType + "MTC"
-						, "MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV"	//String charact  Set to  "MK_machineType_MTC" where <machine_type> is chwProduct.machineType
-						, "CHAR" 							//String datatype  Set to "CHAR".
-						, 9 								//int charnumber  Set to "15".
-						, empty 		//String decplaces
-						, empty 		//String casesens
-						, empty 		//String neg_vals
-						, empty 		//String group
-						, "-" 			//String valassignm  Set to "-".
-						, empty 		//String no_entry
-						, empty 		//String no_display
-						, "X" 			//String addit_vals   Set to "X".
-						, fctransaction.getTOMACHTYPE() +" Features Conversion"	//String chdescr	Set to "Machine Type Conversions <machine_type>" 				
-						);
-				//4.c Call the ChwCharMaintain.addValue() method to add the value with its description to the MK_D_machineType_MOD_CONV characteristic.
-				value = fctransaction.getFROMMODEL() + "_" + fctransaction.getTOMODEL();
-				//Set to "From <MODELCONVERT/TOMACHTYPE> Model <MODELCONVERT/FROMMODEL> to <MODELCONVERT/TOMODEL>"
-				String valdescr = "From " + fctransaction.getTOMACHTYPE() + " Model " + fctransaction.getFROMMODEL() + " to " + fctransaction.getTOMODEL();
-				ChwCharMaintain.addValue(value, valdescr);
-				this.runRfcCaller(ChwCharMaintain);
+				
+				if(!"***".equals(fctransaction.getTOMODEL())){
+					//4.a1 Call the ChwCharMaintain constructor to create the MK_D_machineType_MOD_CONV characteristic.
+					ChwCharMaintain ChwCharMaintain = 
+					new ChwCharMaintain(
+							obj_id				 				//String obj_id  Set to concatenation of chwProduct.machineType + "MTC"
+							, "MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV"	//String charact  Set to  "MK_machineType_MTC" where <machine_type> is chwProduct.machineType
+							, "CHAR" 							//String datatype  Set to "CHAR".
+							, 9 								//int charnumber  Set to "15".
+							, empty 		//String decplaces
+							, empty 		//String casesens
+							, empty 		//String neg_vals
+							, empty 		//String group
+							, "-" 			//String valassignm  Set to "-".
+							, empty 		//String no_entry
+							, empty 		//String no_display
+							, "X" 			//String addit_vals   Set to "X".
+							, fctransaction.getTOMACHTYPE() +" Features Conversion"	//String chdescr	Set to "Machine Type Conversions <machine_type>" 				
+							);
+					//4.a2 Call the ChwCharMaintain.addValue() method to add the value with its description to the MK_D_machineType_MOD_CONV characteristic.
+					value = fctransaction.getFROMMODEL() + "_" + fctransaction.getTOMODEL();
+					//Set to "From <MODELCONVERT/TOMACHTYPE> Model <MODELCONVERT/FROMMODEL> to <MODELCONVERT/TOMODEL>"
+					String valdescr = "From " + fctransaction.getTOMACHTYPE() + " Model " + fctransaction.getFROMMODEL() + " to " + fctransaction.getTOMODEL();
+					ChwCharMaintain.addValue(value, valdescr);
+					this.runRfcCaller(ChwCharMaintain);
+				}
 				
 				
-				//4.d Call the ChwClassMaintain constructor to create the MK_D_machineType_MOD_CONV class. 
+				
+				//4.b Call the ChwClassMaintain constructor to create the MK_D_machineType_MOD_CONV class. 
 				ChwClassMaintain =
 				new ChwClassMaintain(
 						obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "UPG"
 						, "MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV"  //String class_name   Set to  "MK_D_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType
 						, "MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV"  //String class_type   Set to  "MK_D_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType.
 						);
-				//4.e Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class.
+				//4.c Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class.
 				ChwClassMaintain.addCharacteristic("MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV");
 				this.runRfcCaller(ChwClassMaintain);
 				
-				//4.f Call the TssClassificationMaint constructor to associate the MK_D_machineType_MOD_CONV class to the product's material master record
+				//4.d Call the TssClassificationMaint constructor to associate the MK_D_machineType_MOD_CONV class to the product's material master record
 				TssClassificationMaint = 
 				new RdhClassificationMaint(
 						obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "UPG"
@@ -344,12 +348,18 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				ChwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", empty);  //Set to "PR_E2E_PRICING_HW".
 				this.runRfcCaller(ChwConpMaintain);
 				
-				//12. TODO
+				//12. 
 				String tmf_xml = getTMFFromXML(fctransaction.getTOMACHTYPE(),fctransaction.getTOMODEL(),fctransaction.getTOFEATURECODE(), connection);
-				TMF_UPDATE tmf = XMLParse.getObjectFromXml(tmf_xml,TMF_UPDATE.class);				
-				ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(tmf,fctransaction);
-				this.runRfcCaller(caller);
-				
+				if("".equals(tmf_xml)) {
+					addOutput("tmf_xml is Null, not Call ChwFCTYMDMFCMaint");	
+					ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(null,fctransaction);
+					this.runRfcCaller(caller);
+				}else{
+					addDebug("tmf_xml is NOT Null");
+					TMF_UPDATE tmf = XMLParse.getObjectFromXml(tmf_xml,TMF_UPDATE.class);
+					ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(tmf,fctransaction);
+					this.runRfcCaller(caller);
+				}				
 
 			}	
 			
@@ -600,7 +610,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
          * and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE"; $i/MODEL_UPDATE[MACHTYPE/text() = "7954" and MODEL/text() ="24X"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") 
          * with ur;
 		 */
-    	String cacheSql = "select XMLMESSAGE from cache.XMLIDLCACHE "
+    	String cacheSql = "select XMLMESSAGE,XMLENTITYID from cache.XMLIDLCACHE "
     			+ " where XMLCACHEVALIDTO > current timestamp "
     			+ " and  XMLENTITYTYPE = 'MODEL'"
     			+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
@@ -610,9 +620,28 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 		PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
 		ResultSet resultSet = statement.executeQuery();
 		String xml = "";
+		String xmlentityid ="";
 		if (resultSet.next()) {
 			xml = resultSet.getString("XMLMESSAGE");
-			addDebug("getModelFromXML xml=" + xml);		
+			xmlentityid = resultSet.getString("XMLENTITYID");
+			addDebug("getModelFromXML for MODEL TOMACHTYPE="+TOMACHTYPE+" and TOMODEL="+TOMODEL+" and XMLENTITYID=" + xmlentityid);		
+		}else{
+			String TOMACHTYPE_Sql = "select XMLMESSAGE,XMLENTITYID from cache.XMLIDLCACHE "
+	    			+ " where XMLCACHEVALIDTO > current timestamp "
+	    			+ " and  XMLENTITYTYPE = 'MODEL'"
+	    			+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
+	    			+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")" 
+	                + " FETCH FIRST 1 ROWS ONLY with ur";
+			PreparedStatement statement2 = odsConnection.prepareStatement(TOMACHTYPE_Sql);
+			ResultSet resultSet2 = statement2.executeQuery();
+			if (resultSet2.next()) {
+				xml = resultSet2.getString("XMLMESSAGE");
+				xmlentityid = resultSet2.getString("XMLENTITYID");
+				addDebug("getModelFromXML for MODEL only TOMACHTYPE=" + TOMACHTYPE +" and XMLENTITYID=" + xmlentityid);		
+			}else{
+				addDebug("getModelFromXML for MODEL no XML");
+			}			
+			
 		}
 		return xml;
 	}
@@ -637,6 +666,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
     			+ " $i/TMF_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\" and MODEL/text() =\""+TOMODEL+"\" and FEATURECODE/text() =\""+TOFEATURECODE+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")" 
                 + " FETCH FIRST 1 ROWS ONLY with ur";		
 		PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
+		addDebug("Search for TMF cacheSql=" + cacheSql);
 		ResultSet resultSet = statement.executeQuery();
 		String xml = "";
 		if (resultSet.next()) {

@@ -77,7 +77,7 @@ public class RdhChwFcProd extends RdhBase {
 				rdhChwFcProd_TMF.setEosAnnDate(availabilityElement.getEOSANNDATE().replaceAll("-", ""));
 				rdhChwFcProd_TMF.setEndOfServiceDate(availabilityElement.getENDOFSERVICEDATE().replaceAll("-", ""));
 				rdhChwFcProd_TMF.setNoCstShip(tmf.getNOCSTSHIP());
-				rdhChwFcProd_TMF.setInstall(tmf.getINSTALL());
+				rdhChwFcProd_TMF.setInstall("Does not apply".equalsIgnoreCase(tmf.getINSTALL())?"NOT":CommonUtils.getFirstSubString(tmf.getINSTALL(),3));
 				rdhChwFcProd_TMF.setConfiguratorFlag(tmf.getCONFIGURATORFLAG());
 				rdhChwFcProd_TMF.setBulkMesIndc(CommonUtils.getFirstSubString(tmf.getBULKMESINDC(),1));
 				rdhChwFcProd_TMF.setOrderCode(tmf.getORDERCODE());
