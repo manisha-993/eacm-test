@@ -1126,6 +1126,19 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 						addDebug("*****WD date CCN= " + strDSLMWDNCCN);
 						addDebug("*****WD date US= " + strDSLMOPDCCN);
 					}
+					else if (strGenArea.indexOf("Worldwide") != -1) {
+						strDSLMWDNLA = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
+						strDSLMWDNEMEA = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
+						strDSLMWDNAP = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
+						strDSLMWDNUS = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
+						strDSLMWDNCCN = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
+						strDSLMOPDLA = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
+						strDSLMOPDEMEA = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
+						strDSLMOPDAP = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
+						strDSLMOPDUS = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
+						strDSLMOPDCCN = PokUtils.getAttributeValue(eiSearchAvail1, "EFFECTIVEDATE", "", "");
+						strCPDAA = "O";
+					}
 				} else {
 					strDSLMWDN = "2050-12-31";
 					strDSLMOPD = "2050-12-31";
@@ -3362,6 +3375,13 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 						strDSLMWDNCCN = PokUtils.getAttributeValue(searchAvail1, "EFFECTIVEDATE", "", "");
 						// addDebug("***** modelconvert wd CCN= " +
 						// strDSLMWDNCCN);
+					}else if (strGenArea.indexOf("Worldwide") != -1) {
+						strDSLMWDNLA = PokUtils.getAttributeValue(searchAvail1, "EFFECTIVEDATE", "", "");
+						strDSLMWDNEMEA = PokUtils.getAttributeValue(searchAvail1, "EFFECTIVEDATE", "", "");
+						strDSLMWDNAP = PokUtils.getAttributeValue(searchAvail1, "EFFECTIVEDATE", "", "");
+						strDSLMWDNUS = PokUtils.getAttributeValue(searchAvail1, "EFFECTIVEDATE", "", "");
+						strDSLMWDNCCN = PokUtils.getAttributeValue(searchAvail1, "EFFECTIVEDATE", "", "");
+						
 					}
 				}
 			} else {
@@ -4158,4 +4178,4 @@ public class QSMFULLABRSTATUS extends PokBaseABR {
 		            }
 		        }
 		    }*/
-}
+	}
