@@ -248,6 +248,12 @@ public class Chw001ClfCreate extends RfcCallerBase{
 				value = chwModel.getACQRCOCD();
 				rdhClassificationMaint.addCharacteristic("MM_ACQ_COMPANY", CommonUtils.getFirstSubString(value, 3));
 			}
+			//2.x move Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_MTM characteristic to the MM_FIELDS classification.
+			//when chwModel.getCATEGORY is service
+			if("Service".equalsIgnoreCase(chwModel.getCATEGORY())){
+				value = materialID;
+				rdhClassificationMaint.addCharacteristic("MM_SP_MTM", CommonUtils.getFirstSubString(value, 7));
+			}			
 			//2.final 
 			rdhClassificationMaint.execute();
 			this.addRfcResult(rdhClassificationMaint);
@@ -448,10 +454,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 					}
 					TssClassificationMaint.addCharacteristic("MM_SP_TARNDTIME", CommonUtils.getFirstSubString(value, 30));					
 				}		
-				//2.x move Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_MTM characteristic to the MM_FIELDS classification.
-				//Change to assign characteristic MM_SP_MTM to class MM_SERVICEPAC
-				value = materialID;
-				TssClassificationMaint.addCharacteristic("MM_SP_MTM", CommonUtils.getFirstSubString(value, 7));
+				
 				
 				TssClassificationMaint.execute();
 				this.addRfcResult(TssClassificationMaint);
