@@ -4211,6 +4211,7 @@ ADSATTRIBUTE    40  WARRTYPE
         	setFlagValue("SVCMODIERPABRSTATUS", "0020");
         }else if("MODEL".equals(getEntityType())){
         	setFlagValue("MODELIERPABRSTATUS", "0020");
+        	if(m_elist.getEntityGroup("PRODSTRUCT")!=null) {
             EntityItem[] tmfs = m_elist.getEntityGroup("PRODSTRUCT").getEntityItemsAsArray();
             for(EntityItem tmf:tmfs){
                 String BULKMESINDC  = PokUtils.getAttributeFlagValue(tmf, "BULKMESINDC");
@@ -4220,6 +4221,7 @@ ADSATTRIBUTE    40  WARRTYPE
                     break;
                 }
             }
+        }
 
         }else if("PRODSTRUCT".equals(getEntityType())){
         	setFlagValue("TMFIERPABRSTATUS", "0020");
