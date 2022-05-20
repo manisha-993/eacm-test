@@ -132,30 +132,37 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				
 				 MODELCONVERT modelconvert = XMLParse.getObjectFromXml(xml, MODELCONVERT.class); 
 				String modelXML = getModelFromXML(modelconvert.getTOMACHTYPE(), modelconvert.getTOMODEL(), connection);
-						addDebug("MODEL xml:"+convertToHTML(modelXML));
+					//addOutput("MODEL xml:"+convertToHTML(modelXML));
 				if(modelXML==null) {
-					throw new RuntimeException("MODEL xml not found in cache fro MODEL:"+modelconvert.getTOMODEL()+" MACHTYPE:"+modelconvert.getTOMACHTYPE());
+					this.addOutput("MODEL xml not found in cache fro MODEL:"+modelconvert.getTOMODEL()+" MACHTYPE:"+modelconvert.getTOMACHTYPE());
+					return;
 				}
 				MODEL model = XMLParse.getObjectFromXml(modelXML,MODEL.class );
-				 if (modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())) {
-					 ChwModelConvertMtc mtc = new ChwModelConvertMtc(model,modelconvert,m_db.getPDHConnection(),connection);
-					try {
-						mtc.execute();	
-						addOutput(mtc.getRptSb().toString());
-					} catch (Exception e) {
+				//addDebug("Model:"+model);
+				if(model==null){
+					this.addOutput("Not find the Model with the modelxml");
+					return;
+				}
+				if (modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())) {
+					ChwModelConvertUpg mUpg = new ChwModelConvertUpg(model,modelconvert,m_db.getPDHConnection(),connection);
+					try{
+						mUpg.execute();
+						addOutput(mUpg.getRptSb().toString());
+					}catch (Exception e) {
 						// TODO: handle exception
-						 addError(mtc.getRptSb().toString());
+						addError(mUpg.getRptSb().toString());
 						throw e;
 					} 
-				}else {
-					 ChwModelConvertUpg mUpg = new ChwModelConvertUpg(model,modelconvert,m_db.getPDHConnection(),connection);
-					 try{
-						 mUpg.execute();
-					 }catch (Exception e) {
+				}else {					 
+					ChwModelConvertMtc mtc = new ChwModelConvertMtc(model,modelconvert,m_db.getPDHConnection(),connection);
+					try {
+						mtc.execute();	
+					    addOutput(mtc.getRptSb().toString());
+					} catch (Exception e) {
 						// TODO: handle exception
-						 addError(mUpg.getRptSb().toString());
-						 throw e;
-					}
+						addError(mtc.getRptSb().toString());
+						throw e;
+					} 
 				}
 				 MTCYMDMFCMaint maint = new MTCYMDMFCMaint(modelconvert);
 				 
@@ -256,13 +263,14 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 	    			+ " and  XMLENTITYTYPE = 'MODEL'"
 	    			+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
 	    			+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\" and MODEL/text() =\""+TOMODEL+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")" 
-	                + " FETCH FIRST 1 ROWS ONLY with ur";		
+	                + " FETCH FIRST 1 ROWS ONLY with ur";	
+	    	addDebug("getModelFromXML cacheSql" + cacheSql);
 			PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
 			ResultSet resultSet = statement.executeQuery();
 			String xml = "";
 			if (resultSet.next()) {
 				xml = resultSet.getString("XMLMESSAGE");
-				addDebug("getModelFromXML xml=" + xml);		
+				addDebug("getModelFromXML xml");		
 			}
 			return xml;
 		}

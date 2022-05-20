@@ -46,7 +46,12 @@ public class XMLParse {
 		    //SVCMOD svcObj = getObjFromDoc(doc, SVCMOD.class);
 		    SVCMOD svcmod = null;//getSvcmodFromXml( loadXml(""));
 		    MODEL model = getObjectFromXml(loadModelXml(null), MODEL.class);
+		    MODELCONVERT modelconvert = getObjectFromXml(loadModelXml(null), MODELCONVERT.class);
 		    System.out.println(model);
+		    MTCYMDMFCMaint maint = new MTCYMDMFCMaint(modelconvert);
+			 
+			 //this.addDebug("Calling " + maint.getRFCName());
+			 maint.execute();
 		    System.exit(0);
 		    if (xml != null) {
 				try {
@@ -405,7 +410,7 @@ public class XMLParse {
 	}
 	
 	public static String loadModelXml(String xmlPath){
-		xmlPath="C:\\Users\\058241672\\Desktop\\backup\\model.txt";
+		xmlPath="C:\\Users\\058241672\\Desktop\\backup\\covert.txt";
 		//xmlPath = "C:\\Users\\JianBoXu\\Desktop\\eacm\\model.xml";
 
 		StringBuffer stringBuffer = new StringBuffer();

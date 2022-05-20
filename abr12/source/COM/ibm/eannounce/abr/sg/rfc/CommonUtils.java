@@ -105,22 +105,38 @@ public class CommonUtils {
 	}
 	
 	
+	
 	public static void main(String[] args) {
 		
 		
 		
-		String model="mod12345";		
-		System.out.println("isNoLetter 1=" + isNoLetter(model));
-		model="12345";		
-		System.out.println("isNoLetter 2=" + isNoLetter(model));
+//		String model="mod12345";		
+//		System.out.println("isNoLetter 1=" + isNoLetter(model));
+//		model="12345";		
+//		System.out.println("isNoLetter 2=" + isNoLetter(model));
+//		
+//		System.out.println(contains("M,B",""));
+//		System.out.println(contains("M,B","A"));
+//		System.out.println(contains("M,B","b"));
+//		System.out.println(contains("M,B","M"));
+//		int input =1;
+//		String subffix = frontCompWithZore(input,3);
+//		System.out.println("subffix=" + subffix);
 		
-		System.out.println(contains("M,B",""));
-		System.out.println(contains("M,B","A"));
-		System.out.println(contains("M,B","b"));
-		System.out.println(contains("M,B","M"));
-		int input =1;
-		String subffix = frontCompWithZore(input,3);
-		System.out.println("subffix=" + subffix);
+		Object[] params = new String[2]; 
+		params[0] ="11";
+		params[1] ="22";
+		String sql = "SELECT DISTINCT t2.ATTRIBUTEVALUE AS MODEL, t3.ATTRIBUTEVALUE AS INVNAME FROM OPICM.flag F "
+		+ " INNER JOIN opicm.flag t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='MACHTYPEATR' AND T1.ATTRIBUTEVALUE = ? AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP"
+		+ " INNER JOIN opicm.text t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='MODELATR' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP"
+		+ " INNER JOIN opicm.text t3 ON f.ENTITYID =t3.ENTITYID AND f.ENTITYTYPE =t3.ENTITYTYPE AND t3.ATTRIBUTECODE ='INVNAME' AND t3.NLSID =1 AND T3.VALTO > CURRENT  TIMESTAMP AND T3.EFFTO > CURRENT  TIMESTAMP"
+		+ " INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t1.ENTITYID AND F1.ENTITYTYPE =t1.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP"
+		+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP"
+		+ " WHERE f.ENTITYTYPE ='MODEL' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELTIERPABRSTATUS') "
+		+ " AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION=? "
+		+ " WITH ur";
+		String realSql = CommonUtils.getPreparedSQL(sql, params);
+		System.out.println("querySql=" + realSql);
 		
 		
 	}
