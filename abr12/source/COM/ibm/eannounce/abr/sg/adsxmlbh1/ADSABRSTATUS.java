@@ -14,6 +14,7 @@ import COM.ibm.opicmpdh.objects.*;
 import com.ibm.transform.oim.eacm.util.*;
 
 import java.util.*;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -4211,14 +4212,22 @@ ADSATTRIBUTE    40  WARRTYPE
         	setFlagValue("SVCMODIERPABRSTATUS", "0020");
         }else if("MODEL".equals(getEntityType())){
         	setFlagValue("MODELIERPABRSTATUS", "0020");
-            EntityItem[] tmfs = m_elist.getEntityGroup("PRODSTRUCT").getEntityItemsAsArray();
-            for(EntityItem tmf:tmfs){
-                String BULKMESINDC  = PokUtils.getAttributeFlagValue(tmf, "BULKMESINDC");
+        	String tmfSQL = "select distinct f.attributevalue as BULKMESINDC "
+        			+ "from opicm.relator r "
+        			+ "join opicm.flag f on f.entitytype=r.entitytype and f.ENTITYID=r.entityid and f.attributecode='BULKMESINDC' and f.VALTO > current timestamp and f.EFFTO > current timestamp "
+        			+ "where r.ENTITYTYPE = 'PRODSTRUCT' and r.ENTITY2ID = ? and r.VALTO > current timestamp and r.EFFTO > current timestamp with ur";
+        	Connection connection1 = m_db.getPDHConnection();
+            PreparedStatement statement1 = connection1.prepareStatement(tmfSQL);
+            statement1.setInt(1, rootEntity.getEntityID());
+            ResultSet resultSet1 = statement1.executeQuery();
+            this.addOutput("SQL: "+ tmfSQL);
+            while (resultSet1.next()) {
+            	String BULKMESINDC = resultSet1.getString("BULKMESINDC");
                 if("MES0001".equals(BULKMESINDC)){
                     //PRODSTRUCT.BULKMESINDC = "MES0001" (Yes)
                     setFlagValue("MODELBULKABRSTATUS", "0020");
                     break;
-                }
+            	}
             }
 
         }else if("PRODSTRUCT".equals(getEntityType())){

@@ -28,6 +28,8 @@ public class TMFBULKABRSTATUS extends PokBaseABR {
     private String navName = "";
     private Hashtable metaTbl = new Hashtable();
     private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
+    private String modelSQL = "select entity2id as MODELID from opicm.relator where ENTITYTYPE = 'PRODSTRUCT' and ENTITYID = ?  and VALTO > current timestamp and EFFTO > current timestamp with ur";
+    
     String xml = null;
 
     public void execute_run() {
@@ -82,15 +84,25 @@ public class TMFBULKABRSTATUS extends PokBaseABR {
             addDebug("rootDesc" + rootDesc);
             // build the text file
 
-            Vector modelVect = PokUtils.getAllLinkedEntities(rootEntity, "PRODSTRUCT", "MODEL");
-
-            EntityItem eiModel = (EntityItem) modelVect.elementAt(0);
+            String entityid = null;
+            Connection connection1 = m_db.getPDHConnection();
+            PreparedStatement statement1 = connection1.prepareStatement(modelSQL);
+            statement1.setInt(1, rootEntity.getEntityID());
+            ResultSet resultSet1 = statement1.executeQuery();
+            while (resultSet1.next()) {
+            	entityid = resultSet1.getString("MODELID");
+			}
+            
             Connection connection = m_db.getODSConnection();
             PreparedStatement statement = connection.prepareStatement(CACEHSQL);
-            statement.setInt(1, eiModel.getEntityID());
+            statement.setString(1, entityid);
             ResultSet resultSet = statement.executeQuery();
-
+            while (resultSet.next()) {
+				xml = resultSet.getString("XMLMESSAGE");
+			}
+            
             if (xml != null) {
+            	
                 MODEL model = XMLParse.getObjectFromXml(xml, MODEL.class);
                 ChwBulkYMDMProd abr = new ChwBulkYMDMProd(model,"PRODSTRUCT",String.valueOf(rootEntity.getEntityID()),m_db.getODSConnection(),m_db.getPDHConnection());
                 this.addDebug("Calling " + abr.getRFCName());

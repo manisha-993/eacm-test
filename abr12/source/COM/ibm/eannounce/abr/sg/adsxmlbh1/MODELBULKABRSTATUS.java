@@ -83,12 +83,18 @@ public class MODELBULKABRSTATUS extends PokBaseABR {
             PreparedStatement statement = connection.prepareStatement(CACEHSQL);
             statement.setInt(1, rootEntity.getEntityID());
             ResultSet resultSet = statement.executeQuery();
-
+            
+            while (resultSet.next()) {
+				xml = resultSet.getString("XMLMESSAGE");
+			}
+            
             if (xml != null) {
                 MODEL model = XMLParse.getObjectFromXml(xml, MODEL.class);
                 ChwBulkYMDMProd abr = new ChwBulkYMDMProd(model,"MODEL","",m_db.getODSConnection(),m_db.getPDHConnection());
                 this.addDebug("Calling " + abr.getRFCName());
                 abr.execute();
+                String json = abr.generateJson();
+                this.addDebug("json: "+json);
                 this.addDebug(abr.createLogEntry());
                 if (abr.getRfcrc() == 0) {
                     this.addOutput(abr.getRFCName() + " called successfully!");
