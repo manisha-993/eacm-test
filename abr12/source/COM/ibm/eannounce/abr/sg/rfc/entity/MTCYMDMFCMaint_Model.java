@@ -20,7 +20,7 @@ public class MTCYMDMFCMaint_Model {
     private String annDate;
     @SerializedName("FIRSTORDER")
     private String firstOrder;
-    @SerializedName("PLANEDAVAILABILITY")
+    @SerializedName("PLANNEDAVAILABILITY")
     private String planAvail;
     @SerializedName("PUBFROM")
     private String pubFrom;
