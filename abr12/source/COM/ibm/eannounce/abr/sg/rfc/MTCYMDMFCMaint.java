@@ -56,6 +56,14 @@ public class MTCYMDMFCMaint extends RdhBase{
     protected boolean isReadyToExecute() {
         return true;
     }
+	public List<MTCYMDMFCMaint_Model> getTbl_model() {
+		return tbl_model;
+	}
+	public void setTbl_model(List<MTCYMDMFCMaint_Model> tbl_model) {
+		this.tbl_model = tbl_model;
+	}
+    
+    
 
 }
 

@@ -115,7 +115,11 @@ public class WARRIERPABRSTATUS extends PokBaseABR {
 				//call ChwYMdmOthWarranty	
 				addDebug("Start to call chwYMdmOthWarranty");
 				ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(warr);
-				this.runRfcCaller(chwYMdmOthWarranty);
+				if(chwYMdmOthWarranty.getZYTMDMOTHWARRUPD_LIST().size()>0) {
+					this.runRfcCaller(chwYMdmOthWarranty);
+				}else {
+					addDebug("No ZYTMDMOTHWARRUPD in the chwYMdmOthWarranty, will not call the RFC");
+				}				
 				addDebug("End to call chwYMdmOthWarranty");
 			}	
 		} catch (Exception e) {

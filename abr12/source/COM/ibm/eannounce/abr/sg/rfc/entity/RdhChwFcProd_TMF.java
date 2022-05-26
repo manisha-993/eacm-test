@@ -11,6 +11,8 @@ public class RdhChwFcProd_TMF {
     private String featureCode;
     @SerializedName("FEATUREENTITYTYPE")
     private String featureEntityType;
+    @SerializedName("FEATUREENTITYID")
+    private String featureEntityId;
     @SerializedName("COUNTRY_FC")
     private String country_fc;
     @SerializedName("ANNDATE")
@@ -115,6 +117,12 @@ public class RdhChwFcProd_TMF {
 	}
 	public void setFeatureEntityType(String featureEntityType) {
 		this.featureEntityType = featureEntityType;
+	}	
+	public String getFeatureEntityId() {
+		return featureEntityId;
+	}
+	public void setFeatureEntityId(String featureEntityId) {
+		this.featureEntityId = featureEntityId;
 	}
 	public void setCountry_fc(String country_fc) {
 		this.country_fc = country_fc;

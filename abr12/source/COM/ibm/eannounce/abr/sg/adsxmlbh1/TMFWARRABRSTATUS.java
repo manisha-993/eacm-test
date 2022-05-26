@@ -117,7 +117,11 @@ public class TMFWARRABRSTATUS extends PokBaseABR {
 				//step1  Call ChwYMdmOthWarranty to populate iERP custom tables with warranty master data by setting the input parameter for ZYTMDMOTHWARRMOD structure
 				//call ChwYMdmOthWarranty	
 				ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(tmf);
-				this.runRfcCaller(chwYMdmOthWarranty);
+				if(chwYMdmOthWarranty.getZYTMDMOTHWARRTMF_LIST().size()>0) {
+					this.runRfcCaller(chwYMdmOthWarranty);
+				}else {
+					addDebug("No ZYTMDMOTHWARRTMF in the chwYMdmOthWarranty, will not call the RFC");
+				}
 			}	
 		} catch (Exception e) {
 			e.printStackTrace();

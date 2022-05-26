@@ -1,5 +1,6 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
+import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -103,6 +104,15 @@ public class CommonUtils {
 		return isContains;
 		
 	}
+	
+	public static boolean isNumber(String s) {
+	    try { 
+	        BigDecimal a = new BigDecimal(s); 
+	        return true;
+	    } catch (Exception e) {
+	        return false;
+	    }
+	}	
 	
 	
 	

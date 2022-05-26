@@ -109,14 +109,21 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			 */
 			value = "";
 			String var= chwModel.getPRICEDIND().toUpperCase();
-			String var1= chwModel.getZEROPRICE().toUpperCase();
-			if("YES".equals(var) && "YES".equals(var1)){
-				value ="Z";
-			}else if("NO".equals(var) && "NO".equals(var1)){
-				value ="Z";
-			}else if("YES".equals(var) && "NO".equals(var1)){
+//			String var1= chwModel.getZEROPRICE().toUpperCase();
+//			if("YES".equals(var) && "YES".equals(var1)){
+//				value ="Z";
+//			}else if("NO".equals(var) && "NO".equals(var1)){
+//				value ="Z";
+//			}else if("YES".equals(var) && "NO".equals(var1)){
+//				value ="G";
+//			} 
+			//new change on 2022-05-26
+			if("YES".equals(var)){
 				value ="G";
-			} 
+			}else if("NO".equals(var)){
+				value ="Z";
+			}
+			//new change end
 			rdhClassificationMaint.addCharacteristic("MM_PRICERELEVANT", value);
 			//2.f Call the TssClassificationMaint.addCharacteristic() method to add the MM_FG_INSTALLABLE characteristic to the MM_FIELDS classification. 
 			/**

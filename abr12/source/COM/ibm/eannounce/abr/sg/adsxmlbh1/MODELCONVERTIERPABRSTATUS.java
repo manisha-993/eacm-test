@@ -154,14 +154,20 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				 MTCYMDMFCMaint maint = new MTCYMDMFCMaint(modelconvert);
 				 
 				 this.addDebug("Calling " + maint.getRFCName());
-				 maint.execute();
-				this.addDebug(maint.createLogEntry());
-				if (maint.getRfcrc() == 0) {
-						this.addOutput(maint.getRFCName() + " called successfully!");
-				} else {
-						this.addOutput(maint.getRFCName() + " called  faild!");
-						this.addOutput(maint.getError_text());
-				}
+				 if(maint.getTbl_model().size()>0) {
+					 maint.execute();
+					 this.addDebug(maint.createLogEntry());
+					 if (maint.getRfcrc() == 0) {
+							this.addOutput(maint.getRFCName() + " called successfully!");
+					} else {
+							this.addOutput(maint.getRFCName() + " called  faild!");
+							this.addOutput(maint.getError_text());
+					}
+				 }else {
+					 addDebug("No ZYTMDMOTHWARRUPD in the chwYMdmOthWarranty, will not call the RFC");
+				 }
+				 
+				
 			//MTCYMDMFCMa
 			//ChwMachTypeMtc 
 		

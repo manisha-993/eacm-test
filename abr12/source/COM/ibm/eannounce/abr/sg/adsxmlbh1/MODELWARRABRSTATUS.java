@@ -119,7 +119,11 @@ public class MODELWARRABRSTATUS extends PokBaseABR {
 		        //Else, call ChwYMdmOthWarranty to populate iERP custom tables with warranty master data by setting the input parameter as below.
 				//call ChwYMdmOthWarranty	
 				ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(model);
-				this.runRfcCaller(chwYMdmOthWarranty);
+				if(chwYMdmOthWarranty.getZYTMDMOTHWARRMOD_LIST().size()>0) {
+					this.runRfcCaller(chwYMdmOthWarranty);
+				}else {
+					addDebug("No ZYTMDMOTHWARRMOD in the chwYMdmOthWarranty, will not call the RFC");
+				}
 
 			}	
 		} catch (Exception e) {
