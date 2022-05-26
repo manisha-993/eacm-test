@@ -24,13 +24,13 @@ public class ChwYMdmOthWarranty extends RdhBase {
 	private String MATERIAL_TYPE;
 	
 	public ChwYMdmOthWarranty(WARR chwProduct) {
-		super(chwProduct.getWARRID(),	"RDH_YMDMOTH_WARRANTY".toLowerCase(), null);
+		super(chwProduct.getWARRID(),	"Z_YMDMOTH_WARRANTY".toLowerCase(), null);
 		this.pims_identity = "H";
 		this.MATERIAL_TYPE = "WARR";
 		
 		ZYTMDMOTHWARRUPD ZYTMDMOTHWARRUPD = new ZYTMDMOTHWARRUPD();
 		ZYTMDMOTHWARRUPD.setZWARRID(chwProduct.getWARRID());
-		String WARRPRIOD = chwProduct.getWARRID();
+		String WARRPRIOD = chwProduct.getWARRPRIOD();
 		if("N/A".equals(WARRPRIOD) ||"NA".equals(WARRPRIOD)){
 			ZYTMDMOTHWARRUPD.setZWARRPRIOD("0");
 		}else{
@@ -140,7 +140,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 	}
 
 	public ChwYMdmOthWarranty(MODEL chwProduct) {
-		super(chwProduct.getMACHTYPE()+chwProduct.getMODEL(),	"RDH_YMDMOTH_WARRANTY".toLowerCase(), null);
+		super(chwProduct.getMACHTYPE()+chwProduct.getMODEL(),	"Z_YMDMOTH_WARRANTY".toLowerCase(), null);
 		this.pims_identity = "H";
 		this.MATERIAL_TYPE = "MODEL";
 		ZYTMDMOTHWARRMOD zYTMDMOTHWARRMOD = new ZYTMDMOTHWARRMOD();
@@ -267,7 +267,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 	}
 	
 	public ChwYMdmOthWarranty(TMF_UPDATE chwProduct) {
-		super(chwProduct.getMACHTYPE()+chwProduct.getFEATURECODE(), "RDH_YMDMOTH_WARRANTY".toLowerCase(), null);
+		super(chwProduct.getMACHTYPE()+chwProduct.getFEATURECODE(), "Z_YMDMOTH_WARRANTY".toLowerCase(), null);
 		this.pims_identity = "H";
 		this.MATERIAL_TYPE = "TMF";
 		//If no <WARRELEMENT> found
