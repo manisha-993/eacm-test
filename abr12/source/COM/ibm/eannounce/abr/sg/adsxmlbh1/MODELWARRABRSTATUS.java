@@ -122,7 +122,7 @@ public class MODELWARRABRSTATUS extends PokBaseABR {
 				if(chwYMdmOthWarranty.getZYTMDMOTHWARRMOD_LIST().size()>0) {
 					this.runRfcCaller(chwYMdmOthWarranty);
 				}else {
-					addDebug("No ZYTMDMOTHWARRMOD in the chwYMdmOthWarranty, will not call the RFC");
+					addOutput("No ZYTMDMOTHWARRMOD in the chwYMdmOthWarranty, will not call the RFC");
 				}
 
 			}	

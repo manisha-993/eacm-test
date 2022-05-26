@@ -10,6 +10,8 @@ import java.text.StringCharacterIterator;
 import java.util.Hashtable;
 import java.util.List;
 
+import com.ibm.transform.oim.eacm.util.PokUtils;
+
 import COM.ibm.eannounce.abr.sg.rfc.Chw001ClfCreate;
 import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwClassMaintain;
@@ -36,8 +38,6 @@ import COM.ibm.eannounce.objects.EntityItem;
 import COM.ibm.eannounce.objects.ExtractActionItem;
 import COM.ibm.opicmpdh.middleware.D;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
 
 public class MODELIERPABRSTATUS extends PokBaseABR {
 	private StringBuffer rptSb = new StringBuffer();

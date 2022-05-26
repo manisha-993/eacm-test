@@ -164,7 +164,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 							this.addOutput(maint.getError_text());
 					}
 				 }else {
-					 addDebug("No ZYTMDMOTHWARRUPD in the chwYMdmOthWarranty, will not call the RFC");
+					 addOutput("No Tbl_model in the MTCYMDMFCMaint, will not call the RFC");
 				 }
 				 
 				

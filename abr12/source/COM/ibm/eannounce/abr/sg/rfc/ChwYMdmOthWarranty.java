@@ -41,8 +41,6 @@ public class ChwYMdmOthWarranty extends RdhBase {
 			}else {
 				return;
 			}
-			
-			
 		}
 		ZYTMDMOTHWARRUPD.setZWARRPRIODUM("MONTH");
 		ZYTMDMOTHWARRUPD.setZWARRTYPE(chwProduct.getWARRTYPE().toUpperCase());

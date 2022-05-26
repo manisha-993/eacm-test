@@ -120,7 +120,7 @@ public class TMFWARRABRSTATUS extends PokBaseABR {
 				if(chwYMdmOthWarranty.getZYTMDMOTHWARRTMF_LIST().size()>0) {
 					this.runRfcCaller(chwYMdmOthWarranty);
 				}else {
-					addDebug("No ZYTMDMOTHWARRTMF in the chwYMdmOthWarranty, will not call the RFC");
+					addOutput("No ZYTMDMOTHWARRTMF in the chwYMdmOthWarranty, will not call the RFC.");
 				}
 			}	
 		} catch (Exception e) {

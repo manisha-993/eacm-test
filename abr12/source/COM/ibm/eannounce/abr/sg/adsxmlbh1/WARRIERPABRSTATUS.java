@@ -118,7 +118,7 @@ public class WARRIERPABRSTATUS extends PokBaseABR {
 				if(chwYMdmOthWarranty.getZYTMDMOTHWARRUPD_LIST().size()>0) {
 					this.runRfcCaller(chwYMdmOthWarranty);
 				}else {
-					addDebug("No ZYTMDMOTHWARRUPD in the chwYMdmOthWarranty, will not call the RFC");
+					addOutput("WARRPRIOD must be Number in the WARR_UPDATE entity, please fix the Data and resend it.");
 				}				
 				addDebug("End to call chwYMdmOthWarranty");
 			}	
