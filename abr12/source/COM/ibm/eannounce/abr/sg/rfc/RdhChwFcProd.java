@@ -102,7 +102,7 @@ public class RdhChwFcProd extends RdhBase {
 			{
 				if ("1".equals(languageElement.getNLSID()))
 				{
-					rdhChwFcProd_FEATURE.setMktgDesc(languageElement.getMKTGDESC());
+					rdhChwFcProd_FEATURE.setMktgDesc(languageElement.getMKTGNAME());
 				}
 			}
 		}
