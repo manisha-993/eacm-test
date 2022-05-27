@@ -1,7 +1,5 @@
 package COM.ibm.eannounce.abr.sg.rfc.entity;
 
-import com.google.gson.annotations.SerializedName;
-
 public class ZYTMDMOTHWARRTMF {
     private String ZMACHTYP;
     private String ZFEATURECODE;

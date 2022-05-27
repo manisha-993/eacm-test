@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
-
 public class ChwModelConvertMtc extends RfcCallerBase {
 	
 	private MODEL chwMODEL;
@@ -129,7 +127,7 @@ public class ChwModelConvertMtc extends RfcCallerBase {
 					);
 			this.addRfcName(ChwCharMaintain);
 			//4.B For For each MODEL with MODEL/MACHTYPE = MODELCONVERT/TOMACHTYPE
-			String machtype = chwModelConvert.getTOMACHTYPE();
+			//String machtype = chwModelConvert.getTOMACHTYPE();
 			//ArrayList<HashMap<String, String>> recordArray = getModelConvert(machtype);
 			List<Map<String,String>> MODEL_MACHTYPE_LIST = this.getFromModelToModel(MODEL_MACHTYPE, chwModelConvert.getTOMACHTYPE(),chwMODEL.getPDHDOMAIN());
 			String value_descr ="";

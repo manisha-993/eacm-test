@@ -7,28 +7,15 @@ import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
-import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeMtc;
-import COM.ibm.eannounce.abr.sg.rfc.ChwModelConvert;
 import COM.ibm.eannounce.abr.sg.rfc.ChwModelConvertMtc;
 import COM.ibm.eannounce.abr.sg.rfc.ChwModelConvertUpg;
-import COM.ibm.eannounce.abr.sg.rfc.FEATURE;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.MODELCONVERT;
 import COM.ibm.eannounce.abr.sg.rfc.MTCYMDMFCMaint;
-import COM.ibm.eannounce.abr.sg.rfc.RdhChwFcProd;
-import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
-import COM.ibm.eannounce.abr.sg.rfc.RdhMatmCreate;
-import COM.ibm.eannounce.abr.sg.rfc.RdhTssFcProd;
-import COM.ibm.eannounce.abr.sg.rfc.RdhTssMatChar;
-import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
-import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
-import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
@@ -167,14 +154,20 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				 MTCYMDMFCMaint maint = new MTCYMDMFCMaint(modelconvert);
 				 
 				 this.addDebug("Calling " + maint.getRFCName());
-				 maint.execute();
-				this.addDebug(maint.createLogEntry());
-				if (maint.getRfcrc() == 0) {
-						this.addOutput(maint.getRFCName() + " called successfully!");
-				} else {
-						this.addOutput(maint.getRFCName() + " called  faild!");
-						this.addOutput(maint.getError_text());
-				}
+				 if(maint.getTbl_model().size()>0) {
+					 maint.execute();
+					 this.addDebug(maint.createLogEntry());
+					 if (maint.getRfcrc() == 0) {
+							this.addOutput(maint.getRFCName() + " called successfully!");
+					} else {
+							this.addOutput(maint.getRFCName() + " called  faild!");
+							this.addOutput(maint.getError_text());
+					}
+				 }else {
+					 addOutput("No Tbl_model in the MTCYMDMFCMaint, will not call the RFC");
+				 }
+				 
+				
 			//MTCYMDMFCMa
 			//ChwMachTypeMtc 
 		
