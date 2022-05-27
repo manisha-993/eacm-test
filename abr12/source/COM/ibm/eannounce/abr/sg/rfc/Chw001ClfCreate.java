@@ -109,14 +109,21 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			 */
 			value = "";
 			String var= chwModel.getPRICEDIND().toUpperCase();
-			String var1= chwModel.getZEROPRICE().toUpperCase();
-			if("YES".equals(var) && "YES".equals(var1)){
-				value ="Z";
-			}else if("NO".equals(var) && "NO".equals(var1)){
-				value ="Z";
-			}else if("YES".equals(var) && "NO".equals(var1)){
+//			String var1= chwModel.getZEROPRICE().toUpperCase();
+//			if("YES".equals(var) && "YES".equals(var1)){
+//				value ="Z";
+//			}else if("NO".equals(var) && "NO".equals(var1)){
+//				value ="Z";
+//			}else if("YES".equals(var) && "NO".equals(var1)){
+//				value ="G";
+//			} 
+			//new change on 2022-05-26
+			if("YES".equals(var)){
 				value ="G";
-			} 
+			}else if("NO".equals(var)){
+				value ="Z";
+			}
+			//new change end
 			rdhClassificationMaint.addCharacteristic("MM_PRICERELEVANT", value);
 			//2.f Call the TssClassificationMaint.addCharacteristic() method to add the MM_FG_INSTALLABLE characteristic to the MM_FIELDS classification. 
 			/**
@@ -248,6 +255,12 @@ public class Chw001ClfCreate extends RfcCallerBase{
 				value = chwModel.getACQRCOCD();
 				rdhClassificationMaint.addCharacteristic("MM_ACQ_COMPANY", CommonUtils.getFirstSubString(value, 3));
 			}
+			//2.x move Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_MTM characteristic to the MM_FIELDS classification.
+			//when chwModel.getCATEGORY is service
+			if("Service".equalsIgnoreCase(chwModel.getCATEGORY())){
+				value = materialID;
+				rdhClassificationMaint.addCharacteristic("MM_SP_MTM", CommonUtils.getFirstSubString(value, 7));
+			}			
 			//2.final 
 			rdhClassificationMaint.execute();
 			this.addRfcResult(rdhClassificationMaint);
@@ -448,10 +461,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 					}
 					TssClassificationMaint.addCharacteristic("MM_SP_TARNDTIME", CommonUtils.getFirstSubString(value, 30));					
 				}		
-				//2.x move Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_MTM characteristic to the MM_FIELDS classification.
-				//Change to assign characteristic MM_SP_MTM to class MM_SERVICEPAC
-				value = materialID;
-				TssClassificationMaint.addCharacteristic("MM_SP_MTM", CommonUtils.getFirstSubString(value, 7));
+				
 				
 				TssClassificationMaint.execute();
 				this.addRfcResult(TssClassificationMaint);

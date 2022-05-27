@@ -65,6 +65,9 @@ public class RdhChwFcProd extends RdhBase {
 				rdhChwFcProd_TMF.setModel(tmf.getMODEL());
 				rdhChwFcProd_TMF.setFeatureCode(tmf.getFEATURECODE());
 				rdhChwFcProd_TMF.setFeatureEntityType(tmf.getFEATUREENTITYTYPE());
+				//new change add FeatureEntityId 2022-05-26
+				rdhChwFcProd_TMF.setFeatureEntityId(tmf.getFEATUREENTITYID());
+				//new change end
 				rdhChwFcProd_TMF.setCountry_fc(RfcConfigProperties
 						.getCountry(availabilityElement.getCOUNTRY_FC()));
 				rdhChwFcProd_TMF.setAnnDate(availabilityElement.getANNDATE().replaceAll("-", ""));
@@ -102,7 +105,7 @@ public class RdhChwFcProd extends RdhBase {
 			{
 				if ("1".equals(languageElement.getNLSID()))
 				{
-					rdhChwFcProd_FEATURE.setMktgDesc(languageElement.getMKTGDESC());
+					rdhChwFcProd_FEATURE.setMktgDesc(languageElement.getMKTGNAME());
 				}
 			}
 		}

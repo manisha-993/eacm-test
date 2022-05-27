@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
-
 public class ChwModelConvertMtc extends RfcCallerBase {
 	
 	private MODEL chwMODEL;
@@ -18,7 +16,7 @@ public class ChwModelConvertMtc extends RfcCallerBase {
 	private Connection rdhConnection;
 	private Connection odsConnection;
 	
-	private String MODEL_MACHTYPE = "SELECT DISTINCT t2.ATTRIBUTEVALUE AS MODEL, t3.ATTRIBUTEVALUE AS INVNAME FROM OPICM.flag F "
+	private String MODEL_MACHTYPE = "SELECT DISTINCT SUBSTR(t2.ATTRIBUTEVALUE,1,3) AS MODEL, trim(t3.ATTRIBUTEVALUE) AS INVNAME FROM OPICM.flag F "
 			+ " INNER JOIN opicm.flag t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='MACHTYPEATR' AND T1.ATTRIBUTEVALUE = ? AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP"
 			+ " INNER JOIN opicm.text t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='MODELATR' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP"
 			+ " INNER JOIN opicm.text t3 ON f.ENTITYID =t3.ENTITYID AND f.ENTITYTYPE =t3.ENTITYTYPE AND t3.ATTRIBUTECODE ='INVNAME' AND t3.NLSID =1 AND T3.VALTO > CURRENT  TIMESTAMP AND T3.EFFTO > CURRENT  TIMESTAMP"
@@ -79,8 +77,8 @@ public class ChwModelConvertMtc extends RfcCallerBase {
 			this.addRfcName(chwCharMaintain);
 			//3.b Call ChwCharMaintain.addValue() method to add the MODELCONVERT with its description to the MK_machineType_MTC characteristic.	
 			//Set to MODELCONVERT/FROMMACHTYPE + MODELCONVERT/FROMMODEL + "_" + MODELCONVERT/TOMACHTYPE+MODELCONVERT/TOMODEL
-			String value = chwModelConvert.getFROMMACHTYPE() + chwModelConvert.getFROMMODEL() + "_" + chwModelConvert.getTOMACHTYPE() + chwModelConvert.getTOMODEL();
-			String valdescr = chwModelConvert.getFROMMACHTYPE() + chwModelConvert.getFROMMODEL() + " to " + chwModelConvert.getTOMACHTYPE() + chwModelConvert.getTOMODEL();
+			String value = chwModelConvert.getFROMMACHTYPE().trim() + chwModelConvert.getFROMMODEL().trim() + "_" + chwModelConvert.getTOMACHTYPE().trim() + chwModelConvert.getTOMODEL().trim();
+			String valdescr = chwModelConvert.getFROMMACHTYPE().trim() + chwModelConvert.getFROMMODEL().trim() + " to " + chwModelConvert.getTOMACHTYPE().trim() + chwModelConvert.getTOMODEL().trim();
 			chwCharMaintain.addValue(value, valdescr);
 			chwCharMaintain.execute();
 			this.addRfcResult(chwCharMaintain);
@@ -114,14 +112,14 @@ public class ChwModelConvertMtc extends RfcCallerBase {
 			ChwCharMaintain ChwCharMaintain = 
 			new ChwCharMaintain(
 					obj_id				 				//String obj_id  Set to concatenation of chwProduct.machineType + "MTC"
-					, "MK_T_"+chwModelConvert.getTOMACHTYPE()+"_MTC"	//String charact  Set to  "MK_machineType_MTC" where <machine_type> is chwProduct.machineType
+					, "MK_T_"+chwModelConvert.getTOMACHTYPE()+"_MOD"	//String charact  Set to  "MK_machineType_MTC" where <machine_type> is chwProduct.machineType
 					, "CHAR" 							//String datatype  Set to "CHAR".
 					, 6 								//int charnumber  Set to "15".
 					, empty 		//String decplaces
 					, empty 		//String casesens
 					, empty 		//String neg_vals
 					, empty 		//String group
-					, "-" 			//String valassignm  Set to "-".
+					, "S" 			//String valassignm  Set to "-".
 					, empty 		//String no_entry
 					, empty 		//String no_display
 					, "X" 			//String addit_vals   Set to "X".
@@ -129,7 +127,7 @@ public class ChwModelConvertMtc extends RfcCallerBase {
 					);
 			this.addRfcName(ChwCharMaintain);
 			//4.B For For each MODEL with MODEL/MACHTYPE = MODELCONVERT/TOMACHTYPE
-			String machtype = chwModelConvert.getTOMACHTYPE();
+			//String machtype = chwModelConvert.getTOMACHTYPE();
 			//ArrayList<HashMap<String, String>> recordArray = getModelConvert(machtype);
 			List<Map<String,String>> MODEL_MACHTYPE_LIST = this.getFromModelToModel(MODEL_MACHTYPE, chwModelConvert.getTOMACHTYPE(),chwMODEL.getPDHDOMAIN());
 			String value_descr ="";
@@ -158,7 +156,7 @@ public class ChwModelConvertMtc extends RfcCallerBase {
 			TssClassificationMaint = 
 			new RdhClassificationMaint(
 					obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
-					, "MK_"+chwModelConvert.getTOMACHTYPE()+"_MTC"  //String class_name   Set to  "MK_<machine_type>_MTC" where <machine_type> is chwProduct.machineType
+					, "MK_"+chwModelConvert.getTOMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MTC" where <machine_type> is chwProduct.machineType
 					, "300"  							//String class_type   Set to "300"
 					, "H"
 					);
@@ -232,7 +230,7 @@ public class ChwModelConvertMtc extends RfcCallerBase {
 
 	private List<Map<String,String>> getFromModelToModel(String sql,String type,String pdhdomain) throws SQLException {
 		List<Map<String,String>> fromModelToModelList = new ArrayList<Map<String,String>>();
-		Object[] params = new String[4]; 
+		Object[] params = new String[2]; 
 		params[0] =type;
 		params[1] =pdhdomain;
 		String realSql = CommonUtils.getPreparedSQL(sql, params);

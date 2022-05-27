@@ -1,7 +1,5 @@
 package COM.ibm.eannounce.abr.sg.rfc.entity;
 
-import com.google.gson.annotations.SerializedName;
-
 public class ZYTMDMOTHWARRUPD {
     private String ZWARRID;
     private String ZWARRPRIOD;

@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
-
 public class ChwModelConvertUpg extends RfcCallerBase {
 	
 	private MODEL chwMODEL;
@@ -18,7 +16,7 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 	private Connection rdhConnection;
 	private Connection odsConnection;
 	
-	private String MODEL_MACHTYPE = "SELECT DISTINCT t2.ATTRIBUTEVALUE AS MODEL, t3.ATTRIBUTEVALUE AS INVNAME FROM OPICM.flag F "
+	private String MODEL_MACHTYPE = "SELECT DISTINCT SUBSTR(t2.ATTRIBUTEVALUE,1,3) AS MODEL, trim(t3.ATTRIBUTEVALUE) AS INVNAME FROM OPICM.flag F "
 			+ " INNER JOIN opicm.flag t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='MACHTYPEATR' AND T1.ATTRIBUTEVALUE = ? AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP"
 			+ " INNER JOIN opicm.text t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='MODELATR' AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP"
 			+ " INNER JOIN opicm.text t3 ON f.ENTITYID =t3.ENTITYID AND f.ENTITYTYPE =t3.ENTITYTYPE AND t3.ATTRIBUTECODE ='INVNAME' AND t3.NLSID =1 AND T3.VALTO > CURRENT  TIMESTAMP AND T3.EFFTO > CURRENT  TIMESTAMP"
@@ -130,9 +128,9 @@ public class ChwModelConvertUpg extends RfcCallerBase {
 			this.addRfcName(ChwCharMaintain);
 			//4.c Call the ChwCharMaintain.addValue() method to add the value with its description to the MK_D_machineType_MOD_CONV characteristic
 			//Set to MODELCONVERT/FROMMODEL+"_"+MODELCONVERT/TOMODEL (ex: "E12_E26")
-			value = chwModelConvert.getFROMMODEL() + "_" + chwModelConvert.getTOMODEL();
+			value = chwModelConvert.getFROMMODEL().trim() + "_" + chwModelConvert.getTOMODEL().trim();
 			//Set to "From <MODELCONVERT/TOMACHTYPE> Model <MODELCONVERT/FROMMODEL> to <MODELCONVERT/TOMODEL>"
-			String valdescr = "From " + chwModelConvert.getTOMODELTYPE() + " Model " + chwModelConvert.getFROMMODEL() + " to " + chwModelConvert.getTOMODEL();
+			String valdescr = "From " + chwModelConvert.getTOMODELTYPE().trim() + " Model " + chwModelConvert.getFROMMODEL().trim() + " to " + chwModelConvert.getTOMODEL().trim();
 			ChwCharMaintain.addValue(value, valdescr);
 			this.runRfcCaller(ChwCharMaintain);
 			

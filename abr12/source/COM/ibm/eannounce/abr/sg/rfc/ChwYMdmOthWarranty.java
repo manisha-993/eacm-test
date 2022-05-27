@@ -24,18 +24,23 @@ public class ChwYMdmOthWarranty extends RdhBase {
 	private String MATERIAL_TYPE;
 	
 	public ChwYMdmOthWarranty(WARR chwProduct) {
-		super(chwProduct.getWARRID(),	"RDH_YMDMOTH_WARRANTY".toLowerCase(), null);
+		super(chwProduct.getWARRID(),	"Z_YMDMOTH_WARRANTY".toLowerCase(), null);
 		this.pims_identity = "H";
-		this.MATERIAL_TYPE = "WARR";
+		this.MATERIAL_TYPE = "WARR"; 
 		
 		ZYTMDMOTHWARRUPD ZYTMDMOTHWARRUPD = new ZYTMDMOTHWARRUPD();
 		ZYTMDMOTHWARRUPD.setZWARRID(chwProduct.getWARRID());
-		String WARRPRIOD = chwProduct.getWARRID();
+		String WARRPRIOD = chwProduct.getWARRPRIOD();
 		if("N/A".equals(WARRPRIOD) ||"NA".equals(WARRPRIOD)){
 			ZYTMDMOTHWARRUPD.setZWARRPRIOD("0");
 		}else{
-			//Todo set it to CAST(chwProduct/WARRPRIOD as decimal)
-			ZYTMDMOTHWARRUPD.setZWARRPRIOD(WARRPRIOD);
+			//set it to CAST(chwProduct/WARRPRIOD as decimal)
+			//if WARRPRIOD is not number, return
+			if(CommonUtils.isNumber(WARRPRIOD)) {
+				ZYTMDMOTHWARRUPD.setZWARRPRIOD(WARRPRIOD);
+			}else {
+				return;
+			}
 		}
 		ZYTMDMOTHWARRUPD.setZWARRPRIODUM("MONTH");
 		ZYTMDMOTHWARRUPD.setZWARRTYPE(chwProduct.getWARRTYPE().toUpperCase());
@@ -114,10 +119,10 @@ public class ChwYMdmOthWarranty extends RdhBase {
 				}
 			}
 		}
-		//chwProduct/OEMESAPRTSLBR 
-		ZYTMDMOTHWARRUPD.setZALTWTY1(chwProduct.getOEMESAPRTSLBR());
-		//Copy from chwProduct/OEMESAPRTSONY 
-		ZYTMDMOTHWARRUPD.setZALTWTY2(chwProduct.getOEMESAPRTSONY());
+		//chwProduct/OEMESAPRTSLBR length 10
+		ZYTMDMOTHWARRUPD.setZALTWTY1(CommonUtils.getFirstSubString(chwProduct.getOEMESAPRTSLBR(),10));
+		//Copy from chwProduct/OEMESAPRTSONY  length 10
+		ZYTMDMOTHWARRUPD.setZALTWTY2(CommonUtils.getFirstSubString(chwProduct.getOEMESAPRTSONY(),10));
 		//Copy from chwProduct/TIERMAIN
 		ZYTMDMOTHWARRUPD.setZTIER_MAIN(chwProduct.getTIERMAIN());
 		//Copy from chwProduct/PREDSUPP
@@ -140,7 +145,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 	}
 
 	public ChwYMdmOthWarranty(MODEL chwProduct) {
-		super(chwProduct.getMACHTYPE()+chwProduct.getMODEL(),	"RDH_YMDMOTH_WARRANTY".toLowerCase(), null);
+		super(chwProduct.getMACHTYPE()+chwProduct.getMODEL(),	"Z_YMDMOTH_WARRANTY".toLowerCase(), null);
 		this.pims_identity = "H";
 		this.MATERIAL_TYPE = "MODEL";
 		ZYTMDMOTHWARRMOD zYTMDMOTHWARRMOD = new ZYTMDMOTHWARRMOD();
@@ -267,7 +272,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 	}
 	
 	public ChwYMdmOthWarranty(TMF_UPDATE chwProduct) {
-		super(chwProduct.getMACHTYPE()+chwProduct.getFEATURECODE(), "RDH_YMDMOTH_WARRANTY".toLowerCase(), null);
+		super(chwProduct.getMACHTYPE()+chwProduct.getFEATURECODE(), "Z_YMDMOTH_WARRANTY".toLowerCase(), null);
 		this.pims_identity = "H";
 		this.MATERIAL_TYPE = "TMF";
 		//If no <WARRELEMENT> found
@@ -288,8 +293,8 @@ public class ChwYMdmOthWarranty extends RdhBase {
 			}
 			ZYTMDMOTHWARRTMF.setZCOUNTRY("");
 			ZYTMDMOTHWARRTMF.setZWRTYID("");
-			ZYTMDMOTHWARRTMF.setZPUBFROM("0000/00/00");
-			ZYTMDMOTHWARRTMF.setZPUBTO("0000/00/00");
+			ZYTMDMOTHWARRTMF.setZPUBFROM("00000000");
+			ZYTMDMOTHWARRTMF.setZPUBTO("00000000");
 			ZYTMDMOTHWARRTMF.setZWARR_FLAG("");
 			ZYTMDMOTHWARRTMF.setZCOUNTRY_FLAG("");
 			ZYTMDMOTHWARRTMF_LIST.add(ZYTMDMOTHWARRTMF);
@@ -431,7 +436,33 @@ public class ChwYMdmOthWarranty extends RdhBase {
 	}
 
 	@Override
-	protected boolean isReadyToExecute() {
+	protected boolean isReadyToExecute() {		
 		return true;
 	}
+
+	public List<ZYTMDMOTHWARRUPD> getZYTMDMOTHWARRUPD_LIST() {
+		return ZYTMDMOTHWARRUPD_LIST;
+	}
+
+	public void setZYTMDMOTHWARRUPD_LIST(List<ZYTMDMOTHWARRUPD> zYTMDMOTHWARRUPD_LIST) {
+		ZYTMDMOTHWARRUPD_LIST = zYTMDMOTHWARRUPD_LIST;
+	}
+
+	public List<ZYTMDMOTHWARRMOD> getZYTMDMOTHWARRMOD_LIST() {
+		return ZYTMDMOTHWARRMOD_LIST;
+	}
+
+	public void setZYTMDMOTHWARRMOD_LIST(List<ZYTMDMOTHWARRMOD> zYTMDMOTHWARRMOD_LIST) {
+		ZYTMDMOTHWARRMOD_LIST = zYTMDMOTHWARRMOD_LIST;
+	}
+
+	public List<ZYTMDMOTHWARRTMF> getZYTMDMOTHWARRTMF_LIST() {
+		return ZYTMDMOTHWARRTMF_LIST;
+	}
+
+	public void setZYTMDMOTHWARRTMF_LIST(List<ZYTMDMOTHWARRTMF> zYTMDMOTHWARRTMF_LIST) {
+		ZYTMDMOTHWARRTMF_LIST = zYTMDMOTHWARRTMF_LIST;
+	}
+	
+	
 }

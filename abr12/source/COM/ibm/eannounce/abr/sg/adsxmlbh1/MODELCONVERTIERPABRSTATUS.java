@@ -7,28 +7,15 @@ import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
-import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeMtc;
-import COM.ibm.eannounce.abr.sg.rfc.ChwModelConvert;
 import COM.ibm.eannounce.abr.sg.rfc.ChwModelConvertMtc;
 import COM.ibm.eannounce.abr.sg.rfc.ChwModelConvertUpg;
-import COM.ibm.eannounce.abr.sg.rfc.FEATURE;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.MODELCONVERT;
 import COM.ibm.eannounce.abr.sg.rfc.MTCYMDMFCMaint;
-import COM.ibm.eannounce.abr.sg.rfc.RdhChwFcProd;
-import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
-import COM.ibm.eannounce.abr.sg.rfc.RdhMatmCreate;
-import COM.ibm.eannounce.abr.sg.rfc.RdhTssFcProd;
-import COM.ibm.eannounce.abr.sg.rfc.RdhTssMatChar;
-import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
-import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
-import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
@@ -134,19 +121,24 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				String modelXML = getModelFromXML(modelconvert.getTOMACHTYPE(), modelconvert.getTOMODEL(), connection);
 					//addOutput("MODEL xml:"+convertToHTML(modelXML));
 				if(modelXML==null) {
-					throw new RuntimeException("MODEL xml not found in cache fro MODEL:"+modelconvert.getTOMODEL()+" MACHTYPE:"+modelconvert.getTOMACHTYPE());
+					this.addOutput("MODEL xml not found in cache fro MODEL:"+modelconvert.getTOMODEL()+" MACHTYPE:"+modelconvert.getTOMACHTYPE());
+					return;
 				}
 				MODEL model = XMLParse.getObjectFromXml(modelXML,MODEL.class );
 				//addDebug("Model:"+model);
-				 if (modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())) {
-					 ChwModelConvertUpg mUpg = new ChwModelConvertUpg(model,modelconvert,m_db.getPDHConnection(),connection);
-					 try{
-						 mUpg.execute();
-							addOutput(mUpg.getRptSb().toString());
-					 }catch (Exception e) {
+				if(model==null){
+					this.addOutput("Not find the Model with the modelxml");
+					return;
+				}
+				if (modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())) {
+					ChwModelConvertUpg mUpg = new ChwModelConvertUpg(model,modelconvert,m_db.getPDHConnection(),connection);
+					try{
+						mUpg.execute();
+						addOutput(mUpg.getRptSb().toString());
+					}catch (Exception e) {
 						// TODO: handle exception
-						 addError(mUpg.getRptSb().toString());
-						 throw e;
+						addError(mUpg.getRptSb().toString());
+						throw e;
 					} 
 				}else {					 
 					ChwModelConvertMtc mtc = new ChwModelConvertMtc(model,modelconvert,m_db.getPDHConnection(),connection);
@@ -155,21 +147,27 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 					    addOutput(mtc.getRptSb().toString());
 					} catch (Exception e) {
 						// TODO: handle exception
-						 addError(mtc.getRptSb().toString());
+						addError(mtc.getRptSb().toString());
 						throw e;
 					} 
 				}
 				 MTCYMDMFCMaint maint = new MTCYMDMFCMaint(modelconvert);
 				 
 				 this.addDebug("Calling " + maint.getRFCName());
-				 maint.execute();
-				this.addDebug(maint.createLogEntry());
-				if (maint.getRfcrc() == 0) {
-						this.addOutput(maint.getRFCName() + " called successfully!");
-				} else {
-						this.addOutput(maint.getRFCName() + " called  faild!");
-						this.addOutput(maint.getError_text());
-				}
+				 if(maint.getTbl_model().size()>0) {
+					 maint.execute();
+					 this.addDebug(maint.createLogEntry());
+					 if (maint.getRfcrc() == 0) {
+							this.addOutput(maint.getRFCName() + " called successfully!");
+					} else {
+							this.addOutput(maint.getRFCName() + " called  faild!");
+							this.addOutput(maint.getError_text());
+					}
+				 }else {
+					 addOutput("No Tbl_model in the MTCYMDMFCMaint, will not call the RFC");
+				 }
+				 
+				
 			//MTCYMDMFCMa
 			//ChwMachTypeMtc 
 		
@@ -258,13 +256,14 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 	    			+ " and  XMLENTITYTYPE = 'MODEL'"
 	    			+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
 	    			+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\" and MODEL/text() =\""+TOMODEL+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")" 
-	                + " FETCH FIRST 1 ROWS ONLY with ur";		
+	                + " FETCH FIRST 1 ROWS ONLY with ur";	
+	    	addDebug("getModelFromXML cacheSql" + cacheSql);
 			PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
 			ResultSet resultSet = statement.executeQuery();
 			String xml = "";
 			if (resultSet.next()) {
 				xml = resultSet.getString("XMLMESSAGE");
-				addDebug("getModelFromXML xml=" + xml);		
+				addDebug("getModelFromXML xml");		
 			}
 			return xml;
 		}
