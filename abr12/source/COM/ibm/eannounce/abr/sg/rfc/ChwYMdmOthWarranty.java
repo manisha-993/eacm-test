@@ -9,6 +9,7 @@ import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
 import COM.ibm.eannounce.abr.sg.rfc.entity.ZYTMDMOTHWARRMOD;
 import COM.ibm.eannounce.abr.sg.rfc.entity.ZYTMDMOTHWARRTMF;
 import COM.ibm.eannounce.abr.sg.rfc.entity.ZYTMDMOTHWARRUPD;
+import COM.ibm.eannounce.abr.util.RfcConfigProperties;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -184,7 +185,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 							where G.GENAREANAME_FC = chwProduct/WARRLIST/WARRELEMENT/COUNTRYLIST/COUNTRYELEMENT/COUNTRY_FC.
 						 */
 						String COUNTRY_FC = country.getCOUNTRY_FC();					
-						zyTMDMOTHWARRMOD.setZCOUNTRY(COUNTRY_FC);
+						zyTMDMOTHWARRMOD.setZCOUNTRY(RfcConfigProperties.getCountry(COUNTRY_FC));
 						//Copy from chwProduct/WARRLIST/WARRELEMENT/WARRID
 						zyTMDMOTHWARRMOD.setZWRTYID(WARRELEMENT.getWARRID());
 						//If chwProduct/WARRLIST/WARRELEMENT/PUBFROM is null, then 
@@ -192,7 +193,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 						// Else set it to chwProduct/WARRLIST/WARRELEMENT/PUBFROM. (Format as YYYYMMDD)
 						String ZPUBFROM ="";
 						String sPUBFROM = WARRELEMENT.getPUBFROM();
-						if(sPUBFROM==null){
+						if(sPUBFROM==null || "".equals(sPUBFROM)){
 							ZPUBFROM="19800101";
 						}else{
 							ZPUBFROM = sPUBFROM.replaceAll("-", "");
@@ -203,7 +204,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 						// Else set it to chwProduct/WARRLIST/WARRELEMENT/PUBTO. (Format as YYYYMMDD)
 						String ZPUBTO ="";
 						String sPUBTO = WARRELEMENT.getPUBTO();
-						if(sPUBTO==null){
+						if(sPUBTO==null || "".equals(sPUBTO)){
 							ZPUBTO="99991231";
 						}else{
 							ZPUBTO = sPUBTO.replaceAll("-", "");
@@ -247,7 +248,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		// Else set it to chwProduct/WARRLIST/WARRELEMENT/PUBFROM. (Format as YYYYMMDD)
 		String ZPUBFROM ="";
 		String sPUBFROM = WARRELEMENT.getPUBFROM();
-		if(sPUBFROM==null){
+		if(sPUBFROM==null || "".equals(sPUBFROM)){
 			ZPUBFROM="19800101";
 		}else{
 			ZPUBFROM = sPUBFROM.replaceAll("-", "");
@@ -258,7 +259,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		// Else set it to chwProduct/WARRLIST/WARRELEMENT/PUBTO. (Format as YYYYMMDD)
 		String ZPUBTO ="";
 		String sPUBTO = WARRELEMENT.getPUBTO();
-		if(sPUBTO==null){
+		if(sPUBTO==null || "".equals(sPUBTO)){
 			ZPUBTO="99991231";
 		}else{
 			ZPUBTO = sPUBTO.replaceAll("-", "");
@@ -330,7 +331,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 						 */
 						String ZPUBFROM ="";
 						String sPUBFROM = WARRELEMENT.getPUBFROM();
-						if(sPUBFROM==null){
+						if(sPUBFROM==null || "".equals(sPUBFROM)){
 							ZPUBFROM="19800101";
 						}else{
 							ZPUBFROM = sPUBFROM.replaceAll("-", "");
@@ -343,7 +344,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 						 */
 						String ZPUBTO ="";
 						String sPUBTO = WARRELEMENT.getPUBTO();
-						if(sPUBTO==null){
+						if(sPUBTO==null || "".equals(sPUBTO)){
 							ZPUBTO="99991231";
 						}else{
 							ZPUBTO = sPUBTO.replaceAll("-", "");
@@ -380,9 +381,9 @@ public class ChwYMdmOthWarranty extends RdhBase {
 						if("WTY0000".equalsIgnoreCase(WARRELEMENT.getWARRID())){
 							ZCOUNTRY = "";
 						}else{
-							ZCOUNTRY = country.getCOUNTRY_FC();
+							ZCOUNTRY = country.getCOUNTRY_FC(); 
 						}
-						ZYTMDMOTHWARRTMF.setZCOUNTRY(ZCOUNTRY);
+						ZYTMDMOTHWARRTMF.setZCOUNTRY(RfcConfigProperties.getCountry(ZCOUNTRY));
 						//Copy from chwProduct/WARRLIST/WARRELEMENT/WARRID
 						ZYTMDMOTHWARRTMF.setZWRTYID(WARRELEMENT.getWARRID());
 						/**
@@ -392,7 +393,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 						 */
 						String ZPUBFROM ="";
 						String sPUBFROM = WARRELEMENT.getPUBFROM();
-						if(sPUBFROM==null){
+						if(sPUBFROM==null || "".equals(sPUBFROM)){
 							ZPUBFROM="19800101";
 						}else{
 							ZPUBFROM = sPUBFROM.replaceAll("-", "");
@@ -405,7 +406,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 						 */
 						String ZPUBTO ="";
 						String sPUBTO = WARRELEMENT.getPUBTO();
-						if(sPUBTO==null){
+						if(sPUBTO==null || "".equals(sPUBTO)){
 							ZPUBTO="99991231";
 						}else{
 							ZPUBTO = sPUBTO.replaceAll("-", "");

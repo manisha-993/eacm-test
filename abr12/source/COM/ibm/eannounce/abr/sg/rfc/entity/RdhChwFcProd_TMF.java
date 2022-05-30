@@ -45,6 +45,8 @@ public class RdhChwFcProd_TMF {
     private String orderCode;
     @SerializedName("SYSTEMMAX")
     private String systemMax;
+    @SerializedName("RETURNEDPARTS")
+    private String returnedParts;
     
 	public String getMachType() {
 		return machType;
@@ -172,4 +174,11 @@ public class RdhChwFcProd_TMF {
 	public void setSystemMax(String systemMax) {
 		this.systemMax = systemMax;
 	}
+	public String getReturnedParts() {
+		return returnedParts;
+	}
+	public void setReturnedParts(String returnedParts) {
+		this.returnedParts = returnedParts;
+	}
+	
 }

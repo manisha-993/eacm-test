@@ -85,6 +85,8 @@ public class RdhChwFcProd extends RdhBase {
 				rdhChwFcProd_TMF.setBulkMesIndc(CommonUtils.getFirstSubString(tmf.getBULKMESINDC(),1));
 				rdhChwFcProd_TMF.setOrderCode(tmf.getORDERCODE());
 				rdhChwFcProd_TMF.setSystemMax(tmf.getSYSTEMMAX());
+				//EACM-6613 add returnedParts		Char	1		TMF_UPDATE/ RETURNEDPARTS
+				rdhChwFcProd_TMF.setReturnedParts(CommonUtils.getFirstSubString(tmf.getRETURNEDPARTS(),1));
 				tbl_tmf_c.add(rdhChwFcProd_TMF);
 			}
 		}
