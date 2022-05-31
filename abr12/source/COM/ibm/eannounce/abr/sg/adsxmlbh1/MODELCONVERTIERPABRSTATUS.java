@@ -153,6 +153,11 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 						addError(mUpg.getRptSb().toString());
 						throw e;
 					} 
+					// Call UpdateParkStatus
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", modelconvert.getTOMACHTYPE() + "UPG");
+					this.addDebug("Calling "+updateParkStatus.getRFCName());
+					updateParkStatus.execute();
+					this.addDebug(updateParkStatus.createLogEntry());
 				}else {					 
 					ChwModelConvertMtc mtc = new ChwModelConvertMtc(model,modelconvert,m_db.getPDHConnection(),connection);
 					try {
@@ -163,6 +168,11 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 						addError(mtc.getRptSb().toString());
 						throw e;
 					} 
+					// Call UpdateParkStatus
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", modelconvert.getTOMACHTYPE() + "MTC");
+					this.addDebug("Calling "+updateParkStatus.getRFCName());
+					updateParkStatus.execute();
+					this.addDebug(updateParkStatus.createLogEntry());
 				}
 				 MTCYMDMFCMaint maint = new MTCYMDMFCMaint(modelconvert);
 				 

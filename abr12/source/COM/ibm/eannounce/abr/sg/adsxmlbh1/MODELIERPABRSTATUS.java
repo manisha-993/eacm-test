@@ -25,6 +25,7 @@ import COM.ibm.eannounce.abr.sg.rfc.RdhChwFcProd;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.RdhSvcMatmCreate;
 import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
+import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
 import COM.ibm.eannounce.abr.util.EACustom;
@@ -179,6 +180,11 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 							this.addMsg(chwMachTypeMtc.getRptSb());
 							throw e;
 						}
+						// Call UpdateParkStatus
+						UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "MTC");
+						this.addDebug("Calling "+updateParkStatus.getRFCName());
+						updateParkStatus.execute();
+						this.addDebug(updateParkStatus.createLogEntry());
 					}
 					//step d
 					
@@ -194,6 +200,11 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 								this.addMsg(chwMachTypeUpg.getRptSb());
 								throw e;
 							}
+							// Call UpdateParkStatus
+							UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "MTC");
+							this.addDebug("Calling "+updateParkStatus.getRFCName());
+							updateParkStatus.execute();
+							this.addDebug(updateParkStatus.createLogEntry());
 						}else if(model.getORDERCODE()!=null&&model.getORDERCODE().trim().length()>0&&CommonUtils.contains("M,B",model.getORDERCODE())) {
 							this.addDebug("Calling " + "processMachTypeUpg");
 							processMachTypeUpg(model, connection);	
@@ -642,7 +653,11 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		 //ChwDepdMaintain 
 		
 		
-		
+		//5 Call UpdateParkStatus
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + model.getMODEL());
+		this.addDebug("Calling "+updateParkStatus.getRFCName());
+		updateParkStatus.execute();
+		this.addDebug(updateParkStatus.createLogEntry());
     	
     }
     public void processMachTypeNew(MODEL model,Connection odsConnection) throws Exception {
@@ -759,6 +774,12 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		ChwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", empty);  //Set to "PR_E2E_PRICING_HW"		
 		runRfcCaller(ChwConpMaintain);
 		
+		//8 Call UpdateParkStatus
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "NEW");
+		this.addDebug("Calling "+updateParkStatus.getRFCName());
+		updateParkStatus.execute();
+		this.addDebug(updateParkStatus.createLogEntry());
+		
     }
     
     public void processMachTypeUpg(MODEL model,Connection odsConnection) throws Exception {
@@ -848,6 +869,12 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		chwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", "");
 		runRfcCaller(chwConpMaintain);
 		
+		// Call UpdateParkStatus
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "UPG");
+		this.addDebug("Calling "+updateParkStatus.getRFCName());
+		updateParkStatus.execute();
+		this.addDebug(updateParkStatus.createLogEntry());
+		
     }
     public void processMachTypeMODEL_Svc(MODEL model,Connection odsConnection) throws Exception {
     	String materialType = "ZPRT";
@@ -868,7 +895,12 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addMsg(chw001ClfCreate.getRptSb());
 			throw e;
 		}
-    	
+		
+		// Call UpdateParkStatus	
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + model.getMODEL());
+		this.addDebug("Calling "+updateParkStatus.getRFCName());
+		updateParkStatus.execute();
+		this.addDebug(updateParkStatus.createLogEntry());  	
     	
     }
     

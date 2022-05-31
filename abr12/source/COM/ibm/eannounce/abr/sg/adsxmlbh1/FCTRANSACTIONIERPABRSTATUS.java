@@ -26,6 +26,7 @@ import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
+import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
@@ -361,7 +362,13 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					this.runRfcCaller(caller);
 				}				
 
+				// Call UpdateParkStatus
+				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", fctransaction.getTOMACHTYPE()+"UPG");
+				this.addDebug("Calling "+updateParkStatus.getRFCName());
+				updateParkStatus.execute();
+				this.addDebug(updateParkStatus.createLogEntry());
 			}	
+			
 			
 			// exeFtpShell(ffPathName);
 			// ftpFile();

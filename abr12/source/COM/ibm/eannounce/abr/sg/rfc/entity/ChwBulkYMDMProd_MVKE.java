@@ -10,11 +10,11 @@ public class ChwBulkYMDMProd_MVKE {
     private String modelEntityid;
     @SerializedName("COUNTRY_FC")
     private String country_fc;
-    @SerializedName("SALES_ORG")
+    @SerializedName("SLEORG")
     private String sleorg;
-    @SerializedName("PLNT_CD")
+    @SerializedName("PLNTCD")
     private String plntCd;
-    @SerializedName("DEL_PLNT")
+    @SerializedName("PLNTDEL")
     private String plntDel;
 
     public String getModelEntitytype() {
