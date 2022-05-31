@@ -66,9 +66,7 @@ public class ZYTMDMOTHWARRTMF {
 	}
 	public void setZCOUNTRY_FLAG(String zCOUNTRY_FLAG) {
 		ZCOUNTRY_FLAG = zCOUNTRY_FLAG;
-	}
-    
-    
+	}   
     
     
     

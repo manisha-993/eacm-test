@@ -446,6 +446,8 @@ class WARRELEMENT_TMF {
 	private String PUBTO;
 	@XmlElement(name = "DEFWARR")
 	private String DEFWARR;
+	@XmlElement(name = "WARRSVCCOVR")
+	private String WARRSVCCOVR;
 	
 	@XmlElementWrapper(name = "COUNTRYLIST")
 	@XmlElement(name = "COUNTRYELEMENT")
@@ -475,6 +477,10 @@ class WARRELEMENT_TMF {
 	public List<COUNTRYELEMENT_TMF> getCOUNTRYLIST() {
 		return COUNTRYLIST;
 	}
+	public String getWARRSVCCOVR() {
+		return WARRSVCCOVR;
+	}
+	
 }
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)

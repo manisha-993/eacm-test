@@ -150,6 +150,7 @@ public class ZYTMDMOTHWARRUPD {
 	public void setZTECHADVISOR(String zTECHADVISOR) {
 		ZTECHADVISOR = zTECHADVISOR;
 	}
+	
 	public String getZSVC1() {
 		return ZSVC1;
 	}
