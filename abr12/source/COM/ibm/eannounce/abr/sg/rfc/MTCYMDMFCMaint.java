@@ -18,25 +18,27 @@ public class MTCYMDMFCMaint extends RdhBase{
         this.pims_identity = "H";
 
         if (modelconvert.getAVAILABILITYLIST()!=null && !modelconvert.getAVAILABILITYLIST().isEmpty()) {
-            for (AVAILABILITYELEMENT avail: modelconvert.getAVAILABILITYLIST().get(0).getAVAILABILITYELEMENT()) {
-            	MTCYMDMFCMaint_Model model = new MTCYMDMFCMaint_Model();
-                model.setModelEntitytype(modelconvert.getMODELUPGRADEENTITYTYPE());
-                model.setModelEntityid(modelconvert.getMODELUPGRADEENTITYID());
-                model.setFromMachtype(modelconvert.getFROMMACHTYPE());
-                model.setToMachtype(modelconvert.getTOMACHTYPE());
-                model.setCountry_fc(RfcConfigProperties
-                        .getCountry(avail.getCOUNTRY_FC()));
-                model.setAvailAction(avail.getAVAILABILITYACTION());
-                model.setAnnDate(getDate(avail.getANNDATE()));
-                model.setFirstOrder(getDate(avail.getFIRSTORDER()));
-                model.setPlanAvail(getDate(avail.getPLANNEDAVAILABILITY()));
-                model.setPubFrom(getDate(avail.getPUBFROM()));
-                model.setPubTo(getDate(avail.getPUBTO()));
-                model.setWdAnndate(getDate(avail.getWDANNDATE()));
-                model.setLastOrder(getDate(avail.getLASTORDER()));
-
-                tbl_model.add(model);
-            }
+        	if(modelconvert.getAVAILABILITYLIST().get(0).getAVAILABILITYELEMENT()!=null) {
+	            for (AVAILABILITYELEMENT avail: modelconvert.getAVAILABILITYLIST().get(0).getAVAILABILITYELEMENT()) {
+	            	MTCYMDMFCMaint_Model model = new MTCYMDMFCMaint_Model();
+	                model.setModelEntitytype(modelconvert.getMODELUPGRADEENTITYTYPE());
+	                model.setModelEntityid(modelconvert.getMODELUPGRADEENTITYID());
+	                model.setFromMachtype(modelconvert.getFROMMACHTYPE());
+	                model.setToMachtype(modelconvert.getTOMACHTYPE());
+	                model.setCountry_fc(RfcConfigProperties
+	                        .getCountry(avail.getCOUNTRY_FC()));
+	                model.setAvailAction(avail.getAVAILABILITYACTION());
+	                model.setAnnDate(getDate(avail.getANNDATE()));
+	                model.setFirstOrder(getDate(avail.getFIRSTORDER()));
+	                model.setPlanAvail(getDate(avail.getPLANNEDAVAILABILITY()));
+	                model.setPubFrom(getDate(avail.getPUBFROM()));
+	                model.setPubTo(getDate(avail.getPUBTO()));
+	                model.setWdAnndate(getDate(avail.getWDANNDATE()));
+	                model.setLastOrder(getDate(avail.getLASTORDER()));
+	
+	                tbl_model.add(model);
+	            }
+        	}
         }
     }
     public String getDate(String date) {
@@ -56,6 +58,14 @@ public class MTCYMDMFCMaint extends RdhBase{
     protected boolean isReadyToExecute() {
         return true;
     }
+	public List<MTCYMDMFCMaint_Model> getTbl_model() {
+		return tbl_model;
+	}
+	public void setTbl_model(List<MTCYMDMFCMaint_Model> tbl_model) {
+		this.tbl_model = tbl_model;
+	}
+    
+    
 
 }
 

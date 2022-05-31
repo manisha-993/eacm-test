@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
-
 public class ChwModelConvertUpg extends RfcCallerBase {
 	
 	private MODEL chwMODEL;

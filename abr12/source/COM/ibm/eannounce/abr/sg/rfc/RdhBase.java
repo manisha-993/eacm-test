@@ -145,7 +145,7 @@ public abstract class RdhBase
      * @return
      * @throws Exception 
      */
-    protected String generateJson() throws Exception
+    public String generateJson() throws Exception
     {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.setExclusionStrategies(new RdhExclusionStrategy()).registerTypeAdapterFactory(new NullStringToEmptyAdapterFactory()).disableHtmlEscaping().create();

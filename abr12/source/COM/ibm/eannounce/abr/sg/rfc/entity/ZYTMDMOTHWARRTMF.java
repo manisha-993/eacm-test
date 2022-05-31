@@ -1,7 +1,5 @@
 package COM.ibm.eannounce.abr.sg.rfc.entity;
 
-import com.google.gson.annotations.SerializedName;
-
 public class ZYTMDMOTHWARRTMF {
     private String ZMACHTYP;
     private String ZFEATURECODE;
@@ -68,9 +66,7 @@ public class ZYTMDMOTHWARRTMF {
 	}
 	public void setZCOUNTRY_FLAG(String zCOUNTRY_FLAG) {
 		ZCOUNTRY_FLAG = zCOUNTRY_FLAG;
-	}
-    
-    
+	}   
     
     
     

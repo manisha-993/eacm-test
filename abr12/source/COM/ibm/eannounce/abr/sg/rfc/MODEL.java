@@ -440,6 +440,8 @@ class WARRELEMENTTYPE {
 	private String PUBTO;
 	@XmlElement(name = "DEFWARR")
 	private String DEFWARR;
+	@XmlElement(name = "WARRSVCCOVR")
+	private String WARRSVCCOVR;
 	
 	@XmlElementWrapper(name = "COUNTRYLIST")
 	@XmlElement(name = "COUNTRYELEMENT")
@@ -500,6 +502,14 @@ class WARRELEMENTTYPE {
 	public void setCOUNTRYLIST(List<COUNTRY> cOUNTRYLIST) {
 		COUNTRYLIST = cOUNTRYLIST;
 	}
+	public String getWARRSVCCOVR() {
+		return WARRSVCCOVR;
+	}
+	public void setWARRSVCCOVR(String wARRSVCCOVR) {
+		WARRSVCCOVR = wARRSVCCOVR;
+	}
+	
+	
 	
 	
 	

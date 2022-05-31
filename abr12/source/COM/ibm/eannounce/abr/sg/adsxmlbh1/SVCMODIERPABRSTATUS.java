@@ -246,7 +246,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 					 * this.addOutput(cMaint.getRFCName() + " called  faild!");
 					 * this.addOutput(cMaint.getError_text()); }
 					 */
-					if (svcmod.hasProds()) {
+					/*if (svcmod.hasProds()) {
 						RdhTssMatChar chart = new RdhTssMatChar(svcmod);
 						this.addDebug("Calling " + chart.getRFCName());
 						chart.execute();
@@ -259,7 +259,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 							this.addOutput(chart.getError_text());
 						}
 					}
-			
+			*/
 				
 				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_TSS_IERP", svcmod.getMACHTYPE() + svcmod.getMODEL());
 				this.addDebug("Calling "+updateParkStatus.getRFCName());
@@ -276,7 +276,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 				this.addDebug("Check if RdhTssFcProd can run:");
 				
 				
-				RdhTssFcProd rdhTssFcProd = new RdhTssFcProd(svcmod);
+			/*	RdhTssFcProd rdhTssFcProd = new RdhTssFcProd(svcmod);
 				this.addDebug("Can run:"+rdhTssFcProd.canRun());
 				if(rdhTssFcProd.canRun()) {
 				this.addDebug("Calling "+rdhTssFcProd.getRFCName());
@@ -293,7 +293,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 				}else {
 					this.addDebug("skip "+rdhTssFcProd.getRFCName());
 					
-				}
+				}*/
 			} else {
 				this.addOutput("XML file not exist in cache,RFC caller not called!");
 				//return;

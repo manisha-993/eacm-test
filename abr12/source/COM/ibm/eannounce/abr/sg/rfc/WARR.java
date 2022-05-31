@@ -294,7 +294,7 @@ public class WARR {
 
 	@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 	@XmlAccessorType(XmlAccessType.FIELD)
-	class LANGUAGEELEMENT_WARR {
+	static class LANGUAGEELEMENT_WARR {
 		@XmlElement(name = "NLSID")
 		private String NLSID;
 		@XmlElement(name = "INVNAME")

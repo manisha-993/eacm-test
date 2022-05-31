@@ -11,6 +11,8 @@ public class RdhChwFcProd_TMF {
     private String featureCode;
     @SerializedName("FEATUREENTITYTYPE")
     private String featureEntityType;
+    @SerializedName("FEATUREENTITYID")
+    private String featureEntityId;
     @SerializedName("COUNTRY_FC")
     private String country_fc;
     @SerializedName("ANNDATE")
@@ -43,6 +45,8 @@ public class RdhChwFcProd_TMF {
     private String orderCode;
     @SerializedName("SYSTEMMAX")
     private String systemMax;
+    @SerializedName("RETURNEDPARTS")
+    private String returnedParts;
     
 	public String getMachType() {
 		return machType;
@@ -115,6 +119,12 @@ public class RdhChwFcProd_TMF {
 	}
 	public void setFeatureEntityType(String featureEntityType) {
 		this.featureEntityType = featureEntityType;
+	}	
+	public String getFeatureEntityId() {
+		return featureEntityId;
+	}
+	public void setFeatureEntityId(String featureEntityId) {
+		this.featureEntityId = featureEntityId;
 	}
 	public void setCountry_fc(String country_fc) {
 		this.country_fc = country_fc;
@@ -164,4 +174,11 @@ public class RdhChwFcProd_TMF {
 	public void setSystemMax(String systemMax) {
 		this.systemMax = systemMax;
 	}
+	public String getReturnedParts() {
+		return returnedParts;
+	}
+	public void setReturnedParts(String returnedParts) {
+		this.returnedParts = returnedParts;
+	}
+	
 }

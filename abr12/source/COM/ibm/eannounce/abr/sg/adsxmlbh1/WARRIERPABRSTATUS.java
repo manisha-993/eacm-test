@@ -109,12 +109,18 @@ public class WARRIERPABRSTATUS extends PokBaseABR {
 				xml = resultSet.getString("XMLMESSAGE");
 			}
 			if (xml != null) {
-			
+				addDebug("WARR XMLParse xml");
 				WARR warr = XMLParse.getObjectFromXml(xml,WARR.class);
 				//step1 Call ChwYMdmOthWarranty to populate iERP custom tables with warranty master data by setting the input parameter for ZYTMDMOTHWARRUPD structure.
 				//call ChwYMdmOthWarranty	
+				addDebug("Start to call chwYMdmOthWarranty");
 				ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(warr);
-				this.runRfcCaller(chwYMdmOthWarranty);
+				if(chwYMdmOthWarranty.getZYTMDMOTHWARRUPD_LIST().size()>0) {
+					this.runRfcCaller(chwYMdmOthWarranty);
+				}else {
+					addOutput("WARRPRIOD must be Number in the WARR_UPDATE entity, please fix the Data and resend it.");
+				}				
+				addDebug("End to call chwYMdmOthWarranty");
 			}	
 		} catch (Exception e) {
 			e.printStackTrace();

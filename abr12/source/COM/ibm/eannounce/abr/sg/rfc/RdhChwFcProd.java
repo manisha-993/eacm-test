@@ -65,6 +65,9 @@ public class RdhChwFcProd extends RdhBase {
 				rdhChwFcProd_TMF.setModel(tmf.getMODEL());
 				rdhChwFcProd_TMF.setFeatureCode(tmf.getFEATURECODE());
 				rdhChwFcProd_TMF.setFeatureEntityType(tmf.getFEATUREENTITYTYPE());
+				//new change add FeatureEntityId 2022-05-26
+				rdhChwFcProd_TMF.setFeatureEntityId(tmf.getFEATUREENTITYID());
+				//new change end
 				rdhChwFcProd_TMF.setCountry_fc(RfcConfigProperties
 						.getCountry(availabilityElement.getCOUNTRY_FC()));
 				rdhChwFcProd_TMF.setAnnDate(availabilityElement.getANNDATE().replaceAll("-", ""));
@@ -82,6 +85,8 @@ public class RdhChwFcProd extends RdhBase {
 				rdhChwFcProd_TMF.setBulkMesIndc(CommonUtils.getFirstSubString(tmf.getBULKMESINDC(),1));
 				rdhChwFcProd_TMF.setOrderCode(tmf.getORDERCODE());
 				rdhChwFcProd_TMF.setSystemMax(tmf.getSYSTEMMAX());
+				//EACM-6613 add returnedParts		Char	1		TMF_UPDATE/ RETURNEDPARTS
+				rdhChwFcProd_TMF.setReturnedParts(CommonUtils.getFirstSubString(tmf.getRETURNEDPARTS(),1));
 				tbl_tmf_c.add(rdhChwFcProd_TMF);
 			}
 		}
@@ -102,7 +107,7 @@ public class RdhChwFcProd extends RdhBase {
 			{
 				if ("1".equals(languageElement.getNLSID()))
 				{
-					rdhChwFcProd_FEATURE.setMktgDesc(languageElement.getMKTGDESC());
+					rdhChwFcProd_FEATURE.setMktgDesc(languageElement.getMKTGNAME());
 				}
 			}
 		}

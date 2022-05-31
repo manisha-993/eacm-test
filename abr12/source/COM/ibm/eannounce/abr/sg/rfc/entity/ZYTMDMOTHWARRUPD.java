@@ -1,7 +1,5 @@
 package COM.ibm.eannounce.abr.sg.rfc.entity;
 
-import com.google.gson.annotations.SerializedName;
-
 public class ZYTMDMOTHWARRUPD {
     private String ZWARRID;
     private String ZWARRPRIOD;
@@ -152,6 +150,7 @@ public class ZYTMDMOTHWARRUPD {
 	public void setZTECHADVISOR(String zTECHADVISOR) {
 		ZTECHADVISOR = zTECHADVISOR;
 	}
+	
 	public String getZSVC1() {
 		return ZSVC1;
 	}
