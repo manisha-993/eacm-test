@@ -31,8 +31,14 @@ public class ChwReadSalesBomTest {
             System.err.println(e.getMessage());
         }
 
+        System.out.println("111");
         String logEntry = ChwReadSalesBom.createLogEntry();
+        ChwReadSalesBom.getError_text();
+        System.out.println("222");
         System.out.println(logEntry);
+        System.out.println("333");
+        System.out.println(ChwReadSalesBom.getRETURN_MULTIPLE_OBJ());
+        System.out.println("444");
         assertEquals(ChwReadSalesBom.getRfcrc(), 0);
         System.out.println("------------- Test ChwReadSalesBom end -------------");
     }
