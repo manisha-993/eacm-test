@@ -3,6 +3,7 @@ package COM.ibm.eannounce.abr.sg.rfc;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import COM.ibm.eannounce.abr.sg.rfc.entity.OutputData;
@@ -48,6 +49,8 @@ public abstract class RdhBase
     private int rfcrc;
     @Foo
     private String error_text;
+    
+    private HashMap<String, List<HashMap<String, String>>> RETURN_MULTIPLE_OBJ;
 
     /**
      * Constructor
@@ -162,6 +165,7 @@ public abstract class RdhBase
     {
         this.rfcrc = output.getRFCRC();
         this.error_text = output.getERROR_TEXT();
+        this.RETURN_MULTIPLE_OBJ = output.getRETURN_MULTIPLE_OBJ();
     }
 
     /**
@@ -368,4 +372,13 @@ public abstract class RdhBase
     public String getInput() {
     	return input;
     }
+
+	public HashMap<String, List<HashMap<String, String>>> getRETURN_MULTIPLE_OBJ() {
+		return RETURN_MULTIPLE_OBJ;
+	}
+
+	public void setRETURN_MULTIPLE_OBJ(HashMap<String, List<HashMap<String, String>>> rETURN_MULTIPLE_OBJ) {
+		RETURN_MULTIPLE_OBJ = rETURN_MULTIPLE_OBJ;
+	}
+    
 }
