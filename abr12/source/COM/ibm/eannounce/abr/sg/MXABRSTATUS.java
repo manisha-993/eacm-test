@@ -250,9 +250,6 @@ public class MXABRSTATUS extends PokBaseABR {
 				// If input='Y', value is "SIU-CPU" (S00010); if input='N', value is "SIU-Non CPU" (S00020)
 				refoferWrapper.flag("SYSIDUNIT", "Y".equals(refoferModel.FSLMCPU) ? "S00010" : "S00020");
 				refoferWrapper.text("PRODSUPRTCD", refoferModel.PRODSUPRTCD, 3);
-				if(refoferModel.DOMAIN !=null || !"".equals(refoferModel.DOMAIN)) {
-					refoferWrapper.text("DOMAIN", refoferModel.DOMAIN);
-				}
 				refoferWrapper.flag("DATAQUALITY", DQ_FINAL);
 				refoferWrapper.flag("STATUS", STATUS_FINAL);
 				refoferWrapper.flag("ADSABRSTATUS", ABR_QUEUE);
@@ -677,7 +674,6 @@ public class MXABRSTATUS extends PokBaseABR {
 		public String MAINTANNBILLELIGINDC;
 		public String FSLMCPU;
 		public String PRODSUPRTCD;
-		public String DOMAIN;
 
 		public RefoferModel(Element element) {
 			ACTIVITY = getNodeValue(element, "ACTIVITY");
@@ -697,8 +693,6 @@ public class MXABRSTATUS extends PokBaseABR {
 			MAINTANNBILLELIGINDC = getNodeValue(element, "MAINTANNBILLELIGINDC");
 			FSLMCPU = getNodeValue(element, "FSLMCPU");
 			PRODSUPRTCD = getNodeValue(element, "PRODSUPRTCD");
-			DOMAIN = getNodeValue(element, "DOMAIN");
-
 		}
 
 		public void validate() throws Exception {
