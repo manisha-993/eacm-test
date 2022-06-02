@@ -48,7 +48,7 @@ public class RFCConfig {
 					
 					HSSFSheet hssfSheet = wb.getSheetAt(0);
 					int lastRow = hssfSheet.getLastRowNum();	
-					for(int i = 2;i<=lastRow;i++) {
+					for(int i = 1;i<=lastRow;i++) {
 					HSSFRow row = 	hssfSheet.getRow(i);
 					CountryPlantTax tax = new CountryPlantTax();
 					if(row==null)
@@ -133,7 +133,7 @@ public class RFCConfig {
 					
 					HSSFSheet hssfSheet = wb.getSheetAt(0);
 					int lastRow = hssfSheet.getLastRowNum();	
-					for(int i = 2;i<=lastRow;i++) {
+					for(int i = 1;i<=lastRow;i++) {
 					HSSFRow row = 	hssfSheet.getRow(i);
 					Generalarea generalarea = new Generalarea();
 					if(row==null)

@@ -60,6 +60,8 @@ public class TMF_UPDATE {
 	private String NOCSTSHIP;
 	@XmlElement(name = "WARRSVCCOVR")
 	private String WARRSVCCOVR;
+	@XmlElement(name = "RETURNEDPARTS")
+	private String RETURNEDPARTS;
 	
 	@XmlElementWrapper(name = "OSLIST")
 	@XmlElement(name = "OSELEMENT")
@@ -167,6 +169,10 @@ public class TMF_UPDATE {
 	public List<WARRELEMENT_TMF> getWARRLIST() {
 		return WARRLIST;
 	}
+	public String getRETURNEDPARTS() {
+		return RETURNEDPARTS;
+	}
+	
 }
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
@@ -440,6 +446,8 @@ class WARRELEMENT_TMF {
 	private String PUBTO;
 	@XmlElement(name = "DEFWARR")
 	private String DEFWARR;
+	@XmlElement(name = "WARRSVCCOVR")
+	private String WARRSVCCOVR;
 	
 	@XmlElementWrapper(name = "COUNTRYLIST")
 	@XmlElement(name = "COUNTRYELEMENT")
@@ -469,6 +477,10 @@ class WARRELEMENT_TMF {
 	public List<COUNTRYELEMENT_TMF> getCOUNTRYLIST() {
 		return COUNTRYLIST;
 	}
+	public String getWARRSVCCOVR() {
+		return WARRSVCCOVR;
+	}
+	
 }
 
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
