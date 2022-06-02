@@ -4210,7 +4210,8 @@ ADSATTRIBUTE    40  WARRTYPE
         addDebug("put cache:"+m_abri.getABRCode()+"-"+getEntityType());
         if("SVCMOD".equals(getEntityType())&&!m_abri.getABRCode().equals("SVCMODIERPABRSTATUS")){
         	setFlagValue("SVCMODIERPABRSTATUS", "0020");
-        }else if("MODEL".equals(getEntityType())){
+        }
+        /*else if("MODEL".equals(getEntityType())){
         	setFlagValue("MODELIERPABRSTATUS", "0020");
         	//WARRSVCCOVR ！= "WSVC02"
         	String flagString = PokUtils.getAttributeFlagValue(rootEntity, "WARRSVCCOVR");
@@ -4262,7 +4263,7 @@ ADSATTRIBUTE    40  WARRTYPE
 		}else if ("WARR".equals(getEntityType())) {
         	setFlagValue("WARRIERPABRSTATUS", "0020");
 
-		}
+		}*/
     }finally{   
 		try {
 			m_db.commit();
