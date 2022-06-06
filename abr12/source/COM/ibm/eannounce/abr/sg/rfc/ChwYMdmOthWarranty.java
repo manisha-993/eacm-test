@@ -153,10 +153,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		
 		for (WARRELEMENTTYPE WARRELEMENT : chwProduct.getWARRLIST())
 		{
-			//if WARRSVCCOVR £¡= "WSVC02"£¬return;  confirm in slack
-			if(!"WSVC02".equalsIgnoreCase(WARRELEMENT.getWARRSVCCOVR())) {
-				return;
-			}			
+						
 			if("Yes".equalsIgnoreCase(WARRELEMENT.getDEFWARR())){
 				//If chwProduct/WARRLIST/WARRELEMENT/WARRID <> "",
 				if(!"".equals(WARRELEMENT.getWARRID())){
@@ -310,10 +307,6 @@ public class ChwYMdmOthWarranty extends RdhBase {
 			//If chwProduct/WARRLIST/WARRELEMENT/DEFWARR = "Yes", then
 			for (WARRELEMENT_TMF WARRELEMENT : WARRELEMENT_TMF_list)
 			{
-				//if WARRSVCCOVR £¡= "WSVC02"£¬return;  confirm in slack
-				if(!"WSVC02".equalsIgnoreCase(WARRELEMENT.getWARRSVCCOVR())) {
-					return;
-				}
 				String DEFWARR = WARRELEMENT.getDEFWARR();
 				if("Yes".equalsIgnoreCase(DEFWARR)){
 					//If chwProduct/WARRLIST/WARRELEMENT/WARRID <> "",
@@ -408,10 +401,12 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		String ZCOUNTRY ="";		
 		if("WTY0000".equalsIgnoreCase(WARRELEMENT.getWARRID()) || country==null){
 			ZCOUNTRY = "**";
+			ZYTMDMOTHWARRTMF.setZCOUNTRY(ZCOUNTRY);
 		}else{
 			ZCOUNTRY = country.getCOUNTRY_FC(); 
+			ZYTMDMOTHWARRTMF.setZCOUNTRY(RfcConfigProperties.getCountry(ZCOUNTRY));
 		}
-		ZYTMDMOTHWARRTMF.setZCOUNTRY(RfcConfigProperties.getCountry(ZCOUNTRY));
+		//ZYTMDMOTHWARRTMF.setZCOUNTRY(RfcConfigProperties.getCountry(ZCOUNTRY));
 		//Copy from chwProduct/WARRLIST/WARRELEMENT/WARRID
 		ZYTMDMOTHWARRTMF.setZWRTYID(WARRELEMENT.getWARRID());
 		/**

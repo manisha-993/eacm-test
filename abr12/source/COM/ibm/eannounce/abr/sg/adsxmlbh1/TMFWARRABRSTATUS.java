@@ -8,6 +8,8 @@ import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.Hashtable;
 
+import com.ibm.transform.oim.eacm.util.PokUtils;
+
 import COM.ibm.eannounce.abr.sg.rfc.ChwYMdmOthWarranty;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
 import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
@@ -21,8 +23,6 @@ import COM.ibm.eannounce.objects.EntityItem;
 import COM.ibm.eannounce.objects.ExtractActionItem;
 import COM.ibm.opicmpdh.middleware.D;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
-
-import com.ibm.transform.oim.eacm.util.PokUtils;
 
 public class TMFWARRABRSTATUS extends PokBaseABR {
 	private StringBuffer rptSb = new StringBuffer();
@@ -106,7 +106,8 @@ public class TMFWARRABRSTATUS extends PokBaseABR {
 			PreparedStatement statement = connection.prepareStatement(CACEHSQL);
 			statement.setInt(1, rootEntity.getEntityID());
 			ResultSet resultSet = statement.executeQuery();
-		
+			
+			
 			while (resultSet.next()) {
 				xml = resultSet.getString("XMLMESSAGE");
 			}
@@ -114,14 +115,22 @@ public class TMFWARRABRSTATUS extends PokBaseABR {
 			
 				TMF_UPDATE tmf = XMLParse.getObjectFromXml(xml,TMF_UPDATE.class);
 				
-				//step1  Call ChwYMdmOthWarranty to populate iERP custom tables with warranty master data by setting the input parameter for ZYTMDMOTHWARRMOD structure
-				//call ChwYMdmOthWarranty	
-				ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(tmf);
-				if(chwYMdmOthWarranty.getZYTMDMOTHWARRTMF_LIST().size()>0) {
-					this.runRfcCaller(chwYMdmOthWarranty);
+				String WARRSVCCOVR = tmf.getWARRSVCCOVR();
+				if(!"Warranty".equalsIgnoreCase(WARRSVCCOVR)) {
+					addOutput("WARRSVCCOVR value is not Warranty, so nothing to promote.");
 				}else {
-					addOutput("No ZYTMDMOTHWARRTMF in the chwYMdmOthWarranty, will not call the RFC.");
+					//step1  Call ChwYMdmOthWarranty to populate iERP custom tables with warranty master data by setting the input parameter for ZYTMDMOTHWARRMOD structure
+					//call ChwYMdmOthWarranty	
+					ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(tmf);
+					if(chwYMdmOthWarranty.getZYTMDMOTHWARRTMF_LIST().size()>0) {
+						this.runRfcCaller(chwYMdmOthWarranty);
+					}else {
+						addOutput("No warranty linked to the TMF, so nothing to promote.");
+					}
 				}
+				
+				
+				
 			}	
 		} catch (Exception e) {
 			e.printStackTrace();
