@@ -3,6 +3,7 @@ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
@@ -11,6 +12,7 @@ import java.util.Hashtable;
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
 import COM.ibm.eannounce.abr.sg.rfc.ChwYMdmOthWarranty;
+import COM.ibm.eannounce.abr.sg.rfc.CommonUtils;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
 import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
@@ -34,7 +36,8 @@ public class TMFWARRABRSTATUS extends PokBaseABR {
 	private Hashtable metaTbl = new Hashtable();
 	private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'PRODSTRUCT' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
 		
-	
+	private String FEATURESQL = "SELECT attributevalue FROM OPICM.TEXT WHERE ENTITYTYPE='FEATURE' AND ENTITYID=? and "
+			+ " attributecode='MKTGNAME' AND NLSID=1 and valto>current timestamp and effto >current timestamp with ur";
 	
 	String xml = null;
 
@@ -121,7 +124,8 @@ public class TMFWARRABRSTATUS extends PokBaseABR {
 				}else {
 					//step1  Call ChwYMdmOthWarranty to populate iERP custom tables with warranty master data by setting the input parameter for ZYTMDMOTHWARRMOD structure
 					//call ChwYMdmOthWarranty	
-					ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(tmf);
+					String attributevalue = getAttributevalue(FEATURESQL,tmf.getFEATUREENTITYID());
+					ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(tmf,attributevalue);
 					if(chwYMdmOthWarranty.getZYTMDMOTHWARRTMF_LIST().size()>0) {
 						this.runRfcCaller(chwYMdmOthWarranty);
 					}else {
@@ -343,6 +347,30 @@ public class TMFWARRABRSTATUS extends PokBaseABR {
 			this.addOutput(caller.getError_text());
 		}
 	}
+    
+    public String getAttributevalue(String sql,String entityid) {
+    	String attributevalue = "";
+    	try {
+			Connection connection = m_db.getPDHConnection();
+			Object[] params = new String[1]; 
+			params[0] =entityid;			
+			String realSql = CommonUtils.getPreparedSQL(sql, params);
+			this.addDebug("querySql=" + realSql);
+			PreparedStatement statement = connection.prepareStatement(sql);
+			statement.setString(1, entityid);
+			
+			ResultSet resultSet = statement.executeQuery();
+			if(resultSet.next()) {
+				attributevalue = resultSet.getString("attributevalue");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (MiddlewareException e) {
+			e.printStackTrace();
+		}    	
+    	return attributevalue;
+    	
+    }
     
    
 	
