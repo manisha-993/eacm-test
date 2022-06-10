@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import COM.ibm.opicmpdh.objects.Validator;
+
 class XmlGroup {
   public String m_strName = null;
   public Vector m_vctTags = null;
@@ -198,7 +200,10 @@ public final class Expando {
     SourceLine lFile;
 
     try {
-      BufferedWriter bwOutput = new BufferedWriter(new FileWriter(_f + ".bak"));
+    String filePath = _f + ".bak";
+    boolean validate = pathTranelVaild(filePath);
+    if(validate) {
+     BufferedWriter bwOutput = new BufferedWriter(new FileWriter(_f + ".bak"));
 
       while ((lFile = (SourceLine) c_hashLines.get(_f + ":" + iLine)) != null) {
         ++iLine;
@@ -207,10 +212,12 @@ public final class Expando {
       }
 
       bwOutput.close();
+    }
     } catch (Exception x) {
       System.out.println("error saving backup " + x);
     }
   }
+  
   public static void expandFile(File _f) {
 
     try {
