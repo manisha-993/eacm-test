@@ -118,12 +118,18 @@ public class MODELWARRABRSTATUS extends PokBaseABR {
 		        //If no <WARRELEMENT> found, then throw message in report "No warranty linked to the MODEL, so nothing to promote."
 		        //Else, call ChwYMdmOthWarranty to populate iERP custom tables with warranty master data by setting the input parameter as below.
 				//call ChwYMdmOthWarranty	
-				ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(model);
-				if(chwYMdmOthWarranty.getZYTMDMOTHWARRMOD_LIST().size()>0) {
-					this.runRfcCaller(chwYMdmOthWarranty);
+				String WARRSVCCOVR = model.getWARRSVCCOVR();
+				if(!"Warranty".equalsIgnoreCase(WARRSVCCOVR)) {
+					addOutput("WARRSVCCOVR value is not Warranty, so nothing to promote.");
 				}else {
-					addOutput("No ZYTMDMOTHWARRMOD in the chwYMdmOthWarranty, will not call the RFC");
+					ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(model);
+					if(chwYMdmOthWarranty.getZYTMDMOTHWARRMOD_LIST().size()>0) {
+						this.runRfcCaller(chwYMdmOthWarranty);
+					}else {
+						addOutput("No warranty linked to the MODEL, so nothing to promote.");
+					}
 				}
+				
 
 			}	
 		} catch (Exception e) {

@@ -14,6 +14,9 @@ public class RdhBomc_csap_mbom
     @SerializedName("STLAN")
     private String stlan;
     
+    @SerializedName("STLAL")
+    private String stlal;
+    
     @SerializedName("DATUV")
     private String datuv;
     
@@ -73,6 +76,15 @@ public class RdhBomc_csap_mbom
     {
         this.datuv = datuv;
     }
+    
+	public String getStlal() {
+		return stlal;
+	}
+	
+	public void setStlal(String stlal) {
+		this.stlal = stlal;
+	}
+    
     
     
 

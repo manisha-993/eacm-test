@@ -22,6 +22,7 @@ import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
 import COM.ibm.eannounce.abr.sg.rfc.RdhChwFcProd;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
+import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
@@ -494,7 +495,11 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		//step 12 Call the TssClassificationMaint to associate the MK_FC_CONV class to the product's material master record.
 		callRdhClassificationMaint(obj_id, "MK_FC_CONV");
 		
-		
+		// Call UpdateParkStatus
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwTMF.getMACHTYPE() + "UPG");
+		this.addDebug("Calling "+updateParkStatus.getRFCName());
+		updateParkStatus.execute();
+		this.addDebug(updateParkStatus.createLogEntry());
 		
 	}
 
@@ -707,6 +712,11 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		//step 12 Call the TssClassificationMaint to associate the MK_FC_CONV class to the product's material master record
 		callRdhClassificationMaint(obj_id, "MK_FC_CONV");
 		
+		// Call UpdateParkStatus
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwTMF.getMACHTYPE() + "MTC");
+		this.addDebug("Calling "+updateParkStatus.getRFCName());
+		updateParkStatus.execute();
+		this.addDebug(updateParkStatus.createLogEntry());
 		
 	}
 
@@ -854,6 +864,11 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		//step 6. Call the TssClassificationMaint to associate the MK_T_VAO_NEW class to the product's material master record.
 		callRdhClassificationMaint(obj_id, "MK_T_VAO_NEW");		
 		
+		// Call UpdateParkStatus
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwTMF.getMACHTYPE() + "NEW");
+		this.addDebug("Calling "+updateParkStatus.getRFCName());
+		updateParkStatus.execute();
+		this.addDebug(updateParkStatus.createLogEntry());
 	}
 
 	protected void addRfcResult(RdhBase rdhBase) {

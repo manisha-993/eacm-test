@@ -48,9 +48,12 @@ public class UpdateParkStatus extends RdhBase
     	rdhzdmprktbl.setZdmstatus(RfcConfigProperties.getZdmstatus());
     	rdhzdmprktbls.add(rdhzdmprktbl);
     	zgeo = "WW";
+    	
+    	if("MD_CHW_IERP".equals(zdmclass)) {
+    		this.pims_identity="H";
+    	}
     }
     
-   
  
     /* (non-Javadoc)
      * @see com.ibm.sdpi.cmd.interfaces.rdh.esw.caller.RdhBase#setDefaultValues()

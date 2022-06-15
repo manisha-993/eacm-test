@@ -25,7 +25,7 @@ public class ChwBulkYMDMProd_TMF {
     private String pubFromAnnDate;
     @SerializedName("SYSTEMMAX")
     private String systemMax;
-    @SerializedName("SYSTEMMAX")
+    @SerializedName("FCTYPE")
     private String fcType;
     @SerializedName("BLKMESINDC")
     private String blkMesIndc;
