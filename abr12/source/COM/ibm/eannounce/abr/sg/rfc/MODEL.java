@@ -124,6 +124,9 @@ public class MODEL {
 	private String INVNAME ;
 	@XmlElement(name = "MEASUREMETRIC")
 	private String MEASUREMETRIC;
+	@XmlElement(name = "WARRSVCCOVR")
+	private String WARRSVCCOVR;
+	
 
 	public String getMEASUREMETRIC() {
 		return MEASUREMETRIC;
@@ -415,6 +418,14 @@ public class MODEL {
 	public void setWARRLIST(List<WARRELEMENTTYPE> wARRLIST) {
 		WARRLIST = wARRLIST;
 	}
+
+	public String getWARRSVCCOVR() {
+		return WARRSVCCOVR;
+	}
+
+	public void setWARRSVCCOVR(String wARRSVCCOVR) {
+		WARRSVCCOVR = wARRSVCCOVR;
+	}
 	
 	
 
@@ -440,8 +451,6 @@ class WARRELEMENTTYPE {
 	private String PUBTO;
 	@XmlElement(name = "DEFWARR")
 	private String DEFWARR;
-	@XmlElement(name = "WARRSVCCOVR")
-	private String WARRSVCCOVR;
 	
 	@XmlElementWrapper(name = "COUNTRYLIST")
 	@XmlElement(name = "COUNTRYELEMENT")
@@ -501,17 +510,6 @@ class WARRELEMENTTYPE {
 	}
 	public void setCOUNTRYLIST(List<COUNTRY> cOUNTRYLIST) {
 		COUNTRYLIST = cOUNTRYLIST;
-	}
-	public String getWARRSVCCOVR() {
-		return WARRSVCCOVR;
-	}
-	public void setWARRSVCCOVR(String wARRSVCCOVR) {
-		WARRSVCCOVR = wARRSVCCOVR;
-	}
-	
-	
-	
-	
-	
+	}	
 	
 }

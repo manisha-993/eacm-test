@@ -4210,9 +4210,16 @@ ADSATTRIBUTE    40  WARRTYPE
         addDebug("put cache:"+m_abri.getABRCode()+"-"+getEntityType());
         if("SVCMOD".equals(getEntityType())&&!m_abri.getABRCode().equals("SVCMODIERPABRSTATUS")){
         	setFlagValue("SVCMODIERPABRSTATUS", "0020");
-        }else if("MODEL".equals(getEntityType())){
+        }
+        /*else if("MODEL".equals(getEntityType())){
         	setFlagValue("MODELIERPABRSTATUS", "0020");
-        	setFlagValue("MODELWARRABRSTATUS", "0020");
+        	//WARRSVCCOVR ！= "WSVC02"
+        	String flagString = PokUtils.getAttributeFlagValue(rootEntity, "WARRSVCCOVR");
+        	addDebug("WARRSVCCOVR:"+flagString);
+        	if("WSVC02".equals(flagString))
+        	{
+        		setFlagValue("MODELWARRABRSTATUS", "0020");
+        	}
         	String tmfSQL = "select distinct f.attributevalue as BULKMESINDC "
         			+ "from opicm.relator r "
         			+ "join opicm.flag f on f.entitytype=r.entitytype and f.ENTITYID=r.entityid and f.attributecode='BULKMESINDC' and f.VALTO > current timestamp and f.EFFTO > current timestamp "
@@ -4232,7 +4239,13 @@ ADSATTRIBUTE    40  WARRTYPE
 
         }else if("PRODSTRUCT".equals(getEntityType())){
         	setFlagValue("TMFIERPABRSTATUS", "0020");
-        	setFlagValue("TMFWARRABRSTATUS", "0020");
+        	String flagString = PokUtils.getAttributeFlagValue(rootEntity, "WARRSVCCOVR");
+        	addDebug("WARRSVCCOVR:"+flagString);
+        	if("WSVC02".equals(flagString))
+        	{
+        		setFlagValue("TMFWARRABRSTATUS", "0020");
+        	}
+        	
             String BULKMESINDC  = PokUtils.getAttributeFlagValue(rootEntity, "BULKMESINDC");
             if("MES0001".equals(BULKMESINDC)){
                 //PRODSTRUCT.BULKMESINDC = "MES0001" (Yes)
@@ -4249,7 +4262,7 @@ ADSATTRIBUTE    40  WARRTYPE
 		}else if ("WARR".equals(getEntityType())) {
         	setFlagValue("WARRIERPABRSTATUS", "0020");
 
-		}
+		}*/
     }finally{   
 		try {
 			m_db.commit();
