@@ -8,27 +8,35 @@ import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import COM.ibm.eannounce.abr.sg.rfc.Chw001ClfCreate;
+import COM.ibm.eannounce.abr.sg.rfc.ChwBomCreate;
+import COM.ibm.eannounce.abr.sg.rfc.ChwBomMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwClassMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwConpMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwDepdMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwFCTYMDMFCMaint;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMatmCreate;
+import COM.ibm.eannounce.abr.sg.rfc.ChwReadSalesBom;
 import COM.ibm.eannounce.abr.sg.rfc.CommonUtils;
 import COM.ibm.eannounce.abr.sg.rfc.FCTRANSACTION;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
+import COM.ibm.eannounce.abr.sg.rfc.MODELCONVERT;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
+import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
+import COM.ibm.eannounce.abr.util.RFCConfig;
 import COM.ibm.eannounce.objects.EANList;
 import COM.ibm.eannounce.objects.EANMetaAttribute;
 import COM.ibm.eannounce.objects.EntityGroup;
@@ -361,7 +369,28 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					this.runRfcCaller(caller);
 				}				
 
+				//13.
+				if(fctransaction.getTOMACHTYPE().equals(fctransaction.getFROMMACHTYPE())) {
+					List<MODEL> models = getMODEL(fctransaction.getTOMACHTYPE(),fctransaction.getPDHDOMAIN());
+					Set<String> plnts = RFCConfig.getBHPlnts();
+					this.addOutput("Start Bom Processing!");
+					updateSalesBom(fctransaction,plnts,models);
+					this.addOutput("Bom Processing Finished!");
+				}
+				
+				// Call UpdateParkStatus
+				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", fctransaction.getTOMACHTYPE()+"UPG");
+				this.addDebug("Calling "+updateParkStatus.getRFCName());
+				updateParkStatus.execute();
+				this.addDebug(updateParkStatus.createLogEntry());
+				if (updateParkStatus.getRfcrc() == 0) {
+					this.addOutput("Parking records updated successfully for ZDMRELNUM="+fctransaction.getTOMACHTYPE()+"UPG");
+				} else {
+					this.addOutput(updateParkStatus.getRFCName() + " called faild!");
+					this.addOutput(updateParkStatus.getError_text());
+				}
 			}	
+			
 			
 			// exeFtpShell(ffPathName);
 			// ftpFile();
@@ -414,9 +443,137 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 
 	
 
-
+	private List<MODEL> getMODEL(String toMachtype, String domain) {
+		List<MODEL> models= new ArrayList();
+		
+		try {
+			String sql1 = "SELECT distinct t2.ATTRIBUTEVALUE as MACHTYPEATR,substr(T1.ATTRIBUTEVALUE,1,3) as MODELATR FROM OPICM.flag F "
+					+ "INNER JOIN OPICM.FLAG t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='MACHTYPEATR' AND T2.ATTRIBUTEVALUE = ? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
+					+ "INNER JOIN OPICM.text t1 ON t1.ENTITYID =t2.ENTITYID AND t1.ENTITYTYPE =t2.ENTITYTYPE AND t1.ATTRIBUTECODE ='MODELATR' and T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP AND T1.NLSID=1 "
+					+ "INNER JOIN OPICM.FLAG F1 ON F1.ENTITYID =t2.ENTITYID AND F1.ENTITYTYPE =t2.ENTITYTYPE AND F1.ATTRIBUTECODE ='PDHDOMAIN' and F1.VALTO > CURRENT  TIMESTAMP AND F1.EFFTO > CURRENT  TIMESTAMP "
+					+ "INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP "
+					+ "WHERE f.ENTITYTYPE ='MODEL' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELIERPABRSTATUS') AND F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION= ? WITH UR";
+			Connection connection1 = m_db.getPDHConnection();
+			PreparedStatement statement1 = connection1.prepareStatement(sql1);
+			statement1.setString(1, toMachtype);
+			statement1.setString(2, domain);
+			ResultSet resultSet1 = statement1.executeQuery();
+			this.addDebug("GetMODEL SQL:"+ sql1);
+			while (resultSet1.next()) {
+				MODEL model = new MODEL();
+				model.setMACHTYPE(resultSet1.getString("MACHTYPEATR"));
+				model.setMODEL(resultSet1.getString("MODELATR"));
+				models.add(model);
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return models;
+	}
 	
 
+	public void updateSalesBom(FCTRANSACTION fctransaction, Set<String> plnts, List<MODEL> models) throws Exception {
+		for(String plant : plnts) {
+			//call ChwBomCreate 
+			ChwBomCreate chwBomCreate = new ChwBomCreate(fctransaction.getTOMACHTYPE()+"UPG", plant);
+			this.addDebug("Calling " + "ChwBomCreate");
+			this.addDebug(chwBomCreate.generateJson());
+			try{
+				chwBomCreate.execute();
+				this.addDebug(chwBomCreate.createLogEntry());
+			}catch(Exception e) {
+				this.addOutput(e.getMessage());
+				continue;	
+			}
+			//call ChwReadSalesBom 
+			ChwReadSalesBom chwReadSalesBom = new ChwReadSalesBom(fctransaction.getTOMACHTYPE()+"UPG", plant);
+			this.addDebug("Calling " + "ChwReadSalesBom");
+			this.addDebug(chwReadSalesBom.generateJson());
+			try{
+				chwReadSalesBom.execute();
+				this.addDebug(chwReadSalesBom.createLogEntry());
+			}catch(Exception e) {
+				if(e.getMessage().contains("exists in Mast table but not defined to Stpo table")){
+					
+				} else{
+					this.addOutput(e.getMessage());
+					continue;
+				}
+			}
+			this.addDebug("Bom Read result:"+chwReadSalesBom.getRETURN_MULTIPLE_OBJ().toString());
+			List<HashMap<String, String>> componmentList = chwReadSalesBom.getRETURN_MULTIPLE_OBJ().get("stpo_api02");
+			if (componmentList != null && componmentList.size() > 0) {
+				String POSNR = getMaxItemNo(componmentList);
+				for(MODEL model : models) {
+					String componment = model.getMACHTYPE() + model.getMODEL();	
+					if (hasMatchComponent(componmentList, componment)) {
+						this.addDebug("updateSalesBom exist component " + componment);
+					}else {						
+						POSNR=generateItemNumberString(POSNR);
+						//call ChwBomMaintain 
+						ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+"UPG", plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());	
+						this.addDebug("Calling " + "chwBomMaintain");
+						this.addDebug(chwBomMaintain.generateJson());
+						try {
+							chwBomMaintain.execute();
+							this.addDebug(chwBomMaintain.createLogEntry());	
+						}catch(Exception e) {
+							this.addOutput(e.getMessage());
+							POSNR = getMaxItemNo(componmentList);
+							continue;
+						}
+					}
+				}
+			}else {
+				String POSNR ="0005";
+				//call ChwBomMaintain 
+				for(MODEL model : models) {	
+					//call ChwBomMaintain 
+					ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+"UPG", plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+					this.addDebug("Calling " + "chwBomMaintain");
+					this.addDebug(chwBomMaintain.generateJson());
+					try {
+						chwBomMaintain.execute();
+						this.addDebug(chwBomMaintain.createLogEntry());	
+					}catch(Exception e) {
+						this.addOutput(e.getMessage());
+						continue;
+					}
+					POSNR=generateItemNumberString(POSNR);
+				}			
+			}
+		}
+		
+	}
+	
+	private String getMaxItemNo(List<HashMap<String, String>> componmentList) {
+		List itemNo = new ArrayList();
+		for (int i = 0; i < componmentList.size(); i++) {
+			String rev = componmentList.get(i).get("ITEM_NO");
+			itemNo.add(Integer.parseInt(rev));
+		}
+		int maxItemNo = Collections.max(itemNo);
+		return String.format("%04d", maxItemNo);
+	}
+
+	private String generateItemNumberString(String posnr) {
+		int tempValue = Integer.parseInt(posnr)+5;
+		return String.format("%04d", tempValue);
+	}
+
+	private boolean hasMatchComponent(List<HashMap<String, String>> bom, String componment){
+		for (int i = 0; i < bom.size(); i++) {
+			String rev = bom.get(i).get("COMPONENT");
+			if (rev.trim().equals(componment)){				
+			  return true;
+			}
+		}
+		return false;
+	}
+	
 	/*
 	 * Get Name based on navigation attributes for root entity
 	 *

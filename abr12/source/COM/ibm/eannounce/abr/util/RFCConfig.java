@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -24,6 +26,7 @@ public class RFCConfig {
 	static Map<String, Map<String, String>> orgpntMaps = new HashMap<String, Map<String,String>>();
 	static List<CountryPlantTax> taxs = new ArrayList<CountryPlantTax>();
 	static List<Generalarea> generalareas = new ArrayList<Generalarea>();
+	static Set<String> bhplnts = new HashSet<String>();
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
@@ -31,6 +34,7 @@ public class RFCConfig {
 	}static {
 		loadCountryPlantTax();
 		loadGeneralarea();
+		loadBHPlnt();
 	}
 
 	public static void loadCountryPlantTax() {
@@ -84,6 +88,45 @@ public class RFCConfig {
 		}
 
 	}
+	
+	public static void loadBHPlnt() {
+		File excel = new File("BH_ORG_PRD_PROD.xls");
+
+		try {
+			// String encoding = "GBK";
+			if (excel.isFile() && excel.exists()) {
+
+				String[] split = excel.getName().split("\\.");
+				HSSFWorkbook wb;
+				if ("xls".equals(split[1])) {
+					FileInputStream fis = new FileInputStream(excel);
+					wb = new HSSFWorkbook(fis);
+					
+					HSSFSheet hssfSheet = wb.getSheetAt(0);
+					int lastRow = hssfSheet.getLastRowNum();	
+					for(int i = 2;i<=lastRow;i++) {
+						HSSFRow row = hssfSheet.getRow(i);
+						if(row==null) break;
+						String cat = getCellData(row.getCell((short)1));
+						String plnt = getCellData(row.getCell((short)5));
+						if("Hardware".equals(cat.trim())) {
+							bhplnts.add(plnt);
+						}	
+					}
+				}else {
+					System.out.println("File type error!");
+					return;
+				}
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+	public static Set<String> getBHPlnts() {
+		return bhplnts;
+	}
+
 	public static String getCellData(HSSFCell cell) {
 		if(cell==null)
 			return null;
