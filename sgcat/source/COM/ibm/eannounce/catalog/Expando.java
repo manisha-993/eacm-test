@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import COM.ibm.opicmpdh.objects.Validator;
-
 class XmlGroup {
   public String m_strName = null;
   public Vector m_vctTags = null;
