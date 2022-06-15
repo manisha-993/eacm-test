@@ -357,7 +357,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 	}
 	
 	private String getMaxItemNo(List<HashMap<String, String>> componmentList) {
-		List itemNo = new ArrayList();
+		List<Integer> itemNo = new ArrayList<Integer>();
 		for (int i = 0; i < componmentList.size(); i++) {
 			String rev = componmentList.get(i).get("ITEM_NO");
 			itemNo.add(Integer.parseInt(rev));
