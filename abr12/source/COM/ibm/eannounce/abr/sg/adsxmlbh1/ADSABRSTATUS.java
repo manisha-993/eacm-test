@@ -4211,7 +4211,7 @@ ADSATTRIBUTE    40  WARRTYPE
         if("SVCMOD".equals(getEntityType())&&!m_abri.getABRCode().equals("SVCMODIERPABRSTATUS")){
         	setFlagValue("SVCMODIERPABRSTATUS", "0020");
         }
-        /*else if("MODEL".equals(getEntityType())){
+        else if("MODEL".equals(getEntityType())){
         	setFlagValue("MODELIERPABRSTATUS", "0020");
         	//WARRSVCCOVR ！= "WSVC02"
         	String flagString = PokUtils.getAttributeFlagValue(rootEntity, "WARRSVCCOVR");
@@ -4220,7 +4220,7 @@ ADSATTRIBUTE    40  WARRTYPE
         	{
         		setFlagValue("MODELWARRABRSTATUS", "0020");
         	}
-        	String tmfSQL = "select distinct f.attributevalue as BULKMESINDC "
+        	/*ring tmfSQL = "select distinct f.attributevalue as BULKMESINDC "
         			+ "from opicm.relator r "
         			+ "join opicm.flag f on f.entitytype=r.entitytype and f.ENTITYID=r.entityid and f.attributecode='BULKMESINDC' and f.VALTO > current timestamp and f.EFFTO > current timestamp "
         			+ "where r.ENTITYTYPE = 'PRODSTRUCT' and r.ENTITY2ID = ? and r.VALTO > current timestamp and r.EFFTO > current timestamp with ur";
@@ -4236,7 +4236,7 @@ ADSATTRIBUTE    40  WARRTYPE
                     setFlagValue("MODELBULKABRSTATUS", "0020");
                     break;
             	}
-            }
+            }*/
 
         }else if("PRODSTRUCT".equals(getEntityType())){
         	setFlagValue("TMFIERPABRSTATUS", "0020");
@@ -4247,11 +4247,11 @@ ADSATTRIBUTE    40  WARRTYPE
         		setFlagValue("TMFWARRABRSTATUS", "0020");
         	}
         	
-            String BULKMESINDC  = PokUtils.getAttributeFlagValue(rootEntity, "BULKMESINDC");
+          /*  String BULKMESINDC  = PokUtils.getAttributeFlagValue(rootEntity, "BULKMESINDC");
             if("MES0001".equals(BULKMESINDC)){
                 //PRODSTRUCT.BULKMESINDC = "MES0001" (Yes)
                 setFlagValue("TMFBULKABRSTATUS", "0020");
-            }
+            }*/
         }else if ("FEATURE".equals(getEntityType())) {
         	setFlagValue("FEATUREIERPABRSTATUS", "0020");
 		}
@@ -4263,7 +4263,7 @@ ADSATTRIBUTE    40  WARRTYPE
 		}else if ("WARR".equals(getEntityType())) {
         	setFlagValue("WARRIERPABRSTATUS", "0020");
 
-		}*/
+		}
     }finally{   
 		try {
 			m_db.commit();
