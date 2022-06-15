@@ -85,7 +85,7 @@ public class RdhSvcMatmCreate extends RdhBase {
 		bmmh1.get(0).setMtpos(getMtpos(model));
 		bmmh1.get(0).setProdh(model.getPRODHIERCD());
 		bmmh1.get(0).setKtgrm(model.getACCTASGNGRP());
-		bmmh1.get(0).setMvgr5(model.getTAXCODELIST().get(0).getTAXCODE());
+		bmmh1.get(0).setMvgr5(model.getTAXCODELIST().size()==0?"":model.getTAXCODELIST().get(0).getTAXCODE());
 		bmm00.get(0).setXeib1("X");
 		bmm00.get(0).setXeid1("X");
 		bmm00.get(0).setXeik1("X");

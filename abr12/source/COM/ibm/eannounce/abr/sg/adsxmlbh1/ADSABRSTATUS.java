@@ -4221,7 +4221,6 @@ ADSATTRIBUTE    40  WARRTYPE
             PreparedStatement statement1 = connection1.prepareStatement(tmfSQL);
             statement1.setInt(1, rootEntity.getEntityID());
             ResultSet resultSet1 = statement1.executeQuery();
-            this.addDebug("SQL: "+ tmfSQL);
             while (resultSet1.next()) {
             	String BULKMESINDC = resultSet1.getString("BULKMESINDC");
                 if("MES0001".equals(BULKMESINDC)){
