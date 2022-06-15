@@ -3,12 +3,16 @@ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.Hashtable;
 
+import com.ibm.transform.oim.eacm.util.PokUtils;
+
 import COM.ibm.eannounce.abr.sg.rfc.ChwYMdmOthWarranty;
+import COM.ibm.eannounce.abr.sg.rfc.CommonUtils;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
 import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
@@ -22,8 +26,6 @@ import COM.ibm.eannounce.objects.ExtractActionItem;
 import COM.ibm.opicmpdh.middleware.D;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
 
-import com.ibm.transform.oim.eacm.util.PokUtils;
-
 public class TMFWARRABRSTATUS extends PokBaseABR {
 	private StringBuffer rptSb = new StringBuffer();
 	private static final char[] FOOL_JTEST = { '\n' };
@@ -34,7 +36,8 @@ public class TMFWARRABRSTATUS extends PokBaseABR {
 	private Hashtable metaTbl = new Hashtable();
 	private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'PRODSTRUCT' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
 		
-	
+	private String FEATURESQL = "SELECT attributevalue FROM OPICM.TEXT WHERE ENTITYTYPE='FEATURE' AND ENTITYID=? and "
+			+ " attributecode='MKTGNAME' AND NLSID=1 and valto>current timestamp and effto >current timestamp with ur";
 	
 	String xml = null;
 
@@ -106,7 +109,8 @@ public class TMFWARRABRSTATUS extends PokBaseABR {
 			PreparedStatement statement = connection.prepareStatement(CACEHSQL);
 			statement.setInt(1, rootEntity.getEntityID());
 			ResultSet resultSet = statement.executeQuery();
-		
+			
+			
 			while (resultSet.next()) {
 				xml = resultSet.getString("XMLMESSAGE");
 			}
@@ -114,14 +118,23 @@ public class TMFWARRABRSTATUS extends PokBaseABR {
 			
 				TMF_UPDATE tmf = XMLParse.getObjectFromXml(xml,TMF_UPDATE.class);
 				
-				//step1  Call ChwYMdmOthWarranty to populate iERP custom tables with warranty master data by setting the input parameter for ZYTMDMOTHWARRMOD structure
-				//call ChwYMdmOthWarranty	
-				ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(tmf);
-				if(chwYMdmOthWarranty.getZYTMDMOTHWARRTMF_LIST().size()>0) {
-					this.runRfcCaller(chwYMdmOthWarranty);
+				String WARRSVCCOVR = tmf.getWARRSVCCOVR();
+				if(!"Warranty".equalsIgnoreCase(WARRSVCCOVR)) {
+					addOutput("WARRSVCCOVR value is not Warranty, so nothing to promote.");
 				}else {
-					addOutput("No ZYTMDMOTHWARRTMF in the chwYMdmOthWarranty, will not call the RFC.");
+					//step1  Call ChwYMdmOthWarranty to populate iERP custom tables with warranty master data by setting the input parameter for ZYTMDMOTHWARRMOD structure
+					//call ChwYMdmOthWarranty	
+					String attributevalue = getAttributevalue(FEATURESQL,tmf.getFEATUREENTITYID());
+					ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(tmf,attributevalue);
+					if(chwYMdmOthWarranty.getZYTMDMOTHWARRTMF_LIST().size()>0) {
+						this.runRfcCaller(chwYMdmOthWarranty);
+					}else {
+						addOutput("No warranty linked to the TMF, so nothing to promote.");
+					}
 				}
+				
+				
+				
 			}	
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -334,6 +347,30 @@ public class TMFWARRABRSTATUS extends PokBaseABR {
 			this.addOutput(caller.getError_text());
 		}
 	}
+    
+    public String getAttributevalue(String sql,String entityid) {
+    	String attributevalue = "";
+    	try {
+			Connection connection = m_db.getPDHConnection();
+			Object[] params = new String[1]; 
+			params[0] =entityid;			
+			String realSql = CommonUtils.getPreparedSQL(sql, params);
+			this.addDebug("querySql=" + realSql);
+			PreparedStatement statement = connection.prepareStatement(sql);
+			statement.setString(1, entityid);
+			
+			ResultSet resultSet = statement.executeQuery();
+			if(resultSet.next()) {
+				attributevalue = resultSet.getString("attributevalue");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (MiddlewareException e) {
+			e.printStackTrace();
+		}    	
+    	return attributevalue;
+    	
+    }
     
    
 	

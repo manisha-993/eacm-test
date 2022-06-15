@@ -93,8 +93,6 @@ public class MODELBULKABRSTATUS extends PokBaseABR {
                 ChwBulkYMDMProd abr = new ChwBulkYMDMProd(model,"MODEL","",m_db.getODSConnection(),m_db.getPDHConnection());
                 this.addDebug("Calling " + abr.getRFCName());
                 abr.execute();
-                String json = abr.generateJson();
-                this.addDebug("json: "+json);
                 this.addDebug(abr.createLogEntry());
                 if (abr.getRfcrc() == 0) {
                     this.addOutput(abr.getRFCName() + " called successfully!");

@@ -40,6 +40,7 @@ public class ChwBomCreate extends RdhBase {
         RdhBomc_csap_mbom mbom = new RdhBomc_csap_mbom();
         csap_mbom.setMap(mbom);
         mbom.setStlan("5");
+        mbom.setStlal("1");
         
         jIStko = new RdhBomc_stko_api01_Adapter();
         jIStko.setStuctName("jIStko");;

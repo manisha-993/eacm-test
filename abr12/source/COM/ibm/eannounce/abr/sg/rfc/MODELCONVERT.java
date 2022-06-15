@@ -34,6 +34,17 @@ public class MODELCONVERT {
 	@XmlElement(name = "TOMACHTYPE")
 	private String TOMACHTYPE;
 	
+	@XmlElement(name = "PDHDOMAIN")
+	private String PDHDOMAIN;
+	
+	public String getPDHDOMAIN() {
+		return PDHDOMAIN;
+	}
+
+	public void setPDHDOMAIN(String pDHDOMAIN) {
+		PDHDOMAIN = pDHDOMAIN;
+	}
+
 	@XmlElement(name = "AVAILABILITYLIST")
 	private List<AVAILABILITYLIST> AVAILABILITYLIST;
 

@@ -7,12 +7,18 @@ import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
 import COM.ibm.eannounce.abr.sg.rfc.Chw001ClfCreate;
+import COM.ibm.eannounce.abr.sg.rfc.ChwBomCreate;
+import COM.ibm.eannounce.abr.sg.rfc.ChwBomMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwCharMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwClassMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwConpMaintain;
@@ -20,6 +26,7 @@ import COM.ibm.eannounce.abr.sg.rfc.ChwDepdMaintain;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeMtc;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMachTypeUpg;
 import COM.ibm.eannounce.abr.sg.rfc.ChwMatmCreate;
+import COM.ibm.eannounce.abr.sg.rfc.ChwReadSalesBom;
 import COM.ibm.eannounce.abr.sg.rfc.CommonUtils;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
@@ -27,10 +34,12 @@ import COM.ibm.eannounce.abr.sg.rfc.RdhChwFcProd;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.RdhSvcMatmCreate;
 import COM.ibm.eannounce.abr.sg.rfc.SVCMOD;
+import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
+import COM.ibm.eannounce.abr.util.RFCConfig;
 import COM.ibm.eannounce.objects.EANList;
 import COM.ibm.eannounce.objects.EANMetaAttribute;
 import COM.ibm.eannounce.objects.EntityGroup;
@@ -179,6 +188,9 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 							this.addMsg(chwMachTypeMtc.getRptSb());
 							throw e;
 						}
+						// Call UpdateParkStatus
+						UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "MTC");
+						runParkCaller(updateParkStatus, model.getMACHTYPE() + "MTC");
 					}
 					//step d
 					
@@ -194,11 +206,24 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 								this.addMsg(chwMachTypeUpg.getRptSb());
 								throw e;
 							}
+							// Call UpdateParkStatus
+							UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "MTC");
+							runParkCaller(updateParkStatus, model.getMACHTYPE() + "MTC");
+							
 						}else if(model.getORDERCODE()!=null&&model.getORDERCODE().trim().length()>0&&CommonUtils.contains("M,B",model.getORDERCODE())) {
 							this.addDebug("Calling " + "processMachTypeUpg");
 							processMachTypeUpg(model, connection);	
 						}
 					}
+					
+					// step e
+					Set<String> plnts = RFCConfig.getBHPlnts();
+					this.addOutput("Start Bom Processing!");
+					updateSalesBom(model, "NEW", plnts);
+					if("M".equals(model.getORDERCODE())||"B".equals(model.getORDERCODE())) {
+						updateSalesBom(model, "UPG", plnts);
+					}
+					this.addOutput("Bom Processing Finished!");
 					
 					RdhChwFcProd prod = new RdhChwFcProd(model);
 					runRfcCaller(prod);
@@ -264,11 +289,97 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		}
 	}
 
+		
+	public void updateSalesBom(MODEL model, String flag, Set<String> plnts) throws Exception {
+		for(String plant : plnts) {
+			//call ChwBomCreate 
+			ChwBomCreate chwBomCreate = new ChwBomCreate(model.getMACHTYPE()+flag, plant);
+			this.addDebug("Calling " + "ChwBomCreate");
+			this.addDebug(chwBomCreate.generateJson());
+			try{
+				chwBomCreate.execute();
+				this.addDebug(chwBomCreate.createLogEntry());
+			}catch(Exception e) {
+				this.addOutput(e.getMessage());
+				continue;
+			}
+			//call ChwReadSalesBom 
+			ChwReadSalesBom chwReadSalesBom = new ChwReadSalesBom(model.getMACHTYPE()+flag, plant);
+			this.addDebug("Calling " + "ChwReadSalesBom");
+			this.addDebug(chwReadSalesBom.generateJson());
+			try{
+				chwReadSalesBom.execute();
+				this.addDebug(chwReadSalesBom.createLogEntry());
+			}catch(Exception e) {
+				if(e.getMessage().contains("exists in Mast table but not defined to Stpo table")){
+					
+				} else{
+					this.addOutput(e.getMessage());
+					continue;
+				}
+			}
+			this.addDebug("Bom Read result:"+chwReadSalesBom.getRETURN_MULTIPLE_OBJ().toString());
+			List<HashMap<String, String>> componmentList = chwReadSalesBom.getRETURN_MULTIPLE_OBJ().get("stpo_api02");
+			String componment = model.getMACHTYPE() + model.getMODEL();
+			if (componmentList != null && componmentList.size() > 0) {
+				if (hasMatchComponent(componmentList, componment)) {
+					this.addDebug("updateSalesBom exist component " + componment);
+				}else {
+					String POSNR = getMaxItemNo(componmentList);
+					POSNR=generateItemNumberString(POSNR);
+					//call ChwBomMaintain 
+					ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag, plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+					this.addDebug("Calling " + "chwBomMaintain");
+					this.addDebug(chwBomMaintain.generateJson());
+					try {
+						chwBomMaintain.execute();
+						this.addDebug(chwBomMaintain.createLogEntry());	
+					}catch(Exception e) {
+						this.addOutput(e.getMessage());
+						continue;
+					}
+				}
+			}else {
+				//call ChwBomMaintain 
+				ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag, plant, model.getMACHTYPE()+model.getMODEL(),"0005","SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+				this.addDebug("Calling " + "chwBomMaintain");
+				this.addDebug(chwBomMaintain.generateJson());
+				try {
+					chwBomMaintain.execute();
+					this.addDebug(chwBomMaintain.createLogEntry());	
+				}catch(Exception e) {
+					this.addOutput(e.getMessage());
+					continue;
+				}
+			}
+		}
+		
+	}
 	
+	private String getMaxItemNo(List<HashMap<String, String>> componmentList) {
+		List itemNo = new ArrayList();
+		for (int i = 0; i < componmentList.size(); i++) {
+			String rev = componmentList.get(i).get("ITEM_NO");
+			itemNo.add(Integer.parseInt(rev));
+		}
+		int maxItemNo = Collections.max(itemNo);
+		return String.format("%04d", maxItemNo);
+	}
 
+	private String generateItemNumberString(String posnr) {
+		int tempValue = Integer.parseInt(posnr)+5;
+		return String.format("%04d", tempValue);
+	}
 
-	
-
+	private boolean hasMatchComponent(List<HashMap<String, String>> bom, String componment){
+		for (int i = 0; i < bom.size(); i++) {
+			String rev = bom.get(i).get("COMPONENT");
+			if (rev.trim().equals(componment)){				
+			  return true;
+			}
+		}
+		return false;
+	}
 	/*
 	 * Get Name based on navigation attributes for root entity
 	 *
@@ -602,6 +713,18 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		}
 	}
 
+    protected void runParkCaller(RdhBase caller, String zdmnum) throws Exception {
+		this.addDebug("Calling " + caller.getRFCName());
+		caller.execute();
+		this.addDebug(caller.createLogEntry());
+		if (caller.getRfcrc() == 0) {
+			this.addOutput("Parking records updated successfully for ZDMRELNUM="+zdmnum);
+		} else {
+			this.addOutput(caller.getRFCName() + " called faild!");
+			this.addOutput(caller.getError_text());
+		}
+	}
+    
     public void processMachTypeMODEL (MODEL model,Connection odsConnection) throws Exception {
     	String materialType="ZPRT";
     	String  materialID =model.getMACHTYPE()+model.getMODEL();
@@ -639,10 +762,11 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id, dep_extern, dep_type, descript)	;
 		chwDepdCaller.addSourceLineCondition(sourceLine);
 		runRfcCaller(chwDepdCaller);
-		 //ChwDepdMaintain 
+		//ChwDepdMaintain 
 		
-		
-		
+		//5 Call UpdateParkStatus
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + model.getMODEL());
+		runParkCaller(updateParkStatus, model.getMACHTYPE() + model.getMODEL());
     	
     }
     public void processMachTypeNew(MODEL model,Connection odsConnection) throws Exception {
@@ -759,6 +883,10 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		ChwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", empty);  //Set to "PR_E2E_PRICING_HW"		
 		runRfcCaller(ChwConpMaintain);
 		
+		//8 Call UpdateParkStatus
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "NEW");
+		runParkCaller(updateParkStatus, model.getMACHTYPE() + "NEW");
+		
     }
     
     public void processMachTypeUpg(MODEL model,Connection odsConnection) throws Exception {
@@ -848,6 +976,10 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		chwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", "");
 		runRfcCaller(chwConpMaintain);
 		
+		// Call UpdateParkStatus
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "UPG");
+		runParkCaller(updateParkStatus, model.getMACHTYPE() + "UPG");
+		
     }
     public void processMachTypeMODEL_Svc(MODEL model,Connection odsConnection) throws Exception {
     	String materialType = "ZPRT";
@@ -868,7 +1000,10 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addMsg(chw001ClfCreate.getRptSb());
 			throw e;
 		}
-    	
+		
+		// Call UpdateParkStatus	
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + model.getMODEL());
+		runParkCaller(updateParkStatus, model.getMACHTYPE() + model.getMODEL()); 	
     	
     }
     
