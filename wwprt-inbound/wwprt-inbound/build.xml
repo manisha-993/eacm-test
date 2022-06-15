@@ -10,6 +10,8 @@
 
 	<path id="classpath">
 		<fileset dir="${lib.dir}" includes="**/*.jar" />
+		<pathelement path="/home/db2eacmd/sqllib/java/db2jcc4.jar"/>
+		<pathelement path="/home/db2eacmd/sqllib/java/db2jcc_license_cu.jar"/>
 	</path>
 	
 	<target name="clean">
