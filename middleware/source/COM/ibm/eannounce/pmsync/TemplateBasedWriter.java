@@ -29,6 +29,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 
+import COM.ibm.opicmpdh.middleware.Validate;
+import COM.ibm.opicmpdh.objects.Validator;
+
 /**
  * <PRE>
  * Write some output text based on a pre-defined template.
@@ -71,7 +74,9 @@ public  class TemplateBasedWriter extends PrintWriter {
                 if(strLine == null) {
                     return;     
                 }
+                if(Validator.validateInappropriateEncoding(strLine)) {
                 println(performSubstitutions(strLine));   
+                }
             }
             //
         } catch(Exception exc) {

@@ -198,7 +198,10 @@ public final class Expando {
     SourceLine lFile;
 
     try {
-      BufferedWriter bwOutput = new BufferedWriter(new FileWriter(_f + ".bak"));
+    String filePath = _f + ".bak";
+    boolean validate = pathTranelVaild(filePath);
+    if(validate) {
+     BufferedWriter bwOutput = new BufferedWriter(new FileWriter(_f + ".bak"));
 
       while ((lFile = (SourceLine) c_hashLines.get(_f + ":" + iLine)) != null) {
         ++iLine;
@@ -207,10 +210,12 @@ public final class Expando {
       }
 
       bwOutput.close();
+    }
     } catch (Exception x) {
       System.out.println("error saving backup " + x);
     }
   }
+  
   public static void expandFile(File _f) {
 
     try {
