@@ -207,8 +207,8 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 								throw e;
 							}
 							// Call UpdateParkStatus
-							UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "MTC");
-							runParkCaller(updateParkStatus, model.getMACHTYPE() + "MTC");
+							UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "UPG");
+							runParkCaller(updateParkStatus, model.getMACHTYPE() + "UPG");
 							
 						}else if(model.getORDERCODE()!=null&&model.getORDERCODE().trim().length()>0&&CommonUtils.contains("M,B",model.getORDERCODE())) {
 							this.addDebug("Calling " + "processMachTypeUpg");
