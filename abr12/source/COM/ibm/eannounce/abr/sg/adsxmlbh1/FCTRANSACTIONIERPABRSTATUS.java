@@ -357,7 +357,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				this.runRfcCaller(ChwConpMaintain);
 				
 				//12. 
-				String tmf_xml = getTMFFromXML(fctransaction.getTOMACHTYPE(),fctransaction.getTOMODEL(),fctransaction.getTOFEATURECODE(), connection);
+				/*String tmf_xml = getTMFFromXML(fctransaction.getTOMACHTYPE(),fctransaction.getTOMODEL(),fctransaction.getTOFEATURECODE(), connection);
 				if("".equals(tmf_xml)) {
 					addOutput("tmf_xml is Null, not Call ChwFCTYMDMFCMaint");	
 					ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(null,fctransaction);
@@ -367,7 +367,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					TMF_UPDATE tmf = XMLParse.getObjectFromXml(tmf_xml,TMF_UPDATE.class);
 					ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(tmf,fctransaction);
 					this.runRfcCaller(caller);
-				}				
+				}	*/			
 
 				//13.
 				if(fctransaction.getTOMACHTYPE().equals(fctransaction.getFROMMACHTYPE())) {
