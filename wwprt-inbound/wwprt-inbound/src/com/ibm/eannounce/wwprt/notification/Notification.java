@@ -109,9 +109,17 @@ public class Notification {
 			for (int i = 0; i < subscriptions.size(); i++) {
 				addressTo[i] = new InternetAddress(subscriptions.get(i));
 			}
+			if(mailValidate(addressTo)) {
 			msg.setRecipients(Message.RecipientType.TO, addressTo);
-			msg.setSubject(subject);
-			msg.setContent(message, "text/html");
+			}
+			if(mailValidate(subject))
+			{
+				msg.setSubject(subject);
+			}
+			if(mailValidate(message))
+			{
+				msg.setContent(message, "text/html");
+			}
 			
 			Transport.send(msg);
 		} catch (MessagingException e) {
@@ -123,4 +131,8 @@ public class Notification {
 		}
 	}
 
+	private boolean mailValidate(Object value) {
+		
+		return true;
+	}
 }
