@@ -311,8 +311,9 @@ public class SGMDPCatalog extends SGCatalog
 					seq = PokUtils.getAttributeValue(catAttrItem, "CATSEQ", "", "",false);
 					title=" title=\"["+seq+"]"+tooltip+"\"";
 				}
-
-				out.println("<td"+title+"><span class=\"small\">"+value+"</span></td></tr>");
+				String pltStr = "<td"+title+"><span class=\"small\">"+value+"</span></td></tr>";
+				if(validate(pltStr))
+                  out.println(pltStr);
 			}
 		}
     }

@@ -429,13 +429,15 @@ public final class Expando {
     return lReturn;
   }
   public static List getFromConfigFile(File _f) throws IOException {
-
-    BufferedReader bfr = new BufferedReader(new FileReader(_f));
+	  BufferedReader bfr = null;
+	 boolean valid =  pathTranelVaild(_f.toString());
+     if(valid)
+    bfr= new BufferedReader(new FileReader(_f));
     String strLine = null;
     List lReturn = new ArrayList();
 
     while ((strLine = readTemplate(bfr)) != null) {
-    	boolean valid = pathTranelVaild(strLine);
+    	 valid = pathTranelVaild(strLine);
     	if(valid) {
       File f = new File(strLine);
 

@@ -179,7 +179,9 @@ public class SGVAMCatalog extends SGCatalog
                     if (tooltip!=null){
                         title=" title=\""+tooltip+"\"";
                     }
-                    out.println("<td headers=\"colseq"+ic+"\""+title+">"+colVal+"<br /></td>");
+                	String pltStr = "<td headers=\"colseq"+ic+"\""+title+">"+colVal+"<br /></td>";
+    				if(validate(pltStr))
+                     out.println();
                 }
 
                 out.println("</tr>");
