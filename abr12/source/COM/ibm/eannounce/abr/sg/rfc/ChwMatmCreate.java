@@ -393,11 +393,14 @@ public class ChwMatmCreate extends RdhBase {
 			for (int i = 0; i <taxcategories.size(); i++) {
 				TAXCATEGORY taxcategory = taxcategories.get(i);
 				List<COUNTRY> countrys = taxcategory.getCOUNTRYLIST();
+				if(null==taxcategory.getTAXCLASSIFICATION()) {
+					continue;
+				}
 				for (int j = 0; j < countrys.size(); j++) {
 					COUNTRY country = countrys.get(j);
 					if(!countrySet.contains(country.getCOUNTRY_FC())) {
 						countrySet.add(country.getCOUNTRY_FC());
-						taxcategory.getTAXCLASSIFICATION();
+						
 						
 						RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
 						tax_country.setAland(RFCConfig.getAland(country.getCOUNTRY_FC()));
