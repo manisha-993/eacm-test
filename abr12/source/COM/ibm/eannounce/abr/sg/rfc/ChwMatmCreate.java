@@ -393,7 +393,7 @@ public class ChwMatmCreate extends RdhBase {
 			for (int i = 0; i <taxcategories.size(); i++) {
 				TAXCATEGORY taxcategory = taxcategories.get(i);
 				List<COUNTRY> countrys = taxcategory.getCOUNTRYLIST();
-				if(null==taxcategory.getTAXCLASSIFICATION()) {
+				if(null==taxcategory.getTAXCLASSIFICATION()||"".equals(taxcategory.getTAXCLASSIFICATION().trim())) {
 					continue;
 				}
 				for (int j = 0; j < countrys.size(); j++) {
