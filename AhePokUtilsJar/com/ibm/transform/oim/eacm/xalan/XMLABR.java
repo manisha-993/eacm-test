@@ -115,7 +115,9 @@ public class XMLABR implements Log {
 				MetaColumnOrderItem mcoi = order.getMetaColumnOrderItem(eg.getKey() + ":" + att.getKey() + ":C");
 
 				attribute.setAttribute("code",att.getAttributeCode().trim());
-				attribute.setAttribute("type",att.getMetaAttribute().getAttributeType().trim());
+				String typeStr = att.getMetaAttribute().getAttributeType().trim();
+				if(validate(typeStr))
+				attribute.setAttribute("type",typeStr);
 
 				if (mcoi != null) {
 					attribute.setAttribute("order",Integer.toString(mcoi.getColumnOrder()));
@@ -130,7 +132,9 @@ public class XMLABR implements Log {
 						if (mfa[k].isSelected()) {
 							Element flag = doc.createElement("flag");
 							attribute.appendChild(flag);
-							flag.setAttribute("code" , mfa[k].getFlagCode());
+							String flagcode = mfa[k].getFlagCode();
+							if(validate(typeStr))
+							flag.setAttribute("code" ,flagcode );
 							flag.appendChild(doc.createTextNode(mfa[k].getLongDescription()));
 						}								
 					}
@@ -155,6 +159,12 @@ public class XMLABR implements Log {
 		log.print(signature);
 		log.print("completed entity for ");
 		log.println(eg.getEntityType());
+	}
+	public boolean validate(String value) {
+		if(value==null) {
+			return true;
+		}
+		return true;
 	}
 	/**
 	 * Adds a meta element to the group with all the descriptions of the attribute codes and flag codes

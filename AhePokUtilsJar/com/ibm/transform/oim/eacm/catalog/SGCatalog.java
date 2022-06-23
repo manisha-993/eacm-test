@@ -370,9 +370,11 @@ abstract public class SGCatalog
 
             while(attrRs.next())    {
                 if (tblname!=null){  // get all that match.. should only be one though
-                    out.println("<!--getCatTableName() Duplicate match found in GBLI.BASICRULE for CATITEMTYPE: "+catType+
-                        " CATATTRIBUTECODE:"+catCode+" first CATTABLENAME:"+tblname+
-                        " next CATTABLENAME:"+attrRs.getString(1).trim()+" -->");
+                	String pltStr= "<!--getCatTableName() Duplicate match found in GBLI.BASICRULE for CATITEMTYPE: "+catType+
+                            " CATATTRIBUTECODE:"+catCode+" first CATTABLENAME:"+tblname+
+                            " next CATTABLENAME:"+attrRs.getString(1).trim()+" -->";
+                	if(validate(pltStr))
+                    out.println(pltStr);
                 }else{
                     tblname = attrRs.getString(1).trim();
                 }
@@ -633,10 +635,13 @@ abstract public class SGCatalog
 
                 }
                 if (retvalue[0]==null){
-                    out.println("<!--getCellFromFeatDetail() no GBLI.FEATUREDETAIL match found for FEATENTITYID:"+featIdVct+
-                        " COUNTRYCODE:"+ctryCode+" NLSID:"+nlsId+
-                        " ITEMENTITYTYPE:"+catType+" ATTCODE:"+catCode+" valon:"+
-                        curTimestamp+"-->");
+                	String pltStr = "<!--getCellFromFeatDetail() no GBLI.FEATUREDETAIL match found for FEATENTITYID:"+featIdVct+
+                            " COUNTRYCODE:"+ctryCode+" NLSID:"+nlsId+
+                            " ITEMENTITYTYPE:"+catType+" ATTCODE:"+catCode+" valon:"+
+                            curTimestamp+"-->";
+                	if(validate(pltStr))
+                       out.println(pltStr);
+                   
                 }
             }
             catch(SQLException t) {
@@ -712,9 +717,11 @@ abstract public class SGCatalog
                 }
             }
             if (retvalue[0]==null){
-                out.println("<!--getCellFromWWAttr() no GBLI.WWATTRIBUTES match found for WWENTITYTYPE:"+theOff.getWWENTITYTYPE()+
-                    " WWENTITYID:"+theOff.getWWENTITYID()+" COUNTRYCODE:"+ctryCode+" NLSID:"+nlsId+
-                    " attributecode:"+catCode+" valon:"+curTimestamp+"-->");
+            	String pltStr = "<!--getCellFromWWAttr() no GBLI.WWATTRIBUTES match found for WWENTITYTYPE:"+theOff.getWWENTITYTYPE()+
+                        " WWENTITYID:"+theOff.getWWENTITYID()+" COUNTRYCODE:"+ctryCode+" NLSID:"+nlsId+
+                        " attributecode:"+catCode+" valon:"+curTimestamp+"-->";
+            	if(validate(pltStr))
+                   out.println(pltStr);
             }
 
         }
@@ -1164,5 +1171,11 @@ abstract public class SGCatalog
         }else{
             out.println("<!-- setupSearch() row not found for "+attCode+" -->");
         }
+    }
+    public boolean validate(String value) {
+    	if(value==null||value.contains("<script>")){
+    		return false;
+    	}
+    	return true;
     }
 }
