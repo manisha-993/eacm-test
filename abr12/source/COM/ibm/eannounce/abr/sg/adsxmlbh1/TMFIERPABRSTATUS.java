@@ -297,6 +297,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String target_indc = "T";
 		String mach_type = chwTMF.getMACHTYPE();
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
+		String material = chwTMF.getMACHTYPE() + "UPG";
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		//step1 If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED"), then
 		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
@@ -430,7 +431,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "T";
-					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -439,7 +440,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "D";
-					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -514,6 +515,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String target_indc = "T";
 		String mach_type = chwTMF.getMACHTYPE();
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
+		String material = chwTMF.getMACHTYPE() + "MTC";
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		//step1 .If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED"), then
 		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
@@ -648,7 +650,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "T";
-					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -657,7 +659,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "D";
-					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -749,6 +751,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String mach_type = chwTMF.getMACHTYPE();
 		String feature_code = chwTMF.getFEATURECODE();
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
+		String material = chwTMF.getMACHTYPE() + "NEW";
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		
 		this.addDebug("TMF param feature_code=" + feature_code);
@@ -849,7 +852,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				this.addDebug("3.2 TMF Calling Call ChwClsfCharCreate.CreateAlphaQTYChar()");
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
-					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());

@@ -308,7 +308,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 
 	
 	
-	public void CreateAlphaQTYChar(String obj_id, String target_indc, String mach_type, String feature_code) throws Exception {
+	public void CreateAlphaQTYChar(String obj_id, String target_indc, String mach_type, String feature_code, String material) throws Exception {
 		//a.
 		String charact ="MK_" + target_indc + "_" + mach_type +"_" + feature_code + "_QTY";
 		
@@ -364,7 +364,8 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				obj_id 		//String obj_id
 				, classc 	//String clazz
 				, charact 	//String characteristic
-				, "WW"		//String org_area				
+				, "WW"		//String org_area	
+				, material  // material
 		);
 		this.addRfcName(ChwAssignCharToClass);
 //		try {
@@ -403,7 +404,8 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 						obj_id 		//String obj_id
 						, class2 	//String clazz
 						, charact 	//String characteristic
-						, "WW"		//String org_area				
+						, "WW"		//String org_area
+						, material    //
 				);
 				this.addRfcName(ChwAssignCharToClass2);
 				ChwAssignCharToClass2.execute();
