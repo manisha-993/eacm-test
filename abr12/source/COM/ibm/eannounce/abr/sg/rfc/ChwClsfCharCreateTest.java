@@ -14,7 +14,7 @@ public class ChwClsfCharCreateTest
     @BeforeClass
     public static void setUpBeforeClass()
     {
-        obj_id = "5689R2N";
+        obj_id = "9080NEW";
     }
     
     @Test
@@ -24,7 +24,7 @@ public class ChwClsfCharCreateTest
         ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
         
         try{
-        	obj_id = "GroupChar";
+        	obj_id = "9080NEW";
         	String target_indc="T";
         	String mach_type ="9080";
         	String feature_code="1234";
@@ -48,7 +48,7 @@ public class ChwClsfCharCreateTest
         ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
         
         try{
-        	obj_id = "GroupChar";
+        	obj_id = "9080NEW";
         	String target_indc="T";
         	String mach_type ="9080";
         	String feature_code="1234";
@@ -70,7 +70,7 @@ public class ChwClsfCharCreateTest
         ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
         
         try{
-        	obj_id = "GroupChar";
+        	obj_id = "9080NEW";
         	String target_indc="T";
         	String mach_type ="9080";
         	String feature_code="1234";
@@ -94,7 +94,7 @@ public class ChwClsfCharCreateTest
         ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
         
         try{
-        	obj_id = "GroupChar";
+        	obj_id = "9080NEW";
         	String target_indc="T";
         	String mach_type ="9080";
         	String feature_code="1234";
@@ -117,7 +117,7 @@ public class ChwClsfCharCreateTest
         ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
         
         try{
-        	obj_id = "GroupChar";
+        	obj_id = "9080NEW";
         	String target_indc="T";
         	String mach_type ="9080";
         	String feature_code="1234";
@@ -141,11 +141,11 @@ public class ChwClsfCharCreateTest
         ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
         
         try{
-        	obj_id = "7890CHW";
+        	obj_id = "7890NEW";
         	String target_indc="T";
         	String mach_type ="9080";
         	String feature_code="1234";
-        	ChwClsfCharCreate. CreateAlphaQTYChar(obj_id,target_indc,mach_type,feature_code);
+        	ChwClsfCharCreate. CreateAlphaQTYChar(obj_id,target_indc,mach_type,feature_code,obj_id);
         } catch (Exception e)
         {
             System.err.println("@@@@" +e.getMessage());
