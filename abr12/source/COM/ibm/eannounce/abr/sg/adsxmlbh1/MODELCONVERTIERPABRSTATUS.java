@@ -1,5 +1,10 @@
 package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -140,6 +145,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 					this.addOutput("Not find the Model with the modelxml");
 					return;
 				}
+				String flag = modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())?"UPG":"MTC";
 				if (modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())) {
 					ChwModelConvertUpg mUpg = new ChwModelConvertUpg(model,modelconvert,m_db.getPDHConnection(),connection);
 					try{
@@ -149,17 +155,6 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 						// TODO: handle exception
 						addError(mUpg.getRptSb().toString());
 						throw e;
-					} 
-					// Call UpdateParkStatus
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", modelconvert.getTOMACHTYPE() + "UPG");
-					this.addDebug("Calling "+updateParkStatus.getRFCName());
-					updateParkStatus.execute();
-					this.addDebug(updateParkStatus.createLogEntry());
-					if (updateParkStatus.getRfcrc() == 0) {
-						this.addOutput("Parking records updated successfully for ZDMRELNUM="+modelconvert.getTOMACHTYPE()+"UPG");
-					} else {
-						this.addOutput(updateParkStatus.getRFCName() + " called faild!");
-						this.addOutput(updateParkStatus.getError_text());
 					}
 				}else {					 
 					ChwModelConvertMtc mtc = new ChwModelConvertMtc(model,modelconvert,m_db.getPDHConnection(),connection);
@@ -170,17 +165,6 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 						// TODO: handle exception
 						addError(mtc.getRptSb().toString());
 						throw e;
-					} 
-					// Call UpdateParkStatus
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", modelconvert.getTOMACHTYPE() + "MTC");
-					this.addDebug("Calling "+updateParkStatus.getRFCName());
-					updateParkStatus.execute();
-					this.addDebug(updateParkStatus.createLogEntry());
-					if (updateParkStatus.getRfcrc() == 0) {
-						this.addOutput("Parking records updated successfully for ZDMRELNUM="+modelconvert.getTOMACHTYPE()+"MTC");
-					} else {
-						this.addOutput(updateParkStatus.getRFCName() + " called faild!");
-						this.addOutput(updateParkStatus.getError_text());
 					}
 				}
 				/* MTCYMDMFCMaint maint = new MTCYMDMFCMaint(modelconvert);
@@ -214,13 +198,24 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 					}
 					*/
 
-				 //create Sales Bom
-				 String materialType = modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())? "UPG":"MTC";
-				 List<MODEL> models = getMODEL(modelconvert.getTOMACHTYPE(), modelconvert.getPDHDOMAIN());
-				 Set<String> plnts = RFCConfig.getBHPlnts();
-				 this.addOutput("Start Bom Processing!");
-				 updateSalesBom(modelconvert,materialType,plnts,models);
-				 this.addOutput("Bom Processing Finished!");
+				//create Sales Bom
+				List<MODEL> models = getMODEL(modelconvert.getTOMACHTYPE(), modelconvert.getPDHDOMAIN());
+				Set<String> plnts = RFCConfig.getBHPlnts();
+				this.addOutput("Start Bom Processing!");
+				updateSalesBom(modelconvert,flag,plnts,models);
+				this.addOutput("Bom Processing Finished!");
+
+				// Call UpdateParkStatus
+				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", modelconvert.getTOMACHTYPE() + flag);
+				this.addDebug("Calling "+updateParkStatus.getRFCName());
+				updateParkStatus.execute();
+				this.addDebug(updateParkStatus.createLogEntry());
+				if (updateParkStatus.getRfcrc() == 0) {
+					this.addOutput("Parking records updated successfully for ZDMRELNUM="+modelconvert.getTOMACHTYPE()+flag);
+				} else {
+					this.addOutput(updateParkStatus.getRFCName() + " called faild!");
+					this.addOutput(updateParkStatus.getError_text());
+				}
 			} else {
 				this.addOutput("XML file not exeit in cache,RFC caller not called!");
 				//return;
@@ -316,66 +311,88 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				this.addOutput(e.getMessage());
 				continue;
 			}
-			//call ChwReadSalesBom 
-			ChwReadSalesBom chwReadSalesBom = new ChwReadSalesBom(modelconvert.getTOMACHTYPE()+flag, plant);
-			this.addDebug("Calling " + "ChwReadSalesBom");
-			this.addDebug(chwReadSalesBom.generateJson());
-			try{
-				chwReadSalesBom.execute();
-				this.addDebug(chwReadSalesBom.createLogEntry());
-			}catch(Exception e) {
-				if(e.getMessage().contains("exists in Mast table but not defined to Stpo table")){
-					
-				} else{
-					this.addOutput(e.getMessage());
-					continue;
-				}
-			}
-			this.addDebug("Bom Read result:"+chwReadSalesBom.getRETURN_MULTIPLE_OBJ().toString());
-			List<HashMap<String, String>> componmentList = chwReadSalesBom.getRETURN_MULTIPLE_OBJ().get("stpo_api02");
-			if (componmentList != null && componmentList.size() > 0) {
-				String POSNR = getMaxItemNo(componmentList);
-				for(MODEL model : models) {
-					String componment = model.getMACHTYPE() + model.getMODEL();	
-					if (hasMatchComponent(componmentList, componment)) {
-						this.addDebug("updateSalesBom exist component " + componment);
-					}else {						
-						POSNR=generateItemNumberString(POSNR);
-						//call ChwBomMaintain 
-						ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag, plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
-						this.addDebug("Calling " + "chwBomMaintain");
-						this.addDebug(chwBomMaintain.generateJson());
-						try {
-							chwBomMaintain.execute();
-							this.addDebug(chwBomMaintain.createLogEntry());	
-						}catch(Exception e) {
-							this.addOutput(e.getMessage());
-							POSNR = getMaxItemNo(componmentList);
-							continue;
-						}
-					}
-				}
-			}else {
-				//call ChwBomMaintain 
-				String POSNR ="0005";
-				//call ChwBomMaintain 
-				for(MODEL model : models) {	
-					//call ChwBomMaintain 
-					ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag, plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
-					this.addDebug("Calling " + "chwBomMaintain");
-					this.addDebug(chwBomMaintain.generateJson());
+			// start lock
+			String fileName = "./locks/MODELCONVERT" + modelconvert.getTOMACHTYPE() + flag + plant + ".lock";
+			File file = new File(fileName);
+			new File(file.getParent()).mkdirs();
+			try (FileOutputStream fos = new FileOutputStream(file); FileChannel fileChannel = fos.getChannel()) {
+				while (true) {
 					try {
-						chwBomMaintain.execute();
-						this.addDebug(chwBomMaintain.createLogEntry());	
-					}catch(Exception e) {
-						this.addOutput(e.getMessage());
-						continue;
+						FileLock fileLock = fileChannel.tryLock();
+						if (fileLock != null) {
+							this.addDebug("Start lock, lock file " + fileName);
+							// lock content
+							//call ChwReadSalesBom
+							ChwReadSalesBom chwReadSalesBom = new ChwReadSalesBom(modelconvert.getTOMACHTYPE()+flag, plant);
+							this.addDebug("Calling " + "ChwReadSalesBom");
+							this.addDebug(chwReadSalesBom.generateJson());
+							try{
+								chwReadSalesBom.execute();
+								this.addDebug(chwReadSalesBom.createLogEntry());
+							}catch(Exception e) {
+								if(e.getMessage().contains("exists in Mast table but not defined to Stpo table")){
+
+								} else{
+									this.addOutput(e.getMessage());
+									continue;
+								}
+							}
+							this.addDebug("Bom Read result:"+chwReadSalesBom.getRETURN_MULTIPLE_OBJ().toString());
+							List<HashMap<String, String>> componmentList = chwReadSalesBom.getRETURN_MULTIPLE_OBJ().get("stpo_api02");
+							if (componmentList != null && componmentList.size() > 0) {
+								String POSNR = getMaxItemNo(componmentList);
+								for(MODEL model : models) {
+									String componment = model.getMACHTYPE() + model.getMODEL();
+									if (hasMatchComponent(componmentList, componment)) {
+										this.addDebug("updateSalesBom exist component " + componment);
+									}else {
+										POSNR=generateItemNumberString(POSNR);
+										//call ChwBomMaintain
+										ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag, plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+										this.addDebug("Calling " + "chwBomMaintain");
+										this.addDebug(chwBomMaintain.generateJson());
+										try {
+											chwBomMaintain.execute();
+											this.addDebug(chwBomMaintain.createLogEntry());
+										}catch(Exception e) {
+											this.addOutput(e.getMessage());
+											POSNR = getMaxItemNo(componmentList);
+											continue;
+										}
+									}
+								}
+							}else {
+								//call ChwBomMaintain
+								String POSNR ="0005";
+								//call ChwBomMaintain
+								for(MODEL model : models) {
+									//call ChwBomMaintain
+									ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag, plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+									this.addDebug("Calling " + "chwBomMaintain");
+									this.addDebug(chwBomMaintain.generateJson());
+									try {
+										chwBomMaintain.execute();
+										this.addDebug(chwBomMaintain.createLogEntry());
+									}catch(Exception e) {
+										this.addOutput(e.getMessage());
+										continue;
+									}
+									POSNR=generateItemNumberString(POSNR);
+								}
+							}
+							// end lock content
+						} else {
+							this.addDebug("fileLock == null");
+							Thread.sleep(5000);
+						}
+					} catch (OverlappingFileLockException e1) {
+						this.addDebug("other abr is running createSalesBOMforType" + flag);
+						Thread.sleep(5000);
 					}
-					POSNR=generateItemNumberString(POSNR);
-				}		
+				}
 			}
+			// end lock
 		}
-		
 	}
 
 	private String getMaxItemNo(List<HashMap<String, String>> componmentList) {
