@@ -15,17 +15,20 @@ public class ChwAssignCharToClass extends RdhBase
     private String j_class;
     @SerializedName("J_KLART")
     private String j_klart;
+    @SerializedName("MATERIAL")
+    private String material;
     @SerializedName("RMCLM")
     private List<RdhClaa_rmclm> rmclms;
     @Foo
     private RdhClaa_rmclm rmclm;
     
-    public ChwAssignCharToClass(String obj_id, String clazz, String characteristic, String org_area)
+    public ChwAssignCharToClass(String obj_id, String clazz, String characteristic, String org_area, String material)
     {
         super(obj_id,"Z_DM_SAP_ASSIGN_CHAR_TO_CLASS".toLowerCase(), null);
         this.pims_identity = "H";
         j_class = clazz;
         j_klart = "300";
+        this.material = material;
         rmclm = new RdhClaa_rmclm();
         rmclm.setAbtei(org_area);
         rmclm.setMerkma(characteristic);

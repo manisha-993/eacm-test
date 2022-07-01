@@ -15,14 +15,14 @@ public class ChwAssignCharToClassTest
     @BeforeClass
     public static void setUpBeforeClass()
     {
-    	obj_id = "ST00001Y";
+    	obj_id = "9080NEW";
     }
     
     @Test
     public void testConstructor()
     {
         System.out.println("-------------  testConstructor start -------------");
-        ChwAssignCharToClass charToClass =new ChwAssignCharToClass(obj_id, "MK_REFERENCE", "TEST1", "US");
+        ChwAssignCharToClass charToClass =new ChwAssignCharToClass(obj_id, "MK_REFERENCE", "TEST1", "US",obj_id);
         try{
             String logEntry = charToClass.createLogEntry();
             assertTrue(logEntry.indexOf("\"J_KLART\":\"300\"")>0);
@@ -44,7 +44,7 @@ public class ChwAssignCharToClassTest
     public void testIsReadyToExecuteWithoutJCLASS()
     {
         System.out.println("-------------  testIsReadyToExecuteWithoutJCLASS start -------------");
-        ChwAssignCharToClass charToClass =new ChwAssignCharToClass(obj_id, "", "CLSNAME", "CLSTYPE");
+        ChwAssignCharToClass charToClass =new ChwAssignCharToClass(obj_id, "", "CLSNAME", "CLSTYPE",obj_id);
         try{
             charToClass.execute();
         } catch (Exception e)
@@ -64,7 +64,7 @@ public class ChwAssignCharToClassTest
     {
         System.out.println("-------------  testIsReadyToExecuteWithoutMerkma start -------------");
         ChwAssignCharToClass charToClass =new ChwAssignCharToClass(obj_id, "Test", "", 
-                "XXX");
+                "XXX",obj_id);
         try{
             charToClass.execute();
         } catch (Exception e)
@@ -83,7 +83,7 @@ public class ChwAssignCharToClassTest
 	public void testIsReadyToExecuteWithoutJCLASS2()
 	{
 	    System.out.println("-------------  testIsReadyToExecuteWithoutJCLASS start -------------");
-	    ChwAssignCharToClass charToClass =new ChwAssignCharToClass(obj_id, "", "CLSNAME", "CLSTYPE");
+	    ChwAssignCharToClass charToClass =new ChwAssignCharToClass(obj_id, "", "CLSNAME", "CLSTYPE",obj_id);
 	    try{
 	        charToClass.execute();
 	    } catch (Exception e)
