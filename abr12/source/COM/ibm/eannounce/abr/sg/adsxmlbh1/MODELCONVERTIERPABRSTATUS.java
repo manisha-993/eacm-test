@@ -334,7 +334,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 
 								} else{
 									this.addOutput(e.getMessage());
-									continue;
+									break;
 								}
 							}
 							this.addDebug("Bom Read result:"+chwReadSalesBom.getRETURN_MULTIPLE_OBJ().toString());
@@ -357,7 +357,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 										}catch(Exception e) {
 											this.addOutput(e.getMessage());
 											POSNR = getMaxItemNo(componmentList);
-											continue;
+											break;
 										}
 									}
 								}
@@ -375,12 +375,13 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 										this.addDebug(chwBomMaintain.createLogEntry());
 									}catch(Exception e) {
 										this.addOutput(e.getMessage());
-										continue;
+										break;
 									}
 									POSNR=generateItemNumberString(POSNR);
 								}
 							}
 							// end lock content
+							break;
 						} else {
 							this.addDebug("fileLock == null");
 							Thread.sleep(5000);

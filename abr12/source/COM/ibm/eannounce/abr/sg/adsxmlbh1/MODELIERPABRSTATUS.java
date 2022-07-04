@@ -331,7 +331,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 
 								} else {
 									this.addOutput(e.getMessage());
-									continue;
+									break;
 								}
 							}
 							this.addDebug("Bom Read result:" + chwReadSalesBom.getRETURN_MULTIPLE_OBJ().toString());
@@ -352,7 +352,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 										this.addDebug(chwBomMaintain.createLogEntry());
 									} catch (Exception e) {
 										this.addOutput(e.getMessage());
-										continue;
+										break;
 									}
 								}
 							} else {
@@ -365,10 +365,11 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 									this.addDebug(chwBomMaintain.createLogEntry());
 								} catch (Exception e) {
 									this.addOutput(e.getMessage());
-									continue;
+									break;
 								}
 							}
 							// end lock content
+							break;
 						} else {
 							this.addDebug("fileLock == null");
 							Thread.sleep(5000);
