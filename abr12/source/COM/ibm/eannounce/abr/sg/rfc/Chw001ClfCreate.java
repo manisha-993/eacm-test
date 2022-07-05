@@ -111,7 +111,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 				Eles if (var='YES' and var1='NO'), then
 				      Set value to 'G'.
 			 */
-			//change back to old value on 2022-07-05
+			//EACM-6790 change back to old value on 2022-07-05
 			value = "";
 			String var= chwModel.getPRICEDIND().toUpperCase();
 			String var1= chwModel.getZEROPRICE().toUpperCase();
