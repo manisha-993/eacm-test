@@ -7,7 +7,11 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * This function contains the instructions for adding the SAP characteristics to a machine type model material master record.
+ * @author wangyul
+ *
+ */
 public class Chw001ClfCreate extends RfcCallerBase{
 	
 	MODEL chwModel;
@@ -107,23 +111,24 @@ public class Chw001ClfCreate extends RfcCallerBase{
 				Eles if (var='YES' and var1='NO'), then
 				      Set value to 'G'.
 			 */
+			//change back to old value on 2022-07-05
 			value = "";
 			String var= chwModel.getPRICEDIND().toUpperCase();
-//			String var1= chwModel.getZEROPRICE().toUpperCase();
-//			if("YES".equals(var) && "YES".equals(var1)){
-//				value ="Z";
-//			}else if("NO".equals(var) && "NO".equals(var1)){
-//				value ="Z";
-//			}else if("YES".equals(var) && "NO".equals(var1)){
-//				value ="G";
-//			} 
-			//new change on 2022-05-26
-			if("YES".equals(var)){
-				value ="G";
-			}else if("NO".equals(var)){
+			String var1= chwModel.getZEROPRICE().toUpperCase();
+			if("YES".equals(var) && "YES".equals(var1)){
 				value ="Z";
-			}
-			//new change end
+			}else if("NO".equals(var) && "NO".equals(var1)){
+				value ="Z";
+			}else if("YES".equals(var) && "NO".equals(var1)){
+				value ="G";
+			} 
+//			//new change on 2022-05-26 
+//			if("YES".equals(var)){
+//				value ="G";
+//			}else if("NO".equals(var)){
+//				value ="Z";
+//			}
+//			//new change end
 			rdhClassificationMaint.addCharacteristic("MM_PRICERELEVANT", value);
 			//2.f Call the TssClassificationMaint.addCharacteristic() method to add the MM_FG_INSTALLABLE characteristic to the MM_FIELDS classification. 
 			/**
