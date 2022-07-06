@@ -466,8 +466,8 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 			this.addDebug("GetMODEL SQL:"+ sql1);
 			while (resultSet1.next()) {
 				MODEL model = new MODEL();
-				model.setMACHTYPE(resultSet1.getString("MACHTYPEATR"));
-				model.setMODEL(resultSet1.getString("MODELATR"));
+				model.setMACHTYPE(resultSet1.getString("MACHTYPEATR").trim());
+				model.setMODEL(resultSet1.getString("MODELATR").trim());
 				models.add(model);
 			}
 			

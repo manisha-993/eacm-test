@@ -290,8 +290,8 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 		ResultSet resultSet = statement.executeQuery();
 		while (resultSet.next()) {
 			MODEL model = new MODEL();
-			model.setMACHTYPE(resultSet.getString("MACHTYPEATR"));
-			model.setMODEL(resultSet.getString("MODELATR"));
+			model.setMACHTYPE(resultSet.getString("MACHTYPEATR").trim());
+			model.setMODEL(resultSet.getString("MODELATR").trim());
 			models.add(model);
 		}
 		
