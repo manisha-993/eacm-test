@@ -229,7 +229,7 @@ public class XMLIDLFileGen {
 				Hashtable countTab = new Hashtable();
 				MessageDigest md = null;
 				try{
-					md = MessageDigest.getInstance("SHA1");
+					md = MessageDigest.getInstance("SHA-256");
 				}catch(Exception e){
 					log(e.getMessage());
 				}

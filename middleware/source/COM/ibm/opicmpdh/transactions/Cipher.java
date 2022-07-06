@@ -31,17 +31,21 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
+import COM.ibm.opicmpdh.middleware.TestLDAP;
 
 public class Cipher
 {
-	private static final String KEY_ALGO = "DES";
-	private static final String CIPHER_ALGO = "DES/ECB/PKCS5Padding";
+	private static final String KEY_ALGO = "AES";
+	private static final String CIPHER_ALGO = "AES/CBC/PKCS5Padding";
 	private static final HashMap encryptionHashMap;
 	static{
 		encryptionHashMap = new HashMap();	// create a new hashmap and
@@ -195,10 +199,18 @@ public class Cipher
 		javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CIPHER_ALGO);
 
 		String str = uid+(new String(pw));
+		
 		byte[] data = str.getBytes("UTF8");
-
+		//data =Base64.getEncoder().encode(data);
 		// Initialize the cipher for encryption
-		cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, key);
+		//cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, key);
+		byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		IvParameterSpec ivspec = new IvParameterSpec(iv);
+		try{
+			cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, key,ivspec);
+		}catch (InvalidAlgorithmParameterException e) {
+			throw new RuntimeException(e);
+		}
 		byte[] result = cipher.doFinal(data);
 		byte[][] byteArray = {result,key.getEncoded()};
 		return byteArray;
@@ -224,10 +236,15 @@ public class Cipher
 		// convert back to a SecretKey - must use same key that was used for encryption
 		javax.crypto.SecretKey key = new javax.crypto.spec.SecretKeySpec(keyBytes, KEY_ALGO);
 		javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(CIPHER_ALGO);
-
-		cipher.init(javax.crypto.Cipher.DECRYPT_MODE, key);
+		byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		IvParameterSpec ivspec = new IvParameterSpec(iv);
+		try{
+			cipher.init(javax.crypto.Cipher.DECRYPT_MODE, key,ivspec);
+		}catch (InvalidAlgorithmParameterException e) {
+			throw new RuntimeException(e);
+		}
 		byte[] original = cipher.doFinal(result);
-
+		//original = Base64.getDecoder().decode(original);
 		// Decode using utf-8
 		return new String(original, "UTF8");
 	}
@@ -322,7 +339,9 @@ public class Cipher
 	 *
 	 */
 	public static void main(String[] args)
+	
 	{
+		test();
 		if (args.length > 0){
 			System.out.println(codec(args[0]));
 		}
@@ -338,6 +357,34 @@ public class Cipher
 			}catch(Exception e){
 				e.printStackTrace();
 			}
+		}
+	}
+	public static void test() {
+		try {
+			byte [][] result = Cipher.encryptUidPw("name", "password");
+			String dataString = Cipher.decrypt(result[0], result[1]);
+			System.out.println(dataString);
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

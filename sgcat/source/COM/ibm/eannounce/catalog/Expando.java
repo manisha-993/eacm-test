@@ -198,7 +198,10 @@ public final class Expando {
     SourceLine lFile;
 
     try {
-      BufferedWriter bwOutput = new BufferedWriter(new FileWriter(_f + ".bak"));
+    String filePath = _f + ".bak";
+    boolean validate = pathTranelVaild(filePath);
+    if(validate) {
+     BufferedWriter bwOutput = new BufferedWriter(new FileWriter(_f + ".bak"));
 
       while ((lFile = (SourceLine) c_hashLines.get(_f + ":" + iLine)) != null) {
         ++iLine;
@@ -207,10 +210,12 @@ public final class Expando {
       }
 
       bwOutput.close();
+    }
     } catch (Exception x) {
       System.out.println("error saving backup " + x);
     }
   }
+  
   public static void expandFile(File _f) {
 
     try {
@@ -424,12 +429,16 @@ public final class Expando {
     return lReturn;
   }
   public static List getFromConfigFile(File _f) throws IOException {
-
-    BufferedReader bfr = new BufferedReader(new FileReader(_f));
+	  BufferedReader bfr = null;
+	 boolean valid =  pathTranelVaild(_f.toString());
+     if(valid)
+    bfr= new BufferedReader(new FileReader(_f));
     String strLine = null;
     List lReturn = new ArrayList();
 
     while ((strLine = readTemplate(bfr)) != null) {
+    	 valid = pathTranelVaild(strLine);
+    	if(valid) {
       File f = new File(strLine);
 
       // if not a directory, save it
@@ -438,8 +447,14 @@ public final class Expando {
         lReturn.add(f);
       }
     }
+    	}
 
     return lReturn;
+  }
+  public static boolean pathTranelVaild(String path) {
+	  if(path==null||path.contains(".."))
+		  return false;
+	  return true;
   }
   public static String readTemplate(BufferedReader _brTemplate) throws IOException {
     return _brTemplate.readLine();

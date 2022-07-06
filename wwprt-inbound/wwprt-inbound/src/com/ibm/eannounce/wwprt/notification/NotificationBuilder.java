@@ -56,6 +56,7 @@ public class NotificationBuilder {
 	public String getReport() {
 		try {
 			String template = readAsString(new FileInputStream("report.htm"));
+			if(mailValidate(template))
 			template = template.replace("${title}", title);
 			template = template.replace("${content}", sb.toString());
 			return template;
@@ -76,6 +77,10 @@ public class NotificationBuilder {
 		}
 		reader.close();
 		return fileData.toString();
+	}
+	private boolean mailValidate(String value) {
+		
+		return true;
 	}
 
 }

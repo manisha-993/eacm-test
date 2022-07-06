@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path=""/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/middleware"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/bui"/>
-	<classpathentry kind="var" path="WAS_50_PLUGINDIR/lib/j2ee.jar"/>
-	<classpathentry kind="lib" path="/abr12/bin/xsdbeans.jar"/>
-	<classpathentry kind="lib" path="/abr12/source/poi-2.5.1-final-20040804.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="/abr12/source/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="/abr12/source/xml-apis.jar"/>
 	<classpathentry kind="output" path="bin"/>
