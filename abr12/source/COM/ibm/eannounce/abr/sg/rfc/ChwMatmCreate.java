@@ -151,8 +151,8 @@ public class ChwMatmCreate extends RdhBase {
 		}
 		//Todo
 		if(materialID.endsWith("NEW")) {
-			if("LBS".equals(model.getPHANTOMMODINDC())||"'6661', '6662', '6663', '6664', '6665', '6668', '6669', '9602', '9604'".contains(model.getMACHTYPE()
-					)||"Storage Tier','STORAGE TIER','storage tier','Power Tier'".contains(model.getSUBGROUP())) {
+			if("LBS".equals(model.getPHANTOMMODINDC())||"'6661', '6662', '6663', '6664', '6665', '6668', '6669'".contains(model.getMACHTYPE()
+					)||"Storage Tier','STORAGE TIER','storage tier'".contains(model.getSUBGROUP())) {
 				bmmh1.get(0).setSernp("NONE");
 			}else if ("'2063', '2068', '2059', '2057', '2058'".contains(model.getMACHTYPE())) {
 				bmmh1.get(0).setSernp("GG01");
@@ -160,7 +160,7 @@ public class ChwMatmCreate extends RdhBase {
 				bmmh1.get(0).setSernp("ZZ06");
 			}
 		}else if (materialID.endsWith("MTC")||materialID.endsWith("UPG")) {
-			if("LBS".equals(model.getPHANTOMMODINDC())||"Power Tier".equals(model.getSUBGROUP())){
+			if("LBS".equals(model.getPHANTOMMODINDC())){
 				bmmh1.get(0).setSernp("NONE");
 			}
 			else {
@@ -231,13 +231,7 @@ public class ChwMatmCreate extends RdhBase {
 			}
 			
 			if (materialID.endsWith("NEW")) {
-				if("'Storage Tier', 'Power Tier'".contains(model.getSUBGROUP())) {
-					bmmh5.get(0).setMaktx("Expert Care" + " " + model.getMACHTYPE());
-				}else if("STaaS".equals(model.getSUBGROUP())){
-					bmmh5.get(0).setMaktx("STaaS" + " " + model.getMACHTYPE());
-				}else {
-					bmmh5.get(0).setMaktx("MACHINE TYPE " + model.getMACHTYPE() + " - Model NEW");
-				}
+				bmmh5.get(0).setMaktx("MACHINE TYPE "+model.getMACHTYPE()+" - Model NEW");
 				bmmh5.get(0).setTdline("MACHINE TYPE "+model.getMACHTYPE()+" - Model NEW");
 
 			}
@@ -349,13 +343,17 @@ public class ChwMatmCreate extends RdhBase {
 				if(RFCConfig.getDwerk("2",sales_org.getVkorg())!=null)
 				{
 					sales_org.setDwerk(RFCConfig.getDwerk("2",sales_org.getVkorg()));
-					
-					if("0147".equals(sales_org.getVkorg())){
-						sales_org.setZtaxclsf("1");
-						sales_org.setZsabrtax("01");
-					}else if ("0026".equals(sales_org.getVkorg())) {
-						sales_org.setZsabrtax("HW");
+					if("0147".equals(sales_org.getVkorg())||"0026".equals(sales_org.getVkorg())) {
+						sales_org.setZtaxclsf(getZtaxclsf(model));
+						if(sales_org!=null) {
+							sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
+						}
 					}
+					/*
+					 * if("0147".equals(sales_org.getVkorg())){ sales_org.setZtaxclsf("1");
+					 * sales_org.setZsabrtax("01"); }else if ("0026".equals(sales_org.getVkorg())) {
+					 * sales_org.setZsabrtax("HW"); }
+					 */
 					if(!set.contains(sales_org.getVkorg()+sales_org.getDwerk()))
 					{
 						sales_orgList.add(sales_org);
@@ -411,16 +409,28 @@ public class ChwMatmCreate extends RdhBase {
 						RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
 						tax_country.setAland(RFCConfig.getAland(country.getCOUNTRY_FC()));
 						tax_country.setTaty1(taxcategory.getTAXCATEGORYVALUE());
-						tax_country.setTaxm1(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm2(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm3(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm4(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm5(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm6(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm7(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm8(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm9(taxcategory.getTAXCLASSIFICATION());
-
+						/*
+						 * tax_country.setTaxm1(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm2(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm3(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm4(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm5(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm6(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm7(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm8(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm9(taxcategory.getTAXCLASSIFICATION());
+						 */
+						
+						  tax_country.setTaxm1("1");
+						  tax_country.setTaxm2("1");
+						  tax_country.setTaxm3("1");
+						  tax_country.setTaxm4("1");
+						  tax_country.setTaxm5("1");
+						  tax_country.setTaxm6("1");
+						  tax_country.setTaxm7("1");
+						  tax_country.setTaxm8("1");
+						  tax_country.setTaxm9("1");
+						 
 						if(tax_country.getAland()!=null) {
 						tax_countries.add(tax_country);
 						}
@@ -453,14 +463,14 @@ public class ChwMatmCreate extends RdhBase {
 		return RfcConfigProperties.getZsabrtaxPropertys(ztaxclsf);
 	}
 
-	private String getZtaxclsf(SVCMOD svcmod, String country) {
-		List<TAXCATEGORY> taxs = svcmod.getTAXCATEGORYLIST();
+	private String getZtaxclsf(MODEL model) {
+		List<TAXCATEGORY> taxs = model.getTAXCATEGORYLIST();
 		if (taxs != null && taxs.size() > 0) {
 			for (int i = 0; i < taxs.size(); i++) {
 				List<SLEORGGRP> list = taxs.get(i).getSLEORGGRPLIST();
 				if (list != null && list.size() > 0) {
 					for (int j = 0; j < list.size(); j++) {
-						if (country.equals(list.get(j).getSLEORGGRP())) {
+						if ("Canada".equals(list.get(j).getSLEORGGRP())||"US".equals(list.get(j).getSLEORGGRP())) {
 							return taxs.get(i).getTAXCLASSIFICATION();
 						}
 					}
@@ -483,9 +493,9 @@ public class ChwMatmCreate extends RdhBase {
 			}else if ("REACH".equals(var)) {
 				result ="ZPT2";
 			}
-			else if ("'6661', '6662', '6663', '6664', '6665', '6668', '6669', '4663', '4665', '4673', '9255', '9601', '9665' , '4850', '4658', '8924', '9602', '9666', '5131', '9667', '4901', '4903', '4906', '9669', '9670', '9675', '9676', '9677','8883', '8876', '3949', '9603', '9604', '9671')".contains(model.getMACHTYPE())) {
-				result="ZPT4";
-			}
+		else if ("'6661', '6662', '6663', '6664', '6665', '6668', '6669', '4586', '4663', '4665', '4673', '9255', '9601', '9665')".contains(model.getMACHTYPE())) {
+			result="ZPT4";
+		}
 			else if ("LBS".equals(var)) {
 				result="ZPT3";
 			}
