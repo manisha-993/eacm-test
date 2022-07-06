@@ -516,7 +516,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 
 								} else{
 									this.addOutput(e.getMessage());
-									break;
+									continue;
 								}
 							}
 							this.addDebug("Bom Read result:"+chwReadSalesBom.getRETURN_MULTIPLE_OBJ().toString());
@@ -539,7 +539,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 										}catch(Exception e) {
 											this.addOutput(e.getMessage());
 											POSNR = getMaxItemNo(componmentList);
-											break;
+											continue;
 										}
 									}
 								}
@@ -556,13 +556,12 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 										this.addDebug(chwBomMaintain.createLogEntry());
 									}catch(Exception e) {
 										this.addOutput(e.getMessage());
-										break;
+										continue;
 									}
 									POSNR=generateItemNumberString(POSNR);
 								}
 							}
 							// end lock content
-							break;
 						} else {
 							this.addDebug("fileLock == null");
 							Thread.sleep(5000);
