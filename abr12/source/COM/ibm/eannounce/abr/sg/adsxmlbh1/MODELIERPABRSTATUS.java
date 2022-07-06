@@ -1,10 +1,5 @@
 package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -308,79 +303,55 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 				this.addOutput(e.getMessage());
 				continue;
 			}
-			// start lock
-			String fileName = "./locks/MODEL" + model.getMACHTYPE() + flag + plant + ".lock";
-			File file = new File(fileName);
-			new File(file.getParent()).mkdirs();
-			try (FileOutputStream fos = new FileOutputStream(file); FileChannel fileChannel = fos.getChannel()) {
-				while (true) {
-					try {
-						FileLock fileLock = fileChannel.tryLock();
-						if (fileLock != null) {
-							this.addDebug("Start lock, lock file " + fileName);
-							// lock content
-							//call ChwReadSalesBom
-							ChwReadSalesBom chwReadSalesBom = new ChwReadSalesBom(model.getMACHTYPE() + flag, plant);
-							this.addDebug("Calling " + "ChwReadSalesBom");
-							this.addDebug(chwReadSalesBom.generateJson());
-							try {
-								chwReadSalesBom.execute();
-								this.addDebug(chwReadSalesBom.createLogEntry());
-							} catch (Exception e) {
-								if (e.getMessage().contains("exists in Mast table but not defined to Stpo table")) {
+			//call ChwReadSalesBom
+			ChwReadSalesBom chwReadSalesBom = new ChwReadSalesBom(model.getMACHTYPE()+flag, plant);
+			this.addDebug("Calling " + "ChwReadSalesBom");
+			this.addDebug(chwReadSalesBom.generateJson());
+			try{
+				chwReadSalesBom.execute();
+				this.addDebug(chwReadSalesBom.createLogEntry());
+			}catch(Exception e) {
+				if(e.getMessage().contains("exists in Mast table but not defined to Stpo table")){
 
-								} else {
-									this.addOutput(e.getMessage());
-									break;
-								}
-							}
-							this.addDebug("Bom Read result:" + chwReadSalesBom.getRETURN_MULTIPLE_OBJ().toString());
-							List<HashMap<String, String>> componmentList = chwReadSalesBom.getRETURN_MULTIPLE_OBJ().get("stpo_api02");
-							String componment = model.getMACHTYPE() + model.getMODEL();
-							if (componmentList != null && componmentList.size() > 0) {
-								if (hasMatchComponent(componmentList, componment)) {
-									this.addDebug("updateSalesBom exist component " + componment);
-								} else {
-									String POSNR = getMaxItemNo(componmentList);
-									POSNR = generateItemNumberString(POSNR);
-									//call ChwBomMaintain
-									ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE() + flag, plant, model.getMACHTYPE() + model.getMODEL(), POSNR, "SC_" + model.getMACHTYPE() + "_MOD_" + model.getMODEL());
-									this.addDebug("Calling " + "chwBomMaintain");
-									this.addDebug(chwBomMaintain.generateJson());
-									try {
-										chwBomMaintain.execute();
-										this.addDebug(chwBomMaintain.createLogEntry());
-									} catch (Exception e) {
-										this.addOutput(e.getMessage());
-										break;
-									}
-								}
-							} else {
-								//call ChwBomMaintain
-								ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE() + flag, plant, model.getMACHTYPE() + model.getMODEL(), "0005", "SC_" + model.getMACHTYPE() + "_MOD_" + model.getMODEL());
-								this.addDebug("Calling " + "chwBomMaintain");
-								this.addDebug(chwBomMaintain.generateJson());
-								try {
-									chwBomMaintain.execute();
-									this.addDebug(chwBomMaintain.createLogEntry());
-								} catch (Exception e) {
-									this.addOutput(e.getMessage());
-									break;
-								}
-							}
-							// end lock content
-							break;
-						} else {
-							this.addDebug("fileLock == null");
-							Thread.sleep(5000);
-						}
-					} catch (OverlappingFileLockException e1) {
-						this.addDebug("other abr is running createSalesBOMforType" + flag);
-						Thread.sleep(5000);
-					}
+				} else{
+					this.addOutput(e.getMessage());
+					continue;
 				}
 			}
-			// end lock
+			this.addDebug("Bom Read result:"+chwReadSalesBom.getRETURN_MULTIPLE_OBJ().toString());
+			List<HashMap<String, String>> componmentList = chwReadSalesBom.getRETURN_MULTIPLE_OBJ().get("stpo_api02");
+			String componment = model.getMACHTYPE() + model.getMODEL();
+			if (componmentList != null && componmentList.size() > 0) {
+				if (hasMatchComponent(componmentList, componment)) {
+					this.addDebug("updateSalesBom exist component " + componment);
+				}else {
+					String POSNR = getMaxItemNo(componmentList);
+					POSNR=generateItemNumberString(POSNR);
+					//call ChwBomMaintain
+					ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag, plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+					this.addDebug("Calling " + "chwBomMaintain");
+					this.addDebug(chwBomMaintain.generateJson());
+					try {
+						chwBomMaintain.execute();
+						this.addDebug(chwBomMaintain.createLogEntry());
+					}catch(Exception e) {
+						this.addOutput(e.getMessage());
+						continue;
+					}
+				}
+			}else {
+				//call ChwBomMaintain
+				ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag, plant, model.getMACHTYPE()+model.getMODEL(),"0005","SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+				this.addDebug("Calling " + "chwBomMaintain");
+				this.addDebug(chwBomMaintain.generateJson());
+				try {
+					chwBomMaintain.execute();
+					this.addDebug(chwBomMaintain.createLogEntry());
+				}catch(Exception e) {
+					this.addOutput(e.getMessage());
+					continue;
+				}
+			}
 		}
 		
 	}
