@@ -45,7 +45,11 @@ public class UpdateParkStatus extends RdhBase
     	rdhzdmprktbl = new Rdhzdmprktbl();
     	rdhzdmprktbl.setZdmclass(zdmclass);
     	rdhzdmprktbl.setZdmrelnum(zdmrelnum);
-    	rdhzdmprktbl.setZdmstatus(RfcConfigProperties.getZdmstatus());
+        if("MD_TSS_IERP".equals(zdmclass)) {
+            rdhzdmprktbl.setZdmstatus(RfcConfigProperties.getTssZdmstatus());
+        }else {
+            rdhzdmprktbl.setZdmstatus(RfcConfigProperties.getZdmstatus());
+        }
     	rdhzdmprktbls.add(rdhzdmprktbl);
     	zgeo = "WW";
     	

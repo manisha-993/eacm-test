@@ -58,7 +58,6 @@ public class MODELBULKABRSTATUS extends PokBaseABR {
             setDGRptClass("MODELBULKABRSTATUS"); // Set the report class
             // Default set to pass
             setReturnCode(PASS);
-
             start_ABRBuild(false); // pull the VE
 
             abr_debuglvl = COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties
@@ -141,7 +140,9 @@ public class MODELBULKABRSTATUS extends PokBaseABR {
             println(EACustom.getDocTypeHtml()); // Output the doctype and html
             println(rptSb.toString()); // Output the Report
             printDGSubmitString();
-
+            if(!isReadOnly()) {
+                clearSoftLock();
+            }
             println(EACustom.getTOUDiv());
             buildReportFooter(); // Print </html>
         }

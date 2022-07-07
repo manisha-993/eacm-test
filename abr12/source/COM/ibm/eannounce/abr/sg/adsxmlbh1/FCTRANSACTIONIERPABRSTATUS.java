@@ -1,5 +1,10 @@
 package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -488,63 +493,87 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				this.addOutput(e.getMessage());
 				continue;	
 			}
-			//call ChwReadSalesBom
-			ChwReadSalesBom chwReadSalesBom = new ChwReadSalesBom(fctransaction.getTOMACHTYPE()+"UPG", plant);
-			this.addDebug("Calling " + "ChwReadSalesBom");
-			this.addDebug(chwReadSalesBom.generateJson());
-			try{
-				chwReadSalesBom.execute();
-				this.addDebug(chwReadSalesBom.createLogEntry());
-			}catch(Exception e) {
-				if(e.getMessage().contains("exists in Mast table but not defined to Stpo table")){
-
-				} else{
-					this.addOutput(e.getMessage());
-					continue;
-				}
-			}
-			this.addDebug("Bom Read result:"+chwReadSalesBom.getRETURN_MULTIPLE_OBJ().toString());
-			List<HashMap<String, String>> componmentList = chwReadSalesBom.getRETURN_MULTIPLE_OBJ().get("stpo_api02");
-			if (componmentList != null && componmentList.size() > 0) {
-				String POSNR = getMaxItemNo(componmentList);
-				for(MODEL model : models) {
-					String componment = model.getMACHTYPE() + model.getMODEL();
-					if (hasMatchComponent(componmentList, componment)) {
-						this.addDebug("updateSalesBom exist component " + componment);
-					}else {
-						POSNR=generateItemNumberString(POSNR);
-						//call ChwBomMaintain
-						ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+"UPG", plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
-						this.addDebug("Calling " + "chwBomMaintain");
-						this.addDebug(chwBomMaintain.generateJson());
-						try {
-							chwBomMaintain.execute();
-							this.addDebug(chwBomMaintain.createLogEntry());
-						}catch(Exception e) {
-							this.addOutput(e.getMessage());
-							POSNR = getMaxItemNo(componmentList);
-							continue;
-						}
-					}
-				}
-			}else {
-				String POSNR ="0005";
-				//call ChwBomMaintain
-				for(MODEL model : models) {
-					//call ChwBomMaintain
-					ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+"UPG", plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
-					this.addDebug("Calling " + "chwBomMaintain");
-					this.addDebug(chwBomMaintain.generateJson());
+			// start lock
+			String fileName = "./locks/FCTRANSACTION" + fctransaction.getTOMACHTYPE() + "UPG" + plant + ".lock";
+			File file = new File(fileName);
+			new File(file.getParent()).mkdirs();
+			try (FileOutputStream fos = new FileOutputStream(file); FileChannel fileChannel = fos.getChannel()) {
+				while (true) {
 					try {
-						chwBomMaintain.execute();
-						this.addDebug(chwBomMaintain.createLogEntry());
-					}catch(Exception e) {
-						this.addOutput(e.getMessage());
-						continue;
+						FileLock fileLock = fileChannel.tryLock();
+						if (fileLock != null) {
+							this.addDebug("Start lock, lock file " + fileName);
+							// lock content
+							//call ChwReadSalesBom
+							ChwReadSalesBom chwReadSalesBom = new ChwReadSalesBom(fctransaction.getTOMACHTYPE()+"UPG", plant);
+							this.addDebug("Calling " + "ChwReadSalesBom");
+							this.addDebug(chwReadSalesBom.generateJson());
+							try{
+								chwReadSalesBom.execute();
+								this.addDebug(chwReadSalesBom.createLogEntry());
+							}catch(Exception e) {
+								if(e.getMessage().contains("exists in Mast table but not defined to Stpo table")){
+
+								} else{
+									this.addOutput(e.getMessage());
+									break;
+								}
+							}
+							this.addDebug("Bom Read result:"+chwReadSalesBom.getRETURN_MULTIPLE_OBJ().toString());
+							List<HashMap<String, String>> componmentList = chwReadSalesBom.getRETURN_MULTIPLE_OBJ().get("stpo_api02");
+							if (componmentList != null && componmentList.size() > 0) {
+								String POSNR = getMaxItemNo(componmentList);
+								for(MODEL model : models) {
+									String componment = model.getMACHTYPE() + model.getMODEL();
+									if (hasMatchComponent(componmentList, componment)) {
+										this.addDebug("updateSalesBom exist component " + componment);
+									}else {
+										POSNR=generateItemNumberString(POSNR);
+										//call ChwBomMaintain
+										ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+"UPG", plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+										this.addDebug("Calling " + "chwBomMaintain");
+										this.addDebug(chwBomMaintain.generateJson());
+										try {
+											chwBomMaintain.execute();
+											this.addDebug(chwBomMaintain.createLogEntry());
+										}catch(Exception e) {
+											this.addOutput(e.getMessage());
+											POSNR = getMaxItemNo(componmentList);
+											continue;
+										}
+									}
+								}
+							}else {
+								String POSNR ="0005";
+								//call ChwBomMaintain
+								for(MODEL model : models) {
+									//call ChwBomMaintain
+									ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+"UPG", plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+									this.addDebug("Calling " + "chwBomMaintain");
+									this.addDebug(chwBomMaintain.generateJson());
+									try {
+										chwBomMaintain.execute();
+										this.addDebug(chwBomMaintain.createLogEntry());
+									}catch(Exception e) {
+										this.addOutput(e.getMessage());
+										continue;
+									}
+									POSNR=generateItemNumberString(POSNR);
+								}
+							}
+							// end lock content
+							break;
+						} else {
+							this.addDebug("fileLock == null");
+							Thread.sleep(5000);
+						}
+					} catch (OverlappingFileLockException e1) {
+						this.addDebug("other abr is running createSalesBOMforType" + "UPG");
+						Thread.sleep(5000);
 					}
-					POSNR=generateItemNumberString(POSNR);
 				}
 			}
+			// end lock
 		}
 		
 	}
