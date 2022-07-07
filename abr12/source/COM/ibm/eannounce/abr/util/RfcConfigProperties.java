@@ -135,6 +135,11 @@ public final class RfcConfigProperties extends Properties {
 		return 
 			c_prop.getProperty("rdh.zdmstatus", "");
 	}
+	public static final String getTssZdmstatus() {
+		reloadProperties();
+		return
+				c_prop.getProperty("rdh.Tsszdmstatus", "");
+	}
 	public static  String getPropertys(String key){
 		reloadProperties();
 		return 
