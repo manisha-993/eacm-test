@@ -351,9 +351,9 @@ public class ChwMatmCreate extends RdhBase {
 					sales_org.setDwerk(RFCConfig.getDwerk("2",sales_org.getVkorg()));
 					String countrt=null;
 					if("0147".equals(sales_org.getVkorg())) {
-						countrt="Canada";
-					}else if ("0026".equals(sales_org.getVkorg())) {
 						countrt="US";
+					}else if ("0026".equals(sales_org.getVkorg())) {
+						countrt="Canada";
 					}
 					if(countrt!=null) {
 						//0026 C
