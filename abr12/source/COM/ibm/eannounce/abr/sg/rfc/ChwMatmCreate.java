@@ -349,13 +349,25 @@ public class ChwMatmCreate extends RdhBase {
 				if(RFCConfig.getDwerk("2",sales_org.getVkorg())!=null)
 				{
 					sales_org.setDwerk(RFCConfig.getDwerk("2",sales_org.getVkorg()));
-					
-					if("0147".equals(sales_org.getVkorg())){
-						sales_org.setZtaxclsf("1");
-						sales_org.setZsabrtax("01");
+					String countrt=null;
+					if("0147".equals(sales_org.getVkorg())) {
+						countrt="US";
 					}else if ("0026".equals(sales_org.getVkorg())) {
-						sales_org.setZsabrtax("HW");
+						countrt="Canada";
 					}
+					if(countrt!=null) {
+						//0026 C
+						//0147 
+						sales_org.setZtaxclsf(getZtaxclsf(model,countrt));
+						if(sales_org!=null) {
+							sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
+						}
+					}
+					/*
+					 * if("0147".equals(sales_org.getVkorg())){ sales_org.setZtaxclsf("1");
+					 * sales_org.setZsabrtax("01"); }else if ("0026".equals(sales_org.getVkorg())) {
+					 * sales_org.setZsabrtax("HW"); }
+					 */
 					if(!set.contains(sales_org.getVkorg()+sales_org.getDwerk()))
 					{
 						sales_orgList.add(sales_org);
@@ -411,16 +423,28 @@ public class ChwMatmCreate extends RdhBase {
 						RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
 						tax_country.setAland(RFCConfig.getAland(country.getCOUNTRY_FC()));
 						tax_country.setTaty1(taxcategory.getTAXCATEGORYVALUE());
-						tax_country.setTaxm1(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm2(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm3(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm4(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm5(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm6(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm7(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm8(taxcategory.getTAXCLASSIFICATION());
-						tax_country.setTaxm9(taxcategory.getTAXCLASSIFICATION());
-
+						/*
+						 * tax_country.setTaxm1(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm2(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm3(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm4(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm5(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm6(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm7(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm8(taxcategory.getTAXCLASSIFICATION());
+						 * tax_country.setTaxm9(taxcategory.getTAXCLASSIFICATION());
+						 */
+						
+						  tax_country.setTaxm1("1");
+						  tax_country.setTaxm2("1");
+						  tax_country.setTaxm3("1");
+						  tax_country.setTaxm4("1");
+						  tax_country.setTaxm5("1");
+						  tax_country.setTaxm6("1");
+						  tax_country.setTaxm7("1");
+						  tax_country.setTaxm8("1");
+						  tax_country.setTaxm9("1");
+						 
 						if(tax_country.getAland()!=null) {
 						tax_countries.add(tax_country);
 						}
@@ -453,8 +477,8 @@ public class ChwMatmCreate extends RdhBase {
 		return RfcConfigProperties.getZsabrtaxPropertys(ztaxclsf);
 	}
 
-	private String getZtaxclsf(SVCMOD svcmod, String country) {
-		List<TAXCATEGORY> taxs = svcmod.getTAXCATEGORYLIST();
+	private String getZtaxclsf(MODEL model,String country) {
+		List<TAXCATEGORY> taxs = model.getTAXCATEGORYLIST();
 		if (taxs != null && taxs.size() > 0) {
 			for (int i = 0; i < taxs.size(); i++) {
 				List<SLEORGGRP> list = taxs.get(i).getSLEORGGRPLIST();

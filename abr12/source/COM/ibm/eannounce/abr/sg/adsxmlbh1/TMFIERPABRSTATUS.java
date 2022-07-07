@@ -247,7 +247,9 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			println(EACustom.getDocTypeHtml()); // Output the doctype and html
 			println(rptSb.toString()); // Output the Report
 			printDGSubmitString();
-
+			 if(!isReadOnly()) {
+	                clearSoftLock();
+	            }
 			println(EACustom.getTOUDiv());
 			buildReportFooter(); // Print </html>
 		}
