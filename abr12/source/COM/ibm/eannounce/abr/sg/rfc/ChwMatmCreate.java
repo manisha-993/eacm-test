@@ -349,8 +349,16 @@ public class ChwMatmCreate extends RdhBase {
 				if(RFCConfig.getDwerk("2",sales_org.getVkorg())!=null)
 				{
 					sales_org.setDwerk(RFCConfig.getDwerk("2",sales_org.getVkorg()));
-					if("0147".equals(sales_org.getVkorg())||"0026".equals(sales_org.getVkorg())) {
-						sales_org.setZtaxclsf(getZtaxclsf(model));
+					String countrt=null;
+					if("0147".equals(sales_org.getVkorg())) {
+						countrt="US";
+					}else if ("0026".equals(sales_org.getVkorg())) {
+						countrt="Canada";
+					}
+					if(countrt!=null) {
+						//0026 C
+						//0147 
+						sales_org.setZtaxclsf(getZtaxclsf(model,countrt));
 						if(sales_org!=null) {
 							sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
 						}
@@ -469,14 +477,14 @@ public class ChwMatmCreate extends RdhBase {
 		return RfcConfigProperties.getZsabrtaxPropertys(ztaxclsf);
 	}
 
-	private String getZtaxclsf(MODEL model) {
+	private String getZtaxclsf(MODEL model,String country) {
 		List<TAXCATEGORY> taxs = model.getTAXCATEGORYLIST();
 		if (taxs != null && taxs.size() > 0) {
 			for (int i = 0; i < taxs.size(); i++) {
 				List<SLEORGGRP> list = taxs.get(i).getSLEORGGRPLIST();
 				if (list != null && list.size() > 0) {
 					for (int j = 0; j < list.size(); j++) {
-						if ("Canada".equals(list.get(j).getSLEORGGRP())||"US".equals(list.get(j).getSLEORGGRP())) {
+						if (country.equals(list.get(j).getSLEORGGRP())) {
 							return taxs.get(i).getTAXCLASSIFICATION();
 						}
 					}
