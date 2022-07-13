@@ -194,7 +194,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 							throw e;
 						}
 						// Call UpdateParkStatus
-						UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "MTC");
+						UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "MTC", model.getMACHTYPE() + model.getMODEL() + "MTC");
 						runParkCaller(updateParkStatus, model.getMACHTYPE() + "MTC");
 					}
 					//step d
@@ -212,7 +212,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 								throw e;
 							}
 							// Call UpdateParkStatus
-							UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "UPG");
+							UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "UPG", model.getMACHTYPE()+model.getMODEL()+"UPG");
 							runParkCaller(updateParkStatus, model.getMACHTYPE() + "UPG");
 							
 						}else if(model.getORDERCODE()!=null&&model.getORDERCODE().trim().length()>0&&CommonUtils.contains("M,B",model.getORDERCODE())) {
@@ -760,11 +760,11 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     	String materialType="ZPRT";
     	String  materialID =model.getMACHTYPE()+model.getMODEL();
     	
-    	ChwMatmCreate caller = new ChwMatmCreate(model, materialType, materialID);
+    	ChwMatmCreate caller = new ChwMatmCreate(model, materialType, materialID, materialID);
     	runRfcCaller(caller);
 		//Chw001ClfCreate 
 		
-		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
+		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID,materialID, odsConnection);
 		this.addDebug("Calling " + "Chw001ClfCreate");
 		try{
 			chw001ClfCreate.execute();
@@ -796,19 +796,20 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		//ChwDepdMaintain 
 		
 		//5 Call UpdateParkStatus
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + model.getMODEL());
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + model.getMODEL(), model.getMACHTYPE() + model.getMODEL());
 		runParkCaller(updateParkStatus, model.getMACHTYPE() + model.getMODEL());
     	
     }
     public void processMachTypeNew(MODEL model,Connection odsConnection) throws Exception {
     	//step 1 Call ChwMatmCreate to create the material master for the product object
     	String materialType="ZMAT";
-    	String  materialID =model.getMACHTYPE()+"NEW";
-    	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID);
+    	String materialID =model.getMACHTYPE()+"NEW";
+		String rfaNum = model.getMACHTYPE()+model.getMODEL()+"NEW";
+    	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID, rfaNum);
     	runRfcCaller(chwCreateCaller);
 		
     	//step2 Call Chw001ClfCreate to create the standard 001 classifications and characteristics which are tied to the offering's material master record.
-		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
+		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, rfaNum,odsConnection);
 		this.addDebug("Calling " + "Chw001ClfCreate");
 		try{
 			chw001ClfCreate.execute();
@@ -822,18 +823,18 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     	String obj_id = materialID;
 		String class_name="MK_REFERENCE";
 		String class_type="300";
-		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
 		
 		//step4 Call the TssClassificationMaint to associate the MK_T_VAO_NEW class to the product's material master record. 
 		class_name = "MK_T_VAO_NEW";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
 		
 		//step 5 Create the MK_machineType_MOD class and MK_T_machineType_MOD characteristic
 		String empty ="";
 		ChwCharMaintain chwCharMaintain = 
-		new ChwCharMaintain(obj_id  //String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+		new ChwCharMaintain(rfaNum  //String obj_id Set to concatenation of chwProduct.machineType + "MTC"
 							,"MK_T_"+model.getMACHTYPE()+"_MOD" //String charact  Set to  "MK_T_<machine_type>_MOD"
 							, "CHAR" 			//String datatype
 							, 6 				//int charnumber
@@ -864,7 +865,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		//5.c Call the ChwClassMaintain constructor to create the MK_machineType_MOD class.
 		ChwClassMaintain ChwClassMaintain = 
 				new ChwClassMaintain(
-						obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+						rfaNum 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
 						, "MK_"+model.getMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
 						, "MK_"+model.getMACHTYPE()+"_MOD"  //String class_type   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
 						);
@@ -879,7 +880,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 						, "MK_"+model.getMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
 						, "300"  							//String class_type   Set to "300"
 						, "H"
-						);
+						, rfaNum);
 		runRfcCaller(TssClassificationMaint);
 		//step 6 Create the PR_machinetype_SET_MODEL object dependency:
 		//6 a Call the ChwDepdMaintain constructor to create the PR_machinetype_SET_MODEL dependency.
@@ -888,7 +889,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		String dep_type="7"; 
 		String descript=model.getMACHTYPE()+" Set Model";
 		String sourceLine = "$self.mk_model2 = $self.mk_t_"+model.getMACHTYPE()+"_mod";
-		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id_depd, dep_extern, dep_type, descript)	;
+		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(rfaNum, dep_extern, dep_type, descript)	;
 		chwDepdCaller.addSourceLineCondition(sourceLine);
 		runRfcCaller(chwDepdCaller);
 		
@@ -900,7 +901,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 						, "SD01"			//String bomappl Set to "SD01".
 						, "2"				//String bomexpl Set to "2".
 						, model.getMACHTYPE() +	"NEWUI"		//String design	 Set to Set to concatenation of chwProduct.machineType + "NEWUI" 
-						);
+						, rfaNum);
 		
 		//7.b Call the ChwConpMaintain.addConfigDependency() method.
 		ChwConpMaintain.addConfigDependency("E2E", empty); //Set to "E2E".
@@ -915,18 +916,19 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		runRfcCaller(ChwConpMaintain);
 		
 		//8 Call UpdateParkStatus
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "NEW");
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "NEW", rfaNum);
 		runParkCaller(updateParkStatus, model.getMACHTYPE() + "NEW");
 		
     }
     
     public void processMachTypeUpg(MODEL model,Connection odsConnection) throws Exception {
     	String materialType="ZMAT";
-    	String  materialID =model.getMACHTYPE()+"UPG";
-    	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID);
+    	String materialID =model.getMACHTYPE()+"UPG";
+		String rfaNum = model.getMACHTYPE()+model.getMODEL()+"UPG";
+    	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID, rfaNum);
     	runRfcCaller(chwCreateCaller);
     	
-		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
+		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID,rfaNum, odsConnection);
 		this.addDebug("Calling " + "Chw001ClfCreate");
 		try{
 			chw001ClfCreate.execute();
@@ -938,23 +940,23 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
     	String obj_id = materialID;
 		String class_name="MK_REFERENCE";
 		String class_type="300";
-		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
 		
 		class_name = "MK_T_VAO_NEW";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
 		
 		class_name = "MK_D_VAO_NEW";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
 		
 		class_name = "MK_FC_EXCH";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
 		
 		class_name = "MK_FC_CONV";
-		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
 		
 		//Set to  "MK_T_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
@@ -970,7 +972,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		String no_display="";
 		String addit_vals="X";
 		String chdescr=model.getMACHTYPE()+" Model Characteristic";
-		ChwCharMaintain charMaintain = new ChwCharMaintain(obj_id, charact, datatype, charnumber, decplaces, casesens, neg_vals, group, valassignm, no_entry, no_display, addit_vals, chdescr);
+		ChwCharMaintain charMaintain = new ChwCharMaintain(rfaNum, charact, datatype, charnumber, decplaces, casesens, neg_vals, group, valassignm, no_entry, no_display, addit_vals, chdescr);
 		String valdescr = null;
 		List<LANGUAGE> languages =model.getLANGUAGELIST();
 		String invname = null;
@@ -986,12 +988,12 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		
 		class_name = "MK_"+model.getMACHTYPE()+"_MOD";
 		class_type = class_name;
-		ChwClassMaintain chwClassMaintain = new ChwClassMaintain(obj_id, class_name, class_type);
+		ChwClassMaintain chwClassMaintain = new ChwClassMaintain(rfaNum, class_name, class_type);
 		chwClassMaintain.addCharacteristic("MK_T_"+model.getMACHTYPE()+"_MOD");
 		runRfcCaller(chwClassMaintain);
 		
 		class_type="300";
-		RdhClassificationMaint classificationMaint = new RdhClassificationMaint(obj_id, class_name, class_type,"H");
+		RdhClassificationMaint classificationMaint = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(classificationMaint);
 
 
@@ -999,7 +1001,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		String bomappl="SD01";
 		String bomexpl="2";
 		String design=model.getMACHTYPE()+"UPGUI";
-		ChwConpMaintain chwConpMaintain = new ChwConpMaintain(obj_id, c_profile, bomappl, bomexpl, design);
+		ChwConpMaintain chwConpMaintain = new ChwConpMaintain(obj_id, c_profile, bomappl, bomexpl, design, rfaNum);
 		chwConpMaintain.addConfigDependency("E2E", "");
 		chwConpMaintain.addConfigDependency("PR_"+model.getMACHTYPE()+"_SET_MODEL", "");
 		chwConpMaintain.addConfigDependency("PR_E2E_SET_MTM", "");
@@ -1008,7 +1010,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		runRfcCaller(chwConpMaintain);
 		
 		// Call UpdateParkStatus
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "UPG");
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "UPG", rfaNum);
 		runParkCaller(updateParkStatus, model.getMACHTYPE() + "UPG");
 		
     }
@@ -1022,7 +1024,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		 * Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(xml, materialType,
 		 * materialID, materialID); chw001ClfCreate.execute();
 		 */
-		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, odsConnection); 
+		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID,materialID, odsConnection);
 		this.addDebug("Calling " + "Chw001ClfCreate");
 		try{
 			chw001ClfCreate.execute();
@@ -1033,7 +1035,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		}
 		
 		// Call UpdateParkStatus	
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + model.getMODEL());
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + model.getMODEL(),model.getMACHTYPE() + model.getMODEL());
 		runParkCaller(updateParkStatus, model.getMACHTYPE() + model.getMODEL()); 	
     	
     }

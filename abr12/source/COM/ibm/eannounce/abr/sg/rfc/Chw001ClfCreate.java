@@ -17,15 +17,16 @@ public class Chw001ClfCreate extends RfcCallerBase{
 	MODEL chwModel;
 	String materialType;
 	String materialID;
-	Connection odsConnection;	
+	Connection odsConnection;
+	String rfaNum;
 	
 	
-	public Chw001ClfCreate (MODEL model, String materialType, String materialID,  Connection odsConnection ) {
+	public Chw001ClfCreate (MODEL model, String materialType, String materialID, String rfaNum, Connection odsConnection ) {
 		this.chwModel = model;
 		this.materialType = materialType;
 		this.materialID = materialID;
 		this.odsConnection = odsConnection;
-		
+		this.rfaNum = rfaNum;
 	}
 
 	
@@ -41,7 +42,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 					, "MG_COMMON"  						//String class_name   Set to "MG_COMMON".
 					, "001"  							//String class_type   Set to "001"
 					, "H"
-					);
+					, rfaNum);
 			this.addRfcName(rdhClassificationMaint);
 			//1.b Call the TssClassificationMaint.addCharacteristic() method to add the
 			//MG_PRODUCTTYPE characteristic to the MG_COMMON classification and indicate the product type.
@@ -73,7 +74,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 							, "MM_FIELDS"  						//String class_name   Set to "MM_FIELDS".
 							, "001"  							//String class_type   Set to "001"
 							, "H"
-							);
+							, rfaNum);
 			this.addRfcName(rdhClassificationMaint);
 			
 			//2.b Call the TssClassificationMaint.addCharacteristic() method to add the MM_MACH_TYPE characteristic to the MM_FIELDS classification.
@@ -280,7 +281,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 								, "MM_SERVICEPAC"  					//String class_name   Set to "MM_SERVICEPAC".
 								, "001"  							//String class_type   Set to "001"
 								, "H"
-								);
+								, rfaNum);
 				this.addRfcName(TssClassificationMaint);
 				
 				//3.c Call the TssClassificationMaint.addCharacteristic() method to add the MM_SP_SDF characteristic to the MM_SERVICEPAC classification.

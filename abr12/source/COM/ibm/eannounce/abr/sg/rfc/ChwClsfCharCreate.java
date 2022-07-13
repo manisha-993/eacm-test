@@ -5,7 +5,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 	
 	
 	
-	public void  CreateGroupChar(String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc) throws Exception {
+	public void  CreateGroupChar(String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc, String rfaNum) throws Exception {
 		
 		//a.Call the ChwCharMaintain constructor to create the group characteristic
 		/**
@@ -24,7 +24,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		String charact ="MK_" + target_indc + "_" + mach_type + "_FC_" + CommonUtils.getFirstSubString(feature_code, 1) +"000";
 		
 		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(
-				obj_id
+				rfaNum
 				, charact //MK_target_machineType_FC_n000
 				, "CHAR"  	//String datatype Set to "CHAR".
 				, 7			//int charnumber Set to "7".
@@ -46,7 +46,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		
 		//c.Call the ChwClassMaintain constructor to create the MK_target_machineType_FC_n000 class.
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
-				obj_id //String obj_id
+				rfaNum //String obj_id
 				, charact //String class_
 				, charact //String class_desc
 			);
@@ -63,7 +63,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				, charact 	//String class_name
 				, "300" 	//String class_type
 				, "H"		//String pims_identity
-				);
+				, rfaNum);
 		this.addRfcName(rdhClassificationMaint);
 		System.out.println("100");
 		rdhClassificationMaint.execute();
@@ -75,11 +75,11 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 
 	
 	
-	public void CreateQTYChar (String obj_id, String target_indc, String mach_type, String feature_code) throws Exception {
+	public void CreateQTYChar (String obj_id, String target_indc, String mach_type, String feature_code, String rfaNum) throws Exception {
 		//String chdescr = "";
 		String characta ="MK_" + target_indc + "_" + mach_type + "_"+feature_code+"_QTY";
 		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(
-				obj_id
+				rfaNum
 				, characta 	//MK_target_machineType_FC_RPQ
 				, "NUM"  	//String datatype Set to "CHAR".
 				, 4			//int charnumber Set to "6".
@@ -101,7 +101,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		//b.Call the ChwClassMaintain constructor to create the MK_target_machineType_FC_n000 class
 		String classb = "MK_" + target_indc + "_" + mach_type + "_FC_" + CommonUtils.getFirstSubString(feature_code, 1) +"000";
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
-				obj_id //String obj_id
+				rfaNum //String obj_id
 				, classb //String class_
 				, classb //String class_desc
 			);
@@ -118,7 +118,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				, classb 	//String class_name
 				, "300" 	//String class_type
 				, "H"		//String pims_identity
-				);
+				, rfaNum);
 		this.addRfcName(rdhClassificationMaint);
 		rdhClassificationMaint.execute();
 		this.addRfcResult(rdhClassificationMaint);
@@ -126,7 +126,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		
 	}
 	
-	public void CreateRPQGroupChar(String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc) throws Exception {
+	public void CreateRPQGroupChar(String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc, String rfaNum) throws Exception {
 		String chdescr = "";
 		if("T".equalsIgnoreCase(target_indc)){
 			chdescr = "RPQ Features Target";
@@ -136,7 +136,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		String charact ="MK_" + target_indc + "_" + mach_type + "_FC_RPQ";
 		
 		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(
-				obj_id
+				rfaNum
 				, charact //MK_target_machineType_FC_RPQ
 				, "CHAR"  	//String datatype Set to "CHAR".
 				, 6			//int charnumber Set to "6".
@@ -176,7 +176,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				, classc 	//String class_name
 				, "300" 	//String class_type
 				, "H"		//String pims_identity
-				);
+				, rfaNum);
 		this.addRfcName(rdhClassificationMaint);
 		
 		rdhClassificationMaint.execute();
@@ -184,7 +184,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		
 	}
 	
-	public void CreateRPQQTYChar(String obj_id, String target_indc, String mach_type, String feature_code) throws Exception {
+	public void CreateRPQQTYChar(String obj_id, String target_indc, String mach_type, String feature_code, String rfaNum) throws Exception {
 //		String chdescr = "";
 //		if("T".equalsIgnoreCase(target_indc)){
 //			chdescr = "RPQ Features Target";
@@ -195,7 +195,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		String charact ="MK_" + target_indc + "_" + mach_type + "_RPQ_"+feature_code +"_QTY";
 		
 		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(
-				obj_id
+				rfaNum
 				, charact //MK_target_machineType_FC_RPQ
 				, "NUM"  	//String datatype Set to "NUM".
 				, 4			//int charnumber Set to "4".
@@ -217,7 +217,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		//b.Call the ChwClassMaintain constructor to create the MK_target_machineType_RPQ class.
 		String classb = "MK_" + target_indc + "_" + mach_type + "_RPQ";
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
-				obj_id //String obj_id
+				rfaNum //String obj_id
 				, classb //String class_
 				, classb //String class_desc
 			);
@@ -236,7 +236,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				, classb 	//String class_name
 				, "300" 	//String class_type
 				, "H"		//String pims_identity
-				);
+				, rfaNum);
 		this.addRfcName(rdhClassificationMaint);
 		
 		rdhClassificationMaint.execute();
@@ -245,7 +245,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		
 	}
 	
-	public void CreateAlphaGroupChar (String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc) throws Exception{
+	public void CreateAlphaGroupChar (String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc, String rfaNum) throws Exception{
 		//this is the new RFC and caller
 		this.addOutput("CreateAlphaGroupChar obj_id" + obj_id);
 		String suffix = getSuffix(obj_id, target_indc, feature_code, "G");
@@ -262,7 +262,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		String charactb ="MK_" + target_indc+ "_" + CommonUtils.getFirstSubString(obj_id, 4) + "_FC_ALPH_" + suffix;
 		
 		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(
-				obj_id
+				rfaNum
 				, charactb  //"MK_T_" + first 4 characters of <obj_id> + "_FC_ALPH_" + <suffix>
 				, "CHAR"  	//String datatype Set to "CHAR".
 				, 12			//int charnumber Set to "12".
@@ -284,7 +284,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		//d. Call the ChwClassMaintain to create the alpha group classification.
 		String classd = "MK_" + target_indc+ "_" + CommonUtils.getFirstSubString(obj_id, 4) + "_ALPH_" + suffix;
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
-				obj_id //String obj_id
+				rfaNum //String obj_id
 				, classd //String class_
 				, classd //String class_desc
 			);
@@ -299,7 +299,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				, classd 	//String class_name
 				, "300" 	//String class_type
 				, "H"		//String pims_identity
-				);
+				, rfaNum);
 		this.addRfcName(rdhClassificationMaint);
 		rdhClassificationMaint.execute();
 		this.addRfcResult(rdhClassificationMaint);		
@@ -308,12 +308,12 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 
 	
 	
-	public void CreateAlphaQTYChar(String obj_id, String target_indc, String mach_type, String feature_code, String material) throws Exception {
+	public void CreateAlphaQTYChar(String obj_id, String target_indc, String mach_type, String feature_code, String material, String rfaNum) throws Exception {
 		//a.
 		String charact ="MK_" + target_indc + "_" + mach_type +"_" + feature_code + "_QTY";
 		
 		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(
-				obj_id
+				rfaNum
 				, charact //MK_target_machineType_FC_RPQ
 				, "NUM"  	//String datatype Set to "NUM".
 				, 4			//int charnumber Set to "4".
@@ -340,7 +340,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		//Set to "MK_" + <target_indc> + "_" + first 4 characters of <obj_id> + "_ALPH_" + <suffix>.
 		String classc = "MK_" + target_indc + "_" + CommonUtils.getFirstSubString(obj_id, 4) + "_ALPH_" + suffix;
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
-				obj_id //String obj_id
+				rfaNum //String obj_id
 				, classc //String class_
 				, classc //String class_desc
 			);
@@ -354,14 +354,14 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				, classc 	//String class_name
 				, "300" 	//String class_type
 				, "H"		//String pims_identity
-				);
+				, rfaNum);
 		this.addRfcName(rdhClassificationMaint);
 		rdhClassificationMaint.execute();
 		this.addRfcResult(rdhClassificationMaint);		
 		
 		//e.Call ChwAssignCharToClass to add the MK_target_machineType_featurecode_QTY characteristic to MK_target_machineType_ALPH_suffix class
 		ChwAssignCharToClass ChwAssignCharToClass = new ChwAssignCharToClass(
-				obj_id 		//String obj_id
+				rfaNum 		//String obj_id
 				, classc 	//String clazz
 				, charact 	//String characteristic
 				, "WW"		//String org_area	
@@ -382,7 +382,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				this.addOutput("suffix=" + suffix);
 				String class2 = "MK_" + target_indc + "_" + CommonUtils.getFirstSubString(obj_id, 4) + "_ALPH_" + suffix;
 				ChwClassMaintain chwClassMaintain2  = new ChwClassMaintain(
-						obj_id //String obj_id
+						rfaNum //String obj_id
 						, class2 //String class_
 						, class2 //String class_desc
 					);
@@ -395,13 +395,13 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 						, class2 	//String class_name
 						, "300" 	//String class_type
 						, "H"		//String pims_identity
-						);
+						, rfaNum);
 				this.addRfcName(rdhClassificationMaint2);
 				rdhClassificationMaint2.execute();
 				this.addRfcResult(rdhClassificationMaint2);				
 				
 				ChwAssignCharToClass ChwAssignCharToClass2 = new ChwAssignCharToClass(
-						obj_id 		//String obj_id
+						rfaNum 		//String obj_id
 						, class2 	//String clazz
 						, charact 	//String characteristic
 						, "WW"		//String org_area

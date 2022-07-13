@@ -206,7 +206,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				this.addOutput("Bom Processing Finished!");
 
 				// Call UpdateParkStatus
-				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", modelconvert.getTOMACHTYPE() + flag);
+				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", modelconvert.getTOMACHTYPE() + flag,modelconvert.getFROMMACHTYPE()+modelconvert.getFROMMODEL()+modelconvert.getTOMACHTYPE()+modelconvert.getTOMODEL());
 				this.addDebug("Calling "+updateParkStatus.getRFCName());
 				updateParkStatus.execute();
 				this.addDebug(updateParkStatus.createLogEntry());

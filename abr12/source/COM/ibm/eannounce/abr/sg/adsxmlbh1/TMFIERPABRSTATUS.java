@@ -300,6 +300,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String mach_type = chwTMF.getMACHTYPE();
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		String material = chwTMF.getMACHTYPE() + "UPG";
+		String rfaNum = chwTMF.getMACHTYPE() + chwTMF.getMODEL()+chwTMF.getFEATURECODE()+"UPG";
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		//step1 If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED"), then
 		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
@@ -307,7 +308,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			//1.1String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
 			try{
 				target_indc = "T";
-				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -317,7 +318,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			//String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
 			try{
 				target_indc = "D";
-				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -332,7 +333,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				//String obj_id, String target_indc, String mach_type, String feature_code
 				try{
 					target_indc = "T";
-					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -341,7 +342,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "D";
-					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -356,7 +357,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			try{
 				target_indc = "T";
-				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -366,7 +367,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			try{
 				target_indc = "D";
-				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -382,7 +383,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				//String obj_id, String target_indc, String mach_type, String feature_code
 				try{
 					target_indc = "T";
-					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -391,7 +392,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "D";
-					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -409,7 +410,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			try{
 				target_indc = "T";
-				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code,feature_code_desc);
+				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code,feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -419,7 +420,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			try{
 				target_indc = "D";
-				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code,feature_code_desc);
+				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code,feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -433,7 +434,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "T";
-					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material);
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -442,7 +443,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "D";
-					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material);
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -454,7 +455,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		
 		//step4 Call the ChwCharMaintain constructor to create the MK_D_machineType_REM_FC characteristic.  
 		String empty ="";
-		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(obj_id  //String obj_id Set to concatenation of chwProduct.machineType + "UPG"
+		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(rfaNum  //String obj_id Set to concatenation of chwProduct.machineType + "UPG"
 				,"MK_D_"+mach_type+"_REM_FC" //String charact  Set to  "MK_T_<machine_type>_MOD"
 				, "CHAR" 			//String datatype
 				, 12 				//int charnumber
@@ -475,7 +476,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		obj_id = chwTMF.getMACHTYPE() + "UPG"; 
 		String charactd = "MK_D_" + mach_type + "_REM_FC";
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
-				obj_id //String obj_id
+				rfaNum //String obj_id
 				, charactd //String class_
 				, charactd //String class_desc
 			);
@@ -499,7 +500,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		callRdhClassificationMaint(obj_id, "MK_FC_CONV");
 		
 		// Call UpdateParkStatus
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwTMF.getMACHTYPE() + "UPG");
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwTMF.getMACHTYPE() + "UPG", rfaNum);
 		this.addDebug("Calling "+updateParkStatus.getRFCName());
 		updateParkStatus.execute();
 		this.addDebug(updateParkStatus.createLogEntry());
@@ -518,6 +519,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String mach_type = chwTMF.getMACHTYPE();
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		String material = chwTMF.getMACHTYPE() + "MTC";
+		String rfaNum = chwTMF.getMACHTYPE() + chwTMF.getMODEL()+chwTMF.getFEATURECODE()+"MTC";
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		//step1 .If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED"), then
 		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
@@ -526,7 +528,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			//String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
 			try{
 				target_indc = "T";
-				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -536,7 +538,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			try{
 				target_indc ="D";
-				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -551,7 +553,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				//String obj_id, String target_indc, String mach_type, String feature_code
 				try{
 					target_indc = "T";
-					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -562,7 +564,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				//String obj_id, String target_indc, String mach_type, String feature_code
 				try{
 					target_indc = "D";
-					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -576,7 +578,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			try{
 				target_indc = "T";
-				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -586,7 +588,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			try{
 				target_indc = "D";
-				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -601,7 +603,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				//String obj_id, String target_indc, String mach_type, String feature_code
 				try{
 					target_indc = "T";
-					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -610,7 +612,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "D";
-					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -628,7 +630,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			try{
 				target_indc = "T";
-				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code,feature_code_desc);
+				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code,feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -638,7 +640,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			try{
 				target_indc = "D";
-				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code,feature_code_desc);
+				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code,feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -652,7 +654,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "T";
-					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material);
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -661,7 +663,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
 					target_indc = "D";
-					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material);
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -672,7 +674,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		}
 		//step 4 Call the ChwCharMaintain constructor to create the MK_machineType_MTC_REM_FC characteristic.  Set the constructor's parameters as follows.
 		String empty ="";
-		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(obj_id  //String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+		ChwCharMaintain chwCharMaintain = new ChwCharMaintain(rfaNum  //String obj_id Set to concatenation of chwProduct.machineType + "MTC"
 				,"MK_"+mach_type+"_MTC_REM_FC" //String charact  Set to  "MK_T_<machine_type>_MOD"
 				, "CHAR" 			//String datatype
 				, 12 				//int charnumber
@@ -692,7 +694,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		//step5 Call the ChwClassMaintain constructor to create the MK_machineType_MTC class. Set the constructor's input parameters as follows.
 		String charactd = "MK_" + mach_type + "_MTC";
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
-				obj_id //String obj_id
+				rfaNum //String obj_id
 				, charactd //String class_
 				, charactd //String class_desc
 			);
@@ -717,7 +719,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		callRdhClassificationMaint(obj_id, "MK_FC_CONV");
 		
 		// Call UpdateParkStatus
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwTMF.getMACHTYPE() + "MTC");
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwTMF.getMACHTYPE() + "MTC", rfaNum);
 		this.addDebug("Calling "+updateParkStatus.getRFCName());
 		updateParkStatus.execute();
 		this.addDebug(updateParkStatus.createLogEntry());
@@ -755,7 +757,8 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		String material = chwTMF.getMACHTYPE() + "NEW";
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
-		
+		String rfaNum = chwTMF.getMACHTYPE() +chwTMF.getMODEL()+ chwTMF.getFEATURECODE()+"NEW";
+
 		this.addDebug("TMF param feature_code=" + feature_code);
 		this.addDebug("TMF param FCTYPE=" + FCTYPE);
 		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
@@ -764,7 +767,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			//String obj_id, String target_indc, String mach_type, String feature_code, String feature_code_desc
 			try{
-				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				chwClsfCharCreate.CreateGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -784,7 +787,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				//String obj_id, String target_indc, String mach_type, String feature_code
 				try{
-					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -803,7 +806,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			//feature_code_desc = getFeatureCodeDesc(feature);
 			try{
-				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				chwClsfCharCreate.CreateRPQGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -819,7 +822,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				//String obj_id, String target_indc, String mach_type, String feature_code
 				try{
-					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code);
+					chwClsfCharCreate.CreateRPQQTYChar(obj_id, target_indc, mach_type, feature_code, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -840,7 +843,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			chwClsfCharCreate = new ChwClsfCharCreate();
 			//feature_code_desc = getFeatureCodeDesc(feature);
 			try{
-				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc);
+				chwClsfCharCreate.CreateAlphaGroupChar(obj_id, target_indc, mach_type, feature_code, feature_code_desc, rfaNum);
 				this.addMsg(chwClsfCharCreate.getRptSb());
 			} catch(Exception e){
 				this.addMsg(chwClsfCharCreate.getRptSb());
@@ -854,7 +857,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				this.addDebug("3.2 TMF Calling Call ChwClsfCharCreate.CreateAlphaQTYChar()");
 				chwClsfCharCreate = new ChwClsfCharCreate();
 				try{
-					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material);
+					chwClsfCharCreate.CreateAlphaQTYChar(obj_id, target_indc, mach_type, feature_code, material, rfaNum);
 					this.addMsg(chwClsfCharCreate.getRptSb());
 				} catch(Exception e){
 					this.addMsg(chwClsfCharCreate.getRptSb());
@@ -870,7 +873,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		callRdhClassificationMaint(obj_id, "MK_T_VAO_NEW");		
 		
 		// Call UpdateParkStatus
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwTMF.getMACHTYPE() + "NEW");
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwTMF.getMACHTYPE() + "NEW", rfaNum);
 		this.addDebug("Calling "+updateParkStatus.getRFCName());
 		updateParkStatus.execute();
 		this.addDebug(updateParkStatus.createLogEntry());

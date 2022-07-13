@@ -28,11 +28,11 @@ public class ChwConpMaintain extends RdhBase
     private List<RdhConp_rcuco> rcuco ;
     
     public ChwConpMaintain(String obj_id, String c_profile, 
-    		String bomappl, String bomexpl, String design)
+    		String bomappl, String bomexpl, String design, String rfaNum)
     {
-        super(obj_id, "Z_DM_SAP_CONP_MAINTAIN".toLowerCase(), null);
+        super(rfaNum, "Z_DM_SAP_CONP_MAINTAIN".toLowerCase(), null);
         this.pims_identity = "H";
-        this.rfa_num = obj_id;
+        this.rfa_num = rfaNum;
         
         object_key.get(0).setKey_feld("MATNR");
         object_key.get(0).setKpara_valu(obj_id);
