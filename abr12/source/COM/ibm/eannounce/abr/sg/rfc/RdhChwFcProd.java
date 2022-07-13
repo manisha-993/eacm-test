@@ -80,13 +80,36 @@ public class RdhChwFcProd extends RdhBase {
 				rdhChwFcProd_TMF.setEosAnnDate(availabilityElement.getEOSANNDATE().replaceAll("-", ""));
 				rdhChwFcProd_TMF.setEndOfServiceDate(availabilityElement.getENDOFSERVICEDATE().replaceAll("-", ""));
 				rdhChwFcProd_TMF.setNoCstShip(tmf.getNOCSTSHIP());
-				rdhChwFcProd_TMF.setInstall("Does not apply".equalsIgnoreCase(tmf.getINSTALL())?"NOT":CommonUtils.getFirstSubString(tmf.getINSTALL(),3));
+				if("Does not apply".equalsIgnoreCase(tmf.getINSTALL())) {
+					rdhChwFcProd_TMF.setInstall("NA");
+				}else if("CIF".equalsIgnoreCase(tmf.getINSTALL())){
+					rdhChwFcProd_TMF.setInstall("CSU");
+				}else if("CE".equalsIgnoreCase(tmf.getINSTALL())){
+					rdhChwFcProd_TMF.setInstall("IBI");
+				}else {
+					rdhChwFcProd_TMF.setInstall("");
+				}
 				rdhChwFcProd_TMF.setConfiguratorFlag(tmf.getCONFIGURATORFLAG());
-				rdhChwFcProd_TMF.setBulkMesIndc(CommonUtils.getFirstSubString(tmf.getBULKMESINDC(),1));
+
+				if("Yes".equalsIgnoreCase(tmf.getBULKMESINDC())) {
+					rdhChwFcProd_TMF.setBulkMesIndc("1");
+				}else if ("No".equalsIgnoreCase(tmf.getBULKMESINDC())){
+					rdhChwFcProd_TMF.setBulkMesIndc("0");
+				}else {
+					rdhChwFcProd_TMF.setBulkMesIndc("");
+				}
 				rdhChwFcProd_TMF.setOrderCode(tmf.getORDERCODE());
 				rdhChwFcProd_TMF.setSystemMax(tmf.getSYSTEMMAX());
 				//EACM-6613 add returnedParts		Char	1		TMF_UPDATE/ RETURNEDPARTS
-				rdhChwFcProd_TMF.setReturnedParts(CommonUtils.getFirstSubString(tmf.getRETURNEDPARTS(),1));
+				if("Yes".equalsIgnoreCase(tmf.getRETURNEDPARTS())) {
+					rdhChwFcProd_TMF.setReturnedParts("1");
+				}else if ("Feature conversion only".equalsIgnoreCase(tmf.getRETURNEDPARTS())){
+					rdhChwFcProd_TMF.setReturnedParts("1");
+				}else if(tmf.getRETURNEDPARTS()==null||"".equals(tmf.getRETURNEDPARTS())){
+					rdhChwFcProd_TMF.setReturnedParts("");
+				}else{
+					rdhChwFcProd_TMF.setReturnedParts("0");
+				}
 				tbl_tmf_c.add(rdhChwFcProd_TMF);
 			}
 		}
@@ -101,22 +124,30 @@ public class RdhChwFcProd extends RdhBase {
 		rdhChwFcProd_FEATURE.setFeatureCode(feature.getFEATURECODE());
 		rdhChwFcProd_FEATURE.setFeatureEntityType(feature.getENTITYTYPE());
 		rdhChwFcProd_FEATURE.setFeatureEntityID(feature.getENTITYID());
-		if (feature.getLANGUAGELIST()!=null)
-		{
-			for (LANGUAGEELEMENT_FEATURE languageElement : feature.getLANGUAGELIST())
-			{
-				if ("1".equals(languageElement.getNLSID()))
-				{
+		if (feature.getLANGUAGELIST()!=null) {
+			for (LANGUAGEELEMENT_FEATURE languageElement : feature.getLANGUAGELIST()) {
+				if ("1".equals(languageElement.getNLSID())) {
 					rdhChwFcProd_FEATURE.setMktgDesc(languageElement.getMKTGNAME());
 				}
 			}
 		}
-		String priced = feature.getPRICEDFEATURE()==null||feature.getPRICEDFEATURE().length()<1?
-				"" :feature.getPRICEDFEATURE().substring(0, 1).toUpperCase();
 		
 		rdhChwFcProd_FEATURE.setFcType(feature.getFCTYPE());
 		rdhChwFcProd_FEATURE.setFcSubcat(feature.getFCSUBCAT());
-		rdhChwFcProd_FEATURE.setPricedFeature(priced);
+		if("No".equals(feature.getPRICEDFEATURE())){
+			rdhChwFcProd_FEATURE.setPricedFeature("0");
+		}else if("Yes".equals(feature.getPRICEDFEATURE())){
+			if ("Yes".equals(feature.getZEROPRICE())){
+				rdhChwFcProd_FEATURE.setPricedFeature("0");
+			}else if ("".equals(feature.getZEROPRICE())||feature.getZEROPRICE()==null){
+				rdhChwFcProd_FEATURE.setPricedFeature("1");
+			}else if ("No".equals(feature.getZEROPRICE())){
+				rdhChwFcProd_FEATURE.setPricedFeature("1");
+			}
+		}else {
+			rdhChwFcProd_FEATURE.setPricedFeature("");
+		}
+
 		rdhChwFcProd_FEATURE.setFcCat(feature.getFCCAT());
 		rdhChwFcProd_FEATURE.setConfiguratorFlag(feature.getCONFIGURATORFLAG());
 		rdhChwFcProd_FEATURE.setChargeOption(feature.getCHARGEOPTION());
