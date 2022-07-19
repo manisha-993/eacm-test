@@ -364,7 +364,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 				obj_id 		//String obj_id
 				, classc 	//String clazz
 				, charact 	//String characteristic
-				, "WW"		//String org_area	
+				, ""		//Story EACM-6831 change WW to ""
 				, material  // material
 		);
 		this.addRfcName(ChwAssignCharToClass);
@@ -404,8 +404,8 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 						obj_id 		//String obj_id
 						, class2 	//String clazz
 						, charact 	//String characteristic
-						, "WW"		//String org_area
-						, material    //
+						, ""		//Story EACM-6831 change WW to ""
+						, material  //
 				);
 				this.addRfcName(ChwAssignCharToClass2);
 				ChwAssignCharToClass2.execute();
