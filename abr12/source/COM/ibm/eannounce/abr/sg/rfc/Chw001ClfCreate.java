@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -265,7 +267,20 @@ public class Chw001ClfCreate extends RfcCallerBase{
 			if("Service".equalsIgnoreCase(chwModel.getCATEGORY())){
 				value = materialID;
 				rdhClassificationMaint.addCharacteristic("MM_SP_MTM", CommonUtils.getFirstSubString(value, 7));
-			}			
+			}	
+			//2.y
+		    //If <materialType> = "ZPRT", then
+
+		     //For each chwProduct/RELEXPCAMTLIST/RELEXPCAMTELEMENT, then call the TssClassificationMaint.addCharacteristic() method to add the ZZ_RELEXPCAMT characteristic to the MM_FIELDS classification. Supply the parameter values as described below:
+
+			if("ZPRT".equals(materialType)) {
+				List<RELEXPCAMT> relexpcamts =   chwModel.getRELEXPCAMTLIST();
+				if(relexpcamts!=null) {
+					for(int i=0;i<relexpcamts.size();i++) {
+						rdhClassificationMaint.addCharacteristic("ZZ_RELEXPCAMT",relexpcamts.get(0).getRELEXPCAMT());
+					}
+				}
+			}
 			//2.final 
 			rdhClassificationMaint.execute();
 			this.addRfcResult(rdhClassificationMaint);
