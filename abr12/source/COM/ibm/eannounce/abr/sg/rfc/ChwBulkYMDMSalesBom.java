@@ -31,7 +31,7 @@ public class ChwBulkYMDMSalesBom extends RdhBase{
         this.pims_identity="H";
         TMF_ID = machType + "-" + model + "-" +featurecode;
 
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/YYYY");
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
 
         Set<String> plnts = RFCConfig.getBHPlnts();
         for(String plnt : plnts) {
