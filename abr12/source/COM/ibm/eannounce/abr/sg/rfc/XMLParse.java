@@ -147,7 +147,7 @@ public class XMLParse {
 							
 						}
 					}
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_TSS_IERP", svcmod.getMACHTYPE() + svcmod.getMODEL(), svcmod.getMACHTYPE() + svcmod.getMODEL());
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_TSS_IERP", svcmod.getMACHTYPE() + svcmod.getMODEL());
 					updateParkStatus.execute();
 					//this.addDebug(updateParkStatus.createLogEntry());
 

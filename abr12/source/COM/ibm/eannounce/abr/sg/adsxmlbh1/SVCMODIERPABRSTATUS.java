@@ -261,7 +261,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 					}
 			*/
 				
-				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_TSS_IERP", svcmod.getMACHTYPE() + svcmod.getMODEL(),svcmod.getMACHTYPE() + svcmod.getMODEL());
+				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_TSS_IERP", svcmod.getMACHTYPE() + svcmod.getMODEL());
 				this.addDebug("Calling "+updateParkStatus.getRFCName());
 				updateParkStatus.execute();
 				this.addDebug(updateParkStatus.createLogEntry());

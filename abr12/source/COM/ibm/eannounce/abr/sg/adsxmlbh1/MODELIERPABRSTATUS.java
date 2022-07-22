@@ -194,8 +194,8 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 							throw e;
 						}
 						// Call UpdateParkStatus
-						UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "MTC", model.getMACHTYPE() + model.getMODEL() + "MTC");
-						runParkCaller(updateParkStatus, model.getMACHTYPE() + "MTC");
+						UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + model.getMODEL() + "MTC");
+						runParkCaller(updateParkStatus, model.getMACHTYPE() + model.getMODEL() + "MTC");
 					}
 					//step d
 					
@@ -212,8 +212,8 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 								throw e;
 							}
 							// Call UpdateParkStatus
-							UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "UPG", model.getMACHTYPE()+model.getMODEL()+"UPG");
-							runParkCaller(updateParkStatus, model.getMACHTYPE() + "UPG");
+							UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+model.getMODEL()+"UPG");
+							runParkCaller(updateParkStatus, model.getMACHTYPE()+model.getMODEL()+"UPG");
 							
 						}else if(model.getORDERCODE()!=null&&model.getORDERCODE().trim().length()>0&&CommonUtils.contains("M,B",model.getORDERCODE())) {
 							this.addDebug("Calling " + "processMachTypeUpg");
@@ -796,7 +796,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		//ChwDepdMaintain 
 		
 		//5 Call UpdateParkStatus
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + model.getMODEL(), model.getMACHTYPE() + model.getMODEL());
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + model.getMODEL());
 		runParkCaller(updateParkStatus, model.getMACHTYPE() + model.getMODEL());
     	
     }
@@ -916,8 +916,8 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		runRfcCaller(ChwConpMaintain);
 		
 		//8 Call UpdateParkStatus
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "NEW", rfaNum);
-		runParkCaller(updateParkStatus, model.getMACHTYPE() + "NEW");
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP",  rfaNum);
+		runParkCaller(updateParkStatus, rfaNum);
 		
     }
     
@@ -1010,8 +1010,8 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		runRfcCaller(chwConpMaintain);
 		
 		// Call UpdateParkStatus
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + "UPG", rfaNum);
-		runParkCaller(updateParkStatus, model.getMACHTYPE() + "UPG");
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfaNum);
+		runParkCaller(updateParkStatus, rfaNum);
 		
     }
     public void processMachTypeMODEL_Svc(MODEL model,Connection odsConnection) throws Exception {
@@ -1035,7 +1035,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		}
 		
 		// Call UpdateParkStatus	
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + model.getMODEL(),model.getMACHTYPE() + model.getMODEL());
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP",model.getMACHTYPE() + model.getMODEL());
 		runParkCaller(updateParkStatus, model.getMACHTYPE() + model.getMODEL()); 	
     	
     }

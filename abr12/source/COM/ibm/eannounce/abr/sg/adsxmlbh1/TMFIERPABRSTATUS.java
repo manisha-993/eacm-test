@@ -487,22 +487,23 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		this.addRfcResult(chwClassMaintain);
 		//step 7 Call the TssClassificationMaint constructor to associate the MK_machineType_MTC class to the product's material master record.
 		obj_id = chwTMF.getMACHTYPE() + "UPG";  
-		callRdhClassificationMaint(obj_id, "MK_D_" + mach_type + "_REM_FC");
+		callRdhClassificationMaint(obj_id, "MK_D_" + mach_type + "_REM_FC", rfaNum);
 		//step8 Call the TssClassificationMaint constructor to associate the MK_REFERENCE class to the product's material master record. 
-		callRdhClassificationMaint(obj_id, "MK_REFERENCE");
+		callRdhClassificationMaint(obj_id, "MK_REFERENCE", rfaNum);
 		//step9 Call the TssClassificationMaint to associate the MK_T_VAO_NEW class to the product's material master record. 
-		callRdhClassificationMaint(obj_id, "MK_T_VAO_NEW");
+		callRdhClassificationMaint(obj_id, "MK_T_VAO_NEW", rfaNum);
 		//step 10 Call the TssClassificationMaint to associate the MK_D_VAO_NEW class to the product's material master record.
-		callRdhClassificationMaint(obj_id, "MK_D_VAO_NEW");
+		callRdhClassificationMaint(obj_id, "MK_D_VAO_NEW", rfaNum);
 		//step 11 Call the TssClassificationMaint to associate the MK_FC_EXCH class to the product's material master record.
-		callRdhClassificationMaint(obj_id, "MK_FC_EXCH");
+		callRdhClassificationMaint(obj_id, "MK_FC_EXCH", rfaNum);
 		//step 12 Call the TssClassificationMaint to associate the MK_FC_CONV class to the product's material master record.
-		callRdhClassificationMaint(obj_id, "MK_FC_CONV");
+		callRdhClassificationMaint(obj_id, "MK_FC_CONV", rfaNum);
 		
 		// Call UpdateParkStatus
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwTMF.getMACHTYPE() + "UPG", rfaNum);
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfaNum);
 		this.addDebug("Calling "+updateParkStatus.getRFCName());
 		updateParkStatus.execute();
+		this.addOutput("Parking records updated successfully for ZDMRELNUM="+rfaNum);
 		this.addDebug(updateParkStatus.createLogEntry());
 		
 	}
@@ -706,34 +707,35 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		
 		//step7 Call the TssClassificationMaint constructor to associate the MK_machineType_MTC class to the product's material master record.
 		//RdhClassificationMaint rdhClassificationMaint;
-		callRdhClassificationMaint(obj_id, "MK_" + mach_type + "_MTC");
+		callRdhClassificationMaint(obj_id, "MK_" + mach_type + "_MTC", rfaNum);
 		//step8 Call the TssClassificationMaint constructor to associate the MK_REFERENCE class to the product's material master record.
-		callRdhClassificationMaint(obj_id, "MK_REFERENCE");
+		callRdhClassificationMaint(obj_id, "MK_REFERENCE", rfaNum);
 		//step 9 Call the TssClassificationMaint to associate the MK_T_VAO_NEW class to the product's material master record
-		callRdhClassificationMaint(obj_id, "MK_T_VAO_NEW");
+		callRdhClassificationMaint(obj_id, "MK_T_VAO_NEW", rfaNum);
 		//step 10 Call the TssClassificationMaint to associate the MK_D_VAO_NEW class to the product's material master record.
-		callRdhClassificationMaint(obj_id, "MK_D_VAO_NEW");
+		callRdhClassificationMaint(obj_id, "MK_D_VAO_NEW", rfaNum);
 		//step11 Call the TssClassificationMaint to associate the MK_FC_EXCH class to the product's material master record.
-		callRdhClassificationMaint(obj_id, "MK_FC_EXCH");
+		callRdhClassificationMaint(obj_id, "MK_FC_EXCH", rfaNum);
 		//step 12 Call the TssClassificationMaint to associate the MK_FC_CONV class to the product's material master record
-		callRdhClassificationMaint(obj_id, "MK_FC_CONV");
+		callRdhClassificationMaint(obj_id, "MK_FC_CONV", rfaNum);
 		
 		// Call UpdateParkStatus
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwTMF.getMACHTYPE() + "MTC", rfaNum);
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfaNum);
 		this.addDebug("Calling "+updateParkStatus.getRFCName());
 		updateParkStatus.execute();
+		this.addOutput("Parking records updated successfully for ZDMRELNUM="+rfaNum);
 		this.addDebug(updateParkStatus.createLogEntry());
 		
 	}
 
-	protected void callRdhClassificationMaint(String obj_id, String class_name)
+	protected void callRdhClassificationMaint(String obj_id, String class_name, String rfaNum)
 			throws Exception {
 		RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(
 				obj_id 		//String obj_id
 				, class_name  	//String class_name
 				, "300" 	//String class_type
 				, "H"		//String pims_identity
-				);		
+				, rfaNum);
 		this.addDebug("Calling " + rdhClassificationMaint.getRFCName());
 		rdhClassificationMaint.execute();
 		this.addRfcResult(rdhClassificationMaint);
@@ -868,14 +870,15 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		//step5 Call the TssClassificationMaint constructor to associate the MK_target_machineType_FC_n000 class 
 		// to the product's material master record. Set the constructor's input parameters as follows.
 		this.addDebug("5 TMF Calling Call TssClassificationMaint");
-		callRdhClassificationMaint(obj_id, "MK_REFERENCE");
+		callRdhClassificationMaint(obj_id, "MK_REFERENCE", rfaNum);
 		//step 6. Call the TssClassificationMaint to associate the MK_T_VAO_NEW class to the product's material master record.
-		callRdhClassificationMaint(obj_id, "MK_T_VAO_NEW");		
+		callRdhClassificationMaint(obj_id, "MK_T_VAO_NEW", rfaNum);
 		
 		// Call UpdateParkStatus
-		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", chwTMF.getMACHTYPE() + "NEW", rfaNum);
+		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfaNum);
 		this.addDebug("Calling "+updateParkStatus.getRFCName());
 		updateParkStatus.execute();
+		this.addOutput("Parking records updated successfully for ZDMRELNUM="+rfaNum);
 		this.addDebug(updateParkStatus.createLogEntry());
 	}
 

@@ -159,7 +159,7 @@ public class ChwClsfCharCreate extends RfcCallerBase {
 		//c.Call the ChwClassMaintain constructor to create the MK_target_machineType_RPQ class.
 		String classc = "MK_" + target_indc + "_" + mach_type + "_RPQ";
 		ChwClassMaintain chwClassMaintain  = new ChwClassMaintain(
-				obj_id //String obj_id
+				rfaNum //String obj_id
 				, classc //String class_
 				, classc //String class_desc
 			);

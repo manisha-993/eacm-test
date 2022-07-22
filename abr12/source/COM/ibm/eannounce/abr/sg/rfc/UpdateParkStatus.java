@@ -37,9 +37,9 @@ public class UpdateParkStatus extends RdhBase
      * @param class_type
      * @param enablementprocess
      */
-    public UpdateParkStatus (String zdmclass,String zdmrelnum, String rfaNum)
+    public UpdateParkStatus (String zdmclass,String zdmrelnum)
     {
-    	super(rfaNum,"Z_DM_SAP_PARK_STATUS ".toLowerCase(),null);
+    	super(zdmrelnum,"Z_DM_SAP_PARK_STATUS ".toLowerCase(),null);
     	rdhzdmprktbls = new ArrayList<Rdhzdmprktbl>();
     	Rdhzdmprktbl rdhzdmprktbl = new Rdhzdmprktbl();
     	rdhzdmprktbl = new Rdhzdmprktbl();
