@@ -126,9 +126,9 @@ public class ChwBulkYMDMProd extends RdhBase{
                 tbl_mlan.add(mlan);
             }
         }
-        //For each unique combination of column SALES_ORG and PLNT_CD in the return result sets, create one row into tbl_mvke structure
+        //For each unique combination of column SALES_ORG and DEL_PLNT in the return result sets, create one row into tbl_mvke structure
         for(CountryPlantTax tax : taxList){
-            if("7".equals(tax.getINTERFACE_ID()) && !taxKey.contains(tax.getSALES_ORG()+tax.getPLNT_CD())){
+            if("7".equals(tax.getINTERFACE_ID()) && !taxKey.contains(tax.getSALES_ORG()+tax.getDEL_PLNT())){
                 ChwBulkYMDMProd_MVKE mvke = new ChwBulkYMDMProd_MVKE();
                 mvke.setModelEntitytype(chwProduct.getMODELENTITYTYPE());
                 mvke.setModelEntityid(chwProduct.getMODELENTITYID());
@@ -136,7 +136,7 @@ public class ChwBulkYMDMProd extends RdhBase{
                 mvke.setSleorg(tax.getSALES_ORG());
                 mvke.setPlntCd(tax.getPLNT_CD());
                 mvke.setPlntDel(tax.getDEL_PLNT());
-                taxKey.add(tax.getSALES_ORG()+tax.getPLNT_CD());
+                taxKey.add(tax.getSALES_ORG()+tax.getDEL_PLNT());
                 tbl_mvke.add(mvke);
             }
         }
