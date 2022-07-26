@@ -277,7 +277,7 @@ public class Chw001ClfCreate extends RfcCallerBase{
 				List<RELEXPCAMT> relexpcamts =   chwModel.getRELEXPCAMTLIST();
 				if(relexpcamts!=null) {
 					for(int i=0;i<relexpcamts.size();i++) {
-						rdhClassificationMaint.addCharacteristic("ZZ_RELEXPCAMT",relexpcamts.get(0).getRELEXPCAMT());
+						rdhClassificationMaint.addCharacteristic("MM_RELEXPCAMT",relexpcamts.get(i).getRELEXPCAMT());
 					}
 				}
 			}
