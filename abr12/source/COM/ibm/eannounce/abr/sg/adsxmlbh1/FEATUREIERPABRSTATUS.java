@@ -13,6 +13,7 @@ import java.util.List;
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
 import COM.ibm.eannounce.abr.sg.rfc.FEATURE;
+import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
 import COM.ibm.eannounce.abr.sg.rfc.RdhChwFcProd;
 import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.RdhMatmCreate;
@@ -133,7 +134,8 @@ public class FEATUREIERPABRSTATUS extends PokBaseABR {
 						this.addOutput(prod.getRFCName() + " called  faild!");
 						this.addOutput(prod.getError_text());
 					}
-
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", "FFEATURE"+feature.getENTITYID());
+					runParkCaller(updateParkStatus,  "FFEATURE"+feature.getENTITYID());
 			} else {
 				this.addOutput("XML file not exeit in cache,RFC caller not called!");
 				//return;
@@ -285,7 +287,17 @@ public class FEATUREIERPABRSTATUS extends PokBaseABR {
 
         return retVal;
     }
-    
+    protected void runParkCaller(RdhBase caller, String zdmnum) throws Exception {
+		this.addDebug("Calling " + caller.getRFCName());
+		caller.execute();
+		this.addDebug(caller.createLogEntry());
+		if (caller.getRfcrc() == 0) {
+			this.addOutput("Parking records updated successfully for ZDMRELNUM="+zdmnum);
+		} else {
+			this.addOutput(caller.getRFCName() + " called faild!");
+			this.addOutput(caller.getError_text());
+		}
+	}
 	 protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
 
 

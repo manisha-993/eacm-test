@@ -232,11 +232,17 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 					
 					RdhChwFcProd prod = new RdhChwFcProd(model);
 					runRfcCaller(prod);
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+model.getMODEL()+"UPG");
+					runParkCaller(updateParkStatus,"M"+ model.getMACHTYPE()+model.getMODEL());
+				
 				}
 				else if("Service".equals(model.getCATEGORY())) {
 					processMachTypeMODEL_Svc(model, connection);
 					RdhChwFcProd prod = new RdhChwFcProd(model);
 					runRfcCaller(prod);
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+model.getMODEL()+"UPG");
+					runParkCaller(updateParkStatus, "M"+model.getMACHTYPE()+model.getMODEL());
+				
 				}
 				else if ("Software".equals(model.getCATEGORY())) {
 					this.addError("It is not supported to feed software Model to iERP");
