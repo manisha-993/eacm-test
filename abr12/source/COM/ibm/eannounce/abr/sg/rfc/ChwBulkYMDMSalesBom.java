@@ -15,8 +15,6 @@ import COM.ibm.eannounce.abr.util.RFCConfig;
 
 public class ChwBulkYMDMSalesBom extends RdhBase{
 
-    @Foo
-    private String TMF_ID;
     @SerializedName("TBL_MAST")
     private ArrayList<ChwBulkYMDMSalesBom_MAST> tbl_mast;
     @SerializedName("TBL_STKO")
@@ -25,7 +23,8 @@ public class ChwBulkYMDMSalesBom extends RdhBase{
     private ArrayList<ChwBulkYMDMSalesBom_STPO> tbl_stpo;
     @SerializedName("TBL_CUKB")
     private ArrayList<ChwBulkYMDMSalesBom_CUKB> tbl_cukb;
-
+	@SerializedName("TMF_ID")
+    private String TMF_ID;
     public ChwBulkYMDMSalesBom(String machType, String model, String featurecode) {
         super(machType + "MEB", "RDH_YMDMSALES_BOM".toLowerCase(), null);
         this.pims_identity="H";
