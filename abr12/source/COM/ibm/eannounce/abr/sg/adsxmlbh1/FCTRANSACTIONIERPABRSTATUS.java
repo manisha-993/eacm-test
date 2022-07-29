@@ -374,7 +374,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(tmf,fctransaction);
 					this.runRfcCaller(caller);
 				}	*/			
-
+				
 				//13.
 				if(fctransaction.getTOMACHTYPE().equals(fctransaction.getFROMMACHTYPE())) {
 					List<MODEL> models = getMODEL(fctransaction.getTOMACHTYPE(),fctransaction.getPDHDOMAIN());
@@ -382,6 +382,17 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					this.addOutput("Start Bom Processing!");
 					updateSalesBom(fctransaction,plnts,models);
 					this.addOutput("Bom Processing Finished!");
+					// Call UpdateParkStatus
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", fctransaction.getTOMACHTYPE()+"UPG");
+					this.addDebug("Calling "+updateParkStatus.getRFCName());
+					updateParkStatus.execute();
+					this.addDebug(updateParkStatus.createLogEntry());
+					if (updateParkStatus.getRfcrc() == 0) {
+						this.addOutput("Parking records updated successfully for ZDMRELNUM="+rfaNum);
+					} else {
+						this.addOutput(updateParkStatus.getRFCName() + " called faild!");
+						this.addOutput(updateParkStatus.getError_text());
+					}
 				}
 				
 				// Call UpdateParkStatus

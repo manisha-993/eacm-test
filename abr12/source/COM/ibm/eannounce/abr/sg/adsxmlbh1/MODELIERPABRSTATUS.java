@@ -225,22 +225,25 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 					Set<String> plnts = RFCConfig.getBHPlnts();
 					this.addOutput("Start Bom Processing!");
 					updateSalesBom(model, "NEW", plnts);
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+"NEW");
+					runParkCaller(updateParkStatus,model.getMACHTYPE()+"NEW");
 					if("M".equals(model.getORDERCODE())||"B".equals(model.getORDERCODE())) {
 						updateSalesBom(model, "UPG", plnts);
+						updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+"UPG");
+						runParkCaller(updateParkStatus,model.getMACHTYPE()+"UPG");
 					}
 					this.addOutput("Bom Processing Finished!");
 					
 					RdhChwFcProd prod = new RdhChwFcProd(model);
 					runRfcCaller(prod);
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+model.getMODEL()+"UPG");
-					runParkCaller(updateParkStatus,"M"+ model.getMACHTYPE()+model.getMODEL());
-				
+					updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", "M"+model.getMACHTYPE()+model.getMODEL());
+					runParkCaller(updateParkStatus,"M"+ model.getMACHTYPE()+model.getMODEL());				
 				}
 				else if("Service".equals(model.getCATEGORY())) {
 					processMachTypeMODEL_Svc(model, connection);
 					RdhChwFcProd prod = new RdhChwFcProd(model);
 					runRfcCaller(prod);
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+model.getMODEL()+"UPG");
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", "M"+model.getMACHTYPE()+model.getMODEL());
 					runParkCaller(updateParkStatus, "M"+model.getMACHTYPE()+model.getMODEL());
 				
 				}
