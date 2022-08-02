@@ -235,6 +235,8 @@ public class ChwMatmCreate extends RdhBase {
 					bmmh5.get(0).setMaktx("Expert Care" + " " + model.getMACHTYPE());
 				}else if("STaaS".equals(model.getSUBGROUP())){
 					bmmh5.get(0).setMaktx("STaaS" + " " + model.getMACHTYPE());
+				}else if("PWaaS".equals(model.getSUBGROUP())){
+					bmmh5.get(0).setMaktx("PWaaS" + " " + model.getMACHTYPE());
 				}else {
 					bmmh5.get(0).setMaktx("MACHINE TYPE " + model.getMACHTYPE() + " - Model NEW");
 				}
