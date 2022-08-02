@@ -388,7 +388,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					updateParkStatus.execute();
 					this.addDebug(updateParkStatus.createLogEntry());
 					if (updateParkStatus.getRfcrc() == 0) {
-						this.addOutput("Parking records updated successfully for ZDMRELNUM="+rfaNum);
+						this.addOutput("Parking records updated successfully for ZDMRELNUM="+fctransaction.getTOMACHTYPE()+"UPG");
 					} else {
 						this.addOutput(updateParkStatus.getRFCName() + " called faild!");
 						this.addOutput(updateParkStatus.getError_text());
