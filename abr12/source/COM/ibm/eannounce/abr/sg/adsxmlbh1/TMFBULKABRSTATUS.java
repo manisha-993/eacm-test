@@ -133,7 +133,7 @@ public class TMFBULKABRSTATUS extends PokBaseABR {
 
                 ChwBulkYMDMSalesBom bom = new ChwBulkYMDMSalesBom(machtype,modelatr,featurecode);
                 this.addDebug("Calling " + bom.getRFCName());
-                abr.execute();
+                bom.execute();
                 this.addDebug(bom.createLogEntry());
                 if (bom.getRfcrc() == 0) {
                     this.addOutput(bom.getRFCName() + " called successfully!");
