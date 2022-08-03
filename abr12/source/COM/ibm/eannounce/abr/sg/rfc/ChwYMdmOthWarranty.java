@@ -28,6 +28,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		super(chwProduct.getWARRID(),	"Z_YMDMOTH_WARRANTY".toLowerCase(), null);
 		this.pims_identity = "H";
 		this.MATERIAL_TYPE = "WARR"; 
+		//EACM-6768 Truncate values for WARR UPD CommonUtils.getFirstSubString(xxx,size)
 		
 		ZYTMDMOTHWARRUPD ZYTMDMOTHWARRUPD = new ZYTMDMOTHWARRUPD();
 		ZYTMDMOTHWARRUPD.setZWARRID(chwProduct.getWARRID());
@@ -113,9 +114,9 @@ public class ChwYMdmOthWarranty extends RdhBase {
 					//Copy from SUBSTRING(chwProduct/INVNAME from 1 for 40);
 					ZYTMDMOTHWARRUPD.setZPRODDESC(CommonUtils.getFirstSubString(languageElement.getINVNAME(),40));
 					//Copy from chwProduct/MKTGNAME 
-					ZYTMDMOTHWARRUPD.setZMKTGNAME(languageElement.getMKTGNAME());
+					ZYTMDMOTHWARRUPD.setZMKTGNAME(CommonUtils.getFirstSubString(languageElement.getMKTGNAME(),132));
 					//Copy from chwProduct/WARRDESC 
-					ZYTMDMOTHWARRUPD.setZWARRDESC(languageElement.getWARRDESC());
+					ZYTMDMOTHWARRUPD.setZWARRDESC(CommonUtils.getFirstSubString(languageElement.getWARRDESC(),1000));
 					
 				}
 			}
@@ -125,22 +126,22 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		//Copy from chwProduct/OEMESAPRTSONY  length 10
 		ZYTMDMOTHWARRUPD.setZALTWTY2(CommonUtils.getFirstSubString(chwProduct.getOEMESAPRTSONY(),10));
 		//Copy from chwProduct/TIERMAIN
-		ZYTMDMOTHWARRUPD.setZTIER_MAIN(chwProduct.getTIERMAIN());
+		ZYTMDMOTHWARRUPD.setZTIER_MAIN(CommonUtils.getFirstSubString(chwProduct.getTIERMAIN(),50));
 		//Copy from chwProduct/PREDSUPP
-		ZYTMDMOTHWARRUPD.setZPRED_SUP(chwProduct.getPREDSUPP());
+		ZYTMDMOTHWARRUPD.setZPRED_SUP(CommonUtils.getFirstSubString(chwProduct.getPREDSUPP(),50));
 		//Copy from chwProduct/ENHCOMRES
-		ZYTMDMOTHWARRUPD.setZENH_RESP(chwProduct.getENHCOMRES());
+		ZYTMDMOTHWARRUPD.setZENH_RESP(CommonUtils.getFirstSubString(chwProduct.getENHCOMRES(),50));
 		//Copy from chwProduct/REMCODLOAD 
-		ZYTMDMOTHWARRUPD.setZREM_CLOAD(chwProduct.getREMCODLOAD());
+		ZYTMDMOTHWARRUPD.setZREM_CLOAD(CommonUtils.getFirstSubString(chwProduct.getREMCODLOAD(),50));
 		//Copy from chwProduct/TIERWSU
-		ZYTMDMOTHWARRUPD.setZTECH_ADV(chwProduct.getTIERWSU());
+		ZYTMDMOTHWARRUPD.setZTECH_ADV(CommonUtils.getFirstSubString(chwProduct.getTIERWSU(),50));
 		//Copy from chwProduct/TECHADV
-		ZYTMDMOTHWARRUPD.setZTECHADVISOR(chwProduct.getTECHADV());
+		ZYTMDMOTHWARRUPD.setZTECHADVISOR(CommonUtils.getFirstSubString(chwProduct.getTECHADV(),50));
 		//Copy from chwProduct/SVC1-4
-		ZYTMDMOTHWARRUPD.setZSVC1(chwProduct.getSVC1());
-		ZYTMDMOTHWARRUPD.setZSVC2(chwProduct.getSVC2());
-		ZYTMDMOTHWARRUPD.setZSVC3(chwProduct.getSVC3());
-		ZYTMDMOTHWARRUPD.setZSVC4(chwProduct.getSVC4());
+		ZYTMDMOTHWARRUPD.setZSVC1(CommonUtils.getFirstSubString(chwProduct.getSVC1(),50));
+		ZYTMDMOTHWARRUPD.setZSVC2(CommonUtils.getFirstSubString(chwProduct.getSVC2(),50));
+		ZYTMDMOTHWARRUPD.setZSVC3(CommonUtils.getFirstSubString(chwProduct.getSVC3(),50));
+		ZYTMDMOTHWARRUPD.setZSVC4(CommonUtils.getFirstSubString(chwProduct.getSVC4(),50));
 		ZYTMDMOTHWARRUPD_LIST.add(ZYTMDMOTHWARRUPD);
 
 	}

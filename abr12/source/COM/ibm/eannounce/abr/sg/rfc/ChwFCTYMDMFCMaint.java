@@ -62,7 +62,15 @@ public class ChwFCTYMDMFCMaint extends RdhBase {
 		rdhChwFcProd_FCTRANSACTION.setFROMFEATURECODE(fctransaction.getFROMFEATURECODE());
 		rdhChwFcProd_FCTRANSACTION.setTOFEATURECODE(fctransaction.getTOFEATURECODE());
 		rdhChwFcProd_FCTRANSACTION.setFEATURETRANSCAT(fctransaction.getFEATURETRANSACTIONCATEGORY());
-		rdhChwFcProd_FCTRANSACTION.setRETURNEDPARTSMES(CommonUtils.getFirstSubString(fctransaction.getRETURNEDPARTSMES(),1));	
+		if ("Yes".equals(fctransaction.getRETURNEDPARTSMES())){
+			rdhChwFcProd_FCTRANSACTION.setRETURNEDPARTSMES("1");
+		}else if ("Feature conversion only".equals(fctransaction.getRETURNEDPARTSMES())){
+			rdhChwFcProd_FCTRANSACTION.setRETURNEDPARTSMES("1");
+		}else if(fctransaction.getRETURNEDPARTSMES()==null||"".equals(fctransaction.getRETURNEDPARTSMES())){
+			rdhChwFcProd_FCTRANSACTION.setRETURNEDPARTSMES("");
+		}else{
+			rdhChwFcProd_FCTRANSACTION.setRETURNEDPARTSMES("0");
+		}
 		tbl_fctransaction.add(rdhChwFcProd_FCTRANSACTION);
 
 	}

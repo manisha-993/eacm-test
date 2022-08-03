@@ -150,6 +150,11 @@ public final class RfcConfigProperties extends Properties {
 		return 
 			c_prop.getProperty("COUNTRY."+key, null);
 	}
+	public static final String getMtposMachtype() {
+		reloadProperties();
+		return
+				c_prop.getProperty("MTPOS.MACHTYPE", "");
+	}
 	public static  String getZsabrtaxPropertys(String key){
 		reloadProperties();
 		return 
