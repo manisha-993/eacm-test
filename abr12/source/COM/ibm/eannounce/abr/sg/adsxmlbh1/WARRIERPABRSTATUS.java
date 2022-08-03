@@ -10,6 +10,7 @@ import java.util.Hashtable;
 
 import COM.ibm.eannounce.abr.sg.rfc.ChwYMdmOthWarranty;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
+import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.WARR;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
@@ -117,6 +118,16 @@ public class WARRIERPABRSTATUS extends PokBaseABR {
 				ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(warr);
 				if(chwYMdmOthWarranty.getZYTMDMOTHWARRUPD_LIST().size()>0) {
 					this.runRfcCaller(chwYMdmOthWarranty);
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", warr.getWARRID());
+					this.addDebug("Calling "+updateParkStatus.getRFCName());
+					updateParkStatus.execute();
+					this.addDebug(updateParkStatus.createLogEntry());
+					if (updateParkStatus.getRfcrc() == 0) {
+						this.addOutput("Parking records updated successfully for ZDMRELNUM="+ warr.getWARRID());
+					} else {
+						this.addOutput(updateParkStatus.getRFCName() + " called faild!");
+						this.addOutput(updateParkStatus.getError_text());
+					}
 				}else {
 					addOutput("WARRPRIOD must be Number in the WARR_UPDATE entity, please fix the Data and resend it.");
 				}				
