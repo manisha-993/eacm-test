@@ -120,6 +120,9 @@ public class MODEL {
 	@XmlElement(name = "WARRELEMENT")
 	private List<WARRELEMENTTYPE> WARRLIST;
 	
+	@XmlElementWrapper(name = "RELEXPCAMTLIST")
+	@XmlElement(name = "RELEXPCAMTELEMENT")
+	private List<RELEXPCAMT> RELEXPCAMTLIST;
 	@XmlElement(name = "INVNAME")
 	private String INVNAME ;
 	@XmlElement(name = "MEASUREMETRIC")
@@ -127,6 +130,14 @@ public class MODEL {
 	@XmlElement(name = "WARRSVCCOVR")
 	private String WARRSVCCOVR;
 	
+
+	public List<RELEXPCAMT> getRELEXPCAMTLIST() {
+		return RELEXPCAMTLIST;
+	}
+
+	public void setRELEXPCAMTLIST(List<RELEXPCAMT> rELEXPCAMTLIST) {
+		RELEXPCAMTLIST = rELEXPCAMTLIST;
+	}
 
 	public String getMEASUREMETRIC() {
 		return MEASUREMETRIC;
@@ -431,7 +442,27 @@ public class MODEL {
 
 
 }
-
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
+@XmlAccessorType(XmlAccessType.FIELD)
+class RELEXPCAMT {
+	@XmlElement(name = "RELEXPCAMTACTION")
+	private String RELEXPCAMTACTION;
+	@XmlElement(name = "RELEXPCAMT")
+	private String RELEXPCAMT;
+	public String getRELEXPCAMTACTION() {
+		return RELEXPCAMTACTION;
+	}
+	public void setRELEXPCAMTACTION(String rELEXPCAMTACTION) {
+		RELEXPCAMTACTION = rELEXPCAMTACTION;
+	}
+	public String getRELEXPCAMT() {
+		return RELEXPCAMT;
+	}
+	public void setRELEXPCAMT(String rELEXPCAMT) {
+		RELEXPCAMT = rELEXPCAMT;
+	}
+	
+}
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 @XmlAccessorType(XmlAccessType.FIELD)
 class WARRELEMENTTYPE {
