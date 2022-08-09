@@ -45,7 +45,7 @@ public class R160assignChartoClassFEAT_0000 extends Rfc {
 			rfc.setJMultichar(c1Table);
 
 			rfcInfo.append("RMCLM \n");
-			rfcInfo.append(Tab + "MERKMA>>" + c1Row.getMerkma() + "\n");
+			rfcInfo.append(Tab + count+"MERKMA>>" + c1Row.getMerkma() + "\n");
 		}
 		
 		// ZDM_GEO_TO_CLASS
