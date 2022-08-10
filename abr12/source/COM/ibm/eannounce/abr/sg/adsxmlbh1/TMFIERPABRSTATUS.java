@@ -203,10 +203,11 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				//step4 Call CHWYMDMFCMaint to populate iERP user-defined tables (UDTs) with the availability status 
 				//of PRODSTRUCT by setting the input parameter for tbl_tmf_c structure
 				//CHWYMDMFCMaint CHWYMDMFCMaint = new CHWYMDMFCMaint();
-				RdhChwFcProd caller = new RdhChwFcProd(tmf);
+				String rfanum=tmf.getMACHTYPE()+tmf.getMODEL()+tmf.getFEATURECODE();
+				RdhChwFcProd caller = new RdhChwFcProd(tmf,rfanum);
 				runRfcCaller(caller);
 					
-				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", tmf.getMACHTYPE()+tmf.getMODEL()+tmf.getFEATURECODE());
+				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP",rfanum );
 				runParkCaller(updateParkStatus,  tmf.getMACHTYPE()+tmf.getMODEL()+tmf.getFEATURECODE());
 			}else{
 				addDebug("no xml found in the ODS database");

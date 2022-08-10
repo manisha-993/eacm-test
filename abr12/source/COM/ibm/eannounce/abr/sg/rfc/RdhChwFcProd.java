@@ -51,8 +51,8 @@ public class RdhChwFcProd extends RdhBase {
 		}
 	}
 
-	public RdhChwFcProd(TMF_UPDATE tmf) {
-		super(tmf.getMACHTYPE() + tmf.getMODEL(), "RDH_YMDMFC_PROD"
+	public RdhChwFcProd(TMF_UPDATE tmf,String rfanum) {
+		super(rfanum, "RDH_YMDMFC_PROD"
 				.toLowerCase(), null);
 		this.pims_identity = "H";
 		
