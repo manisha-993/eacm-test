@@ -135,8 +135,8 @@ public class FEATUREIERPABRSTATUS extends PokBaseABR {
 						this.addOutput(prod.getError_text());
 					}
 
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", "FFEATURE"+feature.getENTITYID());
-					runParkCaller(updateParkStatus,  "FFEATURE"+feature.getENTITYID());
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", "FEATURE"+feature.getENTITYID());
+					runParkCaller(updateParkStatus,  "FEATURE"+feature.getENTITYID());
 			} else {
 				this.addOutput("XML file not exeit in cache,RFC caller not called!");
 				//return;
