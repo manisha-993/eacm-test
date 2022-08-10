@@ -206,7 +206,8 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				RdhChwFcProd caller = new RdhChwFcProd(tmf);
 				runRfcCaller(caller);
 					
-				
+				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", tmf.getMACHTYPE()+tmf.getMODEL()+tmf.getFEATURECODE());
+				runParkCaller(updateParkStatus,  tmf.getMACHTYPE()+tmf.getMODEL()+tmf.getFEATURECODE());
 			}else{
 				addDebug("no xml found in the ODS database");
 			}	
@@ -287,7 +288,17 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 
 	
 
-
+	protected void runParkCaller(RdhBase caller, String zdmnum) throws Exception {
+		this.addDebug("Calling " + caller.getRFCName());
+		caller.execute();
+		this.addDebug(caller.createLogEntry());
+		if (caller.getRfcrc() == 0) {
+			this.addOutput("Parking records updated successfully for ZDMRELNUM="+zdmnum);
+		} else {
+			this.addOutput(caller.getRFCName() + " called faild!");
+			this.addOutput(caller.getError_text());
+		}
+	}
 	
 
 	private void MachineTypeUPG(TMF_UPDATE chwTMF, FEATURE chwFeature,	MODEL chwModel) throws Exception{
