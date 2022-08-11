@@ -167,7 +167,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			if (xml != null) {
 			
 				MODEL model = XMLParse.getObjectFromXml(xml,MODEL.class);
-				
+				String rfanum="";
 				if("Hardware".equals(model.getCATEGORY())) {
 					processMachTypeNew(model, connection);
 					processMachTypeMODEL(model, connection);
@@ -229,18 +229,19 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 						updateSalesBom(model, "UPG", plnts);
 					}
 					this.addOutput("Bom Processing Finished!");
-					
-					RdhChwFcProd prod = new RdhChwFcProd(model);
+					rfanum = "M"+model.getMACHTYPE()+model.getMODEL();
+					RdhChwFcProd prod = new RdhChwFcProd(model,rfanum);
 					runRfcCaller(prod);
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+model.getMODEL());
-					runParkCaller(updateParkStatus,model.getMACHTYPE()+model.getMODEL());	
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfanum);
+					runParkCaller(updateParkStatus,rfanum);	
 				}
 				else if("Service".equals(model.getCATEGORY())) {
 					processMachTypeMODEL_Svc(model, connection);
-					RdhChwFcProd prod = new RdhChwFcProd(model);
+					rfanum = "M"+model.getMACHTYPE()+model.getMODEL();
+					RdhChwFcProd prod = new RdhChwFcProd(model,rfanum);
 					runRfcCaller(prod);
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+model.getMODEL());
-					runParkCaller(updateParkStatus,model.getMACHTYPE()+model.getMODEL());	
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfanum);
+					runParkCaller(updateParkStatus,rfanum);	
 				
 				}
 				else if ("Software".equals(model.getCATEGORY())) {

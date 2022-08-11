@@ -20,8 +20,8 @@ public class RdhChwFcProd extends RdhBase {
 	@SerializedName("TBL_FEATURE")
 	private List<RdhChwFcProd_FEATURE> tbl_feature;
 	
-	public RdhChwFcProd(MODEL model) {
-		super(model.getMACHTYPE() + model.getMODEL(), "RDH_YMDMFC_PROD"
+	public RdhChwFcProd(MODEL model,String rfanum) {
+		super(rfanum, "RDH_YMDMFC_PROD"
 				.toLowerCase(), null);
 		this.pims_identity = "H";
 		
@@ -115,8 +115,8 @@ public class RdhChwFcProd extends RdhBase {
 		}
 	}
 	
-	public RdhChwFcProd(FEATURE feature) {
-		super(feature.getENTITYTYPE() + feature.getENTITYID(), "RDH_YMDMFC_PROD"
+	public RdhChwFcProd(FEATURE feature,String rfanum) {
+		super(rfanum, "RDH_YMDMFC_PROD"
 				.toLowerCase(), null);
 		this.pims_identity = "H";
 
