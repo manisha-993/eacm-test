@@ -224,19 +224,19 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 						updateSalesBom(model, "UPG", plnts);
 					}
 					this.addOutput("Bom Processing Finished!");
-					rfanum = "M"+model.getMACHTYPE()+model.getMODEL();
+					rfanum = model.getMACHTYPE()+model.getMODEL();
 					RdhChwFcProd prod = new RdhChwFcProd(model,rfanum);
 					runRfcCaller(prod);
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfanum);
-					runParkCaller(updateParkStatus,rfanum);	
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", "M"+rfanum);
+					runParkCaller(updateParkStatus,"M"+rfanum);	
 				}
 				else if("Service".equals(model.getCATEGORY())) {
 					processMachTypeMODEL_Svc(model, connection);
-					rfanum = "M"+model.getMACHTYPE()+model.getMODEL();
+					rfanum = model.getMACHTYPE()+model.getMODEL();
 					RdhChwFcProd prod = new RdhChwFcProd(model,rfanum);
 					runRfcCaller(prod);
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfanum);
-					runParkCaller(updateParkStatus,rfanum);	
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP","M"+ rfanum);
+					runParkCaller(updateParkStatus,"M"+rfanum);	
 				
 				}
 				else if ("Software".equals(model.getCATEGORY())) {

@@ -124,7 +124,7 @@ public class FEATUREIERPABRSTATUS extends PokBaseABR {
 			if (xml != null) {
 			FEATURE feature
 					  = XMLParse.getObjectFromXml(xml, FEATURE.class);
-			String rfanum="FFEATURE"+feature.getENTITYID();
+			String rfanum="FEATURE"+feature.getENTITYID();
 					RdhChwFcProd prod = new RdhChwFcProd( feature,rfanum);
 					this.addDebug("Calling " + prod.getRFCName());
 					prod.execute();
@@ -136,8 +136,8 @@ public class FEATUREIERPABRSTATUS extends PokBaseABR {
 						this.addOutput(prod.getError_text());
 					}
 
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfanum);
-					runParkCaller(updateParkStatus, rfanum );
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", "F"+rfanum);
+					runParkCaller(updateParkStatus,"F"+ rfanum );
 			} else {
 				this.addOutput("XML file not exeit in cache,RFC caller not called!");
 				//return;

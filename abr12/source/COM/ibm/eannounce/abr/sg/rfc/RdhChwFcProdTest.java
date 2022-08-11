@@ -73,6 +73,7 @@ public class RdhChwFcProdTest
 	    
         RdhChwFcProd fcProd = new RdhChwFcProd(model,"");
 
+
 		try {
 			String json = fcProd.generateJson();
 			String formatJson = formatJson(json);
