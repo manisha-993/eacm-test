@@ -11,6 +11,7 @@ import java.util.Hashtable;
 import COM.ibm.eannounce.abr.sg.rfc.ChwYMdmOthWarranty;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
+import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
@@ -125,6 +126,16 @@ public class MODELWARRABRSTATUS extends PokBaseABR {
 					ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(model);
 					if(chwYMdmOthWarranty.getZYTMDMOTHWARRMOD_LIST().size()>0) {
 						this.runRfcCaller(chwYMdmOthWarranty);
+						UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+model.getMODEL());
+						this.addDebug("Calling "+updateParkStatus.getRFCName());
+						updateParkStatus.execute();
+						this.addDebug(updateParkStatus.createLogEntry());
+						if (updateParkStatus.getRfcrc() == 0) {
+							this.addOutput("Parking records updated successfully for ZDMRELNUM="+ model.getMACHTYPE()+model.getMODEL());
+						} else {
+							this.addOutput(updateParkStatus.getRFCName() + " called faild!");
+							this.addOutput(updateParkStatus.getError_text());
+						}
 					}else {
 						addOutput("No warranty linked to the MODEL, so nothing to promote.");
 					}
