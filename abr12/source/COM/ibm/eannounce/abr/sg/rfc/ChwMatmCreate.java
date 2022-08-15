@@ -152,7 +152,7 @@ public class ChwMatmCreate extends RdhBase {
 		//Todo
 		if(materialID.endsWith("NEW")) {
 			if("LBS".equals(model.getPHANTOMMODINDC())||"'6661', '6662', '6663', '6664', '6665', '6668', '6669', '9602', '9604'".contains(model.getMACHTYPE()
-					)||"Storage Tier','STORAGE TIER','storage tier','Power Tier'".contains(model.getSUBGROUP())) {
+					)||("Storage Tier','STORAGE TIER','storage tier','Power Tier'".contains(model.getSUBGROUP())&&model.getSUBGROUP().length()>0)) {
 				bmmh1.get(0).setSernp("NONE");
 			}else if ("'2063', '2068', '2059', '2057', '2058'".contains(model.getMACHTYPE())) {
 				bmmh1.get(0).setSernp("GG01");
