@@ -15,6 +15,7 @@ import COM.ibm.eannounce.abr.sg.rfc.ChwYMdmOthWarranty;
 import COM.ibm.eannounce.abr.sg.rfc.CommonUtils;
 import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
 import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
+import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
@@ -128,6 +129,16 @@ public class TMFWARRABRSTATUS extends PokBaseABR {
 					ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(tmf,attributevalue);
 					if(chwYMdmOthWarranty.getZYTMDMOTHWARRTMF_LIST().size()>0) {
 						this.runRfcCaller(chwYMdmOthWarranty);
+						UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", tmf.getMACHTYPE()+tmf.getFEATURECODE());
+						this.addDebug("Calling "+updateParkStatus.getRFCName());
+						updateParkStatus.execute();
+						this.addDebug(updateParkStatus.createLogEntry());
+						if (updateParkStatus.getRfcrc() == 0) {
+							this.addOutput("Parking records updated successfully for ZDMRELNUM="+ tmf.getMACHTYPE()+tmf.getFEATURECODE());
+						} else {
+							this.addOutput(updateParkStatus.getRFCName() + " called faild!");
+							this.addOutput(updateParkStatus.getError_text());
+						}
 					}else {
 						addOutput("No warranty linked to the TMF, so nothing to promote.");
 					}
