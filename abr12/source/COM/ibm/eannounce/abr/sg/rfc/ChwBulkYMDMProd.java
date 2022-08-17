@@ -93,7 +93,7 @@ public class ChwBulkYMDMProd extends RdhBase{
         ChwBulkYMDMProd_MAKT makt1 = new ChwBulkYMDMProd_MAKT();
         makt1.setEntitytype(chwProduct.getMODELENTITYTYPE());
         makt1.setEntityID(chwProduct.getMODELENTITYID());
-        makt1.setNlsid("1");
+        makt1.setNlsid("E");
         makt1.setInvName("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
         makt1.setMktgDesc("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
         makt1.setMktgName("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
@@ -102,7 +102,7 @@ public class ChwBulkYMDMProd extends RdhBase{
         ChwBulkYMDMProd_MAKT makt2 = new ChwBulkYMDMProd_MAKT();
         makt2.setEntitytype(chwProduct.getMODELENTITYTYPE());
         makt2.setEntityID(chwProduct.getMODELENTITYID());
-        makt2.setNlsid("D");
+        makt2.setNlsid("E");
         makt2.setInvName("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
         makt2.setMktgDesc("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
         makt2.setMktgName("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");

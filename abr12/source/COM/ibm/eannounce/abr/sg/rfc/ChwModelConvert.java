@@ -28,6 +28,8 @@ public class ChwModelConvert extends RdhBase {
 			List<AVAILABILITYELEMENT> availablityelements = availablitylist.get(0).getAVAILABILITYELEMENT();
 			if(availablityelements!=null && !availablityelements.isEmpty()){
 				for(AVAILABILITYELEMENT availablityelement : availablityelements){
+					if(RfcConfigProperties.getCountry(availablityelement.getCOUNTRY_FC())==null)
+						continue;
 					ModelConvertTable modelConvertTable = new ModelConvertTable();
 					modelConvertTable.setMODELUPGRADEENTITYTYPE(modelConvert.getMODELUPGRADEENTITYTYPE());
 					modelConvertTable.setMODELUPGRADEENTITYID(modelConvert.getMODELUPGRADEENTITYID());
