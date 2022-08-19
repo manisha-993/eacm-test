@@ -88,9 +88,9 @@ public class ChwBulkYMDMProd extends RdhBase{
         makt.setInvName("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
         makt.setMktgDesc("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
         makt.setMktgName("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
-        tbl_model_makt.add(makt);
+        tbl_model_makt.add(makt); 
         
-        ChwBulkYMDMProd_MAKT makt1 = new ChwBulkYMDMProd_MAKT();
+       /* ChwBulkYMDMProd_MAKT makt1 = new ChwBulkYMDMProd_MAKT();
         makt1.setEntitytype(chwProduct.getMODELENTITYTYPE());
         makt1.setEntityID(chwProduct.getMODELENTITYID());
         makt1.setNlsid("E");
@@ -106,7 +106,7 @@ public class ChwBulkYMDMProd extends RdhBase{
         makt2.setInvName("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
         makt2.setMktgDesc("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
         makt2.setMktgName("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
-        tbl_model_makt.add(makt2);
+        tbl_model_makt.add(makt2);*/
         //query country_plant_tax where INTERFACE_ID = "7"
         //For each unique value of TAX_COUNTRY  in the return result sets, create one row into tbl_mlan structure
         List countryKey = new ArrayList();
@@ -273,7 +273,7 @@ public class ChwBulkYMDMProd extends RdhBase{
     		if(i==0) sb.append("?");
     		else sb.append(",?");
     	}
-        String sql = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'PRODSTRUCT' and XMLENTITYID in ("+ sb.toString() +")  and XMLCACHEVALIDTO > current timestamp with ur";
+        String sql = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'PRODSTRUCT' and XMLENTITYID in ("+ sb.toString() +")  and XMLCACHEVALIDTO > current timestamp fetch first 1 rows only with ur";
         List<String> xmls = new ArrayList();
         PreparedStatement statement = null;
         statement = odsConnection.prepareStatement(sql);
@@ -283,6 +283,7 @@ public class ChwBulkYMDMProd extends RdhBase{
 
         while (resultSet.next()) {
             xmls.add(resultSet.getString("XMLMESSAGE"));
+            break;
         }     
        
         return xmls;
