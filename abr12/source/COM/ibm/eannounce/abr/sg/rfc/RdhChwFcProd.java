@@ -29,6 +29,8 @@ public class RdhChwFcProd extends RdhBase {
 		{
 			for (AVAILABILITY availabilityElement : model.getAVAILABILITYLIST())
 			{
+				if(RfcConfigProperties.getCountry(availabilityElement.getCOUNTRY_FC())==null)
+					continue;
 				RdhChwFcProd_Model rdhChwFcProd_Model = new RdhChwFcProd_Model();
 				rdhChwFcProd_Model.setMachType(model.getMACHTYPE());
 				rdhChwFcProd_Model.setModel(model.getMODEL());
@@ -60,6 +62,9 @@ public class RdhChwFcProd extends RdhBase {
 		{
 			for (AVAILABILITYELEMENT_TMF availabilityElement : tmf.getAVAILABILITYLIST())
 			{
+				if(RfcConfigProperties.getCountry(availabilityElement.getCOUNTRY_FC())==null)
+						continue;
+				
 				RdhChwFcProd_TMF rdhChwFcProd_TMF = new RdhChwFcProd_TMF();
 				rdhChwFcProd_TMF.setMachType(tmf.getMACHTYPE());
 				rdhChwFcProd_TMF.setModel(tmf.getMODEL());

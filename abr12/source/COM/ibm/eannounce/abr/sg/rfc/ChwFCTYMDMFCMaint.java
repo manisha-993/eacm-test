@@ -32,6 +32,8 @@ public class ChwFCTYMDMFCMaint extends RdhBase {
 			{
 				for (AVAILABILITYELEMENT_TMF availabilityElement : tmf.getAVAILABILITYLIST())
 				{
+					if(RfcConfigProperties.getCountry(availabilityElement.getCOUNTRY_FC())==null)
+						continue;
 					RdhChwFcProd_FCTRANSACTION_C rdhChwFcProd_FCTRANSACTION_C = new RdhChwFcProd_FCTRANSACTION_C();
 					rdhChwFcProd_FCTRANSACTION_C.setFROMMACHTYPE(fctransaction.getFROMMACHTYPE());
 					rdhChwFcProd_FCTRANSACTION_C.setTOMACHTYPE(fctransaction.getTOMACHTYPE());
