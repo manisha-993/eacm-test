@@ -75,8 +75,9 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 	public void execute() throws Exception{
 			String empty ="";
 			String obj_id = chwModel.getMACHTYPE() + "UPG";
+			String rfaNum = chwModel.getMACHTYPE()+chwModel.getMODEL()+"UPG";
 			//1. Call ChwMatmCreate to create the material master for the product object.
-			ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwModel,"ZMAT",chwModel.getMACHTYPE() + "UPG");
+			ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwModel,"ZMAT",chwModel.getMACHTYPE() + "UPG", rfaNum);
 			this.addRfcName(chwMatmCreate);
 			chwMatmCreate.execute();
 			this.addRfcResult(chwMatmCreate);
@@ -84,7 +85,7 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 			//2. Call Chw001ClfCreate to create the standard 001 classifications and characteristics 
 			//   which are tied to the offering's material master record.
 			//
-			Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(chwModel,"ZMAT",chwModel.getMACHTYPE()+ "UPG",odsConnection);
+			Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(chwModel,"ZMAT",chwModel.getMACHTYPE()+ "UPG",rfaNum,odsConnection);
 			this.addDebug("Calling " + "Chw001ClfCreate");
 			try{
 				chw001ClfCreate.execute();
@@ -95,31 +96,31 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 			}
 			
 			//3. Call the TssClassificationMaint constructor to associate the MK_REFERENCE class to the product's material master record
-			RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_REFERENCE","300","H");
+			RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_REFERENCE","300","H", rfaNum);
 			this.addRfcName(rdhClassificationMaint);
 			rdhClassificationMaint.execute();
 			this.addRfcResult(rdhClassificationMaint);
 			
 			//4. Call the TssClassificationMaint constructor to associate the MK_T_VAO_NEW class to the product's material master record
-			rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_T_VAO_NEW","300","H");	
+			rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_T_VAO_NEW","300","H", rfaNum);
 			this.addRfcName(rdhClassificationMaint);
 			rdhClassificationMaint.execute();
 			this.addRfcResult(rdhClassificationMaint);
 			
 			//5. Call the TssClassificationMaint constructor to associate the MK_D_VAO_NEW class to the product's material master record
-			rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_D_VAO_NEW","300","H");
+			rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_D_VAO_NEW","300","H", rfaNum);
 			this.addRfcName(rdhClassificationMaint);
 			rdhClassificationMaint.execute();
 			this.addRfcResult(rdhClassificationMaint);
 			
 			//6.Call the TssClassificationMaint constructor to associate the MK_FC_EXCH class to the product's material master record.
-			rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_FC_EXCH","300","H");
+			rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_FC_EXCH","300","H", rfaNum);
 			this.addRfcName(rdhClassificationMaint);
 			rdhClassificationMaint.execute();
 			this.addRfcResult(rdhClassificationMaint);
 			
 			//7.Call the TssClassificationMaint constructor to associate the MK_FC_CONV class to the product's material master record.
-			rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_FC_CONV","300","H");
+			rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_FC_CONV","300","H", rfaNum);
 			this.addRfcName(rdhClassificationMaint);
 			rdhClassificationMaint.execute();
 			this.addRfcResult(rdhClassificationMaint);
@@ -128,7 +129,7 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 			
 			//8.a Call the ChwCharMaintain constructor to create the MK_T_machineType_MOD characteristic
 			ChwCharMaintain chwCharMaintain = 
-			new ChwCharMaintain(obj_id  //String obj_id Set to concatenation of chwProduct.machineType + "UPG"
+			new ChwCharMaintain(rfaNum  //String obj_id Set to concatenation of chwProduct.machineType + "UPG"
 								,"MK_T_"+chwModel.getMACHTYPE()+"_MOD" //String charact  Set to  "MK_T_<machine_type>_MOD"
 								, "CHAR" 			//String datatype
 								, 6 				//int charnumber
@@ -163,7 +164,7 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 			//no ChwClassMaintain
 			ChwClassMaintain ChwClassMaintain = 
 					new ChwClassMaintain(
-							obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+							rfaNum 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
 							, "MK_"+chwModel.getMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
 							, "MK_"+chwModel.getMACHTYPE()+"_MOD"  //String class_type   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
 							);
@@ -181,7 +182,7 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 					, "MK_"+chwModel.getMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
 					, "300"  							//String class_type   Set to "300"
 					, "H"
-					);
+					, rfaNum);
 			this.addRfcName(TssClassificationMaint);
 			TssClassificationMaint.execute();
 			this.addRfcResult(TssClassificationMaint);
@@ -193,7 +194,7 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 				List<String> FromModelToModel = this.getFromModelToModel(FROMMODELTOMODEL, chwModel.getMACHTYPE(),chwModel.getPDHDOMAIN());				
 				ChwCharMaintain ChwCharMaintain = 
 				new ChwCharMaintain(
-						obj_id				 				//String obj_id  Set to concatenation of chwProduct.machineType + "UPG"
+						rfaNum				 				//String obj_id  Set to concatenation of chwProduct.machineType + "UPG"
 						, "MK_D_"+chwModel.getMACHTYPE()+"_MOD_CONV"	//String charact  Set to  "MK_D_machineType_MOD_CONV" where <machine_type> is chwProduct.machineType
 						, "CHAR" 							//String datatype  Set to "CHAR".
 						, 9 								//int charnumber  Set to "15".
@@ -222,7 +223,7 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 				//9.d Call the ChwClassMaintain constructor to create the MK_D_machineType_MOD_CONV class
 				ChwClassMaintain = 
 						new ChwClassMaintain(
-								obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+								rfaNum 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
 								, "MK_D_"+chwModel.getMACHTYPE()+"_MOD_CONV"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
 								, "MK_D_"+chwModel.getMACHTYPE()+"_MOD_CONV"  //String class_type   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
 								);	
@@ -240,7 +241,7 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 						, "MK_D_"+chwModel.getMACHTYPE()+"_MOD_CONV"  //String class_name   Set to  "MK_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType
 						, "300"  							//String class_type   Set to "300"
 						, "H"
-						);
+						, rfaNum);
 				this.addRfcName(TssClassificationMaint);
 				TssClassificationMaint.execute();
 				this.addRfcResult(TssClassificationMaint);
@@ -256,7 +257,7 @@ public class ChwMachTypeUpg extends RfcCallerBase{
 					, "SD01"			//String bomappl Set to "SD01".
 					, "2"				//String bomexpl Set to "2".
 					, chwModel.getMACHTYPE() +	"UPGUI"		//String design	 Set to Set to concatenation of chwProduct.machineType + "UPGUI" 
-					);
+					, rfaNum);
 			this.addRfcName(ChwConpMaintain);
 			//10.b Call the ChwConpMaintain.addConfigDependency() method.			
 			ChwConpMaintain.addConfigDependency("E2E", empty); //Set to "E2E".

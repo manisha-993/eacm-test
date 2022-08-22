@@ -55,8 +55,8 @@ public class ChwMatmCreate extends RdhBase {
 	private String is_multi_plants;
 	@Foo
 	SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd" );
-	public ChwMatmCreate(MODEL model, String materialType,String materialID) {
-		super(materialID, "Z_DM_SAP_MATM_CREATE".toLowerCase(), null);
+	public ChwMatmCreate(MODEL model, String materialType,String materialID, String rfaNum) {
+		super(rfaNum, "Z_DM_SAP_MATM_CREATE".toLowerCase(), null);
 		// RdhMatm_bmm00 matnr Copy from <SoftwareProduct.productIdentifier>.
 		pims_identity="H";
 		bmm00.get(0).setMatnr(materialID);
