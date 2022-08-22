@@ -4221,9 +4221,10 @@ ADSATTRIBUTE    40  WARRTYPE
         	if("Shadow".equals(subCat)||"Y".equals(oldindc)) {
         		addDebug("Skip trigger IERP caller for MODEL :"+"subCat:"+subCat+" oldindc:"+oldindc);
         	}
-        	else{setFlagValue("MODELIERPABRSTATUS", "0020");
+        	else{
+        		setFlagValue("MODELIERPABRSTATUS", "0020");
         	
-        	}
+        	
 
         	//WARRSVCCOVR ！= "WSVC02"
         	String flagString = PokUtils.getAttributeFlagValue(rootEntity, "WARRSVCCOVR");
@@ -4250,7 +4251,7 @@ ADSATTRIBUTE    40  WARRTYPE
             	}
             }
 */
-        	
+        	}
 
         }else if("PRODSTRUCT".equals(getEntityType())){
         	setFlagValue("TMFIERPABRSTATUS", "0020");
