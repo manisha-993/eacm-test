@@ -4210,10 +4210,19 @@ ADSATTRIBUTE    40  WARRTYPE
         addDebug("put cache:"+m_abri.getABRCode()+"-"+getEntityType());
         if("SVCMOD".equals(getEntityType())&&!m_abri.getABRCode().equals("SVCMODIERPABRSTATUS")){
         	setFlagValue("SVCMODIERPABRSTATUS", "0020");
-        }
+        } 
         else if("MODEL".equals(getEntityType())){
-        	setFlagValue("MODELIERPABRSTATUS", "0020");
+        	String subCat= PokUtils.getAttributeValue(rootEntity, "COFSUBCAT", "", "");
+        	String oldindc= PokUtils.getAttributeValue(rootEntity, "OLDINDC", "", "");
 
+        	addDebug("subCat:"+subCat+" oldindc:"+oldindc);
+
+        	if("Shadow".equals(subCat)||"Y".equals(oldindc)) {
+        		addDebug("Skip trigger IERP caller for MODEL :"+"subCat:"+subCat+" oldindc:"+oldindc);
+        	}
+        	else{
+        		setFlagValue("MODELIERPABRSTATUS", "0020");
+        	}
         	//WARRSVCCOVR ！= "WSVC02"
         	String flagString = PokUtils.getAttributeFlagValue(rootEntity, "WARRSVCCOVR");
         	addDebug("WARRSVCCOVR:"+flagString);
@@ -4239,7 +4248,8 @@ ADSATTRIBUTE    40  WARRTYPE
             	}
             }
 
-            
+
+        	
 
         }else if("PRODSTRUCT".equals(getEntityType())){
         	setFlagValue("TMFIERPABRSTATUS", "0020");
