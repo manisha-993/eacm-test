@@ -231,7 +231,7 @@ public class ChwMatmCreate extends RdhBase {
 			}
 			
 			if (materialID.endsWith("NEW")) {
-				if("'Storage Tier', 'Power Tier'".contains(model.getSUBGROUP())) {
+				if("'Storage Tier', 'Power Tier'".contains(model.getSUBGROUP())&&!"".equals(model.getSUBGROUP())) {
 					bmmh5.get(0).setMaktx("Expert Care" + " " + model.getMACHTYPE());
 				}else if("STaaS".equals(model.getSUBGROUP())){
 					bmmh5.get(0).setMaktx("STaaS" + " " + model.getMACHTYPE());
@@ -416,8 +416,24 @@ public class ChwMatmCreate extends RdhBase {
 				if(null==taxcategory.getTAXCLASSIFICATION()||"".equals(taxcategory.getTAXCLASSIFICATION().trim())) {
 					continue;
 				}
+			
 				for (int j = 0; j < countrys.size(); j++) {
 					COUNTRY country = countrys.get(j);
+					boolean notmatch = true;
+					if("1652".equals(country)) {
+					List<SLEORGGRP> sleorggrps=	taxcategory.getSLEORGGRPLIST();
+					
+					for(int m =0;m<sleorggrps.size();m++)
+					{
+						if("US".equals(sleorggrps.get(m).getSLEORGGRP())) {
+							notmatch = false;
+							break;
+						}
+						
+						}
+					}
+					if(notmatch)
+						continue;
 					if(!countrySet.contains(country.getCOUNTRY_FC())) {
 						countrySet.add(country.getCOUNTRY_FC());
 						
