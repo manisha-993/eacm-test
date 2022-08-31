@@ -729,7 +729,12 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 
     protected void runParkCaller(RdhBase caller, String zdmnum) throws Exception {
 		this.addDebug("Calling " + caller.getRFCName());
-		caller.execute();
+		try {
+			caller.execute();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 		this.addDebug(caller.createLogEntry());
 		if (caller.getRfcrc() == 0) {
 			this.addOutput("Parking records updated successfully for ZDMRELNUM="+zdmnum);
