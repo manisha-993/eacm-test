@@ -432,14 +432,10 @@ public class ChwMatmCreate extends RdhBase {
 						}
 						
 					}
-					if(notmatch)
-					{
-						continue;
-						
-						}
+					
 					}
 					
-					if(!countrySet.contains(country.getCOUNTRY_FC())) {
+					if(!notmatch&&!countrySet.contains(country.getCOUNTRY_FC())) {
 						countrySet.add(country.getCOUNTRY_FC());
 						
 						
