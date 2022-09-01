@@ -417,11 +417,10 @@ public class ChwMatmCreate extends RdhBase {
 				if(null==taxcategory.getTAXCLASSIFICATION()||"".equals(taxcategory.getTAXCLASSIFICATION().trim())) {
 					continue;
 				}
-			
 				for (int j = 0; j < countrys.size(); j++) {
 					COUNTRY country = countrys.get(j);
 					boolean notmatch = false;
-					if("1652".equals(country)) {
+					if("1652".equals(country.getCOUNTRY_FC())) {
 					List<SLEORGGRP> sleorggrps=	taxcategory.getSLEORGGRPLIST();
 					notmatch = true;
 					for(int m =0;m<sleorggrps.size();m++)
