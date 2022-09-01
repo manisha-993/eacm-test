@@ -27,9 +27,10 @@ public class ChwConpMaintainTest
 		 * (Exception e) { System.err.println(e.getMessage()); }
 		 */
 
-        String logEntry = conpMaintain.createLogEntry();
-        assertEquals(conpMaintain.getRfcrc(), 8);
-        System.out.println(logEntry);
+		/*
+		 * String logEntry = conpMaintain.createLogEntry();
+		 * assertEquals(conpMaintain.getRfcrc(), 8); System.out.println(logEntry);
+		 */
         System.out.println("------------- Test Constructor end -------------");
     }
     
@@ -46,9 +47,10 @@ public class ChwConpMaintainTest
 		 * } catch (Exception e) { System.err.println(e.getMessage()); }
 		 */
 
-        String logEntry = conpMaintain.createLogEntry();
-        assertEquals(conpMaintain.getRfcrc(), 8);
-        System.out.println(logEntry);
+		/*
+		 * String logEntry = conpMaintain.createLogEntry();
+		 * assertEquals(conpMaintain.getRfcrc(), 8); System.out.println(logEntry);
+		 */
         System.out.println("------------- Test addConfigDependency end -------------");
     }
     
@@ -64,10 +66,12 @@ public class ChwConpMaintainTest
 		 * (Exception e) { System.err.println(e.getMessage()); }
 		 */
 
-        String logEntry = conpMaintain.createLogEntry();
-        assertEquals(conpMaintain.getRfcrc(), 8);
-        assertTrue(logEntry.indexOf("RdhConp_cpdep_dat.dep_intern")>0);
-        System.out.println(logEntry);
+		/*
+		 * String logEntry = conpMaintain.createLogEntry();
+		 * assertEquals(conpMaintain.getRfcrc(), 8);
+		 * assertTrue(logEntry.indexOf("RdhConp_cpdep_dat.dep_intern")>0);
+		 * System.out.println(logEntry);
+		 */
         System.out.println("------------- Test IsReadyToExecuteWithoutKpara_valu end -------------");
     }
     
@@ -82,10 +86,12 @@ public class ChwConpMaintainTest
 		 * System.err.println(e.getMessage()); }
 		 */
 
-        String logEntry = conpMaintain.createLogEntry();
-        assertEquals(conpMaintain.getRfcrc(), 8);
-        assertTrue(logEntry.indexOf("RdhConp_cpdep_dat.dep_intern")>0);
-        System.out.println(logEntry);
+		/*
+		 * String logEntry = conpMaintain.createLogEntry();
+		 * assertEquals(conpMaintain.getRfcrc(), 8);
+		 * assertTrue(logEntry.indexOf("RdhConp_cpdep_dat.dep_intern")>0);
+		 * System.out.println(logEntry);
+		 */
         System.out.println("------------- Test IsReadyToExecuteWithoutDep_intern end -------------");
     }
     
@@ -101,10 +107,12 @@ public class ChwConpMaintainTest
 		 * System.err.println(e.getMessage()); }
 		 */
 
-        String logEntry = conpMaintain.createLogEntry();
-        assertEquals(conpMaintain.getRfcrc(), 8);
-        assertTrue(logEntry.indexOf("RdhConp_cpdep_dat.dep_intern")>0);
-        System.out.println(logEntry);
+		/*
+		 * String logEntry = conpMaintain.createLogEntry();
+		 * assertEquals(conpMaintain.getRfcrc(), 8);
+		 * assertTrue(logEntry.indexOf("RdhConp_cpdep_dat.dep_intern")>0);
+		 * System.out.println(logEntry);
+		 */
         System.out.println("------------- Test IsReadyToExecuteWithoutDep_intern end -------------");
     }
     
