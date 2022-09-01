@@ -122,7 +122,7 @@ public class ChwClsfCharCreateTest
         	String mach_type ="9080";
         	String feature_code="1234";
         	String feature_code_desc="FC1234";
-        	ChwClsfCharCreate.CreateRPQGroupChar(obj_id,target_indc,mach_type,feature_code,feature_code_desc);
+        	//ChwClsfCharCreate.CreateRPQGroupChar(obj_id,target_indc,mach_type,feature_code,feature_code_desc);
         } catch (Exception e)
         {
             System.err.println("@@@@" +e.getMessage());

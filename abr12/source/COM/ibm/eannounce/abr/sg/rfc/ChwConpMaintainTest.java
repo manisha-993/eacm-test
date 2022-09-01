@@ -21,14 +21,11 @@ public class ChwConpMaintainTest
     public void testConstructor()
     {
         System.out.println("------------- Test Constructor start -------------");
-        ChwConpMaintain conpMaintain =new ChwConpMaintain(
-                obj_id, "PROFILE 1","SD01","2","design");
-        try{
-            conpMaintain.execute();
-        } catch (Exception e)
-        {
-            System.err.println(e.getMessage());
-        }
+		/*
+		 * ChwConpMaintain conpMaintain =new ChwConpMaintain( obj_id,
+		 * "PROFILE 1","SD01","2","design"); try{ conpMaintain.execute(); } catch
+		 * (Exception e) { System.err.println(e.getMessage()); }
+		 */
 
         String logEntry = conpMaintain.createLogEntry();
         assertEquals(conpMaintain.getRfcrc(), 8);
@@ -40,16 +37,14 @@ public class ChwConpMaintainTest
     public void testAddConfigDependency()
     {
         System.out.println("------------- Test addConfigDependency start -------------");
-        ChwConpMaintain conpMaintain =new ChwConpMaintain(
-                obj_id, "PROFILE 1","SD01","2","design");
-        try{
-            conpMaintain.addConfigDependency("MK_INITIALIZE", "");
-            conpMaintain.execute();
-            
-        } catch (Exception e)
-        {
-            System.err.println(e.getMessage());
-        }
+		/*
+		 * ChwConpMaintain conpMaintain =new ChwConpMaintain( obj_id,
+		 * "PROFILE 1","SD01","2","design"); try{
+		 * conpMaintain.addConfigDependency("MK_INITIALIZE", "");
+		 * conpMaintain.execute();
+		 * 
+		 * } catch (Exception e) { System.err.println(e.getMessage()); }
+		 */
 
         String logEntry = conpMaintain.createLogEntry();
         assertEquals(conpMaintain.getRfcrc(), 8);
@@ -63,14 +58,11 @@ public class ChwConpMaintainTest
     public void testIsReadyToExecuteWithoutKpara_valu()
     {
         System.out.println("------------- Test IsReadyToExecuteWithoutKpara_valu start -------------");
-        ChwConpMaintain conpMaintain =new ChwConpMaintain(
-                obj_id,"PROFILE 1","SD01","2","design");
-        try{
-            conpMaintain.execute();
-        } catch (Exception e)
-        {
-            System.err.println(e.getMessage());
-        }
+		/*
+		 * ChwConpMaintain conpMaintain =new ChwConpMaintain(
+		 * obj_id,"PROFILE 1","SD01","2","design"); try{ conpMaintain.execute(); } catch
+		 * (Exception e) { System.err.println(e.getMessage()); }
+		 */
 
         String logEntry = conpMaintain.createLogEntry();
         assertEquals(conpMaintain.getRfcrc(), 8);
@@ -83,15 +75,12 @@ public class ChwConpMaintainTest
     public void testIsReadyToExecuteWithoutDep_intern()
     {
         System.out.println("------------- Test IsReadyToExecuteWithoutDep_intern start -------------");
-        ChwConpMaintain conpMaintain =new ChwConpMaintain(
-                obj_id, "PROFILE 1","SD01","2","design");
-        try{
-            conpMaintain.addConfigDependency("", "");
-            conpMaintain.execute();
-        } catch (Exception e)
-        {
-            System.err.println(e.getMessage());
-        }
+		/*
+		 * ChwConpMaintain conpMaintain =new ChwConpMaintain( obj_id,
+		 * "PROFILE 1","SD01","2","design"); try{ conpMaintain.addConfigDependency("",
+		 * ""); conpMaintain.execute(); } catch (Exception e) {
+		 * System.err.println(e.getMessage()); }
+		 */
 
         String logEntry = conpMaintain.createLogEntry();
         assertEquals(conpMaintain.getRfcrc(), 8);
@@ -104,15 +93,13 @@ public class ChwConpMaintainTest
     public void testSuccess()
     {
         System.out.println("------------- Test IsReadyToExecuteWithoutDep_intern start -------------");
-        ChwConpMaintain conpMaintain =new ChwConpMaintain(
-                obj_id, "PROFILE 1","SD01","2","design");
-        try{
-            conpMaintain.addConfigDependency("MK_S017LF1_EE_PSELECTED", "MK");
-            conpMaintain.execute();
-        } catch (Exception e)
-        {
-            System.err.println(e.getMessage());
-        }
+		/*
+		 * ChwConpMaintain conpMaintain =new ChwConpMaintain( obj_id,
+		 * "PROFILE 1","SD01","2","design"); try{
+		 * conpMaintain.addConfigDependency("MK_S017LF1_EE_PSELECTED", "MK");
+		 * conpMaintain.execute(); } catch (Exception e) {
+		 * System.err.println(e.getMessage()); }
+		 */
 
         String logEntry = conpMaintain.createLogEntry();
         assertEquals(conpMaintain.getRfcrc(), 8);
