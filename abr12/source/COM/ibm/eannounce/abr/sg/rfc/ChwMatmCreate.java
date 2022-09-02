@@ -329,6 +329,7 @@ public class ChwMatmCreate extends RdhBase {
 		Set<String> plntcdtSet = new HashSet<String>();
 		Set<String> saleorgSet = new HashSet<String>();
 		Set<String> countrySet = new HashSet<String>();
+		
 		for (int i = 0; i < taxs.size(); i++) {
 			
 			CountryPlantTax tax = taxs.get(i);
@@ -416,13 +417,12 @@ public class ChwMatmCreate extends RdhBase {
 				if(null==taxcategory.getTAXCLASSIFICATION()||"".equals(taxcategory.getTAXCLASSIFICATION().trim())) {
 					continue;
 				}
-			
 				for (int j = 0; j < countrys.size(); j++) {
 					COUNTRY country = countrys.get(j);
-					boolean notmatch = true;
-					if("1652".equals(country)) {
+					boolean notmatch = false;
+					if("1652".equals(country.getCOUNTRY_FC())) {
 					List<SLEORGGRP> sleorggrps=	taxcategory.getSLEORGGRPLIST();
-					
+					notmatch = true;
 					for(int m =0;m<sleorggrps.size();m++)
 					{
 						if("US".equals(sleorggrps.get(m).getSLEORGGRP())) {
@@ -430,11 +430,11 @@ public class ChwMatmCreate extends RdhBase {
 							break;
 						}
 						
-						}
 					}
-					if(notmatch)
-						continue;
-					if(!countrySet.contains(country.getCOUNTRY_FC())) {
+					
+					}
+					
+					if(!notmatch&&!countrySet.contains(country.getCOUNTRY_FC())) {
 						countrySet.add(country.getCOUNTRY_FC());
 						
 						
@@ -479,12 +479,6 @@ public class ChwMatmCreate extends RdhBase {
 				geo.setTax_countries(tax_countries);
 				geos.add(geo);
 
-			
-
-			
-
-		
-	
 
 	bmm00.get(0).setTcode("MM01");
 	
