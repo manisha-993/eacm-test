@@ -20,7 +20,7 @@
 			<xsd:element name="MKTGNAME" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
 			<xsd:element name="INVNAME" type="xsd:string" minOccurs="1"
 				maxOccurs="1" />
-
+			<xsd:element name="FCTECHDESC" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
 			<xsd:element name="BHINVNAME" type="xsd:string" minOccurs="1" maxOccurs="1"></xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>
