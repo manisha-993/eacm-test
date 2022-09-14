@@ -170,9 +170,9 @@ public class XLSImport implements EACMGlobals, Importable
 
 		// Is it a date?
 		if(DateUtil.isADateFormat(formatIndex,format) &&
-				HSSFDateUtil.isValidExcelDate(value)) {
+				DateUtil.isValidExcelDate(value)) {
 			// Format as a EACM date
-			Date d = HSSFDateUtil.getJavaDate(value, false);
+			Date d = DateUtil.getJavaDate(value, false);
 			return DATE_DF.format(d);
 		} else {
 			logger.log(Level.FINE, "numeric format "+format);
@@ -266,17 +266,17 @@ public class XLSImport implements EACMGlobals, Importable
 
 				switch (cell.getCellType())
 				{
-				case Cell.CELL_TYPE_NUMERIC:
+				case NUMERIC:
 					logger.log(Level.FINE, "numeric "+rowNum+" cell: "+(cellNum+1));
 					value = formatNumberDateCell(cell,attrCodes[cellNum]+"["+rowNum+"]");
 					break;
-				case Cell.CELL_TYPE_STRING:
+				case STRING:
 					logger.log(Level.FINE, "string "+rowNum+" cell: "+(cellNum+1));
 					value = cell.getRichStringCellValue().getString();
 					break;
-				case Cell.CELL_TYPE_BLANK:
+				case BLANK:
 					continue;
-				case Cell.CELL_TYPE_FORMULA:
+				case FORMULA:
 					addWarning("Unsupported FORMULA cell type found in row: "+rowNum+" cell: "+(cellNum+1));
 					String formula = "formula";;
 					try{
