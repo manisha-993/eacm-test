@@ -26,7 +26,7 @@ public class ChwBulkYMDMSalesBom extends RdhBase{
 	@SerializedName("TMF_ID")
     private String TMF_ID;
     public ChwBulkYMDMSalesBom(String machType, String model, String featurecode) {
-        super(machType + "MEB", "RDH_YMDMSALES_BOM".toLowerCase(), null);
+        super(machType +model+featurecode+ "MEB", "RDH_YMDMSALES_BOM".toLowerCase(), null);
         this.pims_identity="H";
         TMF_ID = machType + "-" + model + "-" +featurecode;
 

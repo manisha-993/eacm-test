@@ -220,6 +220,7 @@ public class ChwBulkYMDMProd extends RdhBase{
             f_makt.setInvName(featureAtt.get("INVNAME"));
             f_makt.setBhInvName(featureAtt.get("BHINVNAME"));
             tbl_feature_makt.add(f_makt);
+            this.rfa_num=this.rfa_num+tmf.getFEATURECODE()+"MEB";
         }
 
     }
