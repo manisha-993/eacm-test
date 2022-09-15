@@ -51,15 +51,19 @@ public class RdhMatmCreate extends RdhBase {
 	private List<RdhMatm_geo> geos;
 	@SerializedName("IS_MULTI_PLANTS")
 	private String is_multi_plants;
+	@SerializedName("MULCOMPINDC")
+	private String mulcompindc;
+
 	@Foo
 	SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd" );
 	@Foo
 	SimpleDateFormat sdfANNDATE =   new SimpleDateFormat( "ddMMyy" );
 	@Foo
 	String annnumber = null;
-	public RdhMatmCreate(SVCMOD svcmod) {
+	public RdhMatmCreate(SVCMOD svcmod,String attr) {
 		super(svcmod.getMACHTYPE() + svcmod.getMODEL(), "Z_DM_SAP_MATM_CREATE".toLowerCase(), null);
 		// RdhMatm_bmm00 matnr Copy from <SoftwareProduct.productIdentifier>.
+		mulcompindc = attr;
 		bmm00.get(0).setMatnr(svcmod.getMACHTYPE() + svcmod.getMODEL());
 		bmm00.get(0).setMtart(getMtart(svcmod));
 		bmm00.get(0).setMbrsh("M");
@@ -251,7 +255,7 @@ public class RdhMatmCreate extends RdhBase {
 					}
 
 					/**
-					 * If <geo.sales_org.vkorg> in (“0026”,”0147”) if <geo.sales_org.ztaxclsf> is
+					 * If <geo.sales_org.vkorg> in (?0026?,?0147?) if <geo.sales_org.ztaxclsf> is
 					 * set to a value, then { Read the keyword_t table where category == "ZSABRTAX"
 					 * and kwvalue == <geo.sales_org.ztaxclsf>. if a row is found, then Copy
 					 * <keyword_t.name> to zsabrtax. else { Set error_text to "Error: Unable to set
@@ -359,7 +363,7 @@ public class RdhMatmCreate extends RdhBase {
 			 * sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf())); } }
 			 * 
 			 *//**
-				 * If <geo.sales_org.vkorg> in (“0026”,”0147”) if <geo.sales_org.ztaxclsf> is
+				 * If <geo.sales_org.vkorg> in (?0026?,?0147?) if <geo.sales_org.ztaxclsf> is
 				 * set to a value, then { Read the keyword_t table where category == "ZSABRTAX"
 				 * and kwvalue == <geo.sales_org.ztaxclsf>. if a row is found, then Copy
 				 * <keyword_t.name> to zsabrtax. else { Set error_text to "Error: Unable to set
