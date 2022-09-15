@@ -64,8 +64,9 @@ public class SVCMODIERPABRSTATUSABR extends XMLMQAdapter {
 		abr.addDebug(xml);
 		if (xml != null) {
 			try {
+				String mulcompindc= PokUtils.getAttributeValue(rootEntity, "MULCOMPINDC", "", "");
 				SVCMOD svcmod = XMLParse.getSvcmodFromXml(xml);
-				RdhMatmCreate create = new RdhMatmCreate(svcmod);
+				RdhMatmCreate create = new RdhMatmCreate(svcmod,mulcompindc);
 				abr.addDebug("Calling " + create.getRFCName());
 				create.execute();
 				abr.addDebug(create.createLogEntry());
