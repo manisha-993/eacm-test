@@ -128,7 +128,7 @@ public class ChwBulkYMDMProd extends RdhBase{
         }
         //For each unique combination of column SALES_ORG and DEL_PLNT in the return result sets, create one row into tbl_mvke structure
         for(CountryPlantTax tax : taxList){
-            if("7".equals(tax.getINTERFACE_ID()) && !taxKey.contains(tax.getSALES_ORG()+tax.getDEL_PLNT())){
+            if("7".equals(tax.getINTERFACE_ID()) && !taxKey.contains(tax.getSALES_ORG()+tax.getPLNT_CD())){
                 ChwBulkYMDMProd_MVKE mvke = new ChwBulkYMDMProd_MVKE();
                 mvke.setModelEntitytype(chwProduct.getMODELENTITYTYPE());
                 mvke.setModelEntityid(chwProduct.getMODELENTITYID());
@@ -136,7 +136,7 @@ public class ChwBulkYMDMProd extends RdhBase{
                 mvke.setSleorg(tax.getSALES_ORG());
                 mvke.setPlntCd(tax.getPLNT_CD());
                 mvke.setPlntDel(tax.getDEL_PLNT());
-                taxKey.add(tax.getSALES_ORG()+tax.getDEL_PLNT());
+                taxKey.add(tax.getSALES_ORG()+tax.getPLNT_CD());
                 tbl_mvke.add(mvke);
             }
         }
@@ -177,7 +177,9 @@ public class ChwBulkYMDMProd extends RdhBase{
                 f_makt.setEntitytype("FEATURE");
                 f_makt.setEntityID(tmf.getFEATUREENTITYID());
                 f_makt.setNlsid("E");
-                f_makt.setMktgDesc("");
+                String string = featureAtt.get("BHINVNAME");
+                string=string.length()>30?string.substring(0, 30):string;
+                f_makt.setMktgDesc(string);
                 f_makt.setMktgName(featureAtt.get("MKTGNAME"));
                 f_makt.setInvName(featureAtt.get("INVNAME"));
                 f_makt.setBhInvName(featureAtt.get("BHINVNAME"));
