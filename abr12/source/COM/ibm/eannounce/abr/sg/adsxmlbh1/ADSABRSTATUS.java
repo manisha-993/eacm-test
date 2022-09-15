@@ -4230,7 +4230,7 @@ ADSATTRIBUTE    40  WARRTYPE
         		setFlagValue("MODELWARRABRSTATUS", "0020");
         	}
 
-        	String tmfSQL = "select distinct f.attributevalue as BULKMESINDC "
+        	/*String tmfSQL = "select distinct f.attributevalue as BULKMESINDC "
         			+ "from opicm.relator r "
         			+ "join opicm.flag f on f.entitytype=r.entitytype and f.ENTITYID=r.entityid and f.attributecode='BULKMESINDC' and f.VALTO > current timestamp and f.EFFTO > current timestamp "
         			+ "where r.ENTITYTYPE = 'PRODSTRUCT' and r.ENTITY2ID = ? and r.VALTO > current timestamp and r.EFFTO > current timestamp with ur";
@@ -4245,7 +4245,7 @@ ADSATTRIBUTE    40  WARRTYPE
                     setFlagValue("MODELBULKABRSTATUS", "0020");
                     break;
             	}
-            }
+            }*/
 
         	}
         
