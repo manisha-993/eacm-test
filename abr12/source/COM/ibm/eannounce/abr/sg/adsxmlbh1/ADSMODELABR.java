@@ -552,6 +552,17 @@ public class ADSMODELABR extends XMLMQRoot {
 		// TODO level 4 new added <SLEORGGRPLIST>
 		taxcodeelem.addChild(new XMLSLEORGGRPElem("D:TAXGRPSLEORGA:D"));
 
+		// 1.0 <RELEXPCAMTLIST> 2
+				list = new XMLElem("RELEXPCAMTLIST");
+				XMLMAP.addChild(list);
+				// 1.0 <RELEXPCAMTELEMENT> 3
+				XMLElem relexelem = new XMLChgSetElem("RELEXPCAMTELEMENT");
+				list.addChild(relexelem);
+				// 1.0 <RELEXPCAMTACTION> </RELEXPCAMTACTION> 4
+				// 1.0 <RELEXPCAMT> </RELEXPCAMT> 4 MODEL AUDIEN
+				relexelem.addChild(new XMLMultiFlagElem("RELEXPCAMT", "RELEXPCAMT", "RELEXPCAMTACTION", XMLElem.ATTRVAL));
+
+		
 		// 1.0 <AUDIENCELIST> 2
 		list = new XMLElem("AUDIENCELIST");
 		XMLMAP.addChild(list);

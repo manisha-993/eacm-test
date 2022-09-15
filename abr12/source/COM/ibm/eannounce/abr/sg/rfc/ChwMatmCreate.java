@@ -235,6 +235,8 @@ public class ChwMatmCreate extends RdhBase {
 					bmmh5.get(0).setMaktx("Expert Care" + " " + model.getMACHTYPE());
 				}else if("STaaS".equals(model.getSUBGROUP())){
 					bmmh5.get(0).setMaktx("STaaS" + " " + model.getMACHTYPE());
+				}else if("PWaaS".equals(model.getSUBGROUP())){
+					bmmh5.get(0).setMaktx("PWaaS" + " " + model.getMACHTYPE());
 				}else {
 					bmmh5.get(0).setMaktx("MACHINE TYPE " + model.getMACHTYPE() + " - Model NEW");
 				}
@@ -506,14 +508,11 @@ public class ChwMatmCreate extends RdhBase {
 				result="ZPT1";
 			}else if ("REACH".equals(var)) {
 				result ="ZPT2";
-			}
-			else if ("'6661', '6662', '6663', '6664', '6665', '6668', '6669', '4663', '4665', '4673', '9255', '9601', '9665' , '4850', '4658', '8924', '9602', '9666', '5131', '9667', '4901', '4903', '4906', '9669', '9670', '9675', '9676', '9677','8883', '8876', '3949', '9603', '9604', '9671')".contains(model.getMACHTYPE())) {
+			}else if (RfcConfigProperties.getMtposMachtype().contains(model.getMACHTYPE())) {
 				result="ZPT4";
-			}
-			else if ("LBS".equals(var)) {
+			}else if ("LBS".equals(var)) {
 				result="ZPT3";
-			}
-			else {
+			}else {
 				result="Z002";
 			}
 			if ("P1030".equals(model.getPRFTCTR())) {
@@ -739,7 +738,7 @@ public class ChwMatmCreate extends RdhBase {
 	 */
 	/**
 	 * 
-	 * @param product
+	 * @param model
 	 * @return
 	 */
 	private String getEarliestAnnDate(MODEL model) {
@@ -780,7 +779,7 @@ public class ChwMatmCreate extends RdhBase {
 	
 	/**
 	 * 
-	 * @param product
+	 * @param model
 	 * @return
 	 */
 	private String getEarliestPUBFROM(MODEL model) {

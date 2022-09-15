@@ -31,9 +31,10 @@ public class R160assignChartoClassFEAT_0000 extends Rfc {
 
 		// RMCLM - C1
 		RmclmTable c1Table = new RmclmTable();
-		RmclmTableRow c1Row = c1Table.createEmptyRow();
+		RmclmTableRow c1Row = null;
 		int count;
 		for (count = 1; count <= 2; count++) {
+			c1Row = c1Table.createEmptyRow();
 			if (count == 1) {
 				c1Row.setMerkma("MK_SUBLINE");
 			} else if (count == 2) {
