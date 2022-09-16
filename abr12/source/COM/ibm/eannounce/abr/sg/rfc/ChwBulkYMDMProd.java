@@ -214,10 +214,13 @@ public class ChwBulkYMDMProd extends RdhBase{
             //Create one row into tbl_feature_makt structure
             Map<String,String> featureAtt = getFeatureAtt(tmf.getFEATUREENTITYID());
             ChwBulkYMDMProd_MAKT f_makt = new ChwBulkYMDMProd_MAKT();
+            String value = featureAtt.get("BHINVNAME");
+            value = value.length()>30?value.substring(0,30):value;
+            	
             f_makt.setEntitytype("FEATURE");
             f_makt.setEntityID(tmf.getFEATUREENTITYID());
             f_makt.setNlsid("E");
-            f_makt.setMktgDesc("");
+            f_makt.setMktgDesc(value);
             f_makt.setMktgName(featureAtt.get("MKTGNAME"));
             f_makt.setInvName(featureAtt.get("INVNAME"));
             f_makt.setBhInvName(featureAtt.get("BHINVNAME"));
