@@ -3,6 +3,8 @@ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 import COM.ibm.eannounce.abr.sg.rfc.ChwBulkYMDMProd;
 import COM.ibm.eannounce.abr.sg.rfc.ChwBulkYMDMSalesBom;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
+import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
+import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
@@ -130,7 +132,9 @@ public class TMFBULKABRSTATUS extends PokBaseABR {
                     this.addOutput(abr.getRFCName() + " called  faild!");
                     this.addOutput(abr.getError_text());
                 }
-
+                UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", abr.getRFCNum());
+                
+				runParkCaller(updateParkStatus,abr.getRFCNum());
                 ChwBulkYMDMSalesBom bom = new ChwBulkYMDMSalesBom(machtype,modelatr,featurecode);
                 this.addDebug("Calling " + bom.getRFCName());
                 bom.execute();
@@ -142,6 +146,9 @@ public class TMFBULKABRSTATUS extends PokBaseABR {
                     this.addDebug(bom.getRFCName()+" webservice return code:"+bom.getRfcrc());
                     this.addOutput(bom.getError_text());
                 }
+                updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", bom.getRFCNum());
+                
+				runParkCaller(updateParkStatus,bom.getRFCNum());
 
             } else {
                 this.addOutput("XML file not exeit in cache,RFC caller not called!");
@@ -188,7 +195,22 @@ public class TMFBULKABRSTATUS extends PokBaseABR {
             buildReportFooter(); // Print </html>
         }
     }
-
+    protected void runParkCaller(RdhBase caller, String zdmnum) throws Exception {
+		this.addDebug("Calling " + caller.getRFCName());
+		try {
+			caller.execute();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		this.addDebug(caller.createLogEntry());
+		if (caller.getRfcrc() == 0) {
+			this.addOutput("Parking records updated successfully for ZDMRELNUM="+zdmnum);
+		} else {
+			this.addOutput(caller.getRFCName() + " called faild!");
+			this.addOutput(caller.getError_text());
+		}
+	}
     protected static String convertToHTML(String txt)
     {
         String retVal="";
