@@ -14,6 +14,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
+import com.ibm.eacm.AES256Utils;
+
 //$Log: WWCOMPATIDLABR.java,v $
 //Revision 1.9  2012/12/12 05:58:47  wangyulo
 //the wwcompat IDL change base on the document of BH FS ABR Catalog DB Compatibility Gen 20121030.doc
@@ -140,7 +142,7 @@ public class WWCOMPATIDLABR {
 			String pdh_database_user = c_props.getProperty("pdh_database_user");
 			String pdh_database_password = c_props.getProperty("pdh_database_password");
 
-			setConOPICM(DriverManager.getConnection(pdh_database_url,pdh_database_user, pdh_database_password));
+			setConOPICM(DriverManager.getConnection(pdh_database_url,pdh_database_user,AES256Utils.decrypt(pdh_database_password)));
 			getConOPICM().setAutoCommit(true);
 		} catch (Exception ex) {
 			System.out.println(new Date() + ":connection:err: "	+ ex.getMessage());
