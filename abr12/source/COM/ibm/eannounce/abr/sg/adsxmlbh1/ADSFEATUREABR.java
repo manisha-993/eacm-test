@@ -97,6 +97,7 @@ public class ADSFEATUREABR extends XMLMQRoot
         langelem.addChild(new XMLElem("MKTGDESC"));
         langelem.addChild(new XMLElem("MKTGNAME","MKTGNAME"));
         langelem.addChild(new XMLElem("INVNAME","INVNAME"));
+        langelem.addChild(new XMLElem("FCTECHDESC","FCTECHDESC"));
         langelem.addChild(new XMLElem("BHINVNAME","BHINVNAME"));
 
         list = new XMLElem("COUNTRYLIST"); 

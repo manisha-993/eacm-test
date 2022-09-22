@@ -767,6 +767,18 @@ public class XMLFiterMQIDL {
 				ps.setString(11, (String) record[5]);
 				ps.setString(12, (String) record[6]);
 				ps.addBatch();
+				abr.addDebug("SETUPENTITYTYPE:"+setupType+"-"+setupType.length()+"!"
+						+"SETUPENTITYID:"+setupid+"-"+(setupid+"").length()+"!"
+						+"SETUPDTS:"+setupDTS+"-"+setupDTS.length()+"!"
+						+"SENDMSGDTS:"+record[1]+"-"+record[1].length()+"!"
+						+"MSGTYPE:"+record[2]+"-"+record[2].length()+"!"
+						+"ENTITYTYPE:"+entityType+"-"+entityType.length()+"!"
+						+"ENTITYID:"+entityid+"-"+(entityid+"").length()+"!"
+						+"DTSOFMSG:"+record[3]+"-"+record[3].length()+"!"
+						+"MSGSTATUS:"+record[4]+"-"+record[4].length()+"!"
+						+"REASON:"+record[5]+"-"+record[5].length()+"!"
+						+"MQPROPFILE:"+record[6]+"-"+record[6].length()+"!"
+						);
 			}
 			ps.executeBatch();
 			//TODO change to m_db.getODSConnection() accroding to DBA response
