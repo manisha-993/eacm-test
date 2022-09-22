@@ -641,6 +641,9 @@ public class ADSMODELABR extends XMLMQRoot {
 		// start of WARRLIST structure
 		list = new XMLGroupElem("WARRLIST", "WARR");
 		XMLMAP.addChild(list);
+		/**
+		 *  WARRELEMENT in MODEL_UPDATE will be reordered by COM/ibm/eannounce/abr/util/UpdateXML.java
+		 */
 		// level 3
 		XMLElem warrelem = new XMLElem("WARRELEMENT");// check for chgs is
 														// controlled by
@@ -655,6 +658,7 @@ public class ADSMODELABR extends XMLMQRoot {
 		// 1615427: EACM SPF Feed to PEP - XML Update Activity(TMF mapping)
 		// <WARRPRIOD> </WARRPRIOD> 4 WARR WARRPRIOD Long Description
 		warrelem.addChild(new XMLElem("WARRPRIOD", "WARRPRIOD"));
+		warrelem.addChild(new XMLElem("WARRDESC", "INVNAME"));
 
 		XMLElem modelwarrelem = new XMLGroupElem(null, "MODELWARR", "U:MODELWARR");
 		warrelem.addChild(modelwarrelem);

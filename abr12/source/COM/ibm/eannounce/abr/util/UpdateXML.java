@@ -49,6 +49,9 @@ public class UpdateXML {
 		       
 		        Element warrpriod = (Element) warrElement.getElementsByTagName("WARRPRIOD").item(0);
 		        warr.setWarrpriod(warrpriod.getTextContent());
+
+				Element warrdesc = (Element) warrElement.getElementsByTagName("WARRDESC").item(0);
+				warr.setWarrdesc(warrdesc.getTextContent());
 		        
 		        Element pubFrom = (Element) warrElement.getElementsByTagName("PUBFROM").item(0);
 		        warr.setPubFrom(pubFrom.getTextContent());
@@ -123,6 +126,9 @@ public class UpdateXML {
 		        
 		        Element warrpriod = (Element) warrElement.getElementsByTagName("WARRPRIOD").item(0);
 		        warrpriod.setTextContent(warr.getWarrpriod());
+
+				Element warrdesc = (Element) warrElement.getElementsByTagName("WARRDESC").item(0);
+				warrdesc.setTextContent(warr.getWarrdesc());
 		        
 		        Element pubFrom = (Element) warrElement.getElementsByTagName("PUBFROM").item(0);
 		        pubFrom.setTextContent(warr.getPubFrom());
@@ -172,6 +178,7 @@ public class UpdateXML {
 		String entityId = CHEAT;
 		String warrid = CHEAT;
 		String Warrpriod = CHEAT;
+		String warrdesc = CHEAT;
 		String pubFrom = CHEAT;
 		String pubTo = CHEAT;
 		String defwarr = CHEAT;
@@ -206,6 +213,12 @@ public class UpdateXML {
 		}
 		public void setWarrpriod(String warrpriod) {
 			Warrpriod = warrpriod;
+		}
+		public String getWarrdesc() {
+			return warrdesc;
+		}
+		public void setWarrdesc(String warrdesc) {
+			this.warrdesc = warrdesc;
 		}
 		public String getPubFrom() {
 			return pubFrom;
