@@ -291,6 +291,7 @@ public class ADSPRODSTRUCTABR extends XMLMQRoot {
 		warrelem.addChild(new XMLElem("WARRENTITYTYPE", "ENTITYTYPE"));
 		warrelem.addChild(new XMLElem("WARRENTITYID", "ENTITYID"));
 		warrelem.addChild(new XMLElem("WARRID", "WARRID"));
+		warrelem.addChild(new XMLElem("WARRDESC", "INVNAME"));
 		XMLElem modelwarrelem = new XMLGroupElem(null, "PRODSTRUCTWARR", "U:PRODSTRUCTWARR");
 		warrelem.addChild(modelwarrelem);
 //		Add Default Warranty attr change notename to PUBFROM and PUBTO
