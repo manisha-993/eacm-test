@@ -655,10 +655,10 @@ public class ADSMODELABR extends XMLMQRoot {
 		// 1615427: EACM SPF Feed to PEP - XML Update Activity(TMF mapping)
 		// <WARRPRIOD> </WARRPRIOD> 4 WARR WARRPRIOD Long Description
 		warrelem.addChild(new XMLElem("WARRPRIOD", "WARRPRIOD"));
-		warrelem.addChild(new XMLElem("WARRDESC", "INVNAME"));
 
 		XMLElem modelwarrelem = new XMLGroupElem(null, "MODELWARR", "U:MODELWARR");
 		warrelem.addChild(modelwarrelem);
+		modelwarrelem.addChild(new XMLElem("WARRDESC", "INVNAME"));
 		modelwarrelem.addChild(new XMLElem("PUBFROM", "EFFECTIVEDATE"));
 		modelwarrelem.addChild(new XMLElem("PUBTO", "ENDDATE"));
 		// TODO Correct defect - add Default Warranty attr
