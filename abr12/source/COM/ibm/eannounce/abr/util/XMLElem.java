@@ -432,6 +432,9 @@ public class XMLElem
         COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
     {
 		D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
+        if(nodeName.contains("MKTGNAME")) {
+            D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getCurrentEntityItem(), "MKTGNAME", "", ""));
+        }
         if(nodeName.contains("WARR")){
             D.ebug(D.EBUG_ERR,"entityid="+parentItem.getEntityID());
             if(nodeName.contains("WARRDESC")) {
