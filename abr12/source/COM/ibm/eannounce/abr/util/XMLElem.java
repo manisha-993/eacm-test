@@ -437,13 +437,13 @@ public class XMLElem
         }
         if(nodeName.contains("WARR")){
             D.ebug(D.EBUG_ERR,"entityid="+parentItem.getEntityID());
+            debugSb.append("<!-- " + "entityid="+parentItem.getEntityID() + " -->" + NEWLINE);
             if(nodeName.contains("WARRDESC")) {
                 D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getCurrentEntityItem(), "INVNAME", "", ""));
             }
             else {
                 D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getCurrentEntityItem(), nodeName, "", ""));
             }
-
         }
 		Element elem = (Element) document.createElement(nodeName);
 		addXMLAttrs(elem);
