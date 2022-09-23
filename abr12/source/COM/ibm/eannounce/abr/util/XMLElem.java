@@ -433,15 +433,15 @@ public class XMLElem
     {
 		D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
         if(nodeName.contains("MKTGNAME")) {
-            D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getCurrentEntityItem(), "MKTGNAME", "", ""));
+            D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getPriorEntityItem(), "MKTGNAME", "", ""));
         }
         if(nodeName.contains("WARR")){
             D.ebug(D.EBUG_ERR,"entityid="+parentItem.getEntityID());
             if(nodeName.contains("WARRDESC")) {
-                D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getCurrentEntityItem(), "INVNAME", "", ""));
+                D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getPriorEntityItem(), "INVNAME", "", ""));
             }
             else {
-                D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getCurrentEntityItem(), nodeName, "", ""));
+                D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getPriorEntityItem(), nodeName, "", ""));
             }
 
         }
