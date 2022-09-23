@@ -435,10 +435,10 @@ public class XMLElem
         if(nodeName.contains("WARR")|| parentItem.getEntityType().equals("WARR")){
             D.ebug(D.EBUG_ERR,"entityid="+parentItem.getEntityID());
             if(nodeName.contains("WARRDESC")) {
-                D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getCurrentEntityItem(), "INVNAME", "", ""));
+                D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getPriorEntityItem(), "INVNAME", "", ""));
             }
             else {
-                D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getCurrentEntityItem(), nodeName, "", ""));
+                D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getPriorEntityItem(), nodeName, "", ""));
             }
 
         }
