@@ -374,7 +374,7 @@ public class XMLElem
         COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
     {
     	D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
-        if(parentItem.getEntityType().equals("WARR")){
+        if(nodeName.contains("WARR")){
             D.ebug(D.EBUG_ERR,"entityid="+parentItem.getEntityID());
         }
 		Element elem = (Element) document.createElement(nodeName);
@@ -425,6 +425,9 @@ public class XMLElem
         COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
     {
 		D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
+        if(nodeName.contains("WARR")){
+            D.ebug(D.EBUG_ERR,"entityid="+parentItem.getEntityID());
+        }
 		Element elem = (Element) document.createElement(nodeName);
 		addXMLAttrs(elem);
 		if (parent ==null){ // create the root
