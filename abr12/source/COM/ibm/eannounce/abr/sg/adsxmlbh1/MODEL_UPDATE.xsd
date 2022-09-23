@@ -466,6 +466,8 @@
 			<xsd:element name="WARRID" type="xsd:string"></xsd:element>
 			<xsd:element name="WARRPRIOD" type="xsd:string"></xsd:element>
 			<xsd:element name="WARRDESC" type="xsd:string"></xsd:element>
+			<xsd:element name="MKTGNAME" type="xsd:string"></xsd:element>
+			<xsd:element name="WARRDATERULEKEY" type="xsd:string"></xsd:element>
 			<xsd:element name="PUBFROM" type="xsd:string"></xsd:element>
 			<xsd:element name="PUBTO" type="xsd:string"></xsd:element>
 
