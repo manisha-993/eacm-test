@@ -434,6 +434,7 @@ public class XMLElem
 		D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
         if(nodeName.contains("MKTGNAME")) {
             D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getCurrentEntityItem(), "MKTGNAME", "", ""));
+            debugSb.append("<!-- " + "entityid="+parentItem.getEntityID() + " -->" + NEWLINE);
         }
         if(nodeName.contains("WARR")){
             D.ebug(D.EBUG_ERR,"entityid="+parentItem.getEntityID());
