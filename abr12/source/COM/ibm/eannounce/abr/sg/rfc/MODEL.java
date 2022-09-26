@@ -476,6 +476,8 @@ class WARRELEMENTTYPE {
 	private String WARRID;
 	@XmlElement(name = "WARRPRIOD")
 	private String WARRPRIOD;
+	@XmlElement(name = "WARRDESC")
+	private String WARRDESC;
 	@XmlElement(name = "PUBFROM")
 	private String PUBFROM;
 	@XmlElement(name = "PUBTO")
@@ -516,6 +518,12 @@ class WARRELEMENTTYPE {
 	}
 	public void setWARRPRIOD(String wARRPRIOD) {
 		WARRPRIOD = wARRPRIOD;
+	}
+	public String getWARRDESC() {
+		return WARRDESC;
+	}
+	public void setWARRDESC(String wARRDESC) {
+		WARRDESC = wARRDESC;
 	}
 	public String getPUBFROM() {
 		return PUBFROM;

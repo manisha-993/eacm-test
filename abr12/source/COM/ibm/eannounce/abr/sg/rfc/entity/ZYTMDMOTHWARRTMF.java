@@ -6,8 +6,8 @@ public class ZYTMDMOTHWARRTMF {
     private String ZINVNAME;
     private String ZCOUNTRY;
     private String ZWRTYID;
-    
-    private String ZPUBFROM;
+	private String ZWTYDESC;
+	private String ZPUBFROM;
     private String ZPUBTO;
     private String ZWARR_FLAG;
     private String ZCOUNTRY_FLAG;
@@ -42,6 +42,12 @@ public class ZYTMDMOTHWARRTMF {
 	}
 	public void setZWRTYID(String zWRTYID) {
 		ZWRTYID = zWRTYID;
+	}
+	public String getZWTYDESC() {
+		return ZWTYDESC;
+	}
+	public void setZWTYDESC(String zWTYDESC) {
+		ZWTYDESC = zWTYDESC;
 	}
 	public String getZPUBFROM() {
 		return ZPUBFROM;

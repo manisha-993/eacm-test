@@ -651,10 +651,12 @@ public class ADSMODELABR extends XMLMQRoot {
 		warrelem.addChild(new XMLElem("WARRENTITYTYPE", "ENTITYTYPE"));
 		warrelem.addChild(new XMLElem("WARRENTITYID", "ENTITYID"));
 		warrelem.addChild(new XMLElem("WARRID", "WARRID"));
-
 		// 1615427: EACM SPF Feed to PEP - XML Update Activity(TMF mapping)
 		// <WARRPRIOD> </WARRPRIOD> 4 WARR WARRPRIOD Long Description
 		warrelem.addChild(new XMLElem("WARRPRIOD", "WARRPRIOD"));
+		warrelem.addChild(new XMLElem("WARRDESC", "INVNAME"));
+		warrelem.addChild(new XMLElem("MKTGNAME", "MKTGNAME"));
+		warrelem.addChild(new XMLElem("WARRDATERULEKEY", "WARRDATERULEKEY"));
 
 		XMLElem modelwarrelem = new XMLGroupElem(null, "MODELWARR", "U:MODELWARR");
 		warrelem.addChild(modelwarrelem);

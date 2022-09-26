@@ -374,6 +374,16 @@ public class XMLElem
         COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
     {
     	D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
+        if(nodeName.contains("WARR")){
+            D.ebug(D.EBUG_ERR,"entityid="+parentItem.getEntityID());
+            if(nodeName.contains("WARRDESC")) {
+                D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem, "INVNAME", "", ""));
+            }
+            else {
+                D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem, nodeName, "", ""));
+            }
+
+        }
 		Element elem = (Element) document.createElement(nodeName);
 		addXMLAttrs(elem);
 
@@ -422,6 +432,18 @@ public class XMLElem
         COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException
     {
 		D.ebug(D.EBUG_ERR,"Working on the item:"+nodeName);
+        if(nodeName.contains("MKTGNAME")) {
+            D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getCurrentEntityItem(), "MKTGNAME", "", ""));
+        }
+        if(nodeName.contains("WARR")){
+            D.ebug(D.EBUG_ERR,"entityid="+parentItem.getEntityID());
+            if(nodeName.contains("WARRDESC")) {
+                D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getCurrentEntityItem(), "INVNAME", "", ""));
+            }
+            else {
+                D.ebug(D.EBUG_ERR, "attrvalue=" + PokUtils.getAttributeValue(parentItem.getCurrentEntityItem(), nodeName, "", ""));
+            }
+        }
 		Element elem = (Element) document.createElement(nodeName);
 		addXMLAttrs(elem);
 		if (parent ==null){ // create the root
