@@ -105,6 +105,7 @@ import java.util.Vector;
 import COM.ibm.opicmpdh.middleware.D;
 import java.util.*;
 
+import com.ibm.eacm.AES256Utils;
 import com.ibm.mq.*;
 
 /**
@@ -199,7 +200,7 @@ public class MQUsage {
 			MQEnvironment.userID = strUserId;
 		}
 		if (strPassWord != null && strPassWord.length() > 0) {
-			MQEnvironment.password = strPassWord;
+			MQEnvironment.password = AES256Utils.decrypt(strPassWord);
 		}
 		if (strPort != null && strPort.length() > 0) {
 			MQEnvironment.port = Integer.parseInt(strPort);
@@ -211,14 +212,14 @@ public class MQUsage {
 			}
 			if (strKSPassword != null && strKSPassword.length() > 0) {
 				System.setProperty("javax.net.ssl.keyStorePassword",
-						strKSPassword);
+						AES256Utils.decrypt(strKSPassword) );
 			}
 			if (strTStore != null && strTStore.length() > 0) {
 				System.setProperty("javax.net.ssl.trustStore", strTStore);
 			}
 			if (strTSPassword != null && strTSPassword.length() > 0) {
 				System.setProperty("javax.net.ssl.trustStorePassword",
-						strTSPassword);
+						AES256Utils.decrypt(strTSPassword));
 			}
 		}
 
@@ -359,7 +360,7 @@ public class MQUsage {
 			MQEnvironment.userID = strUserId;
 		}
 		if (strPassWord != null && strPassWord.length() > 0) {
-			MQEnvironment.password = strPassWord;
+			MQEnvironment.password = AES256Utils.decrypt(strPassWord);
 		}
 		if (strPort != null && strPort.length() > 0) {
 			MQEnvironment.port = Integer.parseInt(strPort);
@@ -371,14 +372,14 @@ public class MQUsage {
 			}
 			if (strKSPassword != null && strKSPassword.length() > 0) {
 				System.setProperty("javax.net.ssl.keyStorePassword",
-						strKSPassword);
+						AES256Utils.decrypt(strKSPassword));
 			}
 			if (strTStore != null && strTStore.length() > 0) {
 				System.setProperty("javax.net.ssl.trustStore", strTStore);
 			}
 			if (strTSPassword != null && strTSPassword.length() > 0) {
 				System.setProperty("javax.net.ssl.trustStorePassword",
-						strTSPassword);
+						AES256Utils.decrypt(strTSPassword));
 			}
 		}
 
@@ -549,7 +550,7 @@ public class MQUsage {
 			MQEnvironment.userID = strUserId;
 		}
 		if (strPassWord != null && strPassWord.length() > 0) {
-			MQEnvironment.password = strPassWord;
+			MQEnvironment.password = AES256Utils.decrypt(strPassWord);
 		}
 		if (strPort != null && strPort.length() > 0) {
 			MQEnvironment.port = Integer.parseInt(strPort);
@@ -568,7 +569,7 @@ public class MQUsage {
 			}
 			if (strTSPassword != null && strTSPassword.length() > 0) {
 				System.setProperty("javax.net.ssl.trustStorePassword",
-						strTSPassword);
+						AES256Utils.decrypt(strTSPassword));
 			}
 		}
 		
