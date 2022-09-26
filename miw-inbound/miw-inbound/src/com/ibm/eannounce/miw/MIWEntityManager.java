@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Vector;
 
+import com.ibm.eacm.AES256Utils;
+
 import COM.ibm.eannounce.objects.EntityGroup;
 import COM.ibm.eannounce.objects.EntityItem;
 import COM.ibm.opicmpdh.middleware.Database;
@@ -80,7 +82,7 @@ public class MIWEntityManager {
 			now = datepackage.getNow();
 			timeStampForever = datepackage.getForever();
 			String ldapId = properties.getProperty(Keys.MW_USER);
-			String ldapPassword = properties.getProperty(Keys.MW_PASSWORD);
+			String ldapPassword =AES256Utils.decrypt(properties.getProperty(Keys.MW_PASSWORD));
 			String OPICMVersion = properties.getProperty(Keys.MW_OPICMVERSION);
 			String roleCode = properties.getProperty(Keys.MW_ROLECODE);
 			enterprise = properties.getProperty(Keys.MW_ENTERPRISE);

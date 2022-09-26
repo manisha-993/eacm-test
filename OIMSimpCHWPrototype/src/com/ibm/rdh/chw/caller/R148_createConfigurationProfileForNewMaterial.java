@@ -69,9 +69,10 @@ public class R148_createConfigurationProfileForNewMaterial extends Rfc {
 		// CPDET_DAT - P2 STRUCTURE
 
 		Cpdep_datTable p2Table = new Cpdep_datTable();
-		Cpdep_datTableRow p2Row = p2Table.createEmptyRow();
+		Cpdep_datTableRow p2Row =null;
 		int count;
 		for (count = 1; count <= 2; count++) {
+			p2Row = p2Table.createEmptyRow();
 			if (count == 1) {
 				p2Row.setCProfile("INITIAL");
 				p2_dep_intern = "MK_HW_PRICING";

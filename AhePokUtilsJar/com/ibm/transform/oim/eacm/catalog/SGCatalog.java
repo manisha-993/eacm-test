@@ -13,6 +13,8 @@ import javax.servlet.http.*;
 import COM.ibm.eannounce.objects.*;
 import COM.ibm.opicmpdh.middleware.*;
 import COM.ibm.opicmpdh.transactions.*;
+
+import com.ibm.eacm.AES256Utils;
 import com.ibm.transform.oim.eacm.util.*;
 
 /**********************************************************************************
@@ -310,11 +312,19 @@ abstract public class SGCatalog
         throws java.sql.SQLException
     {
         // get the connection for gbli.prodstruct, gbli.featuredetails and eacm.finalprice
-        connection =
-            DriverManager.getConnection(
-                MiddlewareServerProperties.getPDHDatabaseURL(),
-                MiddlewareServerProperties.getPDHDatabaseUser(),
-                MiddlewareServerProperties.getPDHDatabasePassword());
+        try {
+			connection =
+			    DriverManager.getConnection(
+			        MiddlewareServerProperties.getPDHDatabaseURL(),
+			        MiddlewareServerProperties.getPDHDatabaseUser(),
+			        AES256Utils.decrypt(MiddlewareServerProperties.getPDHDatabasePassword()));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			throw e;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         connection.setAutoCommit(false);
 

@@ -10,6 +10,9 @@ import COM.ibm.opicmpdh.transactions.*;
 import COM.ibm.eannounce.objects.*;
 
 import java.util.*;
+
+import com.ibm.eacm.AES256Utils;
+
 import java.io.*;
 
 /**********************************************************************************
@@ -780,7 +783,7 @@ public class FMChgLog
     {
         String enterprise = FMChgProperties.getEnterprise();
         String roleCode = FMChgProperties.getRoleCode();
-        String passwd = FMChgProperties.getUserPassword();
+        String passwd = AES256Utils.decrypt(FMChgProperties.getUserPassword());
         String userid = FMChgProperties.getUserid();
         String versionLiteral = FMChgProperties.getVersionLiteral();
         ProfileSet profileSet = dbCurrent.login(userid, passwd, versionLiteral);

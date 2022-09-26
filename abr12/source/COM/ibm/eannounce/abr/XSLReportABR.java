@@ -46,6 +46,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.ibm.eacm.AES256Utils;
 import com.ibm.transform.oim.eacm.util.Log;
 import com.ibm.transform.oim.eacm.xalan.BinaryReport;
 import com.ibm.transform.oim.eacm.xalan.DataView;
@@ -414,7 +415,7 @@ public class XSLReportABR extends PokBaseABR {
 					conODS = DriverManager.getConnection(
 						MiddlewareServerProperties.getPDHDatabaseURL(),
 						MiddlewareServerProperties.getPDHDatabaseUser(),
-						MiddlewareServerProperties.getPDHDatabasePassword()
+						AES256Utils.decrypt(MiddlewareServerProperties.getPDHDatabasePassword())
 					);
 				}
 				ODSConnection tmp = (ODSConnection) instance;
