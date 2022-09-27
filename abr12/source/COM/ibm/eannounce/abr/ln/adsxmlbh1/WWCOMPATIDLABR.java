@@ -14,6 +14,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
+import com.ibm.eacm.AES256Utils;
+
 //$Log: WWCOMPATIDLABR.java,v $
 //Revision 1.1  2015/02/04 14:55:49  wangyul
 //RCQ00337765-RQ change the XML mapping to pull DIV from PROJ for Lenovo
@@ -141,7 +143,7 @@ public class WWCOMPATIDLABR {
 			//Class.forName("com.ibm.db2.jcc.DB2Driver").newInstance();
 			String pdh_database_url = c_props.getProperty("pdh_database_url");
 			String pdh_database_user = c_props.getProperty("pdh_database_user");
-			String pdh_database_password = c_props.getProperty("pdh_database_password");
+			String pdh_database_password = AES256Utils.decrypt(c_props.getProperty("pdh_database_password"));
 
 			setConOPICM(DriverManager.getConnection(pdh_database_url,pdh_database_user, pdh_database_password));
 			getConOPICM().setAutoCommit(true);
