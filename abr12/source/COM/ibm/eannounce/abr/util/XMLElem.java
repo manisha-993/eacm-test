@@ -453,11 +453,11 @@ public class XMLElem
 		}
 
 		Node contentElem = getContentNode(document, parentItem, parent,debugSb);
-        if(nodeName.contains("WARR")) {
-            D.ebug(D.EBUG_ERR, "NodeValue= " + contentElem.getNodeValue());
-        }
 		if (contentElem!=null){
 			elem.appendChild(contentElem);
+            if(nodeName.contains("WARR")) {
+                D.ebug(D.EBUG_ERR, "NodeValue= " + contentElem.getNodeValue());
+            }
 		}
 		// add any children
 		//StringBuffer debugSb1 = null;
