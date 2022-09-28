@@ -20,7 +20,7 @@ public class ChwClsfCharCreateTest
     @Test
     public void testCreateGroupChar()
     {
-        System.out.println("------------- Test CreateGroupChar start -------------");
+       /* System.out.println("------------- Test CreateGroupChar start -------------");
         ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
         
         try{
@@ -37,14 +37,14 @@ public class ChwClsfCharCreateTest
         System.out.println("------------- Test CreateGroupChar log Begin -------------");
         System.out.println(ChwClsfCharCreate.getRptSb().toString());
         System.out.println("------------- Test CreateGroupChar log end -------------");
-        System.out.println("------------- Test CreateGroupChar end -------------");
+        System.out.println("------------- Test CreateGroupChar end -------------");*/
     }
     
     
     @Test
     public void testCreateQTYChar()
     {
-        System.out.println("------------- Test CreateQTYChar start -------------");
+       /* System.out.println("------------- Test CreateQTYChar start -------------");
         ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
         
         try{
@@ -61,12 +61,13 @@ public class ChwClsfCharCreateTest
         System.out.println(ChwClsfCharCreate.getRptSb().toString());
         System.out.println("------------- Test CreateQTYChar log end -------------");
         System.out.println("------------- Test CreateQTYChar end -------------");
+        */
     }
     
     @Test
     public void testCreateRPQGroupChar()
     {
-        System.out.println("------------- Test CreateRPQGroupChar start -------------");
+       /* System.out.println("------------- Test CreateRPQGroupChar start -------------");
         ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
         
         try{
@@ -83,14 +84,14 @@ public class ChwClsfCharCreateTest
         System.out.println("------------- Test CreateRPQGroupChar log Begin -------------");
         System.out.println(ChwClsfCharCreate.getRptSb().toString());
         System.out.println("------------- Test CreateRPQGroupChar log end -------------");
-        System.out.println("------------- Test CreateRPQGroupChar end -------------");
+        System.out.println("------------- Test CreateRPQGroupChar end -------------");*/
     }
     
     
     @Test
     public void testCreateRPQQTYChar()
     {
-        System.out.println("------------- Test CreateRPQQTYChar start -------------");
+       /* System.out.println("------------- Test CreateRPQQTYChar start -------------");
         ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
         
         try{
@@ -106,14 +107,14 @@ public class ChwClsfCharCreateTest
         System.out.println("------------- Test CreateRPQQTYChar log Begin -------------");
         System.out.println(ChwClsfCharCreate.getRptSb().toString());
         System.out.println("------------- Test CreateRPQQTYChar log end -------------");
-        System.out.println("------------- Test CreateRPQQTYChar end -------------");
+        System.out.println("------------- Test CreateRPQQTYChar end -------------");*/
     }
     
     
     @Test
     public void testCreateAlphaGroupChar()
     {
-        System.out.println("------------- Test CreateAlphaGroupChar start -------------");
+       /* System.out.println("------------- Test CreateAlphaGroupChar start -------------");
         ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
         
         try{
@@ -130,14 +131,14 @@ public class ChwClsfCharCreateTest
         System.out.println("------------- Test CreateAlphaGroupChar log Begin -------------");
         System.out.println(ChwClsfCharCreate.getRptSb().toString());
         System.out.println("------------- Test CreateAlphaGroupChar log end -------------");
-        System.out.println("------------- Test CreateAlphaGroupChar end -------------");
+        System.out.println("------------- Test CreateAlphaGroupChar end -------------");*/
     }
     
     
     @Test
     public void testCreateAlphaQTYChar()
     {
-        System.out.println("------------- Test  CreateAlphaQTYChar start -------------");
+        /*System.out.println("------------- Test  CreateAlphaQTYChar start -------------");
         ChwClsfCharCreate ChwClsfCharCreate = new ChwClsfCharCreate();
         
         try{
@@ -153,7 +154,7 @@ public class ChwClsfCharCreateTest
         System.out.println("------------- Test CreateAlphaQTYChar log Begin -------------");
         System.out.println(ChwClsfCharCreate.getRptSb().toString());
         System.out.println("------------- Test CreateRPQQTYChar log end -------------");
-        System.out.println("------------- Test CreateRPQQTYChar end -------------");
+        System.out.println("------------- Test CreateRPQQTYChar end -------------");*/
     }
     
     
