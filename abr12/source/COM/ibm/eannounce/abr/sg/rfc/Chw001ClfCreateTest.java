@@ -10,7 +10,7 @@ public class Chw001ClfCreateTest {
 	@Test
     public void testSuccess() throws Exception
     {
-        System.out.println("------------- Test Chw001ClfCreate start -------------");
+       /* System.out.println("------------- Test Chw001ClfCreate start -------------");
         String xmlPath = "C:/EACM_DEV/xml/MODEL_UPDATE_MODEL1284872.xml";
 		String xml = CommonEntities.loadXml(xmlPath);
 		String pdhconnect= "fvtcloudpdh";
@@ -26,7 +26,7 @@ public class Chw001ClfCreateTest {
         Chw001ClfCreate.execute();
         Chw001ClfCreate.getRptSb().toString();
         
-        System.out.println("------------- Test Chw001ClfCreate end -------------");
+        System.out.println("------------- Test Chw001ClfCreate end -------------");*/
     }
 
 }
