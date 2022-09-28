@@ -10,6 +10,8 @@ import java.sql.Statement;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
+import com.ibm.eacm.AES256Utils;
+
 
 /**
  * @version 1.0
@@ -204,7 +206,7 @@ public class ConnectionFactory {
 		Connection _connection = null;
 		try {
 			Class.forName(driver);
-			_connection = DriverManager.getConnection(datasource, user, password);
+			_connection = DriverManager.getConnection(datasource, user,AES256Utils.decrypt(password));
 			_connection.setAutoCommit(false);
 			System.out.println("connect("+prefix+"), has connect to db successfully");
 		}catch (SQLException ex) {
@@ -217,6 +219,9 @@ public class ConnectionFactory {
 			System.out.println("connect("+prefix+"), Can not load Database driver.\n" + ex.getMessage());
 			System.out.println("datasource=" + datasource);
 			throw ex;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}  
 		return _connection;
 		
@@ -231,7 +236,7 @@ public class ConnectionFactory {
 		Connection _connection = null;
 		try {
 			Class.forName(driver);
-			_connection = DriverManager.getConnection(datasource, user, password);
+				_connection = DriverManager.getConnection(datasource, user, AES256Utils.decrypt(password));
 			_connection.setAutoCommit(false);
 			System.out.println("connect(), has connect to db successfully");
 		}catch (SQLException ex) {
@@ -241,6 +246,9 @@ public class ConnectionFactory {
 		catch (ClassNotFoundException ex) {
 			System.out.println("connect(), Can not load Database driver.\n" + ex.getMessage());
 			throw ex;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}  
 		return _connection;
 		

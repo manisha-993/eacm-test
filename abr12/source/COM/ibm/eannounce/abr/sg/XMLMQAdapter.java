@@ -17,6 +17,8 @@ import java.io.*;
 
 import javax.xml.parsers.*;
 
+import com.ibm.eacm.AES256Utils;
+
 /**********************************************************************************
 * base class for ADS feeds in ADSABRSTATUS abr
 *
@@ -105,11 +107,19 @@ public abstract class XMLMQAdapter implements XMLMQ
     protected Connection setupConnection()
         throws java.sql.SQLException
     {
-        Connection connection =
-            DriverManager.getConnection(
+        Connection connection = null;
+		try {
+			connection = DriverManager.getConnection(
                 MiddlewareServerProperties.getPDHDatabaseURL(),
                 MiddlewareServerProperties.getPDHDatabaseUser(),
-                MiddlewareServerProperties.getPDHDatabasePassword());
+                AES256Utils.decrypt(MiddlewareServerProperties.getPDHDatabasePassword()));
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			throw e;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         connection.setAutoCommit(false);
 
