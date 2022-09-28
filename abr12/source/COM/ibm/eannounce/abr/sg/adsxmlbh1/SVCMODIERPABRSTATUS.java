@@ -133,7 +133,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 					String obj_id = svcmod.getMACHTYPE() + svcmod.getMODEL();
 					String class_name = "MG_COMMON";
 					String class_type = "001";
-					RdhClassificationMaint cMaint = new RdhClassificationMaint(obj_id, class_name, class_type);
+					RdhClassificationMaint cMaint = new RdhClassificationMaint(obj_id, class_name, class_type, obj_id);
 
 					this.addDebug("Calling " + cMaint.getRFCName()+" ID="+obj_id+" NAME="+class_name+" type="+class_type);
 
@@ -156,7 +156,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 						this.addOutput(cMaint.getError_text());
 					}
 					class_name = "MM_CUSTOM_SERVICES";
-					cMaint = new RdhClassificationMaint(obj_id, class_name, class_type);
+					cMaint = new RdhClassificationMaint(obj_id, class_name, class_type, obj_id);
 					type = "MM_CUSTOM_TYPE";
 					tableData = getTableMapingDate(type, svcmod);
 					if (tableData != null && !"No characteristic".equals(tableData)) {
@@ -216,7 +216,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 					 * " called  faild!"); this.addOutput(cMaint.getError_text()); }
 					 */
 					class_name = "MM_FIELDS";
-					cMaint = new RdhClassificationMaint(obj_id, class_name, class_type);
+					cMaint = new RdhClassificationMaint(obj_id, class_name, class_type, obj_id);
 					
 					if ("Yes".equals(svcmod.getSOPRELEVANT())) {
 						type = "MM_SOP_IND";

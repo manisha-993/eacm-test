@@ -97,9 +97,9 @@ public class RdhClassificationMaint extends RdhBase
      * @param class_type
      * @param enablementprocess
      */
-    public RdhClassificationMaint (String obj_id, String class_name, String class_type )
+    public RdhClassificationMaint (String obj_id, String class_name, String class_type, String rfaNum )
     {
-    	super(obj_id,"Z_DM_SAP_CLASSIFICATION_MAINT".toLowerCase(),null);
+    	super(rfaNum,"Z_DM_SAP_CLASSIFICATION_MAINT".toLowerCase(),null);
     	charval_refresh = "1";
     	object_key = new RdhClaf_object_key();
     	object_key.setKey_feld("MATNR");
@@ -122,9 +122,9 @@ public class RdhClassificationMaint extends RdhBase
      *  add pims_identity 
      * @param enablementprocess
      */
-    public RdhClassificationMaint (String obj_id, String class_name, String class_type, String pims_identity)
+    public RdhClassificationMaint (String obj_id, String class_name, String class_type, String pims_identity, String rfaNum)
     {
-    	super(obj_id,"Z_DM_SAP_CLASSIFICATION_MAINT".toLowerCase(),null);
+    	super(rfaNum,"Z_DM_SAP_CLASSIFICATION_MAINT".toLowerCase(),null);
     	this.pims_identity = pims_identity;
     	charval_refresh = "1";
     	object_key = new RdhClaf_object_key();
