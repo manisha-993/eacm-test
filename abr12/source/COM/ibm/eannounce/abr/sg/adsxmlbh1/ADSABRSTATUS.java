@@ -4254,19 +4254,25 @@ ADSATTRIBUTE    40  WARRTYPE
         	}
 
         }else if("PRODSTRUCT".equals(getEntityType())){
-        	setFlagValue("TMFIERPABRSTATUS", "0020");
-        	String flagString = PokUtils.getAttributeFlagValue(rootEntity, "WARRSVCCOVR");
-        	addDebug("WARRSVCCOVR:"+flagString);
-        	if("WSVC02".equals(flagString))
-        	{
-        		setFlagValue("TMFWARRABRSTATUS", "0020");
-        	}
-        	
-            String BULKMESINDC  = PokUtils.getAttributeFlagValue(rootEntity, "BULKMESINDC");
+            String oldindc= PokUtils.getAttributeValue(rootEntity, "OLDINDC", "", "");
+            addDebug("oldindc:"+oldindc);
+            if("Y".equals(oldindc)) {
+                addDebug("Skip trigger IERP caller for TMF :"+" oldindc:"+oldindc);
+            }
+            else{
+                setFlagValue("TMFIERPABRSTATUS", "0020");
+                String flagString = PokUtils.getAttributeFlagValue(rootEntity, "WARRSVCCOVR");
+                addDebug("WARRSVCCOVR:" + flagString);
+                if ("WSVC02".equals(flagString)) {
+                    setFlagValue("TMFWARRABRSTATUS", "0020");
+                }
+
+                String BULKMESINDC = PokUtils.getAttributeFlagValue(rootEntity, "BULKMESINDC");
            /* if("MES0001".equals(BULKMESINDC)){
                 //PRODSTRUCT.BULKMESINDC = "MES0001" (Yes)
                 setFlagValue("TMFBULKABRSTATUS", "0020");
             }*/
+            }
         }else if ("FEATURE".equals(getEntityType())) {
         	setFlagValue("FEATUREIERPABRSTATUS", "0020");
 		}
