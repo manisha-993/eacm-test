@@ -529,6 +529,8 @@ import java.io.*;
 import java.sql.*;
 //import COM.ibm.opicmpdh.transactions.*;
 
+import com.ibm.eacm.AES256Utils;
+
 /**
  * A pool of <code>Database</code> connections
  * @version @date
@@ -684,13 +686,13 @@ implements Runnable {
 
 			c_adbOPICM[i] = new Database(MiddlewareServerProperties.getPDHDatabaseURL(),
 					MiddlewareServerProperties.getPDHDatabaseUser(),
-					MiddlewareServerProperties.getPDHDatabasePassword(),
+					AES256Utils.decrypt(MiddlewareServerProperties.getPDHDatabasePassword()),
 					MiddlewareServerProperties.getODSDatabaseURL(),
 					MiddlewareServerProperties.getODSDatabaseUser(),
-					MiddlewareServerProperties.getODSDatabasePassword(),
+					AES256Utils.decrypt(MiddlewareServerProperties.getODSDatabasePassword()),
 					MiddlewareServerProperties.getODS2DatabaseURL(), //RTC1119727
 					MiddlewareServerProperties.getODS2DatabaseUser(),
-					MiddlewareServerProperties.getODS2DatabasePassword());
+					AES256Utils.decrypt(MiddlewareServerProperties.getODS2DatabasePassword()));
 
 			// Set some properties
 			c_adbOPICM[i].setInstanceName(m_strInstanceName);
@@ -1150,11 +1152,11 @@ implements Runnable {
 						// Reconnect to the database
 						c_adbOPICM[i] = null;
 						c_adbOPICM[i] = new Database(MiddlewareServerProperties.getPDHDatabaseURL(),
-								MiddlewareServerProperties.getPDHDatabaseUser(), MiddlewareServerProperties.getPDHDatabasePassword(),
+								MiddlewareServerProperties.getPDHDatabaseUser(), AES256Utils.decrypt(MiddlewareServerProperties.getPDHDatabasePassword()),
 								MiddlewareServerProperties.getODSDatabaseURL(), MiddlewareServerProperties.getODSDatabaseUser(),
-								MiddlewareServerProperties.getODSDatabasePassword(),
+								AES256Utils.decrypt(MiddlewareServerProperties.getODSDatabasePassword()),
 								MiddlewareServerProperties.getODS2DatabaseURL(), MiddlewareServerProperties.getODS2DatabaseUser(),
-								MiddlewareServerProperties.getODS2DatabasePassword());
+								AES256Utils.decrypt(MiddlewareServerProperties.getODS2DatabasePassword()));
 
 						// attach the Object Cache to it
 						//c_adbOPICM[i].setObjectPool(c_oObjectCache);

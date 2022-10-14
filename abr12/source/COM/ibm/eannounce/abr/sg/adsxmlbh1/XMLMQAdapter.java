@@ -40,6 +40,7 @@ import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
 import COM.ibm.opicmpdh.middleware.Profile;
 import COM.ibm.opicmpdh.middleware.taskmaster.ABRServerProperties;
 
+import com.ibm.eacm.AES256Utils;
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
 /**********************************************************************************
@@ -1726,15 +1727,27 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
     protected Connection setupConnection()
         throws java.sql.SQLException
     {
-        Connection connection =
-            DriverManager.getConnection(
+    	try {
+        Connection connection;
+		
+			connection = DriverManager.getConnection(
                 MiddlewareServerProperties.getPDHDatabaseURL(),
                 MiddlewareServerProperties.getPDHDatabaseUser(),
-                MiddlewareServerProperties.getPDHDatabasePassword());
+                AES256Utils.decrypt(MiddlewareServerProperties.getPDHDatabasePassword()));
+			connection.setAutoCommit(false);
+			 return connection;
+		} catch (SQLException e) {
+			// TODO: handle exception
+			throw e;
+		}catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 
-        connection.setAutoCommit(false);
+        
 
-        return connection;
+       
     }
     /********************************************************************************
     * close the connection and preparedstatements
