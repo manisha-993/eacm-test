@@ -108,6 +108,9 @@
 import java.io.*;
 import java.util.*;
 import java.util.Date;
+
+import com.ibm.eacm.AES256Utils;
+
 import java.lang.*;
 import java.lang.String;
 import java.lang.Integer;
@@ -1409,12 +1412,17 @@ class ODSCreateEntities {
 
     strurlODS = properties.getProperty("ODSURL");
     struidODS = properties.getProperty("ODSID");
-    strpwdODS = properties.getProperty("ODSPWD");
+  
     strurlPDH = properties.getProperty("PDHURL");
     struidPDH = properties.getProperty("PDHID");
     strNLSOds = properties.getProperty("ODSNLS","ALL");
-
-    strpwdPDH = properties.getProperty("PDHPWD");
+    try {
+	 strpwdPDH = AES256Utils.decrypt(properties.getProperty("PDHPWD"));
+	  strpwdODS = AES256Utils.decrypt(properties.getProperty("ODSPWD"));
+    	} catch (Exception e) {
+	// TODO: handle exception
+    }
+   
     strSchemaPDH = properties.getProperty("PDHSCHEMA");
     strSchemaODS = properties.getProperty("ODSSCHEMA", "OPICM").toUpperCase();
     strEnterprise = properties.getProperty("ENTERPRISE");
