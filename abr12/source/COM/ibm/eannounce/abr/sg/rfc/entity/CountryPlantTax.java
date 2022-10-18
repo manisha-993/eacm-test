@@ -4,6 +4,7 @@ public class CountryPlantTax{
 	String SALES_ORG = null;
 	String PLNT_CD = null;
 	String DEL_PLNT = null;
+	String TAX_CD = null;
 	String TAX_CAT = null;
 	String TAX_CLAS = null;
 	String TAX_COUNTRY = null;
@@ -37,6 +38,13 @@ public class CountryPlantTax{
 	}
 	public void setDEL_PLNT(String dEL_PLNT) {
 		DEL_PLNT = dEL_PLNT;
+	}
+	public String getTAX_CD() {
+		return TAX_CD;
+	}
+
+	public void setTAX_CD(String TAX_CD) {
+		this.TAX_CD = TAX_CD;
 	}
 	public String getTAX_CAT() {
 		return TAX_CAT;
