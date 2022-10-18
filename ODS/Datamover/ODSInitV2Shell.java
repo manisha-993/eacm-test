@@ -76,6 +76,9 @@
 //
 
 import java.util.Date;
+
+import com.ibm.eacm.AES256Utils;
+
 import java.text.*;
 import java.sql.*;
 
@@ -285,9 +288,9 @@ class ODSInitV2 {
         DriverManager.getConnection(
           getUrlOPICM(),
           getUidOPICM(),
-          getPwdOPICM()));
+         AES256Utils.decrypt(getPwdOPICM())));
       setConODS(
-        DriverManager.getConnection(getUrlODS(), getUidODS(), getPwdODS()));
+       DriverManager.getConnection(getUrlODS(), getUidODS(), AES256Utils.decrypt( getPwdODS())));
       getConOPICM().setAutoCommit(true);
       getConODS().setAutoCommit(true);
     } catch (Exception ex) {
