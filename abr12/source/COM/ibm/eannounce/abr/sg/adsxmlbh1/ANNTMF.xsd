@@ -90,7 +90,11 @@
 			<xsd:element name ="MKTGNAME" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
 			<xsd:element name ="ATTPROVIDED" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
 			<xsd:element name ="ATTREQUIRED" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
-			<xsd:element name ="FCMKTGDESC" type = "xsd:string" minOccurs="1" maxOccurs="1"/>			
+			<xsd:element name ="FCMKTGDESC" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="CONFIGURATORFLAG" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="BULKMESINDC" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+			<xsd:element name ="WARRSVCCOVR" type = "xsd:string" minOccurs="1" maxOccurs="1"/>
+
 		</xsd:sequence>
 	</xsd:complexType>  
 	
