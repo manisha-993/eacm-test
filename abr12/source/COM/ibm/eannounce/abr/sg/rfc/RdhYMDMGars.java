@@ -46,7 +46,7 @@ public class RdhYMDMGars extends RdhBase
                 mat.setEan11("");
                 mat.setZconf("E");
                 mat.setAeszn(getEarliestAnnDate(chwProduct));
-                if(!annnumber.equals("")&&annnumber!=null){
+                if(!annnumber.equals("")){
                    mat.setZeiar("RFA");
                 } else {
                     mat.setZeiar("");
@@ -116,13 +116,11 @@ public class RdhYMDMGars extends RdhBase
     public String getEarliestAnnDate(MODEL model) {
         Date annDate = null;
         Date annTemp = null;
-        String result = "";
         List<AVAILABILITY> list = model.getAVAILABILITYLIST();
         if (list != null && list.size() > 0) {
             for (int i = 0; i < list.size(); i++) {
                 try {
                     if (annDate == null) {
-                        //result = list.get(i).getANNDATE();
                         annnumber= list.get(i).getANNNUMBER();
                         annDate= sdf.parse(list.get(i).getANNDATE());
 
@@ -131,7 +129,6 @@ public class RdhYMDMGars extends RdhBase
 
                         if (annTemp.before(annDate)) {
                             annDate = annTemp;
-                            //result = list.get(i).getANNDATE();
                             annnumber= list.get(i).getANNNUMBER();
                         }
                     }
@@ -140,10 +137,6 @@ public class RdhYMDMGars extends RdhBase
                 }
             }
         }
-        /*
-         * if (result != null) result = result.replace("-", ""); if (result != null &&
-         * result.length() > 6) { result = result.substring(result.length() - 6); }
-         */
         if(annDate==null)
             return null;
         return sdfANNDATE.format(annDate);
@@ -157,18 +150,14 @@ public class RdhYMDMGars extends RdhBase
             for (int i = 0; i < list.size(); i++) {
                 try {
                     if (pubDate == null) {
-                        //result = list.get(i).getANNDATE();
-                        //annnumber= list.get(i).getANNNUMBER();
-                        pubDate = sdf.parse(list.get(i).getANNDATE());
+                        pubDate = sdf.parse(list.get(i).getPUBFROM());
 
                     } else {
-                        pubTemp = sdf.parse(list.get(i).getANNDATE());
+                        pubTemp = sdf.parse(list.get(i).getPUBFROM());
                         ;
 
                         if (pubTemp.before(pubDate)) {
                             pubDate = pubTemp;
-                            //result = list.get(i).getANNDATE();
-                            //annnumber= list.get(i).getANNNUMBER();
                         }
                     }
                 } catch (Exception e) {
@@ -176,10 +165,6 @@ public class RdhYMDMGars extends RdhBase
                 }
             }
         }
-        /*
-         * if (result != null) result = result.replace("-", ""); if (result != null &&
-         * result.length() > 6) { result = result.substring(result.length() - 6); }
-         */
         if (pubDate == null)
             return null;
         return sdfPUBFROMDATE.format(pubDate);
