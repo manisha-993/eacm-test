@@ -39,6 +39,8 @@ public class RdhMatm_plant
     private String mtver;
     @SerializedName("PRCTR")
     private String prctr;
+    @SerializedName("STEUC")
+    private String steuc;
     /**
      * @return the lgort
      */
@@ -227,6 +229,12 @@ public class RdhMatm_plant
 	public void setPrctr(String prctr) {
 		this.prctr = prctr;
 	}
-    
-    
+
+    public String getSteuc() {
+        return steuc;
+    }
+
+    public void setSteuc(String steuc) {
+        this.steuc = steuc;
+    }
 }
