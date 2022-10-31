@@ -485,9 +485,12 @@ public class RdhMatmCreate extends RdhBase {
 				}else if ("OEM".equals(svcmod.getGROUP())) {
 					result = "ZSOE";
 				}
-			} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())
-					&& "Non-Federated".equals(svcmod.getGROUP())) {
-				result = "ZSA1";
+			} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())){
+				if ("Non-Federated".equals(svcmod.getGROUP())) {
+					result = "ZSA1";
+				} else if ("General".equals(svcmod.getGROUP())) {
+					result = "ZSV1";
+				}
 			}
 		} else if ("IP".equals(svcmod.getCATEGORY()) && "SC".equals(svcmod.getSUBCATEGORY())) {
 			result = "ZSV1";
