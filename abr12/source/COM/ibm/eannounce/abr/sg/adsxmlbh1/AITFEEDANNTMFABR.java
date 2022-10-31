@@ -229,6 +229,9 @@ public class AITFEEDANNTMFABR extends AITFEEDXML {
 				xml.addElement("ATTPROVIDED", getAttributeValue(featureEntity, "ATTPROVIDED"));
 				xml.addElement("ATTREQUIRED", getAttributeValue(featureEntity, "ATTREQUIRED"));
 				xml.addElement("FCMKTGDESC", getAttributeValue(featureEntity, "FCMKTGDESC"));
+				xml.addElement("CONFIGURATORFLAG", getAttributeValue(tmfEntity, "CONFIGURATORFLAG"));
+				xml.addElement("BULKMESINDC", getAttributeValue(tmfEntity, "BULKMESINDC"));
+				xml.addElement("WARRSVCCOVR", getAttributeValue(tmfEntity, "WARRSVCCOVR"));
 		    	xml.endElement("TMFELEMENT");
 			} else {
 				abr.addDebug("model or feature is null skip the " + tmfEntity.getKey());
