@@ -90,12 +90,16 @@ public class RdhYMDMGars extends RdhBase
                 tbl_gars_mat.add(mat);
             }
         }
-
+        List CountryList = new ArrayList();
         for(CountryPlantTax tax : taxList) {
             if ("19".equals(tax.getINTERFACE_ID())) {
                 RdhYMDMGars_PRODUCTS products = new RdhYMDMGars_PRODUCTS();
                 products.setPartnum(chwProduct.getMACHTYPE()+"FEA");
+                if(CountryList.contains(tax.getTAX_COUNTRY())){
+                    continue;
+                }
                 products.setLand1(tax.getTAX_COUNTRY());
+                CountryList.add(tax.getTAX_COUNTRY());
                 tbl_products.add(products);
             }
         }
@@ -125,7 +129,7 @@ public class RdhYMDMGars extends RdhBase
                     } else {
                         annTemp = sdf.parse(list.get(i).getANNDATE());;
 
-                        if (annTemp.after(annDate)) {
+                        if (annTemp.before(annDate)) {
                             annDate = annTemp;
                             //result = list.get(i).getANNDATE();
                             annnumber= list.get(i).getANNNUMBER();
@@ -161,7 +165,7 @@ public class RdhYMDMGars extends RdhBase
                         pubTemp = sdf.parse(list.get(i).getANNDATE());
                         ;
 
-                        if (pubTemp.after(pubDate)) {
+                        if (pubTemp.before(pubDate)) {
                             pubDate = pubTemp;
                             //result = list.get(i).getANNDATE();
                             //annnumber= list.get(i).getANNNUMBER();

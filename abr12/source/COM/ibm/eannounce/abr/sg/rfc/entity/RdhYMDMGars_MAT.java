@@ -13,7 +13,7 @@ public class RdhYMDMGars_MAT {
     private String numtp;
     @SerializedName("EAN11")
     private String ean11;
-    @SerializedName("ZONF")
+    @SerializedName("ZCONF")
     private String zconf;
     @SerializedName("AESZN")
     private String aeszn;
