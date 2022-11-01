@@ -470,7 +470,6 @@
 			<xsd:element name="WARRDATERULEKEY" type="xsd:string"></xsd:element>
 			<xsd:element name="PUBFROM" type="xsd:string"></xsd:element>
 			<xsd:element name="PUBTO" type="xsd:string"></xsd:element>
-
 			<xsd:element name="DEFWARR" type="xsd:string"></xsd:element>
 			<xsd:element name="COUNTRYLIST" type="COUNTRYLISTTYPE"></xsd:element>
 

@@ -641,6 +641,9 @@ public class ADSMODELABR extends XMLMQRoot {
 		// start of WARRLIST structure
 		list = new XMLGroupElem("WARRLIST", "WARR");
 		XMLMAP.addChild(list);
+		/**
+		 *  WARRELEMENT in MODEL_UPDATE will be reordered by COM/ibm/eannounce/abr/util/UpdateXML.java
+		 */
 		// level 3
 		XMLElem warrelem = new XMLElem("WARRELEMENT");// check for chgs is
 														// controlled by
