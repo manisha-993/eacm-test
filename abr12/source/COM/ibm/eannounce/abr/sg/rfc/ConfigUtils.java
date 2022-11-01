@@ -85,8 +85,7 @@ public class ConfigUtils
     /**
      * Gets a string for the given key from specified resource bundle, if no
      * value is found, then retrun defaultValue
-     * 
-     * @param name
+     *
      * @return
      */
     public static String getValue(String key, String defaultValue)

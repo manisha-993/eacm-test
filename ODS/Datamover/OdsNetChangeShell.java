@@ -364,6 +364,9 @@
 import java.io.*;
 import java.util.*;
 import java.util.Date;
+
+import com.ibm.eacm.AES256Utils;
+
 import java.text.*;
 import java.sql.*;
 import COM.ibm.opicmpdh.middleware.*;
@@ -6018,12 +6021,16 @@ class ODSNetChangeEngine {
 
     strurlODS = properties.getProperty("ODSURL");
     struidODS = properties.getProperty("ODSID");
-    strpwdODS = properties.getProperty("ODSPWD");
     strurlPDH = properties.getProperty("PDHURL");
     struidPDH = properties.getProperty("PDHID");
     strNLSOds = properties.getProperty("ODSNLS", "ALL");
-
-    strpwdPDH = properties.getProperty("PDHPWD");
+    try {
+    	strpwdODS = AES256Utils.decrypt( properties.getProperty("ODSPWD"));
+    	strpwdPDH = AES256Utils.decrypt(  properties.getProperty("PDHPWD"));
+    } catch (Exception e) {
+	// TODO: handle exception
+    }
+    
     strSchemaPDH = properties.getProperty("PDHSCHEMA");
     strSchemaODS = properties.getProperty("ODSSCHEMA", "OPICM").toUpperCase();
     strEnterprise = properties.getProperty("ENTERPRISE");

@@ -205,7 +205,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 				//CHWYMDMFCMaint CHWYMDMFCMaint = new CHWYMDMFCMaint();
 				String rfanum=tmf.getMACHTYPE()+tmf.getMODEL()+tmf.getFEATURECODE();
 				RdhChwFcProd caller = new RdhChwFcProd(tmf,rfanum);
-				runRfcCaller(caller);				
+				runRfcCaller(caller);
 				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP","T"+rfanum );
 				runParkCaller(updateParkStatus, "T"+rfanum);
 
@@ -286,6 +286,11 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		}
 		return sReturn;
 	}
+
+	
+
+
+
 	private void MachineTypeUPG(TMF_UPDATE chwTMF, FEATURE chwFeature,	MODEL chwModel) throws Exception{
 		if(chwFeature==null) return;
 		if(chwModel==null) return;
