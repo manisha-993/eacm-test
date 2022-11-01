@@ -198,9 +198,19 @@ public class FEATUREIERPABRSTATUS extends PokBaseABR {
 		}
 	}
 
-	
-	
 
+
+	protected void runParkCaller(RdhBase caller, String zdmnum) throws Exception {
+		this.addDebug("Calling " + caller.getRFCName());
+		caller.execute();
+		this.addDebug(caller.createLogEntry());
+		if (caller.getRfcrc() == 0) {
+			this.addOutput("Parking records updated successfully for ZDMRELNUM="+zdmnum);
+		} else {
+			this.addOutput(caller.getRFCName() + " called faild!");
+			this.addOutput(caller.getError_text());
+		}
+	}
 	/*
 	 * Get Name based on navigation attributes for root entity
 	 *
