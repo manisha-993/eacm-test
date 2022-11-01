@@ -36,6 +36,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 //import org.w3c.dom.Element;
+import com.ibm.eacm.AES256Utils;
 import org.xml.sax.InputSource;
 
 import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
@@ -520,7 +521,7 @@ public class XSLReportABR extends AbstractTask {
 									Connection dbConnect = DriverManager.getConnection(
 											abrCon.getDatabaseURL(),
 											abrCon.getUserID(),
-											abrCon.getPassword());
+											AES256Utils.decrypt( abrCon.getPassword()));
 											
 									/* cant do this because taskmaster doesnt connect to the ODS
 									if (con.equals("PDH")){
