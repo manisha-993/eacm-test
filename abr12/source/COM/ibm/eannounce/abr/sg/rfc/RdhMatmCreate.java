@@ -520,12 +520,11 @@ public class RdhMatmCreate extends RdhBase {
 					result = "ZSOE";
 				}
 			} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())){
-					if ("Non-Federated".equals(svcmod.getGROUP())) {
-						result = "ZSA1";
-					}
-					else if("Non-Federated".equals(svcmod.getGROUP())){
-						result = "ZSV1";
-					}
+				if ("Non-Federated".equals(svcmod.getGROUP())) {
+					result = "ZSA1";
+				} else if ("General".equals(svcmod.getGROUP())) {
+					result = "ZSV1";
+				}
 			}
 		} else if ("IP".equals(svcmod.getCATEGORY()) && "SC".equals(svcmod.getSUBCATEGORY())) {
 			result = "ZSV1";
@@ -731,7 +730,7 @@ public class RdhMatmCreate extends RdhBase {
 	 */
 	/**
 	 * 
-	 * @param svcmod
+	 * @param product
 	 * @return
 	 */
 	public String getEarliestAnnDate(SVCMOD svcmod) {
