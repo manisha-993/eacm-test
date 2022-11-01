@@ -57,7 +57,11 @@ public class RdhYMDMGars extends RdhBase
                 mat.setKtgrm("06");
                 mat.setVkorg(tax.getSALES_ORG());
                 mat.setDwerk(tax.getDEL_PLNT());
-                mat.setMvgr5(tax.getTAX_CD().trim());
+                if(!tax.getTAX_CD().trim().contains("NULL")){
+                    mat.setMvgr5(tax.getTAX_CD().trim());
+                }else{
+                    mat.setMvgr5("");
+                }
                 mat.setProdh(chwProduct.getPRODHIERCD());
                 mat.setVmstd(getEarliestPUBFROM(chwProduct));
                 mat.setSptxt("");
