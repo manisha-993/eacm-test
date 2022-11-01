@@ -28,7 +28,7 @@ public class Chw001ClfCreateTest {
 		 * Chw001ClfCreate.execute(); Chw001ClfCreate.getRptSb().toString();
 		 */
         
-        System.out.println("------------- Test Chw001ClfCreate end -------------");*/
+
     }
 
 }

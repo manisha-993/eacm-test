@@ -46,7 +46,7 @@ public class ChwReadSalesBomTest {
 	@Test
 	public void testNotfound() throws ClassNotFoundException, SQLException 
     {
-		System.out.println("------------- Test ChwReadSalesBom testNotfound start -------------");
+		/*System.out.println("------------- Test ChwReadSalesBom testNotfound start -------------");
 		
 		ChwReadSalesBom ChwReadSalesBom = new ChwReadSalesBom("0002NEW","1222");
         try
@@ -60,7 +60,7 @@ public class ChwReadSalesBomTest {
         String logEntry = ChwReadSalesBom.createLogEntry();
         System.out.println(logEntry);
         assertEquals(ChwReadSalesBom.getRfcrc(), 8);
-        System.out.println("------------- Test ChwReadSalesBom testNotfound end -------------");
+        System.out.println("------------- Test ChwReadSalesBom testNotfound end -------------");*/
     }
 
 }
