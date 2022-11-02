@@ -124,7 +124,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 					create.execute();
 					this.addDebug(create.createLogEntry());
 					if (create.getRfcrc() == 0) {
-						this.addOutput(create.getRFCName() + " called successfully!");
+						this.addOutput(create.getRFCName() + " called  successfully!");
 					} else {
 						this.addOutput(create.getRFCName() + " called  faild!");
 						this.addOutput(create.getError_text());
