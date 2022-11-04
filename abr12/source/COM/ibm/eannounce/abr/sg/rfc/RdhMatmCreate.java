@@ -264,8 +264,7 @@ public class RdhMatmCreate extends RdhBase {
 						if (sales_org.getZtaxclsf() != null && !sales_org.getZtaxclsf().equals("")) {
 							sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
 						}
-					} else if (org_groupMap.get(sleorggrps.get(j).getSLEORG())!=null) {
-						if ("2046".equals(plant.getWerks())) {
+					} else if (org_groupMap.get(sales_org.getVkorg())!=null) {
 							if ("P4016".equals(bmmh1.get(0).getPrctr())) {
 								sales_org.setZsabrtax("SWMA");
 							} else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
@@ -273,7 +272,7 @@ public class RdhMatmCreate extends RdhBase {
 							}else {
 								sales_org.setZsabrtax(" ");
 							}
-						}
+
 					}
 					if (werks_set.contains(plant.getWerks())){
 						if ("2046".equals(plant.getWerks())) {
