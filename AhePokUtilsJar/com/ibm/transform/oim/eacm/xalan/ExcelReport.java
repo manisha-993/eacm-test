@@ -348,12 +348,14 @@ public class ExcelReport implements Log, ReturnCode, Data, BinaryReport, JDBCCon
 
 		try {		
 			if (dependentProcessID > -1) {
+				log.println("dependentProcessID:"+dependentProcessID);
 				if (jdbcCon.contains("PDH")) {
 					query = ((Connection) jdbcCon.get("PDH")).prepareStatement(runAllowedSQL);
 					query.setInt(1, dependentProcessID);
 					// This query will only return a row if CATODS is running
 					ResultSet row = query.executeQuery();
 					dependentProcessRunning = row.next();
+					log.println("execute PDH:"+runAllowedSQL +"-"+dependentProcessID+"-"+dependentProcessRunning);
 					if (dependentProcessRunning) {
 						dependentProcessName = row.getString(1);
 						dependentProcessStartTime = row.getString(2);
@@ -368,10 +370,12 @@ public class ExcelReport implements Log, ReturnCode, Data, BinaryReport, JDBCCon
 				}
 			}
 			canRun &= result;
+			log.println("canRun &= result:"+canRun+" processID:"+processID);
 			if (processID > -1 && canRun) { 
 				if (jdbcCon.containsKey("PDH")) {
 					query = ((Connection) jdbcCon.get("PDH")).prepareStatement(runStartSQL);
 					query.setInt(1, processID);
+					log.println("process PDH!");
 					if (query.executeUpdate() == 0) {
 						log.print(getClass().getName());
 						log.print(signature);
@@ -396,6 +400,7 @@ public class ExcelReport implements Log, ReturnCode, Data, BinaryReport, JDBCCon
 			log.print(signature);
 			log.println(e.getMessage());
 		}
+		log.println("result:"+result);
 		if (result) {
 			int nTabs = tabNames.size();
 			for (int tabIndex = 0; tabIndex < nTabs; tabIndex++) {
