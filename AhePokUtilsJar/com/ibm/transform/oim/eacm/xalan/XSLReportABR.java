@@ -36,6 +36,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 //import org.w3c.dom.Element;
+import com.ibm.eacm.AES256Utils;
 import org.xml.sax.InputSource;
 
 import COM.ibm.eannounce.objects.AttributeChangeHistoryGroup;
@@ -516,11 +517,12 @@ public class XSLReportABR extends AbstractTask {
 							com.ibm.transform.oim.eacm.xalan.xslabr.Connection abrCon =	abrEnterprise.getConnection(j);
 							if (abrCon.getId().equals(con)) {
 								try {
+									log.println("abrCon:"+abrCon.getDatabaseURL()+":"+abrCon.getPassword());
 									Class.forName(abrCon.getDatabaseDriver());
 									Connection dbConnect = DriverManager.getConnection(
 											abrCon.getDatabaseURL(),
 											abrCon.getUserID(),
-											abrCon.getPassword());
+											AES256Utils.decrypt( abrCon.getPassword()));
 											
 									/* cant do this because taskmaster doesnt connect to the ODS
 									if (con.equals("PDH")){
@@ -540,7 +542,12 @@ public class XSLReportABR extends AbstractTask {
 									log.print(getClass().getName());
 									log.print(signature);
 									log.println(e.getMessage());
-								} /*catch (MiddlewareException e) {
+								}catch (Exception e){
+									log.print(getClass().getName());
+									log.print(signature);
+									log.println(e.getMessage());
+								}
+								/*catch (MiddlewareException e) {
 									log.print(getClass().getName());
 									log.print(signature);
 									log.println(e.getMessage());
