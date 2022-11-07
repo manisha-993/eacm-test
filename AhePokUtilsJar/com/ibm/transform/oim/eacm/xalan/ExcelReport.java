@@ -349,6 +349,7 @@ public class ExcelReport implements Log, ReturnCode, Data, BinaryReport, JDBCCon
 		try {		
 			if (dependentProcessID > -1) {
 				log.println("dependentProcessID:"+dependentProcessID);
+				addMessage("dependentProcessID:"+dependentProcessID);
 				if (jdbcCon.contains("PDH")) {
 					query = ((Connection) jdbcCon.get("PDH")).prepareStatement(runAllowedSQL);
 					query.setInt(1, dependentProcessID);
@@ -356,6 +357,7 @@ public class ExcelReport implements Log, ReturnCode, Data, BinaryReport, JDBCCon
 					ResultSet row = query.executeQuery();
 					dependentProcessRunning = row.next();
 					log.println("execute PDH:"+runAllowedSQL +"-"+dependentProcessID+"-"+dependentProcessRunning);
+					addMessage("execute PDH:"+runAllowedSQL +"-"+dependentProcessID+"-"+dependentProcessRunning);
 					if (dependentProcessRunning) {
 						dependentProcessName = row.getString(1);
 						dependentProcessStartTime = row.getString(2);
@@ -366,20 +368,25 @@ public class ExcelReport implements Log, ReturnCode, Data, BinaryReport, JDBCCon
 					log.print(getClass().getName());
 					log.print(signature);
 					log.println(" a PDH connection is required to check the eacm.ifmlock table");
+					addMessage(" a PDH connection is required to check the eacm.ifmlock table");
 					result = false;
 				}
 			}
 			canRun &= result;
 			log.println("canRun &= result:"+canRun+" processID:"+processID);
+			addMessage("canRun &= result:"+canRun+" processID:"+processID);
 			if (processID > -1 && canRun) { 
 				if (jdbcCon.containsKey("PDH")) {
 					query = ((Connection) jdbcCon.get("PDH")).prepareStatement(runStartSQL);
 					query.setInt(1, processID);
 					log.println("process PDH!");
+					addMessage("process PDH!");
 					if (query.executeUpdate() == 0) {
 						log.print(getClass().getName());
 						log.print(signature);
 						log.print("process id ");
+						addMessage("process id "+processID);
+						addMessage("is not in eacm.ifmlock table");
 						log.print(processID);
 						log.println(" is not in eacm.ifmlock table");
 						result = false;
@@ -389,6 +396,7 @@ public class ExcelReport implements Log, ReturnCode, Data, BinaryReport, JDBCCon
 					log.print(getClass().getName());
 					log.print(signature);
 					log.println(" a PDH connection is required to set the process start in the eacm.ifmlock table");
+					addMessage(" a PDH connection is required to set the process start in the eacm.ifmlock table");
 					result = false;
 				}
 			}
@@ -396,11 +404,13 @@ public class ExcelReport implements Log, ReturnCode, Data, BinaryReport, JDBCCon
 		}
 		catch (SQLException e) {
 			result = false;
+			addMessage("Exception:"+result+ e.getStackTrace());
 			log.print(getClass().getName());
 			log.print(signature);
 			log.println(e.getMessage());
 		}
 		log.println("result:"+result);
+		addMessage("result:"+result);
 		if (result) {
 			int nTabs = tabNames.size();
 			for (int tabIndex = 0; tabIndex < nTabs; tabIndex++) {
