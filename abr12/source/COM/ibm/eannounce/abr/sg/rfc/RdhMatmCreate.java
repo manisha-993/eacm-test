@@ -275,13 +275,13 @@ public class RdhMatmCreate extends RdhBase {
 
 					}
 					if (werks_set.contains(plant.getWerks())){
-						if ("2046".equals(plant.getWerks())) {
+
 							if ("P4016".equals(bmmh1.get(0).getPrctr())) {
 								plant.setSteuc("998313");
 							} else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
 								plant.setSteuc("998713");
 
-							}/*else {
+							/*else {
 								plant.setSteuc(" ");
 							}*/
 						}
