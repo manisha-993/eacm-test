@@ -60,7 +60,7 @@ public class RdhMatmCreate extends RdhBase {
 	static {
 		String[] codes ="0026, 0066, 0147, 0008,0099,0452,0064,0088,0108,8340,0164,0411,0127,0063".split(",");
 		String[] countrys = "Canada, Ireland, US, Australia, New Zealand, Brunei Darussalam, Indonesia, Malaysia, Philippines, Singapore, Vietnam, Thailand, Sri Lanka, India".split(",");
-		String[] werks = "2008,2019,2023,2015,2017,2021,2554,2010,2505,1704,IN01,IN02,IN03,IN04,IN05,IN06,IN07,IN08,IN09,IN10,IN11,IN12,IN13,IN14,IN15,IN16,IN17,2500".split(",");
+		String[] werks = "1704,IN01,IN02,IN03,IN04,IN05,IN06,IN07,IN08,IN09,IN10,IN11,IN12,IN13,IN14,IN15,IN16,IN17".split(",");
 		werks_set = new HashSet<>(Arrays.asList(werks));
 		org_groupMap = new HashMap<String,String>();
 		for (int i = 0; i < codes.length; i++) {
