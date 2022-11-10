@@ -2615,7 +2615,7 @@
 		<Connection id="PDH">
 			<UserID>opicmadm</UserID>
 			<Password>B2wIPD6LClnoeG9N8zgJF5Vo942MwYJqrvyRTHSUIWI=</Password>
-			<Database></Database>
+			<Database>opicmpdh</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:pdhalias</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
 			<DatabaseURL>jdbc:db2://g51pa00002402.az11.dal.cpc.ibm.com:60000/OPICMPDH:timestampPrecisionReporting=2;sslConnection=true;</DatabaseURL>
@@ -2624,7 +2624,7 @@
 		<Connection id="ODS">
 			<UserID>opicmadm</UserID>
 			<Password>B2wIPD6LClnoeG9N8zgJF5Vo942MwYJqrvyRTHSUIWI=</Password>
-			<Database>bldods</Database>
+			<Database>opicmods</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:bldods</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
 			<DatabaseURL>jdbc:db2://g51pa00002402.az11.dal.cpc.ibm.com:60000/OPICMODS:timestampPrecisionReporting=2;sslConnection=true;</DatabaseURL>
