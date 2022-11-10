@@ -457,21 +457,21 @@
 	</Enterprise>
 	<Enterprise code="SG">
 		<Connection id="PDH">
-			<UserID></UserID>
-			<Password></Password>
+			<UserID>opicmadm</UserID>
+			<Password>oaZJtWeaZZ/cUq7IvL07Uqe+SV7G0PNFNGSXRyuSiEw=</Password>
 			<Database>opicmpdh</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:pdhalias</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
-			<DatabaseURL>jdbc:db2://g51pa00002662.az11.dal.cpc.ibm.com:60000/OPICMPDH</DatabaseURL>
+			<DatabaseURL>jdbc:db2://g51pa00002662.az11.dal.cpc.ibm.com:60000/OPICMPDH:timestampPrecisionReporting=2;sslConnection=true;</DatabaseURL>
 			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
 		</Connection>
 		<Connection id="ODS">
-			<UserID></UserID>
-			<Password></Password>
+			<UserID>opicmadm</UserID>
+			<Password>oaZJtWeaZZ/cUq7IvL07Uqe+SV7G0PNFNGSXRyuSiEw=</Password>
 			<Database>opicmods</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:bldods</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
-			<DatabaseURL>jdbc:db2://g51pa00002662.az11.dal.cpc.ibm.com:60006/OPICMODS</DatabaseURL>
+			<DatabaseURL>jdbc:db2://g51pa00002662.az11.dal.cpc.ibm.com:60006/OPICMODS:timestampPrecisionReporting=2;sslConnection=true;</DatabaseURL>
 			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
 		</Connection>
 		<Entity type="EXTSTORAGE">
@@ -2614,20 +2614,20 @@
 	<Enterprise code="LN">
 		<Connection id="PDH">
 			<UserID>opicmadm</UserID>
-			<Password></Password>
-			<Database></Database>
+			<Password>oaZJtWeaZZ/cUq7IvL07Uqe+SV7G0PNFNGSXRyuSiEw=</Password>
+			<Database>opicmpdh</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:pdhalias</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
-			<DatabaseURL>jdbc:db2://127.0.0.1:50001/PDHALIAS</DatabaseURL>
+			<DatabaseURL>jdbc:db2://g51pa00002662.az11.dal.cpc.ibm.com:60000/OPICMPDH:timestampPrecisionReporting=2;sslConnection=true;</DatabaseURL>
 			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
 		</Connection>
 		<Connection id="ODS">
-			<UserID></UserID>
-			<Password></Password>
-			<Database>bldods</Database>
+			<UserID>opicmadm</UserID>
+			<Password>oaZJtWeaZZ/cUq7IvL07Uqe+SV7G0PNFNGSXRyuSiEw=</Password>
+			<Database>opicmods</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:bldods</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
-			<DatabaseURL>jdbc:db2://b01cxnp11082.gho.pok.ibm.com:3702/OPICMODS</DatabaseURL>
+			<DatabaseURL>jdbc:db2://g51pa00002662.az11.dal.cpc.ibm.com:60006/OPICMODS:timestampPrecisionReporting=2;sslConnection=true;</DatabaseURL>
 			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
 		</Connection>
 		<Entity type="EXTPRCCALCRPT">
