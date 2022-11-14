@@ -42,7 +42,7 @@ public class EACMWebServiceUtil
         OutputStream os = null;
         StringBuffer output = new StringBuffer();
 
-        String uri = RfcConfigProperties.getServiceURI();
+        String uri = RfcConnectionProperties.getServiceURI();
         String trustStore = RfcConfigProperties.getServiceTruststore();
         String trustStorepw =AES256Utils.decrypt(RfcConfigProperties.getServiceTruststorePassword());
         String keyStore = RfcConfigProperties.getServiceKeystore();
