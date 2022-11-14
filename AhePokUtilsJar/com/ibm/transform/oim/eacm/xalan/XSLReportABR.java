@@ -517,6 +517,7 @@ public class XSLReportABR extends AbstractTask {
 							com.ibm.transform.oim.eacm.xalan.xslabr.Connection abrCon =	abrEnterprise.getConnection(j);
 							if (abrCon.getId().equals(con)) {
 								try {
+									log.println("abrCon:"+abrCon.getDatabaseURL()+":"+abrCon.getPassword());
 									Class.forName(abrCon.getDatabaseDriver());
 									Connection dbConnect = DriverManager.getConnection(
 											abrCon.getDatabaseURL(),
@@ -541,7 +542,12 @@ public class XSLReportABR extends AbstractTask {
 									log.print(getClass().getName());
 									log.print(signature);
 									log.println(e.getMessage());
-								} /*catch (MiddlewareException e) {
+								}catch (Exception e){
+									log.print(getClass().getName());
+									log.print(signature);
+									log.println(e.getMessage());
+								}
+								/*catch (MiddlewareException e) {
 									log.print(getClass().getName());
 									log.print(signature);
 									log.println(e.getMessage());

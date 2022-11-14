@@ -128,8 +128,8 @@
     
 -->
 <Config xmlns="http://w3.ibm.com/eacm/XSLReportABRConfiguration"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://w3.ibm.com/eacm/XSLReportABRConfiguration XSLReportABRConfiguration ">
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://w3.ibm.com/eacm/XSLReportABRConfiguration XSLReportABRConfiguration ">
 	<Enterprise code="L2">
 		<Entity type="CCTO">
 			<Attribute code="UNLOCKABR">
@@ -142,7 +142,7 @@
 			</Attribute>
 			<Attribute code="CCTOABR002">
 				<Style
-					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/CCTOABR002.xsl">
+						xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/CCTOABR002.xsl">
 					<XSLParam name="xmlabr">
 						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
 							<Invoke method="setABRCode">
@@ -173,7 +173,7 @@
 			</Attribute>
 			<Attribute code="CTOABR003">
 				<Style
-					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/CTOABR003.xsl">
+						xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/CTOABR003.xsl">
 					<XSLParam name="xmlabr">
 						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
 							<Invoke method="setABRCode">
@@ -204,7 +204,7 @@
 			</Attribute>
 			<Attribute code="CVARABR002">
 				<Style
-					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/CVARABR002.xsl">
+						xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/CVARABR002.xsl">
 					<XSLParam name="xmlabr">
 						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
 							<Invoke method="setABRCode">
@@ -235,7 +235,7 @@
 			</Attribute>
 			<Attribute code="VARABR003">
 				<Style
-					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/VARABR003.xsl">
+						xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/VARABR003.xsl">
 					<XSLParam name="xmlabr">
 						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
 							<Invoke method="setABRCode">
@@ -257,7 +257,7 @@
 			</Attribute>
 			<Attribute code="VARABR004">
 				<Style
-					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/VARABR004.xsl">
+						xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/VARABR004.xsl">
 					<XSLParam name="xmlabr">
 						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
 							<Invoke method="setABRCode">
@@ -410,7 +410,7 @@
 		<Entity type="CSOL">
 			<Attribute code="CSOLABR002">
 				<Style
-					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/CSOLABR002.xsl">
+						xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/CSOLABR002.xsl">
 					<XSLParam name="xmlabr">
 						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
 							<Invoke method="setABRCode">
@@ -434,7 +434,7 @@
 		<Entity type="SBB">
 			<Attribute code="SBBABR001">
 				<Style
-					xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/SBBABR001.xsl">
+						xsl="/com/ibm/transform/oim/eacm/lenovo/xalan/style/SBBABR001.xsl">
 					<XSLParam name="xmlabr">
 						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
 							<Invoke method="setABRCode">
@@ -458,20 +458,20 @@
 	<Enterprise code="SG">
 		<Connection id="PDH">
 			<UserID>opicmadm</UserID>
-			<Password>oaZJtWeaZZ/cUq7IvL07Uqe+SV7G0PNFNGSXRyuSiEw=</Password>
+			<Password>B2wIPD6LClnoeG9N8zgJF5Vo942MwYJqrvyRTHSUIWI=</Password>
 			<Database>opicmpdh</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:pdhalias</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
-			<DatabaseURL>jdbc:db2://g51pa00002662.az11.dal.cpc.ibm.com:60000/OPICMPDH:timestampPrecisionReporting=2;sslConnection=true;</DatabaseURL>
+			<DatabaseURL>jdbc:db2://g51pa00002402.az11.dal.cpc.ibm.com:60000/OPICMPDH</DatabaseURL>
 			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
 		</Connection>
 		<Connection id="ODS">
 			<UserID>opicmadm</UserID>
-			<Password>oaZJtWeaZZ/cUq7IvL07Uqe+SV7G0PNFNGSXRyuSiEw=</Password>
+			<Password>B2wIPD6LClnoeG9N8zgJF5Vo942MwYJqrvyRTHSUIWI=</Password>
 			<Database>opicmods</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:bldods</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
-			<DatabaseURL>jdbc:db2://g51pa00002662.az11.dal.cpc.ibm.com:60006/OPICMODS:timestampPrecisionReporting=2;sslConnection=true;</DatabaseURL>
+			<DatabaseURL>jdbc:db2://g51pa00002402.az11.dal.cpc.ibm.com:60000/OPICMODS</DatabaseURL>
 			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
 		</Connection>
 		<Entity type="EXTSTORAGE">
@@ -496,7 +496,7 @@
 										<Obj>PDH</Obj>
 									</Invoke>
 									<Invoke method="setDataView">
-										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">	                                                              
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
 											<Invoke method="initialize" />
 										</Obj>
 									</Invoke>
@@ -514,14 +514,14 @@
 					<XSLParam name="xmlabr">
 						<Obj type="com.ibm.transform.oim.eacm.xalan.XMLABR">
 							<Invoke method="setABRCode">
-								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">							
+								<Obj type="com.ibm.transform.oim.eacm.xalan.CsvReport">
 									<Invoke method="addTabForSQL">
 										<Obj>WARRANTYRPT</Obj>
 										<Obj>SELECT * FROM OPICM.VWARRANTYRPT WITH UR</Obj>
 										<Obj>ODS</Obj>
 									</Invoke>
 									<Invoke method="setDataView">
-										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">	                                                              
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
 											<Invoke method="initialize" />
 										</Obj>
 									</Invoke>
@@ -533,7 +533,7 @@
 			</Attribute>
 			<Attribute code="STORAGEABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>Announcement extract</DGTitle>
 					<XSLParam name="dgTitle">Announcement extract</XSLParam>
@@ -548,7 +548,7 @@
 											<DynamicSQL>
 												<BaseSQL>SELECT * FROM price.VSTEXTANNOUNCEMENT</BaseSQL>
 												<InsertAttribute code="ANNNUMBER" isList="true"
-													isNumber="true"> annnumber IN (?)</InsertAttribute>
+																 isNumber="true"> annnumber IN (?)</InsertAttribute>
 											</DynamicSQL>
 										</Obj>
 										<Obj>PDH</Obj>
@@ -559,7 +559,7 @@
 											<DynamicSQL>
 												<BaseSQL>SELECT * FROM price.VSTEXTMODEL</BaseSQL>
 												<InsertAttribute code="ANNNUMBER" isList="true"
-													isNumber="true"> annnumber IN (?)</InsertAttribute>
+																 isNumber="true"> annnumber IN (?)</InsertAttribute>
 											</DynamicSQL>
 										</Obj>
 										<Obj>PDH</Obj>
@@ -570,7 +570,7 @@
 											<DynamicSQL>
 												<BaseSQL>SELECT * FROM price.VSTEXTFEATURE</BaseSQL>
 												<InsertAttribute code="ANNNUMBER" isList="true"
-													isNumber="true"> annnumber IN (?)</InsertAttribute>
+																 isNumber="true"> annnumber IN (?)</InsertAttribute>
 											</DynamicSQL>
 										</Obj>
 										<Obj>PDH</Obj>
@@ -581,7 +581,7 @@
 											<DynamicSQL>
 												<BaseSQL>SELECT * FROM price.VSTEXTPRODSTRUCT</BaseSQL>
 												<InsertAttribute code="ANNNUMBER" isList="true"
-													isNumber="true"> annnumber IN (?)</InsertAttribute>
+																 isNumber="true"> annnumber IN (?)</InsertAttribute>
 											</DynamicSQL>
 										</Obj>
 										<Obj>PDH</Obj>
@@ -599,7 +599,7 @@
 			</Attribute>
 			<Attribute code="STORAGEMTABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>Machine Type extract</DGTitle>
 					<XSLParam name="dgTitle">Machine Type extract</XSLParam>
@@ -678,7 +678,7 @@
 		<Entity type="MODEL">
 			<Attribute code="STORAGEMTABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>Machine Type extract</DGTitle>
 					<XSLParam name="dgTitle">Machine Type extract</XSLParam>
@@ -741,7 +741,7 @@
 											</DynamicSQL>
 										</Obj>
 										<Obj>PDH</Obj>
-									</Invoke>									
+									</Invoke>
 									<Invoke method="setDataView">
 										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
 											<Invoke method="initialize" />
@@ -769,7 +769,7 @@
 										<Obj>PDH</Obj>
 									</Invoke>
 									<Invoke method="setDataView">
-										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">	                                                              
+										<Obj type="com.ibm.transform.oim.eacm.xalan.DataView">
 											<Invoke method="initialize" />
 										</Obj>
 									</Invoke>
@@ -781,7 +781,7 @@
 			</Attribute>
 			<Attribute code="CSWREPORT">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>CSWREPORT report extract</DGTitle>
 					<XSLParam name="dgTitle">CSWREPORT report extract
@@ -811,7 +811,7 @@
 		<Entity type="ANNOUNCEMENT">
 			<Attribute code="STORAGEABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>Announcement extract</DGTitle>
 					<XSLParam name="dgTitle">Announcement extract</XSLParam>
@@ -826,7 +826,7 @@
 											<DynamicSQL>
 												<BaseSQL>SELECT * FROM price.VSTEXTANNOUNCEMENT</BaseSQL>
 												<InsertAttribute code="ANNNUMBER" isList="true"
-													isNumber="true"> annnumber IN (?)</InsertAttribute>
+																 isNumber="true"> annnumber IN (?)</InsertAttribute>
 											</DynamicSQL>
 										</Obj>
 										<Obj>PDH</Obj>
@@ -837,7 +837,7 @@
 											<DynamicSQL>
 												<BaseSQL>SELECT * FROM price.VSTEXTMODEL</BaseSQL>
 												<InsertAttribute code="ANNNUMBER" isList="true"
-													isNumber="true"> annnumber IN (?)</InsertAttribute>
+																 isNumber="true"> annnumber IN (?)</InsertAttribute>
 											</DynamicSQL>
 										</Obj>
 										<Obj>PDH</Obj>
@@ -848,7 +848,7 @@
 											<DynamicSQL>
 												<BaseSQL>SELECT * FROM price.VSTEXTFEATURE</BaseSQL>
 												<InsertAttribute code="ANNNUMBER" isList="true"
-													isNumber="true"> annnumber IN (?)</InsertAttribute>
+																 isNumber="true"> annnumber IN (?)</InsertAttribute>
 											</DynamicSQL>
 										</Obj>
 										<Obj>PDH</Obj>
@@ -859,7 +859,7 @@
 											<DynamicSQL>
 												<BaseSQL>SELECT * FROM price.VSTEXTPRODSTRUCT</BaseSQL>
 												<InsertAttribute code="ANNNUMBER" isList="true"
-													isNumber="true"> annnumber IN (?)</InsertAttribute>
+																 isNumber="true"> annnumber IN (?)</InsertAttribute>
 											</DynamicSQL>
 										</Obj>
 										<Obj>PDH</Obj>
@@ -879,7 +879,7 @@
 		<Entity type="EXTPRCCALCRPT">
 			<Attribute code="SEOBUNDLERPTABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>PriceCalc - Bundle LSEO Detail Pricing Report</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Bundle LSEO Detail Pricing
@@ -907,7 +907,7 @@
 			</Attribute>
 			<Attribute code="PRCCALCSEORPT_USCAABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>PriceCalc - Custom Option SEO Report for US only</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Custom Option SEO Report for US
@@ -966,7 +966,7 @@
 			</Attribute>
 			<Attribute code="PRICECALCCOSTABLESABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>PriceCalc - Features Report for US only</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Features Report for US only
@@ -995,7 +995,7 @@
 			</Attribute>
 			<Attribute code="PRICECALCCOSTABLES1ABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>PriceCalc - Features Report for CA only</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Features Report for CA only
@@ -1024,7 +1024,7 @@
 			</Attribute>
 			<Attribute code="UNIQUEMTMPRICECALCABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>PriceCalc - MT and Model Report for US only</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - MT and Model Report for US only
@@ -1049,11 +1049,11 @@
 					</XSLParam>
 				</Style>
 			</Attribute>
-			<!-- Previous attributes use ODS and opicm tables. The following use PDH 
+			<!-- Previous attributes use ODS and opicm tables. The following use PDH
 				and price tables -->
 			<Attribute code="PRCMTMABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>PriceCalc - MT and Model Report - xSeries</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - MT and Model Report - xSeries
@@ -1081,7 +1081,7 @@
 			</Attribute>
 			<Attribute code="PRCBUNDLEABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>PriceCalc - Bundle LSEO Detail Pricing Report</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Bundle LSEO Detail Pricing
@@ -1110,7 +1110,7 @@
 			</Attribute>
 			<Attribute code="PRCFEATUREABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>PriceCalc - Features Report - US and CA</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Features Report - US and CA
@@ -1139,7 +1139,7 @@
 			<!-- added for new feature report - only for CH and only for GR -->
 			<Attribute code="PRCFEATUREAPABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>PriceCalc - Features Report for China only</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Features Report for China only
@@ -1167,7 +1167,7 @@
 			</Attribute>
 			<Attribute code="PRCFEATUREEMEAABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>PriceCalc - Features Report for Germany only</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Features Report for Germany
@@ -1198,7 +1198,7 @@
 		<Entity type="TMFAVAILREQSETUP">
 			<Attribute code="TMFAVAILRPTSTATUS">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>TMF AVAIL Report</DGTitle>
 					<XSLParam name="dgTitle">TMF AVAIL Report</XSLParam>
@@ -1224,7 +1224,7 @@
 			</Attribute>
 			<Attribute code="TMFAVAILLORPTSTATUS">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>TMF AVAIL Report</DGTitle>
 					<XSLParam name="dgTitle">TMF AVAIL LAST ORDER Report</XSLParam>
@@ -1254,7 +1254,7 @@
 				<SelectionAttribute code="PRRTYPE">
 					<Option code="PRR01">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>TM to SEO Cross Reference</DGTitle>
 							<DGClass>PRR01</DGClass>
@@ -1283,7 +1283,7 @@
 														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
 														</InsertAttribute>
 														<InsertAttribute code="COUNTRYLIST"
-															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+																		 useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -1301,7 +1301,7 @@
 					</Option>
 					<Option code="PRR02">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>SEO Pre-PRG Reference</DGTitle>
 							<DGClass>PRR02</DGClass>
@@ -1332,7 +1332,7 @@
 														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
 														</InsertAttribute>
 														<InsertAttribute code="COUNTRYLIST"
-															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+																		 useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -1350,7 +1350,7 @@
 					</Option>
 					<Option code="PRR03">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>LSEO Detail Pricing Report</DGTitle>
 							<DGClass>PRR03</DGClass>
@@ -1379,7 +1379,7 @@
 														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
 														</InsertAttribute>
 														<InsertAttribute code="COUNTRYLIST"
-															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+																		 useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -1397,7 +1397,7 @@
 					</Option>
 					<Option code="PRR04">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>LSEOBUNDLE Detail Pricing Report</DGTitle>
 							<DGClass>PRR04</DGClass>
@@ -1424,7 +1424,7 @@
 														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
 														</InsertAttribute>
 														<InsertAttribute code="COUNTRYLIST"
-															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+																		 useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -1442,7 +1442,7 @@
 					</Option>
 					<Option code="PRR05">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>Assortment Module Report</DGTitle>
 							<DGClass>PRR05</DGClass>
@@ -1462,7 +1462,7 @@
 														<InsertAttribute code="PRRPUBTO"> PUBLISHTO = '?'
 														</InsertAttribute>
 														<InsertAttribute code="COUNTRYLIST"
-															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+																		 useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -1480,7 +1480,7 @@
 					</Option>
 					<Option code="PRR06">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>TM to Feature Cross Reference</DGTitle>
 							<DGClass>PRR06</DGClass>
@@ -1507,7 +1507,7 @@
 															GLOBALWITHDRAWALANNOUNCEDATE = '?'
 														</InsertAttribute>
 														<InsertAttribute code="COUNTRYLIST"
-															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+																		 useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -1529,7 +1529,7 @@
 		<Entity type="ABRDELAYEDQUEUE">
 			<Attribute code="DELAYABRSTATUS">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/QueueReport.xsl"
-					zip="false">
+					   zip="false">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>ABR Delayed Queue Report</DGTitle>
 					<XSLParam name="dgTitle">ABR Delayed Queue Report</XSLParam>
@@ -1585,7 +1585,7 @@
 		<Entity type="EPMODEL">
 			<Attribute code="EPMODELABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>ABR Inbound Queue Report</DGTitle>
 					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
@@ -1608,7 +1608,7 @@
 		<Entity type="EPFEATURE">
 			<Attribute code="EPFEATUREABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>ABR Inbound Queue Report</DGTitle>
 					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
@@ -1631,7 +1631,7 @@
 		<Entity type="EPSWFEATURE">
 			<Attribute code="EPFSWEATUREABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>ABR Inbound Queue Report</DGTitle>
 					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
@@ -1654,7 +1654,7 @@
 		<Entity type="EPLSEO">
 			<Attribute code="EPLSEOABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>ABR Inbound Queue Report</DGTitle>
 					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
@@ -1677,7 +1677,7 @@
 		<Entity type="EPLSEOBUNDLE">
 			<Attribute code="EPLSEOBUNDLEABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>ABR Inbound Queue Report</DGTitle>
 					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
@@ -1702,7 +1702,7 @@
 				<SelectionAttribute code="FCWURPTTYPE">
 					<Option code="FCWU1">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>HW Feature MODEL Where Used Report</DGTitle>
 							<DGClass>FCWU1</DGClass>
@@ -1718,7 +1718,7 @@
 													<DynamicSQL>
 														<BaseSQL>SELECT * FROM PRICE.VHWFCWUMODEL</BaseSQL>
 														<InsertAttribute code="FCWUFCLIST" isList="true"
-															maxList="36"> FEATURECODE in (?) </InsertAttribute>
+																		 maxList="36"> FEATURECODE in (?) </InsertAttribute>
 														<InsertAttribute code="INVENTORYGROUP"> INVENTORYGROUP =
 															'?'
 														</InsertAttribute>
@@ -1739,7 +1739,7 @@
 					</Option>
 					<Option code="FCWU3">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>HW Feature LSEO Where Used Report</DGTitle>
 							<DGClass>FCWU3</DGClass>
@@ -1755,7 +1755,7 @@
 													<DynamicSQL>
 														<BaseSQL>SELECT * FROM PRICE.VHWFCWULSEO</BaseSQL>
 														<InsertAttribute code="FCWUFCLIST" isList="true"
-															maxList="36"> FEATURECODE in (?) </InsertAttribute>
+																		 maxList="36"> FEATURECODE in (?) </InsertAttribute>
 														<InsertAttribute code="INVENTORYGROUP"> INVENTORYGROUP =
 															'?'
 														</InsertAttribute>
@@ -1776,7 +1776,7 @@
 					</Option>
 					<Option code="FCWU6">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>HW Feature LSEOBUNDLE Where Used Report</DGTitle>
 							<DGClass>FCWU6</DGClass>
@@ -1792,7 +1792,7 @@
 													<DynamicSQL>
 														<BaseSQL>SELECT * FROM PRICE.VHWFCWUBDL</BaseSQL>
 														<InsertAttribute code="FCWUFCLIST" isList="true"
-															maxList="36"> FEATURECODE in (?) </InsertAttribute>
+																		 maxList="36"> FEATURECODE in (?) </InsertAttribute>
 														<InsertAttribute code="INVENTORYGROUP"> INVENTORYGROUP =
 															'?'
 														</InsertAttribute>
@@ -1813,7 +1813,7 @@
 					</Option>
 					<Option code="FCWU2">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>SW Feature MODEL Where Used Report</DGTitle>
 							<DGClass>FCWU2</DGClass>
@@ -1831,7 +1831,7 @@
 														<InsertAttribute code="PDHDOMAIN"> DOMAIN = '?'
 														</InsertAttribute>
 														<InsertAttribute code="FCWUFCLIST" isList="true"
-															maxList="28"> FEATURECODE in (?) </InsertAttribute>
+																		 maxList="28"> FEATURECODE in (?) </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -1849,7 +1849,7 @@
 					</Option>
 					<Option code="FCWU4">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>SW Feature LSEO Where Used Report</DGTitle>
 							<DGClass>FCWU4</DGClass>
@@ -1867,7 +1867,7 @@
 														<InsertAttribute code="PDHDOMAIN"> DOMAIN = '?'
 														</InsertAttribute>
 														<InsertAttribute code="FCWUFCLIST" isList="true"
-															maxList="28"> FEATURECODE in (?) </InsertAttribute>
+																		 maxList="28"> FEATURECODE in (?) </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -1885,7 +1885,7 @@
 					</Option>
 					<Option code="FCWU5">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>SW Feature LSEOBUNDLE Where Used Report</DGTitle>
 							<DGClass>FCWU5</DGClass>
@@ -1903,7 +1903,7 @@
 														<InsertAttribute code="PDHDOMAIN"> DOMAIN = '?'
 														</InsertAttribute>
 														<InsertAttribute code="FCWUFCLIST" isList="true"
-															maxList="28"> FEATURECODE in (?) </InsertAttribute>
+																		 maxList="28"> FEATURECODE in (?) </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -1927,7 +1927,7 @@
 				<SelectionAttribute code="GFSQSMRPTTYPE">
 					<Option code="QSMRPT1">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>Announcements - Summary - New</DGTitle>
 							<DGClass>QSMRPT1</DGClass>
@@ -1958,7 +1958,7 @@
 					</Option>
 					<Option code="QSMRPT2">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>Announcements - Summary - Withdrawal</DGTitle>
 							<DGClass>QSMRPT2</DGClass>
@@ -1990,7 +1990,7 @@
 					</Option>
 					<Option code="QSMRPT3">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>Special Bid - Summary</DGTitle>
 							<DGClass>QSMRPT3</DGClass>
@@ -2027,7 +2027,7 @@
 				<SelectionAttribute code="DRRSSRPTTYPE">
 					<Option code="WWPR">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>Project DRR Report for WWSEOs</DGTitle>
 							<DGClass>DRRSSRPT</DGClass>
@@ -2559,7 +2559,7 @@
 		<Entity type="EXTUNSPSCCDRPT">
 			<Attribute code="UNSPSCCDLSEO">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>UNSPSC Report - UNSPSCCDLSEO</DGTitle>
 					<XSLParam name="dgTitle">UNSPSC Report - UNSPSCCDLSEO</XSLParam>
@@ -2585,7 +2585,7 @@
 			</Attribute>
 			<Attribute code="UNSPSCCDMODEL">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>UNSPSC Report - UNSPSCCDMODEL</DGTitle>
 					<XSLParam name="dgTitle">UNSPSC Report - UNSPSCCDMODEL</XSLParam>
@@ -2614,26 +2614,26 @@
 	<Enterprise code="LN">
 		<Connection id="PDH">
 			<UserID>opicmadm</UserID>
-			<Password>oaZJtWeaZZ/cUq7IvL07Uqe+SV7G0PNFNGSXRyuSiEw=</Password>
-			<Database>opicmpdh</Database>
+			<Password>B2wIPD6LClnoeG9N8zgJF5Vo942MwYJqrvyRTHSUIWI=</Password>
+			<Database></Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:pdhalias</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
-			<DatabaseURL>jdbc:db2://g51pa00002662.az11.dal.cpc.ibm.com:60000/OPICMPDH:timestampPrecisionReporting=2;sslConnection=true;</DatabaseURL>
+			<DatabaseURL>jdbc:db2://g51pa00002402.az11.dal.cpc.ibm.com:60000/OPICMPDH</DatabaseURL>
 			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
 		</Connection>
 		<Connection id="ODS">
 			<UserID>opicmadm</UserID>
-			<Password>oaZJtWeaZZ/cUq7IvL07Uqe+SV7G0PNFNGSXRyuSiEw=</Password>
-			<Database>opicmods</Database>
+			<Password>B2wIPD6LClnoeG9N8zgJF5Vo942MwYJqrvyRTHSUIWI=</Password>
+			<Database>bldods</Database>
 			<!-- jdbc4 format required -->
 			<!-- DatabaseURL>jdbc:db2:bldods</DatabaseURL> <DatabaseDriver>COM.ibm.db2.jdbc.app.DB2Driver</DatabaseDriver -->
-			<DatabaseURL>jdbc:db2://g51pa00002662.az11.dal.cpc.ibm.com:60006/OPICMODS:timestampPrecisionReporting=2;sslConnection=true;</DatabaseURL>
+			<DatabaseURL>jdbc:db2://g51pa00002402.az11.dal.cpc.ibm.com:60000/OPICMODS</DatabaseURL>
 			<DatabaseDriver>com.ibm.db2.jcc.DB2Driver</DatabaseDriver>
 		</Connection>
 		<Entity type="EXTPRCCALCRPT">
 			<Attribute code="SEOBUNDLERPTABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>PriceCalc - Bundle LSEO Detail Pricing Report</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Bundle LSEO Detail Pricing
@@ -2661,7 +2661,7 @@
 			</Attribute>
 			<Attribute code="PRCCALCSEORPT_USCAABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>PriceCalc - Custom Option SEO Report for US only</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Custom Option SEO Report for US
@@ -2720,7 +2720,7 @@
 			</Attribute>
 			<Attribute code="PRICECALCCOSTABLESABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>PriceCalc - Features Report for US only</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Features Report for US only
@@ -2749,7 +2749,7 @@
 			</Attribute>
 			<Attribute code="PRICECALCCOSTABLES1ABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>PriceCalc - Features Report for CA only</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Features Report for CA only
@@ -2778,7 +2778,7 @@
 			</Attribute>
 			<Attribute code="UNIQUEMTMPRICECALCABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>PriceCalc - MT and Model Report for US only</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - MT and Model Report for US only
@@ -2807,7 +2807,7 @@
 				and price tables -->
 			<Attribute code="PRCMTMABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>PriceCalc - MT and Model Report - xSeries</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - MT and Model Report - xSeries
@@ -2835,7 +2835,7 @@
 			</Attribute>
 			<Attribute code="PRCBUNDLEABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>PriceCalc - Bundle LSEO Detail Pricing Report</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Bundle LSEO Detail Pricing
@@ -2864,7 +2864,7 @@
 			</Attribute>
 			<Attribute code="PRCFEATUREABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>PriceCalc - Features Report - US and CA</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Features Report - US and CA
@@ -2894,7 +2894,7 @@
 			<!-- added for new feature report - only for CH and only for GR -->
 			<Attribute code="PRCFEATUREAPABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>PriceCalc - Features Report for China only</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Features Report for China only
@@ -2922,7 +2922,7 @@
 			</Attribute>
 			<Attribute code="PRCFEATUREEMEAABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>PriceCalc - Features Report for Germany only</DGTitle>
 					<XSLParam name="dgTitle">PriceCalc - Features Report for Germany
@@ -2953,7 +2953,7 @@
 		<Entity type="TMFAVAILREQSETUP">
 			<Attribute code="TMFAVAILRPTSTATUS">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>TMF AVAIL Report</DGTitle>
 					<XSLParam name="dgTitle">TMF AVAIL Report</XSLParam>
@@ -2979,7 +2979,7 @@
 			</Attribute>
 			<Attribute code="TMFAVAILLORPTSTATUS">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>TMF AVAIL Report</DGTitle>
 					<XSLParam name="dgTitle">TMF AVAIL LAST ORDER Report</XSLParam>
@@ -3009,7 +3009,7 @@
 				<SelectionAttribute code="PRRTYPE">
 					<Option code="PRR01">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>TM to SEO Cross Reference</DGTitle>
 							<DGClass>PRR01</DGClass>
@@ -3038,7 +3038,7 @@
 														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
 														</InsertAttribute>
 														<InsertAttribute code="COUNTRYLIST"
-															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+																		 useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -3056,7 +3056,7 @@
 					</Option>
 					<Option code="PRR02">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>SEO Pre-PRG Reference</DGTitle>
 							<DGClass>PRR02</DGClass>
@@ -3087,7 +3087,7 @@
 														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
 														</InsertAttribute>
 														<InsertAttribute code="COUNTRYLIST"
-															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+																		 useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -3105,7 +3105,7 @@
 					</Option>
 					<Option code="PRR03">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>LSEO Detail Pricing Report</DGTitle>
 							<DGClass>PRR03</DGClass>
@@ -3134,7 +3134,7 @@
 														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
 														</InsertAttribute>
 														<InsertAttribute code="COUNTRYLIST"
-															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+																		 useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -3152,7 +3152,7 @@
 					</Option>
 					<Option code="PRR04">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>LSEOBUNDLE Detail Pricing Report</DGTitle>
 							<DGClass>PRR04</DGClass>
@@ -3179,7 +3179,7 @@
 														<InsertAttribute code="AUDIEN"> AUDIENCE = '?'
 														</InsertAttribute>
 														<InsertAttribute code="COUNTRYLIST"
-															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+																		 useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -3197,7 +3197,7 @@
 					</Option>
 					<Option code="PRR05">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>Assortment Module Report</DGTitle>
 							<DGClass>PRR05</DGClass>
@@ -3217,7 +3217,7 @@
 														<InsertAttribute code="PRRPUBTO"> PUBLISHTO = '?'
 														</InsertAttribute>
 														<InsertAttribute code="COUNTRYLIST"
-															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+																		 useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -3235,7 +3235,7 @@
 					</Option>
 					<Option code="PRR06">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>TM to Feature Cross Reference</DGTitle>
 							<DGClass>PRR06</DGClass>
@@ -3262,7 +3262,7 @@
 															GLOBALWITHDRAWALANNOUNCEDATE = '?'
 														</InsertAttribute>
 														<InsertAttribute code="COUNTRYLIST"
-															useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
+																		 useFlagCode="true"> COUNTRY = '?' </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -3284,7 +3284,7 @@
 		<Entity type="ABRDELAYEDQUEUE">
 			<Attribute code="DELAYABRSTATUS">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/QueueReport.xsl"
-					zip="false">
+					   zip="false">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>ABR Delayed Queue Report</DGTitle>
 					<XSLParam name="dgTitle">ABR Delayed Queue Report</XSLParam>
@@ -3340,7 +3340,7 @@
 		<Entity type="EPMODEL">
 			<Attribute code="EPMODELABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>ABR Inbound Queue Report</DGTitle>
 					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
@@ -3363,7 +3363,7 @@
 		<Entity type="EPFEATURE">
 			<Attribute code="EPFEATUREABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>ABR Inbound Queue Report</DGTitle>
 					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
@@ -3386,7 +3386,7 @@
 		<Entity type="EPSWFEATURE">
 			<Attribute code="EPFSWEATUREABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>ABR Inbound Queue Report</DGTitle>
 					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
@@ -3409,7 +3409,7 @@
 		<Entity type="EPLSEO">
 			<Attribute code="EPLSEOABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>ABR Inbound Queue Report</DGTitle>
 					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
@@ -3432,7 +3432,7 @@
 		<Entity type="EPLSEOBUNDLE">
 			<Attribute code="EPLSEOBUNDLEABR">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/TBD.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>PDH</UsesConnection>
 					<DGTitle>ABR Inbound Queue Report</DGTitle>
 					<XSLParam name="dgTitle">ABR Inbound Queue Report</XSLParam>
@@ -3457,7 +3457,7 @@
 				<SelectionAttribute code="FCWURPTTYPE">
 					<Option code="FCWU1">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>HW Feature MODEL Where Used Report</DGTitle>
 							<DGClass>FCWU1</DGClass>
@@ -3473,7 +3473,7 @@
 													<DynamicSQL>
 														<BaseSQL>SELECT * FROM PRICE.VHWFCWUMODEL</BaseSQL>
 														<InsertAttribute code="FCWUFCLIST" isList="true"
-															maxList="36"> FEATURECODE in (?) </InsertAttribute>
+																		 maxList="36"> FEATURECODE in (?) </InsertAttribute>
 														<InsertAttribute code="INVENTORYGROUP"> INVENTORYGROUP =
 															'?'
 														</InsertAttribute>
@@ -3494,7 +3494,7 @@
 					</Option>
 					<Option code="FCWU3">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>HW Feature LSEO Where Used Report</DGTitle>
 							<DGClass>FCWU3</DGClass>
@@ -3510,7 +3510,7 @@
 													<DynamicSQL>
 														<BaseSQL>SELECT * FROM PRICE.VHWFCWULSEO</BaseSQL>
 														<InsertAttribute code="FCWUFCLIST" isList="true"
-															maxList="36"> FEATURECODE in (?) </InsertAttribute>
+																		 maxList="36"> FEATURECODE in (?) </InsertAttribute>
 														<InsertAttribute code="INVENTORYGROUP"> INVENTORYGROUP =
 															'?'
 														</InsertAttribute>
@@ -3531,7 +3531,7 @@
 					</Option>
 					<Option code="FCWU6">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>HW Feature LSEOBUNDLE Where Used Report</DGTitle>
 							<DGClass>FCWU6</DGClass>
@@ -3547,7 +3547,7 @@
 													<DynamicSQL>
 														<BaseSQL>SELECT * FROM PRICE.VHWFCWUBDL</BaseSQL>
 														<InsertAttribute code="FCWUFCLIST" isList="true"
-															maxList="36"> FEATURECODE in (?) </InsertAttribute>
+																		 maxList="36"> FEATURECODE in (?) </InsertAttribute>
 														<InsertAttribute code="INVENTORYGROUP"> INVENTORYGROUP =
 															'?'
 														</InsertAttribute>
@@ -3568,7 +3568,7 @@
 					</Option>
 					<Option code="FCWU2">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>SW Feature MODEL Where Used Report</DGTitle>
 							<DGClass>FCWU2</DGClass>
@@ -3586,7 +3586,7 @@
 														<InsertAttribute code="PDHDOMAIN"> DOMAIN = '?'
 														</InsertAttribute>
 														<InsertAttribute code="FCWUFCLIST" isList="true"
-															maxList="28"> FEATURECODE in (?) </InsertAttribute>
+																		 maxList="28"> FEATURECODE in (?) </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -3604,7 +3604,7 @@
 					</Option>
 					<Option code="FCWU4">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>SW Feature LSEO Where Used Report</DGTitle>
 							<DGClass>FCWU4</DGClass>
@@ -3622,7 +3622,7 @@
 														<InsertAttribute code="PDHDOMAIN"> DOMAIN = '?'
 														</InsertAttribute>
 														<InsertAttribute code="FCWUFCLIST" isList="true"
-															maxList="28"> FEATURECODE in (?) </InsertAttribute>
+																		 maxList="28"> FEATURECODE in (?) </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -3640,7 +3640,7 @@
 					</Option>
 					<Option code="FCWU5">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>SW Feature LSEOBUNDLE Where Used Report</DGTitle>
 							<DGClass>FCWU5</DGClass>
@@ -3658,7 +3658,7 @@
 														<InsertAttribute code="PDHDOMAIN"> DOMAIN = '?'
 														</InsertAttribute>
 														<InsertAttribute code="FCWUFCLIST" isList="true"
-															maxList="28"> FEATURECODE in (?) </InsertAttribute>
+																		 maxList="28"> FEATURECODE in (?) </InsertAttribute>
 													</DynamicSQL>
 												</Obj>
 												<Obj>PDH</Obj>
@@ -3682,7 +3682,7 @@
 				<SelectionAttribute code="GFSQSMRPTTYPE">
 					<Option code="QSMRPT1">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>Announcements - Summary - New</DGTitle>
 							<DGClass>QSMRPT1</DGClass>
@@ -3713,7 +3713,7 @@
 					</Option>
 					<Option code="QSMRPT2">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>Announcements - Summary - Withdrawal</DGTitle>
 							<DGClass>QSMRPT2</DGClass>
@@ -3745,7 +3745,7 @@
 					</Option>
 					<Option code="QSMRPT3">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>Special Bid - Summary</DGTitle>
 							<DGClass>QSMRPT3</DGClass>
@@ -3782,7 +3782,7 @@
 				<SelectionAttribute code="DRRSSRPTTYPE">
 					<Option code="WWPR">
 						<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-							zip="true">
+							   zip="true">
 							<UsesConnection>PDH</UsesConnection>
 							<DGTitle>Project DRR Report for WWSEOs</DGTitle>
 							<DGClass>DRRSSRPT</DGClass>
@@ -4314,7 +4314,7 @@
 		<Entity type="EXTUNSPSCCDRPT">
 			<Attribute code="UNSPSCCDLSEO">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>UNSPSC Report - UNSPSCCDLSEO</DGTitle>
 					<XSLParam name="dgTitle">UNSPSC Report - UNSPSCCDLSEO</XSLParam>
@@ -4340,7 +4340,7 @@
 			</Attribute>
 			<Attribute code="UNSPSCCDMODEL">
 				<Style xsl="/com/ibm/transform/oim/eacm/xalan/style/ExcelReport.xsl"
-					zip="true">
+					   zip="true">
 					<UsesConnection>ODS</UsesConnection>
 					<DGTitle>UNSPSC Report - UNSPSCCDMODEL</DGTitle>
 					<XSLParam name="dgTitle">UNSPSC Report - UNSPSCCDMODEL</XSLParam>
