@@ -187,7 +187,13 @@ public class EntityManager {
 				refoferWrapper.text("MFRPRODDESC", model.getMFRPRODDESC(), ctrl);
 				refoferWrapper.text("MKTGDIV", model.getMKTGDIV(), ctrl);
 				refoferWrapper.text("CATGSHRTDESC", model.getCATGSHRTDESC(), ctrl);
-				refoferWrapper.text("STRTOFSVC", model.getSTRTOFSVC(), ctrl);
+				if(model.getSTRTOFSVC()==null||"".equals(model.getSTRTOFSVC().trim())){
+					//2014-12-02
+					refoferWrapper.text("STRTOFSVC","2000-01-01", ctrl);
+				}
+				else {
+					refoferWrapper.text("STRTOFSVC", model.getSTRTOFSVC(), ctrl);
+				}
 				refoferWrapper.text("ENDOFSVC", model.getENDOFSVC(), ctrl);
 
 				refoferWrapper.text("VENDNAM", model.getVENDNAM(), ctrl);
