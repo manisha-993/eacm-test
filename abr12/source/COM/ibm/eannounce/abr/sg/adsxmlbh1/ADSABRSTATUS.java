@@ -4223,8 +4223,12 @@ ADSATTRIBUTE    40  WARRTYPE
         	}
         	else{
         		setFlagValue("MODELIERPABRSTATUS", "0020");
-        	
-        	
+                String cofcat= PokUtils.getAttributeValue(rootEntity, "COFCAT", "", "");
+                addDebug("MODELCOFCAT:"+cofcat);
+                D.ebug(D.EBUG_ERR,"MODELCOFCAT:"+cofcat);
+                if("Hardware".equals(cofcat)) {
+                    setFlagValue("MODELGARSABRSTATUS", "0020");
+                }
 
         	//WARRSVCCOVR ！= "WSVC02"
         	String flagString = PokUtils.getAttributeFlagValue(rootEntity, "WARRSVCCOVR");
