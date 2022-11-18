@@ -105,7 +105,7 @@ public class RFCConfig {
 					
 					HSSFSheet hssfSheet = wb.getSheetAt(0);
 					int lastRow = hssfSheet.getLastRowNum();	
-					for(int i = 2;i<=lastRow;i++) {
+					for(int i = 1;i<=lastRow;i++) {
 						HSSFRow row = hssfSheet.getRow(i);
 						if(row==null) break;
 						String cat = getCellData(row.getCell((short)1));
