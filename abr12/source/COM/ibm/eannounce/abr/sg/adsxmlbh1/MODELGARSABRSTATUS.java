@@ -102,7 +102,7 @@ public class MODELGARSABRSTATUS extends PokBaseABR {
                 runParkCaller(updateParkStatus,abr.getRFCNum());
 
             } else {
-                this.addOutput("XML file not exeit in cache,RFC caller not called!");
+                this.addOutput("XML file not exist in cache,RFC caller not called!");
             }
 
         } catch (Exception e) {
