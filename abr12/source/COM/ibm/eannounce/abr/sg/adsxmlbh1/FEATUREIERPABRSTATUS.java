@@ -140,7 +140,7 @@ public class FEATUREIERPABRSTATUS extends PokBaseABR {
 					runParkCaller(updateParkStatus,"F"+ rfanum );
 
 			} else {
-				this.addOutput("XML file not exeit in cache,RFC caller not called!");
+				this.addOutput("XML file not exist in cache,RFC caller not called!");
 				//return;
 			}
 			
