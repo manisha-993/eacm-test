@@ -1,7 +1,10 @@
 package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 
 import COM.ibm.eannounce.abr.sg.rfc.ChwBulkYMDMProd;
+import COM.ibm.eannounce.abr.sg.rfc.ChwBulkYMDMSalesBom;
 import COM.ibm.eannounce.abr.sg.rfc.MODEL;
+import COM.ibm.eannounce.abr.sg.rfc.RdhBase;
+import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
@@ -29,7 +32,8 @@ public class TMFBULKABRSTATUS extends PokBaseABR {
     private Hashtable metaTbl = new Hashtable();
     private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
     private String modelSQL = "select entity2id as MODELID from opicm.relator where ENTITYTYPE = 'PRODSTRUCT' and ENTITYID = ?  and VALTO > current timestamp and EFFTO > current timestamp with ur";
-    
+    private String tmfSQL = "SELECT f.ATTRIBUTEVALUE AS MACHTYPE, t1.ATTRIBUTEVALUE AS MODEL, t2.ATTRIBUTEVALUE AS FEATURECODE FROM opicm.RELATOR r JOIN OPICM.FLAG f ON f.ENTITYTYPE =r.ENTITY2TYPE  AND f.ENTITYID =r.ENTITY2ID AND f.ATTRIBUTECODE ='MACHTYPEATR' JOIN OPICM.TEXT t1 ON t1.ENTITYTYPE =r.ENTITY2TYPE AND t1.ENTITYID =r.ENTITY2ID AND t1.ATTRIBUTECODE ='MODELATR' and t1.nlsid=1 JOIN OPICM.TEXT t2 ON t2.ENTITYTYPE =r.ENTITY1TYPE AND t2.ENTITYID =r.ENTITY1ID AND t2.ATTRIBUTECODE ='FEATURECODE' WHERE r.ENTITYTYPE ='PRODSTRUCT' AND r.ENTITYID =? AND r.VALTO >CURRENT TIMESTAMP AND r.EFFTO > CURRENT TIMESTAMP AND f.VALTO >CURRENT TIMESTAMP AND f.EFFTO > CURRENT TIMESTAMP AND t1.VALTO >CURRENT TIMESTAMP AND t1.EFFTO > CURRENT TIMESTAMP AND t2.VALTO >CURRENT TIMESTAMP AND t2.EFFTO > CURRENT TIMESTAMP WITH ur";
+
     String xml = null;
 
     public void execute_run() {
@@ -90,19 +94,33 @@ public class TMFBULKABRSTATUS extends PokBaseABR {
             statement1.setInt(1, rootEntity.getEntityID());
             ResultSet resultSet1 = statement1.executeQuery();
             while (resultSet1.next()) {
-            	entityid = resultSet1.getString("MODELID");
-			}
-            
+                entityid = resultSet1.getString("MODELID");
+            }
+
+            String machtype = null;
+            String modelatr = null;
+            String featurecode = null;
+            PreparedStatement statement2 = connection1.prepareStatement(tmfSQL);
+            statement2.setInt(1, rootEntity.getEntityID());
+            ResultSet resultSet2 = statement2.executeQuery();
+            while (resultSet2.next()) {
+                machtype = resultSet2.getString("MACHTYPE");
+                modelatr = resultSet2.getString("MODEL");
+                featurecode = resultSet2.getString("FEATURECODE");
+            }
+
+            this.addDebug("MACHTYPE:"+machtype+",MODEL:"+modelatr+",FEATURECODE:"+featurecode);
+
             Connection connection = m_db.getODSConnection();
             PreparedStatement statement = connection.prepareStatement(CACEHSQL);
             statement.setString(1, entityid);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-				xml = resultSet.getString("XMLMESSAGE");
-			}
-            
+                xml = resultSet.getString("XMLMESSAGE");
+            }
+
             if (xml != null) {
-            	
+
                 MODEL model = XMLParse.getObjectFromXml(xml, MODEL.class);
                 ChwBulkYMDMProd abr = new ChwBulkYMDMProd(model,"PRODSTRUCT",String.valueOf(rootEntity.getEntityID()),m_db.getODSConnection(),m_db.getPDHConnection());
                 this.addDebug("Calling " + abr.getRFCName());
@@ -114,6 +132,23 @@ public class TMFBULKABRSTATUS extends PokBaseABR {
                     this.addOutput(abr.getRFCName() + " called  faild!");
                     this.addOutput(abr.getError_text());
                 }
+                UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", abr.getRFCNum());
+                
+				runParkCaller(updateParkStatus,abr.getRFCNum());
+                ChwBulkYMDMSalesBom bom = new ChwBulkYMDMSalesBom(machtype,modelatr,featurecode);
+                this.addDebug("Calling " + bom.getRFCName());
+                bom.execute();
+                this.addDebug(bom.createLogEntry());
+                if (bom.getRfcrc() == 0) {
+                    this.addOutput(bom.getRFCName() + " called successfully!");
+                } else {
+                    this.addOutput(bom.getRFCName() + " called  faild!");
+                    this.addDebug(bom.getRFCName()+" webservice return code:"+bom.getRfcrc());
+                    this.addOutput(bom.getError_text());
+                }
+                updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", bom.getRFCNum());
+                
+				runParkCaller(updateParkStatus,bom.getRFCNum());
 
             } else {
                 this.addOutput("XML file not exeit in cache,RFC caller not called!");
@@ -155,14 +190,27 @@ public class TMFBULKABRSTATUS extends PokBaseABR {
             println(EACustom.getDocTypeHtml()); // Output the doctype and html
             println(rptSb.toString()); // Output the Report
             printDGSubmitString();
-            if(!isReadOnly()) {
-                clearSoftLock();
-            }
+
             println(EACustom.getTOUDiv());
             buildReportFooter(); // Print </html>
         }
     }
-
+    protected void runParkCaller(RdhBase caller, String zdmnum) throws Exception {
+		this.addDebug("Calling " + caller.getRFCName());
+		try {
+			caller.execute();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		this.addDebug(caller.createLogEntry());
+		if (caller.getRfcrc() == 0) {
+			this.addOutput("Parking records updated successfully for ZDMRELNUM="+zdmnum);
+		} else {
+			this.addOutput(caller.getRFCName() + " called faild!");
+			this.addOutput(caller.getError_text());
+		}
+	}
     protected static String convertToHTML(String txt)
     {
         String retVal="";
