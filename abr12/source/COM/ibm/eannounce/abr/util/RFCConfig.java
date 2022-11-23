@@ -173,7 +173,6 @@ public class RFCConfig {
 				if ("xls".equals(split[1])) {
 					FileInputStream fis = new FileInputStream(excel);
 					wb = new HSSFWorkbook(fis);
-					
 					HSSFSheet hssfSheet = wb.getSheetAt(0);
 					int lastRow = hssfSheet.getLastRowNum();	
 					for(int i = 1;i<=lastRow;i++) {
