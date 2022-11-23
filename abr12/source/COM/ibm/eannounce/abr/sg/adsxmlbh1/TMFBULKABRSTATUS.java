@@ -135,7 +135,7 @@ public class TMFBULKABRSTATUS extends PokBaseABR {
                 UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", abr.getRFCNum());
                 
 				runParkCaller(updateParkStatus,abr.getRFCNum());
-                ChwBulkYMDMSalesBom bom = new ChwBulkYMDMSalesBom(machtype,modelatr,featurecode);
+               /* ChwBulkYMDMSalesBom bom = new ChwBulkYMDMSalesBom(machtype,modelatr,featurecode);
                 this.addDebug("Calling " + bom.getRFCName());
                 bom.execute();
                 this.addDebug(bom.createLogEntry());
@@ -149,7 +149,7 @@ public class TMFBULKABRSTATUS extends PokBaseABR {
                 updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", bom.getRFCNum());
                 
 				runParkCaller(updateParkStatus,bom.getRFCNum());
-
+            */
             } else {
                 this.addOutput("XML file not exeit in cache,RFC caller not called!");
             }
