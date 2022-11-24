@@ -4269,10 +4269,10 @@ ADSATTRIBUTE    40  WARRTYPE
                 }
 
                 String BULKMESINDC = PokUtils.getAttributeFlagValue(rootEntity, "BULKMESINDC");
-           /* if("MES0001".equals(BULKMESINDC)){
+            if("MES0001".equals(BULKMESINDC)){
                 //PRODSTRUCT.BULKMESINDC = "MES0001" (Yes)
                 setFlagValue("TMFBULKABRSTATUS", "0020");
-            }*/
+            }
             }
         }else if ("FEATURE".equals(getEntityType())) {
         	setFlagValue("FEATUREIERPABRSTATUS", "0020");
