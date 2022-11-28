@@ -24,6 +24,7 @@ public class MODELGARSABRSTATUS extends PokBaseABR {
     private String navName = "";
     private Hashtable metaTbl = new Hashtable();
     private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
+    private String MODELSQL = "select mt.attributevalue as MACHTYPE ,md.attributevalue as MODEL from opicm.flag mt join opicm.text md on mt.entityid=md.entityid and mt.entitytype=md.entitytype where mt.ENTITYTYPE='MODEL' and mt.ATTRIBUTECODE = 'MACHTYPEATR' and mt.entityid = ? and md.ATTRIBUTECODE = 'MODELATR' and md.VALTO > current timestamp and md.EFFTO > current timestamp and mt.VALTO > current timestamp and mt.EFFTO > current timestamp with ur";
     String xml = null;
 
     public void execute_run() {
@@ -81,10 +82,21 @@ public class MODELGARSABRSTATUS extends PokBaseABR {
             PreparedStatement statement = connection.prepareStatement(CACEHSQL);
             statement.setInt(1, rootEntity.getEntityID());
             ResultSet resultSet = statement.executeQuery();
-
             while (resultSet.next()) {
                 xml = resultSet.getString("XMLMESSAGE");
             }
+
+            Connection connection1 = m_db.getPDHConnection();
+            String machtype = null;
+            String modelatr = null;
+            PreparedStatement statement1 = connection1.prepareStatement(MODELSQL);
+            statement1.setInt(1, rootEntity.getEntityID());
+            ResultSet resultSet1 = statement1.executeQuery();
+            while (resultSet1.next()) {
+                machtype = resultSet1.getString("MACHTYPE");
+                modelatr = resultSet1.getString("MODEL");
+            }
+
 
             if (xml != null) {
                 MODEL model = XMLParse.getObjectFromXml(xml, MODEL.class);
@@ -100,6 +112,20 @@ public class MODELGARSABRSTATUS extends PokBaseABR {
                 }
                 UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", abr.getRFCNum());
                 runParkCaller(updateParkStatus,abr.getRFCNum());
+
+                GARSYMDMSalesBom bom = new GARSYMDMSalesBom(machtype,modelatr);
+                this.addDebug("Calling " + bom.getRFCName());
+                bom.execute();
+                this.addDebug(bom.createLogEntry());
+                if (bom.getRfcrc() == 0) {
+                    this.addOutput(bom.getRFCName() + " called successfully!");
+                } else {
+                    this.addOutput(bom.getRFCName() + " called  faild!");
+                    this.addDebug(bom.getRFCName()+" webservice return code:"+bom.getRfcrc());
+                    this.addOutput(bom.getError_text());
+                }
+                updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", bom.getRFCNum());
+                runParkCaller(updateParkStatus,bom.getRFCNum());
 
             } else {
                 this.addOutput("XML file not exeit in cache,RFC caller not called!");
