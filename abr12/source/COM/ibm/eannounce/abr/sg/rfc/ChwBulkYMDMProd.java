@@ -107,6 +107,7 @@ public class ChwBulkYMDMProd extends RdhBase{
         makt2.setMktgDesc("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
         makt2.setMktgName("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
         tbl_model_makt.add(makt2);*/
+
         //query country_plant_tax where INTERFACE_ID = "7"
         //For each unique value of TAX_COUNTRY  in the return result sets, create one row into tbl_mlan structure
         List countryKey = new ArrayList();

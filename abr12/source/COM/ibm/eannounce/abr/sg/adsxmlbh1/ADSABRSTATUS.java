@@ -4210,9 +4210,9 @@ ADSATTRIBUTE    40  WARRTYPE
         addDebug("put cache:"+m_abri.getABRCode()+"-"+getEntityType());
         if("SVCMOD".equals(getEntityType())&&!m_abri.getABRCode().equals("SVCMODIERPABRSTATUS")){
         	setFlagValue("SVCMODIERPABRSTATUS", "0020");
-        } 
+        }
         else if("MODEL".equals(getEntityType())){
-           
+
         	String subCat= PokUtils.getAttributeValue(rootEntity, "COFSUBCAT", "", "");
         	String oldindc= PokUtils.getAttributeValue(rootEntity, "OLDINDC", "", "");
 
@@ -4223,12 +4223,8 @@ ADSATTRIBUTE    40  WARRTYPE
         	}
         	else{
         		setFlagValue("MODELIERPABRSTATUS", "0020");
-                String cofcat= PokUtils.getAttributeValue(rootEntity, "COFCAT", "", "");
-                addDebug("MODELCOFCAT:"+cofcat);
-                D.ebug(D.EBUG_ERR,"MODELCOFCAT:"+cofcat);
-                if("Hardware".equals(cofcat)) {
-                    setFlagValue("MODELGARSABRSTATUS", "0020");
-                }
+
+
 
         	//WARRSVCCOVR ！= "WSVC02"
         	String flagString = PokUtils.getAttributeFlagValue(rootEntity, "WARRSVCCOVR");
@@ -4238,8 +4234,24 @@ ADSATTRIBUTE    40  WARRTYPE
         		setFlagValue("MODELWARRABRSTATUS", "0020");
         	}
 
-        	
-
+        	/*String tmfSQL = "select distinct f.attributevalue as BULKMESINDC "
+        	/*String tmfSQL = "select distinct f.attributevalue as BULKMESINDC "
+        			+ "from opicm.relator r "
+        			+ "join opicm.flag f on f.entitytype=r.entitytype and f.ENTITYID=r.entityid and f.attributecode='BULKMESINDC' and f.VALTO > current timestamp and f.EFFTO > current timestamp "
+        			+ "where r.ENTITYTYPE = 'PRODSTRUCT' and r.ENTITY2ID = ? and r.VALTO > current timestamp and r.EFFTO > current timestamp with ur";
+        	Connection connection1 = m_db.getPDHConnection();
+            PreparedStatement statement1 = connection1.prepareStatement(tmfSQL);
+            statement1.setInt(1, rootEntity.getEntityID());
+            ResultSet resultSet1 = statement1.executeQuery();
+            while (resultSet1.next()) {
+            	String BULKMESINDC = resultSet1.getString("BULKMESINDC");
+                if("MES0001".equals(BULKMESINDC)){
+                    //PRODSTRUCT.BULKMESINDC = "MES0001" (Yes)
+                    setFlagValue("MODELBULKABRSTATUS", "0020");
+                    break;
+            	}
+            }
+*/
         	}
 
         }else if("PRODSTRUCT".equals(getEntityType())){
