@@ -151,7 +151,7 @@ public class TMFBULKABRSTATUS extends PokBaseABR {
 				runParkCaller(updateParkStatus,bom.getRFCNum());
             */
             } else {
-                this.addOutput("XML file not exeit in cache,RFC caller not called!");
+                this.addOutput("XML file not exist in cache,RFC caller not called!");
             }
 
         } catch (Exception e) {

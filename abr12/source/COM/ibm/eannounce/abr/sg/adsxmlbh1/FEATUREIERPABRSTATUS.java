@@ -139,7 +139,7 @@ public class FEATUREIERPABRSTATUS extends PokBaseABR {
 					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", "F"+rfanum);
 					runParkCaller(updateParkStatus,"F"+ rfanum );
 			} else {
-				this.addOutput("XML file not exeit in cache,RFC caller not called!");
+				this.addOutput("XML file not exist in cache,RFC caller not called!");
 				//return;
 			}
 			
