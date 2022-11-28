@@ -879,7 +879,7 @@ public class ADSMODELABR extends XMLMQRoot {
 		geoModElem.addChild(new XMLElem("PERCALLCLS", "PERCALLCLS"));
 		geoModElem.addChild(new XMLElem("PLNTOFMFR", "PLNTOFMFR", XMLElem.SHORTDESC));
 		geoModElem.addChild(new XMLElem("PURCHONLY", "PURCHONLY"));
-		geoModElem.addChild(new XMLElem("SYSTYPE", "SYSTYPE"));
+		geoModElem.addChild(new XMLElem("SYSTYPE"));
 		geoModElem.addChild(new XMLElem("INTEGRATEDMODEL", "INTEGRATEDMODEL"));
 		geoModElem.addChild(new XMLElem("GRADUATEDCHARGE", "GRADUATEDCHARGE", XMLElem.SHORTDESC));
 		geoModElem.addChild(new XMLElem("METHODPROD", "METHODPROD"));
