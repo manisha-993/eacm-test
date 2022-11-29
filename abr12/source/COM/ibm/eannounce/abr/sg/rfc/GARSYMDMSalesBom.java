@@ -17,8 +17,7 @@ public class GARSYMDMSalesBom extends RdhBase
      * Creates or updates a GARS material master.
      * @author yuzgyg
      */
-    @SerializedName("Z_GEO")
-    private String z_geo;
+
     @SerializedName("TBL_MAST")
     private List<GARSYMDMSalesBom_MAST> tbl_mast;
     @SerializedName("TBL_STKO")
@@ -38,7 +37,6 @@ public class GARSYMDMSalesBom extends RdhBase
     public GARSYMDMSalesBom(String machType, String model) {
         super(machType + model + "BOM", "RDH_YMDMSALES_BOM".toLowerCase(),null);
         this.pims_identity = "H";
-        this.z_geo = "WW";
         this.tmf_id = machType + "-" + model;
         this.machine_type = machType;
         this.model = model;
@@ -66,7 +64,7 @@ public class GARSYMDMSalesBom extends RdhBase
                 tbl_stpo.add(stpo);
 
                 GARSYMDMSalesBom_CUKB cukb = new GARSYMDMSalesBom_CUKB();
-                cukb.setMatnr(machType + "MEB");
+                cukb.setMatnr(machType + "FEA");
                 cukb.setWerks(plnt);
                 cukb.setIdnrk(machType + model);
                 cukb.setDep_intern("SC_" + machType + "_MOD_" + model);
