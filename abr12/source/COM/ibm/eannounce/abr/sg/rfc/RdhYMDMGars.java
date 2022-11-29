@@ -16,8 +16,7 @@ public class RdhYMDMGars extends RdhBase
      * Creates or updates a GARS material master.
      * @author yuzgyg
      */
-    @SerializedName("Z_GEO")
-    private String z_geo;
+
     @SerializedName("TBL_GARS_MAT")
     private List<RdhYMDMGars_MAT> tbl_gars_mat;
     @SerializedName("TBL_PRODUCTS")
@@ -33,7 +32,6 @@ public class RdhYMDMGars extends RdhBase
     public RdhYMDMGars(MODEL chwProduct) {
         super(chwProduct.getMACHTYPE()+chwProduct.getMODEL()+"FEA", "RDH_YMDM_GARS".toLowerCase(), null);
         this.pims_identity = "H";
-        this.z_geo = "WW";
         List<CountryPlantTax> taxList = RFCConfig.getTaxs();
         for(CountryPlantTax tax : taxList){
             if("19".equals(tax.getINTERFACE_ID())){
