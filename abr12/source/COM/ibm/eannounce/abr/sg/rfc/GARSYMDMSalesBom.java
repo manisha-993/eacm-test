@@ -19,13 +19,13 @@ public class GARSYMDMSalesBom extends RdhBase
      */
     @SerializedName("Z_GEO")
     private String z_geo;
-    @SerializedName("TBL_MAST_STRUCTURE")
+    @SerializedName("TBL_MAST")
     private List<GARSYMDMSalesBom_MAST> tbl_mast;
-    @SerializedName("TBL_STKO_STRUCTURE")
+    @SerializedName("TBL_STKO")
     private List<GARSYMDMSalesBom_STKO> tbl_stko;
-    @SerializedName("TBL_STPO_STRUCTURE")
+    @SerializedName("TBL_STPO")
     private List<GARSYMDMSalesBom_STPO> tbl_stpo;
-    @SerializedName("TBL_CUKB_STRUCTURE")
+    @SerializedName("TBL_CUKB")
     private List<GARSYMDMSalesBom_CUKB> tbl_cukb;
 
     @SerializedName("TMF_ID")
