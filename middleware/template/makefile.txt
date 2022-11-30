@@ -71,9 +71,9 @@ PDH_USER=""
 PDH_PASSWD=""
 PDH_INSTALLDIR="/home/opicmdb2/sqllib/"
 
-ODS_DBASE="opicmods"
-ODS_USER="opicmadm"
-ODS_PASSWD="mice8chs"
+ODS_DBASE=""
+ODS_USER=""
+ODS_PASSWD=""
 ODS_INSTALLDIR="/home/opicmdb2/sqllib/"
 
 all:: pdh ods

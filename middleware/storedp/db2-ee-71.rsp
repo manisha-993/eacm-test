@@ -94,10 +94,10 @@ DB2.PORT_NUMBER                        = 50011
 
 * Fenced User Creation Settings
 * -----------------------------
-UDF.USER_NAME                          = opicf11
-UDF.GROUP_NAME                         = opicf11g
+UDF.USER_NAME                          =
+UDF.GROUP_NAME                         =
 UDF.HOME_DIRECTORY                     = /home/opicf11
-UDF.PASSWORD                           = cat9tail
+UDF.PASSWORD                           =
 
 *UDF.USER_NAME                           = char(8)  no spaces
 *UDF.UID                                 = 100 - 65535
