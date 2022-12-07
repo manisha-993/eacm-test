@@ -74,12 +74,6 @@ Init for AHE
   	<copy file="fmchglog3b.jar" todir="/eacmsw/FMChgLog_drop"/>
   </target>
 	  <!-- target name="ftp" depends="jar2">
-	    <ftp server="eacmbhdev.lexington.ibm.com"
-	       remotedir="/eacmsw/FMChgLog_drop"
-	       userid="opicmadm"
-	       password="mice8chs"
-	       binary="yes"
-	    >
 	      <fileset dir=".">
 	        <include name="fmchglog3b.jar"/>
 	      </fileset>
