@@ -6,7 +6,7 @@ pdh_database_connections=8
 
 ods_database_url=jdbc\:db2\:v02pdh
 ods_database_user=opicmadm
-ods_database_password=cat9tail
+ods_database_password=
 ods_database_connections=5
 
 object_name=OPICM-Middleware
