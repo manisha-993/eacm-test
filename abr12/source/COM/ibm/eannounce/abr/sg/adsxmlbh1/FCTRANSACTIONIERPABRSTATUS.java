@@ -195,7 +195,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				}			
 				String obj_id = fctransaction.getTOMACHTYPE() + "UPG";
 				String rfaNum = fctransaction.getFROMMACHTYPE()+fctransaction.getFROMFEATURECODE()+fctransaction.getTOMACHTYPE()+fctransaction.getTOFEATURECODE();
-				//1. Call ChwMatmCreate to create the material master for the product object. 
+				//1. Call ChwMatmCreate to create the material master for the product object.
 				addDebug("FCTRANSACTION ChwMatmCreate ");	
 				ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwMODEL,"ZMAT",obj_id,rfaNum);
 				this.runRfcCaller(chwMatmCreate);
@@ -363,7 +363,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				this.runRfcCaller(ChwConpMaintain);
 				
 				//12. 
-				/*String tmf_xml = getTMFFromXML(fctransaction.getTOMACHTYPE(),fctransaction.getTOMODEL(),fctransaction.getTOFEATURECODE(), connection);
+				String tmf_xml = getTMFFromXML(fctransaction.getTOMACHTYPE(),fctransaction.getTOMODEL(),fctransaction.getTOFEATURECODE(), connection);
 				if("".equals(tmf_xml)) {
 					addOutput("tmf_xml is Null, not Call ChwFCTYMDMFCMaint");	
 					ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(null,fctransaction);
@@ -373,8 +373,8 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					TMF_UPDATE tmf = XMLParse.getObjectFromXml(tmf_xml,TMF_UPDATE.class);
 					ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(tmf,fctransaction);
 					this.runRfcCaller(caller);
-				}	*/			
-				
+				}
+
 				//13.
 				if(fctransaction.getTOMACHTYPE().equals(fctransaction.getFROMMACHTYPE())) {
 					List<MODEL> models = getMODEL(fctransaction.getTOMACHTYPE(),fctransaction.getPDHDOMAIN());
@@ -394,7 +394,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 						this.addOutput(updateParkStatus.getError_text());
 					}
 				}
-				
+
 				// Call UpdateParkStatus
 				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfaNum);
 				this.addDebug("Calling "+updateParkStatus.getRFCName());
