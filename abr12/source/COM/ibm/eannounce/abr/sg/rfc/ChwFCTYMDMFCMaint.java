@@ -20,7 +20,7 @@ public class ChwFCTYMDMFCMaint extends RdhBase {
 	
 	
 	
-	public ChwFCTYMDMFCMaint(TMF_UPDATE tmf, FCTRANSACTION fctransaction) {
+	public ChwFCTYMDMFCMaint(FCTRANSACTION fctransaction) {
 		
 		super(fctransaction.getFROMMACHTYPE().equals(fctransaction.getTOMACHTYPE()) ? fctransaction.getTOMACHTYPE() + "UPG": fctransaction.getTOMACHTYPE() + "MTC",
 				"RDH_YMDMFC_FCT".toLowerCase(), null);
