@@ -8,6 +8,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import com.ibm.eacm.AES256Utils;
+
 public class DB2ConnectionFactory implements ConnectionFactory {
 
 	static final String DRIVER = "com.ibm.db2.jcc.DB2Driver";
@@ -58,7 +60,12 @@ public class DB2ConnectionFactory implements ConnectionFactory {
 			throw new RuntimeException("DB Password cannot be null");
 		}
 		this.username = username;
-		this.password = password;
+		try {
+			this.password = AES256Utils.decrypt(password);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//URL example "jdbc:db2://localhost:50000/dbname"
 		url = "jdbc:db2://"+server+"/"+database;
 	}

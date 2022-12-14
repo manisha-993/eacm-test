@@ -206,6 +206,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 							ZPUBFROM = sPUBFROM.replaceAll("-", "");
 						}
 						zyTMDMOTHWARRMOD.setZPUBFROM(ZPUBFROM);
+						zyTMDMOTHWARRMOD.setZWTYDESC(CommonUtils.getFirstSubString(WARRELEMENT.getWARRDESC(),40));
 						//If chwProduct/WARRLIST/WARRELEMENT/PUBTO is null, then 
 						// set it to "99991231".
 						// Else set it to chwProduct/WARRLIST/WARRELEMENT/PUBTO. (Format as YYYYMMDD)
@@ -250,6 +251,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		zYTMDMOTHWARRMOD.setZCOUNTRY("**");
 		//Copy from chwProduct/WARRLIST/WARRELEMENT/WARRID
 		zYTMDMOTHWARRMOD.setZWRTYID(WARRELEMENT.getWARRID());
+		zYTMDMOTHWARRMOD.setZWTYDESC(CommonUtils.getFirstSubString(WARRELEMENT.getWARRDESC(),40));
 		//If chwProduct/WARRLIST/WARRELEMENT/PUBFROM is null, then 
 		// set it to "19800101".
 		// Else set it to chwProduct/WARRLIST/WARRELEMENT/PUBFROM. (Format as YYYYMMDD)
@@ -310,6 +312,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 			}
 			ZYTMDMOTHWARRTMF.setZCOUNTRY("");
 			ZYTMDMOTHWARRTMF.setZWRTYID("");
+			ZYTMDMOTHWARRTMF.setZWTYDESC("");
 			ZYTMDMOTHWARRTMF.setZPUBFROM("00000000");
 			ZYTMDMOTHWARRTMF.setZPUBTO("00000000");
 			ZYTMDMOTHWARRTMF.setZWARR_FLAG("");
@@ -335,6 +338,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 						ZYTMDMOTHWARRTMF.setZCOUNTRY("**");
 						//Copy from chwProduct/WARRLIST/WARRELEMENT/WARRID
 						ZYTMDMOTHWARRTMF.setZWRTYID(WARRELEMENT.getWARRID());
+						ZYTMDMOTHWARRTMF.setZWTYDESC(CommonUtils.getFirstSubString(WARRELEMENT.getWARRDESC(),40));
 						/**
 						 * If chwProduct/WARRLIST/WARRELEMENT/PUBFROM is null, then 
      						set it to "19800101".
@@ -416,6 +420,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		//ZYTMDMOTHWARRTMF.setZCOUNTRY(RfcConfigProperties.getCountry(ZCOUNTRY));
 		//Copy from chwProduct/WARRLIST/WARRELEMENT/WARRID
 		ZYTMDMOTHWARRTMF.setZWRTYID(WARRELEMENT.getWARRID());
+		ZYTMDMOTHWARRTMF.setZWTYDESC(CommonUtils.getFirstSubString(WARRELEMENT.getWARRDESC(),40));
 		/**
 		 * If chwProduct/WARRLIST/WARRELEMENT/PUBFROM is null, then 
 			set it to "19800101".

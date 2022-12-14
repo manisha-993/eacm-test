@@ -2,14 +2,7 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
 import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmm00;
@@ -51,15 +44,35 @@ public class RdhMatmCreate extends RdhBase {
 	private List<RdhMatm_geo> geos;
 	@SerializedName("IS_MULTI_PLANTS")
 	private String is_multi_plants;
+	@SerializedName("MULCOMPINDC")
+	private String mulcompindc;
+
 	@Foo
 	SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd" );
 	@Foo
 	SimpleDateFormat sdfANNDATE =   new SimpleDateFormat( "ddMMyy" );
 	@Foo
 	String annnumber = null;
-	public RdhMatmCreate(SVCMOD svcmod) {
+	@Foo
+	static HashMap<String,String> org_groupMap = null;
+	@Foo
+	static Set<String> werks_set = null;
+	static {
+		String[] codes ="0026, 0066, 0147, 0008,0099,0452,0064,0088,0108,8340,0164,0411,0127,0063".split(",");
+		String[] countrys = "Canada, Ireland, US, Australia, New Zealand, Brunei Darussalam, Indonesia, Malaysia, Philippines, Singapore, Viet Nam, Thailand, Sri Lanka, India".split(",");
+		String[] werks = "1704,IN01,IN02,IN03,IN04,IN05,IN06,IN07,IN08,IN09,IN10,IN11,IN12,IN13,IN14,IN15,IN16,IN17".split(",");
+		werks_set = new HashSet<>(Arrays.asList(werks));
+		org_groupMap = new HashMap<String,String>();
+		for (int i = 0; i < codes.length; i++) {
+			org_groupMap.put(codes[i].trim(),countrys[i].trim());
+		}
+
+
+	}
+	public RdhMatmCreate(SVCMOD svcmod,String attr) {
 		super(svcmod.getMACHTYPE() + svcmod.getMODEL(), "Z_DM_SAP_MATM_CREATE".toLowerCase(), null);
 		// RdhMatm_bmm00 matnr Copy from <SoftwareProduct.productIdentifier>.
+		mulcompindc = attr;
 		bmm00.get(0).setMatnr(svcmod.getMACHTYPE() + svcmod.getMODEL());
 		bmm00.get(0).setMtart(getMtart(svcmod));
 		bmm00.get(0).setMbrsh("M");
@@ -224,13 +237,16 @@ public class RdhMatmCreate extends RdhBase {
 					sales_org.setVkorg(sleorggrps.get(j).getSLEORG());
 					sales_org.setDwerk(sleorggrps.get(j).getPLNTCD());
 					// "Canada, Ireland, US"
-					if ("0026".contains(sleorggrps.get(j).getSLEORG())) {
+					if(org_groupMap.get(sleorggrps.get(j).getSLEORG())!=null){
+						sales_org.setZtaxclsf(getZtaxclsf(svcmod, org_groupMap.get(sleorggrps.get(j).getSLEORG())));
+					}
+					/*if ("0026".contains(sleorggrps.get(j).getSLEORG())) {
 						sales_org.setZtaxclsf(getZtaxclsf(svcmod, "Canada"));
 					} else if ("0066".contains(sleorggrps.get(j).getSLEORG())) {
 						sales_org.setZtaxclsf(getZtaxclsf(svcmod, "Ireland"));
 					} else if ("0147".contains(sleorggrps.get(j).getSLEORG())) {
 						sales_org.setZtaxclsf(getZtaxclsf(svcmod, "US"));
-					}
+					}*/
 					if ("0066".equals(sales_org.getVkorg())) {
 						if ("2046".equals(plant.getWerks())) {
 							if ("P4016".equals(bmmh1.get(0).getPrctr())) {
@@ -248,10 +264,31 @@ public class RdhMatmCreate extends RdhBase {
 						if (sales_org.getZtaxclsf() != null && !sales_org.getZtaxclsf().equals("")) {
 							sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
 						}
+					} else if (org_groupMap.get(sales_org.getVkorg())!=null) {
+							if ("P4016".equals(bmmh1.get(0).getPrctr())) {
+								sales_org.setZsabrtax("SWMA");
+							} else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
+								sales_org.setZsabrtax("HWMA");
+							}else {
+								sales_org.setZsabrtax(" ");
+							}
+
+					}
+					if (werks_set.contains(plant.getWerks())){
+
+							if ("P4016".equals(bmmh1.get(0).getPrctr())) {
+								plant.setSteuc("998313");
+							} else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
+								plant.setSteuc("998713");
+
+							/*else {
+								plant.setSteuc(" ");
+							}*/
+						}
 					}
 
 					/**
-					 * If <geo.sales_org.vkorg> in (“0026”,”0147”) if <geo.sales_org.ztaxclsf> is
+					 * If <geo.sales_org.vkorg> in (?0026?,?0147?) if <geo.sales_org.ztaxclsf> is
 					 * set to a value, then { Read the keyword_t table where category == "ZSABRTAX"
 					 * and kwvalue == <geo.sales_org.ztaxclsf>. if a row is found, then Copy
 					 * <keyword_t.name> to zsabrtax. else { Set error_text to "Error: Unable to set
@@ -359,7 +396,7 @@ public class RdhMatmCreate extends RdhBase {
 			 * sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf())); } }
 			 * 
 			 *//**
-				 * If <geo.sales_org.vkorg> in (“0026”,”0147”) if <geo.sales_org.ztaxclsf> is
+				 * If <geo.sales_org.vkorg> in (?0026?,?0147?) if <geo.sales_org.ztaxclsf> is
 				 * set to a value, then { Read the keyword_t table where category == "ZSABRTAX"
 				 * and kwvalue == <geo.sales_org.ztaxclsf>. if a row is found, then Copy
 				 * <keyword_t.name> to zsabrtax. else { Set error_text to "Error: Unable to set
@@ -481,9 +518,12 @@ public class RdhMatmCreate extends RdhBase {
 				}else if ("OEM".equals(svcmod.getGROUP())) {
 					result = "ZSOE";
 				}
-			} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())
-					&& "Non-Federated".equals(svcmod.getGROUP())) {
-				result = "ZSA1";
+			} else if ("Productized Services".equals(svcmod.getSUBCATEGORY())){
+				if ("Non-Federated".equals(svcmod.getGROUP())) {
+					result = "ZSA1";
+				} else if ("General".equals(svcmod.getGROUP())) {
+					result = "ZSV1";
+				}
 			}
 		} else if ("IP".equals(svcmod.getCATEGORY()) && "SC".equals(svcmod.getSUBCATEGORY())) {
 			result = "ZSV1";

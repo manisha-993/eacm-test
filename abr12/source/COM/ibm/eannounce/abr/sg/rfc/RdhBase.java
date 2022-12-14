@@ -357,6 +357,9 @@ public abstract class RdhBase
     public String getRFCName() {
     	return rfc_name;
     }
+    public String getRFCNum() {
+    	return rfa_num;
+    }
     /**
      * check if the field value of object is null or empty string 
      * @param obj

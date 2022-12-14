@@ -39,6 +39,7 @@ import COM.ibm.opicmpdh.middleware.MiddlewareServerProperties;
 import COM.ibm.opicmpdh.middleware.MiddlewareShutdownInProgressException;
 import COM.ibm.opicmpdh.middleware.Profile;
 
+import com.ibm.eacm.AES256Utils;
 import com.ibm.transform.oim.eacm.util.PokUtils;
 
 /**********************************************************************************
@@ -65,7 +66,7 @@ import com.ibm.transform.oim.eacm.util.PokUtils;
 //update country filter for service LSEO
 //
 //Revision 1.16  2011/10/26 08:05:36  guobin
-// Final � support for old data � CQ 67890  Changed to handle offerings that have an AVAIL left in Draft where the data is older than �2010-03-01�.
+// Final ï¿½ support for old data ï¿½ CQ 67890  Changed to handle offerings that have an AVAIL left in Draft where the data is older than ï¿½2010-03-01ï¿½.
 //
 //Revision 1.15  2011/10/17 13:45:39  guobin
 //Support both 0.5 and 1.0 XML together  (BH FS ABR Data Transformation System Feed 20110914.doc)
@@ -609,7 +610,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 			fCOFSUBCAT = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,"COFSUBCAT"));
 			fCOFGRP    = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,"COFGRP"));
 			fCOFSUBGRP = convertValue(PokUtils.getAttributeFlagValue(EXTXMLFEEDItem,"COFSUBGRP"));
-			//If COFCAT = “Service” (102), then the following are not applicable: COFGRP, and COFSUBGRP
+			//If COFCAT = â€œServiceâ€� (102), then the following are not applicable: COFGRP, and COFSUBGRP
 			//check COFCAT from MODEL or LSEO with isService
 			if(isService){
 				fCOFGRP = "";
@@ -620,7 +621,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 //				fCOFSUBGRP = "";
 //			}
 			else{
-				//If COFGRP is applicable, then it defaults to “Base” (150) if not specified
+				//If COFGRP is applicable, then it defaults to â€œBaseâ€� (150) if not specified
 				if("".equals(fCOFGRP)){
 					fCOFGRP = "150";
 				}
@@ -1176,7 +1177,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 		//AVAIL: MODEL,      MODELCONVERT     SVCMOD      SWPRODSTRUCT      PRODSTRUCT
 		//VE:    ADFMODEL    ADFMODELCONVERT  ADFSVCMOD   ADFSWPRODSTRUCT   ADFPRODSTRUCT
 		//AVAILTYPE = "Planned Availability" (146)
-		//COUNTRYLIST – The “Availability” (AVAIL) of type “Planned Availability” (146) is used for this filter. 
+		//COUNTRYLIST â€“ The â€œAvailabilityâ€� (AVAIL) of type â€œPlanned Availabilityâ€� (146) is used for this filter. 
 		//If MODEL, MODELCONVERT, SVCMOD, SWPRODSTRUCT do not have an AVAIL of this type, 
 		//then assume "World Wide" and hence this data is NOT filtered out (i.e. it is sent).
 		//Add AVAIL's status must be ready for review and final
@@ -1260,7 +1261,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 		EntityItem itemArray[] = null;
 		if(mdlGrp!=null) {
 			itemArray = mdlGrp.getEntityItemsAsArray();
-			abr.addDebug("getDIVISION： itemArray=" +itemArray.length);
+			abr.addDebug("getDIVISIONï¼š itemArray=" +itemArray.length);
 		}
 		int k=0;
 		for(int i=0;i<itemArray.length;i++){
@@ -1274,7 +1275,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
 				}
 			}
 		}
-		abr.addDebug("getDIVISION：end");
+		abr.addDebug("getDIVISIONï¼šend");
 		return attrvalue;
 	}
 	
@@ -1605,12 +1606,20 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
     protected Connection setupConnection()
         throws java.sql.SQLException
     {
-        Connection connection =
-            DriverManager.getConnection(
+        Connection connection =null;
+		try {
+			connection = DriverManager.getConnection(
                 MiddlewareServerProperties.getPDHDatabaseURL(),
                 MiddlewareServerProperties.getPDHDatabaseUser(),
-                MiddlewareServerProperties.getPDHDatabasePassword());
-
+                AES256Utils.decrypt( MiddlewareServerProperties.getPDHDatabasePassword()));
+		} catch (SQLException e) {
+			// TODO: handle exception
+			throw e;
+		}
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         connection.setAutoCommit(false);
 
         return connection;
@@ -1643,7 +1652,7 @@ public abstract class XMLMQAdapter implements XMLMQ, Constants
     /**
      * There is special filtering of MODEL based on classification attributes. 
 	  Only MODELs that match the filtering are to flow. The functional specification 
-	  “BH FS ABR XML IDL 2011mmdd.doc” describes the “XML Setup Entity” (EXTXMLFEED) 
+	  â€œBH FS ABR XML IDL 2011mmdd.docâ€� describes the â€œXML Setup Entityâ€� (EXTXMLFEED) 
 	  which may be used to further filter data for downstream systems 
 	  (i.e. a subset of the data that matches the following criteria).
 	    COFCAT   COFSUBCAT COFGRP  

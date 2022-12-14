@@ -10,6 +10,8 @@ import java.sql.Statement;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
+import com.ibm.eacm.AES256Utils;
+
 
 /**
  * @version 1.0
@@ -204,7 +206,7 @@ public class ConnectionFactory {
 		Connection _connection = null;
 		try {
 			Class.forName(driver);
-			_connection = DriverManager.getConnection(datasource, user, password);
+			_connection = DriverManager.getConnection(datasource, user,AES256Utils.decrypt(password));
 			_connection.setAutoCommit(false);
 			System.out.println("connect("+prefix+"), has connect to db successfully");
 		}catch (SQLException ex) {
@@ -217,6 +219,9 @@ public class ConnectionFactory {
 			System.out.println("connect("+prefix+"), Can not load Database driver.\n" + ex.getMessage());
 			System.out.println("datasource=" + datasource);
 			throw ex;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}  
 		return _connection;
 		
@@ -231,7 +236,7 @@ public class ConnectionFactory {
 		Connection _connection = null;
 		try {
 			Class.forName(driver);
-			_connection = DriverManager.getConnection(datasource, user, password);
+				_connection = DriverManager.getConnection(datasource, user, AES256Utils.decrypt(password));
 			_connection.setAutoCommit(false);
 			System.out.println("connect(), has connect to db successfully");
 		}catch (SQLException ex) {
@@ -241,62 +246,20 @@ public class ConnectionFactory {
 		catch (ClassNotFoundException ex) {
 			System.out.println("connect(), Can not load Database driver.\n" + ex.getMessage());
 			throw ex;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}  
 		return _connection;
 		
 	}
 	
-//	public static Connection getMMLCConnection() throws SQLException, ClassNotFoundException {
-//		
-//		String datasource = ConfigUtils.getProperty(ConnectionFactory.KEY_PROD_DB_DATASOURCE);
-//		String driver = ConfigUtils.getProperty(ConnectionFactory.KEY_PROD_DB_JDBCDRIVERCLASS);
-//		String user = ConfigUtils.getProperty(KEY_PROD_DB_DBUSER);
-//		String password = ConfigUtils.getProperty(ConnectionFactory.KEY_PROD_DB_DBPASSWORD);
-//		Connection _connection = null;
-//		try {
-//			Class.forName(driver);
-//			_connection = DriverManager.getConnection(datasource, user, password);
-//			_connection.setAutoCommit(false);
-//			System.out.println("connect(), has connect to db successfully");
-//		}catch (SQLException ex) {
-//			System.out.println("connect(), Can not connect to database.\n" + ex.getMessage());
-//			throw ex;
-//		}
-//		catch (ClassNotFoundException ex) {
-//			System.out.println("connect(), Can not load Database driver.\n" + ex.getMessage());
-//			throw ex;
-//		}  
-//		return _connection;
-//		
-//	}
-	
-	
-//	public static void main(String[] args){
-//		String jdbc_url = "jdbc:db2://rdtst1e4.sby.ibm.com:50000/pprdshad";
-//        String jdbc_user = "oimdev";
-//        String jdbc_password = "2016oimdev";
-//        String jdbc_driver = "com.ibm.db2.jcc.DB2Driver";
-//        Connection conn = null;
-//	    try {
-//	        Class.forName(jdbc_driver);
-//	        conn = DriverManager.getConnection(jdbc_url, jdbc_user,jdbc_password);
-//	        if(conn!=null){
-//	        	System.out.print("connect to the databse successfully");
-//	        }
-//	    }
-//	    catch (ClassNotFoundException cne) {
-//	       cne.printStackTrace();
-//	    }
-//	    catch (SQLException se) {
-//	        se.printStackTrace();
-//	    }
-//	    //return conn;
-//	}
+
 	
 	public static void main(String[] args){
-		String jdbc_url = "jdbc:db2://rdtst1e4.sby.ibm.com:60021/pprdshad:sslConnection=true;sslTrustStoreLocation=./rdxsitkeystore.jks;sslTrustStorePassword=DB2RDX;";
-        String jdbc_user = "oimdev";
-        String jdbc_password = "2016oimdev";
+		String jdbc_url = "";
+        String jdbc_user = "";
+        String jdbc_password = "";
         String jdbc_driver = "com.ibm.db2.jcc.DB2Driver";
         Connection conn = null;
 	    try {

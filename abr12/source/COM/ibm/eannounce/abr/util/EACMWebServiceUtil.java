@@ -11,6 +11,8 @@ import java.net.URL;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSocketFactory;
 
+import com.ibm.eacm.AES256Utils;
+
 import COM.ibm.opicmpdh.middleware.D;
 
 
@@ -40,11 +42,11 @@ public class EACMWebServiceUtil
         OutputStream os = null;
         StringBuffer output = new StringBuffer();
 
-        String uri = RfcConfigProperties.getServiceURI();
+        String uri = RfcConnectionProperties.getServiceURI();
         String trustStore = RfcConfigProperties.getServiceTruststore();
-        String trustStorepw = RfcConfigProperties.getServiceTruststorePassword();
+        String trustStorepw =AES256Utils.decrypt(RfcConfigProperties.getServiceTruststorePassword());
         String keyStore = RfcConfigProperties.getServiceKeystore();
-        String keyStorepw = RfcConfigProperties.getServiceKeystorePassword();
+        String keyStorepw = AES256Utils.decrypt(RfcConfigProperties.getServiceKeystorePassword());
 
         String keyStoreType = RfcConfigProperties.getServiceKeystoreType();
         String algorithm = RfcConfigProperties.getSSLAlgorithm();

@@ -465,9 +465,9 @@
 			<xsd:element name="WARRENTITYID" type="xsd:string"></xsd:element>
 			<xsd:element name="WARRID" type="xsd:string"></xsd:element>
 			<xsd:element name="WARRPRIOD" type="xsd:string"></xsd:element>
+			<xsd:element name="WARRDESC" type="xsd:string"></xsd:element>
 			<xsd:element name="PUBFROM" type="xsd:string"></xsd:element>
 			<xsd:element name="PUBTO" type="xsd:string"></xsd:element>
-
 			<xsd:element name="DEFWARR" type="xsd:string"></xsd:element>
 			<xsd:element name="COUNTRYLIST" type="COUNTRYLISTTYPE"></xsd:element>
 

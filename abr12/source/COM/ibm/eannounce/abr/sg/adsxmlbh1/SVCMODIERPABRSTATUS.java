@@ -117,14 +117,14 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 				xml = resultSet.getString("XMLMESSAGE");
 			}
 			if (xml != null) {
-			
+				    String mulcompindc= PokUtils.getAttributeValue(rootEntity, "MULCOMPINDC", "", "");
 					SVCMOD svcmod = XMLParse.getSvcmodFromXml(xml);
-					RdhMatmCreate create = new RdhMatmCreate(svcmod);
+					RdhMatmCreate create = new RdhMatmCreate(svcmod,mulcompindc);
 					this.addDebug("Calling " + create.getRFCName());
 					create.execute();
 					this.addDebug(create.createLogEntry());
 					if (create.getRfcrc() == 0) {
-						this.addOutput(create.getRFCName() + " called successfully!");
+						this.addOutput(create.getRFCName() + " called  successfully!");
 					} else {
 						this.addOutput(create.getRFCName() + " called  faild!");
 						this.addOutput(create.getError_text());

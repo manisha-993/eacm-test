@@ -85,9 +85,9 @@ public class ChwBulkYMDMProd extends RdhBase{
         makt.setEntitytype(chwProduct.getMODELENTITYTYPE());
         makt.setEntityID(chwProduct.getMODELENTITYID());
         makt.setNlsid("E");
-        makt.setInvName("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
-        makt.setMktgDesc("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
-        makt.setMktgName("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
+        makt.setInvName("MACHINE TYPE "+chwProduct.getMACHTYPE()+" - MODEL MEB");
+        makt.setMktgDesc("MACHINE TYPE "+chwProduct.getMACHTYPE()+" - MODEL MEB");
+        makt.setMktgName("MACHINE TYPE "+chwProduct.getMACHTYPE()+" - MODEL MEB");
         tbl_model_makt.add(makt); 
         
        /* ChwBulkYMDMProd_MAKT makt1 = new ChwBulkYMDMProd_MAKT();
@@ -107,6 +107,7 @@ public class ChwBulkYMDMProd extends RdhBase{
         makt2.setMktgDesc("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
         makt2.setMktgName("MACHINE TYPE "+chwProduct.getMODELENTITYTYPE()+" - MODEL MEB");
         tbl_model_makt.add(makt2);*/
+
         //query country_plant_tax where INTERFACE_ID = "7"
         //For each unique value of TAX_COUNTRY  in the return result sets, create one row into tbl_mlan structure
         List countryKey = new ArrayList();
@@ -128,7 +129,7 @@ public class ChwBulkYMDMProd extends RdhBase{
         }
         //For each unique combination of column SALES_ORG and DEL_PLNT in the return result sets, create one row into tbl_mvke structure
         for(CountryPlantTax tax : taxList){
-            if("7".equals(tax.getINTERFACE_ID()) && !taxKey.contains(tax.getSALES_ORG()+tax.getDEL_PLNT())){
+            if("7".equals(tax.getINTERFACE_ID()) && !taxKey.contains(tax.getSALES_ORG()+tax.getPLNT_CD())){
                 ChwBulkYMDMProd_MVKE mvke = new ChwBulkYMDMProd_MVKE();
                 mvke.setModelEntitytype(chwProduct.getMODELENTITYTYPE());
                 mvke.setModelEntityid(chwProduct.getMODELENTITYID());
@@ -136,7 +137,7 @@ public class ChwBulkYMDMProd extends RdhBase{
                 mvke.setSleorg(tax.getSALES_ORG());
                 mvke.setPlntCd(tax.getPLNT_CD());
                 mvke.setPlntDel(tax.getDEL_PLNT());
-                taxKey.add(tax.getSALES_ORG()+tax.getDEL_PLNT());
+                taxKey.add(tax.getSALES_ORG()+tax.getPLNT_CD());
                 tbl_mvke.add(mvke);
             }
         }
@@ -177,7 +178,9 @@ public class ChwBulkYMDMProd extends RdhBase{
                 f_makt.setEntitytype("FEATURE");
                 f_makt.setEntityID(tmf.getFEATUREENTITYID());
                 f_makt.setNlsid("E");
-                f_makt.setMktgDesc("");
+                String string = featureAtt.get("BHINVNAME");
+                string=string.length()>30?string.substring(0, 30):string;
+                f_makt.setMktgDesc(string);
                 f_makt.setMktgName(featureAtt.get("MKTGNAME"));
                 f_makt.setInvName(featureAtt.get("INVNAME"));
                 f_makt.setBhInvName(featureAtt.get("BHINVNAME"));
@@ -212,14 +215,18 @@ public class ChwBulkYMDMProd extends RdhBase{
             //Create one row into tbl_feature_makt structure
             Map<String,String> featureAtt = getFeatureAtt(tmf.getFEATUREENTITYID());
             ChwBulkYMDMProd_MAKT f_makt = new ChwBulkYMDMProd_MAKT();
+            String value = featureAtt.get("BHINVNAME");
+            value = value.length()>30?value.substring(0,30):value;
+            	
             f_makt.setEntitytype("FEATURE");
             f_makt.setEntityID(tmf.getFEATUREENTITYID());
             f_makt.setNlsid("E");
-            f_makt.setMktgDesc("");
+            f_makt.setMktgDesc(value);
             f_makt.setMktgName(featureAtt.get("MKTGNAME"));
             f_makt.setInvName(featureAtt.get("INVNAME"));
             f_makt.setBhInvName(featureAtt.get("BHINVNAME"));
             tbl_feature_makt.add(f_makt);
+            this.rfa_num=this.rfa_num+tmf.getFEATURECODE()+"MEB";
         }
 
     }

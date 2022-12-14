@@ -440,6 +440,8 @@ class WARRELEMENT_TMF {
 	private String WARRENTITYID;
 	@XmlElement(name = "WARRID")
 	private String WARRID;
+	@XmlElement(name = "WARRDESC")
+	private String WARRDESC;
 	@XmlElement(name = "PUBFROM")
 	private String PUBFROM;
 	@XmlElement(name = "PUBTO")
@@ -462,6 +464,9 @@ class WARRELEMENT_TMF {
 	}
 	public String getWARRID() {
 		return WARRID;
+	}
+	public String getWARRDESC() {
+		return WARRDESC;
 	}
 	public String getPUBFROM() {
 		return PUBFROM;

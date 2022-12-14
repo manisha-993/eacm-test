@@ -84,17 +84,6 @@ public final class RfcConfigProperties extends Properties {
       String keyStoreType = ConfigUtils.getProperty("rdh.keystore.type");
       String algorithm = ConfigUtils.getProperty("rdh.ssl.algorithm");*/
 	/**
-	 * Return the DB gate delay
-	 *
-	 * @return long
-	 */
-	public static final String getServiceURI() {
-		reloadProperties();
-
-		return 
-			c_prop.getProperty("rdh.service.uri", "");
-	}
-	/**
 	 * Return
 	 *
 	 * @return int
