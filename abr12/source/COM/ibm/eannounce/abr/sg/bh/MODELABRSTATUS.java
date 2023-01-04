@@ -1529,7 +1529,9 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 		}
 		boolean isSvcModel = SERVICE.equals(modelCOFCAT);
 		String prodhierFlag = PokUtils.getAttributeFlagValue(rootEntity, "BHPRODHIERCD");
-
+		//If SYSIDUNIT = "SIU-CPU", system type should be set to machine type.
+		//Else no check on system type, which means system type can be blank.
+		doModelSysteamTypeChecks(rootEntity, statusFlag);
 		addDebug(rootEntity.getKey() + " COFCAT: " + modelCOFCAT + " isSvcModel " + isSvcModel + " prodhierFlag "
 				+ prodhierFlag);
 		doWarrantyWTY0000(rootEntity);
@@ -1658,6 +1660,20 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 			checkUniqueCoverage(rootEntity, "MODELFB", "FB", mdlPlaAvailVctA, mdlLOAvailVctC, checklvl, false);
 			// checkUniqueCoverage(rootEntity, "MODELFB","FB",
 			// mdlMesPlaAvailVctA, mdlMesLOAvailVctC, checklvl, false);
+		}
+	}
+
+	private void doModelSysteamTypeChecks(EntityItem rootEntity, String statusFlag) {
+		String sysidunit= PokUtils.getAttributeValue(rootEntity, "SYSIDUNIT", "", "");
+		String systemtype= PokUtils.getAttributeValue(rootEntity, "SYSTEMTYPE", "", "");
+		String machtype= PokUtils.getAttributeValue(rootEntity, "MACHTYPEATR", "", "");
+		addHeading(3,"Model SysteamType Checks:");
+		addDebug("sysidunit=" + sysidunit + " systemtype=" + systemtype);
+		if("S00010".equals(sysidunit)){
+           if(!machtype.equals(systemtype)){
+			   args[0] = "If SYSIDUNIT = \"SIU-CPU\", system type should be set to machine type :"+machtype;
+			   createMessage(getCheck_W_W_E(statusFlag), "INVALID_VALUES_ERR", args);
+		   }
 		}
 	}
 
