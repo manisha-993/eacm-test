@@ -1673,7 +1673,8 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 		if("Hardware".equals(cofcat)) {
 			if ("SIU-CPU".equals(sysidunit)) {
 				if (machtype == null || machtype.equals("") || !machtype.equals(systemtype)) {
-					args[0] = "If SYSIDUNIT = \"SIU-CPU\", system type should be set to machine type :" + machtype;
+					args[0] = "\"" + systemtype + "\"";
+					args[1] = "System Type."+" If System Identification Unit = \"SIU-CPU\", System Type should be set to machine type.";
 					createMessage(getCheck_W_W_E(statusFlag), "INVALID_VALUES_ERR", args);
 				}
 			}
