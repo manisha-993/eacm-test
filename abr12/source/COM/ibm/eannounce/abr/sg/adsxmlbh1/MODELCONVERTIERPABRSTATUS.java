@@ -206,12 +206,13 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				this.addOutput("Bom Processing Finished!");
 
 				// Call UpdateParkStatus
-				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", modelconvert.getTOMACHTYPE() + flag);
+				String rfaNum= modelconvert.getFROMMACHTYPE()+modelconvert.getFROMMODEL()+modelconvert.getTOMACHTYPE()+modelconvert.getTOMODEL();
+				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP",rfaNum);
 				this.addDebug("Calling "+updateParkStatus.getRFCName());
 				updateParkStatus.execute();
 				this.addDebug(updateParkStatus.createLogEntry());
 				if (updateParkStatus.getRfcrc() == 0) {
-					this.addOutput("Parking records updated successfully for ZDMRELNUM="+modelconvert.getTOMACHTYPE()+flag);
+					this.addOutput("Parking records updated successfully for ZDMRELNUM="+rfaNum);
 				} else {
 					this.addOutput(updateParkStatus.getRFCName() + " called faild!");
 					this.addOutput(updateParkStatus.getError_text());

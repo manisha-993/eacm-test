@@ -194,12 +194,13 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					return;	
 				}			
 				String obj_id = fctransaction.getTOMACHTYPE() + "UPG";
+				String rfaNum = fctransaction.getFROMMACHTYPE()+fctransaction.getFROMFEATURECODE()+fctransaction.getTOMACHTYPE()+fctransaction.getTOFEATURECODE();
 				//1. Call ChwMatmCreate to create the material master for the product object. 
 				addDebug("FCTRANSACTION ChwMatmCreate ");	
-				ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwMODEL,"ZMAT",obj_id);
+				ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwMODEL,"ZMAT",obj_id,rfaNum);
 				this.runRfcCaller(chwMatmCreate);
 				//2. Call Chw001ClfCreate to create the standard 001 classifications and characteristics which are tied to the offering's material master record.
-				Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(chwMODEL,"ZMAT",obj_id, connection);
+				Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(chwMODEL,"ZMAT",obj_id,rfaNum, connection);
 				this.addDebug("Calling " + "Chw001ClfCreate");
 				try{
 					chw001ClfCreate.execute();
@@ -210,7 +211,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				}
 				//3.a Call the ChwCharMaintain constructor to create the MK_T_machineType_MOD characteristic.
 				ChwCharMaintain chwCharMaintain = 
-				new ChwCharMaintain(obj_id  //String obj_id Set to concatenation of chwProduct.machineType + "UPG"
+				new ChwCharMaintain(rfaNum  //String obj_id Set to concatenation of chwProduct.machineType + "UPG"
 									,"MK_T_"+fctransaction.getTOMACHTYPE()+"_MOD" //String charact  Set to  "MK_T_<machine_type>_MOD"
 									, "CHAR" 			//String datatype
 									, 6 				//int charnumber
@@ -238,7 +239,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				//3.c Call the ChwClassMaintain constructor to create the MK_machineType_MOD class.
 				ChwClassMaintain ChwClassMaintain = 
 				new ChwClassMaintain(
-						obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+						rfaNum 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
 						, "MK_"+fctransaction.getTOMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
 						, "MK_"+fctransaction.getTOMACHTYPE()+"_MOD"  //String class_type   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
 						);
@@ -253,7 +254,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 						, "MK_"+fctransaction.getTOMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
 						, "300"  							//String class_type   Set to "300"
 						, "H"
-						);
+						, rfaNum);
 				this.runRfcCaller(TssClassificationMaint);
 				
 				
@@ -261,7 +262,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					//4.a1 Call the ChwCharMaintain constructor to create the MK_D_machineType_MOD_CONV characteristic.
 					ChwCharMaintain ChwCharMaintain = 
 					new ChwCharMaintain(
-							obj_id				 				//String obj_id  Set to concatenation of chwProduct.machineType + "MTC"
+							rfaNum				 				//String obj_id  Set to concatenation of chwProduct.machineType + "MTC"
 							, "MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV"	//String charact  Set to  "MK_machineType_MTC" where <machine_type> is chwProduct.machineType
 							, "CHAR" 							//String datatype  Set to "CHAR".
 							, 9 								//int charnumber  Set to "15".
@@ -288,7 +289,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				//4.b Call the ChwClassMaintain constructor to create the MK_D_machineType_MOD_CONV class. 
 				ChwClassMaintain =
 				new ChwClassMaintain(
-						obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "UPG"
+						rfaNum 								//String obj_id Set to concatenation of chwProduct.machineType + "UPG"
 						, "MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV"  //String class_name   Set to  "MK_D_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType
 						, "MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV"  //String class_type   Set to  "MK_D_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType.
 						);
@@ -303,27 +304,27 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 						, "MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV"  //String class_name   Set to  "MK_D_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType
 						, "300"  							//String class_type   Set to "300"
 						, "H"
-						);
+						, rfaNum);
 				this.runRfcCaller(TssClassificationMaint);
 				
 				//5. Call the TssClassificationMaint constructor to associate the MK_REFERENCE class to the product's material master record.
-				RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_REFERENCE","300","H");	
+				RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_REFERENCE","300","H", rfaNum);
 				this.runRfcCaller(rdhClassificationMaint);
 				
 				//6. Call the TssClassificationMaint constructor to associate the MK_T_VAO_NEW class to the product's material master record. 
-				rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_T_VAO_NEW","300","H");	
+				rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_T_VAO_NEW","300","H", rfaNum);
 				this.runRfcCaller(rdhClassificationMaint);
 				
 				//7. Call the TssClassificationMaint constructor to associate the MK_D_VAO_NEW class to the product's material master record. 
-				rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_D_VAO_NEW","300","H");	
+				rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_D_VAO_NEW","300","H", rfaNum);
 				this.runRfcCaller(rdhClassificationMaint);
 				
 				//8.Call the TssClassificationMaint constructor to associate the MK_FC_EXCH class to the product's material master record.
-				rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_FC_EXCH","300","H");	
+				rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_FC_EXCH","300","H", rfaNum);
 				this.runRfcCaller(rdhClassificationMaint);
 				
 				//9.Call the TssClassificationMaint constructor to associate the MK_FC_CONV class to the product's material master record.
-				rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_FC_CONV","300","H");	
+				rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_FC_CONV","300","H", rfaNum);
 				this.runRfcCaller(rdhClassificationMaint);
 				//10 For each MODEL with MODEL/MACHTYPE = MODELCONVERT/TOMACHTYPE
 				for(Map<String,String> map : MODEL_MACHTYPE_LIST){
@@ -334,7 +335,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					//Set to "SC_<MODEL/MACHTYPE>_MOD_<MODEL/MODEL>".
 					String descript="SC_"+fctransaction.getTOMACHTYPE()+"_MOD_" + map.get("MODEL");
 					
-					ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id_depd, dep_extern, dep_type, descript);
+					ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(rfaNum, dep_extern, dep_type, descript);
 					
 					String sourceLine = "$PARENT.MK_T_"+fctransaction.getTOMACHTYPE() +"_MOD='"+map.get("MODEL")+"'";				
 					chwDepdCaller.addSourceLineCondition(sourceLine);
@@ -348,7 +349,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 						, "SD01"			//String bomappl Set to "SD01".
 						, "2"				//String bomexpl Set to "2".
 						, fctransaction.getTOMACHTYPE() + "UPGUI"		//String design	 Set to Set to concatenation of chwProduct.machineType + "MTCUI" 
-						);
+						, rfaNum);
 				//11.b Call the ChwConpMaintain.addConfigDependency() method.
 				ChwConpMaintain.addConfigDependency("E2E", empty); //Set to "E2E".
 				//11.c 
@@ -384,12 +385,12 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				}
 				
 				// Call UpdateParkStatus
-				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", fctransaction.getTOMACHTYPE()+"UPG");
+				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfaNum);
 				this.addDebug("Calling "+updateParkStatus.getRFCName());
 				updateParkStatus.execute();
 				this.addDebug(updateParkStatus.createLogEntry());
 				if (updateParkStatus.getRfcrc() == 0) {
-					this.addOutput("Parking records updated successfully for ZDMRELNUM="+fctransaction.getTOMACHTYPE()+"UPG");
+					this.addOutput("Parking records updated successfully for ZDMRELNUM="+rfaNum);
 				} else {
 					this.addOutput(updateParkStatus.getRFCName() + " called faild!");
 					this.addOutput(updateParkStatus.getError_text());
