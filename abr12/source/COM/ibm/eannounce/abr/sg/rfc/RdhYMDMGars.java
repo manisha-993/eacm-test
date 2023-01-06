@@ -101,7 +101,7 @@ public class RdhYMDMGars extends RdhBase
         Statement statement = pdhConnection.createStatement();
         ResultSet resultSet = statement.executeQuery(GETCOUNTYNAME);
         while(resultSet.next()) {
-            countryName.put(resultSet.getString("GENAREANAME_FC"),resultSet.getString("GENAREACODE"));
+            countryName.put(resultSet.getString(1),resultSet.getString(2));
         }
         statement.close();
         resultSet.close();
@@ -112,7 +112,7 @@ public class RdhYMDMGars extends RdhBase
                 continue;
             }
             countrySet.add(countryFc);
-            products.setPartnum(chwProduct.getMACHTYPE() + "FEA");
+            products.setPartnum(chwProduct.getMACHTYPE() + "FEA" + " countryFc="+countryFc + "countryName= " + countryName);
             products.setLand1(countryName.get(countryFc));
             tbl_products.add(products);
         }
