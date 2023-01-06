@@ -2,13 +2,12 @@ package COM.ibm.eannounce.abr.sg.rfc;
 
 import COM.ibm.eannounce.abr.sg.rfc.entity.*;
 import COM.ibm.eannounce.abr.util.RFCConfig;
-import COM.ibm.eannounce.abr.util.RfcConfigProperties;
 import com.google.gson.annotations.SerializedName;
 
+import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
 
 public class RdhYMDMGars extends RdhBase
 {
@@ -29,7 +28,9 @@ public class RdhYMDMGars extends RdhBase
     SimpleDateFormat sdfPUBFROMDATE =   new SimpleDateFormat( "MMddyyyy" );
     @Foo
     String annnumber = null;
-    public RdhYMDMGars(MODEL chwProduct) {
+
+    private String GETCOUNTYNAME = "select GENAREANAME_FC,GENAREACODE from price.generalarea  where GENAREACODE in (select GENAREACODE from price.generalarea) WITH UR";
+    public RdhYMDMGars(MODEL chwProduct, Connection pdhConnection) throws SQLException {
         super(chwProduct.getMACHTYPE()+chwProduct.getMODEL()+"FEA", "RDH_YMDM_GARS".toLowerCase(), null);
         this.pims_identity = "H";
         List<CountryPlantTax> taxList = RFCConfig.getTaxs();
@@ -92,18 +93,28 @@ public class RdhYMDMGars extends RdhBase
                 tbl_gars_mat.add(mat);
             }
         }
-        List CountryList = new ArrayList();
-        for(CountryPlantTax tax : taxList) {
-            if ("19".equals(tax.getINTERFACE_ID())) {
-                RdhYMDMGars_PRODUCTS products = new RdhYMDMGars_PRODUCTS();
-                products.setPartnum(chwProduct.getMACHTYPE()+"FEA");
-                if(CountryList.contains(tax.getTAX_COUNTRY())){
-                    continue;
-                }
-                products.setLand1(tax.getTAX_COUNTRY());
-                CountryList.add(tax.getTAX_COUNTRY());
-                tbl_products.add(products);
+        //1.1
+        //Dec 5, 2022
+        //Go through MODEL xml to get all of available countries into tbl_products structure.
+        Set<String> countrySet = new HashSet<>();
+        Hashtable<String,String> countryName = new Hashtable<>();
+        Statement statement = pdhConnection.createStatement();
+        ResultSet resultSet = statement.executeQuery(GETCOUNTYNAME);
+        while(resultSet.next()) {
+            countryName.put(resultSet.getString("GENAREANAME_FC"),resultSet.getString("GENAREACODE"));
+        }
+        statement.close();
+        resultSet.close();
+        for (AVAILABILITY availabilityElement : chwProduct.getAVAILABILITYLIST()) {
+            RdhYMDMGars_PRODUCTS products = new RdhYMDMGars_PRODUCTS();
+            String countryFc = availabilityElement.getCOUNTRY_FC();
+            if (countrySet.contains(countryFc)) {
+                continue;
             }
+            countrySet.add(countryFc);
+            products.setPartnum(chwProduct.getMACHTYPE() + "FEA");
+            products.setLand1(countryName.get(countryFc));
+            tbl_products.add(products);
         }
 
     }
