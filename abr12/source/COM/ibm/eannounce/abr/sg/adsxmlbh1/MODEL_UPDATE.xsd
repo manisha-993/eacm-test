@@ -50,6 +50,9 @@
 
 			<xsd:element name="ANNDATE" type="xsd:string" />
 			<xsd:element name="ANNNUMBER" type="xsd:string"></xsd:element>
+			<xsd:element name="CDOCANNNUMBER" type="xsd:string"></xsd:element>
+			<xsd:element name="EDOCANNNUMBER" type="xsd:string"></xsd:element>
+			<xsd:element name="ADOCANNNUMBER" type="xsd:string"></xsd:element>
 			<xsd:element name="FIRSTORDER" type="xsd:string"></xsd:element>
 			<xsd:element name="PLANNEDAVAILABILITY" type="xsd:string"></xsd:element>
 			<xsd:element name="PUBFROM" type="xsd:string" />
