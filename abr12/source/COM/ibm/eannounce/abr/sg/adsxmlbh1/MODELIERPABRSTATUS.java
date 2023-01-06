@@ -1,10 +1,5 @@
 package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -61,7 +56,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 	private String navName = "";
 	private Hashtable metaTbl = new Hashtable();
 	private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
-	
+
 	private String COVNOTEQUALSQL = "SELECT count(*) FROM OPICM.flag F\n"
 			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
 			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE = ? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
@@ -69,7 +64,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP "
 			+ " WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS') "
 			+ " AND T1.ATTRIBUTEVALUE !=T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION= ? WITH UR";
-	
+
 	private String COVEQUALSQL = "SELECT count(*) FROM OPICM.flag F\n"
 			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT TIMESTAMP AND T1.EFFTO > CURRENT TIMESTAMP "
 			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE = ? and T2.VALTO > CURRENT TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
@@ -85,7 +80,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP "
 			+ " WHERE f.ENTITYTYPE ='FCTRANSACTION' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'FCTRANSACTIONIERPABRSTATUS') "
 			+ " AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION= ? WITH UR";
-	
+
 	String xml = null;
 
 	public static void main(String[] args) {
@@ -138,9 +133,9 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 
 			// get the root entity using current timestamp, need this to get the
 			// timestamps or info for VE pulls
-			  m_elist = m_db.getEntityList(m_prof,
-                    new ExtractActionItem(null, m_db, m_prof,"dummy"),
-                    new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
+			m_elist = m_db.getEntityList(m_prof,
+					new ExtractActionItem(null, m_db, m_prof,"dummy"),
+					new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
 			/*
 			 * m_db.getEntityList(m_prof, new ExtractActionItem(null, m_db,
 			 * m_prof,"dummy"), new EntityItem[] { new EntityItem(null, m_prof,
@@ -160,29 +155,29 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			PreparedStatement statement = connection.prepareStatement(CACEHSQL);
 			statement.setInt(1, rootEntity.getEntityID());
 			ResultSet resultSet = statement.executeQuery();
-		
+
 			while (resultSet.next()) {
 				xml = resultSet.getString("XMLMESSAGE");
 			}
 			if (xml != null) {
-			
+
 				MODEL model = XMLParse.getObjectFromXml(xml,MODEL.class);
 				String rfanum="";
 				if("Hardware".equals(model.getCATEGORY())) {
 					processMachTypeNew(model, connection);
 					processMachTypeMODEL(model, connection);
-					
-					
+
+
 					/**
 					 *  step c
-			            If there is a MODELCONVERT which meets all of conditions below,
-			                tomachtype = chwProduct.machineType
-			                frommachtype !=tomachtype
-			                pdhdomain = chwProduct.pdhdomain -- new add 
-			                past passed ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
-			            then execute the steps described in the document MachTypeMTC RDH Feed to iERP to populate data elements for MachineTypeMTC material.
+					 If there is a MODELCONVERT which meets all of conditions below,
+					 tomachtype = chwProduct.machineType
+					 frommachtype !=tomachtype
+					 pdhdomain = chwProduct.pdhdomain -- new add
+					 past passed ADSABRSTATUS or MODELCONVERTIERPABRSTATUS
+					 then execute the steps described in the document MachTypeMTC RDH Feed to iERP to populate data elements for MachineTypeMTC material.
 					 */
-			
+
 					if(exist(COVNOTEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())) {
 						ChwMachTypeMtc chwMachTypeMtc =new ChwMachTypeMtc(model, m_db.getPDHConnection(), connection);
 						this.addDebug("Calling " + "ChwMachTypeMtc");
@@ -198,9 +193,9 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 						runParkCaller(updateParkStatus, model.getMACHTYPE() + model.getMODEL() + "MTC");
 					}
 					//step d
-					
+
 					if(!CommonUtils.contains("Maintenance,MaintFeature",model.getSUBCATEGORY())) {
-						
+
 						if(exist(COVEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())||exist(FCTEQUALSQL, model.getMACHTYPE(),model.getPDHDOMAIN())) {
 							ChwMachTypeUpg chwMachTypeUpg = new ChwMachTypeUpg(model, m_db.getPDHConnection(), connection);
 							this.addDebug("Calling " + "ChwMachTypeUpg");
@@ -214,47 +209,55 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 							// Call UpdateParkStatus
 							UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+model.getMODEL()+"UPG");
 							runParkCaller(updateParkStatus, model.getMACHTYPE()+model.getMODEL()+"UPG");
-							
+
 						}else if(model.getORDERCODE()!=null&&model.getORDERCODE().trim().length()>0&&CommonUtils.contains("M,B",model.getORDERCODE())) {
 							this.addDebug("Calling " + "processMachTypeUpg");
-							processMachTypeUpg(model, connection);	
+							processMachTypeUpg(model, connection);
 						}
 					}
-					
+
 					// step e
 					Set<String> plnts = RFCConfig.getBHPlnts();
 					this.addOutput("Start Bom Processing!");
 					updateSalesBom(model, "NEW", plnts);
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+"NEW");
+					runParkCaller(updateParkStatus,model.getMACHTYPE()+"NEW");
 					if("M".equals(model.getORDERCODE())||"B".equals(model.getORDERCODE())) {
 						updateSalesBom(model, "UPG", plnts);
+						updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+"UPG");
+						runParkCaller(updateParkStatus,model.getMACHTYPE()+"UPG");
 					}
 					this.addOutput("Bom Processing Finished!");
 					rfanum = model.getMACHTYPE()+model.getMODEL();
 					RdhChwFcProd prod = new RdhChwFcProd(model,rfanum);
 					runRfcCaller(prod);
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", "M"+rfanum);
-					runParkCaller(updateParkStatus,"M"+rfanum);	
+
+					updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", "M"+rfanum);
+					runParkCaller(updateParkStatus,"M"+rfanum);
+
 				}
 				else if("Service".equals(model.getCATEGORY())) {
 					processMachTypeMODEL_Svc(model, connection);
 					rfanum = model.getMACHTYPE()+model.getMODEL();
 					RdhChwFcProd prod = new RdhChwFcProd(model,rfanum);
 					runRfcCaller(prod);
+
 					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP","M"+ rfanum);
-					runParkCaller(updateParkStatus,"M"+rfanum);	
-				
+					runParkCaller(updateParkStatus,"M"+rfanum);
+
+
 				}
 				else if ("Software".equals(model.getCATEGORY())) {
 					this.addError("It is not supported to feed software Model to iERP");
 					//throw new Exception("Not support SoftWare");
 				}
-				
-			}	
-			
+
+			}
+
 			// exeFtpShell(ffPathName);
 			// ftpFile();
 			/*
-			 * } catch (Exception e) { 
+			 * } catch (Exception e) {
 			 * e.printStackTrace(); this.addError(e.getMessage()); setReturnCode(FAIL); }
 			 */
 		} catch (Exception e) {
@@ -277,7 +280,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			logError(exBuf.getBuffer().toString());
 			// was an error make sure user gets report
 			setCreateDGEntity(true);
-			
+
 			// sentFile=exeFtpShell(ffPathName);
 		} finally {
 			StringBuffer sb = new StringBuffer();
@@ -294,18 +297,18 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			println(EACustom.getDocTypeHtml()); // Output the doctype and html
 			println(rptSb.toString()); // Output the Report
 			printDGSubmitString();
-			 if(!isReadOnly()) {
-	                clearSoftLock();
-	            }
+			if(!isReadOnly()) {
+				clearSoftLock();
+			}
 			println(EACustom.getTOUDiv());
 			buildReportFooter(); // Print </html>
 		}
 	}
 
-		
+
 	public void updateSalesBom(MODEL model, String flag, Set<String> plnts) throws Exception {
 		for(String plant : plnts) {
-			//call ChwBomCreate 
+			//call ChwBomCreate
 			ChwBomCreate chwBomCreate = new ChwBomCreate(model.getMACHTYPE()+flag, plant);
 			this.addDebug("Calling " + "ChwBomCreate");
 			this.addDebug(chwBomCreate.generateJson());
@@ -316,83 +319,59 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 				this.addOutput(e.getMessage());
 				continue;
 			}
-			// start lock
-			String fileName = "./locks/MODEL" + model.getMACHTYPE() + flag + plant + ".lock";
-			File file = new File(fileName);
-			new File(file.getParent()).mkdirs();
-			try (FileOutputStream fos = new FileOutputStream(file); FileChannel fileChannel = fos.getChannel()) {
-				while (true) {
-					try {
-						FileLock fileLock = fileChannel.tryLock();
-						if (fileLock != null) {
-							this.addDebug("Start lock, lock file " + fileName);
-							// lock content
-							//call ChwReadSalesBom
-							ChwReadSalesBom chwReadSalesBom = new ChwReadSalesBom(model.getMACHTYPE() + flag, plant);
-							this.addDebug("Calling " + "ChwReadSalesBom");
-							this.addDebug(chwReadSalesBom.generateJson());
-							try {
-								chwReadSalesBom.execute();
-								this.addDebug(chwReadSalesBom.createLogEntry());
-							} catch (Exception e) {
-								if (e.getMessage().contains("exists in Mast table but not defined to Stpo table")) {
+			//call ChwReadSalesBom
+			ChwReadSalesBom chwReadSalesBom = new ChwReadSalesBom(model.getMACHTYPE()+flag, plant);
+			this.addDebug("Calling " + "ChwReadSalesBom");
+			this.addDebug(chwReadSalesBom.generateJson());
+			try{
+				chwReadSalesBom.execute();
+				this.addDebug(chwReadSalesBom.createLogEntry());
+			}catch(Exception e) {
+				if(e.getMessage().contains("exists in Mast table but not defined to Stpo table")){
 
-								} else {
-									this.addOutput(e.getMessage());
-									break;
-								}
-							}
-							this.addDebug("Bom Read result:" + chwReadSalesBom.getRETURN_MULTIPLE_OBJ().toString());
-							List<HashMap<String, String>> componmentList = chwReadSalesBom.getRETURN_MULTIPLE_OBJ().get("stpo_api02");
-							String componment = model.getMACHTYPE() + model.getMODEL();
-							if (componmentList != null && componmentList.size() > 0) {
-								if (hasMatchComponent(componmentList, componment)) {
-									this.addDebug("updateSalesBom exist component " + componment);
-								} else {
-									String POSNR = getMaxItemNo(componmentList);
-									POSNR = generateItemNumberString(POSNR);
-									//call ChwBomMaintain
-									ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE() + flag, plant, model.getMACHTYPE() + model.getMODEL(), POSNR, "SC_" + model.getMACHTYPE() + "_MOD_" + model.getMODEL());
-									this.addDebug("Calling " + "chwBomMaintain");
-									this.addDebug(chwBomMaintain.generateJson());
-									try {
-										chwBomMaintain.execute();
-										this.addDebug(chwBomMaintain.createLogEntry());
-									} catch (Exception e) {
-										this.addOutput(e.getMessage());
-										break;
-									}
-								}
-							} else {
-								//call ChwBomMaintain
-								ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE() + flag, plant, model.getMACHTYPE() + model.getMODEL(), "0005", "SC_" + model.getMACHTYPE() + "_MOD_" + model.getMODEL());
-								this.addDebug("Calling " + "chwBomMaintain");
-								this.addDebug(chwBomMaintain.generateJson());
-								try {
-									chwBomMaintain.execute();
-									this.addDebug(chwBomMaintain.createLogEntry());
-								} catch (Exception e) {
-									this.addOutput(e.getMessage());
-									break;
-								}
-							}
-							// end lock content
-							break;
-						} else {
-							this.addDebug("fileLock == null");
-							Thread.sleep(5000);
-						}
-					} catch (OverlappingFileLockException e1) {
-						this.addDebug("other abr is running createSalesBOMforType" + flag);
-						Thread.sleep(5000);
-					}
+				} else{
+					this.addOutput(e.getMessage());
+					continue;
 				}
 			}
-			// end lock
+			this.addDebug("Bom Read result:"+chwReadSalesBom.getRETURN_MULTIPLE_OBJ().toString());
+			List<HashMap<String, String>> componmentList = chwReadSalesBom.getRETURN_MULTIPLE_OBJ().get("stpo_api02");
+			String componment = model.getMACHTYPE() + model.getMODEL();
+			if (componmentList != null && componmentList.size() > 0) {
+				if (hasMatchComponent(componmentList, componment)) {
+					this.addDebug("updateSalesBom exist component " + componment);
+				}else {
+					String POSNR = getMaxItemNo(componmentList);
+					POSNR=generateItemNumberString(POSNR);
+					//call ChwBomMaintain
+					ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag, plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+					this.addDebug("Calling " + "chwBomMaintain");
+					this.addDebug(chwBomMaintain.generateJson());
+					try {
+						chwBomMaintain.execute();
+						this.addDebug(chwBomMaintain.createLogEntry());
+					}catch(Exception e) {
+						this.addOutput(e.getMessage());
+						continue;
+					}
+				}
+			}else {
+				//call ChwBomMaintain
+				ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag, plant, model.getMACHTYPE()+model.getMODEL(),"0005","SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+				this.addDebug("Calling " + "chwBomMaintain");
+				this.addDebug(chwBomMaintain.generateJson());
+				try {
+					chwBomMaintain.execute();
+					this.addDebug(chwBomMaintain.createLogEntry());
+				}catch(Exception e) {
+					this.addOutput(e.getMessage());
+					continue;
+				}
+			}
 		}
-		
+
 	}
-	
+
 	private String getMaxItemNo(List<HashMap<String, String>> componmentList) {
 		List<Integer> itemNo = new ArrayList<Integer>();
 		for (int i = 0; i < componmentList.size(); i++) {
@@ -411,8 +390,8 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 	private boolean hasMatchComponent(List<HashMap<String, String>> bom, String componment){
 		for (int i = 0; i < bom.size(); i++) {
 			String rev = bom.get(i).get("COMPONENT");
-			if (rev.trim().equals(componment)){				
-			  return true;
+			if (rev.trim().equals(componment)){
+				return true;
 			}
 		}
 		return false;
@@ -430,7 +409,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 	 * Get Name based on navigation attributes for specified entity
 	 *
 	 * @return java.lang.String
-	 */ 
+	 */
 	private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException {
 		StringBuffer navName = new StringBuffer();
 		// NAME is navigate attributes
@@ -439,7 +418,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		if (metaList == null) {
 			EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
 			metaList = eg.getMetaAttribute(); // iterator does not maintain
-												// navigate order
+			// navigate order
 			metaTbl.put(theItem.getEntityType(), metaList);
 		}
 		for (int ii = 0; ii < metaList.size(); ii++) {
@@ -621,124 +600,124 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		// MM_PROFIT_CENTER
 		return value;
 	}
-	
-	 /********************************************************************************
-     * Convert string into valid html.  Special HTML characters are converted.
-     *
-     * @param txt    String to convert
-     * @return String
-     */
-    protected static String convertToHTML(String txt)
-    {
-        String retVal="";
-        StringBuffer htmlSB = new StringBuffer();
-        StringCharacterIterator sci = null;
-        char ch = ' ';
-        if (txt != null) {
-            sci = new StringCharacterIterator(txt);
-            ch = sci.first();
-            while(ch != CharacterIterator.DONE)
-            {
-                switch(ch)
-                {
-                case '<':
-                    htmlSB.append("&lt;");
-                break;
-                case '>':
-                    htmlSB.append("&gt;");
-                    break;
-                case '"':
-                    // double quotation marks could be saved as &quot; also. this will be &#34;
-                    // this should be included too, but left out to be consistent with west coast
-                    htmlSB.append("&quot;");
-                    break;
-                case '\'':
-                    //IE6 doesn't support &apos; to convert single quotation marks,we can use &#39; instead
-                    htmlSB.append("&#"+((int)ch)+";");
-                    break;
-                    //case '&': 
-                    // ignore entity references such as &lt; if user typed it, user will see it
-                    // could be saved as &amp; also. this will be &#38;
-                    //htmlSB.append("&#"+((int)ch)+";");
-                    //  htmlSB.append("&amp;");
-                    //    break;
-                default:
-                    htmlSB.append(ch);
-                break;
-                }
-                ch = sci.next();
-            }
-            retVal = htmlSB.toString();
-        }
 
-        return retVal;
-    }
-    
-    /********************************************************************************
-     * Convert string into valid html.  Special HTML characters are converted.
-     *
-     * @param txt    String to convert
-     * @return String
-     */
-    protected static String convertToTag(String txt)
-    {
-        String retVal="";
-        StringBuffer htmlSB = new StringBuffer();
-        StringCharacterIterator sci = null;
-        char ch = ' ';
-        if (txt != null) {
-            sci = new StringCharacterIterator(txt);
-            ch = sci.first();
-            while(ch != CharacterIterator.DONE)
-            {
-                switch(ch)
-                {
-                case '<':
-                    htmlSB.append("&lt;");
-                break;
-                case '>':
-                    htmlSB.append("&gt;");
-                    break;
-                default:
-                    htmlSB.append(ch);
-                break;
-                }
-                ch = sci.next();
-            }
-            retVal = htmlSB.toString();
-        }
+	/********************************************************************************
+	 * Convert string into valid html.  Special HTML characters are converted.
+	 *
+	 * @param txt    String to convert
+	 * @return String
+	 */
+	protected static String convertToHTML(String txt)
+	{
+		String retVal="";
+		StringBuffer htmlSB = new StringBuffer();
+		StringCharacterIterator sci = null;
+		char ch = ' ';
+		if (txt != null) {
+			sci = new StringCharacterIterator(txt);
+			ch = sci.first();
+			while(ch != CharacterIterator.DONE)
+			{
+				switch(ch)
+				{
+					case '<':
+						htmlSB.append("&lt;");
+						break;
+					case '>':
+						htmlSB.append("&gt;");
+						break;
+					case '"':
+						// double quotation marks could be saved as &quot; also. this will be &#34;
+						// this should be included too, but left out to be consistent with west coast
+						htmlSB.append("&quot;");
+						break;
+					case '\'':
+						//IE6 doesn't support &apos; to convert single quotation marks,we can use &#39; instead
+						htmlSB.append("&#"+((int)ch)+";");
+						break;
+					//case '&':
+					// ignore entity references such as &lt; if user typed it, user will see it
+					// could be saved as &amp; also. this will be &#38;
+					//htmlSB.append("&#"+((int)ch)+";");
+					//  htmlSB.append("&amp;");
+					//    break;
+					default:
+						htmlSB.append(ch);
+						break;
+				}
+				ch = sci.next();
+			}
+			retVal = htmlSB.toString();
+		}
 
-        return retVal;
-    }
-    
-	 protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
-	 
-	 protected void addMsg(StringBuffer msg) { rptSb.append(msg.toString()+NEWLINE);}
+		return retVal;
+	}
+
+	/********************************************************************************
+	 * Convert string into valid html.  Special HTML characters are converted.
+	 *
+	 * @param txt    String to convert
+	 * @return String
+	 */
+	protected static String convertToTag(String txt)
+	{
+		String retVal="";
+		StringBuffer htmlSB = new StringBuffer();
+		StringCharacterIterator sci = null;
+		char ch = ' ';
+		if (txt != null) {
+			sci = new StringCharacterIterator(txt);
+			ch = sci.first();
+			while(ch != CharacterIterator.DONE)
+			{
+				switch(ch)
+				{
+					case '<':
+						htmlSB.append("&lt;");
+						break;
+					case '>':
+						htmlSB.append("&gt;");
+						break;
+					default:
+						htmlSB.append(ch);
+						break;
+				}
+				ch = sci.next();
+			}
+			retVal = htmlSB.toString();
+		}
+
+		return retVal;
+	}
+
+	protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
+
+	protected void addMsg(StringBuffer msg) { rptSb.append(msg.toString()+NEWLINE);}
 
 
-		/**********************************
-	     * add debug info as html comment
-	     *    EBUG_ERR = 0;
-	          EBUG_WARN = 1;
-	          EBUG_INFO = 2;
-	          EBUG_DETAIL = 3;
-	          EBUG_SPEW = 4
-	     */
-	   
+	/**********************************
+	 * add debug info as html comment
+	 *    EBUG_ERR = 0;
+	 EBUG_WARN = 1;
+	 EBUG_INFO = 2;
+	 EBUG_DETAIL = 3;
+	 EBUG_SPEW = 4
+	 */
+
 	protected void addDebug(String msg) {
 		if (D.EBUG_DETAIL <= abr_debuglvl) {
-		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
+			rptSb.append("<!-- " + msg + " -->" + NEWLINE);
 		}
 	}
-	 /**********************************
-     * add error info and fail abr
-     */
-    protected void addError(String msg) {
-        addOutput(msg);
-        setReturnCode(FAIL);
-    }
-    
-    protected void runRfcCaller(RdhBase caller) throws Exception {
+	/**********************************
+	 * add error info and fail abr
+	 */
+	protected void addError(String msg) {
+		addOutput(msg);
+		setReturnCode(FAIL);
+	}
+
+	protected void runRfcCaller(RdhBase caller) throws Exception {
 		this.addDebug("Calling " + caller.getRFCName());
 		caller.execute();
 		this.addDebug(caller.createLogEntry());
@@ -750,9 +729,14 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		}
 	}
 
-    protected void runParkCaller(RdhBase caller, String zdmnum) throws Exception {
+	protected void runParkCaller(RdhBase caller, String zdmnum) throws Exception {
 		this.addDebug("Calling " + caller.getRFCName());
-		caller.execute();
+		try {
+			caller.execute();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 		this.addDebug(caller.createLogEntry());
 		if (caller.getRfcrc() == 0) {
 			this.addOutput("Parking records updated successfully for ZDMRELNUM="+zdmnum);
@@ -761,15 +745,15 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(caller.getError_text());
 		}
 	}
-    
-    public void processMachTypeMODEL (MODEL model,Connection odsConnection) throws Exception {
-    	String materialType="ZPRT";
-    	String  materialID =model.getMACHTYPE()+model.getMODEL();
-    	
-    	ChwMatmCreate caller = new ChwMatmCreate(model, materialType, materialID, materialID);
-    	runRfcCaller(caller);
+
+	public void processMachTypeMODEL (MODEL model,Connection odsConnection) throws Exception {
+		String materialType="ZPRT";
+		String  materialID =model.getMACHTYPE()+model.getMODEL();
+
+		ChwMatmCreate caller = new ChwMatmCreate(model, materialType, materialID, materialID);
+		runRfcCaller(caller);
 		//Chw001ClfCreate 
-		
+
 		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID,materialID, odsConnection);
 		this.addDebug("Calling " + "Chw001ClfCreate");
 		try{
@@ -779,7 +763,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addMsg(chw001ClfCreate.getRptSb());
 			throw e;
 		}
-		 
+
 		//step 3 Create the SC_machinetype_MOD_model object dependency:
 //		String obj_id=model.getMACHTYPE()+model.getMODEL();
 //		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
@@ -789,32 +773,32 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 //		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id, dep_extern, dep_type, descript)	;
 //		chwDepdCaller.addSourceLineCondition(sourceLine);
 //		runRfcCaller(chwDepdCaller);
-		
+
 		//step 4 Create the SC_machinetype_MOD_model object dependency:
 		String obj_id=model.getMACHTYPE()+model.getMODEL();
 		String dep_extern = "SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
-		String dep_type="5"; 
+		String dep_type="5";
 		String descript="SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL();
 		String sourceLine = "$PARENT.MK_T_"+model.getMACHTYPE()+"_MOD='"+model.getMODEL()+"'";
 		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(obj_id, dep_extern, dep_type, descript)	;
 		chwDepdCaller.addSourceLineCondition(sourceLine);
 		runRfcCaller(chwDepdCaller);
 		//ChwDepdMaintain 
-		
+
 		//5 Call UpdateParkStatus
 		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE() + model.getMODEL());
 		runParkCaller(updateParkStatus, model.getMACHTYPE() + model.getMODEL());
-    	
-    }
-    public void processMachTypeNew(MODEL model,Connection odsConnection) throws Exception {
-    	//step 1 Call ChwMatmCreate to create the material master for the product object
-    	String materialType="ZMAT";
-    	String materialID =model.getMACHTYPE()+"NEW";
+
+	}
+	public void processMachTypeNew(MODEL model,Connection odsConnection) throws Exception {
+		//step 1 Call ChwMatmCreate to create the material master for the product object
+		String materialType="ZMAT";
+		String materialID =model.getMACHTYPE()+"NEW";
 		String rfaNum = model.getMACHTYPE()+model.getMODEL()+"NEW";
-    	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID, rfaNum);
-    	runRfcCaller(chwCreateCaller);
-		
-    	//step2 Call Chw001ClfCreate to create the standard 001 classifications and characteristics which are tied to the offering's material master record.
+		ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID, rfaNum);
+		runRfcCaller(chwCreateCaller);
+
+		//step2 Call Chw001ClfCreate to create the standard 001 classifications and characteristics which are tied to the offering's material master record.
 		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID, rfaNum,odsConnection);
 		this.addDebug("Calling " + "Chw001ClfCreate");
 		try{
@@ -824,36 +808,36 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addMsg(chw001ClfCreate.getRptSb());
 			throw e;
 		}
-		
+
 		//step3 Call the TssClassificationMaint to associate the MK_REFERENCE class to the product's material master record
-    	String obj_id = materialID;
+		String obj_id = materialID;
 		String class_name="MK_REFERENCE";
 		String class_type="300";
 		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
-		
+
 		//step4 Call the TssClassificationMaint to associate the MK_T_VAO_NEW class to the product's material master record. 
 		class_name = "MK_T_VAO_NEW";
 		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
-		
+
 		//step 5 Create the MK_machineType_MOD class and MK_T_machineType_MOD characteristic
 		String empty ="";
-		ChwCharMaintain chwCharMaintain = 
-		new ChwCharMaintain(rfaNum  //String obj_id Set to concatenation of chwProduct.machineType + "MTC"
-							,"MK_T_"+model.getMACHTYPE()+"_MOD" //String charact  Set to  "MK_T_<machine_type>_MOD"
-							, "CHAR" 			//String datatype
-							, 6 				//int charnumber
-							, empty				//String decplaces
-							, empty				//String casesens
-							, empty				//String neg_vals
-							, empty				//String group
-							, "S"				//String valassignm  Set to "-".
-							, empty				//String no_entry
-							, empty				//String no_display
-							, "X" 				//String addit_vals Set to "X".
-							, model.getMACHTYPE() +" Model Characteristic" //String chdescr  Set to "<machine_type> Model Characteristic" where <machine_type> is chwProduct.machineType
-							);
+		ChwCharMaintain chwCharMaintain =
+				new ChwCharMaintain(rfaNum  //String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+						,"MK_T_"+model.getMACHTYPE()+"_MOD" //String charact  Set to  "MK_T_<machine_type>_MOD"
+						, "CHAR" 			//String datatype
+						, 6 				//int charnumber
+						, empty				//String decplaces
+						, empty				//String casesens
+						, empty				//String neg_vals
+						, empty				//String group
+						, "S"				//String valassignm  Set to "-".
+						, empty				//String no_entry
+						, empty				//String no_display
+						, "X" 				//String addit_vals Set to "X".
+						, model.getMACHTYPE() +" Model Characteristic" //String chdescr  Set to "<machine_type> Model Characteristic" where <machine_type> is chwProduct.machineType
+				);
 		//5.b Call the ChwCharMaintain.addValue() method Set to SUBSTRING(chwProduct/INVNAME FROM 1 FOR 25)||' '||chwProduct/MODEL;
 		String invname = "";
 		List<LANGUAGE> languagesList = model.getLANGUAGELIST();
@@ -867,20 +851,20 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		String valdescr = CommonUtils.getFirstSubString(invname,25) + " " + model.getMODEL();
 		chwCharMaintain.addValue(model.getMODEL(), valdescr);
 		runRfcCaller(chwCharMaintain);
-		
+
 		//5.c Call the ChwClassMaintain constructor to create the MK_machineType_MOD class.
-		ChwClassMaintain ChwClassMaintain = 
+		ChwClassMaintain ChwClassMaintain =
 				new ChwClassMaintain(
 						rfaNum 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
 						, "MK_"+model.getMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
 						, "MK_"+model.getMACHTYPE()+"_MOD"  //String class_type   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
-						);
+				);
 		//5.d Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class
-		ChwClassMaintain.addCharacteristic("MK_T_"+model.getMACHTYPE()+"_MOD"); 
+		ChwClassMaintain.addCharacteristic("MK_T_"+model.getMACHTYPE()+"_MOD");
 		runRfcCaller(ChwClassMaintain);
-		
+
 		//5.e Call the TssClassificationMaint constructor to associate the MK_machineType_MOD class to the product's material master record. 
-		RdhClassificationMaint TssClassificationMaint = 
+		RdhClassificationMaint TssClassificationMaint =
 				new RdhClassificationMaint(
 						obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
 						, "MK_"+model.getMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
@@ -892,15 +876,15 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		//6 a Call the ChwDepdMaintain constructor to create the PR_machinetype_SET_MODEL dependency.
 		String obj_id_depd=model.getMACHTYPE()+"NEW";
 		String dep_extern="PR_"+model.getMACHTYPE()+"_SET_MODEL";
-		String dep_type="7"; 
+		String dep_type="7";
 		String descript=model.getMACHTYPE()+" Set Model";
 		String sourceLine = "$self.mk_model2 = $self.mk_t_"+model.getMACHTYPE()+"_mod";
 		ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(rfaNum, dep_extern, dep_type, descript)	;
 		chwDepdCaller.addSourceLineCondition(sourceLine);
 		runRfcCaller(chwDepdCaller);
-		
+
 		//step7 Call the ChwConpMaintain to create a configuration profile for the product's material master record
-		ChwConpMaintain ChwConpMaintain  = 
+		ChwConpMaintain ChwConpMaintain  =
 				new ChwConpMaintain(
 						obj_id 				//String obj_id  Set to concatenation of chwProduct.machineType + "MTC"
 						, "INITIAL"         //String c_profile Set to "INITIAL".
@@ -908,7 +892,7 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 						, "2"				//String bomexpl Set to "2".
 						, model.getMACHTYPE() +	"NEWUI"		//String design	 Set to Set to concatenation of chwProduct.machineType + "NEWUI" 
 						, rfaNum);
-		
+
 		//7.b Call the ChwConpMaintain.addConfigDependency() method.
 		ChwConpMaintain.addConfigDependency("E2E", empty); //Set to "E2E".
 		//7.c 
@@ -920,20 +904,20 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		//7.f 
 		ChwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", empty);  //Set to "PR_E2E_PRICING_HW"		
 		runRfcCaller(ChwConpMaintain);
-		
+
 		//8 Call UpdateParkStatus
 		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP",  rfaNum);
 		runParkCaller(updateParkStatus, rfaNum);
-		
-    }
-    
-    public void processMachTypeUpg(MODEL model,Connection odsConnection) throws Exception {
-    	String materialType="ZMAT";
-    	String materialID =model.getMACHTYPE()+"UPG";
+
+	}
+
+	public void processMachTypeUpg(MODEL model,Connection odsConnection) throws Exception {
+		String materialType="ZMAT";
+		String materialID =model.getMACHTYPE()+"UPG";
 		String rfaNum = model.getMACHTYPE()+model.getMODEL()+"UPG";
-    	ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID, rfaNum);
-    	runRfcCaller(chwCreateCaller);
-    	
+		ChwMatmCreate chwCreateCaller = new ChwMatmCreate(model, materialType, materialID, rfaNum);
+		runRfcCaller(chwCreateCaller);
+
 		Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(model, materialType,materialID,rfaNum, odsConnection);
 		this.addDebug("Calling " + "Chw001ClfCreate");
 		try{
@@ -943,33 +927,33 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addMsg(chw001ClfCreate.getRptSb());
 			throw e;
 		}
-    	String obj_id = materialID;
+		String obj_id = materialID;
 		String class_name="MK_REFERENCE";
 		String class_type="300";
 		RdhClassificationMaint cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
-		
+
 		class_name = "MK_T_VAO_NEW";
 		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
-		
+
 		class_name = "MK_D_VAO_NEW";
 		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
-		
+
 		class_name = "MK_FC_EXCH";
 		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
-		
+
 		class_name = "MK_FC_CONV";
 		cMaintCaller = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(cMaintCaller);
-		
+
 		//Set to  "MK_T_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
 		String charact = "MK_T_"+model.getMACHTYPE()+"_MOD";
 		String datatype="CHAR";
 		int charnumber=6;
-		String decplaces=""; 
+		String decplaces="";
 		String casesens="";
 		String neg_vals="";
 		String group="";
@@ -987,23 +971,23 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 				invname= languages.get(i).getINVNAME();
 			}
 		}
-		
+
 		valdescr =  invname==null? "":invname.substring(0, Math.min(invname.length(),24))+" "+model.getMODEL();
 		charMaintain.addValue(model.getMODEL(),valdescr);
 		runRfcCaller(charMaintain);
-		
+
 		class_name = "MK_"+model.getMACHTYPE()+"_MOD";
 		class_type = class_name;
 		ChwClassMaintain chwClassMaintain = new ChwClassMaintain(rfaNum, class_name, class_type);
 		chwClassMaintain.addCharacteristic("MK_T_"+model.getMACHTYPE()+"_MOD");
 		runRfcCaller(chwClassMaintain);
-		
+
 		class_type="300";
 		RdhClassificationMaint classificationMaint = new RdhClassificationMaint(obj_id, class_name, class_type,"H", rfaNum);
 		runRfcCaller(classificationMaint);
 
 
-		String c_profile = "INITIAL"; 
+		String c_profile = "INITIAL";
 		String bomappl="SD01";
 		String bomexpl="2";
 		String design=model.getMACHTYPE()+"UPGUI";
@@ -1014,18 +998,18 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 		chwConpMaintain.addConfigDependency("PR_E2E_PRICING_HW", "");
 		chwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", "");
 		runRfcCaller(chwConpMaintain);
-		
+
 		// Call UpdateParkStatus
 		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfaNum);
 		runParkCaller(updateParkStatus, rfaNum);
-		
-    }
-    public void processMachTypeMODEL_Svc(MODEL model,Connection odsConnection) throws Exception {
-    	String materialType = "ZPRT";
-    	String materialID = model.getMACHTYPE()+model.getMODEL();
 
-    	RdhSvcMatmCreate svcMatmCreate = new RdhSvcMatmCreate(model);
-    	runRfcCaller(svcMatmCreate);
+	}
+	public void processMachTypeMODEL_Svc(MODEL model,Connection odsConnection) throws Exception {
+		String materialType = "ZPRT";
+		String materialID = model.getMACHTYPE()+model.getMODEL();
+
+		RdhSvcMatmCreate svcMatmCreate = new RdhSvcMatmCreate(model);
+		runRfcCaller(svcMatmCreate);
 		/*
 		 * Chw001ClfCreate chw001ClfCreate = new Chw001ClfCreate(xml, materialType,
 		 * materialID, materialID); chw001ClfCreate.execute();
@@ -1039,26 +1023,26 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			this.addMsg(chw001ClfCreate.getRptSb());
 			throw e;
 		}
-		
+
 		// Call UpdateParkStatus	
 		UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP",model.getMACHTYPE() + model.getMODEL());
-		runParkCaller(updateParkStatus, model.getMACHTYPE() + model.getMODEL()); 	
-    	
-    }
-    
-    public boolean exist(String sql,String type,String pdhdomain) {
-    	boolean flag = false;
-    	try {
+		runParkCaller(updateParkStatus, model.getMACHTYPE() + model.getMODEL());
+
+	}
+
+	public boolean exist(String sql,String type,String pdhdomain) {
+		boolean flag = false;
+		try {
 			Connection connection = m_db.getPDHConnection();
-			Object[] params = new String[2]; 
+			Object[] params = new String[2];
 			params[0] =type;
-			params[1] =pdhdomain;			
+			params[1] =pdhdomain;
 			String realSql = CommonUtils.getPreparedSQL(sql, params);
 			this.addDebug("querySql=" + realSql);
 			PreparedStatement statement = connection.prepareStatement(sql);
 			statement.setString(1, type);
 			statement.setString(2, pdhdomain);
-			
+
 			ResultSet resultSet = statement.executeQuery();
 			if(resultSet.next()) {
 				int count = resultSet.getInt(1);
@@ -1068,9 +1052,9 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 			e.printStackTrace();
 		} catch (MiddlewareException e) {
 			e.printStackTrace();
-		}    	
-    	return flag;
-    	
-    }
-	
+		}
+		return flag;
+
+	}
+
 }
