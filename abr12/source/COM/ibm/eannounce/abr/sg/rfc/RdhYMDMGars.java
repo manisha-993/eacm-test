@@ -99,9 +99,10 @@ public class RdhYMDMGars extends RdhBase
         //1.1
         //Dec 5, 2022
         //Go through MODEL xml to get all of available countries into tbl_products structure.
-        RdhYMDMGars_PRODUCTS products = new RdhYMDMGars_PRODUCTS();
+
         List<String> CountryList = new ArrayList<>();
         for (AVAILABILITY availabilityElement : chwProduct.getAVAILABILITYLIST()) {
+            RdhYMDMGars_PRODUCTS products = new RdhYMDMGars_PRODUCTS();
             String countryFc = availabilityElement.getCOUNTRY_FC();
 
             if (CountryList.contains(countryFc)) {
