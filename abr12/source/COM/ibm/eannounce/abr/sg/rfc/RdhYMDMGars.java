@@ -4,12 +4,10 @@ import COM.ibm.eannounce.abr.sg.rfc.entity.*;
 import COM.ibm.eannounce.abr.util.RFCConfig;
 import com.google.gson.annotations.SerializedName;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 
 public class RdhYMDMGars extends RdhBase
 {
@@ -100,11 +98,13 @@ public class RdhYMDMGars extends RdhBase
         //Go through MODEL xml to get all of available countries into tbl_products structure.
         Set<String> countrySet = new HashSet<>();
         Hashtable<String,String> countryName = new Hashtable<>();
-        PreparedStatement statement = pdhConnection.prepareStatement(GETCOUNTYNAME);
-        ResultSet resultSet = statement.executeQuery();
+        Statement statement = pdhConnection.createStatement();
+        ResultSet resultSet = statement.executeQuery(GETCOUNTYNAME);
         while(resultSet.next()) {
             countryName.put(resultSet.getString("GENAREANAME_FC"),resultSet.getString("GENAREACODE"));
         }
+        statement.close();
+        resultSet.close();
         for (AVAILABILITY availabilityElement : chwProduct.getAVAILABILITYLIST()) {
             RdhYMDMGars_PRODUCTS products = new RdhYMDMGars_PRODUCTS();
             String countryFc = availabilityElement.getCOUNTRY_FC();
