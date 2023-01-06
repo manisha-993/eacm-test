@@ -115,6 +115,8 @@ public class RdhYMDMGars extends RdhBase
                 products.setPartnum(chwProduct.getMACHTYPE() + "FEA");
                 products.setLand1(countryName);
             }
+            statement.close();
+            resultSet.close();
             tbl_products.add(products);
         }
     }
