@@ -114,7 +114,7 @@ public class RdhYMDMGars extends RdhBase
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 String countryName = resultSet.getString("GENAREACODE");
-                products.setPartnum(chwProduct.getMACHTYPE() + "FEA" + "FC"+ countryFc);
+                products.setPartnum(chwProduct.getMACHTYPE() + "FEA");
                 products.setLand1(countryName);
             }
             statement.close();
