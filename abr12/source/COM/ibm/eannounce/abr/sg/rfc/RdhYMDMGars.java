@@ -9,9 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class RdhYMDMGars extends RdhBase
 {
@@ -32,24 +30,25 @@ public class RdhYMDMGars extends RdhBase
     SimpleDateFormat sdfPUBFROMDATE =   new SimpleDateFormat( "MMddyyyy" );
     @Foo
     String annnumber = null;
-    private String GETCOUNTYNAME = "select GENAREACODE from price.generalarea  where GENAREANAME_FC = ? WITH UR";
-    public RdhYMDMGars(MODEL chwProduct, Connection PDHconnection) throws SQLException {
-        super(chwProduct.getMACHTYPE() + chwProduct.getMODEL() + "FEA", "RDH_YMDM_GARS".toLowerCase(), null);
+
+    private String GETCOUNTYNAME = "select GENAREANAME_FC,GENAREACODE from price.generalarea  where GENAREACODE in (select GENAREACODE from price.generalarea) WITH UR";
+    public RdhYMDMGars(MODEL chwProduct, Connection pdhConnection) throws SQLException {
+        super(chwProduct.getMACHTYPE()+chwProduct.getMODEL()+"FEA", "RDH_YMDM_GARS".toLowerCase(), null);
         this.pims_identity = "H";
         List<CountryPlantTax> taxList = RFCConfig.getTaxs();
-        for (CountryPlantTax tax : taxList) {
-            if ("19".equals(tax.getINTERFACE_ID())) {
+        for(CountryPlantTax tax : taxList){
+            if("19".equals(tax.getINTERFACE_ID())){
                 RdhYMDMGars_MAT mat = new RdhYMDMGars_MAT();
                 //Add a row to tbl_gars_mat structure
-                mat.setMatnr(chwProduct.getMACHTYPE() + "FEA");
+                mat.setMatnr(chwProduct.getMACHTYPE()+"FEA");
                 mat.setBrgew("00");
                 mat.setPrdha(chwProduct.getPRODHIERCD());
                 mat.setNumtp("");
                 mat.setEan11("");
                 mat.setZconf("E");
                 mat.setAeszn(getEarliestAnnDate(chwProduct));
-                if (!annnumber.equals("")) {
-                    mat.setZeiar("RFA");
+                if(!annnumber.equals("")){
+                   mat.setZeiar("RFA");
                 } else {
                     mat.setZeiar("");
                 }
@@ -59,9 +58,9 @@ public class RdhYMDMGars extends RdhBase
                 mat.setKtgrm("06");
                 mat.setVkorg(tax.getSALES_ORG());
                 mat.setDwerk(tax.getDEL_PLNT());
-                if (!tax.getTAX_CD().trim().contains("NULL")) {
+                if(!tax.getTAX_CD().trim().contains("NULL")){
                     mat.setMvgr5(tax.getTAX_CD().trim());
-                } else {
+                }else{
                     mat.setMvgr5("");
                 }
                 mat.setProdh(chwProduct.getPRODHIERCD());
@@ -73,18 +72,18 @@ public class RdhYMDMGars extends RdhBase
                 mat.setTaxm1(tax.getTAX_CLAS());
                 mat.setTaty1(tax.getTAX_CAT());
                 mat.setMm_mach_type(chwProduct.getMACHTYPE());
-                if (chwProduct.getUNITCLASS().equals("SIU-CPU") || chwProduct.getUNITCLASS().equals("SIU-Non CPU")) {
+                if(chwProduct.getUNITCLASS().equals("SIU-CPU")||chwProduct.getUNITCLASS().equals("SIU-Non CPU")){
                     mat.setMm_siu("2");
-                } else if (chwProduct.getUNITCLASS().equals("Non SIU- CPU")) {
+                }else if(chwProduct.getUNITCLASS().equals("Non SIU- CPU")){
                     mat.setMm_siu("0");
-                } else {
+                }else {
                     mat.setMm_siu("");
                 }
-                if (chwProduct.getINSTALL().equals("CIF")) {
+                if(chwProduct.getINSTALL().equals("CIF")){
                     mat.setMm_fg_installable("CSU");
-                } else if (chwProduct.getINSTALL().equals("CE")) {
+                }else if(chwProduct.getINSTALL().equals("CE")){
                     mat.setMm_fg_installable("IBI");
-                } else {
+                }else {
                     mat.setMm_fg_installable("");
                 }
                 mat.setMm_identity("");
@@ -99,30 +98,26 @@ public class RdhYMDMGars extends RdhBase
         //1.1
         //Dec 5, 2022
         //Go through MODEL xml to get all of available countries into tbl_products structure.
-
-        List<String> CountryList = new ArrayList<>();
+        Set<String> countrySet = new HashSet<>();
+        Hashtable<String,String> countryName = new Hashtable<>();
+        PreparedStatement statement = pdhConnection.prepareStatement(GETCOUNTYNAME);
+        ResultSet resultSet = statement.executeQuery();
+        while(resultSet.next()) {
+            countryName.put(resultSet.getString("GENAREANAME_FC"),resultSet.getString("GENAREACODE"));
+        }
         for (AVAILABILITY availabilityElement : chwProduct.getAVAILABILITYLIST()) {
             RdhYMDMGars_PRODUCTS products = new RdhYMDMGars_PRODUCTS();
             String countryFc = availabilityElement.getCOUNTRY_FC();
-
-            if (CountryList.contains(countryFc)) {
+            if (countrySet.contains(countryFc)) {
                 continue;
             }
-            CountryList.add(countryFc);
-            PreparedStatement statement = PDHconnection.prepareStatement(GETCOUNTYNAME);
-            statement.setString(1, countryFc);
-            ResultSet resultSet = statement.executeQuery();
-            while(resultSet.next()) {
-                String countryName = resultSet.getString("GENAREACODE");
-                products.setPartnum(chwProduct.getMACHTYPE() + "FEA");
-                products.setLand1(countryName);
-            }
-            statement.close();
-            resultSet.close();
+            countrySet.add(countryFc);
+            products.setPartnum(chwProduct.getMACHTYPE() + "FEA");
+            products.setLand1(countryName.get(countryFc));
             tbl_products.add(products);
         }
-    }
 
+    }
     protected void setDefaultValues() {
         this.tbl_gars_mat = new ArrayList<RdhYMDMGars_MAT>();
         this.tbl_products = new ArrayList<RdhYMDMGars_PRODUCTS>();
