@@ -99,22 +99,27 @@ public class RdhYMDMGars extends RdhBase
         //1.1
         //Dec 5, 2022
         //Go through MODEL xml to get all of available countries into tbl_products structure.
-                RdhYMDMGars_PRODUCTS products = new RdhYMDMGars_PRODUCTS();
-                List<AVAILABILITY> list = chwProduct.getAVAILABILITYLIST();
-                PreparedStatement statement = PDHconnection.prepareStatement(GETCOUNTYNAME);
-                if (list != null && list.size() > 0) {
-                    for (int i = 0; i < list.size(); i++) {
-                        products.setPartnum(chwProduct.getMACHTYPE()+"FEA");
-                        String countryFc = chwProduct.getAVAILABILITYLIST().get(i).getCOUNTRY_FC();
-                        statement.setString(1, countryFc);
-                        ResultSet resultSet = statement.executeQuery();
-                        while(resultSet.next()){
-                            String countryName = resultSet.getString("GENAREACODE");
-                            products.setLand1(countryName);
-                        }
-                        tbl_products.add(products);
-                    }
+        RdhYMDMGars_PRODUCTS products = new RdhYMDMGars_PRODUCTS();
+        List<AVAILABILITY> list = chwProduct.getAVAILABILITYLIST();
+        List<String> CountryList = new ArrayList<>();
+        if (list != null && list.size() > 0) {
+            for (int i = 0; i < list.size(); i++) {
+                String countryFc = chwProduct.getAVAILABILITYLIST().get(i).getCOUNTRY_FC();
+                if(CountryList.contains(countryFc)){
+                    continue;
                 }
+                PreparedStatement statement = PDHconnection.prepareStatement(GETCOUNTYNAME);
+                statement.setString(1, countryFc);
+                ResultSet resultSet = statement.executeQuery();
+                while(resultSet.next()){
+                    String countryName = resultSet.getString("GENAREACODE");
+                    products.setPartnum(chwProduct.getMACHTYPE()+"FEA");
+                    products.setLand1(countryName);
+                    CountryList.add(countryName);
+                }
+                tbl_products.add(products);
+            }
+        }
 
 
 
