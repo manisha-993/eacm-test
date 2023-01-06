@@ -110,9 +110,11 @@ public class RdhYMDMGars extends RdhBase
             PreparedStatement statement = PDHconnection.prepareStatement(GETCOUNTYNAME);
             statement.setString(1, countryFc);
             ResultSet resultSet = statement.executeQuery();
-            String countryName = resultSet.getString("GENAREACODE");
-            products.setPartnum(chwProduct.getMACHTYPE() + "FEA");
-            products.setLand1(countryName);
+            while(resultSet.next()) {
+                String countryName = resultSet.getString("GENAREACODE");
+                products.setPartnum(chwProduct.getMACHTYPE() + "FEA");
+                products.setLand1(countryName);
+            }
             tbl_products.add(products);
         }
     }
