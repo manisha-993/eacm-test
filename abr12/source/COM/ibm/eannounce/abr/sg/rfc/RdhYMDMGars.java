@@ -28,7 +28,7 @@ public class RdhYMDMGars extends RdhBase
     SimpleDateFormat sdfPUBFROMDATE =   new SimpleDateFormat( "MMddyyyy" );
     @Foo
     String annnumber = null;
-
+    @Foo
     private String GETCOUNTYNAME = "select GENAREANAME_FC,GENAREACODE from price.generalarea  where GENAREACODE in (select GENAREACODE from price.generalarea) WITH UR";
     public RdhYMDMGars(MODEL chwProduct, Connection pdhConnection) throws SQLException {
         super(chwProduct.getMACHTYPE()+chwProduct.getMODEL()+"FEA", "RDH_YMDM_GARS".toLowerCase(), null);
