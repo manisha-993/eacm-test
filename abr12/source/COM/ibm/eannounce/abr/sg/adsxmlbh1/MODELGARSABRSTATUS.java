@@ -100,7 +100,7 @@ public class MODELGARSABRSTATUS extends PokBaseABR {
 
             if (xml != null) {
                 MODEL model = XMLParse.getObjectFromXml(xml, MODEL.class);
-                RdhYMDMGars abr = new RdhYMDMGars(model);
+                RdhYMDMGars abr = new RdhYMDMGars(model,m_db.getPDHConnection());
                 this.addDebug("Calling " + abr.getRFCName());
                 abr.execute();
                 this.addDebug(abr.createLogEntry());

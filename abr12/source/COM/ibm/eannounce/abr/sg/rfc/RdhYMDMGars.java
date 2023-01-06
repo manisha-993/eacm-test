@@ -2,9 +2,12 @@ package COM.ibm.eannounce.abr.sg.rfc;
 
 import COM.ibm.eannounce.abr.sg.rfc.entity.*;
 import COM.ibm.eannounce.abr.util.RFCConfig;
-import COM.ibm.eannounce.abr.util.RfcConfigProperties;
 import com.google.gson.annotations.SerializedName;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,7 +32,8 @@ public class RdhYMDMGars extends RdhBase
     SimpleDateFormat sdfPUBFROMDATE =   new SimpleDateFormat( "MMddyyyy" );
     @Foo
     String annnumber = null;
-    public RdhYMDMGars(MODEL chwProduct) {
+    private String GETCOUNTYNAME = "select GENAREACODE from price.generalarea  where GENAREANAME_FC = ? WITH UR";
+    public RdhYMDMGars(MODEL chwProduct, Connection PDHconnection) throws SQLException {
         super(chwProduct.getMACHTYPE()+chwProduct.getMODEL()+"FEA", "RDH_YMDM_GARS".toLowerCase(), null);
         this.pims_identity = "H";
         List<CountryPlantTax> taxList = RFCConfig.getTaxs();
@@ -92,19 +96,27 @@ public class RdhYMDMGars extends RdhBase
                 tbl_gars_mat.add(mat);
             }
         }
-        List CountryList = new ArrayList();
-        for(CountryPlantTax tax : taxList) {
-            if ("19".equals(tax.getINTERFACE_ID())) {
+        //1.1
+        //Dec 5, 2022
+        //Go through MODEL xml to get all of available countries into tbl_products structure.
                 RdhYMDMGars_PRODUCTS products = new RdhYMDMGars_PRODUCTS();
-                products.setPartnum(chwProduct.getMACHTYPE()+"FEA");
-                if(CountryList.contains(tax.getTAX_COUNTRY())){
-                    continue;
+                List<AVAILABILITY> list = chwProduct.getAVAILABILITYLIST();
+                PreparedStatement statement = PDHconnection.prepareStatement(GETCOUNTYNAME);
+                if (list != null && list.size() > 0) {
+                    for (int i = 0; i < list.size(); i++) {
+                        products.setPartnum(chwProduct.getMACHTYPE()+"FEA");
+                        String countryFc = chwProduct.getAVAILABILITYLIST().get(i).getCOUNTRY_FC();
+                        statement.setString(1, countryFc);
+                        ResultSet resultSet = statement.executeQuery();
+                        while(resultSet.next()){
+                            String countryName = resultSet.getString("GENAREACODE");
+                            products.setLand1(countryName);
+                        }
+                        tbl_products.add(products);
+                    }
                 }
-                products.setLand1(tax.getTAX_COUNTRY());
-                CountryList.add(tax.getTAX_COUNTRY());
-                tbl_products.add(products);
-            }
-        }
+
+
 
     }
     protected void setDefaultValues() {
