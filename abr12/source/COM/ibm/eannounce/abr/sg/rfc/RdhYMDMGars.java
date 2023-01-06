@@ -103,6 +103,7 @@ public class RdhYMDMGars extends RdhBase
         List<String> CountryList = new ArrayList<>();
         for (AVAILABILITY availabilityElement : chwProduct.getAVAILABILITYLIST()) {
             String countryFc = availabilityElement.getCOUNTRY_FC();
+
             if (CountryList.contains(countryFc)) {
                 continue;
             }
@@ -112,7 +113,7 @@ public class RdhYMDMGars extends RdhBase
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 String countryName = resultSet.getString("GENAREACODE");
-                products.setPartnum(chwProduct.getMACHTYPE() + "FEA");
+                products.setPartnum(chwProduct.getMACHTYPE() + "FEA" + "FC"+ countryFc);
                 products.setLand1(countryName);
             }
             statement.close();
