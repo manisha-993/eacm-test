@@ -866,6 +866,15 @@ public class XMLAVAILElembh1 extends XMLElem {
 			child = (Element) document.createElement("ANNNUMBER");
 			child.appendChild(document.createTextNode("" + ctryAudRec.getAnnnumber()));
 			elem.appendChild(child);
+			child = (Element) document.createElement("CDOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getCDOCNO()));
+			elem.appendChild(child);
+			child = (Element) document.createElement("EDOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getEDOCNO()));
+			elem.appendChild(child);
+			child = (Element) document.createElement("ADOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getADOCNO()));
+			elem.appendChild(child);
 			child = (Element) document.createElement("FIRSTORDER");
 			child.appendChild(document.createTextNode("" + ctryAudRec.getFirstorder()));
 			elem.appendChild(child);
