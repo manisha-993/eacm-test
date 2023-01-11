@@ -203,11 +203,6 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 						this.addOutput(cMaint.getRFCName() + " called  faild!");
 						this.addOutput(cMaint.getError_text());
 					}
-
-					/*
-					 * class_name = "MM_CUSTOM_COSTING"; cMaint = new RdhClassificationMaint(obj_id,
-					 * class_name, class_type);
-					 */
 					
 					/*
 					 * cMaint.execute(); this.addDebug(cMaint.createLogEntry()); if

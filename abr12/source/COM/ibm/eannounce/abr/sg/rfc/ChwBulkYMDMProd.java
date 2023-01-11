@@ -3,15 +3,8 @@ package COM.ibm.eannounce.abr.sg.rfc;
 import COM.ibm.eannounce.abr.sg.rfc.entity.*;
 import COM.ibm.eannounce.abr.util.RFCConfig;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.*;
+import java.util.*;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -44,7 +37,8 @@ public class ChwBulkYMDMProd extends RdhBase{
     Connection odsConnection;
     @Foo
     Connection pdhConnection;
-
+    @Foo
+    private String GETCOUNTYNAME = "select GENAREANAME_FC,GENAREACODE from price.generalarea  where GENAREACODE in (select GENAREACODE from price.generalarea) and NLSID = 1 and ISACTIVE = 1 WITH UR";
     public ChwBulkYMDMProd (MODEL model, String materialType, String tmfEntityID, Connection odsConnection, Connection pdhConnection) throws Exception {
         super(model.getMACHTYPE()+model.getMODEL(), "Z_YMDMBLK_PROD1".toLowerCase(), null);
         this.pims_identity = "H";
@@ -141,6 +135,46 @@ public class ChwBulkYMDMProd extends RdhBase{
                 tbl_mvke.add(mvke);
             }
         }
+        //5.  If <materialType> = "PRODSTRUCT", then use <tmfEntityID> to retrieve the XML of PRODSTRUCT from cache table and save it as chwTMF object.
+        //        For each chwTMF/AVAILABILITYLIST/AVAILABILITYELEMENT, query price.generalarea table in PDH database to get the country name by SQL - select GENAREACODE from price.generalarea  where GENAREANAME_FC = chwTMF/AVAILABILITYLIST/AVAILABILITYELEMENT/COUNTRY_FC.
+        //            If the country name is not existing in column country_fc of tbl_mvke structure, then start to insert it into tbl_mvke structure.
+        //                For each chwTMF/AVAILABILITYLIST/AVAILABILITYELEMENT/SLEORGNPLNTCODELIST/SLEORGNPLNTCODEELEMENT, insert one row into tbl_mvke structure.
+        //                    Else skip the current chwTMF/AVAILABILITYLIST/AVAILABILITYELEMENT and continue to the next one.
+        if ("PRODSTRUCT".equals(materialType)) {
+            //use <tmfEntityID> to retrieve the XML of PRODSTRUCT from cache table
+            List<String> xmls = getXML(Arrays.asList(tmfEntityID));
+            TMF_UPDATE tmf = getObjectFromXml(xmls.get(0), TMF_UPDATE.class);
+            Hashtable<String,String> countryName = new Hashtable<>();
+            Statement statement = pdhConnection.createStatement();
+            ResultSet resultSet = statement.executeQuery(GETCOUNTYNAME);
+            while(resultSet.next()) {
+                countryName.put(resultSet.getString("GENAREANAME_FC").trim(),resultSet.getString("GENAREACODE").trim());
+            }
+            statement.close();
+            resultSet.close();
+            for (AVAILABILITYELEMENT_TMF availabilityElement : tmf.getAVAILABILITYLIST()) {
+                if(countryKey.contains(countryName.get(availabilityElement.getCOUNTRY_FC()))){
+                  continue;
+                }
+                for(SLEORGNPLNTCODEELEMENT_TMF sleorgnplntcodeElement: availabilityElement.getSLEORGNPLNTCODELIST()){
+                    ChwBulkYMDMProd_MVKE mvke = new ChwBulkYMDMProd_MVKE();
+                    mvke.setModelEntitytype(tmf.getMODELENTITYTYPE());
+                    mvke.setModelEntityid(tmf.getMODELENTITYID());
+                    mvke.setCountry_fc(countryName.get(availabilityElement.getCOUNTRY_FC()));
+                    mvke.setSleorg(sleorgnplntcodeElement.getSLEORG());
+                    mvke.setPlntCd(sleorgnplntcodeElement.getPLNTCD());
+                    for(CountryPlantTax tax : taxList){
+                        if("7".equals(tax.getINTERFACE_ID()) && sleorgnplntcodeElement.getSLEORG().equals(tax.getSALES_ORG())){
+                            mvke.setPlntDel(tax.getDEL_PLNT());
+                            break;
+                        }
+                    }
+                    tbl_mvke.add(mvke);
+                }
+            }
+
+        }
+
 
         //Construct tbl_tmf structure
         if("MODEL".equals(materialType)){
