@@ -363,7 +363,8 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				this.runRfcCaller(ChwConpMaintain);
 
 				//12. 
-				/*String tmf_xml = getTMFFromXML(fctransaction.getTOMACHTYPE(),fctransaction.getTOMODEL(),fctransaction.getTOFEATURECODE(), connection);
+				/* deprecated EACM-7238 CHW-to-iERP feed: FCTRANSACTION-Function Separation Dev
+				String tmf_xml = getTMFFromXML(fctransaction.getTOMACHTYPE(),fctransaction.getTOMODEL(),fctransaction.getTOFEATURECODE(), connection);
 				if("".equals(tmf_xml)) {
 					addOutput("tmf_xml is Null, not Call ChwFCTYMDMFCMaint");	
 					ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(null,fctransaction);
@@ -374,6 +375,8 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(tmf,fctransaction);
 					this.runRfcCaller(caller);
 				}	*/
+				ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(fctransaction);
+				this.runRfcCaller(caller);
 
 				//13.
 				if(fctransaction.getTOMACHTYPE().equals(fctransaction.getFROMMACHTYPE())) {
