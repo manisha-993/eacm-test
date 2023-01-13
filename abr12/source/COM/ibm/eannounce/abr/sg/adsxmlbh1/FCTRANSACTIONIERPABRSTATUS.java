@@ -258,23 +258,23 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				this.runRfcCaller(TssClassificationMaint);
 
 
-				if(!"***".equals(fctransaction.getTOMODEL())){
+				if(!"***".equals(fctransaction.getTOMODEL())) {
 					//4.a1 Call the ChwCharMaintain constructor to create the MK_D_machineType_MOD_CONV characteristic.
 					ChwCharMaintain ChwCharMaintain =
 							new ChwCharMaintain(
-									rfaNum				 				//String obj_id  Set to concatenation of chwProduct.machineType + "MTC"
-									, "MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV"	//String charact  Set to  "MK_machineType_MTC" where <machine_type> is chwProduct.machineType
-									, "CHAR" 							//String datatype  Set to "CHAR".
-									, 9 								//int charnumber  Set to "15".
-									, empty 		//String decplaces
-									, empty 		//String casesens
-									, empty 		//String neg_vals
-									, empty 		//String group
-									, "-" 			//String valassignm  Set to "-".
-									, empty 		//String no_entry
-									, empty 		//String no_display
-									, "X" 			//String addit_vals   Set to "X".
-									, fctransaction.getTOMACHTYPE() +" Features Conversion"	//String chdescr	Set to "Machine Type Conversions <machine_type>"
+									rfaNum                                //String obj_id  Set to concatenation of chwProduct.machineType + "MTC"
+									, "MK_D_" + fctransaction.getTOMACHTYPE() + "_MOD_CONV"    //String charact  Set to  "MK_machineType_MTC" where <machine_type> is chwProduct.machineType
+									, "CHAR"                            //String datatype  Set to "CHAR".
+									, 9                                //int charnumber  Set to "15".
+									, empty        //String decplaces
+									, empty        //String casesens
+									, empty        //String neg_vals
+									, empty        //String group
+									, "-"            //String valassignm  Set to "-".
+									, empty        //String no_entry
+									, empty        //String no_display
+									, "X"            //String addit_vals   Set to "X".
+									, fctransaction.getTOMACHTYPE() + " Features Conversion"    //String chdescr	Set to "Machine Type Conversions <machine_type>"
 							);
 					//4.a2 Call the ChwCharMaintain.addValue() method to add the value with its description to the MK_D_machineType_MOD_CONV characteristic.
 					value = fctransaction.getFROMMODEL() + "_" + fctransaction.getTOMODEL();
@@ -282,31 +282,29 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					String valdescr = "From " + fctransaction.getTOMACHTYPE() + " Model " + fctransaction.getFROMMODEL() + " to " + fctransaction.getTOMODEL();
 					ChwCharMaintain.addValue(value, valdescr);
 					this.runRfcCaller(ChwCharMaintain);
+
+
+					//4.b Call the ChwClassMaintain constructor to create the MK_D_machineType_MOD_CONV class.
+					ChwClassMaintain =
+							new ChwClassMaintain(
+									rfaNum                                //String obj_id Set to concatenation of chwProduct.machineType + "UPG"
+									, "MK_D_" + fctransaction.getTOMACHTYPE() + "_MOD_CONV"  //String class_name   Set to  "MK_D_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType
+									, "MK_D_" + fctransaction.getTOMACHTYPE() + "_MOD_CONV"  //String class_type   Set to  "MK_D_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType.
+							);
+					//4.c Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class.
+					ChwClassMaintain.addCharacteristic("MK_D_" + fctransaction.getTOMACHTYPE() + "_MOD_CONV");
+					this.runRfcCaller(ChwClassMaintain);
+
+					//4.d Call the TssClassificationMaint constructor to associate the MK_D_machineType_MOD_CONV class to the product's material master record
+					TssClassificationMaint =
+							new RdhClassificationMaint(
+									obj_id                                //String obj_id Set to concatenation of chwProduct.machineType + "UPG"
+									, "MK_D_" + fctransaction.getTOMACHTYPE() + "_MOD_CONV"  //String class_name   Set to  "MK_D_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType
+									, "300"                            //String class_type   Set to "300"
+									, "H"
+									, rfaNum);
+					this.runRfcCaller(TssClassificationMaint);
 				}
-
-
-
-				//4.b Call the ChwClassMaintain constructor to create the MK_D_machineType_MOD_CONV class. 
-				ChwClassMaintain =
-						new ChwClassMaintain(
-								rfaNum 								//String obj_id Set to concatenation of chwProduct.machineType + "UPG"
-								, "MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV"  //String class_name   Set to  "MK_D_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType
-								, "MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV"  //String class_type   Set to  "MK_D_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType.
-						);
-				//4.c Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class.
-				ChwClassMaintain.addCharacteristic("MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV");
-				this.runRfcCaller(ChwClassMaintain);
-
-				//4.d Call the TssClassificationMaint constructor to associate the MK_D_machineType_MOD_CONV class to the product's material master record
-				TssClassificationMaint =
-						new RdhClassificationMaint(
-								obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "UPG"
-								, "MK_D_"+fctransaction.getTOMACHTYPE()+"_MOD_CONV"  //String class_name   Set to  "MK_D_<machine_type>_MOD_CONV" where <machine_type> is chwProduct.machineType
-								, "300"  							//String class_type   Set to "300"
-								, "H"
-								, rfaNum);
-				this.runRfcCaller(TssClassificationMaint);
-
 				//5. Call the TssClassificationMaint constructor to associate the MK_REFERENCE class to the product's material master record.
 				RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_REFERENCE","300","H", rfaNum);
 				this.runRfcCaller(rdhClassificationMaint);
