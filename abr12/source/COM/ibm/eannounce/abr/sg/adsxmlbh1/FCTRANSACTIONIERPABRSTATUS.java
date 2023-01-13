@@ -360,8 +360,9 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				ChwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", empty);  //Set to "PR_E2E_PRICING_HW".
 				this.runRfcCaller(ChwConpMaintain);
 				
-				//12. 
-				/*String tmf_xml = getTMFFromXML(fctransaction.getTOMACHTYPE(),fctransaction.getTOMODEL(),fctransaction.getTOFEATURECODE(), connection);
+				//12.
+				/* deprecated EACM-7238 CHW-to-iERP feed: FCTRANSACTION-Function Separation Dev
+				String tmf_xml = getTMFFromXML(fctransaction.getTOMACHTYPE(),fctransaction.getTOMODEL(),fctransaction.getTOFEATURECODE(), connection);
 				if("".equals(tmf_xml)) {
 					addOutput("tmf_xml is Null, not Call ChwFCTYMDMFCMaint");	
 					ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(null,fctransaction);
@@ -371,8 +372,10 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					TMF_UPDATE tmf = XMLParse.getObjectFromXml(tmf_xml,TMF_UPDATE.class);
 					ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(tmf,fctransaction);
 					this.runRfcCaller(caller);
-				}	*/			
-				
+				}*/
+				ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(fctransaction);
+				this.runRfcCaller(caller);
+
 				//13.
 				if(fctransaction.getTOMACHTYPE().equals(fctransaction.getFROMMACHTYPE())) {
 					List<MODEL> models = getMODEL(fctransaction.getTOMACHTYPE(),fctransaction.getPDHDOMAIN());
