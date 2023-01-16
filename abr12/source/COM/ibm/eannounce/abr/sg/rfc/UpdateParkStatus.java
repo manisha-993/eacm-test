@@ -57,6 +57,31 @@ public class UpdateParkStatus extends RdhBase
     		this.pims_identity="H";
     	}
     }
+
+    public UpdateParkStatus (String zdmclass,String zdmrelnum, boolean isfc)
+    {
+        super(zdmrelnum,"Z_DM_SAP_PARK_STATUS ".toLowerCase(),null);
+        rdhzdmprktbls = new ArrayList<Rdhzdmprktbl>();
+        Rdhzdmprktbl rdhzdmprktbl = new Rdhzdmprktbl();
+        rdhzdmprktbl = new Rdhzdmprktbl();
+        rdhzdmprktbl.setZdmclass(zdmclass);
+        rdhzdmprktbl.setZdmrelnum(zdmrelnum);
+        if("MD_TSS_IERP".equals(zdmclass)) {
+            rdhzdmprktbl.setZdmstatus(RfcConfigProperties.getTssZdmstatus());
+        }
+        else if (isfc){
+            rdhzdmprktbl.setZdmstatus("R");
+        }
+        else {
+            rdhzdmprktbl.setZdmstatus(RfcConfigProperties.getZdmstatus());
+        }
+        rdhzdmprktbls.add(rdhzdmprktbl);
+        zgeo = "WW";
+
+        if("MD_CHW_IERP".equals(zdmclass)) {
+            this.pims_identity="H";
+        }
+    }
     
  
     /* (non-Javadoc)
