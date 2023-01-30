@@ -29,7 +29,7 @@ public class ChwClsfCharCreateTest
         	String mach_type ="9080";
         	String feature_code="1234";
         	String feature_code_desc="FC1234";
-        	ChwClsfCharCreate.CreateGroupChar(obj_id,target_indc,mach_type,feature_code,feature_code_desc);
+        //	ChwClsfCharCreate.CreateGroupChar(obj_id,target_indc,mach_type,feature_code,feature_code_desc);
         } catch (Exception e)
         {
             System.err.println("@@@@" +e.getMessage());
@@ -52,7 +52,7 @@ public class ChwClsfCharCreateTest
         	String target_indc="T";
         	String mach_type ="9080";
         	String feature_code="1234";
-        	ChwClsfCharCreate.CreateQTYChar(obj_id,target_indc,mach_type,feature_code);
+        	//ChwClsfCharCreate.CreateQTYChar(obj_id,target_indc,mach_type,feature_code);
         } catch (Exception e)
         {
             System.err.println("@@@@" +e.getMessage());
@@ -76,7 +76,7 @@ public class ChwClsfCharCreateTest
         	String mach_type ="9080";
         	String feature_code="1234";
         	String feature_code_desc="FC1234";
-        	ChwClsfCharCreate.CreateRPQGroupChar(obj_id,target_indc,mach_type,feature_code,feature_code_desc);
+        	//ChwClsfCharCreate.CreateRPQGroupChar(obj_id,target_indc,mach_type,feature_code,feature_code_desc);
         } catch (Exception e)
         {
             System.err.println("@@@@" +e.getMessage());
@@ -99,7 +99,7 @@ public class ChwClsfCharCreateTest
         	String target_indc="T";
         	String mach_type ="9080";
         	String feature_code="1234";
-        	ChwClsfCharCreate.CreateRPQQTYChar(obj_id,target_indc,mach_type,feature_code);
+        	//ChwClsfCharCreate.CreateRPQQTYChar(obj_id,target_indc,mach_type,feature_code);
         } catch (Exception e)
         {
             System.err.println("@@@@" +e.getMessage());
@@ -123,7 +123,7 @@ public class ChwClsfCharCreateTest
         	String mach_type ="9080";
         	String feature_code="1234";
         	String feature_code_desc="FC1234";
-        	ChwClsfCharCreate.CreateRPQGroupChar(obj_id,target_indc,mach_type,feature_code,feature_code_desc);
+        	//ChwClsfCharCreate.CreateRPQGroupChar(obj_id,target_indc,mach_type,feature_code,feature_code_desc);
         } catch (Exception e)
         {
             System.err.println("@@@@" +e.getMessage());
@@ -146,7 +146,7 @@ public class ChwClsfCharCreateTest
         	String target_indc="T";
         	String mach_type ="9080";
         	String feature_code="1234";
-        	ChwClsfCharCreate. CreateAlphaQTYChar(obj_id,target_indc,mach_type,feature_code,obj_id);
+        	//ChwClsfCharCreate. CreateAlphaQTYChar(obj_id,target_indc,mach_type,feature_code,obj_id);
         } catch (Exception e)
         {
             System.err.println("@@@@" +e.getMessage());
