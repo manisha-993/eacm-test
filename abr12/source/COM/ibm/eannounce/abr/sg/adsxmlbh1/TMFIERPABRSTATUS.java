@@ -304,7 +304,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String mach_type = chwTMF.getMACHTYPE();
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		String material = chwTMF.getMACHTYPE() + "UPG";
-		String rfaNum = chwTMF.getMACHTYPE() + chwTMF.getMODEL()+chwTMF.getFEATURECODE()+"UPG"+date;
+		String rfaNum = chwTMF.getMACHTYPE() +"UPG"+date;
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		//step1 If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED"), then
 		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
@@ -524,7 +524,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String mach_type = chwTMF.getMACHTYPE();
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		String material = chwTMF.getMACHTYPE() + "MTC";
-		String rfaNum = chwTMF.getMACHTYPE() + chwTMF.getMODEL()+chwTMF.getFEATURECODE()+"MTC"+date;
+		String rfaNum = chwTMF.getMACHTYPE() +"MTC"+date;
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		//step1 .If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED"), then
 		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
@@ -763,7 +763,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		String material = chwTMF.getMACHTYPE() + "NEW";
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
-		String rfaNum = chwTMF.getMACHTYPE() +chwTMF.getMODEL()+ chwTMF.getFEATURECODE()+"NEW"+date;
+		String rfaNum = chwTMF.getMACHTYPE() +"NEW"+date;
 
 		this.addDebug("TMF param feature_code=" + feature_code);
 		this.addDebug("TMF param FCTYPE=" + FCTYPE);
