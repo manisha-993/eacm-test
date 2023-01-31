@@ -344,7 +344,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			String ORDERCODE = chwTMF.getORDERCODE();
 			if("Non SIU- CPU".equalsIgnoreCase(UNITCLASS) || SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
 				chwClsfCharCreate = new ChwClsfCharCreate();
-				//String obj_id, String target_indc, String mach_type, String feature_code
+				//String obj_id , String target_indc, String mach_type, String feature_code
 				try{
 					target_indc = "T";
 					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code, rfaNum);
