@@ -60,7 +60,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 	private String navName = "";
 	private Hashtable metaTbl = new Hashtable();
 	private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'FCTRANSACTION' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
-		
+
 	private String COVNOTEQUALSQL = "SELECT count(*) FROM OPICM.flag F\n"
 			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
 			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE = ? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
@@ -68,7 +68,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 			+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP "
 			+ " WHERE f.ENTITYTYPE ='MODELCONVERT' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELCONVERTIERPABRSTATUS') "
 			+ " AND T1.ATTRIBUTEVALUE !=T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION= ? WITH UR";
-	
+
 	private String COVEQUALSQL = "SELECT count(*) FROM OPICM.flag F\n"
 			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT TIMESTAMP AND T1.EFFTO > CURRENT TIMESTAMP "
 			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE = ? and T2.VALTO > CURRENT TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
@@ -84,7 +84,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 			+ " INNER JOIN OPICM.METADESCRIPTION M ON M.DESCRIPTIONCLASS=F1.ATTRIBUTEVALUE AND  M.NLSID=1 AND M.VALTO > CURRENT  TIMESTAMP AND M.EFFTO > CURRENT  TIMESTAMP "
 			+ " WHERE f.ENTITYTYPE ='FCTRANSACTION' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'FCTRANSACTIONIERPABRSTATUS') "
 			+ " AND T1.ATTRIBUTEVALUE =T2.ATTRIBUTEVALUE AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION= ? WITH UR";
-	
+
 	private String MODEL_MACHTYPE = "SELECT DISTINCT t2.ATTRIBUTEVALUE AS MODEL, t3.ATTRIBUTEVALUE AS INVNAME FROM OPICM.flag F "
 			+ " INNER JOIN opicm.flag t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='MACHTYPEATR' AND T1.ATTRIBUTEVALUE = ? AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP"
 			+ " INNER JOIN opicm.text t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='MODELATR' AND t2.NLSID=1 AND T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP"
@@ -94,10 +94,10 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 			+ " WHERE f.ENTITYTYPE ='MODEL' AND F.ATTRIBUTECODE IN ('ADSABRSTATUS' ,'MODELTIERPABRSTATUS') "
 			+ " AND  F.ATTRIBUTEVALUE ='0030' AND M.LONGDESCRIPTION=? "
 			+ " WITH ur";
-	
+
 	String xml = null;
 
-	
+
 
 	public String getDescription() {
 		return "FCTRANSACTIONIERPABRSTATUS";
@@ -145,9 +145,9 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 
 			// get the root entity using current timestamp, need this to get the
 			// timestamps or info for VE pulls
-			  m_elist = m_db.getEntityList(m_prof,
-                    new ExtractActionItem(null, m_db, m_prof,"dummy"),
-                    new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
+			m_elist = m_db.getEntityList(m_prof,
+					new ExtractActionItem(null, m_db, m_prof,"dummy"),
+					new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
 			/*
 			 * m_db.getEntityList(m_prof, new ExtractActionItem(null, m_db,
 			 * m_prof,"dummy"), new EntityItem[] { new EntityItem(null, m_prof,
@@ -167,36 +167,36 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 			PreparedStatement statement = connection.prepareStatement(CACEHSQL);
 			statement.setInt(1, rootEntity.getEntityID());
 			ResultSet resultSet = statement.executeQuery();
-		
+
 			while (resultSet.next()) {
 				xml = resultSet.getString("XMLMESSAGE");
 			}
 			if (xml != null) {
-			
+
 				FCTRANSACTION fctransaction = XMLParse.getObjectFromXml(xml,FCTRANSACTION.class);
 				//If <entityType> = "FCTRANSACTION", then set chwProduct to the XML of MODEL where MODEL/MACHTYPE = FCTRANSACTION/TOMACHTYPE and MODEL/MODEL = FCTRANSACTION/TOMODEL
 				/**
-				 * 
-					select XMLMESSAGE from cache.XMLIDLCACHE 
-					 where XMLCACHEVALIDTO > current timestamp 
-					 and  XMLENTITYTYPE = 'MODEL'
-					 and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE"; $i/MODEL_UPDATE[MACHTYPE/text() = "7954" and MODEL/text() ="24X"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") 
-					 with ur;
+				 *
+				 select XMLMESSAGE from cache.XMLIDLCACHE
+				 where XMLCACHEVALIDTO > current timestamp
+				 and  XMLENTITYTYPE = 'MODEL'
+				 and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE"; $i/MODEL_UPDATE[MACHTYPE/text() = "7954" and MODEL/text() ="24X"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i")
+				 with ur;
 				 */
 				String modelxml = getModelFromXML(fctransaction.getTOMACHTYPE(),fctransaction.getTOMODEL(),connection);
 				if("".equals(modelxml)) {
-					addOutput("modelxml is empty");	
-					return;				
+					addOutput("modelxml is empty");
+					return;
 				}
-				MODEL chwMODEL =  XMLParse.getObjectFromXml(modelxml,MODEL.class);				
+				MODEL chwMODEL =  XMLParse.getObjectFromXml(modelxml,MODEL.class);
 				if(chwMODEL==null) {
-					addOutput("MODEL is Null");	
-					return;	
-				}			
+					addOutput("MODEL is Null");
+					return;
+				}
 				String obj_id = fctransaction.getTOMACHTYPE() + "UPG";
 				String rfaNum = fctransaction.getFROMMACHTYPE()+fctransaction.getFROMFEATURECODE()+fctransaction.getTOMACHTYPE()+fctransaction.getTOFEATURECODE();
 				//1. Call ChwMatmCreate to create the material master for the product object. 
-				addDebug("FCTRANSACTION ChwMatmCreate ");	
+				addDebug("FCTRANSACTION ChwMatmCreate ");
 				ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwMODEL,"ZMAT",obj_id,rfaNum);
 				this.runRfcCaller(chwMatmCreate);
 				//2. Call Chw001ClfCreate to create the standard 001 classifications and characteristics which are tied to the offering's material master record.
@@ -210,54 +210,54 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					throw e;
 				}
 				//3.a Call the ChwCharMaintain constructor to create the MK_T_machineType_MOD characteristic.
-				ChwCharMaintain chwCharMaintain = 
-				new ChwCharMaintain(rfaNum  //String obj_id Set to concatenation of chwProduct.machineType + "UPG"
-									,"MK_T_"+fctransaction.getTOMACHTYPE()+"_MOD" //String charact  Set to  "MK_T_<machine_type>_MOD"
-									, "CHAR" 			//String datatype
-									, 6 				//int charnumber
-									, empty				//String decplaces
-									, empty				//String casesens
-									, empty				//String neg_vals
-									, empty				//String group
-									, "S"				//String valassignm  Set to "-".
-									, empty				//String no_entry
-									, empty				//String no_display
-									, "X" 				//String addit_vals Set to "X".
-									, fctransaction.getTOMACHTYPE() +" Model Characteristic" //String chdescr  Set to "<machine_type> Model Characteristic" where <machine_type> is chwProduct.machineType
-									);
+				ChwCharMaintain chwCharMaintain =
+						new ChwCharMaintain(rfaNum  //String obj_id Set to concatenation of chwProduct.machineType + "UPG"
+								,"MK_T_"+fctransaction.getTOMACHTYPE()+"_MOD" //String charact  Set to  "MK_T_<machine_type>_MOD"
+								, "CHAR" 			//String datatype
+								, 6 				//int charnumber
+								, empty				//String decplaces
+								, empty				//String casesens
+								, empty				//String neg_vals
+								, empty				//String group
+								, "S"				//String valassignm  Set to "-".
+								, empty				//String no_entry
+								, empty				//String no_display
+								, "X" 				//String addit_vals Set to "X".
+								, fctransaction.getTOMACHTYPE() +" Model Characteristic" //String chdescr  Set to "<machine_type> Model Characteristic" where <machine_type> is chwProduct.machineType
+						);
 				//3.b For each MODEL with MODEL/MACHTYPE = FCTRANSACTION/TOMACHTYPE, 
 				List<Map<String,String>> MODEL_MACHTYPE_LIST = this.getFromModelToModel(MODEL_MACHTYPE, fctransaction.getTOMACHTYPE(),chwMODEL.getPDHDOMAIN(),m_db.getPDHConnection());
 				String value = "";
 				String value_descr = "";
-				for(Map<String,String> map : MODEL_MACHTYPE_LIST){					
-					value = map.get("MODEL");				
+				for(Map<String,String> map : MODEL_MACHTYPE_LIST){
+					value = map.get("MODEL");
 					value_descr = CommonUtils.getFirstSubString(map.get("INVNAME"),25) + " " + map.get("MODEL");
 					chwCharMaintain.addValue(value, value_descr);
-				}	
+				}
 				this.runRfcCaller(chwCharMaintain);
-				
+
 				//3.c Call the ChwClassMaintain constructor to create the MK_machineType_MOD class.
-				ChwClassMaintain ChwClassMaintain = 
-				new ChwClassMaintain(
-						rfaNum 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
-						, "MK_"+fctransaction.getTOMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
-						, "MK_"+fctransaction.getTOMACHTYPE()+"_MOD"  //String class_type   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
+				ChwClassMaintain ChwClassMaintain =
+						new ChwClassMaintain(
+								rfaNum 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+								, "MK_"+fctransaction.getTOMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
+								, "MK_"+fctransaction.getTOMACHTYPE()+"_MOD"  //String class_type   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType.
 						);
 				//3.d Call the ChwClassMaintain.addCharacteristic() method to add the MK_T_machineType_MOD characteristic to the MK_machineType_MOD characteristic class. 
-				ChwClassMaintain.addCharacteristic("MK_T_"+fctransaction.getTOMACHTYPE()+"_MOD"); 
+				ChwClassMaintain.addCharacteristic("MK_T_"+fctransaction.getTOMACHTYPE()+"_MOD");
 				this.runRfcCaller(ChwClassMaintain);
-				
+
 				//3.e Call the TssClassificationMaint constructor to associate the MK_machineType_MOD class to the product's material master record.
-				RdhClassificationMaint TssClassificationMaint = 
-				new RdhClassificationMaint(
-						obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
-						, "MK_"+fctransaction.getTOMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
-						, "300"  							//String class_type   Set to "300"
-						, "H"
-						, rfaNum);
+				RdhClassificationMaint TssClassificationMaint =
+						new RdhClassificationMaint(
+								obj_id 								//String obj_id Set to concatenation of chwProduct.machineType + "MTC"
+								, "MK_"+fctransaction.getTOMACHTYPE()+"_MOD"  //String class_name   Set to  "MK_<machine_type>_MOD" where <machine_type> is chwProduct.machineType
+								, "300"  							//String class_type   Set to "300"
+								, "H"
+								, rfaNum);
 				this.runRfcCaller(TssClassificationMaint);
-				
-				
+
+
 				if(!"***".equals(fctransaction.getTOMODEL())) {
 					//4.a1 Call the ChwCharMaintain constructor to create the MK_D_machineType_MOD_CONV characteristic.
 					ChwCharMaintain ChwCharMaintain =
@@ -308,19 +308,19 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				//5. Call the TssClassificationMaint constructor to associate the MK_REFERENCE class to the product's material master record.
 				RdhClassificationMaint rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_REFERENCE","300","H", rfaNum);
 				this.runRfcCaller(rdhClassificationMaint);
-				
+
 				//6. Call the TssClassificationMaint constructor to associate the MK_T_VAO_NEW class to the product's material master record. 
 				rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_T_VAO_NEW","300","H", rfaNum);
 				this.runRfcCaller(rdhClassificationMaint);
-				
+
 				//7. Call the TssClassificationMaint constructor to associate the MK_D_VAO_NEW class to the product's material master record. 
 				rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_D_VAO_NEW","300","H", rfaNum);
 				this.runRfcCaller(rdhClassificationMaint);
-				
+
 				//8.Call the TssClassificationMaint constructor to associate the MK_FC_EXCH class to the product's material master record.
 				rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_FC_EXCH","300","H", rfaNum);
 				this.runRfcCaller(rdhClassificationMaint);
-				
+
 				//9.Call the TssClassificationMaint constructor to associate the MK_FC_CONV class to the product's material master record.
 				rdhClassificationMaint = new RdhClassificationMaint(obj_id,"MK_FC_CONV","300","H", rfaNum);
 				this.runRfcCaller(rdhClassificationMaint);
@@ -329,13 +329,13 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					String obj_id_depd= fctransaction.getTOMACHTYPE()+"UPG";
 					//Set to "SC_<MODEL/MACHTYPE>_MOD_<MODEL/MODEL>"
 					String dep_extern="SC_"+fctransaction.getTOMACHTYPE()+"_MOD_" + map.get("MODEL");
-					String dep_type="5"; 
+					String dep_type="5";
 					//Set to "SC_<MODEL/MACHTYPE>_MOD_<MODEL/MODEL>".
 					String descript="SC_"+fctransaction.getTOMACHTYPE()+"_MOD_" + map.get("MODEL");
-					
+
 					ChwDepdMaintain chwDepdCaller	=new ChwDepdMaintain(rfaNum, dep_extern, dep_type, descript);
-					
-					String sourceLine = "$PARENT.MK_T_"+fctransaction.getTOMACHTYPE() +"_MOD='"+map.get("MODEL")+"'";				
+
+					String sourceLine = "$PARENT.MK_T_"+fctransaction.getTOMACHTYPE() +"_MOD='"+map.get("MODEL")+"'";
 					chwDepdCaller.addSourceLineCondition(sourceLine);
 					runRfcCaller(chwDepdCaller);
 				}
@@ -359,8 +359,8 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				//11.f 
 				ChwConpMaintain.addConfigDependency("PR_E2E_CSTIC_HIDING_HW", empty);  //Set to "PR_E2E_PRICING_HW".
 				this.runRfcCaller(ChwConpMaintain);
-				
-				//12.
+
+				//12. 
 				/* deprecated EACM-7238 CHW-to-iERP feed: FCTRANSACTION-Function Separation Dev
 				String tmf_xml = getTMFFromXML(fctransaction.getTOMACHTYPE(),fctransaction.getTOMODEL(),fctransaction.getTOFEATURECODE(), connection);
 				if("".equals(tmf_xml)) {
@@ -372,7 +372,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					TMF_UPDATE tmf = XMLParse.getObjectFromXml(tmf_xml,TMF_UPDATE.class);
 					ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(tmf,fctransaction);
 					this.runRfcCaller(caller);
-				}*/
+				}	*/
 				ChwFCTYMDMFCMaint caller = new ChwFCTYMDMFCMaint(fctransaction);
 				this.runRfcCaller(caller);
 
@@ -395,9 +395,9 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 						this.addOutput(updateParkStatus.getError_text());
 					}
 				}
-				
+
 				// Call UpdateParkStatus
-				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfaNum, true);
+				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", rfaNum,true);
 				this.addDebug("Calling "+updateParkStatus.getRFCName());
 				updateParkStatus.execute();
 				this.addDebug(updateParkStatus.createLogEntry());
@@ -407,13 +407,13 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					this.addOutput(updateParkStatus.getRFCName() + " called faild!");
 					this.addOutput(updateParkStatus.getError_text());
 				}
-			}	
-			
-			
+			}
+
+
 			// exeFtpShell(ffPathName);
 			// ftpFile();
 			/*
-			 * } catch (Exception e) { 
+			 * } catch (Exception e) {
 			 * e.printStackTrace(); this.addError(e.getMessage()); setReturnCode(FAIL); }
 			 */
 		} catch (Exception e) {
@@ -436,7 +436,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 			logError(exBuf.getBuffer().toString());
 			// was an error make sure user gets report
 			setCreateDGEntity(true);
-			
+
 			// sentFile=exeFtpShell(ffPathName);
 		} finally {
 			StringBuffer sb = new StringBuffer();
@@ -459,11 +459,11 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 		}
 	}
 
-	
+
 
 	private List<MODEL> getMODEL(String toMachtype, String domain) {
 		List<MODEL> models= new ArrayList();
-		
+
 		try {
 			String sql1 = "SELECT distinct t2.ATTRIBUTEVALUE as MACHTYPEATR,substr(T1.ATTRIBUTEVALUE,1,3) as MODELATR FROM OPICM.flag F "
 					+ "INNER JOIN OPICM.FLAG t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='MACHTYPEATR' AND T2.ATTRIBUTEVALUE = ? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
@@ -483,15 +483,15 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				model.setMODEL(resultSet1.getString("MODELATR"));
 				models.add(model);
 			}
-			
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return models;
 	}
-	
+
 
 	public void updateSalesBom(FCTRANSACTION fctransaction, Set<String> plnts, List<MODEL> models) throws Exception {
 		for(String plant : plnts) {
@@ -504,7 +504,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				this.addDebug(chwBomCreate.createLogEntry());
 			}catch(Exception e) {
 				this.addOutput(e.getMessage());
-				continue;	
+				continue;
 			}
 			// start lock
 			String fileName = "./locks/FCTRANSACTION" + fctransaction.getTOMACHTYPE() + "UPG" + plant + ".lock";
@@ -588,9 +588,9 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 			}
 			// end lock
 		}
-		
+
 	}
-	
+
 	private String getMaxItemNo(List<HashMap<String, String>> componmentList) {
 		List<Integer> itemNo = new ArrayList<Integer>();
 		for (int i = 0; i < componmentList.size(); i++) {
@@ -609,13 +609,13 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 	private boolean hasMatchComponent(List<HashMap<String, String>> bom, String componment){
 		for (int i = 0; i < bom.size(); i++) {
 			String rev = bom.get(i).get("COMPONENT");
-			if (rev.trim().equals(componment)){				
-			  return true;
+			if (rev.trim().equals(componment)){
+				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	/*
 	 * Get Name based on navigation attributes for root entity
 	 *
@@ -629,7 +629,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 	 * Get Name based on navigation attributes for specified entity
 	 *
 	 * @return java.lang.String
-	 */ 
+	 */
 	private String getNavigationName(EntityItem theItem) throws java.sql.SQLException, MiddlewareException {
 		StringBuffer navName = new StringBuffer();
 		// NAME is navigate attributes
@@ -638,7 +638,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 		if (metaList == null) {
 			EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
 			metaList = eg.getMetaAttribute(); // iterator does not maintain
-												// navigate order
+			// navigate order
 			metaTbl.put(theItem.getEntityType(), metaList);
 		}
 		for (int ii = 0; ii < metaList.size(); ii++) {
@@ -650,124 +650,124 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 		}
 		return navName.toString();
 	}
-	
-	 /********************************************************************************
-     * Convert string into valid html.  Special HTML characters are converted.
-     *
-     * @param txt    String to convert
-     * @return String
-     */
-    protected static String convertToHTML(String txt)
-    {
-        String retVal="";
-        StringBuffer htmlSB = new StringBuffer();
-        StringCharacterIterator sci = null;
-        char ch = ' ';
-        if (txt != null) {
-            sci = new StringCharacterIterator(txt);
-            ch = sci.first();
-            while(ch != CharacterIterator.DONE)
-            {
-                switch(ch)
-                {
-                case '<':
-                    htmlSB.append("&lt;");
-                break;
-                case '>':
-                    htmlSB.append("&gt;");
-                    break;
-                case '"':
-                    // double quotation marks could be saved as &quot; also. this will be &#34;
-                    // this should be included too, but left out to be consistent with west coast
-                    htmlSB.append("&quot;");
-                    break;
-                case '\'':
-                    //IE6 doesn't support &apos; to convert single quotation marks,we can use &#39; instead
-                    htmlSB.append("&#"+((int)ch)+";");
-                    break;
-                    //case '&': 
-                    // ignore entity references such as &lt; if user typed it, user will see it
-                    // could be saved as &amp; also. this will be &#38;
-                    //htmlSB.append("&#"+((int)ch)+";");
-                    //  htmlSB.append("&amp;");
-                    //    break;
-                default:
-                    htmlSB.append(ch);
-                break;
-                }
-                ch = sci.next();
-            }
-            retVal = htmlSB.toString();
-        }
 
-        return retVal;
-    }
-    
-    /********************************************************************************
-     * Convert string into valid html.  Special HTML characters are converted.
-     *
-     * @param txt    String to convert
-     * @return String
-     */
-    protected static String convertToTag(String txt)
-    {
-        String retVal="";
-        StringBuffer htmlSB = new StringBuffer();
-        StringCharacterIterator sci = null;
-        char ch = ' ';
-        if (txt != null) {
-            sci = new StringCharacterIterator(txt);
-            ch = sci.first();
-            while(ch != CharacterIterator.DONE)
-            {
-                switch(ch)
-                {
-                case '<':
-                    htmlSB.append("&lt;");
-                break;
-                case '>':
-                    htmlSB.append("&gt;");
-                    break;
-                default:
-                    htmlSB.append(ch);
-                break;
-                }
-                ch = sci.next();
-            }
-            retVal = htmlSB.toString();
-        }
+	/********************************************************************************
+	 * Convert string into valid html.  Special HTML characters are converted.
+	 *
+	 * @param txt    String to convert
+	 * @return String
+	 */
+	protected static String convertToHTML(String txt)
+	{
+		String retVal="";
+		StringBuffer htmlSB = new StringBuffer();
+		StringCharacterIterator sci = null;
+		char ch = ' ';
+		if (txt != null) {
+			sci = new StringCharacterIterator(txt);
+			ch = sci.first();
+			while(ch != CharacterIterator.DONE)
+			{
+				switch(ch)
+				{
+					case '<':
+						htmlSB.append("&lt;");
+						break;
+					case '>':
+						htmlSB.append("&gt;");
+						break;
+					case '"':
+						// double quotation marks could be saved as &quot; also. this will be &#34;
+						// this should be included too, but left out to be consistent with west coast
+						htmlSB.append("&quot;");
+						break;
+					case '\'':
+						//IE6 doesn't support &apos; to convert single quotation marks,we can use &#39; instead
+						htmlSB.append("&#"+((int)ch)+";");
+						break;
+					//case '&':
+					// ignore entity references such as &lt; if user typed it, user will see it
+					// could be saved as &amp; also. this will be &#38;
+					//htmlSB.append("&#"+((int)ch)+";");
+					//  htmlSB.append("&amp;");
+					//    break;
+					default:
+						htmlSB.append(ch);
+						break;
+				}
+				ch = sci.next();
+			}
+			retVal = htmlSB.toString();
+		}
 
-        return retVal;
-    }
-    
-	 protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
-	 
-	 protected void addMsg(StringBuffer msg) { rptSb.append(msg.toString()+NEWLINE);}
+		return retVal;
+	}
+
+	/********************************************************************************
+	 * Convert string into valid html.  Special HTML characters are converted.
+	 *
+	 * @param txt    String to convert
+	 * @return String
+	 */
+	protected static String convertToTag(String txt)
+	{
+		String retVal="";
+		StringBuffer htmlSB = new StringBuffer();
+		StringCharacterIterator sci = null;
+		char ch = ' ';
+		if (txt != null) {
+			sci = new StringCharacterIterator(txt);
+			ch = sci.first();
+			while(ch != CharacterIterator.DONE)
+			{
+				switch(ch)
+				{
+					case '<':
+						htmlSB.append("&lt;");
+						break;
+					case '>':
+						htmlSB.append("&gt;");
+						break;
+					default:
+						htmlSB.append(ch);
+						break;
+				}
+				ch = sci.next();
+			}
+			retVal = htmlSB.toString();
+		}
+
+		return retVal;
+	}
+
+	protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
+
+	protected void addMsg(StringBuffer msg) { rptSb.append(msg.toString()+NEWLINE);}
 
 
-		/**********************************
-	     * add debug info as html comment
-	     *    EBUG_ERR = 0;
-	          EBUG_WARN = 1;
-	          EBUG_INFO = 2;
-	          EBUG_DETAIL = 3;
-	          EBUG_SPEW = 4
-	     */
-	   
+	/**********************************
+	 * add debug info as html comment
+	 *    EBUG_ERR = 0;
+	 EBUG_WARN = 1;
+	 EBUG_INFO = 2;
+	 EBUG_DETAIL = 3;
+	 EBUG_SPEW = 4
+	 */
+
 	protected void addDebug(String msg) {
 		if (D.EBUG_DETAIL <= abr_debuglvl) {
-		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
+			rptSb.append("<!-- " + msg + " -->" + NEWLINE);
 		}
 	}
-	 /**********************************
-     * add error info and fail abr
-     */
-    protected void addError(String msg) {
-        addOutput(msg);
-        setReturnCode(FAIL);
-    }
-    
-    protected void runRfcCaller(RdhBase caller) throws Exception {
+	/**********************************
+	 * add error info and fail abr
+	 */
+	protected void addError(String msg) {
+		addOutput(msg);
+		setReturnCode(FAIL);
+	}
+
+	protected void runRfcCaller(RdhBase caller) throws Exception {
 		this.addDebug("Calling " + caller.getRFCName());
 		caller.execute();
 		this.addDebug(caller.createLogEntry());
@@ -778,15 +778,15 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 			this.addOutput(caller.getError_text());
 		}
 	}
-    
-    private List<Map<String,String>> getFromModelToModel(String sql,String type,String pdhdomain, Connection rdhConnection) throws SQLException {
+
+	private List<Map<String,String>> getFromModelToModel(String sql,String type,String pdhdomain, Connection rdhConnection) throws SQLException {
 		List<Map<String,String>> fromModelToModelList = new ArrayList<Map<String,String>>();
-		Object[] params = new String[2]; 
+		Object[] params = new String[2];
 		params[0] =type;
 		params[1] =pdhdomain;
 		String realSql = CommonUtils.getPreparedSQL(sql, params);
 		this.addDebug("querySql=" + realSql);
-		
+
 		PreparedStatement statement = rdhConnection.prepareStatement(sql);
 		statement.setString(1, type);
 		statement.setString(2, pdhdomain);
@@ -796,26 +796,26 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 			map.put("MODEL", resultSet.getString("MODEL"));
 			map.put("INVNAME", resultSet.getString("INVNAME"));
 			fromModelToModelList.add(map);
-		}		
+		}
 		return fromModelToModelList;
 	}
-    
-    private String getModelFromXML(String TOMACHTYPE, String TOMODEL,Connection odsConnection) throws SQLException {
+
+	private String getModelFromXML(String TOMACHTYPE, String TOMODEL,Connection odsConnection) throws SQLException {
 		/**
-		 * 
+		 *
 		 * select XMLMESSAGE from cache.XMLIDLCACHE 
-         * where XMLCACHEVALIDTO > current timestamp 
-         * and  XMLENTITYTYPE = 'MODEL'
-         * and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE"; $i/MODEL_UPDATE[MACHTYPE/text() = "7954" and MODEL/text() ="24X"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") 
-         * with ur;
+		 * where XMLCACHEVALIDTO > current timestamp
+		 * and  XMLENTITYTYPE = 'MODEL'
+		 * and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE"; $i/MODEL_UPDATE[MACHTYPE/text() = "7954" and MODEL/text() ="24X"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i")
+		 * with ur;
 		 */
-    	String cacheSql = "select XMLMESSAGE,XMLENTITYID from cache.XMLIDLCACHE "
-    			+ " where XMLCACHEVALIDTO > current timestamp "
-    			+ " and  XMLENTITYTYPE = 'MODEL'"
-    			+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
-    			+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\" and MODEL/text() =\""+TOMODEL+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")" 
-                + " FETCH FIRST 1 ROWS ONLY with ur";	
-    	addDebug("cacheSql=" + cacheSql);
+		String cacheSql = "select XMLMESSAGE,XMLENTITYID from cache.XMLIDLCACHE "
+				+ " where XMLCACHEVALIDTO > current timestamp "
+				+ " and  XMLENTITYTYPE = 'MODEL'"
+				+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
+				+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\" and MODEL/text() =\""+TOMODEL+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")"
+				+ " FETCH FIRST 1 ROWS ONLY with ur";
+		addDebug("cacheSql=" + cacheSql);
 		PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
 		ResultSet resultSet = statement.executeQuery();
 		String xml = "";
@@ -823,72 +823,72 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 		if (resultSet.next()) {
 			xml = resultSet.getString("XMLMESSAGE");
 			xmlentityid = resultSet.getString("XMLENTITYID");
-			addDebug("getModelFromXML for MODEL TOMACHTYPE="+TOMACHTYPE+" and TOMODEL="+TOMODEL+" and XMLENTITYID=" + xmlentityid);		
+			addDebug("getModelFromXML for MODEL TOMACHTYPE="+TOMACHTYPE+" and TOMODEL="+TOMODEL+" and XMLENTITYID=" + xmlentityid);
 		}else{
 			String TOMACHTYPE_Sql = "select XMLMESSAGE,XMLENTITYID from cache.XMLIDLCACHE "
-	    			+ " where XMLCACHEVALIDTO > current timestamp "
-	    			+ " and  XMLENTITYTYPE = 'MODEL'"
-	    			+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
-	    			+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")" 
-	                + " FETCH FIRST 1 ROWS ONLY with ur";
+					+ " where XMLCACHEVALIDTO > current timestamp "
+					+ " and  XMLENTITYTYPE = 'MODEL'"
+					+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
+					+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")"
+					+ " FETCH FIRST 1 ROWS ONLY with ur";
 			PreparedStatement statement2 = odsConnection.prepareStatement(TOMACHTYPE_Sql);
 			ResultSet resultSet2 = statement2.executeQuery();
 			if (resultSet2.next()) {
 				xml = resultSet2.getString("XMLMESSAGE");
 				xmlentityid = resultSet2.getString("XMLENTITYID");
-				addDebug("getModelFromXML for MODEL only TOMACHTYPE=" + TOMACHTYPE +" and XMLENTITYID=" + xmlentityid);		
+				addDebug("getModelFromXML for MODEL only TOMACHTYPE=" + TOMACHTYPE +" and XMLENTITYID=" + xmlentityid);
 			}else{
 				addDebug("getModelFromXML for MODEL no XML");
-			}			
-			
+			}
+
 		}
 		return xml;
 	}
-    /**
-     * TMF. Search for TMF where FCTRANSACTION.TOMACHTYPE = TMF.MACHTYPE 
-     *                       and FCTRANSACTION.TOMODEL= TMF.MODEL 
-     *                       and FCTRANSACTION.TOFEATURECODE = TMF.FEATURECODE.
-     */
-    private String getTMFFromXML(String TOMACHTYPE, String TOMODEL,String TOFEATURECODE, Connection odsConnection) throws SQLException {
+	/**
+	 * TMF. Search for TMF where FCTRANSACTION.TOMACHTYPE = TMF.MACHTYPE
+	 *                       and FCTRANSACTION.TOMODEL= TMF.MODEL
+	 *                       and FCTRANSACTION.TOFEATURECODE = TMF.FEATURECODE.
+	 */
+	private String getTMFFromXML(String TOMACHTYPE, String TOMODEL,String TOFEATURECODE, Connection odsConnection) throws SQLException {
 		/**
-		 * 
+		 *
 		 * select XMLMESSAGE from cache.XMLIDLCACHE 
- 		 *	where XMLCACHEVALIDTO > current timestamp 
- 		 *	and  XMLENTITYTYPE = 'PRODSTRUCT'
- 		 *	and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/TMF_UPDATE"; $i/TMF_UPDATE[MACHTYPE/text() = "7031" and MODEL/text() ="D24" and FEATURECODE/text() ="0002"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") 
- 		 *	FETCH FIRST 1 ROWS ONLY with ur;
+		 *	where XMLCACHEVALIDTO > current timestamp
+		 *	and  XMLENTITYTYPE = 'PRODSTRUCT'
+		 *	and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/TMF_UPDATE"; $i/TMF_UPDATE[MACHTYPE/text() = "7031" and MODEL/text() ="D24" and FEATURECODE/text() ="0002"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i")
+		 *	FETCH FIRST 1 ROWS ONLY with ur;
 		 */
-    	String cacheSql = "select XMLMESSAGE from cache.XMLIDLCACHE "
-    			+ " where XMLCACHEVALIDTO > current timestamp "
-    			+ " and  XMLENTITYTYPE = 'PRODSTRUCT'"
-    			+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/TMF_UPDATE\"; "
-    			+ " $i/TMF_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\" and MODEL/text() =\""+TOMODEL+"\" and FEATURECODE/text() =\""+TOFEATURECODE+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")" 
-                + " FETCH FIRST 1 ROWS ONLY with ur";		
+		String cacheSql = "select XMLMESSAGE from cache.XMLIDLCACHE "
+				+ " where XMLCACHEVALIDTO > current timestamp "
+				+ " and  XMLENTITYTYPE = 'PRODSTRUCT'"
+				+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/TMF_UPDATE\"; "
+				+ " $i/TMF_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\" and MODEL/text() =\""+TOMODEL+"\" and FEATURECODE/text() =\""+TOFEATURECODE+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")"
+				+ " FETCH FIRST 1 ROWS ONLY with ur";
 		PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
 		addDebug("Search for TMF cacheSql=" + cacheSql);
 		ResultSet resultSet = statement.executeQuery();
 		String xml = "";
 		if (resultSet.next()) {
 			xml = resultSet.getString("XMLMESSAGE");
-			addDebug("getTMFFromXML");			
+			addDebug("getTMFFromXML");
 		}
 		return xml;
 	}
-    
-    
-    public boolean exist(String sql,String type,String pdhdomain) {
-    	boolean flag = false;
-    	try {
+
+
+	public boolean exist(String sql,String type,String pdhdomain) {
+		boolean flag = false;
+		try {
 			Connection connection = m_db.getPDHConnection();
-			Object[] params = new String[2]; 
+			Object[] params = new String[2];
 			params[0] =type;
-			params[1] =pdhdomain;			
+			params[1] =pdhdomain;
 			String realSql = CommonUtils.getPreparedSQL(sql, params);
 			this.addDebug("querySql=" + realSql);
 			PreparedStatement statement = connection.prepareStatement(sql);
 			statement.setString(1, type);
 			statement.setString(2, pdhdomain);
-			
+
 			ResultSet resultSet = statement.executeQuery();
 			if(resultSet.next()) {
 				int count = resultSet.getInt(1);
@@ -898,9 +898,9 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 			e.printStackTrace();
 		} catch (MiddlewareException e) {
 			e.printStackTrace();
-		}    	
-    	return flag;
-    	
-    }
-	
+		}
+		return flag;
+
+	}
+
 }
