@@ -194,7 +194,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					return;
 				}
 				String obj_id = fctransaction.getTOMACHTYPE() + "UPG";
-				String rfaNum = fctransaction.getFROMMACHTYPE()+fctransaction.getFROMFEATURECODE()+fctransaction.getTOMACHTYPE()+fctransaction.getTOFEATURECODE();
+				String rfaNum = fctransaction.getTOMACHTYPE()+"UPG";
 				//1. Call ChwMatmCreate to create the material master for the product object. 
 				addDebug("FCTRANSACTION ChwMatmCreate ");
 				ChwMatmCreate chwMatmCreate = new ChwMatmCreate(chwMODEL,"ZMAT",obj_id,rfaNum);
@@ -403,6 +403,17 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 				this.addDebug(updateParkStatus.createLogEntry());
 				if (updateParkStatus.getRfcrc() == 0) {
 					this.addOutput("Parking records updated successfully for ZDMRELNUM="+rfaNum);
+				} else {
+					this.addOutput(updateParkStatus.getRFCName() + " called faild!");
+					this.addOutput(updateParkStatus.getError_text());
+				}
+
+				updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", caller.getRFCNum(),true);
+				this.addDebug("Calling "+updateParkStatus.getRFCName());
+				updateParkStatus.execute();
+				this.addDebug(updateParkStatus.createLogEntry());
+				if (updateParkStatus.getRfcrc() == 0) {
+					this.addOutput("Parking records updated successfully for ZDMRELNUM="+caller.getRFCNum());
 				} else {
 					this.addOutput(updateParkStatus.getRFCName() + " called faild!");
 					this.addOutput(updateParkStatus.getError_text());
