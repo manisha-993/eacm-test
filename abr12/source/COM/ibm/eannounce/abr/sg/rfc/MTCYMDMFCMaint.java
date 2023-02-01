@@ -13,7 +13,7 @@ public class MTCYMDMFCMaint extends RdhBase{
     @SerializedName("TBL_MODELCONVERT")
     private List<MTCYMDMFCMaint_Model> tbl_model;
     public MTCYMDMFCMaint(MODELCONVERT modelconvert) {
-		super(modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())?modelconvert.getTOMACHTYPE()+"UPG":modelconvert.getTOMACHTYPE()+"MTC",
+		super(modelconvert.getFROMMACHTYPE() + modelconvert.getFROMMODEL() + modelconvert.getTOMACHTYPE() + modelconvert.getTOMODEL(),
 				"RDH_YMDMFC_MTC".toLowerCase(), null);
         this.pims_identity = "H";
 
