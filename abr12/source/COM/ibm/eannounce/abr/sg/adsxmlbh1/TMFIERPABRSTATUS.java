@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -24,6 +25,7 @@ import COM.ibm.eannounce.abr.sg.rfc.RdhClassificationMaint;
 import COM.ibm.eannounce.abr.sg.rfc.TMF_UPDATE;
 import COM.ibm.eannounce.abr.sg.rfc.UpdateParkStatus;
 import COM.ibm.eannounce.abr.sg.rfc.XMLParse;
+import COM.ibm.eannounce.abr.util.DateUtility;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
 import COM.ibm.eannounce.objects.EANList;
@@ -48,7 +50,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 	private String MODELSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
 	
 	private String FEATURESQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'FEATURE' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
-	
+	private String  date;
 	private String COVNOTEQUALSQL = "SELECT count(*) FROM OPICM.flag F\n"
 			+ " INNER JOIN opicm.text t1 ON f.ENTITYID =t1.ENTITYID AND f.ENTITYTYPE =t1.ENTITYTYPE AND t1.ATTRIBUTECODE ='FROMMACHTYPE' AND T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP "
 			+ " INNER JOIN OPICM.TEXT t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='TOMACHTYPE' AND T2.ATTRIBUTEVALUE =? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
@@ -107,7 +109,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String rootDesc = "";
 
 		Object[] args = new String[10];
-
+		 date =  "_"+DateUtility.getTodayStringWithSimpleFormat();
 		try {
 			msgf = new MessageFormat(HEADER);
 			args[0] = getShortClassName(getClass());
@@ -301,7 +303,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String mach_type = chwTMF.getMACHTYPE();
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		String material = chwTMF.getMACHTYPE() + "UPG";
-		String rfaNum = chwTMF.getMACHTYPE() + chwTMF.getMODEL()+chwTMF.getFEATURECODE()+"UPG";
+		String rfaNum = chwTMF.getMACHTYPE() +"UPG"+date;
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		//step1 If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED"), then
 		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
@@ -331,7 +333,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 			String ORDERCODE = chwTMF.getORDERCODE();
 			if("Non SIU- CPU".equalsIgnoreCase(UNITCLASS) || SYSTEMMAX.compareTo("1")>0 || "B".equalsIgnoreCase(ORDERCODE)){
 				chwClsfCharCreate = new ChwClsfCharCreate();
-				//String obj_id, String target_indc, String mach_type, String feature_code
+				//String obj_id , String target_indc, String mach_type, String feature_code
 				try{
 					target_indc = "T";
 					chwClsfCharCreate.CreateQTYChar(obj_id, target_indc, mach_type, feature_code, rfaNum);
@@ -521,7 +523,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String mach_type = chwTMF.getMACHTYPE();
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		String material = chwTMF.getMACHTYPE() + "MTC";
-		String rfaNum = chwTMF.getMACHTYPE() + chwTMF.getMODEL()+chwTMF.getFEATURECODE()+"MTC";
+		String rfaNum = chwTMF.getMACHTYPE() +"MTC"+date;
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
 		//step1 .If chwTMF/FEATURECODE does not contain any letter and chwTMF/FCTYPE not in ("RPQ-PLISTED","RPQ-ILISTED"), then
 		if(CommonUtils.isNoLetter(feature_code) && !FctypeEMap.containsKey(FCTYPE)){
@@ -760,7 +762,7 @@ public class TMFIERPABRSTATUS extends PokBaseABR {
 		String feature_code_desc = getFeatureCodeDesc(chwFeature);
 		String material = chwTMF.getMACHTYPE() + "NEW";
 		ChwClsfCharCreate chwClsfCharCreate = new ChwClsfCharCreate();
-		String rfaNum = chwTMF.getMACHTYPE() +chwTMF.getMODEL()+ chwTMF.getFEATURECODE()+"NEW";
+		String rfaNum = chwTMF.getMACHTYPE() +"NEW"+date;
 
 		this.addDebug("TMF param feature_code=" + feature_code);
 		this.addDebug("TMF param FCTYPE=" + FCTYPE);
