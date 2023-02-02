@@ -24,7 +24,7 @@ public class MODELGARSABRSTATUS extends PokBaseABR {
     private String navName = "";
     private Hashtable metaTbl = new Hashtable();
     private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODEL' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
-    private String MODELSQL = "select mt.attributevalue as MACHTYPE ,md.attributevalue as MODEL from opicm.flag mt join opicm.text md on mt.entityid=md.entityid and mt.entitytype=md.entitytype where mt.ENTITYTYPE='MODEL' and mt.ATTRIBUTECODE = 'MACHTYPEATR' and mt.entityid = ? and md.ATTRIBUTECODE = 'MODELATR' and md.VALTO > current timestamp and md.EFFTO > current timestamp and mt.VALTO > current timestamp and mt.EFFTO > current timestamp with ur";
+    private String MODELSQL = "select mt.attributevalue as MACHTYPE ,md.attributevalue as MODEL from opicm.flag mt join opicm.text md on mt.entityid=md.entityid and mt.entitytype=md.entitytype where mt.ENTITYTYPE='MODEL' and mt.ATTRIBUTECODE = 'MACHTYPEATR' and mt.entityid = ? and md.ATTRIBUTECODE = 'MODELATR' and md.nlsid = 1 and md.VALTO > current timestamp and md.EFFTO > current timestamp and mt.VALTO > current timestamp and mt.EFFTO > current timestamp with ur";
     String xml = null;
 
     public void execute_run() {
