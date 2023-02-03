@@ -408,7 +408,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					this.addOutput(updateParkStatus.getError_text());
 				}
 
-				updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", caller.getRFCNum(),true);
+				updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", caller.getRFCNum());
 				this.addDebug("Calling "+updateParkStatus.getRFCName());
 				updateParkStatus.execute();
 				this.addDebug(updateParkStatus.createLogEntry());
