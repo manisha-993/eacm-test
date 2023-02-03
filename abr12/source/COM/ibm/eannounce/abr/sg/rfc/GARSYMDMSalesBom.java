@@ -34,40 +34,40 @@ public class GARSYMDMSalesBom extends RdhBase
     @SerializedName("MODEL")
     private String model;
 
-    public GARSYMDMSalesBom(String machType, String model) {
-        super(machType + model + "BOM", "RDH_YMDMSALES_BOM".toLowerCase(),null);
+    public GARSYMDMSalesBom(MODEL chwProduct) {
+        super(chwProduct.getMACHTYPE() + chwProduct.getMODEL() + "BOM", "RDH_YMDMSALES_BOM".toLowerCase(),null);
         this.pims_identity = "H";
-        this.tmf_id = machType + "-" + model;
-        this.machine_type = machType;
-        this.model = model;
+        this.tmf_id = chwProduct.getMACHTYPE() + "-" + chwProduct.getMODEL();
+        this.machine_type = chwProduct.getMACHTYPE();
+        this.model = chwProduct.getMODEL();
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
 
         Set<String> plnts = RFCConfig.getBHPlnts();
         for(String plnt : plnts) {
                 GARSYMDMSalesBom_MAST mast = new GARSYMDMSalesBom_MAST();
-                mast.setMatnr(machType + "FEA");
+                mast.setMatnr(machine_type + "FEA");
                 mast.setWerks(plnt);
                 mast.setLosvn("0.000");
                 mast.setLosbs("0.000");
                 tbl_mast.add(mast);
 
                 GARSYMDMSalesBom_STKO stko = new GARSYMDMSalesBom_STKO();
-                stko.setMatnr(machType + "FEA");
+                stko.setMatnr(machine_type + "FEA");
                 stko.setWerks(plnt);
                 stko.setDatuv(sdf.format(new Date()));
                 tbl_stko.add(stko);
 
                 GARSYMDMSalesBom_STPO stpo = new GARSYMDMSalesBom_STPO();
-                stpo.setMatnr(machType + "FEA");
+                stpo.setMatnr(machine_type + "FEA");
                 stpo.setWerks(plnt);
-                stpo.setIdnrk(machType + model);
+                stpo.setIdnrk(machine_type + model);
                 tbl_stpo.add(stpo);
 
                 GARSYMDMSalesBom_CUKB cukb = new GARSYMDMSalesBom_CUKB();
-                cukb.setMatnr(machType + "FEA");
+                cukb.setMatnr(machine_type + "FEA");
                 cukb.setWerks(plnt);
-                cukb.setIdnrk(machType + model);
-                cukb.setDep_intern("SC_" + machType + "_MOD_" + model);
+                cukb.setIdnrk(machine_type + model);
+                cukb.setDep_intern("SC_" + machine_type + "_MOD_" + model);
                 cukb.setDep_type("5");
                 tbl_cukb.add(cukb);
         }
