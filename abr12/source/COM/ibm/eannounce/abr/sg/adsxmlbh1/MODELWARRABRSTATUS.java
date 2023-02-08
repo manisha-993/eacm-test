@@ -123,7 +123,7 @@ public class MODELWARRABRSTATUS extends PokBaseABR {
 				if(!"Warranty".equalsIgnoreCase(WARRSVCCOVR)) {
 					addOutput("WARRSVCCOVR value is not Warranty, so nothing to promote.");
 				}else {
-					ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(model);
+					ChwYMdmOthWarranty chwYMdmOthWarranty = new ChwYMdmOthWarranty(model,m_db.getPDHConnection());
 					if(chwYMdmOthWarranty.getZYTMDMOTHWARRMOD_LIST().size()>0) {
 						this.runRfcCaller(chwYMdmOthWarranty);
 						UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+model.getMODEL());
