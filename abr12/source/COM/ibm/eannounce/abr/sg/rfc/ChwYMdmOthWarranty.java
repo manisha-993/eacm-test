@@ -1,6 +1,10 @@
 /* Copyright IBM Corp. 2021 */
 package COM.ibm.eannounce.abr.sg.rfc;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,12 +150,12 @@ public class ChwYMdmOthWarranty extends RdhBase {
 
 	}
 
-	public ChwYMdmOthWarranty(MODEL chwProduct) {
+	public ChwYMdmOthWarranty(MODEL chwProduct,Connection pdhConnection) {
 		super(chwProduct.getMACHTYPE()+chwProduct.getMODEL(),	"Z_YMDMOTH_WARRANTY".toLowerCase(), null);
 		this.pims_identity = "H";
 		this.MATERIAL_TYPE = "MODEL";
 		ZYTMDMOTHWARRMOD zYTMDMOTHWARRMOD = new ZYTMDMOTHWARRMOD();
-		
+		boolean existGENAREASELECTION6400 = existGENAREASELECTION6400(chwProduct.getMODELENTITYID(),pdhConnection);
 		for (WARRELEMENTTYPE WARRELEMENT : chwProduct.getWARRLIST())
 		{
 						
@@ -164,8 +168,12 @@ public class ChwYMdmOthWarranty extends RdhBase {
 			}else {
 				//If chwProduct/WARRLIST/WARRELEMENT/WARRID  = "WTY0000",
 				if("WTY0000".equals(WARRELEMENT.getWARRID())){
-					zYTMDMOTHWARRMOD = setZYTMDMOTHWARRMOD(chwProduct, WARRELEMENT);
-					ZYTMDMOTHWARRMOD_LIST.add(zYTMDMOTHWARRMOD);
+					if(existGENAREASELECTION6400) {
+						zYTMDMOTHWARRMOD = setZYTMDMOTHWARRMOD(chwProduct, WARRELEMENT);
+						ZYTMDMOTHWARRMOD_LIST.add(zYTMDMOTHWARRMOD);
+					}else {
+						ZYTMDMOTHWARRMOD_LIST.addAll(setZYTMDMOTHWARRMODs(chwProduct, WARRELEMENT));
+					}
 				}else if(!"WTY0000".equals(WARRELEMENT.getWARRID())){
 					//then for each <COUNTRYELEMENT>
 					for(COUNTRY country: WARRELEMENT.getCOUNTRYLIST()){						
@@ -233,6 +241,25 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		
 	}
 
+	public boolean existGENAREASELECTION6400(String entityid,Connection connection){
+		String sql = "SELECT DISTINCT f.ATTRIBUTEVALUE  FROM OPICM.RELATOR r " +
+				"JOIN OPICM.TEXT t ON r.ENTITY2TYPE =t.ENTITYTYPE AND r.ENTITY2ID =t.ENTITYID AND t.ATTRIBUTECODE ='WARRID'  AND t.ATTRIBUTEVALUE ='WTY0000' AND t.VALTO > CURRENT timestamp AND t.EFFTO > CURRENT timestamp " +
+				"JOIN OPICM.FLAG f ON f.ENTITYTYPE =r.ENTITYTYPE AND f.ENTITYID =r.ENTITYID AND f.ATTRIBUTECODE ='GENAREASELECTION' and f.attributevalue='6400' AND f.VALTO > CURRENT timestamp AND f.EFFTO > CURRENT timestamp" +
+				"WHERE r.ENTITYTYPE ='MODELWARR' AND r.ENTITY1ID =?" +
+				"AND r.VALTO > CURRENT timestamp AND r.EFFTO > CURRENT timestamp WITH ur";
+		try {
+			PreparedStatement prepareStatement=	connection.prepareStatement(sql
+			);
+			prepareStatement.setString(1,entityid);
+			ResultSet resultSet= prepareStatement.executeQuery();
+			while (resultSet.next()){
+				return true;
+			}
+			return false;
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
 	protected ZYTMDMOTHWARRMOD setZYTMDMOTHWARRMOD(MODEL chwProduct,
 			WARRELEMENTTYPE WARRELEMENT) {
 		ZYTMDMOTHWARRMOD zYTMDMOTHWARRMOD = new ZYTMDMOTHWARRMOD();
@@ -288,6 +315,64 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		
 		
 		return zYTMDMOTHWARRMOD;
+	}
+	protected List<ZYTMDMOTHWARRMOD> setZYTMDMOTHWARRMODs(MODEL chwProduct,
+												   WARRELEMENTTYPE WARRELEMENT) {
+		List<ZYTMDMOTHWARRMOD> list = new ArrayList<>();
+		for (COUNTRY country:WARRELEMENT.getCOUNTRYLIST()) {
+			ZYTMDMOTHWARRMOD zYTMDMOTHWARRMOD = new ZYTMDMOTHWARRMOD();
+			zYTMDMOTHWARRMOD.setZMACHTYP(chwProduct.getMACHTYPE());
+			zYTMDMOTHWARRMOD.setZMODEL(chwProduct.getMODEL());
+			//Set ZINVNAME =left(chwProduct/MKTGNAME,40) where NLSID = 1;
+			for (LANGUAGE languageElement : chwProduct.getLANGUAGELIST()) {
+				if ("1".equals(languageElement.getNLSID())) {
+					zYTMDMOTHWARRMOD.setZINVNAME(CommonUtils.getFirstSubString(languageElement.getMKTGNAME(), 40));
+					break;
+				}
+			}
+
+			zYTMDMOTHWARRMOD.setZCOUNTRY(RFCConfig.getAland(country.getCOUNTRY_FC()));
+			//Copy from chwProduct/WARRLIST/WARRELEMENT/WARRID
+			zYTMDMOTHWARRMOD.setZWRTYID(WARRELEMENT.getWARRID());
+			zYTMDMOTHWARRMOD.setZWTYDESC(CommonUtils.getFirstSubString(WARRELEMENT.getWARRDESC(), 40));
+			//If chwProduct/WARRLIST/WARRELEMENT/PUBFROM is null, then
+			// set it to "19800101".
+			// Else set it to chwProduct/WARRLIST/WARRELEMENT/PUBFROM. (Format as YYYYMMDD)
+			String ZPUBFROM = "";
+			String sPUBFROM = WARRELEMENT.getPUBFROM();
+			if (sPUBFROM == null || "".equals(sPUBFROM)) {
+				ZPUBFROM = "19800101";
+			} else {
+				ZPUBFROM = sPUBFROM.replaceAll("-", "");
+			}
+			zYTMDMOTHWARRMOD.setZPUBFROM(ZPUBFROM);
+			//If chwProduct/WARRLIST/WARRELEMENT/PUBTO is null, then
+			// set it to "99991231".
+			// Else set it to chwProduct/WARRLIST/WARRELEMENT/PUBTO. (Format as YYYYMMDD)
+			String ZPUBTO = "";
+			String sPUBTO = WARRELEMENT.getPUBTO();
+			if (sPUBTO == null || "".equals(sPUBTO)) {
+				ZPUBTO = "99991231";
+			} else {
+				ZPUBTO = sPUBTO.replaceAll("-", "");
+			}
+			zYTMDMOTHWARRMOD.setZPUBTO(ZPUBTO);
+			//Set to first character of chwProduct/WARRLIST/WARRELEMENT/WARRACTION
+			zYTMDMOTHWARRMOD.setZWARR_FLAG(CommonUtils.getFirstSubString(WARRELEMENT.getWARRACTION(), 1));
+			//Default to ""
+
+			if ("Yes".equalsIgnoreCase(WARRELEMENT.getDEFWARR())) {
+				zYTMDMOTHWARRMOD.setZCOUNTRY_FLAG("");
+			} else {
+				COUNTRY c = WARRELEMENT.getCOUNTRYLIST().get(0);
+				String COUNTRYACTION = c.getCOUNTRYACTION();
+				zYTMDMOTHWARRMOD.setZCOUNTRY_FLAG(CommonUtils.getFirstSubString(COUNTRYACTION, 1));
+			}
+
+			list.add(zYTMDMOTHWARRMOD);
+		}
+
+		return list;
 	}
 	
 	public ChwYMdmOthWarranty(TMF_UPDATE chwProduct, String attributevalue) {
