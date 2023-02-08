@@ -199,17 +199,18 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 					*/
 
 				//create Sales Bom
+				String bomFlag = modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())?"BOMUPG":"BOMMTC";
 				List<MODEL> models = getMODEL(modelconvert.getTOMACHTYPE(), modelconvert.getPDHDOMAIN());
 				Set<String> plnts = RFCConfig.getBHPlnts();
 				this.addOutput("Start Bom Processing!");
-				updateSalesBom(modelconvert,flag,plnts,models);
+				updateSalesBom(modelconvert,flag,bomFlag,plnts,models);
 				this.addOutput("Bom Processing Finished!");
-				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP",modelconvert.getTOMACHTYPE()+flag);
+				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP",modelconvert.getTOMACHTYPE()+bomFlag);
 				this.addDebug("Calling "+updateParkStatus.getRFCName());
 				updateParkStatus.execute();
 				this.addDebug(updateParkStatus.createLogEntry());
 				if (updateParkStatus.getRfcrc() == 0) {
-					this.addOutput("Parking records updated successfully for ZDMRELNUM="+modelconvert.getTOMACHTYPE()+flag);
+					this.addOutput("Parking records updated successfully for ZDMRELNUM="+modelconvert.getTOMACHTYPE()+bomFlag);
 				} else {
 					this.addOutput(updateParkStatus.getRFCName() + " called faild!");
 					this.addOutput(updateParkStatus.getError_text());
@@ -308,10 +309,10 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 		return models;
 	}
 
-	public void updateSalesBom(MODELCONVERT modelconvert, String flag, Set<String> plnts, List<MODEL> models) throws Exception {
+	public void updateSalesBom(MODELCONVERT modelconvert, String flag, String bomFlag,Set<String> plnts, List<MODEL> models) throws Exception {
 		for(String plant : plnts) {
 			//call ChwBomCreate 
-			ChwBomCreate chwBomCreate = new ChwBomCreate(modelconvert.getTOMACHTYPE()+flag, plant);
+			ChwBomCreate chwBomCreate = new ChwBomCreate(modelconvert.getTOMACHTYPE()+flag,modelconvert.getTOMACHTYPE()+bomFlag, plant);
 			this.addDebug("Calling " + "ChwBomCreate");
 			this.addDebug(chwBomCreate.generateJson());
 			try{
@@ -358,7 +359,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 									}else {
 										POSNR=generateItemNumberString(POSNR);
 										//call ChwBomMaintain
-										ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag, plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+										ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag,modelconvert.getTOMACHTYPE()+bomFlag, plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
 										this.addDebug("Calling " + "chwBomMaintain");
 										this.addDebug(chwBomMaintain.generateJson());
 										try {
@@ -377,7 +378,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 								//call ChwBomMaintain
 								for(MODEL model : models) {
 									//call ChwBomMaintain
-									ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag, plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+									ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+flag,modelconvert.getTOMACHTYPE()+bomFlag, plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
 									this.addDebug("Calling " + "chwBomMaintain");
 									this.addDebug(chwBomMaintain.generateJson());
 									try {
