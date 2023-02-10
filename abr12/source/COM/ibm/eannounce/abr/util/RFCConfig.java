@@ -62,6 +62,7 @@ public class RFCConfig {
 					tax.setPLNT_CD(getCellData(row.getCell((short)2)));
 					tax.setDEL_PLNT(getCellData(row.getCell((short)3)));
 					tax.setTAX_COUNTRY(getCellData(row.getCell((short)4)));
+					tax.setTAX_CD(getCellData(row.getCell((short)6)));
 					tax.setTAX_CAT((getCellData(row.getCell((short)7))));
 					tax.setTAX_CLAS((getCellData(row.getCell((short)8))));
 					if(tax.getINTERFACE_ID()==null||"".equals(tax.getINTERFACE_ID()))
