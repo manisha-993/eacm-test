@@ -1,12 +1,8 @@
 /* Copyright IBM Corp. 2021 */
 package COM.ibm.eannounce.abr.sg.rfc;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.*;
+import java.util.*;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -150,7 +146,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 
 	}
 
-	public ChwYMdmOthWarranty(MODEL chwProduct,Connection pdhConnection) {
+	public ChwYMdmOthWarranty(MODEL chwProduct,Connection pdhConnection) throws SQLException {
 		super(chwProduct.getMACHTYPE()+chwProduct.getMODEL(),	"Z_YMDMOTH_WARRANTY".toLowerCase(), null);
 		this.pims_identity = "H";
 		this.MATERIAL_TYPE = "MODEL";
@@ -172,7 +168,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 						zYTMDMOTHWARRMOD = setZYTMDMOTHWARRMOD(chwProduct, WARRELEMENT);
 						ZYTMDMOTHWARRMOD_LIST.add(zYTMDMOTHWARRMOD);
 					}else {
-						ZYTMDMOTHWARRMOD_LIST.addAll(setZYTMDMOTHWARRMODs(chwProduct, WARRELEMENT));
+						ZYTMDMOTHWARRMOD_LIST.addAll(setZYTMDMOTHWARRMODs(chwProduct, WARRELEMENT,pdhConnection));
 					}
 				}else if(!"WTY0000".equals(WARRELEMENT.getWARRID())){
 					//then for each <COUNTRYELEMENT>
@@ -317,8 +313,18 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		return zYTMDMOTHWARRMOD;
 	}
 	protected List<ZYTMDMOTHWARRMOD> setZYTMDMOTHWARRMODs(MODEL chwProduct,
-												   WARRELEMENTTYPE WARRELEMENT) {
+												   WARRELEMENTTYPE WARRELEMENT,Connection pdhConnection) throws SQLException {
 		List<ZYTMDMOTHWARRMOD> list = new ArrayList<>();
+		String GETCOUNTYNAME = "select GENAREANAME_FC,GENAREACODE from price.generalarea  where GENAREACODE in (select GENAREACODE from price.generalarea) and NLSID = 1 and ISACTIVE = 1 WITH UR";
+		Set<String> countrySet = new HashSet<>();
+		Hashtable<String,String> countryName = new Hashtable<>();
+		Statement statement = pdhConnection.createStatement();
+		ResultSet resultSet = statement.executeQuery(GETCOUNTYNAME);
+		while(resultSet.next()) {
+			countryName.put(resultSet.getString("GENAREANAME_FC").trim(),resultSet.getString("GENAREACODE").trim());
+		}
+		statement.close();
+		resultSet.close();
 		for (COUNTRY country:WARRELEMENT.getCOUNTRYLIST()) {
 			ZYTMDMOTHWARRMOD zYTMDMOTHWARRMOD = new ZYTMDMOTHWARRMOD();
 			zYTMDMOTHWARRMOD.setZMACHTYP(chwProduct.getMACHTYPE());
@@ -331,7 +337,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 				}
 			}
 
-			zYTMDMOTHWARRMOD.setZCOUNTRY(RFCConfig.getAland(country.getCOUNTRY_FC()));
+			zYTMDMOTHWARRMOD.setZCOUNTRY(countryName.get(country.getCOUNTRY_FC()));
 			//Copy from chwProduct/WARRLIST/WARRELEMENT/WARRID
 			zYTMDMOTHWARRMOD.setZWRTYID(WARRELEMENT.getWARRID());
 			zYTMDMOTHWARRMOD.setZWTYDESC(CommonUtils.getFirstSubString(WARRELEMENT.getWARRDESC(), 40));
