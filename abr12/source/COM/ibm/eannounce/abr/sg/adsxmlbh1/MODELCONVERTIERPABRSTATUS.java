@@ -199,18 +199,18 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 					*/
 
 				//create Sales Bom
-				String bomFlag = modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())?"BOMUPG":"BOMMTC";
+				//String bomFlag = modelconvert.getFROMMACHTYPE().equals(modelconvert.getTOMACHTYPE())?"BOMUPG":"BOMMTC";
 				List<MODEL> models = getMODEL(modelconvert.getTOMACHTYPE(), modelconvert.getPDHDOMAIN());
 				Set<String> plnts = RFCConfig.getBHPlnts();
 				this.addOutput("Start Bom Processing!");
-				updateSalesBom(modelconvert,bomFlag,plnts,models);
+				updateSalesBom(modelconvert,flag,plnts,models);
 				this.addOutput("Bom Processing Finished!");
-				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP",modelconvert.getTOMACHTYPE()+bomFlag);
+				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP",modelconvert.getTOMACHTYPE()+flag);
 				this.addDebug("Calling "+updateParkStatus.getRFCName());
 				updateParkStatus.execute();
 				this.addDebug(updateParkStatus.createLogEntry());
 				if (updateParkStatus.getRfcrc() == 0) {
-					this.addOutput("Parking records updated successfully for ZDMRELNUM="+modelconvert.getTOMACHTYPE()+bomFlag);
+					this.addOutput("Parking records updated successfully for ZDMRELNUM="+modelconvert.getTOMACHTYPE()+flag);
 				} else {
 					this.addOutput(updateParkStatus.getRFCName() + " called faild!");
 					this.addOutput(updateParkStatus.getError_text());

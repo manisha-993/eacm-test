@@ -219,13 +219,13 @@ public class MODELIERPABRSTATUS extends PokBaseABR {
 					// step e
 					Set<String> plnts = RFCConfig.getBHPlnts();
 					this.addOutput("Start Bom Processing!");
-					updateSalesBom(model, "BOMNEW", plnts);
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+"BOMNEW");
-					runParkCaller(updateParkStatus,model.getMACHTYPE()+"BOMNEW");
+					updateSalesBom(model, "NEW", plnts);
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+"NEW");
+					runParkCaller(updateParkStatus,model.getMACHTYPE()+"NEW");
 					if("M".equals(model.getORDERCODE())||"B".equals(model.getORDERCODE())) {
-						updateSalesBom(model, "BOMUPG", plnts);
-						updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+"BOMUPG");
-						runParkCaller(updateParkStatus,model.getMACHTYPE()+"BOMUPG");
+						updateSalesBom(model, "UPG", plnts);
+						updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", model.getMACHTYPE()+"UPG");
+						runParkCaller(updateParkStatus,model.getMACHTYPE()+"UPG");
 					}
 					this.addOutput("Bom Processing Finished!");
 					rfanum = model.getMACHTYPE()+model.getMODEL();
