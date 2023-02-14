@@ -168,7 +168,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 			}else {
 				//If chwProduct/WARRLIST/WARRELEMENT/WARRID  = "WTY0000",
 				if("WTY0000".equals(WARRELEMENT.getWARRID())){
-					if(existGENAREASELECTION6400) {
+					if(!existGENAREASELECTION6400) {
 						zYTMDMOTHWARRMOD = setZYTMDMOTHWARRMOD(chwProduct, WARRELEMENT);
 						ZYTMDMOTHWARRMOD_LIST.add(zYTMDMOTHWARRMOD);
 					}else {
