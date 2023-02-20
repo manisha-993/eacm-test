@@ -58,7 +58,7 @@ public class RdhMatmCreate extends RdhBase {
 	@Foo
 	static Set<String> werks_set = null;
 	static {
-		String[] codes ="0026, 0066, 0147, 0008,0099,0452,0064,0088,0108,8340,0164,0411,0127,0063".split(",");
+		String[] codes ="0026, 0066, 0147, 0008,0099,0452,0064,0088,0108,8340,0164,0411,0127,0063,7600".split(",");
 		String[] countrys = "Canada, Ireland, US, Australia, New Zealand, Brunei Darussalam, Indonesia, Malaysia, Philippines, Singapore, Viet Nam, Thailand, Sri Lanka, India".split(",");
 		String[] werks = "1704,IN01,IN02,IN03,IN04,IN05,IN06,IN07,IN08,IN09,IN10,IN11,IN12,IN13,IN14,IN15,IN16,IN17".split(",");
 		werks_set = new HashSet<>(Arrays.asList(werks));
@@ -269,6 +269,8 @@ public class RdhMatmCreate extends RdhBase {
 								sales_org.setZsabrtax("SWMA");
 							} else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
 								sales_org.setZsabrtax("HWMA");
+							}else if ("P4065".equals(bmmh1.get(0).getPrctr())) {
+								sales_org.setZsabrtax("SMVS");
 							}else {
 								sales_org.setZsabrtax(" ");
 							}
@@ -276,7 +278,7 @@ public class RdhMatmCreate extends RdhBase {
 					}
 					if (werks_set.contains(plant.getWerks())){
 
-							if ("P4016".equals(bmmh1.get(0).getPrctr())) {
+							if ("P4016".equals(bmmh1.get(0).getPrctr())||"P4065".equals(bmmh1.get(0).getPrctr())) {
 								plant.setSteuc("998313");
 							} else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
 								plant.setSteuc("998713");
