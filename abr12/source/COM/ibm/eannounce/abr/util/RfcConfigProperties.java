@@ -144,6 +144,11 @@ public final class RfcConfigProperties extends Properties {
 		return
 				c_prop.getProperty("MTPOS.MACHTYPE", "");
 	}
+	public static final String getSUOMachtype() {
+		reloadProperties();
+		return
+				c_prop.getProperty("SUO.MACHTYPE", "");
+	}
 	public static  String getZsabrtaxPropertys(String key){
 		reloadProperties();
 		return 
