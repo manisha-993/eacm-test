@@ -203,7 +203,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				List<MODEL> models = getMODEL(modelconvert.getTOMACHTYPE(), modelconvert.getPDHDOMAIN());
 				Set<String> plnts = RFCConfig.getBHPlnts();
 				this.addOutput("Start Bom Processing!");
-				updateSalesBom(modelconvert,bomFlag,plnts,models);
+				updateSalesBom(modelconvert,flag,plnts,models);
 				this.addOutput("Bom Processing Finished!");
 				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP",modelconvert.getTOMACHTYPE()+bomFlag);
 				this.addDebug("Calling "+updateParkStatus.getRFCName());
