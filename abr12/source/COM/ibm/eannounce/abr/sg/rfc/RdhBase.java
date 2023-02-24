@@ -358,6 +358,7 @@ public abstract class RdhBase
     	return rfc_name;
     }
     public String getRFCNum() {
+
         return rfa_num;
     }
     /**
