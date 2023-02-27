@@ -1669,7 +1669,7 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 		String machtype= PokUtils.getAttributeValue(rootEntity, "MACHTYPEATR", "", "");
 		String cofcat= PokUtils.getAttributeValue(rootEntity, "COFCAT", "", "");
 		addHeading(3,"Model SysteamType Checks:");
-		addDebug("sysidunit=" + sysidunit + " systemtype=" + systemtype + "cofcat" + cofcat);
+		addDebug("sysidunit=" + sysidunit + " systemtype=" + systemtype + " cofcat=" + cofcat);
 		if("Hardware".equals(cofcat)) {
 			if ("SIU-CPU".equals(sysidunit)) {
 				if (machtype == null || machtype.equals("") || !machtype.equals(systemtype)) {
