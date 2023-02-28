@@ -388,7 +388,12 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					// Call UpdateParkStatus
 					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", fctransaction.getTOMACHTYPE()+"BOMUPG");
 					this.addDebug("Calling "+updateParkStatus.getRFCName());
-					updateParkStatus.execute();
+					try {
+						updateParkStatus.execute();
+					} catch (Exception e) {
+						// TODO: handle exception
+						e.printStackTrace();
+					}
 					this.addDebug(updateParkStatus.createLogEntry());
 					if (updateParkStatus.getRfcrc() == 0) {
 						this.addOutput("Parking records updated successfully for ZDMRELNUM="+fctransaction.getTOMACHTYPE()+"BOMUPG");
