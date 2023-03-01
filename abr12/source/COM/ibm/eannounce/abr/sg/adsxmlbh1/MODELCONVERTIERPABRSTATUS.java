@@ -52,7 +52,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 	private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'MODELCONVERT' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
 	String xml = null;
 
-	
+
 
 	public String getDescription() {
 		// TODO Auto-generated method stub
@@ -77,7 +77,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				+ NEWLINE;
 
 		String header1 = "";
-	
+
 
 		MessageFormat msgf;
 		String abrversion = "";
@@ -104,9 +104,9 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 
 			// get the root entity using current timestamp, need this to get the
 			// timestamps or info for VE pulls
-			  m_elist = m_db.getEntityList(m_prof,
-                    new ExtractActionItem(null, m_db, m_prof,"dummy"),
-                    new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
+			m_elist = m_db.getEntityList(m_prof,
+					new ExtractActionItem(null, m_db, m_prof,"dummy"),
+					new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
 			/*
 			 * m_db.getEntityList(m_prof, new ExtractActionItem(null, m_db,
 			 * m_prof,"dummy"), new EntityItem[] { new EntityItem(null, m_prof,
@@ -126,15 +126,15 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 			PreparedStatement statement = connection.prepareStatement(CACEHSQL);
 			statement.setInt(1, rootEntity.getEntityID());
 			ResultSet resultSet = statement.executeQuery();
-		
+
 			while (resultSet.next()) {
 				xml = resultSet.getString("XMLMESSAGE");
 			}
 			if (xml != null) {
-				
-				MODELCONVERT modelconvert = XMLParse.getObjectFromXml(xml, MODELCONVERT.class); 
+
+				MODELCONVERT modelconvert = XMLParse.getObjectFromXml(xml, MODELCONVERT.class);
 				String modelXML = getModelFromXML(modelconvert.getTOMACHTYPE(), modelconvert.getTOMODEL(), connection);
-					//addOutput("MODEL xml:"+convertToHTML(modelXML));
+				//addOutput("MODEL xml:"+convertToHTML(modelXML));
 				if(modelXML==null) {
 					this.addOutput("MODEL xml not found in cache fro MODEL:"+modelconvert.getTOMODEL()+" MACHTYPE:"+modelconvert.getTOMACHTYPE());
 					return;
@@ -156,18 +156,18 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 						addError(mUpg.getRptSb().toString());
 						throw e;
 					}
-				}else {					 
+				}else {
 					ChwModelConvertMtc mtc = new ChwModelConvertMtc(model,modelconvert,m_db.getPDHConnection(),connection);
 					try {
-						mtc.execute();	
-					    addOutput(mtc.getRptSb().toString());
+						mtc.execute();
+						addOutput(mtc.getRptSb().toString());
 					} catch (Exception e) {
 						// TODO: handle exception
 						addError(mtc.getRptSb().toString());
 						throw e;
 					}
 				}
-				/* MTCYMDMFCMaint maint = new MTCYMDMFCMaint(modelconvert);
+				 MTCYMDMFCMaint maint = new MTCYMDMFCMaint(modelconvert);
 				 
 				 this.addDebug("Calling " + maint.getRFCName());
 				 if(maint.getTbl_model().size()>0) {
@@ -182,10 +182,10 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				 }else {
 					 addOutput("No Tbl_model in the MTCYMDMFCMaint, will not call the RFC");
 				 }
-				 */
-				
-			//MTCYMDMFCMa
-			//ChwMachTypeMtc 
+
+
+				//MTCYMDMFCMa
+				//ChwMachTypeMtc
 		
 				/*	this.addDebug("Calling " + prod.getRFCName());
 					prod.execute();
@@ -204,9 +204,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 				this.addOutput("Start Bom Processing!");
 				updateSalesBom(modelconvert,flag,plnts,models);
 				this.addOutput("Bom Processing Finished!");
-
-				// Call UpdateParkStatus
-				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", modelconvert.getTOMACHTYPE() + flag);
+				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP",modelconvert.getTOMACHTYPE()+flag);
 				this.addDebug("Calling "+updateParkStatus.getRFCName());
 				updateParkStatus.execute();
 				this.addDebug(updateParkStatus.createLogEntry());
@@ -216,13 +214,25 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 					this.addOutput(updateParkStatus.getRFCName() + " called faild!");
 					this.addOutput(updateParkStatus.getError_text());
 				}
+				// Call UpdateParkStatus
+				String rfaNum= modelconvert.getFROMMACHTYPE()+modelconvert.getFROMMODEL()+modelconvert.getTOMACHTYPE()+modelconvert.getTOMODEL();
+				updateParkStatus = new UpdateParkStatus("MD_CHW_IERP",rfaNum);
+				this.addDebug("Calling "+updateParkStatus.getRFCName());
+				updateParkStatus.execute();
+				this.addDebug(updateParkStatus.createLogEntry());
+				if (updateParkStatus.getRfcrc() == 0) {
+					this.addOutput("Parking records updated successfully for ZDMRELNUM="+rfaNum);
+				} else {
+					this.addOutput(updateParkStatus.getRFCName() + " called faild!");
+					this.addOutput(updateParkStatus.getError_text());
+				}
 			} else {
-				this.addOutput("XML file not exist in cache,RFC caller not called!");
+				this.addOutput("XML file not exeit in cache,RFC caller not called!");
 				//return;
 			}
-			
-			
-			
+
+
+
 			// exeFtpShell(ffPathName);
 			// ftpFile();
 			/*
@@ -250,7 +260,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 			logError(exBuf.getBuffer().toString());
 			// was an error make sure user gets report
 			setCreateDGEntity(true);
-			
+
 			// sentFile=exeFtpShell(ffPathName);
 		} finally {
 			StringBuffer sb = new StringBuffer();
@@ -267,18 +277,16 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 			println(EACustom.getDocTypeHtml()); // Output the doctype and html
 			println(rptSb.toString()); // Output the Report
 			printDGSubmitString();
-			 if(!isReadOnly()) {
-	                clearSoftLock();
-	            }
+
 			println(EACustom.getTOUDiv());
 			buildReportFooter(); // Print </html>
 		}
 	}
 
-	
+
 	private List<MODEL> getMODEL(String toMachtype, String domain) throws Exception{
 		List<MODEL> models= new ArrayList();
-		
+
 		String sql = "SELECT distinct t2.ATTRIBUTEVALUE as MACHTYPEATR,substr(T1.ATTRIBUTEVALUE,1,3) as MODELATR FROM OPICM.flag F "
 				+ "INNER JOIN OPICM.FLAG t2 ON f.ENTITYID =t2.ENTITYID AND f.ENTITYTYPE =t2.ENTITYTYPE AND t2.ATTRIBUTECODE ='MACHTYPEATR' AND T2.ATTRIBUTEVALUE =? and T2.VALTO > CURRENT  TIMESTAMP AND T2.EFFTO > CURRENT  TIMESTAMP "
 				+ "INNER JOIN OPICM.text t1 ON t1.ENTITYID =t2.ENTITYID AND t1.ENTITYTYPE =t2.ENTITYTYPE AND t1.ATTRIBUTECODE ='MODELATR' and T1.VALTO > CURRENT  TIMESTAMP AND T1.EFFTO > CURRENT  TIMESTAMP AND T1.NLSID=1 "
@@ -292,11 +300,11 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 		ResultSet resultSet = statement.executeQuery();
 		while (resultSet.next()) {
 			MODEL model = new MODEL();
-			model.setMACHTYPE(resultSet.getString("MACHTYPEATR").trim());
-			model.setMODEL(resultSet.getString("MODELATR").trim());
+			model.setMACHTYPE(resultSet.getString("MACHTYPEATR"));
+			model.setMODEL(resultSet.getString("MODELATR"));
 			models.add(model);
 		}
-		
+
 		return models;
 	}
 
@@ -305,7 +313,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 			//call ChwBomCreate 
 			ChwBomCreate chwBomCreate = new ChwBomCreate(modelconvert.getTOMACHTYPE()+flag, plant);
 			this.addDebug("Calling " + "ChwBomCreate");
-			this.addDebug(chwBomCreate.generateJson());	
+			this.addDebug(chwBomCreate.generateJson());
 			try{
 				chwBomCreate.execute();
 				this.addDebug(chwBomCreate.createLogEntry());
@@ -416,38 +424,38 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 	private boolean hasMatchComponent(List<HashMap<String, String>> bom, String componment){
 		for (int i = 0; i < bom.size(); i++) {
 			String rev = bom.get(i).get("COMPONENT");
-			if (rev.trim().equals(componment)){				
-			  return true;
+			if (rev.trim().equals(componment)){
+				return true;
 			}
 		}
 		return false;
 	}
-	
-	 private String getModelFromXML(String TOMACHTYPE, String TOMODEL,Connection odsConnection) throws SQLException {
-			/**
-			 * 
-			 * select XMLMESSAGE from cache.XMLIDLCACHE 
-	         * where XMLCACHEVALIDTO > current timestamp 
-	         * and  XMLENTITYTYPE = 'MODEL'
-	         * and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE"; $i/MODEL_UPDATE[MACHTYPE/text() = "7954" and MODEL/text() ="24X"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i") 
-	         * with ur;
-			 */
-	    	String cacheSql = "select XMLMESSAGE from cache.XMLIDLCACHE "
-	    			+ " where XMLCACHEVALIDTO > current timestamp "
-	    			+ " and  XMLENTITYTYPE = 'MODEL'"
-	    			+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
-	    			+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\" and MODEL/text() =\""+TOMODEL+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")" 
-	                + " FETCH FIRST 1 ROWS ONLY with ur";	
-	    	addDebug("getModelFromXML cacheSql" + cacheSql);
-			PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
-			ResultSet resultSet = statement.executeQuery();
-			String xml = "";
-			if (resultSet.next()) {
-				xml = resultSet.getString("XMLMESSAGE");
-				addDebug("getModelFromXML xml");		
-			}
-			return xml;
+
+	private String getModelFromXML(String TOMACHTYPE, String TOMODEL,Connection odsConnection) throws SQLException {
+		/**
+		 *
+		 * select XMLMESSAGE from cache.XMLIDLCACHE
+		 * where XMLCACHEVALIDTO > current timestamp
+		 * and  XMLENTITYTYPE = 'MODEL'
+		 * and xmlexists('declare default element namespace "http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE"; $i/MODEL_UPDATE[MACHTYPE/text() = "7954" and MODEL/text() ="24X"]' passing cache.XMLIDLCACHE.XMLMESSAGE as "i")
+		 * with ur;
+		 */
+		String cacheSql = "select XMLMESSAGE from cache.XMLIDLCACHE "
+				+ " where XMLCACHEVALIDTO > current timestamp "
+				+ " and  XMLENTITYTYPE = 'MODEL'"
+				+ " and xmlexists('declare default element namespace \"http://w3.ibm.com/xmlns/ibmww/oim/eannounce/ads/MODEL_UPDATE\"; "
+				+ " $i/MODEL_UPDATE[MACHTYPE/text() = \""+TOMACHTYPE+"\" and MODEL/text() =\""+TOMODEL+"\"]' passing cache.XMLIDLCACHE.XMLMESSAGE as \"i\")"
+				+ " FETCH FIRST 1 ROWS ONLY with ur";
+		addDebug("getModelFromXML cacheSql" + cacheSql);
+		PreparedStatement statement = odsConnection.prepareStatement(cacheSql);
+		ResultSet resultSet = statement.executeQuery();
+		String xml = "";
+		if (resultSet.next()) {
+			xml = resultSet.getString("XMLMESSAGE");
+			addDebug("getModelFromXML xml");
 		}
+		return xml;
+	}
 
 	/*
 	 * Get Name based on navigation attributes for root entity
@@ -471,7 +479,7 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 		if (metaList == null) {
 			EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
 			metaList = eg.getMetaAttribute(); // iterator does not maintain
-												// navigate order
+			// navigate order
 			metaTbl.put(theItem.getEntityType(), metaList);
 		}
 		for (int ii = 0; ii < metaList.size(); ii++) {
@@ -483,84 +491,84 @@ public class MODELCONVERTIERPABRSTATUS extends PokBaseABR {
 		}
 		return navName.toString();
 	}
-	
-	
-	 /********************************************************************************
-     * Convert string into valid html.  Special HTML characters are converted.
-     *
-     * @param txt    String to convert
-     * @return String
-     */
-    protected static String convertToHTML(String txt)
-    {
-        String retVal="";
-        StringBuffer htmlSB = new StringBuffer();
-        StringCharacterIterator sci = null;
-        char ch = ' ';
-        if (txt != null) {
-            sci = new StringCharacterIterator(txt);
-            ch = sci.first();
-            while(ch != CharacterIterator.DONE)
-            {
-                switch(ch)
-                {
-                case '<':
-                    htmlSB.append("&lt;");
-                break;
-                case '>':
-                    htmlSB.append("&gt;");
-                    break;
-                case '"':
-                    // double quotation marks could be saved as &quot; also. this will be &#34;
-                    // this should be included too, but left out to be consistent with west coast
-                    htmlSB.append("&quot;");
-                    break;
-                case '\'':
-                    //IE6 doesn't support &apos; to convert single quotation marks,we can use &#39; instead
-                    htmlSB.append("&#"+((int)ch)+";");
-                    break;
-                    //case '&': 
-                    // ignore entity references such as &lt; if user typed it, user will see it
-                    // could be saved as &amp; also. this will be &#38;
-                    //htmlSB.append("&#"+((int)ch)+";");
-                    //  htmlSB.append("&amp;");
-                    //    break;
-                default:
-                    htmlSB.append(ch);
-                break;
-                }
-                ch = sci.next();
-            }
-            retVal = htmlSB.toString();
-        }
-
-        return retVal;
-    }
-    
-	 protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
 
 
-		/**********************************
-	     * add debug info as html comment
-	     *    EBUG_ERR = 0;
-	          EBUG_WARN = 1;
-	          EBUG_INFO = 2;
-	          EBUG_DETAIL = 3;
-	          EBUG_SPEW = 4
-	     */
-	   
+	/********************************************************************************
+	 * Convert string into valid html.  Special HTML characters are converted.
+	 *
+	 * @param txt    String to convert
+	 * @return String
+	 */
+	protected static String convertToHTML(String txt)
+	{
+		String retVal="";
+		StringBuffer htmlSB = new StringBuffer();
+		StringCharacterIterator sci = null;
+		char ch = ' ';
+		if (txt != null) {
+			sci = new StringCharacterIterator(txt);
+			ch = sci.first();
+			while(ch != CharacterIterator.DONE)
+			{
+				switch(ch)
+				{
+					case '<':
+						htmlSB.append("&lt;");
+						break;
+					case '>':
+						htmlSB.append("&gt;");
+						break;
+					case '"':
+						// double quotation marks could be saved as &quot; also. this will be &#34;
+						// this should be included too, but left out to be consistent with west coast
+						htmlSB.append("&quot;");
+						break;
+					case '\'':
+						//IE6 doesn't support &apos; to convert single quotation marks,we can use &#39; instead
+						htmlSB.append("&#"+((int)ch)+";");
+						break;
+					//case '&':
+					// ignore entity references such as &lt; if user typed it, user will see it
+					// could be saved as &amp; also. this will be &#38;
+					//htmlSB.append("&#"+((int)ch)+";");
+					//  htmlSB.append("&amp;");
+					//    break;
+					default:
+						htmlSB.append(ch);
+						break;
+				}
+				ch = sci.next();
+			}
+			retVal = htmlSB.toString();
+		}
+
+		return retVal;
+	}
+
+	protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
+
+
+	/**********************************
+	 * add debug info as html comment
+	 *    EBUG_ERR = 0;
+	 EBUG_WARN = 1;
+	 EBUG_INFO = 2;
+	 EBUG_DETAIL = 3;
+	 EBUG_SPEW = 4
+	 */
+
 	protected void addDebug(String msg) {
 		if (D.EBUG_DETAIL <= abr_debuglvl) {
-		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
+			rptSb.append("<!-- " + msg + " -->" + NEWLINE);
 		}
 	}
-	 /**********************************
-     * add error info and fail abr
-     */
-    protected void addError(String msg) {
-        addOutput(msg);
-        setReturnCode(FAIL);
-    }
+	/**********************************
+	 * add error info and fail abr
+	 */
+	protected void addError(String msg) {
+		addOutput(msg);
+		setReturnCode(FAIL);
+	}
 
-	
+
 }

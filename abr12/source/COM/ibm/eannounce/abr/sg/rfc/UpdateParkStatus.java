@@ -57,7 +57,6 @@ public class UpdateParkStatus extends RdhBase
     		this.pims_identity="H";
     	}
     }
-    
  
     /* (non-Javadoc)
      * @see com.ibm.sdpi.cmd.interfaces.rdh.esw.caller.RdhBase#setDefaultValues()
