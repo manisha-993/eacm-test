@@ -31,7 +31,7 @@ public class RdhYMDMGars extends RdhBase
     @Foo
     private String GETCOUNTYNAME = "select GENAREANAME_FC,GENAREACODE from price.generalarea  where GENAREACODE in (select GENAREACODE from price.generalarea) and NLSID = 1 and ISACTIVE = 1 WITH UR";
     public RdhYMDMGars(MODEL chwProduct, Connection pdhConnection) throws SQLException {
-        super(chwProduct.getMACHTYPE()+chwProduct.getMODEL()+"FEA", "RDH_YMDM_GARS".toLowerCase(), null);
+        super(chwProduct.getMACHTYPE()+"FEA", "RDH_YMDM_GARS".toLowerCase(), null);
         this.pims_identity = "H";
         List<CountryPlantTax> taxList = RFCConfig.getTaxs();
         for(CountryPlantTax tax : taxList){
