@@ -26,24 +26,18 @@ public class GARSYMDMSalesBom extends RdhBase
     private List<GARSYMDMSalesBom_STPO> tbl_stpo;
     @SerializedName("TBL_CUKB")
     private List<GARSYMDMSalesBom_CUKB> tbl_cukb;
-
-    @SerializedName("TMF_ID")
-    private String tmf_id;
     @SerializedName("MACHINE_TYPE")
     private String machine_type;
     @SerializedName("MODEL")
     private String model;
 
-    public GARSYMDMSalesBom(MODEL chwProduct) {
-        super(chwProduct.getMACHTYPE() + chwProduct.getMODEL() + "BOM", "RDH_YMDMSALES_BOM".toLowerCase(),null);
-        this.pims_identity = "H";
-        this.tmf_id = chwProduct.getMACHTYPE() + "-" + chwProduct.getMODEL();
-        this.machine_type = chwProduct.getMACHTYPE();
-        this.model = chwProduct.getMODEL();
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
+    public GARSYMDMSalesBom(MODEL chwProduct, String plnt) {
+               super(chwProduct.getMACHTYPE() + "BOMFEA" + plnt, "RDH_YMDMSALES_BOM".toLowerCase(),null);
+               this.pims_identity = "H";
+               this.machine_type = chwProduct.getMACHTYPE();
+               this.model = chwProduct.getMODEL();
+               SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
 
-        Set<String> plnts = RFCConfig.getBHPlnts();
-        for(String plnt : plnts) {
                 GARSYMDMSalesBom_MAST mast = new GARSYMDMSalesBom_MAST();
                 mast.setMatnr(machine_type + "FEA");
                 mast.setWerks(plnt);
@@ -71,7 +65,6 @@ public class GARSYMDMSalesBom extends RdhBase
                 cukb.setDep_type("5");
                 tbl_cukb.add(cukb);
         }
-    }
     protected void setDefaultValues() {
         this.tbl_mast = new ArrayList<GARSYMDMSalesBom_MAST>();
         this.tbl_stko = new ArrayList<GARSYMDMSalesBom_STKO>();
