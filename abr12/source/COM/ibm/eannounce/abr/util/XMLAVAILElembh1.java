@@ -700,6 +700,15 @@ public class XMLAVAILElembh1 extends XMLElem {
 			child = (Element) document.createElement("ANNNUMBER");
 			child.appendChild(document.createTextNode("" + ctryAudRec.getAnnnumber()));
 			elem.appendChild(child);
+			child = (Element) document.createElement("CDOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getCDOCNO()));
+			elem.appendChild(child);
+			child = (Element) document.createElement("EDOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getEDOCNO()));
+			elem.appendChild(child);
+			child = (Element) document.createElement("ADOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getADOCNO()));
+			elem.appendChild(child);
 			child = (Element) document.createElement("FIRSTORDER");
 			child.appendChild(document.createTextNode("" + ctryAudRec.getFirstorder()));
 			elem.appendChild(child);
@@ -772,6 +781,15 @@ public class XMLAVAILElembh1 extends XMLElem {
 			elem.appendChild(child);
 			child = (Element) document.createElement("ANNNUMBER");
 			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrannnumber()));
+			elem.appendChild(child);
+			child = (Element) document.createElement("CDOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getCDOCNO()));
+			elem.appendChild(child);
+			child = (Element) document.createElement("EDOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getEDOCNO()));
+			elem.appendChild(child);
+			child = (Element) document.createElement("ADOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getADOCNO()));
 			elem.appendChild(child);
 			child = (Element) document.createElement("FIRSTORDER");
 			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrfirstorder()));
@@ -866,6 +884,15 @@ public class XMLAVAILElembh1 extends XMLElem {
 			child = (Element) document.createElement("ANNNUMBER");
 			child.appendChild(document.createTextNode("" + ctryAudRec.getAnnnumber()));
 			elem.appendChild(child);
+			child = (Element) document.createElement("CDOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getCDOCNO()));
+			elem.appendChild(child);
+			child = (Element) document.createElement("EDOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getEDOCNO()));
+			elem.appendChild(child);
+			child = (Element) document.createElement("ADOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getADOCNO()));
+			elem.appendChild(child);
 			child = (Element) document.createElement("FIRSTORDER");
 			child.appendChild(document.createTextNode("" + ctryAudRec.getFirstorder()));
 			elem.appendChild(child);
@@ -938,6 +965,20 @@ public class XMLAVAILElembh1 extends XMLElem {
 			elem.appendChild(child);
 			child = (Element) document.createElement("ANNNUMBER");
 			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrannnumber()));
+			elem.appendChild(child);
+			/**
+			 * </CDOCANNNUMBER>
+			 * </EDOCANNNUMBER>
+			 * </ADOCANNNUMBER>
+			 */
+			child = (Element) document.createElement("CDOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getCDOCNO()));
+			elem.appendChild(child);
+			child = (Element) document.createElement("EDOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getEDOCNO()));
+			elem.appendChild(child);
+			child = (Element) document.createElement("ADOCANNNUMBER");
+			child.appendChild(document.createTextNode("" + ctryAudRec.getADOCNO()));
 			elem.appendChild(child);
 			child = (Element) document.createElement("FIRSTORDER");
 			child.appendChild(document.createTextNode("" + ctryAudRec.getRfrfirstorder()));
@@ -1816,6 +1857,12 @@ public class XMLAVAILElembh1 extends XMLElem {
 			// lanned Availability (146).
 			String[] annnumbers = deriveAnnNumber(plAvailDiff[1], false, debugSb);
 			String[] annnumbersT1 = deriveAnnNumber(plAvailDiff[0], true, debugSb);
+			String[] adocnumbers = deriveADOCNUMBER(plAvailDiff[1], false, debugSb);
+			String[] adocnumbersT1 = deriveADOCNUMBER(plAvailDiff[0], true, debugSb);
+			String[] edocnumbers = deriveEDOCNUMBER(plAvailDiff[1], false, debugSb);
+			String[] edocnumbersT1 = deriveEDOCNUMBER(plAvailDiff[0], true, debugSb);
+			String[] cdocnumbers = deriveCDOCNUMBER(plAvailDiff[1], false, debugSb);
+			String[] cdocnumbersT1 = deriveCDOCNUMBER(plAvailDiff[0], true, debugSb);
 
 			// FIRSTORDER - should be AVAIL.EFFECTIVEDATE where AVAILTYPE = 143 or null.
 			String[] firstorders = deriveFIRSTORDER(plAvailDiff[1], parentDiffEntity, foAvailDiff, false, debugSb);
@@ -1897,7 +1944,7 @@ public class XMLAVAILElembh1 extends XMLElem {
 					plannedavailabilitys, plannedavailabilitysT1, pubfroms, pubfromsT1, pubtos, pubtosT1, wdanndates,
 					wdanndatesT1, eomannnums, eomannnumsT1, lastorders, lastordersT1, endofservices, endofservicesT1,
 					eodanndates, eodanndatesT1, eodavaildate, eodavaildateT1, eosanndates, eosanndatesT1, eosannnums,
-					eosannnumsT1, ordersysnames, ordersysnamesT1, country, isExistfinal, compatModel, debugSb);
+					eosannnumsT1, ordersysnames, ordersysnamesT1,adocnumbers,adocnumbersT1,cdocnumbers,cdocnumbersT1,edocnumbers,edocnumbersT1, country, isExistfinal, compatModel, debugSb);
 			// String cofsubcat =
 			// parentDiffEntity.getAttribute("COFSUBCAT")[0].getShortDescription();
 			
@@ -2285,6 +2332,63 @@ public class XMLAVAILElembh1 extends XMLElem {
 			returns[0]= thedate;
 			returns[1]= rfrthedate;
 			return returns;	
+		}
+		private String[] deriveCDOCNUMBER(DiffEntity endAvailDiff,boolean findT1, StringBuffer debugSb){
+			String thedate = CHEAT;
+			String rfrthedate = CHEAT;
+			String returns[] = new String[2];
+			String temps[] = new String[2];
+			ABRUtil.append(debugSb,"XMLAVAILElem.deriveCDOCNUMBER endAvailDiff: " + (endAvailDiff == null ? "null" : endAvailDiff.getKey())
+					+ "findT1:" + findT1 + NEWLINE);
+
+			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
+
+				temps = AvailUtil.getAvailAnnAttributeDate(findT1, endAvailDiff, thedate, rfrthedate, country, "CDOCNO", debugSb);
+				thedate = temps[0];
+				rfrthedate = temps[1];
+			}
+
+			returns[0]= thedate;
+			returns[1]= rfrthedate;
+			return returns;
+		}
+		private String[] deriveEDOCNUMBER(DiffEntity endAvailDiff,boolean findT1, StringBuffer debugSb){
+			String thedate = CHEAT;
+			String rfrthedate = CHEAT;
+			String returns[] = new String[2];
+			String temps[] = new String[2];
+			ABRUtil.append(debugSb,"XMLAVAILElem.deriveEDOCNUMBER endAvailDiff: " + (endAvailDiff == null ? "null" : endAvailDiff.getKey())
+					+ "findT1:" + findT1 + NEWLINE);
+
+			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
+
+				temps = AvailUtil.getAvailAnnAttributeDate(findT1, endAvailDiff, thedate, rfrthedate, country, "EDOCNO", debugSb);
+				thedate = temps[0];
+				rfrthedate = temps[1];
+			}
+
+			returns[0]= thedate;
+			returns[1]= rfrthedate;
+			return returns;
+		}
+		private String[] deriveADOCNUMBER(DiffEntity endAvailDiff,boolean findT1, StringBuffer debugSb){
+			String thedate = CHEAT;
+			String rfrthedate = CHEAT;
+			String returns[] = new String[2];
+			String temps[] = new String[2];
+			ABRUtil.append(debugSb,"XMLAVAILElem.deriveADOCNUMBER endAvailDiff: " + (endAvailDiff == null ? "null" : endAvailDiff.getKey())
+					+ "findT1:" + findT1 + NEWLINE);
+
+			if (CHEAT.equals(thedate) || CHEAT.equals(rfrthedate)) {
+
+				temps = AvailUtil.getAvailAnnAttributeDate(findT1, endAvailDiff, thedate, rfrthedate, country, "ADOCNO", debugSb);
+				thedate = temps[0];
+				rfrthedate = temps[1];
+			}
+
+			returns[0]= thedate;
+			returns[1]= rfrthedate;
+			return returns;
 		}
 		
 		/****************************
