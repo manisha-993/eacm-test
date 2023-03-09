@@ -240,8 +240,8 @@ public class ChwYMdmOthWarranty extends RdhBase {
 	public boolean existGENAREASELECTION6400(String entityid,Connection connection){
 		String sql = "SELECT DISTINCT f.ATTRIBUTEVALUE  FROM OPICM.RELATOR r " +
 				"JOIN OPICM.TEXT t ON r.ENTITY2TYPE =t.ENTITYTYPE AND r.ENTITY2ID =t.ENTITYID AND t.ATTRIBUTECODE ='WARRID'  AND t.ATTRIBUTEVALUE ='WTY0000' AND t.VALTO > CURRENT timestamp AND t.EFFTO > CURRENT timestamp " +
-				"JOIN OPICM.FLAG f ON f.ENTITYTYPE =r.ENTITYTYPE AND f.ENTITYID =r.ENTITYID AND f.ATTRIBUTECODE ='GENAREASELECTION' and f.attributevalue='6400' AND f.VALTO > CURRENT timestamp AND f.EFFTO > CURRENT timestamp" +
-				" WHERE r.ENTITYTYPE ='MODELWARR' AND r.ENTITY1ID =?" +
+				"JOIN OPICM.FLAG f ON f.ENTITYTYPE =r.ENTITYTYPE AND f.ENTITYID =r.ENTITYID AND f.ATTRIBUTECODE ='GENAREASELECTION' and f.attributevalue='6400' AND f.VALTO > CURRENT timestamp AND f.EFFTO > CURRENT timestamp " +
+				"WHERE r.ENTITYTYPE ='MODELWARR' AND r.ENTITY1ID =?" +
 				"AND r.VALTO > CURRENT timestamp AND r.EFFTO > CURRENT timestamp WITH ur";
 		try {
 			PreparedStatement prepareStatement=	connection.prepareStatement(sql
