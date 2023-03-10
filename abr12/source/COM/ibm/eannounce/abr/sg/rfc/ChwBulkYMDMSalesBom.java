@@ -23,17 +23,13 @@ public class ChwBulkYMDMSalesBom extends RdhBase{
     private ArrayList<ChwBulkYMDMSalesBom_STPO> tbl_stpo;
     @SerializedName("TBL_CUKB")
     private ArrayList<ChwBulkYMDMSalesBom_CUKB> tbl_cukb;
-	@SerializedName("TMF_ID")
-    private String TMF_ID;
-    public ChwBulkYMDMSalesBom(String machType, String model, String featurecode) {
-        super(machType +model+featurecode+ "BOM", "RDH_YMDMSALES_BOM".toLowerCase(), null);
-        this.pims_identity="H";
-        TMF_ID = machType + "-" + model + "-" +featurecode;
 
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
+    public ChwBulkYMDMSalesBom(String machType, String model, String featurecode, String plnt) {
+            super(machType + "BOMMEB" + plnt, "RDH_YMDMSALES_BOM".toLowerCase(), null);
+            this.pims_identity="H";
 
-        Set<String> plnts = RFCConfig.getBHPlnts();
-        for(String plnt : plnts) {
+            SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMdd");
+
             ChwBulkYMDMSalesBom_MAST mast = new ChwBulkYMDMSalesBom_MAST();
             mast.setMatnr(machType + "MEB");
             mast.setWerks(plnt);
@@ -83,7 +79,7 @@ public class ChwBulkYMDMSalesBom extends RdhBase{
             cukb3.setDep_type("5");
             tbl_cukb.add(cukb3);
         }
-    }
+
 
     @Override
     protected boolean isReadyToExecute() {
