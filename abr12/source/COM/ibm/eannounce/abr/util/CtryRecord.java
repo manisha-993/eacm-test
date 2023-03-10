@@ -82,6 +82,12 @@ public class CtryRecord extends XMLElem {
 	String ordersysname = CHEAT;
 	String rfrordersysname = CHEAT;
 
+	String CDOCNO = CHEAT;
+	String	EDOCNO = CHEAT;
+	String ADOCNO = CHEAT;
+	String rfrCDOCNO = CHEAT;
+	String rfrEDOCNO = CHEAT;
+	String rfrADOCNO = CHEAT;
 
 	public String getOrderSysName() {
 		return ordersysname;
@@ -230,6 +236,30 @@ public class CtryRecord extends XMLElem {
 
 	String getAnnnumber() {
 		return annnumber;
+	}
+
+	public String getCDOCNO() {
+		return CDOCNO;
+	}
+
+	public void setCDOCNO(String CDOCNO) {
+		this.CDOCNO = CDOCNO;
+	}
+
+	public String getEDOCNO() {
+		return EDOCNO;
+	}
+
+	public void setEDOCNO(String EDOCNO) {
+		this.EDOCNO = EDOCNO;
+	}
+
+	public String getADOCNO() {
+		return ADOCNO;
+	}
+
+	public void setADOCNO(String ADOCNO) {
+		this.ADOCNO = ADOCNO;
 	}
 
 	boolean isDeleted() {
@@ -1117,7 +1147,7 @@ public class CtryRecord extends XMLElem {
 			String[] lastorders, String[] lastordersT1, String[] endofservices, String[] endofservicesT1, 
 			String[] eodanndates, String[] eodanndatesT1, String[] eodavaildates, String[] eodavaildatesT1, 
 			String[] eosanndates, String[] eosanndatesT1, String[] eosannnums, String[] eosannnumsT1, String[] ordersysnames, 
-			String[] ordersysnamesT1, String country, boolean isExistfinal, boolean isCompatmodel, StringBuffer debugSb) {
+			String[] ordersysnamesT1,String[] adocnumbers,String[] adocnumbersT1,String[] cdocnumbers,String[] cdocnumbersT1,String[] edocnumbers,String[] edocnumbersT1, String country, boolean isExistfinal, boolean isCompatmodel, StringBuffer debugSb) {
 		// TODO Compare T1 and T2 set action and rfraction
 		String anndateT1 = CHEAT;
 		String rfranndateT1 = CHEAT;
@@ -1149,6 +1179,12 @@ public class CtryRecord extends XMLElem {
   		String rfreosannnumT1 = CHEAT;
 		String ordersysnameT1 = CHEAT;
 		String rfrordersysnameT1 = CHEAT;
+		String edocnumberT1 = CHEAT;
+		String adocnumberT1 = CHEAT;
+		String cdocnumberT1 = CHEAT;
+		String rfredocnumberT1 = CHEAT;
+		String rfradocnumberT1 = CHEAT;
+		String rfrcdocnumberT1 = CHEAT;
 
 		anndate = anndates[0];
 		rfranndate = anndates[1];
@@ -1212,8 +1248,19 @@ public class CtryRecord extends XMLElem {
 		rfrordersysname = ordersysnames[1];
 		ordersysnameT1 = ordersysnamesT1[0];
 		rfrordersysnameT1 = ordersysnamesT1[1];
-		
-		
+		EDOCNO=edocnumbers[0];
+		rfrEDOCNO=edocnumbers[1];
+		edocnumberT1 = edocnumbersT1[0];
+		rfredocnumberT1 = edocnumbersT1[0];
+		ADOCNO = adocnumbers[0];
+		rfrADOCNO=adocnumbers[1];
+		adocnumberT1 = adocnumbersT1[0];
+		CDOCNO=cdocnumbers[0];
+		rfrCDOCNO=cdocnumbers[1];
+		cdocnumberT1=cdocnumbersT1[0];
+		rfradocnumberT1=adocnumbersT1[1];
+		rfrcdocnumberT1=cdocnumbersT1[1];
+		rfredocnumberT1=edocnumbersT1[1];
 		if (DELETE_ACTIVITY.equals(action)) {
 			ABRUtil.append(debugSb, "setallfileds: coutry is delete:" + country);
 
@@ -1237,7 +1284,9 @@ public class CtryRecord extends XMLElem {
 			//Story 1865979 Withdrawal RFA Number generation
   			rfreosannnumT1 = copyfinaltoRFR(eosannnumT1, rfreosannnumT1, true, debugSb);
   			rfrordersysnameT1 = copyfinaltoRFR(ordersysnameT1, rfrordersysnameT1, true, debugSb);
-			
+			rfredocnumberT1=copyfinaltoRFR(edocnumberT1,rfredocnumberT1,true,debugSb);
+			rfradocnumberT1=copyfinaltoRFR(adocnumberT1,rfradocnumberT1,true,debugSb);
+			rfrcdocnumberT1=copyfinaltoRFR(cdocnumberT1,rfrcdocnumberT1,true,debugSb);
 			if (existfinalT1) {
 				ABRUtil.append(debugSb, "setallfileds: coutry is exist final T1:" + country + NEWLINE);
 				setAction(DELETE_ACTIVITY);
@@ -1273,7 +1322,11 @@ public class CtryRecord extends XMLElem {
 			//Story 1865979 Withdrawal RFA Number generation
   			rfreosannnum = copyfinaltoRFR(eosannnum, rfreosannnum, false, debugSb);
   			rfrordersysname = copyfinaltoRFR(ordersysname, rfrordersysname, false, debugSb);
-			
+
+			rfrADOCNO = copyfinaltoRFR(ADOCNO, rfrADOCNO, false, debugSb);
+			rfrEDOCNO = copyfinaltoRFR(EDOCNO, rfrEDOCNO, false, debugSb);
+			rfrCDOCNO = copyfinaltoRFR(CDOCNO, rfrCDOCNO, false, debugSb);
+
 			if (existfinalT2) {
 				ABRUtil.append(debugSb, "setallfileds: coutry is  exist final T2:" + country + NEWLINE);
 				setAction(UPDATE_ACTIVITY);
@@ -1309,7 +1362,10 @@ public class CtryRecord extends XMLElem {
 			//Story 1865979 Withdrawal RFA Number generation
   			rfreosannnumT1 = copyfinaltoRFR(eosannnumT1, rfreosannnumT1, true, debugSb);
   			rfrordersysnameT1 = copyfinaltoRFR(ordersysnameT1, rfrordersysnameT1, true, debugSb);
-			
+			rfredocnumberT1=copyfinaltoRFR(edocnumberT1,rfredocnumberT1,true,debugSb);
+			rfradocnumberT1=copyfinaltoRFR(adocnumberT1,rfradocnumberT1,true,debugSb);
+			rfrcdocnumberT1=copyfinaltoRFR(cdocnumberT1,rfrcdocnumberT1,true,debugSb);
+
 
 			rfranndate = copyfinaltoRFR(anndate, rfranndate, false, debugSb);
 			rfrannnumber = copyfinaltoRFR(annnumber, rfrannnumber, false, debugSb);
@@ -1329,7 +1385,9 @@ public class CtryRecord extends XMLElem {
 			//Story 1865979 Withdrawal RFA Number generation
   			rfreosannnum = copyfinaltoRFR(eosannnum, rfreosannnum, false, debugSb);
   			rfrordersysname = copyfinaltoRFR(ordersysname, rfrordersysname, false, debugSb);
-			
+			rfrADOCNO = copyfinaltoRFR(ADOCNO, rfrADOCNO, false, debugSb);
+			rfrEDOCNO = copyfinaltoRFR(EDOCNO, rfrEDOCNO, false, debugSb);
+			rfrCDOCNO = copyfinaltoRFR(CDOCNO, rfrCDOCNO, false, debugSb);
 
 			if (existfinalT1 && !existfinalT2) {
 				ABRUtil.append(debugSb, "setallfileds: coutry  exist final T1 but T2:" + country + NEWLINE);
@@ -1361,6 +1419,11 @@ public class CtryRecord extends XMLElem {
 				//Story 1865979 Withdrawal RFA Number generation
   				compareT1vT2(eosannnum, eosannnumT1, false);
   				compareT1vT2(ordersysname, ordersysnameT1, false);
+
+				compareT1vT2(ADOCNO, adocnumberT1, false);
+				compareT1vT2(EDOCNO, edocnumberT1, false);
+				compareT1vT2(CDOCNO, cdocnumberT1, false);
+
 				
 				ABRUtil.append(debugSb, "setallfileds: after compare action :" + action + NEWLINE);
 			} else {
@@ -1386,7 +1449,11 @@ public class CtryRecord extends XMLElem {
 			//Story 1865979 Withdrawal RFA Number generation
   			compareT1vT2(rfreosannnum, rfreosannnumT1, false);
   			compareT1vT2(rfrordersysname, rfrordersysnameT1, true);
-			
+			compareT1vT2(rfrADOCNO, rfradocnumberT1, true);
+			compareT1vT2(rfrEDOCNO, rfredocnumberT1, true);
+			compareT1vT2(rfrCDOCNO, rfrcdocnumberT1, true);
+
+
 			ABRUtil.append(debugSb, "setallfileds: after compare rfr values action:" + rfraction + NEWLINE);
 		}
 
@@ -1486,6 +1553,9 @@ public class CtryRecord extends XMLElem {
 		eosannnum = CHEAT;
 		annnumber = CHEAT;
 		ordersysname = CHEAT;
+		CDOCNO=CHEAT;
+		EDOCNO=CHEAT;
+		ADOCNO=CHEAT;
 	}
 
 	void dereference() {
@@ -1521,6 +1591,9 @@ public class CtryRecord extends XMLElem {
 			
 		ordersysname = null;
 		rfrordersysname = null;
+		CDOCNO=null;
+		EDOCNO=null;
+		ADOCNO=null;
 	}
 
 }
