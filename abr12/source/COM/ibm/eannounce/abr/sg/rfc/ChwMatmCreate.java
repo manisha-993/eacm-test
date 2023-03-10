@@ -234,12 +234,7 @@ public class ChwMatmCreate extends RdhBase {
 				if("'Storage Tier', 'Power Tier'".contains(model.getSUBGROUP())&&!"".equals(model.getSUBGROUP())) {
 					bmmh5.get(0).setMaktx("Expert Care" + " " + model.getMACHTYPE());
 				}else if("STaaS".equals(model.getSUBGROUP())){
-					if (RfcConfigProperties.getSUOMachtype().contains(model.getMACHTYPE())){
-						bmmh5.get(0).setMaktx("\"SUO\"" + " " + model.getMACHTYPE()+" (for Subgroup SUO)");
-					}else {
 						bmmh5.get(0).setMaktx("STaaS" + " " + model.getMACHTYPE());
-					}
-
 				}else if("PWaaS".equals(model.getSUBGROUP())){
 					bmmh5.get(0).setMaktx("PWaaS" + " " + model.getMACHTYPE());
 				}else if("SUO".equals(model.getSUBGROUP())){
