@@ -3,6 +3,7 @@ package COM.ibm.eannounce.abr.sg.adsxmlbh1;
 import COM.ibm.eannounce.abr.sg.rfc.*;
 import COM.ibm.eannounce.abr.util.EACustom;
 import COM.ibm.eannounce.abr.util.PokBaseABR;
+import COM.ibm.eannounce.abr.util.RFCConfig;
 import COM.ibm.eannounce.objects.*;
 import COM.ibm.opicmpdh.middleware.D;
 import COM.ibm.opicmpdh.middleware.MiddlewareException;
@@ -15,6 +16,7 @@ import java.text.CharacterIterator;
 import java.text.MessageFormat;
 import java.text.StringCharacterIterator;
 import java.util.Hashtable;
+import java.util.Set;
 
 public class MODELGARSABRSTATUS extends PokBaseABR {
     private StringBuffer rptSb = new StringBuffer();
@@ -100,20 +102,22 @@ public class MODELGARSABRSTATUS extends PokBaseABR {
                 UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", abr.getRFCNum());
                 runParkCaller(updateParkStatus,abr.getRFCNum());
 
-                GARSYMDMSalesBom bom = new GARSYMDMSalesBom(model);
-                this.addDebug("Calling " + bom.getRFCName());
-                bom.execute();
-                this.addDebug(bom.createLogEntry());
-                if (bom.getRfcrc() == 0) {
-                    this.addOutput(bom.getRFCName() + " called successfully!");
-                } else {
-                    this.addOutput(bom.getRFCName() + " called  faild!");
-                    this.addDebug(bom.getRFCName()+" webservice return code:"+bom.getRfcrc());
-                    this.addOutput(bom.getError_text());
+                Set<String> plnts = RFCConfig.getBHPlnts();
+                for(String plnt : plnts) {
+                    GARSYMDMSalesBom bom = new GARSYMDMSalesBom(model,plnt);
+                    this.addDebug("Calling " + bom.getRFCName());
+                    bom.execute();
+                    this.addDebug(bom.createLogEntry());
+                    if (bom.getRfcrc() == 0) {
+                        this.addOutput(bom.getRFCName() + " called successfully!");
+                    } else {
+                        this.addOutput(bom.getRFCName() + " called  faild!");
+                        this.addDebug(bom.getRFCName() + " webservice return code:" + bom.getRfcrc());
+                        this.addOutput(bom.getError_text());
+                    }
+                    updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", bom.getRFCNum());
+                    runParkCaller(updateParkStatus, bom.getRFCNum());
                 }
-                updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", bom.getRFCNum());
-                runParkCaller(updateParkStatus,bom.getRFCNum());
-
             } else {
                 this.addOutput("XML file not exist in cache,RFC caller not called!");
             }
