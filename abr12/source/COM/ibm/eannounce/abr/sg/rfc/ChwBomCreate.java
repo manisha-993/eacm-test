@@ -31,7 +31,17 @@ public class ChwBomCreate extends RdhBase {
 	     csap_mbom.getMap().setDatuv(DateUtility.getTodayStringWithSimpleFormat()); //current data
 		
 	}
-	
+    public ChwBomCreate (
+            String matnr, String bom_rfanum,String mfg_plant) {
+        super(bom_rfanum, "Z_DM_SAP_BOM_CREATE".toLowerCase(), null);
+        this.pims_identity = "H";
+        this.default_mandt = "10H";
+
+        csap_mbom.getMap().setMatnr(matnr);
+        csap_mbom.getMap().setWerks(mfg_plant);
+        csap_mbom.getMap().setDatuv(DateUtility.getTodayStringWithSimpleFormat()); //current data
+
+    }
 
 	@Override
 	protected void setDefaultValues() {
