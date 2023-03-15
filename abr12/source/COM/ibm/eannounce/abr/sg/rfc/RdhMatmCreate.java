@@ -282,11 +282,12 @@ public class RdhMatmCreate extends RdhBase {
 								plant.setSteuc("998313");
 							} else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
 								plant.setSteuc("998713");
-
+							} else if ("2123".equals(plant.getWerks())){
+								plant.setSteuc("9815.6000");
+						    }
 							/*else {
 								plant.setSteuc(" ");
 							}*/
-						}
 					}
 
 					/**
