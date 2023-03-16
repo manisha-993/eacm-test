@@ -375,8 +375,8 @@ public class ChwMatmCreate extends RdhBase {
 							sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
 						}
 					}else {
-						if(taxSaleMap.get(sales_org)!=null){
-							sales_org.setZsabrtax(taxSaleMap.get(sales_org));
+						if(taxSaleMap.get(salesorg)!=null){
+							sales_org.setZsabrtax(taxSaleMap.get(salesorg));
 						}
 					}
 					/*
