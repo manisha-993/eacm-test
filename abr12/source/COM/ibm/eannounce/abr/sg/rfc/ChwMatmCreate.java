@@ -259,10 +259,9 @@ public class ChwMatmCreate extends RdhBase {
 		for (int i = 0; i <taxcategories.size(); i++) {
 			 String prodCode = taxcategories.get(i).getPRODUCTCODE();
 			 if(prodCode!=null&&!prodCode.trim().equals(""))
-			 {
-				 List<SLEORGGRP> list = taxcategories.get(i).getSLEORGGRPLIST();
+			 {List<SLEORGNPLNTCODE> list = taxcategories.get(i).getSLEORGNPLNTCODELIST();
 					for(int j=0;j<list.size();j++){
-					taxSaleMap.put(list.get(j).getSLEORGGRP(),prodCode);
+					taxSaleMap.put(list.get(j).getSLEORG(),prodCode);
 				}
 			 }
 		}
