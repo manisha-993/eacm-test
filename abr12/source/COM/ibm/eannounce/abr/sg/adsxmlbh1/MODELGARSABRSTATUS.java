@@ -112,7 +112,7 @@ public class MODELGARSABRSTATUS extends PokBaseABR {
                         this.addOutput(bom.getRFCName() + " called successfully!");
                     } else {
                         this.addOutput(bom.getRFCName() + " called  faild!");
-                        this.addDebug(bom.getRFCName() + " webservice return code:" + bom.getRfcrc());
+                        this.addDebug(bom.getRFCName() + " webservice return code: " + bom.getRfcrc());
                         this.addOutput(bom.getError_text());
                     }
                     updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", bom.getRFCNum());
