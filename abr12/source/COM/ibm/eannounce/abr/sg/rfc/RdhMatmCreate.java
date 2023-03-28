@@ -284,7 +284,7 @@ public class RdhMatmCreate extends RdhBase {
 								plant.setSteuc("998713");
 							}
 							/*else {
-								plant.setSteuc(" ");
+								plant.setSteuc("  ");
 							}*/
 					}else if("2123".equals(plant.getWerks())){
 						plant.setSteuc("9815.6000");
