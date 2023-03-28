@@ -668,7 +668,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 	}
 
 	/********************************************************************************
-	 * Convert string into valid html.  Special HTML characters are converted.
+	 * Convert string into valid html.   Special HTML characters are converted.
 	 *
 	 * @param txt    String to convert
 	 * @return String
