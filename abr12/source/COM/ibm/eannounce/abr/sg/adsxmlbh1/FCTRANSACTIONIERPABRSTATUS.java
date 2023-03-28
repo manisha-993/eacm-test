@@ -384,12 +384,17 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 					updateSalesBom(fctransaction,plnts,models);
 					this.addOutput("Bom Processing Finished!");
 					// Call UpdateParkStatus
-					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", fctransaction.getTOMACHTYPE()+"UPG");
+					UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_CHW_IERP", fctransaction.getTOMACHTYPE()+"BOMUPG");
 					this.addDebug("Calling "+updateParkStatus.getRFCName());
-					updateParkStatus.execute();
+					try {
+						updateParkStatus.execute();
+					} catch (Exception e) {
+						// TODO: handle exception
+						e.printStackTrace();
+					}
 					this.addDebug(updateParkStatus.createLogEntry());
 					if (updateParkStatus.getRfcrc() == 0) {
-						this.addOutput("Parking records updated successfully for ZDMRELNUM="+fctransaction.getTOMACHTYPE()+"UPG");
+						this.addOutput("Parking records updated successfully for ZDMRELNUM="+fctransaction.getTOMACHTYPE()+"BOMUPG");
 					} else {
 						this.addOutput(updateParkStatus.getRFCName() + " called faild!");
 						this.addOutput(updateParkStatus.getError_text());
@@ -507,7 +512,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 	public void updateSalesBom(FCTRANSACTION fctransaction, Set<String> plnts, List<MODEL> models) throws Exception {
 		for(String plant : plnts) {
 			//call ChwBomCreate 
-			ChwBomCreate chwBomCreate = new ChwBomCreate(fctransaction.getTOMACHTYPE()+"UPG", plant);
+			ChwBomCreate chwBomCreate = new ChwBomCreate(fctransaction.getTOMACHTYPE()+"UPG",fctransaction.getTOMACHTYPE()+"BOMUPG", plant);
 			this.addDebug("Calling " + "ChwBomCreate");
 			this.addDebug(chwBomCreate.generateJson());
 			try{
@@ -554,7 +559,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 									}else {
 										POSNR=generateItemNumberString(POSNR);
 										//call ChwBomMaintain
-										ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+"UPG", plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+										ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+"UPG",model.getMACHTYPE()+"BOMUPG", plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
 										this.addDebug("Calling " + "chwBomMaintain");
 										this.addDebug(chwBomMaintain.generateJson());
 										try {
@@ -572,7 +577,7 @@ public class FCTRANSACTIONIERPABRSTATUS extends PokBaseABR {
 								//call ChwBomMaintain
 								for(MODEL model : models) {
 									//call ChwBomMaintain
-									ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+"UPG", plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
+									ChwBomMaintain chwBomMaintain = new ChwBomMaintain(model.getMACHTYPE()+"UPG",model.getMACHTYPE()+"BOMUPG",plant, model.getMACHTYPE()+model.getMODEL(),POSNR,"SC_"+model.getMACHTYPE()+"_MOD_"+model.getMODEL());
 									this.addDebug("Calling " + "chwBomMaintain");
 									this.addDebug(chwBomMaintain.generateJson());
 									try {

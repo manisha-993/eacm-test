@@ -70,7 +70,46 @@ public class ChwBomMaintain extends RdhBase {
         	 stko_api01.add(rdhBomm_stko_api01);
         }
     }
+    public ChwBomMaintain (String bom_header_id, String bom_rfanum,String mfg_plant, String component_id,
+                           String item_no, String dependency) {
+        super(bom_rfanum, "Z_DM_SAP_BOM_MAINTAIN".toLowerCase(), null);
+        this.pims_identity = "H";
+        this.default_mandt = "10H";
 
+        if (this.getRfcrc() != 0)
+            return;
+        System.out.println("111");
+        System.out.println("csap_mbom=" + csap_mbom);
+        csap_mbom.getMap().setMatnr(bom_header_id);
+        csap_mbom.getMap().setWerks(mfg_plant);
+        csap_mbom.getMap().setDatuv(DateUtility.getTodayStringWithSimpleFormat());
+
+        RdhBomm_api03 api = new RdhBomm_api03();
+        api.setComponent(component_id);
+        api.setItem_no(item_no);
+        api.setItem_categ("N");
+        api.setComp_qty("1");
+        api.setComp_unit("EA");
+        api.setRel_sales("X");
+        api.setIdentifier("A1");
+        api03.add(api);
+
+        RdhBomm_csdep_dat dat = new RdhBomm_csdep_dat();
+        if (dependency != null)
+        {
+            dat.setDep_intern(dependency);
+            dat.setObject_id("2");
+            dat.setIdentifier("A1");
+            dat.setStatus("1");
+            csdep_dat.add(dat);
+        }
+
+        RdhBomm_stko_api01 rdhBomm_stko_api01 = new RdhBomm_stko_api01();
+        if(rdhBomm_stko_api01 != null) {
+            rdhBomm_stko_api01.setBom_status("01");
+            stko_api01.add(rdhBomm_stko_api01);
+        }
+    }
     /*
      * (non-Javadoc)
      * 
