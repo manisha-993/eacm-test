@@ -3129,7 +3129,7 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 	 */
 	private void matchPsModelLastOrderAvail(String statusFlag, EntityGroup psGrp, String featType, String psRelType)
 			throws MiddlewareException, SQLException {
-		int checklvl = getCheck_W_RW_RE(statusFlag);
+		int checklvl = getCheck_W_RW_RW(statusFlag);
 
 		if (mdlLOAvailVctC.size() > 0) {
 			Hashtable mdlloAvailOSNTbl = new Hashtable();
