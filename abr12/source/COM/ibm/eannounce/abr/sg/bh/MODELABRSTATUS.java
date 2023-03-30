@@ -3204,10 +3204,10 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 							+ " plaAvail: " + psplannedAvailVct.size() + " loAvail: " + pslastOrderAvailVct.size());
 
 					Hashtable loAvailOSNTbl = new Hashtable();
-					boolean loOsnErrors = getAvailByOSN(loAvailOSNTbl, pslastOrderAvailVct, true, CHECKLEVEL_RE);
+					boolean loOsnErrors = getAvailByOSN(loAvailOSNTbl, pslastOrderAvailVct, true, CHECKLEVEL_RW);
 
 					Hashtable plaAvailOSNTbl = new Hashtable();
-					boolean plaOsnErrors = getAvailByOSN(plaAvailOSNTbl, psplannedAvailVct, true, CHECKLEVEL_RE);
+					boolean plaOsnErrors = getAvailByOSN(plaAvailOSNTbl, psplannedAvailVct, true, CHECKLEVEL_RW);
 					addDebug("matchPsModelLastOrderAvail " + psitem.getKey() + " loOsnErrors " + loOsnErrors
 							+ " loAvailOSNTbl.keys " + loAvailOSNTbl.keySet() + " plaOsnErrors " + plaOsnErrors
 							+ " plaAvailOSNTbl.keys " + plaAvailOSNTbl.keySet());
