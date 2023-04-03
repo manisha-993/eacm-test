@@ -379,7 +379,7 @@ public class DateEditor extends JFormattedTextField implements PropertyChangeLis
 					return false;
 				}
 
-				if(isFuture()&& DateRoutines.isFutureDate(p_Date, DateRoutines.getToday())){
+				/*if(isFuture()&& DateRoutines.isFutureDate(p_Date, DateRoutines.getToday())){
 					//msg50001 = Date must be in the future.
 					if(!isWarning()){
 						errMsgCode = "msg50001";
@@ -388,7 +388,7 @@ public class DateEditor extends JFormattedTextField implements PropertyChangeLis
 						warnMsg = Utils.getResource("msg50004",p_Date);
 					}
 					return false;
-				}
+				}*/
 				if(isPast()&& DateRoutines.isPastDate(p_Date, DateRoutines.getToday())){
 					//msg50002 = Date must be in the past.
 					if(!isWarning()){
