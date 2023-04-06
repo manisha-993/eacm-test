@@ -3204,10 +3204,10 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 							+ " plaAvail: " + psplannedAvailVct.size() + " loAvail: " + pslastOrderAvailVct.size());
 
 					Hashtable loAvailOSNTbl = new Hashtable();
-					boolean loOsnErrors = getAvailByOSN(loAvailOSNTbl, pslastOrderAvailVct, true, CHECKLEVEL_RW);
+					boolean loOsnErrors = getAvailByOSN(loAvailOSNTbl, pslastOrderAvailVct, true, CHECKLEVEL_RE);
 
 					Hashtable plaAvailOSNTbl = new Hashtable();
-					boolean plaOsnErrors = getAvailByOSN(plaAvailOSNTbl, psplannedAvailVct, true, CHECKLEVEL_RW);
+					boolean plaOsnErrors = getAvailByOSN(plaAvailOSNTbl, psplannedAvailVct, true, CHECKLEVEL_RE);
 					addDebug("matchPsModelLastOrderAvail " + psitem.getKey() + " loOsnErrors " + loOsnErrors
 							+ " loAvailOSNTbl.keys " + loAvailOSNTbl.keySet() + " plaOsnErrors " + plaOsnErrors
 							+ " plaAvailOSNTbl.keys " + plaAvailOSNTbl.keySet());
@@ -3383,7 +3383,7 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 	private void matchPsModelLastOrderAndMesLastOrderAvail(String availType, Vector mdlLOAvailOrMesLOAvailVctC,
 			String statusFlag, EntityGroup psGrp, String featType, String psRelType)
 			throws MiddlewareException, SQLException {
-		int checklvl = getCheck_W_RW_RE(statusFlag);
+		int checklvl = getCheck_W_RW_RW(statusFlag);
 
 		if (mdlLOAvailOrMesLOAvailVctC.size() > 0) {
 			Hashtable mdlloAvailOSNTbl = new Hashtable();
@@ -3643,7 +3643,7 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 
 	private void matchPsModelLastOrderAvail(Vector mdlLOOrMesLOAvailVctC, String statusFlag, EntityGroup psGrp,
 			String featType, String psRelType) throws MiddlewareException, SQLException {
-		int checklvl = getCheck_W_RW_RE(statusFlag);
+		int checklvl = getCheck_W_RW_RW(statusFlag);
 
 		if (mdlLOOrMesLOAvailVctC.size() > 0) {
 			Hashtable mdlloAvailOSNTbl = new Hashtable();
