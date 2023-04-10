@@ -70,6 +70,7 @@ public class CloudantCatcher implements MessageListener {
 		FindResult result = null;
 		do {
 			Log.i("Pulling data on skip:"+skip+" size:"+size);
+			long start = System.currentTimeMillis();
 			 result = pullPriceFromCloudant(selector,skip,size);
 			try {
 				catchAndProcessMessage(result);
@@ -79,6 +80,13 @@ public class CloudantCatcher implements MessageListener {
 			}
 			size = result.getDocs().size();
 			total+=size;
+			if(size>0){
+				Log.i("Pulled data size:" + size + ", pulled total:"+total);
+				long end = System.currentTimeMillis();
+				long timeDiff = (end - start) / 1000; //
+				Log.i("Time cost:" + timeDiff + " seconds");
+			}
+
 		}while (result.getDocs().size()>0);
 
 
