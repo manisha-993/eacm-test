@@ -66,9 +66,13 @@ public class CloudantListener implements Runnable {
 				 t2=times[1];
 				}
 				Log.i("Pulling data t1="+t1+" t2="+t2);
+				long start = System.currentTimeMillis();
 				pullPrice(t1,t2);
 				onCheck();
 				Thread.sleep(interval);
+				long end = System.currentTimeMillis();
+				long timeDiff = (end - start) / 1000; //
+				Log.i("Time cost:" + timeDiff + " seconds");
 			} catch (InterruptedException e) {
 			} catch (Throwable e) {
 				Log.e( "Error on catcher loop", e);

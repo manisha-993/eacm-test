@@ -164,8 +164,6 @@ public class WWPRTInbound {
 		Log.i("Starting WWPRT In-bound Catcher...");
 
 		configureCloud("cloudant.eacm.properties");
-		cloudantCatcher.setT1(t1);
-		cloudantCatcher.setT2(t2);
 		cloudantCatcher = new CloudantListener() {
 			@Override
 			public void onCheck() {
@@ -182,6 +180,8 @@ public class WWPRTInbound {
 				}
 			}
 		};
+		cloudantCatcher.setT1(t1);
+		cloudantCatcher.setT2(t2);
 		cloudantCatcher.setInterval(interval);
 		cloudantCatcher.start();
 	}
