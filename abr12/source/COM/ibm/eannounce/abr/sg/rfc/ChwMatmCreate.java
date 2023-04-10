@@ -2,12 +2,7 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import COM.ibm.eannounce.abr.sg.rfc.entity.CountryPlantTax;
 import COM.ibm.eannounce.abr.sg.rfc.entity.Generalarea;
@@ -258,6 +253,17 @@ public class ChwMatmCreate extends RdhBase {
 		List<AVAILABILITY> availabilities = model.getAVAILABILITYLIST();
 		List<TAXCATEGORY> taxcategories = model.getTAXCATEGORYLIST();
 
+		Map<String,String> taxSaleMap = new HashMap();
+		for (int i = 0; i <taxcategories.size(); i++) {
+			 String prodCode = taxcategories.get(i).getPRODUCTCODE();
+			 if(prodCode!=null&&!prodCode.trim().equals(""))
+			 {List<SLEORGNPLNTCODE> list = taxcategories.get(i).getSLEORGNPLNTCODELIST();
+					for(int j=0;j<list.size();j++){
+					taxSaleMap.put(list.get(j).getSLEORG(),prodCode);
+				}
+			 }
+		}
+
 		RdhMatm_geo geo = new RdhMatm_geo();
 		geo.setName("WW1");
 		geo.setVmsta("Z0");
@@ -364,6 +370,10 @@ public class ChwMatmCreate extends RdhBase {
 						sales_org.setZtaxclsf(getZtaxclsf(model,countrt));
 						if(sales_org!=null) {
 							sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
+						}
+					}else {
+						if(taxSaleMap.get(salesorg)!=null){
+							sales_org.setZsabrtax(taxSaleMap.get(salesorg));
 						}
 					}
 					/*
