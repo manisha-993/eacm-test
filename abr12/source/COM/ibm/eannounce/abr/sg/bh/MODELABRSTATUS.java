@@ -3129,7 +3129,7 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 	 */
 	private void matchPsModelLastOrderAvail(String statusFlag, EntityGroup psGrp, String featType, String psRelType,boolean reTorw)
 			throws MiddlewareException, SQLException {
-		int checklvl = getCheck_W_RE_RE(statusFlag);
+		int checklvl = getCheck_W_RW_RE(statusFlag);
 		if (reTorw){
 			checklvl = getCheck_W_RW_RW(statusFlag);
 		}
@@ -3386,7 +3386,7 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 	private void matchPsModelLastOrderAndMesLastOrderAvail(String availType, Vector mdlLOAvailOrMesLOAvailVctC,
 			String statusFlag, EntityGroup psGrp, String featType, String psRelType,boolean reTorw)
 			throws MiddlewareException, SQLException {
-		int checklvl = getCheck_W_RE_RE(statusFlag);
+		int checklvl = getCheck_W_RW_RE(statusFlag);
 		if (reTorw){
 			checklvl = getCheck_W_RW_RW(statusFlag);
 		}
@@ -3648,7 +3648,7 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 
 	private void matchPsModelLastOrderAvail(Vector mdlLOOrMesLOAvailVctC, String statusFlag, EntityGroup psGrp,
 			String featType, String psRelType, boolean reTorw) throws MiddlewareException, SQLException {
-		int checklvl = getCheck_W_RE_RE(statusFlag);
+		int checklvl = getCheck_W_RW_RE(statusFlag);
 		if (reTorw){
 			checklvl = getCheck_W_RW_RW(statusFlag);
 		}
