@@ -122,12 +122,12 @@ public class CloudantUtil {
 	}
 	public static String[] getPreviousTimePeriod(int span) {
 		String timePeriod[] = new String[2];
-		OffsetDateTime now = OffsetDateTime.now(); // 获取当前时间
-		int hour = now.getHour(); // 获取当前小时数
-		if (hour < span) { // 如果当前时间小于4小时
-			now = now.minusHours(span); // 将当前时间减去1天
+		OffsetDateTime now = OffsetDateTime.now();
+		int hour = now.getHour();
+		if (hour < span) {
+			now = now.minusHours(span);
 		}
-		int roundedHour = hour - (hour % span); // 计算往前最近的4的倍数小时数
+		int roundedHour = hour - (hour % span);
 		OffsetDateTime t1 = now.withHour(roundedHour).withMinute(0).withSecond(0).withNano(0); // 设置整点时间
 		OffsetDateTime t2 = t1.plusHours(span);
 		timePeriod[0]=t1.format(cloudant_time_formatter);;

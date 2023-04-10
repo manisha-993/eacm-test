@@ -23,6 +23,7 @@ public class Price {
     private String pricevalueusd;
     private String factor;
     private String type;
+    private String xsiType;
     public Price(){
 
     this.setType("I");
@@ -116,7 +117,11 @@ public class Price {
     public void setType(String type) {
         this.type = type;
     }
+    @XmlAttribute(name="xsi:type")
 
+    public void setXsiType(String xsiType) {
+        this.xsiType = xsiType;
+    }
     public String getOfferingname() {
         return offeringname;
     }
@@ -180,4 +185,10 @@ public class Price {
     public String getFactor() {
         return factor;
     }
+
+    public String getXsiType() {
+        return xsiType;
+    }
+
+
 }
