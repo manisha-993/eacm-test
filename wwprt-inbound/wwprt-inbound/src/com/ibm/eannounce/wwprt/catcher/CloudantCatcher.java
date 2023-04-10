@@ -5,14 +5,9 @@ import com.ibm.cloud.cloudant.v1.model.FindResult;
 import com.ibm.cloud.cloudant.v1.model.PostFindOptions;
 import com.ibm.commons.db.transaction.Transaction;
 import com.ibm.commons.db.transaction.connection.ConnectionFactory;
-import com.ibm.eannounce.wwprt.CloudantUtil;
-import com.ibm.eannounce.wwprt.Context;
-import com.ibm.eannounce.wwprt.JsonUtils;
-import com.ibm.eannounce.wwprt.Log;
-import com.ibm.eannounce.wwprt.MQ.MessageListener;
+import com.ibm.eannounce.wwprt.*;
 import com.ibm.eannounce.wwprt.dao.InsertPricesXML;
 import com.ibm.eannounce.wwprt.notification.NotificationBuilder;
-import com.ibm.mq.MQMessage;
 import org.json.JSONObject;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -31,7 +26,7 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CloudantCatcher implements MessageListener {
+public class CloudantCatcher {
 
 	private SAXParser parser;
 	private Connection connection;
@@ -45,10 +40,6 @@ public class CloudantCatcher implements MessageListener {
 		} catch (Exception e) {
 			throw new IllegalStateException("Unable to create SAX Parser. Java 1.5 is required.");
 		}
-	}
-
-	public void readMessage(final MQMessage msg) throws Exception {
-
 	}
 
 	public void startFull(){
@@ -107,7 +98,7 @@ public class CloudantCatcher implements MessageListener {
 
 	public boolean initConnection() {
 		// First of all check the connection
-		ConnectionFactory connectionFactory = Context.get().getConnectionFactory();
+		ConnectionFactory connectionFactory = CloudantContext.get().getConnectionFactory();
 		try {
 			if (connection == null || connection.isClosed()) {
 				connection = connectionFactory.getConnection();
@@ -268,15 +259,7 @@ public class CloudantCatcher implements MessageListener {
 		public String getQueryStatement(){
 			return null;
 		}
-	private String readMQMessageData(final MQMessage msg) throws CatcherException {
-		try {
-			byte[] b = new byte[msg.getMessageLength()];
-			msg.readFully(b);
-			return new String(b);
-		} catch (IOException e) {
-			throw new CatcherException("Unable to read the MQ message (IOException)", e);
-		}
-	}
+
 
 	private String parseMessageId(String data) throws CatcherException {
 		IdFinderHandler idFinderHandler = new IdFinderHandler();
