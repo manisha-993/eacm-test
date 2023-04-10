@@ -6131,6 +6131,11 @@ Add 2011-10-20		121.590	END	121.522
 	protected static int getCheck_RW_RW_RE(String statusFlag){
 		return (STATUS_R4REVIEW.equals(statusFlag)?CHECKLEVEL_RE:CHECKLEVEL_RW);
 	}
+
+	protected static int getCheck_W_RW_RW(String statusFlag){
+		return (STATUS_DRAFT.equals(statusFlag)?CHECKLEVEL_W:CHECKLEVEL_RW);
+	}
+
 	protected static int getCheck_W_RW_RE(String statusFlag){
 		int checklvlWRWRE = 0;
 		if (STATUS_DRAFT.equals(statusFlag)){
