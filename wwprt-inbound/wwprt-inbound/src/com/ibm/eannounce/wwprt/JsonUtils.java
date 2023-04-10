@@ -64,6 +64,8 @@ public class JsonUtils {
         ) {
             localDoc.set(doc);
             Price p = new Price();
+            p.setXsiType("referencePriceElementType");
+            p.setType(getString("updateind"));
             p.setOfferingname(getString("offeringname"));
             p.setOfferingtype(getString("offeringtype"));
             p.setStartdate(getString("startdate"));
