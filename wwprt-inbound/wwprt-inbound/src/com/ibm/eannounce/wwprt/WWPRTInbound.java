@@ -10,6 +10,8 @@ import com.ibm.commons.db.transaction.connection.ConnectionFactory;
 import com.ibm.commons.db.transaction.connection.DB2ConnectionFactory;
 import com.ibm.eannounce.wwprt.Context.AcknowledgmentInterceptor;
 import com.ibm.eannounce.wwprt.catcher.CatcherListener;
+import com.ibm.eannounce.wwprt.catcher.CloudantCatcher;
+import com.ibm.eannounce.wwprt.catcher.CloudantListener;
 import com.ibm.eannounce.wwprt.processor.Processor;
 import com.ibm.eannounce.wwprt.processor.ProcessorListener;
 
@@ -40,6 +42,19 @@ public class WWPRTInbound {
 			} catch (Throwable e) {
 				Log.e("Uncought exception", e);
 			}
+		} else if ("cloudant".equals(command)) {
+			String t1 = null;
+			String t2 = null;
+			if(args.length==3){
+				 t1 = args[1];
+				 t2 = args[2];
+			}else if(args.length!=1){
+				printCommands();
+				return;
+			}
+
+			inbound.startCloudCatcher(t1,t2);
+
 		} else if ("test".equalsIgnoreCase(command)) {
 			if (args.length < 2) {
 				printCommands();
@@ -58,6 +73,7 @@ public class WWPRTInbound {
 	private static void printCommands() {
 		System.out.println("Valid params are:");
 		System.out.println("catcher - Starts the Catcher");
+		System.out.println("cloudant <MODE>- Starts the Catcher full|delta|defect");
 		System.out.println("processor - Starts the Processor");
 		System.out.println("test <file.xml> - Feed the MQ with an xml file, catch and process it");
 	}
@@ -67,6 +83,9 @@ public class WWPRTInbound {
 	private File lockFile;
 	private int interval;
 	private Properties properties;
+
+	private CloudantListener cloudantCatcher;
+
 
 	public void init(String command) throws IOException {
 		FileInputStream in = new FileInputStream(new File("wwprt-inbound.properties"));
@@ -85,6 +104,15 @@ public class WWPRTInbound {
 
 		Context context = Context.get();
 		context.setMq(mq);
+		context.setConnectionFactory(connectionFactory);
+		context.setupFromProperties(properties);
+
+		interval = Integer.parseInt(properties.getProperty("interval", "500"));
+	}
+	private void configureCloud(String cloudPoperties) throws FileNotFoundException, IOException {
+		ConnectionFactory connectionFactory = new DB2ConnectionFactory(properties);
+		CloudantUtil.setup(cloudPoperties);
+		CloudantContext  context = CloudantContext.get();
 		context.setConnectionFactory(connectionFactory);
 		context.setupFromProperties(properties);
 
@@ -124,6 +152,39 @@ public class WWPRTInbound {
 		catcher.start();
 	}
 
+	public void startCloudCatcher(String t1 ,String t2) throws IOException {
+
+		lockFile = new File(".catcher.lock");
+		if (lockFile.exists()) {
+			throw new IllegalStateException(
+					"WWPRT Inbound Catcher is already running ("+lockFile.getName()+" file exists).");
+		} else {
+			lockFile.createNewFile();
+		}
+		Log.i("Starting WWPRT In-bound Catcher...");
+
+		configureCloud("cloudant.eacm.properties");
+		cloudantCatcher = new CloudantListener() {
+			@Override
+			public void onCheck() {
+				if (!lockFile.exists()) {
+					//Program shutdown
+					WWPRTInbound.this.exit();
+				}
+			}
+
+			@Override
+			public void onStop() {
+				if (lockFile.exists()) {
+					lockFile.delete();
+				}
+			}
+		};
+		cloudantCatcher.setT1(t1);
+		cloudantCatcher.setT2(t2);
+		cloudantCatcher.setInterval(interval);
+		cloudantCatcher.start();
+	}
 	public void startProcessor() throws IOException {
 		lockFile = new File(".processor.lock");
 		if (lockFile.exists()) {
