@@ -2345,7 +2345,7 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 			// MODEL is withdrawn" {LD: PRODSTRUCT} (NDN: E: PRODSTRUCT} {LD:
 			// AVAIL} {E: AVAIL} must be no later than the {LD: MODEL}
 			// {LD:AVAIL}
-			matchPsModelLastOrderAvail(statusFlag, m_elist.getEntityGroup("PRODSTRUCT"), "FEATURE", "OOFAVAIL");
+			matchPsModelLastOrderAvail(statusFlag, m_elist.getEntityGroup("PRODSTRUCT"), "FEATURE", "OOFAVAIL",false);
 			// 34.20 END 34.00
 		}
 
@@ -2363,7 +2363,7 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 			// {LD: SWPRODSTRUCT} (NDN: K: SWPRODSTRUCT} {LD: AVAIL} {E: AVAIL}
 			// must be no later than the {LD: MODEL} {LD:AVAIL}
 			matchPsModelLastOrderAvail(statusFlag, m_elist.getEntityGroup("SWPRODSTRUCT"), "SWFEATURE",
-					"SWPRODSTRUCTAVAIL");
+					"SWPRODSTRUCTAVAIL",true);
 			// 36.20 END 36.00
 		}
 
@@ -2514,7 +2514,7 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 			// matchPsModelLastOrderAvail(statusFlag,
 			// m_elist.getEntityGroup("PRODSTRUCT"),"FEATURE","OOFAVAIL");
 			matchPsModelLastOrderAndMesLastOrderAvail(availType, mdlLOOrMesLOAvailVctC, statusFlag,
-					m_elist.getEntityGroup("PRODSTRUCT"), "FEATURE", "OOFAVAIL");
+					m_elist.getEntityGroup("PRODSTRUCT"), "FEATURE", "OOFAVAIL",false);
 			// 34.20 END 34.00
 		}
 
@@ -2534,7 +2534,7 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 			// matchPsModelLastOrderAvail(statusFlag,
 			// m_elist.getEntityGroup("SWPRODSTRUCT"),"SWFEATURE","SWPRODSTRUCTAVAIL");
 			matchPsModelLastOrderAndMesLastOrderAvail(availType, mdlLOOrMesLOAvailVctC, statusFlag,
-					m_elist.getEntityGroup("SWPRODSTRUCT"), "SWFEATURE", "SWPRODSTRUCTAVAIL");
+					m_elist.getEntityGroup("SWPRODSTRUCT"), "SWFEATURE", "SWPRODSTRUCTAVAIL",true);
 			// 36.20 END 36.00
 		}
 
@@ -3127,9 +3127,12 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 	 *             36.00
 	 *
 	 */
-	private void matchPsModelLastOrderAvail(String statusFlag, EntityGroup psGrp, String featType, String psRelType)
+	private void matchPsModelLastOrderAvail(String statusFlag, EntityGroup psGrp, String featType, String psRelType,boolean reTorw)
 			throws MiddlewareException, SQLException {
 		int checklvl = getCheck_W_RW_RE(statusFlag);
+		if (reTorw){
+			checklvl = getCheck_W_RW_RW(statusFlag);
+		}
 
 		if (mdlLOAvailVctC.size() > 0) {
 			Hashtable mdlloAvailOSNTbl = new Hashtable();
@@ -3381,10 +3384,12 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 	}
 
 	private void matchPsModelLastOrderAndMesLastOrderAvail(String availType, Vector mdlLOAvailOrMesLOAvailVctC,
-			String statusFlag, EntityGroup psGrp, String featType, String psRelType)
+			String statusFlag, EntityGroup psGrp, String featType, String psRelType,boolean reTorw)
 			throws MiddlewareException, SQLException {
 		int checklvl = getCheck_W_RW_RE(statusFlag);
-
+		if (reTorw){
+			checklvl = getCheck_W_RW_RW(statusFlag);
+		}
 		if (mdlLOAvailOrMesLOAvailVctC.size() > 0) {
 			Hashtable mdlloAvailOSNTbl = new Hashtable();
 			boolean mdlloOsnErrors = getAvailByOSN(mdlloAvailOSNTbl, mdlLOAvailOrMesLOAvailVctC, true, CHECKLEVEL_RE);
@@ -3642,9 +3647,11 @@ public class MODELABRSTATUS extends DQABRSTATUS {
 	}
 
 	private void matchPsModelLastOrderAvail(Vector mdlLOOrMesLOAvailVctC, String statusFlag, EntityGroup psGrp,
-			String featType, String psRelType) throws MiddlewareException, SQLException {
+			String featType, String psRelType, boolean reTorw) throws MiddlewareException, SQLException {
 		int checklvl = getCheck_W_RW_RE(statusFlag);
-
+		if (reTorw){
+			checklvl = getCheck_W_RW_RW(statusFlag);
+		}
 		if (mdlLOOrMesLOAvailVctC.size() > 0) {
 			Hashtable mdlloAvailOSNTbl = new Hashtable();
 			boolean mdlloOsnErrors = getAvailByOSN(mdlloAvailOSNTbl, mdlLOOrMesLOAvailVctC, true, CHECKLEVEL_RE);
