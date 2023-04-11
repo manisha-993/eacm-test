@@ -67,6 +67,7 @@ public class CloudantCatcher {
 				catchAndProcessMessage(result);
 			} catch (JAXBException e) {
 				Log.e("Error occur when transfer to xml: "+e.getMessage());
+				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
 			size = result.getDocs().size();
