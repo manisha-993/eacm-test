@@ -60,11 +60,12 @@ public class CloudantUtil {
 			client.setServiceUrl(cloudant_host);
 
 			environmentSet = true;
+			Log.i( "Setup Cloudant Environment properties successful, host:"+cloudant_host+" size:"+size+" span:"+span);
 		} catch (Throwable e) {
 			e.printStackTrace();
-			Log.e( "Unable to setup MQ Environment properties", e);
+			Log.e( "Unable to setup Cloudant Environment properties", e);
 			environmentSet = false;
-			throw new IllegalStateException("Unable to setup MQ Environment properties.", e);
+			throw new IllegalStateException("Unable to setup Cloudant Environment properties.", e);
 		}
 	}
 

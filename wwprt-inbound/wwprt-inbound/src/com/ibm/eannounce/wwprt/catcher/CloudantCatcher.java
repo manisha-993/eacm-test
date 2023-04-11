@@ -50,7 +50,7 @@ public class CloudantCatcher {
 	}
 	public void pullPricetoXML(String t1,String t2){
 
-		int size = CloudantUtil.getSpan();
+		int size = CloudantUtil.getSize();
 		Map<String, Object>  selector = new HashMap<>();
 		HashMap operate = new HashMap();
 		operate.put("$gt",t1);
