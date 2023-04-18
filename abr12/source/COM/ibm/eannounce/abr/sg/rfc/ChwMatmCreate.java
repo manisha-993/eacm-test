@@ -2,12 +2,7 @@
 package COM.ibm.eannounce.abr.sg.rfc;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import COM.ibm.eannounce.abr.sg.rfc.entity.CountryPlantTax;
 import COM.ibm.eannounce.abr.sg.rfc.entity.Generalarea;
@@ -152,7 +147,7 @@ public class ChwMatmCreate extends RdhBase {
 		//Todo
 		if(materialID.endsWith("NEW")) {
 			if("LBS".equals(model.getPHANTOMMODINDC())||"'6661', '6662', '6663', '6664', '6665', '6668', '6669', '9602', '9604'".contains(model.getMACHTYPE()
-					)||("Storage Tier','STORAGE TIER','storage tier','Power Tier'".contains(model.getSUBGROUP())&&model.getSUBGROUP().length()>0)) {
+					)||("'Storage Tier','STORAGE TIER','storage tier','Power Tier'".contains("'"+model.getSUBGROUP()+"'")&&model.getSUBGROUP().length()>0)) {
 				bmmh1.get(0).setSernp("NONE");
 			}else if ("'2063', '2068', '2059', '2057', '2058'".contains(model.getMACHTYPE())) {
 				bmmh1.get(0).setSernp("GG01");
@@ -237,6 +232,8 @@ public class ChwMatmCreate extends RdhBase {
 					bmmh5.get(0).setMaktx("STaaS" + " " + model.getMACHTYPE());
 				}else if("PWaaS".equals(model.getSUBGROUP())){
 					bmmh5.get(0).setMaktx("PWaaS" + " " + model.getMACHTYPE());
+				}else if("SUO".equals(model.getSUBGROUP())){
+					bmmh5.get(0).setMaktx("\"SUO\"" + " " + model.getMACHTYPE()+" (for Subgroup SUO)");
 				}else {
 					bmmh5.get(0).setMaktx("MACHINE TYPE " + model.getMACHTYPE() + " - Model NEW");
 				}
@@ -257,6 +254,17 @@ public class ChwMatmCreate extends RdhBase {
 		} 
 		List<AVAILABILITY> availabilities = model.getAVAILABILITYLIST();
 		List<TAXCATEGORY> taxcategories = model.getTAXCATEGORYLIST();
+
+		Map<String,String> taxSaleMap = new HashMap();
+		for (int i = 0; i <taxcategories.size(); i++) {
+			 String prodCode = taxcategories.get(i).getPRODUCTCODE();
+			 if(prodCode!=null&&!prodCode.trim().equals(""))
+			 {List<SLEORGNPLNTCODE> list = taxcategories.get(i).getSLEORGNPLNTCODELIST();
+					for(int j=0;j<list.size();j++){
+					taxSaleMap.put(list.get(j).getSLEORG(),prodCode);
+				}
+			 }
+		}
 
 		RdhMatm_geo geo = new RdhMatm_geo();
 		geo.setName("WW1");
@@ -364,6 +372,10 @@ public class ChwMatmCreate extends RdhBase {
 						sales_org.setZtaxclsf(getZtaxclsf(model,countrt));
 						if(sales_org!=null) {
 							sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
+						}
+					}else {
+						if(taxSaleMap.get(salesorg)!=null){
+							sales_org.setZsabrtax(taxSaleMap.get(salesorg));
 						}
 					}
 					/*

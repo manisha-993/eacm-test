@@ -707,6 +707,9 @@ class SVCSEOREF {
 class TAXCATEGORY {
 	@XmlElement(name = "TAXCATEGORYACTION")
 	private String TAXCATEGORYACTION;
+
+	@XmlElement(name = "PRODUCTCODE")
+	private String PRODUCTCODE;
 	@XmlElement(name = "TAXCATEGORYVALUE")
 	private String TAXCATEGORYVALUE;
 	/*@XmlElement(name = "COUNTRYLIST")
@@ -722,6 +725,15 @@ class TAXCATEGORY {
 	@XmlElementWrapper(name = "SLEORGNPLNTCODELIST")
 	@XmlElement(name = "SLEORGNPLNTCODEELEMENT")
 	private List<SLEORGNPLNTCODE> SLEORGNPLNTCODELIST;
+
+	public String getPRODUCTCODE() {
+		return PRODUCTCODE;
+	}
+
+	public void setPRODUCTCODE(String PRODUCTCODE) {
+		this.PRODUCTCODE = PRODUCTCODE;
+	}
+
 	public String getTAXCATEGORYACTION() {
 		return TAXCATEGORYACTION;
 	}
