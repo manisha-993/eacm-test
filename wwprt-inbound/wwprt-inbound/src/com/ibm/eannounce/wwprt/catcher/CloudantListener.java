@@ -104,8 +104,14 @@ public class CloudantListener implements Runnable {
 		OffsetDateTime t1 = now.withHour(roundedHour).withMinute(0).withSecond(0).withNano(0); // 设置整点时间
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnnnnnXXX");
 		OffsetDateTime t2 = t1.plusHours(span);
-		timePeriod[0]=t1.format(formatter);;
+		timePeriod[0]=t1.format(formatter);
+		if(timePeriod[0].endsWith("Z")){
+			timePeriod[0].replace("Z","++00:00");
+		}
 		timePeriod[1]=t2.format(formatter);
+		if(timePeriod[1].endsWith("Z")){
+			timePeriod[1].replace("Z","++00:00");
+		}
 		return timePeriod;
 	}
 	
