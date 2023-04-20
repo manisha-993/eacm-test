@@ -115,7 +115,9 @@ public class WWPRTInbound {
 		CloudantContext  context = CloudantContext.get();
 		context.setConnectionFactory(connectionFactory);
 		context.setupFromProperties(properties);
-
+		Context context1 = Context.get();
+		context1.setConnectionFactory(connectionFactory);
+		context1.setupFromProperties(properties);
 		interval = Integer.parseInt(properties.getProperty("interval", "500"));
 	}
 	

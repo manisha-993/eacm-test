@@ -3,7 +3,6 @@ package com.ibm.eannounce.wwprt;
 import com.ibm.cloud.cloudant.v1.Cloudant;
 import com.ibm.cloud.cloudant.v1.model.PostFindOptions;
 import com.ibm.cloud.sdk.core.security.BasicAuthenticator;
-import com.ibm.mq.*;
 
 import java.io.FileInputStream;
 import java.time.OffsetDateTime;
@@ -138,9 +137,5 @@ public class CloudantUtil {
 
 	public static void main(String[] args) {
 		getNow();
-	}
-	public interface MessageListener {
-		public void readMessage(MQMessage msg) throws Exception;
-		public void noMessagesToRead() throws Exception;
 	}
 }
