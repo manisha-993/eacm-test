@@ -30,6 +30,7 @@ public class CloudantCatcher {
 
 	private SAXParser parser;
 	private Connection connection;
+	private CloudantListener catcherListener;
 
 	public int id =50000;
 	public CloudantCatcher() {
@@ -40,6 +41,14 @@ public class CloudantCatcher {
 		} catch (Exception e) {
 			throw new IllegalStateException("Unable to create SAX Parser. Java 1.5 is required.");
 		}
+	}
+
+	public CloudantListener getCatcherListener() {
+		return catcherListener;
+	}
+
+	public void setCatcherListener(CloudantListener catcherListener) {
+		this.catcherListener = catcherListener;
 	}
 
 	public void startFull(){
@@ -59,6 +68,7 @@ public class CloudantCatcher {
 		int skip = 0;
 		int total=0;
 		FindResult result = null;
+
 		do {
 			Log.i("Pulling data on skip:"+skip+" size:"+size);
 			long start = System.currentTimeMillis();
@@ -70,6 +80,7 @@ public class CloudantCatcher {
 				throw new RuntimeException(e);
 			}
 			size = result.getDocs().size();
+			skip+=size;
 			total+=size;
 			if(size>0){
 				Log.i("Pulled data size:" + size + ", pulled total:"+total);
@@ -78,6 +89,7 @@ public class CloudantCatcher {
 				Log.i("Time cost:" + timeDiff + " seconds");
 			}
 
+			catcherListener.onCheck();
 		}while (result.getDocs().size()>0);
 
 
