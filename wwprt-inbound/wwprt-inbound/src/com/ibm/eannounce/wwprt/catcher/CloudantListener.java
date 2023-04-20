@@ -33,6 +33,7 @@ public class CloudantListener implements Runnable {
 
 	public CloudantListener() {
 		catcher = new CloudantCatcher();
+		catcher.setCatcherListener(this);
 		catcher.initConnection();
 	}
 	
