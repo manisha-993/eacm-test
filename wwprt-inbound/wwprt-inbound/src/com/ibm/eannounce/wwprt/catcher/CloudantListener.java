@@ -74,6 +74,7 @@ public class CloudantListener implements Runnable {
 				long end = System.currentTimeMillis();
 				long timeDiff = (end - start) / 1000; //
 				Log.i("Time cost:" + timeDiff + " seconds");
+				running=false;
 			} catch (InterruptedException e) {
 			} catch (Throwable e) {
 				Log.e( "Error on catcher loop", e);
@@ -101,16 +102,16 @@ public class CloudantListener implements Runnable {
 			now = now.minusHours(span);
 		}
 		int roundedHour = hour - (hour % span);
-		OffsetDateTime t1 = now.withHour(roundedHour).withMinute(0).withSecond(0).withNano(0); // 设置整点时间
+		OffsetDateTime t1 = now.withHour(roundedHour).withMinute(0).withSecond(0).withNano(0);
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.nnnnnnnnnnnnXXX");
 		OffsetDateTime t2 = t1.plusHours(span);
 		timePeriod[0]=t1.format(formatter);
 		if(timePeriod[0].endsWith("Z")){
-			timePeriod[0].replace("Z","++00:00");
+			timePeriod[0]=timePeriod[0].replace("Z","+00:00");
 		}
 		timePeriod[1]=t2.format(formatter);
 		if(timePeriod[1].endsWith("Z")){
-			timePeriod[1].replace("Z","++00:00");
+			timePeriod[1]=timePeriod[1].replace("Z","+00:00");
 		}
 		return timePeriod;
 	}

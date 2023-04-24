@@ -81,13 +81,17 @@ public class CloudantCatcher {
 				throw new RuntimeException(e);
 			}
 			size = result.getDocs().size();
-			skip+=size;
+			skip += size;
 			total+=size;
 			if(size>0){
 				Log.i("Pulled data size:" + size + ", pulled total:"+total);
 				long end = System.currentTimeMillis();
 				long timeDiff = (end - start) / 1000; //
 				Log.i("Time cost:" + timeDiff + " seconds");
+			}
+			else if(size==0){
+				Log.i("Pulled data finished,"+" pulled total:"+total);
+				break;
 			}
 
 			catcherListener.onCheck();
