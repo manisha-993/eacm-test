@@ -151,9 +151,9 @@ public class CloudantCatcher {
 
 	}
 	private void catchAndProcessMessage(FindResult result) throws JAXBException {
-		JSONObject object= JsonUtils.getJsonObject(result.getDocs());
+		//JSONObject object= JsonUtils.getJsonObject(result.getDocs());
 
-		 String data=JsonUtils.Json2Xml(result.getDocs(),getID());;
+		String data=JsonUtils.Json2Xml(result.getDocs(),getID());;
 		Context context = Context.get();
 		boolean ackSent = false;
 		String pricesId = "Invalid ID";
@@ -180,6 +180,8 @@ public class CloudantCatcher {
 			Log.v("Saving XML data to WWPRTXML table...");
 			ConnectionFactory connectionFactory = context.getConnectionFactory();
 			try {
+				Log.v("Connecting:"+connection+","+connectionFactory);
+				Log.v("pricesId:"+pricesId);
 				Transaction transaction = new Transaction(connection);
 				transaction.executeUpdate(new InsertPricesXML(pricesId, data));
 				connectionFactory.commit(connection);
