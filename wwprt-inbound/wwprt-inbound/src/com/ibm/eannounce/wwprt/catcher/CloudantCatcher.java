@@ -115,6 +115,7 @@ public class CloudantCatcher {
 
 	public boolean initConnection() {
 		// First of all check the connection
+		Log.v("init Connection");
 		ConnectionFactory connectionFactory = CloudantContext.get().getConnectionFactory();
 		try {
 			if (connection == null || connection.isClosed()) {
@@ -187,6 +188,9 @@ public class CloudantCatcher {
 			try {
 				Log.v("Connecting:"+connection+","+connectionFactory);
 				Log.v("pricesId:"+pricesId);
+				if(connection==null){
+					initConnection();
+				}
 				Transaction transaction = new Transaction(connection);
 				transaction.executeUpdate(new InsertPricesXML(pricesId, data));
 				connectionFactory.commit(connection);
