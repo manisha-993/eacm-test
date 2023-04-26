@@ -126,7 +126,8 @@ public class CloudantCatcher {
 			}
 			return true;
 		} catch (SQLException e) {
-			Log.v("init Connection step 3 " +e.getStackTrace());
+			e.printStackTrace();
+			Log.v("init Connection step 3 " +e.getMessage());
 			if (connection != null) {
 				Log.e( "Disconnected from the DB", e);
 				try {
