@@ -51,12 +51,6 @@ public class CloudantCatcher {
 		this.catcherListener = catcherListener;
 	}
 
-	public void startFull(){
-
-		String t1 = "";
-		String t2 = "";
-
-	}
 	public void pullPricetoXML(String t1,String t2){
 
 		int size = CloudantUtil.getSize();
@@ -99,9 +93,8 @@ public class CloudantCatcher {
 
 
 	}
-	public void startDefect(){}
 
-	public void noMessagesToRead() throws Exception {
+	public void close() throws Exception {
 		// Close the connection if active
 		if (connection != null && !connection.isClosed()) {
 			Log.v("Catcher read all messages, closing the connection...");
@@ -252,9 +245,10 @@ public class CloudantCatcher {
 			NotificationBuilder nb = new NotificationBuilder("WWPRT Inbound - Catcher problem ("
 					+ pricesId + ")");
 			nb.exception(e);
-			context.getNotification().post(pricesId, nb);
-			if (!ackSent) {
-				context.sendInitialResponse(false, pricesId, e.getMessage());
+			try {
+				close();
+			} catch (Exception ex) {
+				throw new RuntimeException(ex);
 			}
 		}
 

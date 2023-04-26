@@ -83,6 +83,11 @@ public class CloudantListener implements Runnable {
 			if (!running)
 				break;
 		}
+		try {
+			catcher.close();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 		Log.i("Catcher has stopped.");
 		onStop();
 	}
