@@ -169,9 +169,11 @@ public class WWPRTInbound {
 		cloudantCatcher = new CloudantListener() {
 			@Override
 			public void onCheck() {
+				Log.v("Checking shutdown flag "+lockFile.exists());
 				if (!lockFile.exists()) {
 					//Program shutdown
 					WWPRTInbound.this.exit();
+					throw new RuntimeException("Program shutdown!");
 				}
 			}
 

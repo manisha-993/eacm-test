@@ -109,13 +109,16 @@ public class CloudantCatcher {
 		// First of all check the connection
 		Log.v("init Connection");
 		ConnectionFactory connectionFactory = CloudantContext.get().getConnectionFactory();
+		Log.v("init Connection step 1");
 		try {
 			if (connection == null || connection.isClosed()) {
+				Log.v("init Connection step 2");
 				connection = connectionFactory.getConnection();
 				Log.v("Catcher started a new db connection");
 			}
 			return true;
 		} catch (SQLException e) {
+			Log.v("init Connection step 3 " +e.getStackTrace());
 			if (connection != null) {
 				Log.e( "Disconnected from the DB", e);
 				try {
