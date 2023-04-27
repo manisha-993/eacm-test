@@ -67,25 +67,24 @@ public class CloudantCatcher {
 			Log.i("Pulling data on skip:"+skip+" size:"+size);
 			long start = System.currentTimeMillis();
 			 result = pullPriceFromCloudant(selector,skip,size);
+			size = result.getDocs().size();
 			try {
-				catchAndProcessMessage(result);
+				if(size>0)
+				{
+					catchAndProcessMessage(result);
+				}
 			} catch (JAXBException e) {
 				Log.e("Error occur when transfer to xml: "+e.getMessage());
-				e.printStackTrace();
 				throw new RuntimeException(e);
 			}
-			size = result.getDocs().size();
-			skip += size;
+
+			skip+=size;
 			total+=size;
 			if(size>0){
 				Log.i("Pulled data size:" + size + ", pulled total:"+total);
 				long end = System.currentTimeMillis();
 				long timeDiff = (end - start) / 1000; //
 				Log.i("Time cost:" + timeDiff + " seconds");
-			}
-			else if(size==0){
-				Log.i("Pulled data finished,"+" pulled total:"+total);
-				break;
 			}
 
 			catcherListener.onCheck();
@@ -110,17 +109,13 @@ public class CloudantCatcher {
 		// First of all check the connection
 		Log.v("init Connection");
 		ConnectionFactory connectionFactory = CloudantContext.get().getConnectionFactory();
-		Log.v("init Connection step 1");
 		try {
 			if (connection == null || connection.isClosed()) {
-				Log.v("init Connection step 2");
 				connection = connectionFactory.getConnection();
 				Log.v("Catcher started a new db connection");
 			}
 			return true;
 		} catch (SQLException e) {
-			e.printStackTrace();
-			Log.v("init Connection step 3 " +e.getMessage());
 			if (connection != null) {
 				Log.e( "Disconnected from the DB", e);
 				try {
