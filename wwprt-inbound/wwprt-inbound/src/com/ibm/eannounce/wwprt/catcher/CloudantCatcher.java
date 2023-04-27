@@ -67,13 +67,17 @@ public class CloudantCatcher {
 			Log.i("Pulling data on skip:"+skip+" size:"+size);
 			long start = System.currentTimeMillis();
 			 result = pullPriceFromCloudant(selector,skip,size);
+			size = result.getDocs().size();
 			try {
-				catchAndProcessMessage(result);
+				if(size>0)
+				{
+					catchAndProcessMessage(result);
+				}
 			} catch (JAXBException e) {
 				Log.e("Error occur when transfer to xml: "+e.getMessage());
 				throw new RuntimeException(e);
 			}
-			size = result.getDocs().size();
+
 			skip+=size;
 			total+=size;
 			if(size>0){
