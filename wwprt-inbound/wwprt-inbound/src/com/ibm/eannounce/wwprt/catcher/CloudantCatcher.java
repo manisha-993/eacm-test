@@ -151,7 +151,10 @@ public class CloudantCatcher {
 	private void catchAndProcessMessage(FindResult result) throws JAXBException {
 		//JSONObject object= JsonUtils.getJsonObject(result.getDocs());
 
-		String data=JsonUtils.Json2Xml(result.getDocs(),getID());;
+		String id = getID();
+		String data=JsonUtils.Json2Xml(result.getDocs(),id);
+		Log.d("id:"+id);
+		Log.d("Json:"+result.getDocs());
 		Context context = Context.get();
 		boolean ackSent = false;
 		String pricesId = "Invalid ID";
