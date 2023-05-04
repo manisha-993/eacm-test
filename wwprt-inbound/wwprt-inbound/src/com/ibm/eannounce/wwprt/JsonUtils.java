@@ -79,6 +79,11 @@ public class JsonUtils {
             p.setCountry(getString("country"));
             p.setPricetype(getString("pricetype"));
             p.setOnshore(getString("onshore"));
+            if("Y".equals(p.getOnshore())){
+                p.setOnshore("true");
+            }else {
+                p.setOnshore("false");
+            }
             p.setEnddate(getString("enddate"));
             p.setPricevalueusd(getString("pricevalueusd"));
             p.setFactor(getString("factor"));

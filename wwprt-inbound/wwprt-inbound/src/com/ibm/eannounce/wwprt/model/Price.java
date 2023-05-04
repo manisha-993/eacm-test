@@ -3,8 +3,10 @@ package com.ibm.eannounce.wwprt.model;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement
+@XmlType(propOrder = {"offeringname", "offeringtype", "startdate", "currency", "cabletype","cableid", "releasets", "pricevalue", "varianttype", "variantname","country", "pricetype", "onshore", "enddate", "pricevalueusd","factor"})
 public class Price {
     private String offeringname;
     private String offeringtype;
