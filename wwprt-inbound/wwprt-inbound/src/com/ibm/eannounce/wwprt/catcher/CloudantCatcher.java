@@ -6,7 +6,9 @@ import com.ibm.cloud.cloudant.v1.model.PostFindOptions;
 import com.ibm.commons.db.transaction.Transaction;
 import com.ibm.commons.db.transaction.connection.ConnectionFactory;
 import com.ibm.eannounce.wwprt.*;
+import com.ibm.eannounce.wwprt.dao.CountNewPricesXMLQuery;
 import com.ibm.eannounce.wwprt.dao.InsertPricesXML;
+import com.ibm.eannounce.wwprt.dao.MaxPricesIDQuery;
 import com.ibm.eannounce.wwprt.notification.NotificationBuilder;
 import org.json.JSONObject;
 import org.xml.sax.Attributes;
@@ -32,7 +34,8 @@ public class CloudantCatcher {
 	private Connection connection;
 	private CloudantListener catcherListener;
 
-	public int id =50000;
+	private Transaction transaction = null;
+	public int id =0;
 	public CloudantCatcher() {
 		try {
 			SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -115,6 +118,7 @@ public class CloudantCatcher {
 				Log.v("init Connection step 2");
 				connection = connectionFactory.getConnection();
 				Log.v("Catcher started a new db connection");
+				transaction = new Transaction(connection);
 			}
 			return true;
 		} catch (SQLException e) {
@@ -189,7 +193,7 @@ public class CloudantCatcher {
 				if(connection==null){
 					initConnection();
 				}
-				Transaction transaction = new Transaction(connection);
+				transaction = new Transaction(connection);
 				transaction.executeUpdate(new InsertPricesXML(pricesId, data));
 				connectionFactory.commit(connection);
 			} catch (SQLException e) {
@@ -318,6 +322,16 @@ public class CloudantCatcher {
 
 	}
 	public String getID(){
+		if (id == 0) {
+			MaxPricesIDQuery maxPricesIDQuery = new MaxPricesIDQuery();
+			try {
+				transaction.executeQuery(maxPricesIDQuery);
+				id = maxPricesIDQuery.id;
+			} catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+			Log.i("Max id : " + maxPricesIDQuery.id );
+		}
 		id++;
 		return  id+"";
 	}
