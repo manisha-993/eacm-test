@@ -29,8 +29,9 @@ public class RdhChwFcProd extends RdhBase {
 		{
 			for (AVAILABILITY availabilityElement : model.getAVAILABILITYLIST())
 			{
-				if(RfcConfigProperties.getCountry(availabilityElement.getCOUNTRY_FC())==null)
+				if(RfcConfigProperties.getCountry(availabilityElement.getCOUNTRY_FC())==null||!validateAVAILABILITY(availabilityElement))
 					continue;
+
 				RdhChwFcProd_Model rdhChwFcProd_Model = new RdhChwFcProd_Model();
 				rdhChwFcProd_Model.setMachType(model.getMACHTYPE());
 				rdhChwFcProd_Model.setModel(model.getMODEL());
@@ -168,6 +169,13 @@ public class RdhChwFcProd extends RdhBase {
 		this.tbl_feature = new ArrayList<RdhChwFcProd_FEATURE>();
 	}
 
+	public boolean validateAVAILABILITY(AVAILABILITY availability){
+		return  availability==null&&validateData(availability.getANNDATE())&&validateData(availability.getPUBFROM())&&validateData(availability.getPUBTO())
+		&&validateData(availability.getPLANNEDAVAILABILITY())&&validateData(availability.getFIRSTORDER());
+	}
+	public boolean validateData(String data){
+		return data!=null&&data.trim().length()>0;
+	}
 	@Override
 	protected boolean isReadyToExecute() {
 		return true;
