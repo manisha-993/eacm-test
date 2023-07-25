@@ -17,7 +17,7 @@ import com.google.gson.annotations.SerializedName;
 
 import static COM.ibm.eannounce.abr.sg.rfc.XMLParse.getObjectFromXml;
 
-public class ChwBulkYMDMProd extends RdhBase{
+public class ChwBulkYMDMProd extends RdhBase {
 
     @SerializedName("TBL_MODEL")
     List<ChwBulkYMDMProd_MODEL> tbl_model;
@@ -45,8 +45,8 @@ public class ChwBulkYMDMProd extends RdhBase{
     @Foo
     Connection pdhConnection;
 
-    public ChwBulkYMDMProd (MODEL model, String materialType, String tmfEntityID, Connection odsConnection, Connection pdhConnection) throws Exception {
-        super(model.getMACHTYPE()+model.getMODEL(), "Z_YMDMBLK_PROD1".toLowerCase(), null);
+    public ChwBulkYMDMProd(MODEL model, String materialType, String tmfEntityID, Connection odsConnection, Connection pdhConnection) throws Exception {
+        super(model.getMACHTYPE() + model.getMODEL(), "Z_YMDMBLK_PROD1".toLowerCase(), null);
         this.pims_identity = "H";
         this.chwProduct = model;
         this.materialType = materialType;
@@ -85,9 +85,9 @@ public class ChwBulkYMDMProd extends RdhBase{
         makt.setEntitytype(chwProduct.getMODELENTITYTYPE());
         makt.setEntityID(chwProduct.getMODELENTITYID());
         makt.setNlsid("E");
-        makt.setInvName("MACHINE TYPE "+chwProduct.getMACHTYPE()+" - MODEL MEB");
-        makt.setMktgDesc("MACHINE TYPE "+chwProduct.getMACHTYPE()+" - MODEL MEB");
-        makt.setMktgName("MACHINE TYPE "+chwProduct.getMACHTYPE()+" - MODEL MEB");
+        makt.setInvName("MACHINE TYPE " + chwProduct.getMACHTYPE() + " - MODEL MEB");
+        makt.setMktgDesc("MACHINE TYPE " + chwProduct.getMACHTYPE() + " - MODEL MEB");
+        makt.setMktgName("MACHINE TYPE " + chwProduct.getMACHTYPE() + " - MODEL MEB");
         tbl_model_makt.add(makt); 
         
        /* ChwBulkYMDMProd_MAKT makt1 = new ChwBulkYMDMProd_MAKT();
@@ -113,8 +113,8 @@ public class ChwBulkYMDMProd extends RdhBase{
         List countryKey = new ArrayList();
         List taxKey = new ArrayList();
         List<CountryPlantTax> taxList = RFCConfig.getTaxs();
-        for(CountryPlantTax tax : taxList){
-            if("7".equals(tax.getINTERFACE_ID()) && !countryKey.contains(tax.getTAX_COUNTRY())){
+        for (CountryPlantTax tax : taxList) {
+            if ("7".equals(tax.getINTERFACE_ID()) && !countryKey.contains(tax.getTAX_COUNTRY())) {
                 ChwBulkYMDMProd_MLAN mlan = new ChwBulkYMDMProd_MLAN();
                 mlan.setModelEntitytype(chwProduct.getMODELENTITYTYPE());
                 mlan.setModelEntityid(chwProduct.getMODELENTITYID());
@@ -128,8 +128,8 @@ public class ChwBulkYMDMProd extends RdhBase{
             }
         }
         //For each unique combination of column SALES_ORG and DEL_PLNT in the return result sets, create one row into tbl_mvke structure
-        for(CountryPlantTax tax : taxList){
-            if("7".equals(tax.getINTERFACE_ID()) && !taxKey.contains(tax.getSALES_ORG()+tax.getPLNT_CD())){
+        for (CountryPlantTax tax : taxList) {
+            if ("7".equals(tax.getINTERFACE_ID()) && !taxKey.contains(tax.getTAX_COUNTRY() + tax.getSALES_ORG() + tax.getPLNT_CD())) {
                 ChwBulkYMDMProd_MVKE mvke = new ChwBulkYMDMProd_MVKE();
                 mvke.setModelEntitytype(chwProduct.getMODELENTITYTYPE());
                 mvke.setModelEntityid(chwProduct.getMODELENTITYID());
@@ -137,18 +137,18 @@ public class ChwBulkYMDMProd extends RdhBase{
                 mvke.setSleorg(tax.getSALES_ORG());
                 mvke.setPlntCd(tax.getPLNT_CD());
                 mvke.setPlntDel(tax.getDEL_PLNT());
-                taxKey.add(tax.getSALES_ORG()+tax.getPLNT_CD());
+                taxKey.add(tax.getTAX_COUNTRY()+tax.getSALES_ORG()+tax.getPLNT_CD());
                 tbl_mvke.add(mvke);
             }
         }
 
         //Construct tbl_tmf structure
-        if("MODEL".equals(materialType)){
+        if ("MODEL".equals(materialType)) {
             //search for all of PRODSTRUCTs related to the MODEL where BULKMESINDC = "MES0001" (Yes) in PDH database
             List<String> id_list = getTMFid(chwProduct.getMODELENTITYID());
             //retrieve the XML of PRODSTRUCT from cache table
-            List<String > xmls = getXML(id_list);
-            for(String xml : xmls){
+            List<String> xmls = getXML(id_list);
+            for (String xml : xmls) {
                 TMF_UPDATE tmf = getObjectFromXml(xml, TMF_UPDATE.class);
                 //Create one row into tbl_tmf structure as below
                 ChwBulkYMDMProd_TMF t_tmf = new ChwBulkYMDMProd_TMF();
@@ -173,20 +173,20 @@ public class ChwBulkYMDMProd extends RdhBase{
                 feature.setFeatureCode(tmf.getFEATURECODE());
                 tbl_feature.add(feature);
                 //Create one row into tbl_feature_makt structure
-                Map<String,String> featureAtt = getFeatureAtt(tmf.getFEATUREENTITYID());
+                Map<String, String> featureAtt = getFeatureAtt(tmf.getFEATUREENTITYID());
                 ChwBulkYMDMProd_MAKT f_makt = new ChwBulkYMDMProd_MAKT();
                 f_makt.setEntitytype("FEATURE");
                 f_makt.setEntityID(tmf.getFEATUREENTITYID());
                 f_makt.setNlsid("E");
                 String string = featureAtt.get("BHINVNAME");
-                string=string.length()>30?string.substring(0, 30):string;
+                string = string.length() > 30 ? string.substring(0, 30) : string;
                 f_makt.setMktgDesc(string);
                 f_makt.setMktgName(featureAtt.get("MKTGNAME"));
                 f_makt.setInvName(featureAtt.get("INVNAME"));
                 f_makt.setBhInvName(featureAtt.get("BHINVNAME"));
                 tbl_feature_makt.add(f_makt);
             }
-        }else if ("PRODSTRUCT".equals(materialType)) {
+        } else if ("PRODSTRUCT".equals(materialType)) {
             //use <tmfEntityID> to retrieve the XML of PRODSTRUCT from cache table       	
             List<String> xmls = getXML(Arrays.asList(tmfEntityID));
             TMF_UPDATE tmf = getObjectFromXml(xmls.get(0), TMF_UPDATE.class);
@@ -213,11 +213,11 @@ public class ChwBulkYMDMProd extends RdhBase{
             feature.setFeatureCode(tmf.getFEATURECODE());
             tbl_feature.add(feature);
             //Create one row into tbl_feature_makt structure
-            Map<String,String> featureAtt = getFeatureAtt(tmf.getFEATUREENTITYID());
+            Map<String, String> featureAtt = getFeatureAtt(tmf.getFEATUREENTITYID());
             ChwBulkYMDMProd_MAKT f_makt = new ChwBulkYMDMProd_MAKT();
             String value = featureAtt.get("BHINVNAME");
-            value = value.length()>30?value.substring(0,30):value;
-            	
+            value = value.length() > 30 ? value.substring(0, 30) : value;
+
             f_makt.setEntitytype("FEATURE");
             f_makt.setEntityID(tmf.getFEATUREENTITYID());
             f_makt.setNlsid("E");
@@ -226,37 +226,37 @@ public class ChwBulkYMDMProd extends RdhBase{
             f_makt.setInvName(featureAtt.get("INVNAME"));
             f_makt.setBhInvName(featureAtt.get("BHINVNAME"));
             tbl_feature_makt.add(f_makt);
-            this.rfa_num=this.rfa_num+tmf.getFEATURECODE()+"MEB";
+            this.rfa_num = this.rfa_num + tmf.getFEATURECODE() + "MEB";
         }
 
     }
 
     @Override
     protected boolean isReadyToExecute() {
-    	if (this.getRfcrc() != 0) {
-			return false;
-		} else {
-			return true;
-		}
+        if (this.getRfcrc() != 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
-    
+
     @Override
     protected void setDefaultValues() {
         tbl_model = new ArrayList<ChwBulkYMDMProd_MODEL>();
         ChwBulkYMDMProd_MODEL model = new ChwBulkYMDMProd_MODEL();
-		tbl_model.add(model);
-		
-		tbl_model_makt = new ArrayList<ChwBulkYMDMProd_MAKT>();
-	    tbl_mlan = new ArrayList<ChwBulkYMDMProd_MLAN>();	  
-	    tbl_mvke = new ArrayList<ChwBulkYMDMProd_MVKE>(); 
-	    tbl_tmf = new ArrayList<ChwBulkYMDMProd_TMF>();	 
-	    tbl_feature = new ArrayList<ChwBulkYMDMProd_FEATURE>();
-	    tbl_feature_makt = new ArrayList<ChwBulkYMDMProd_MAKT>();	   
-	    
+        tbl_model.add(model);
+
+        tbl_model_makt = new ArrayList<ChwBulkYMDMProd_MAKT>();
+        tbl_mlan = new ArrayList<ChwBulkYMDMProd_MLAN>();
+        tbl_mvke = new ArrayList<ChwBulkYMDMProd_MVKE>();
+        tbl_tmf = new ArrayList<ChwBulkYMDMProd_TMF>();
+        tbl_feature = new ArrayList<ChwBulkYMDMProd_FEATURE>();
+        tbl_feature_makt = new ArrayList<ChwBulkYMDMProd_MAKT>();
+
     }
 
 
-    public List getTMFid(String modelid) throws SQLException{
+    public List getTMFid(String modelid) throws SQLException {
         String sql = "select distinct r.entityid as TMFID from opicm.relator r\n" +
                 "join opicm.flag f on f.entitytype=r.entitytype and f.entityid=r.entityid and f.attributecode='BULKMESINDC' and f.attributevalue='MES0001'\n" +
                 "where r.entitytype='PRODSTRUCT' and r.entity2type='MODEL' and r.entity2id = ?\n" +
@@ -268,35 +268,35 @@ public class ChwBulkYMDMProd extends RdhBase{
         ResultSet resultSet = statement.executeQuery();
 
         while (resultSet.next()) {
-            ids.add(resultSet.getInt("TMFID")+"");
+            ids.add(resultSet.getInt("TMFID") + "");
         }
-                 
+
         return ids;
     }
 
-    public List<String> getXML(List ids) throws SQLException{
-    	StringBuilder sb = new StringBuilder();
-    	for(int i=0;i<ids.size();i++) {
-    		if(i==0) sb.append("?");
-    		else sb.append(",?");
-    	}
-        String sql = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'PRODSTRUCT' and XMLENTITYID in ("+ sb.toString() +")  and XMLCACHEVALIDTO > current timestamp fetch first 1 rows only with ur";
+    public List<String> getXML(List ids) throws SQLException {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < ids.size(); i++) {
+            if (i == 0) sb.append("?");
+            else sb.append(",?");
+        }
+        String sql = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'PRODSTRUCT' and XMLENTITYID in (" + sb.toString() + ")  and XMLCACHEVALIDTO > current timestamp fetch first 1 rows only with ur";
         List<String> xmls = new ArrayList();
         PreparedStatement statement = null;
         statement = odsConnection.prepareStatement(sql);
-        for(int j = 0;j<ids.size();j++)
-        	statement.setString(j+1, (String) ids.get(j));
+        for (int j = 0; j < ids.size(); j++)
+            statement.setString(j + 1, (String) ids.get(j));
         ResultSet resultSet = statement.executeQuery();
 
         while (resultSet.next()) {
             xmls.add(resultSet.getString("XMLMESSAGE"));
             break;
-        }     
-       
+        }
+
         return xmls;
     }
 
-    public Map getFeatureAtt(String id) throws SQLException{
+    public Map getFeatureAtt(String id) throws SQLException {
 
         String sql = "select t1.attributevalue as MKTGNAME,t2.attributevalue as INVNAME,t3.attributevalue as BHINVNAME " +
                 "from opicm.text t1 " +
@@ -305,18 +305,18 @@ public class ChwBulkYMDMProd extends RdhBase{
                 "where t1.entityid= ? and t1.entitytype='FEATURE' and t1.attributecode='MKTGNAME' and t1.nlsid=1 and t2.nlsid=1 and t3.nlsid=1 " +
                 "and t1.valto>current timestamp and t1.effto>current timestamp and t2.valto>current timestamp and t2.effto>current timestamp and t3.valto>current timestamp and t3.effto>current timestamp with ur";
         Map result = new HashMap();
-       
+
         PreparedStatement statement = null;
         statement = pdhConnection.prepareStatement(sql);
         statement.setString(1, id);
         ResultSet resultSet = statement.executeQuery();
 
         while (resultSet.next()) {
-            result.put("MKTGNAME",resultSet.getString("MKTGNAME"));
-            result.put("INVNAME",resultSet.getString("INVNAME"));
-            result.put("BHINVNAME",resultSet.getString("BHINVNAME"));
+            result.put("MKTGNAME", resultSet.getString("MKTGNAME"));
+            result.put("INVNAME", resultSet.getString("INVNAME"));
+            result.put("BHINVNAME", resultSet.getString("BHINVNAME"));
         }
-       
+
         return result;
     }
 }
