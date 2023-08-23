@@ -13,7 +13,7 @@ public class CloudantListener implements Runnable {
 
 	private long interval = 10000;
 
-	private CloudantCatcher catcher;
+	private com.ibm.eannounce.wwprt.catcher.CloudantCatcher catcher;
 
 	public String getT1() {
 		return t1;

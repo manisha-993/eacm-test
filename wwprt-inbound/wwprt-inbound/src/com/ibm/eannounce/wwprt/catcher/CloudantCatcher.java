@@ -70,6 +70,7 @@ public class CloudantCatcher {
 			Log.i("Pulling data on skip:"+skip+" size:"+size);
 			long start = System.currentTimeMillis();
 			 result = pullPriceFromCloudant(selector,skip,size);
+			Log.v("Result from cloudant");
 			size = result.getDocs().size();
 			try {
 				if(size>0)
@@ -136,8 +137,8 @@ public class CloudantCatcher {
 	}
 
 	public FindResult pullPriceFromCloudant(Map<String, Object> selector , long skip, int limit){
-		Cloudant client = CloudantUtil.getClient();
-		PostFindOptions findOptions= CloudantUtil.getFindOptions(selector,skip,limit);
+		Cloudant client = com.ibm.eannounce.wwprt.CloudantUtil.getClient();
+		PostFindOptions findOptions= com.ibm.eannounce.wwprt.CloudantUtil.getFindOptions(selector,skip,limit);
 		FindResult result = null;
 		int times = 0;
 		while (true)
@@ -158,10 +159,12 @@ public class CloudantCatcher {
 	private void catchAndProcessMessage(FindResult result) throws JAXBException {
 		//JSONObject object= JsonUtils.getJsonObject(result.getDocs());
 
-		String id = getID();
+		//String id = getID();
+		String id = "5052445354472E50524943455F4C4F43414C5F435552525F6F66666572696E676E616D655F323037325F76617269616E746E616D655F303032315F76617269616E74747970655F4645415F7072696365747970655F4D45535F636F756E7472795F43485F656E64646174655F323032332D30392D33305F6F6E73686F72655F595F63757272656E63795F4348465F757064617465696E645F49";
 		String data=JsonUtils.Json2Xml(result.getDocs(),id);
 		Log.d("id:"+id);
 		Log.d("Json:"+result.getDocs());
+		Log.d("After converting data to XML " +data);
 		Context context = Context.get();
 		boolean ackSent = false;
 		String pricesId = "Invalid ID";
