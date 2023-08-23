@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import COM.ibm.eannounce.abr.sg.rfc.entity.HSN;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -27,16 +28,63 @@ public class RFCConfig {
 	static List<CountryPlantTax> taxs = new ArrayList<CountryPlantTax>();
 	static List<Generalarea> generalareas = new ArrayList<Generalarea>();
 	static Set<String> bhplnts = new HashSet<String>();
+	static List<HSN> hsns = new ArrayList<HSN>();
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
 		System.out.println(RFCConfig.getDwerk("6","0684"));;
 	}static {
+		loadHSN();
 		loadCountryPlantTax();
 		loadGeneralarea();
 		loadBHPlnt();
 	}
+	public static void loadHSN() {
 
+		File excel = new File("HSN_LOOKUP.xls");
+
+		try {
+			// String encoding = "GBK";
+			if (excel.isFile() && excel.exists()) {
+
+				String[] split = excel.getName().split("\\.");
+				HSSFWorkbook wb;
+				if ("xls".equals(split[1])) {
+					FileInputStream fis = new FileInputStream(excel);
+					wb = new HSSFWorkbook(fis);
+
+					HSSFSheet hssfSheet = wb.getSheetAt(0);
+					int lastRow = hssfSheet.getLastRowNum();
+					for(int i = 1;i<=lastRow;i++) {
+						HSSFRow row = 	hssfSheet.getRow(i);
+						HSN hsn = new HSN();
+						if(row==null)
+							break;
+						hsn.setCountry(getCellData(row.getCell((short)0)));
+						hsn.setaLand(getCellData(row.getCell((short)1)));
+						hsn.setMachType(getCellData(row.getCell((short)2)));
+						hsn.setSteuc(getCellData(row.getCell((short)3)));
+						hsn.setAvailStatus(getCellData(row.getCell((short)4)));
+
+
+						hsns.add(hsn);
+
+					}
+				}else {
+					System.out.println("File type error!");
+					return;
+				}
+			}
+		}
+
+
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+
+
+	}
 	public static void loadCountryPlantTax() {
 		File excel = new File("COUNTRY_PLANT_TAX.xls");
 

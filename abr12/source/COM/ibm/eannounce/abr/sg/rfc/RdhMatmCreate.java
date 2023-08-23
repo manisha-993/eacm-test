@@ -4,17 +4,7 @@ package COM.ibm.eannounce.abr.sg.rfc;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmm00;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh1;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh2;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh5;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh6;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh7;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_geo;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_plant;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_sales_org;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_tax_country;
+import COM.ibm.eannounce.abr.sg.rfc.entity.*;
 import COM.ibm.eannounce.abr.util.RFCConfig;
 import COM.ibm.eannounce.abr.util.RfcConfigProperties;
 import com.google.gson.annotations.SerializedName;
@@ -286,7 +276,9 @@ public class RdhMatmCreate extends RdhBase {
 							}*/
 						}
 					}
-
+					if(org_groupMap.get(sleorggrps.get(j).getSLEORG())!=null){
+						plant.setSteuc(getSteucCode(svcmod, org_groupMap.get(sleorggrps.get(j).getSLEORG())));
+					}
 					/**
 					 * If <geo.sales_org.vkorg> in (?0026?,?0147?) if <geo.sales_org.ztaxclsf> is
 					 * set to a value, then { Read the keyword_t table where category == "ZSABRTAX"
@@ -468,7 +460,19 @@ public class RdhMatmCreate extends RdhBase {
 
 	// setGeoSalesOrgCountry(softwareProduct, null, null, null);
 	}
+	private String getSteucCode(SVCMOD svcmod,String country){
+		String steucCode=null;
+		String machTypeMatch=svcmod.getMACHTYPE();
 
+		List<HSN> hsns=RFCConfig.getHsns();
+
+		for (int i=0;i<hsns.size();i++){
+			HSN hsn=hsns.get(i);
+			if (hsn.getCountry().equals(country)&& hsn.getMachType().equals(machTypeMatch))
+				steucCode=hsn.getSteuc();
+		}
+		return steucCode;
+	}
 	private String getZsabrtax(String ztaxclsf) {
 		// TODO Auto-generated method stub
 		return RfcConfigProperties.getZsabrtaxPropertys(ztaxclsf);
