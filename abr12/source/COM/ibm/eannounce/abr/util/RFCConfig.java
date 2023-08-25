@@ -31,7 +31,7 @@ public class RFCConfig {
 	static List<HSN> hsns = new ArrayList<HSN>();
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+		System.out.println(hsns);
 		System.out.println(RFCConfig.getDwerk("6","0684"));;
 	}static {
 		loadHSN();
@@ -85,6 +85,10 @@ public class RFCConfig {
 
 
 	}
+
+	public static List<HSN> getHsns() {
+		return hsns;
+	}
 	public static void loadCountryPlantTax() {
 		File excel = new File("COUNTRY_PLANT_TAX.xls");
 
@@ -97,33 +101,33 @@ public class RFCConfig {
 				if ("xls".equals(split[1])) {
 					FileInputStream fis = new FileInputStream(excel);
 					wb = new HSSFWorkbook(fis);
-					
+
 					HSSFSheet hssfSheet = wb.getSheetAt(0);
-					int lastRow = hssfSheet.getLastRowNum();	
+					int lastRow = hssfSheet.getLastRowNum();
 					for(int i = 1;i<=lastRow;i++) {
-					HSSFRow row = 	hssfSheet.getRow(i);
-					CountryPlantTax tax = new CountryPlantTax();
-					if(row==null)
-						break;
-					tax.setINTERFACE_ID(getCellData(row.getCell((short)0)));
-					tax.setSALES_ORG(getCellData(row.getCell((short)1)));
-					tax.setPLNT_CD(getCellData(row.getCell((short)2)));
-					tax.setDEL_PLNT(getCellData(row.getCell((short)3)));
-					tax.setTAX_COUNTRY(getCellData(row.getCell((short)4)));
-					tax.setTAX_CD(getCellData(row.getCell((short)6)));
-					tax.setTAX_CAT((getCellData(row.getCell((short)7))));
-					tax.setTAX_CLAS((getCellData(row.getCell((short)8))));
-					if(tax.getINTERFACE_ID()==null||"".equals(tax.getINTERFACE_ID()))
-						break;
-					orgplntMap = orgpntMaps.get(tax.getINTERFACE_ID());
-					if(orgplntMap==null) {
-						orgplntMap = new HashMap<String, String>();
-						orgpntMaps.put(tax.getINTERFACE_ID(), orgplntMap);
+						HSSFRow row = 	hssfSheet.getRow(i);
+						CountryPlantTax tax = new CountryPlantTax();
+						if(row==null)
+							break;
+						tax.setINTERFACE_ID(getCellData(row.getCell((short)0)));
+						tax.setSALES_ORG(getCellData(row.getCell((short)1)));
+						tax.setPLNT_CD(getCellData(row.getCell((short)2)));
+						tax.setDEL_PLNT(getCellData(row.getCell((short)3)));
+						tax.setTAX_COUNTRY(getCellData(row.getCell((short)4)));
+						tax.setTAX_CD(getCellData(row.getCell((short)6)));
+						tax.setTAX_CAT((getCellData(row.getCell((short)7))));
+						tax.setTAX_CLAS((getCellData(row.getCell((short)8))));
+						if(tax.getINTERFACE_ID()==null||"".equals(tax.getINTERFACE_ID()))
+							break;
+						orgplntMap = orgpntMaps.get(tax.getINTERFACE_ID());
+						if(orgplntMap==null) {
+							orgplntMap = new HashMap<String, String>();
+							orgpntMaps.put(tax.getINTERFACE_ID(), orgplntMap);
+						}
+						orgplntMap.put(tax.getSALES_ORG(), tax.getDEL_PLNT());
+						taxs.add(tax);
+
 					}
-					orgplntMap.put(tax.getSALES_ORG(), tax.getDEL_PLNT());
-					taxs.add(tax);
-					
-				}
 				}else {
 					System.out.println("File type error!");
 					return;
@@ -131,13 +135,13 @@ public class RFCConfig {
 			}
 		}
 
-		
+
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
-	
+
 	public static void loadBHPlnt() {
 		File excel = new File("BH_ORG_PRD_PROD.xls");
 
@@ -150,9 +154,9 @@ public class RFCConfig {
 				if ("xls".equals(split[1])) {
 					FileInputStream fis = new FileInputStream(excel);
 					wb = new HSSFWorkbook(fis);
-					
+
 					HSSFSheet hssfSheet = wb.getSheetAt(0);
-					int lastRow = hssfSheet.getLastRowNum();	
+					int lastRow = hssfSheet.getLastRowNum();
 					for(int i = 1;i<=lastRow;i++) {
 						HSSFRow row = hssfSheet.getRow(i);
 						if(row==null) break;
@@ -160,7 +164,7 @@ public class RFCConfig {
 						String plnt = getCellData(row.getCell((short)5));
 						if("Hardware".equals(cat.trim())) {
 							bhplnts.add(plnt);
-						}	
+						}
 					}
 				}else {
 					System.out.println("File type error!");
@@ -185,7 +189,7 @@ public class RFCConfig {
 		else if(cell.getCellType()==HSSFCell.CELL_TYPE_NUMERIC){
 			return (int)cell.getNumericCellValue()+"";
 		}
-		
+
 		return null;
 	}
 	public static String getDwerk(String  intID,String salesOrg ) {
@@ -223,20 +227,20 @@ public class RFCConfig {
 					FileInputStream fis = new FileInputStream(excel);
 					wb = new HSSFWorkbook(fis);
 					HSSFSheet hssfSheet = wb.getSheetAt(0);
-					int lastRow = hssfSheet.getLastRowNum();	
+					int lastRow = hssfSheet.getLastRowNum();
 					for(int i = 1;i<=lastRow;i++) {
-					HSSFRow row = 	hssfSheet.getRow(i);
-					Generalarea generalarea = new Generalarea();
-					if(row==null)
-						break;
-					generalarea.setGENAREANAME_FC(getCellData(row.getCell((short)3)));
-					generalarea.setGENAREACODE(getCellData(row.getCell((short)2)));
-					if(generalarea.getGENAREACODE()==null||"".equals(generalarea.getGENAREACODE()))
-						break;
-					//tax.setSALES_ORG(row.getCell((short)1).getStringCellValue());
-					geneMap.put(generalarea.getGENAREANAME_FC(), generalarea.getGENAREACODE());
-					generalareas.add(generalarea);
-				}
+						HSSFRow row = 	hssfSheet.getRow(i);
+						Generalarea generalarea = new Generalarea();
+						if(row==null)
+							break;
+						generalarea.setGENAREANAME_FC(getCellData(row.getCell((short)3)));
+						generalarea.setGENAREACODE(getCellData(row.getCell((short)2)));
+						if(generalarea.getGENAREACODE()==null||"".equals(generalarea.getGENAREACODE()))
+							break;
+						//tax.setSALES_ORG(row.getCell((short)1).getStringCellValue());
+						geneMap.put(generalarea.getGENAREANAME_FC(), generalarea.getGENAREACODE());
+						generalareas.add(generalarea);
+					}
 				}else {
 					System.out.println("File type error!");
 					return;
@@ -244,12 +248,12 @@ public class RFCConfig {
 			}
 		}
 
-		
+
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
-	
-	
+
+
 }

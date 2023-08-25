@@ -11,7 +11,7 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * Creates or updates an SAP material master.
- * 
+ *
  * @author will
  *
  */
@@ -72,7 +72,7 @@ public class RdhMatmCreate extends RdhBase {
 		bmm00.get(0).setXeiv1("X");
 		bmmh1.get(0).setMatkl("000");
 		bmmh1.get(0).setMeins(getMeins(svcmod));
-		
+
 		bmmh1.get(0).setZeiar("RFA");
 		bmmh1.get(0).setAeszn(getEarliestAnnDate(svcmod));
 		bmmh1.get(0).setZeinr(annnumber);
@@ -82,7 +82,7 @@ public class RdhMatmCreate extends RdhBase {
 		bmmh1.get(0).setMtpos(getMtpos(svcmod));
 		bmmh1.get(0).setPrctr(svcmod.getPRFTCTR()==null?"":svcmod.getPRFTCTR());
 		bmmh1.get(0).setKtgrm(svcmod.getACCTASGNGRP()==null?"":svcmod.getACCTASGNGRP());
-//		/PCTOFCMPLTINDC 
+//		/PCTOFCMPLTINDC
 		if ("Yes".equals(svcmod.getPCTOFCMPLTINDC()))
 			bmmh1.get(0).setPrat1("X");
 
@@ -144,10 +144,10 @@ public class RdhMatmCreate extends RdhBase {
 					}
 				}else {
 					key ="PUBFROM"+availabilities.get(i).getPUBFROM();
-				sset = sMap.get(key);
-				if (sset == null) {
-					sset = new HashSet<SLEORGNPLNTCODE>();
-					sMap.put(key, sset);
+					sset = sMap.get(key);
+					if (sset == null) {
+						sset = new HashSet<SLEORGNPLNTCODE>();
+						sMap.put(key, sset);
 					}
 				}
 				sset.addAll(availabilities.get(i).getSLEORGNPLNTCODELIST());
@@ -184,7 +184,7 @@ public class RdhMatmCreate extends RdhBase {
 			if (groupName!=null) {
 				allSet.removeAll(groupSet);
 				Set<TAXCATEGORY> cset = cMap.get(groupName);
-				if(cset!=null) {	
+				if(cset!=null) {
 					cset.addAll(allSet);
 				}
 				cMap.put(groupName, cset);
@@ -195,11 +195,11 @@ public class RdhMatmCreate extends RdhBase {
 				String key = iterator.next();
 
 				RdhMatm_geo geo = new RdhMatm_geo();
-				
+
 				geo.setName("WW" + index++);
 				if(key.startsWith("PUBFROM")) {
-				geo.setVmsta("Z0");
-				geo.setVmstd(key.replace("PUBFROM", ""));
+					geo.setVmsta("Z0");
+					geo.setVmstd(key.replace("PUBFROM", ""));
 				}else {
 					geo.setVmsta("ZJ");
 					geo.setVmstd(key.replace("PUBTO", ""));
@@ -215,7 +215,7 @@ public class RdhMatmCreate extends RdhBase {
 				Set<String> plantSet = new HashSet<String>();
 				for (int j = 0; j < sleorggrps.size(); j++) {
 					SLEORGNPLNTCODE sleorgnplntcode = sleorggrps.get(j);
-					
+
 					RdhMatm_plant plant = new RdhMatm_plant();
 					plant.setWerks(sleorgnplntcode.getPLNTCD());
 					if (plant.getWerks() != null && plant.getWerks().startsWith("Y")) {
@@ -255,21 +255,21 @@ public class RdhMatmCreate extends RdhBase {
 							sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf()));
 						}
 					} else if (org_groupMap.get(sales_org.getVkorg())!=null) {
-							if ("P4016".equals(bmmh1.get(0).getPrctr())) {
-								sales_org.setZsabrtax("SWMA");
-							} else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
-								sales_org.setZsabrtax("HWMA");
-							}else {
-								sales_org.setZsabrtax(" ");
-							}
+						if ("P4016".equals(bmmh1.get(0).getPrctr())) {
+							sales_org.setZsabrtax("SWMA");
+						} else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
+							sales_org.setZsabrtax("HWMA");
+						}else {
+							sales_org.setZsabrtax(" ");
+						}
 
 					}
 					if (werks_set.contains(plant.getWerks())){
 
-							if ("P4016".equals(bmmh1.get(0).getPrctr())) {
-								plant.setSteuc("998313");
-							} else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
-								plant.setSteuc("998713");
+						if ("P4016".equals(bmmh1.get(0).getPrctr())) {
+							plant.setSteuc("998313");
+						} else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
+							plant.setSteuc("998713");
 
 							/*else {
 								plant.setSteuc(" ");
@@ -286,7 +286,7 @@ public class RdhMatmCreate extends RdhBase {
 					 * <keyword_t.name> to zsabrtax. else { Set error_text to "Error: Unable to set
 					 * ZSABRTAX value. ZTAXCLSF value geo.sales_org.ztaxclsf> not found in keyword_t
 					 * table for category "ZSABRTAX". } }
-					 * 
+					 *
 					 */
 
 					if(RFCConfig.getDwerk("6",sales_org.getVkorg())!=null&&!unitSet.contains(sales_org.getVkorg()))
@@ -296,12 +296,12 @@ public class RdhMatmCreate extends RdhBase {
 						unitSet.add(sales_org.getVkorg());
 					}
 					if(plantSet.contains(plant.getWerks())) {
-						
+
 					}else {
 						plantList.add(plant);
 						plantSet.add(plant.getWerks());
 					}
-					
+
 				}
 
 				/**
@@ -310,13 +310,13 @@ public class RdhMatmCreate extends RdhBase {
 				 * COUNTRYLIST /COUNTRYELEMENT /COUNTRY_FC = SVCMOD_UPDATE /AVAILABILITYLIST
 				 * /AVAILABILITYELEMENT/COUNTRY_FC Create one row into tax_country structure of
 				 * the group as below and then remove the duplidated rows.
-				 * 
+				 *
 				 */
 				if (taxcList != null) {
 					for (int k = 0; k < taxcList.size(); k++) {
 						List<COUNTRY> countries = taxcList.get(k).getCOUNTRYLIST();
 						if(taxcList.get(k).getCOUNTRYLIST().size()==0)
-							continue; 
+							continue;
 						RdhMatm_tax_country tax_country = new RdhMatm_tax_country();
 						tax_country.setTaty1(taxcList.get(k).getTAXCATEGORYVALUE());
 						//tax_country.setTaxm1(taxcList.get(k).getTAXCLASSIFICATION());
@@ -337,7 +337,7 @@ public class RdhMatmCreate extends RdhBase {
 						tax_country.setTaxm9("1");
 
 						if(tax_country.getAland()!=null) {
-						tax_countries.add(tax_country);
+							tax_countries.add(tax_country);
 						}
 					}
 				}
@@ -352,13 +352,13 @@ public class RdhMatmCreate extends RdhBase {
 			 * for (int i = 0; i <availabilities.size(); i++) {
 			 * if(pubfromSet.contains(availabilities.get(i).getPUBFROM())){ continue; }else
 			 * {
-			 * 
+			 *
 			 * } RdhMatm_geo geo = new RdhMatm_geo(); geo.setName("WW"+index);
 			 * geo.setVmsta("Z0"); geo.setVmstd(availabilities.get(i).getPUBFROM());
-			 * 
+			 *
 			 * List<SLEORGNPLNTCODE> sleorggrps
 			 * =availabilities.get(i).getSLEORGNPLNTCODELIST();
-			 * 
+			 *
 			 * List<RdhMatm_sales_org> sales_orgList = new ArrayList<RdhMatm_sales_org>();
 			 * List<RdhMatm_plant> plantList = new ArrayList<RdhMatm_plant>();
 			 * List<RdhMatm_tax_country> tax_countries = new
@@ -381,84 +381,84 @@ public class RdhMatmCreate extends RdhBase {
 			 * if("P4016".equals(bmmh1.get(0).getPrctr())){ sales_org.setZsabrtax("SWMA");
 			 * }else if ("P4022".equals(bmmh1.get(0).getPrctr())) {
 			 * sales_org.setZsabrtax("HWMA"); } } }
-			 * 
+			 *
 			 * else if ("0026,0147".contains(sales_org.getVkorg())) {
 			 * sales_org.setZtaxclsf(""); if
 			 * (sales_org.getZtaxclsf()!=null&&!sales_org.getZtaxclsf().equals("")) {
 			 * sales_org.setZsabrtax(getZsabrtax(sales_org.getZtaxclsf())); } }
-			 * 
+			 *
 			 *//**
-				 * If <geo.sales_org.vkorg> in (?0026?,?0147?) if <geo.sales_org.ztaxclsf> is
-				 * set to a value, then { Read the keyword_t table where category == "ZSABRTAX"
-				 * and kwvalue == <geo.sales_org.ztaxclsf>. if a row is found, then Copy
-				 * <keyword_t.name> to zsabrtax. else { Set error_text to "Error: Unable to set
-				 * ZSABRTAX value. ZTAXCLSF value geo.sales_org.ztaxclsf> not found in keyword_t
-				 * table for category "ZSABRTAX". } }
-				 * 
-				 */
+			 * If <geo.sales_org.vkorg> in (?0026?,?0147?) if <geo.sales_org.ztaxclsf> is
+			 * set to a value, then { Read the keyword_t table where category == "ZSABRTAX"
+			 * and kwvalue == <geo.sales_org.ztaxclsf>. if a row is found, then Copy
+			 * <keyword_t.name> to zsabrtax. else { Set error_text to "Error: Unable to set
+			 * ZSABRTAX value. ZTAXCLSF value geo.sales_org.ztaxclsf> not found in keyword_t
+			 * table for category "ZSABRTAX". } }
+			 *
+			 */
 			/*
-			 * 
-			 * 
-			 * 
+			 *
+			 *
+			 *
 			 * sales_orgList.add(sales_org); plantList.add(plant); }
-			 * 
+			 *
 			 *//**
-				 * e. For each SVCMOD_UPDATE /TAXCATEGORYLIST /TAXCATEGORYELEMENT Associate the
-				 * TAXCATEGORYELEMENT to the group on the condition that TAXCATEGORYELEMENT/
-				 * COUNTRYLIST /COUNTRYELEMENT /COUNTRY_FC = SVCMOD_UPDATE /AVAILABILITYLIST
-				 * /AVAILABILITYELEMENT/COUNTRY_FC Create one row into tax_country structure of
-				 * the group as below and then remove the duplidated rows.
-				 * 
-				 *//*
-					 * if(taxcategories!=null){ for (int k = 0; k < taxcategories.size(); k++) {
-					 * List<COUNTRY> countries = taxcategories.get(k).getCOUNTRYLIST();
-					 * if(countries!=null){ for (int j = 0; j < countries.size(); j++) {
-					 * if(countries.get(j).getCOUNTRY_FC().equals(availabilities.get(i).
-					 * getCOUNTRY_FC())){ RdhMatm_tax_country tax_country = new
-					 * RdhMatm_tax_country();
-					 * tax_country.setTaty1(taxcategories.get(k).getTAXCATEGORYVALUE());
-					 * tax_country.setTaxm1(taxcategories.get(k).getTAXCATEGORYACTION());
-					 * tax_country.setTaxm2("1"); tax_country.setTaxm3("1");
-					 * tax_country.setTaxm4("1"); tax_country.setTaxm5("1");
-					 * tax_country.setTaxm6("1"); tax_country.setTaxm7("1");
-					 * tax_country.setTaxm8("1"); tax_country.setTaxm9("1"); } }
-					 * 
-					 * } } } index++; pubfromSet.add(availabilities.get(i).getPUBFROM());
-					 * geo.setPlants(plantList); geo.setSales_orgs(sales_orgList);
-					 * geo.setTax_countries(tax_countries); geos.add(geo); }
-					 */
+			 * e. For each SVCMOD_UPDATE /TAXCATEGORYLIST /TAXCATEGORYELEMENT Associate the
+			 * TAXCATEGORYELEMENT to the group on the condition that TAXCATEGORYELEMENT/
+			 * COUNTRYLIST /COUNTRYELEMENT /COUNTRY_FC = SVCMOD_UPDATE /AVAILABILITYLIST
+			 * /AVAILABILITYELEMENT/COUNTRY_FC Create one row into tax_country structure of
+			 * the group as below and then remove the duplidated rows.
+			 *
+			 *//*
+			 * if(taxcategories!=null){ for (int k = 0; k < taxcategories.size(); k++) {
+			 * List<COUNTRY> countries = taxcategories.get(k).getCOUNTRYLIST();
+			 * if(countries!=null){ for (int j = 0; j < countries.size(); j++) {
+			 * if(countries.get(j).getCOUNTRY_FC().equals(availabilities.get(i).
+			 * getCOUNTRY_FC())){ RdhMatm_tax_country tax_country = new
+			 * RdhMatm_tax_country();
+			 * tax_country.setTaty1(taxcategories.get(k).getTAXCATEGORYVALUE());
+			 * tax_country.setTaxm1(taxcategories.get(k).getTAXCATEGORYACTION());
+			 * tax_country.setTaxm2("1"); tax_country.setTaxm3("1");
+			 * tax_country.setTaxm4("1"); tax_country.setTaxm5("1");
+			 * tax_country.setTaxm6("1"); tax_country.setTaxm7("1");
+			 * tax_country.setTaxm8("1"); tax_country.setTaxm9("1"); } }
+			 *
+			 * } } } index++; pubfromSet.add(availabilities.get(i).getPUBFROM());
+			 * geo.setPlants(plantList); geo.setSales_orgs(sales_orgList);
+			 * geo.setTax_countries(tax_countries); geos.add(geo); }
+			 */
 
-		
-	}
 
-	bmm00.get(0).setTcode("MM01");
-	// geos.get(0);
-	// !!!!!
-	// bmmh1.get(0).set
+		}
 
-	// bmmh1.get(0).setMvgr5(svcmod.getTAXCATEGORYLIST());
+		bmm00.get(0).setTcode("MM01");
+		// geos.get(0);
+		// !!!!!
+		// bmmh1.get(0).set
 
-	/*
-	 * if(!isNullOrBlank(productSchedule.getRfaNumber())) {
-	 * bmmh1.get(0).setZeiar("RFA");
-	 * bmmh1.get(0).setZeinr(productSchedule.getRfaNumber()); }
-	 * 
-	 * if(this.isAas(softwareProduct)) { if(!softwareProduct.getIsSwmaOffered()) {
-	 * Date annDate = this.getEarliestAnnDate(softwareProduct); if(annDate != null)
-	 * { bmmh1. get(0).setAeszn(DateUtility.getDateStringWithAesznFormat(annDate));
-	 * } } if(RpqType.NOT_RPQ.name().equals(softwareProduct.getRpqType().getKwValue
-	 * ())) { bmmh1.get(0).setZconf("F"); }else { bmmh1.get(0).setZconf("E"); } }
-	 */
+		// bmmh1.get(0).setMvgr5(svcmod.getTAXCATEGORYLIST());
 
-	// RdhMatm_bmmh5 spras Set to "E" (English).
+		/*
+		 * if(!isNullOrBlank(productSchedule.getRfaNumber())) {
+		 * bmmh1.get(0).setZeiar("RFA");
+		 * bmmh1.get(0).setZeinr(productSchedule.getRfaNumber()); }
+		 *
+		 * if(this.isAas(softwareProduct)) { if(!softwareProduct.getIsSwmaOffered()) {
+		 * Date annDate = this.getEarliestAnnDate(softwareProduct); if(annDate != null)
+		 * { bmmh1. get(0).setAeszn(DateUtility.getDateStringWithAesznFormat(annDate));
+		 * } } if(RpqType.NOT_RPQ.name().equals(softwareProduct.getRpqType().getKwValue
+		 * ())) { bmmh1.get(0).setZconf("F"); }else { bmmh1.get(0).setZconf("E"); } }
+		 */
 
-	// if(softwareProduct.getLicenseAgreementType() == null
-	// ||
-	// "F".equalsIgnoreCase(softwareProduct.getLicenseAgreementType().getIsSerialized())){
-	// bmmh1.get(0).setSernp("");
-	// }
+		// RdhMatm_bmmh5 spras Set to "E" (English).
 
-	// setGeoSalesOrgCountry(softwareProduct, null, null, null);
+		// if(softwareProduct.getLicenseAgreementType() == null
+		// ||
+		// "F".equalsIgnoreCase(softwareProduct.getLicenseAgreementType().getIsSerialized())){
+		// bmmh1.get(0).setSernp("");
+		// }
+
+		// setGeoSalesOrgCountry(softwareProduct, null, null, null);
 	}
 	private String getSteucCode(SVCMOD svcmod,String country){
 		String steucCode=null;
@@ -589,9 +589,9 @@ public class RdhMatmCreate extends RdhBase {
 	 * .getVendorLogoAAG().getEswAccountAssignGroup()); }
 	 * bmmh5.get(0).setSpras("E");
 	 * bmmh5.get(0).setMaktx(licensedFunction.getShortName());
-	 * 
+	 *
 	 * setGeoSalesOrgCountry(softwareProduct,licensedFunction,null,null); }
-	 * 
+	 *
 	 * public RdhMatmCreate(ProductSchedule productSchedule, SoftwareProduct
 	 * softwareProduct, OrderableSupply orderableSupply, String orderableSupplyName)
 	 * { super(productSchedule.getMainProduct().getProductIdentifier() + "_" +
@@ -604,7 +604,7 @@ public class RdhMatmCreate extends RdhBase {
 	 * bmmh1.get(0).setSpart(softwareProduct.getOwningDivision().getName());
 	 * bmmh5.get(0).setSpras("E"); bmmh5.get(0).setMaktx(orderableSupplyName);
 	 * setGeoSalesOrgCountry(softwareProduct,null,orderableSupply, null); }
-	 * 
+	 *
 	 * public RdhMatmCreate(ProductSchedule productSchedule, SoftwareProduct
 	 * softwareProduct, SliceGroupEsw sliceGroupEsw){
 	 * super(productSchedule.getMainProduct().getProductIdentifier() + "_" +
@@ -618,7 +618,7 @@ public class RdhMatmCreate extends RdhBase {
 	 * bmmh5.get(0).setSpras("E"); String srel = ""; if(srel != null) { srel =
 	 * " SREL" + ("DBS".equals(sliceGroupEsw.getSRel()) ? "DB" :
 	 * sliceGroupEsw.getSRel()); }
-	 * 
+	 *
 	 * String language = sliceGroupEsw.getLanguageName() != null ? " " +
 	 * sliceGroupEsw.getLanguageName() : ""; String mediaTypeCdsId =
 	 * sliceGroupEsw.getMediaTypeCdsId() != null ? " " +
@@ -626,10 +626,10 @@ public class RdhMatmCreate extends RdhBase {
 	 * sliceGroupEsw.getMediaTypeCdsId().substring(8, 11) : "";
 	 * bmmh5.get(0).setMaktx("Grp for" + srel + language + mediaTypeCdsId);
 	 * setGeoSalesOrgCountry(softwareProduct, null, null, sliceGroupEsw);
-	 * 
+	 *
 	 * }
-	 * 
-	 * 
+	 *
+	 *
 	 * private void setGeoSalesOrgCountry(SoftwareProduct
 	 * softwareProduct,LicensedFunction licensedFunction, OrderableSupply
 	 * orderableSupply, SliceGroupEsw sliceGroupEsw) { geos.clear(); String
@@ -639,7 +639,7 @@ public class RdhMatmCreate extends RdhBase {
 	 * if(softwareProduct.getIsSwmaOffered()) { sapFeedId = "CSW_FEED_IERP_SWMA";
 	 * }else { sapFeedId = "CSW_FEED_IERP_LIC"; } sapGeos =
 	 * softwareProduct.getSapGeoObjectsBasedOnSapFeedId(sapFeedId); }
-	 * 
+	 *
 	 * for(SapGeo sapGeo : sapGeos) { boolean isSetSalesStatus = false;
 	 * List<GeoAvailStatus> availStatuses = null;// for different case, will get the
 	 * geoavailstatus by different way if(licensedFunction != null) { availStatuses
@@ -658,20 +658,20 @@ public class RdhMatmCreate extends RdhBase {
 	 * availStatus.getAnnouncementDate(); RdhMatm_geo geo =
 	 * generateGeoStructure(softwareProduct, orderableSupply, sliceGroupEsw, sapGeo,
 	 * isSetSalesStatus, announcementDate, withdrawMarketingDate); geos.add(geo); }
-	 * 
+	 *
 	 * } if("WW".equals(sapGeo.getBusinessGeo().getKwValue())) //no matched GAS for
 	 * WW { RdhMatm_geo geo = generateGeoStructure(softwareProduct, orderableSupply,
 	 * sliceGroupEsw, sapGeo, isSetSalesStatus,
 	 * this.getEarliestAnnDate(softwareProduct),null); geos.add(geo); } } }
-	 * 
+	 *
 	 * private RdhMatm_geo generateGeoStructure(SoftwareProduct softwareProduct,
 	 * OrderableSupply orderableSupply, SliceGroupEsw sliceGroupEsw, SapGeo sapGeo,
 	 * boolean isSetSalesStatus, Date annDate, Date wdDate) { RdhMatm_geo geo = new
 	 * RdhMatm_geo();
-	 * 
+	 *
 	 * geo.setName(sapGeo.getBusinessGeo().getKwValue());//Copy from
 	 * <SapGeo.getBusinessGeo().value>. if(isSetSalesStatus) {
-	 * 
+	 *
 	 * if(this.isSWPIMs(softwareProduct)) { if(wdDate != null &&
 	 * !DateUtility.isAfterToday(wdDate)) { geo.setVmsta("ZJ"); }else {
 	 * geo.setVmsta("Z0"); } if(wdDate != null && !DateUtility.isAfterToday(wdDate))
@@ -689,7 +689,7 @@ public class RdhMatmCreate extends RdhBase {
 	 * RdhMatm_plant(); plant.setWerks(sapplant.getPlantCode());
 	 * plant.setLgort(sapplant.getStorageLocation()); plants.add(plant); }
 	 * geo.setPlants(plants);
-	 * 
+	 *
 	 * List<RdhMatm_sales_org> sales_orgs = new ArrayList<RdhMatm_sales_org>();
 	 * for(SapSalesOrg salesorg : sapGeo.getSapSalesOrgs()) { RdhMatm_sales_org
 	 * sales_org = new RdhMatm_sales_org(); sales_orgs.add(sales_org);
@@ -697,14 +697,14 @@ public class RdhMatmCreate extends RdhBase {
 	 * sales_org.setDwerk(salesorg.getDeliveryPlant());
 	 * if("0147".equals(salesorg.getSalesOrg())) {
 	 * sales_org.setZtaxclsf(softwareProduct.getUsTaxClass().getKwValue()); }
-	 * 
+	 *
 	 * } geo.setSales_orgs(sales_orgs);
-	 * 
+	 *
 	 * List<RdhMatm_tax_country> tax_countries = new
 	 * ArrayList<RdhMatm_tax_country>(); for(SapCountry country :
 	 * sapGeo.getSapCountries()) { RdhMatm_tax_country tax_cnty = new
 	 * RdhMatm_tax_country(); tax_countries.add(tax_cnty);
-	 * 
+	 *
 	 * tax_cnty.setAland(country.getIsoCountry());
 	 * tax_cnty.setTaxm1(country.getTaxClass()); if(sliceGroupEsw != null) {
 	 * if("2".equals(country.getTaxClassRule())) {
@@ -728,11 +728,11 @@ public class RdhMatmCreate extends RdhBase {
 	 * tax_cnty.setTaxm6(country.getTaxm6()); tax_cnty.setTaxm7(country.getTaxm7());
 	 * tax_cnty.setTaxm8(country.getTaxm8()); tax_cnty.setTaxm9(country.getTaxm9());
 	 * }
-	 * 
+	 *
 	 * geo.setTax_countries(tax_countries); return geo; }
 	 */
 	/**
-	 * 
+	 *
 	 * @param product
 	 * @return
 	 */
@@ -776,7 +776,7 @@ public class RdhMatmCreate extends RdhBase {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see com.ibm.sdpi.cmd.interfaces.esw.rdh.RdhBase#setDefaultValues()
 	 */
 	@Override
@@ -791,9 +791,9 @@ public class RdhMatmCreate extends RdhBase {
 		RdhMatm_bmmh5 bmh5 = new RdhMatm_bmmh5();
 		bmmh5 = new ArrayList<RdhMatm_bmmh5>();
 		bmmh5.add(bmh5);
-	
+
 		bmmh6 = new ArrayList<RdhMatm_bmmh6>();
-		
+
 		RdhMatm_bmmh7 bmh7 = new RdhMatm_bmmh7();
 		bmmh7 = new ArrayList<RdhMatm_bmmh7>();
 		bmmh7.add(bmh7);
@@ -814,7 +814,7 @@ public class RdhMatmCreate extends RdhBase {
 
 	/**
 	 * Change add_date to yyyy-MM-dd
-	 * 
+	 *
 	 * @param time
 	 * @return add_date
 	 */

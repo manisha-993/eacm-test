@@ -9,19 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import COM.ibm.eannounce.abr.sg.rfc.entity.CountryPlantTax;
-import COM.ibm.eannounce.abr.sg.rfc.entity.Generalarea;
-import COM.ibm.eannounce.abr.sg.rfc.entity.LANGUAGE;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmm00;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh1;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh2;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh5;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh6;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_bmmh7;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_geo;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_plant;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_sales_org;
-import COM.ibm.eannounce.abr.sg.rfc.entity.RdhMatm_tax_country;
+import COM.ibm.eannounce.abr.sg.rfc.entity.*;
 import COM.ibm.eannounce.abr.util.DateUtility;
 import COM.ibm.eannounce.abr.util.RFCConfig;
 import COM.ibm.eannounce.abr.util.RfcConfigProperties;
@@ -342,6 +330,8 @@ public class ChwMatmCreate extends RdhBase {
 				RdhMatm_plant plant = new RdhMatm_plant();
 				plant.setWerks(plntcd);
 				plant.setEkgrp("ZZZ");
+				plant.setSteuc(getSteucCode(model, salesorg));
+
 				plantList.add(plant);
 			}
 			if(!saleorgSet.contains(salesorg)) {
@@ -380,7 +370,7 @@ public class ChwMatmCreate extends RdhBase {
 			}
 			
 		}
-		
+
 		if(materialID.endsWith("UPG")||materialID.endsWith("MTC")) {
 		for (int i = 0; i < taxs.size(); i++) {
 			CountryPlantTax tax = taxs.get(i);
@@ -482,6 +472,20 @@ public class ChwMatmCreate extends RdhBase {
 
 	bmm00.get(0).setTcode("MM01");
 	
+	}
+
+	private String getSteucCode(MODEL model, String country) {
+		String steucCode=null;
+		String machTypeMatch=model.getMACHTYPE();
+
+		List<HSN> hsns=RFCConfig.getHsns();
+
+		for (int i=0;i<hsns.size();i++){
+			HSN hsn=hsns.get(i);
+			if (hsn.getCountry().equals(country)&& hsn.getMachType().equals(machTypeMatch))
+				steucCode=hsn.getSteuc();
+		}
+		return steucCode;
 	}
 
 	private String getZsabrtax(String ztaxclsf) {
