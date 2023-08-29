@@ -64,7 +64,7 @@ public class RFCConfig {
 						hsn.setaLand(getCellData(row.getCell((short)1)));
 						hsn.setMachType(getCellData(row.getCell((short)2)));
 						hsn.setSteuc(getCellData(row.getCell((short)3)));
-						hsn.setAvailStatus(getCellData(row.getCell((short)4)));
+						//hsn.setAvailStatus(getCellData(row.getCell((short)4)));
 
 
 						hsns.add(hsn);
