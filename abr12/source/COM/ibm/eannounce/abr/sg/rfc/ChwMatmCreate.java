@@ -475,6 +475,8 @@ public class ChwMatmCreate extends RdhBase {
 	}
 
 	private String getSteucCode(MODEL model, String country) {
+
+		System.out.println("Getting HSN Steuc Code");
 		String steucCode=null;
 		String machTypeMatch=model.getMACHTYPE();
 
@@ -485,6 +487,7 @@ public class ChwMatmCreate extends RdhBase {
 			if (hsn.getCountry().equals(country)&& hsn.getMachType().equals(machTypeMatch))
 				steucCode=hsn.getSteuc();
 		}
+		System.out.println("returned HSN Steuc Code "+steucCode);
 		return steucCode;
 	}
 

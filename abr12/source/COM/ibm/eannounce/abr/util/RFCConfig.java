@@ -40,13 +40,13 @@ public class RFCConfig {
 		loadBHPlnt();
 	}
 	public static void loadHSN() {
-
+		System.out.println("Loading HSN Lookup File!");
 		File excel = new File("HSN_LOOKUP.xls");
 
 		try {
 			// String encoding = "GBK";
 			if (excel.isFile() && excel.exists()) {
-
+				System.out.println("HSN Lookup File Found!");
 				String[] split = excel.getName().split("\\.");
 				HSSFWorkbook wb;
 				if ("xls".equals(split[1])) {
@@ -75,6 +75,7 @@ public class RFCConfig {
 					return;
 				}
 			}
+			System.out.println("HSN Lookup Data Loaded!");
 		}
 
 
