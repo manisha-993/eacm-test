@@ -30,9 +30,10 @@ public class RFCConfig {
 	static Set<String> bhplnts = new HashSet<String>();
 	static List<HSN> hsns = new ArrayList<HSN>();
 	public static void main(String[] args) {
+
 		// TODO Auto-generated method stub
 		System.out.println(hsns);
-		System.out.println(RFCConfig.getDwerk("6","0684"));;
+		//System.out.println(RFCConfig.getDwerk("6","0684"));;
 	}static {
 		loadHSN();
 		loadCountryPlantTax();
