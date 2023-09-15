@@ -62,6 +62,7 @@ public class DB2ConnectionFactory implements ConnectionFactory {
 		this.username = username;
 		try {
 			this.password = AES256Utils.decrypt(password);
+			com.ibm.eannounce.wwprt.Log.i("Decrypted password is " +password);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,6 +76,7 @@ public class DB2ConnectionFactory implements ConnectionFactory {
 	    connectionProps.put("user", username);
 	    connectionProps.put("password", password);
 	    Connection connection = DriverManager.getConnection(url, connectionProps);
+		com.ibm.eannounce.wwprt.Log.i("Db connectivity details " +username + "password " +password+ "url " +url);
 	    connection.setAutoCommit(false);
 	    return connection;
 	}

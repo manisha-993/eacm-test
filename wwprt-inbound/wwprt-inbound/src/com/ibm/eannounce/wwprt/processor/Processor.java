@@ -171,9 +171,11 @@ public class Processor implements Runnable {
 			updateCommands.clear();
 
 			//Read all pending prices and process them
+			Log.i("Reading all pending prices and process them");
 			pricesTransaction.executeQuery(findAndProcessPricesQuery);
 
 			//Update WWPRTXML table status
+			Log.i("Updateing WWPRTXML table status for count ");
 			int count = 0;
 			for (UpdatePricesXML command : updateCommands) {
 				count++;
@@ -182,6 +184,7 @@ public class Processor implements Runnable {
 			commit(pricesTransaction.getConnection());
 
 			if (count > 0) {
+				Log.i("count is " +count);
 				CountNewPricesXMLQuery countQuery = new CountNewPricesXMLQuery();
 				pricesTransaction.executeQuery(countQuery);
 				Log.i("Messages processed in this cycle: " + count + " - Total remaining: "
