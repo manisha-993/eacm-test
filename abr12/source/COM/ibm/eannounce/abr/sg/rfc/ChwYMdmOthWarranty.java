@@ -23,6 +23,7 @@ public class ChwYMdmOthWarranty extends RdhBase {
 	private List<ZYTMDMOTHWARRTMF> ZYTMDMOTHWARRTMF_LIST;
 	@SerializedName("MATERIAL_TYPE")
 	private String MATERIAL_TYPE;
+	private   List<String> excludedCountryList=new ArrayList<>();
 
 	public ChwYMdmOthWarranty(WARR chwProduct) {
 		super(chwProduct.getWARRID(),	"Z_YMDMOTH_WARRANTY".toLowerCase(), null);
@@ -152,15 +153,30 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		this.MATERIAL_TYPE = "MODEL";
 		ZYTMDMOTHWARRMOD zYTMDMOTHWARRMOD = new ZYTMDMOTHWARRMOD();
 		boolean existGENAREASELECTION6400 = existGENAREASELECTION6400(chwProduct.getMODELENTITYID(),pdhConnection);
+
+		boolean ctryWarr=false;
+		for (WARRELEMENTTYPE WARRELEMENT : chwProduct.getWARRLIST()) {
+			if("No".equalsIgnoreCase(WARRELEMENT.getDEFWARR()) && !"WTY0000".equals(WARRELEMENT.getWARRID())){
+				for(COUNTRY country: WARRELEMENT.getCOUNTRYLIST())
+				{          excludedCountryList.add(country.getCOUNTRY_FC());
+				}
+
+				 ctryWarr=true;
+			}
+		}
+
+
+
+
 		for (WARRELEMENTTYPE WARRELEMENT : chwProduct.getWARRLIST())
 		{
 
 			if("Yes".equalsIgnoreCase(WARRELEMENT.getDEFWARR())){
 				//If chwProduct/WARRLIST/WARRELEMENT/WARRID <> "",
-				if(!"".equals(WARRELEMENT.getWARRID()) && !existGENAREASELECTION6400){
+				if(!"".equals(WARRELEMENT.getWARRID()) && !ctryWarr){
 					zYTMDMOTHWARRMOD = setZYTMDMOTHWARRMOD(chwProduct, WARRELEMENT);
 					ZYTMDMOTHWARRMOD_LIST.add(zYTMDMOTHWARRMOD);
-				} else if (!"".equals(WARRELEMENT.getWARRID()) && existGENAREASELECTION6400){
+				} else if (!"".equals(WARRELEMENT.getWARRID()) && ctryWarr){
 					ZYTMDMOTHWARRMOD_LIST.addAll(setZYTMDMOTHWARRMODs(chwProduct, WARRELEMENT,pdhConnection));
 				}
 			}else {
@@ -328,6 +344,8 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		statement.close();
 		resultSet.close();
 		for (COUNTRY country:WARRELEMENT.getCOUNTRYLIST()) {
+			if(existInExcludedCountryList(country.getCOUNTRY_FC()))
+				continue;
 			ZYTMDMOTHWARRMOD zYTMDMOTHWARRMOD = new ZYTMDMOTHWARRMOD();
 			zYTMDMOTHWARRMOD.setZMACHTYP(chwProduct.getMACHTYPE());
 			zYTMDMOTHWARRMOD.setZMODEL(chwProduct.getMODEL());
@@ -381,6 +399,15 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		}
 
 		return list;
+	}
+
+	private boolean existInExcludedCountryList(String countryFc) {
+		boolean existInExcludedCountries=false;
+		for (int i=0;i<excludedCountryList.size();i++){
+			if(countryFc.equals(excludedCountryList.get(i)))
+				existInExcludedCountries=true;
+		}
+		return existInExcludedCountries;
 	}
 
 	public ChwYMdmOthWarranty(TMF_UPDATE chwProduct, String attributevalue) {
