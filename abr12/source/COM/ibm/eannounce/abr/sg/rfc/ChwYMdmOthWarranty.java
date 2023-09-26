@@ -159,6 +159,8 @@ public class ChwYMdmOthWarranty extends RdhBase {
 			if("No".equalsIgnoreCase(WARRELEMENT.getDEFWARR()) && !"WTY0000".equals(WARRELEMENT.getWARRID())){
 				for(COUNTRY country: WARRELEMENT.getCOUNTRYLIST())
 				{          excludedCountryList.add(country.getCOUNTRY_FC());
+					System.out.println("Warranty Id: "+WARRELEMENT.getWARRID());
+					System.out.println("Country_FC: "+country.getCOUNTRY_FC());
 				}
 
 				 ctryWarr=true;
@@ -341,11 +343,14 @@ public class ChwYMdmOthWarranty extends RdhBase {
 		while(resultSet.next()) {
 			countryName.put(resultSet.getString("GENAREANAME_FC").trim(),resultSet.getString("GENAREACODE").trim());
 		}
+
 		statement.close();
 		resultSet.close();
 		for (COUNTRY country:WARRELEMENT.getCOUNTRYLIST()) {
-			if(existInExcludedCountryList(country.getCOUNTRY_FC()))
-				continue;
+			if ("Yes".equalsIgnoreCase(WARRELEMENT.getDEFWARR()) && existInExcludedCountryList(country.getCOUNTRY_FC())){
+				System.out.println("Exist in excluded Country list: "+country.getCOUNTRY_FC());
+			continue;
+		}
 			ZYTMDMOTHWARRMOD zYTMDMOTHWARRMOD = new ZYTMDMOTHWARRMOD();
 			zYTMDMOTHWARRMOD.setZMACHTYP(chwProduct.getMACHTYPE());
 			zYTMDMOTHWARRMOD.setZMODEL(chwProduct.getMODEL());
