@@ -539,6 +539,8 @@ public class ChwMatmCreate extends RdhBase {
 				result="ZPT4";
 			}else if ("LBS".equals(var)) {
 				result="ZPT3";
+			}else if ("5838".equals(model.getMACHTYPE())) {
+				result="ZPT5";
 			}else {
 				result="Z002";
 			}
