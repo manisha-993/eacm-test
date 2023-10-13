@@ -38,7 +38,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 	private String CACEHSQL = "select XMLMESSAGE from cache.XMLIDLCACHE where XMLENTITYTYPE = 'SVCMOD' and XMLENTITYID = ?  and XMLCACHEVALIDTO > current timestamp with ur";
 	String xml = null;
 
-	
+
 
 	public String getDescription() {
 		// TODO Auto-generated method stub
@@ -63,7 +63,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 				+ NEWLINE;
 
 		String header1 = "";
-	
+
 
 		MessageFormat msgf;
 		String abrversion = "";
@@ -90,9 +90,9 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 
 			// get the root entity using current timestamp, need this to get the
 			// timestamps or info for VE pulls
-			  m_elist = m_db.getEntityList(m_prof,
-                    new ExtractActionItem(null, m_db, m_prof,"dummy"),
-                    new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
+			m_elist = m_db.getEntityList(m_prof,
+					new ExtractActionItem(null, m_db, m_prof,"dummy"),
+					new EntityItem[] { new EntityItem(null, m_prof, getEntityType(), getEntityID()) });
 			/*
 			 * m_db.getEntityList(m_prof, new ExtractActionItem(null, m_db,
 			 * m_prof,"dummy"), new EntityItem[] { new EntityItem(null, m_prof,
@@ -112,150 +112,150 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 			PreparedStatement statement = connection.prepareStatement(CACEHSQL);
 			statement.setInt(1, rootEntity.getEntityID());
 			ResultSet resultSet = statement.executeQuery();
-		
+
 			while (resultSet.next()) {
 				xml = resultSet.getString("XMLMESSAGE");
 			}
 			if (xml != null) {
-				    String mulcompindc= PokUtils.getAttributeValue(rootEntity, "MULCOMPINDC", "", "");
-					SVCMOD svcmod = XMLParse.getSvcmodFromXml(xml);
-					RdhMatmCreate create = new RdhMatmCreate(svcmod,mulcompindc);
-					this.addDebug("Calling " + create.getRFCName());
-					create.execute();
-					this.addDebug(create.createLogEntry());
-					if (create.getRfcrc() == 0) {
-						this.addOutput(create.getRFCName() + " called  successfully!");
-					} else {
-						this.addOutput(create.getRFCName() + " called  faild!");
-						this.addOutput(create.getError_text());
-					}
+				String mulcompindc= PokUtils.getAttributeValue(rootEntity, "MULCOMPINDC", "", "");
+				SVCMOD svcmod = XMLParse.getSvcmodFromXml(xml);
+				RdhMatmCreate create = new RdhMatmCreate(svcmod,mulcompindc);
+				this.addDebug("Calling " + create.getRFCName());
+				create.execute();
+				this.addDebug(create.createLogEntry());
+				if (create.getRfcrc() == 0) {
+					this.addOutput(create.getRFCName() + " called  successfully!");
+				} else {
+					this.addOutput(create.getRFCName() + " called  faild!");
+					this.addOutput(create.getError_text());
+				}
 
-					String obj_id = svcmod.getMACHTYPE() + svcmod.getMODEL();
-					String class_name = "MG_COMMON";
-					String class_type = "001";
-					RdhClassificationMaint cMaint = new RdhClassificationMaint(obj_id, class_name, class_type, obj_id);
+				String obj_id = svcmod.getMACHTYPE() + svcmod.getMODEL();
+				String class_name = "MG_COMMON";
+				String class_type = "001";
+				RdhClassificationMaint cMaint = new RdhClassificationMaint(obj_id, class_name, class_type, obj_id);
 
-					this.addDebug("Calling " + cMaint.getRFCName()+" ID="+obj_id+" NAME="+class_name+" type="+class_type);
+				this.addDebug("Calling " + cMaint.getRFCName()+" ID="+obj_id+" NAME="+class_name+" type="+class_type);
 
-					String type = "MG_PRODUCTTYPE";
-					String tableData = getTableMapingDate(type, svcmod);
+				String type = "MG_PRODUCTTYPE";
+				String tableData = getTableMapingDate(type, svcmod);
+				this.addDebug("addCharacteristic for type="+type+" value=" +tableData );
+				if (tableData != null && !"No characteristic".equals(tableData)) {
 					this.addDebug("addCharacteristic for type="+type+" value=" +tableData );
-					if (tableData != null && !"No characteristic".equals(tableData)) {	
-						this.addDebug("addCharacteristic for type="+type+" value=" +tableData );
-						cMaint.addCharacteristic(type, tableData);
-					}else {
-						this.addDebug("addCharacteristic for type="+type+" value=" +"" );
-						cMaint.addCharacteristic(type, "");
-					} // No characteristic
-					cMaint.execute();
-					this.addDebug(cMaint.createLogEntry());
-					if (cMaint.getRfcrc() == 0) {
-						this.addOutput(cMaint.getRFCName() + " called successfully!");
-					} else {
-						this.addOutput(cMaint.getRFCName() + " called  faild!");
-						this.addOutput(cMaint.getError_text());
-					}
-					class_name = "MM_CUSTOM_SERVICES";
-					cMaint = new RdhClassificationMaint(obj_id, class_name, class_type, obj_id);
-					type = "MM_CUSTOM_TYPE";
-					tableData = getTableMapingDate(type, svcmod);
-					if (tableData != null && !"No characteristic".equals(tableData)) {
-						this.addDebug("addCharacteristic for type="+type+" value=" +tableData );
-						cMaint.addCharacteristic(type, tableData);
-					}else {
-						this.addDebug("addCharacteristic for type="+type+" value=" +"" );
-						cMaint.addCharacteristic(type, "");
-					}
-					type = "MM_CUSTOM_COSTING";
-					tableData = getTableMapingDate(type, svcmod);
-					
-					if (tableData != null && !"No characteristic".equals(tableData)) {
-						this.addDebug("addCharacteristic for type="+type+" value=" +tableData );
-						cMaint.addCharacteristic(type, tableData);
-					}else {
-						this.addDebug("addCharacteristic for type="+type+" value=" +"" );
-						cMaint.addCharacteristic(type, "");
-					}
-					type = "MM_PROFIT_CENTER";
-					tableData = getTableMapingDate(type, svcmod);
-					if (tableData != null && !"No characteristic".equals(tableData)) {
-						this.addDebug("addCharacteristic for type="+type+" value=" +tableData );
-						cMaint.addCharacteristic(type, tableData);
-					}else {
-						this.addDebug("addCharacteristic for type="+type+" value=" +"" );
-						cMaint.addCharacteristic(type, "");
-					}
-					type = "MM_TAX_CATEGORY";
-					tableData = getTableMapingDate(type, svcmod);
-					
-					if (tableData != null && !"No characteristic".equals(tableData)) {
-						this.addDebug("addCharacteristic for type="+type+" value=" +tableData );
-						cMaint.addCharacteristic(type, tableData);
-					}else {
-						this.addDebug("addCharacteristic for type="+type+" value=" +"" );
-						cMaint.addCharacteristic(type, "");
-					}
-					cMaint.execute();
-					this.addDebug(cMaint.createLogEntry());
-					if (cMaint.getRfcrc() == 0) {
-						this.addOutput(cMaint.getRFCName() + " called successfully!");
-					} else {
-						this.addOutput(cMaint.getRFCName() + " called  faild!");
-						this.addOutput(cMaint.getError_text());
-					}
-					
-					/*
-					 * cMaint.execute(); this.addDebug(cMaint.createLogEntry()); if
-					 * (cMaint.getRfcrc() == 0) { this.addOutput(cMaint.getRFCName() +
-					 * " called successfully!"); } else { this.addOutput(cMaint.getRFCName() +
-					 * " called  faild!"); this.addOutput(cMaint.getError_text()); }
-					 */
-					class_name = "MM_FIELDS";
-					cMaint = new RdhClassificationMaint(obj_id, class_name, class_type, obj_id);
-					
-					if ("Yes".equals(svcmod.getSOPRELEVANT())) {
-						type = "MM_SOP_IND";
-						this.addDebug("addCharacteristic for type="+type+" value=" +"X" );
-						cMaint.addCharacteristic(type, "X");
-					}
-					type = "MM_TASK_TYPE";
-					this.addDebug("addCharacteristic for type="+type+" value=" +svcmod.getSOPTASKTYPE() );
-					cMaint.addCharacteristic(type, svcmod.getSOPTASKTYPE());
-					type = "MM_OPPORTUNITY_CODE";
-					this.addDebug("addCharacteristic for type="+type+" value=" +svcmod.getWWOCCODE() );
-					cMaint.addCharacteristic(type, svcmod.getWWOCCODE());
-					cMaint.execute();
-					this.addDebug(cMaint.createLogEntry());
+					cMaint.addCharacteristic(type, tableData);
+				}else {
+					this.addDebug("addCharacteristic for type="+type+" value=" +"" );
+					cMaint.addCharacteristic(type, "");
+				} // No characteristic
+				cMaint.execute();
+				this.addDebug(cMaint.createLogEntry());
+				if (cMaint.getRfcrc() == 0) {
+					this.addOutput(cMaint.getRFCName() + " called successfully!");
+				} else {
+					this.addOutput(cMaint.getRFCName() + " called  faild!");
+					this.addOutput(cMaint.getError_text());
+				}
+				class_name = "MM_CUSTOM_SERVICES";
+				cMaint = new RdhClassificationMaint(obj_id, class_name, class_type, obj_id);
+				type = "MM_CUSTOM_TYPE";
+				tableData = getTableMapingDate(type, svcmod);
+				if (tableData != null && !"No characteristic".equals(tableData)) {
+					this.addDebug("addCharacteristic for type="+type+" value=" +tableData );
+					cMaint.addCharacteristic(type, tableData);
+				}else {
+					this.addDebug("addCharacteristic for type="+type+" value=" +"" );
+					cMaint.addCharacteristic(type, "");
+				}
+				type = "MM_CUSTOM_COSTING";
+				tableData = getTableMapingDate(type, svcmod);
 
-					if (cMaint.getRfcrc() == 0) {
-						this.addOutput(cMaint.getRFCName() + " called successfully!");
-						this.addOutput(cMaint.getError_text());
-					} else {
-						this.addOutput(cMaint.getRFCName() + " called  faild!");
-						this.addOutput(cMaint.getError_text());
-					}
-					/*
-					 * cMaint.execute(); this.addDebug(cMaint.createLogEntry()); if
-					 * (cMaint.getRfcrc() == 0) { this.addOutput(cMaint.getRFCName() +
-					 * " called successfully!"); this.addOutput(cMaint.getError_text()); } else {
-					 * this.addOutput(cMaint.getRFCName() + " called  faild!");
-					 * this.addOutput(cMaint.getError_text()); }
+				if (tableData != null && !"No characteristic".equals(tableData)) {
+					this.addDebug("addCharacteristic for type="+type+" value=" +tableData );
+					cMaint.addCharacteristic(type, tableData);
+				}else {
+					this.addDebug("addCharacteristic for type="+type+" value=" +"" );
+					cMaint.addCharacteristic(type, "");
+				}
+				type = "MM_PROFIT_CENTER";
+				tableData = getTableMapingDate(type, svcmod);
+				if (tableData != null && !"No characteristic".equals(tableData)) {
+					this.addDebug("addCharacteristic for type="+type+" value=" +tableData );
+					cMaint.addCharacteristic(type, tableData);
+				}else {
+					this.addDebug("addCharacteristic for type="+type+" value=" +"" );
+					cMaint.addCharacteristic(type, "");
+				}
+				type = "MM_TAX_CATEGORY";
+				tableData = getTableMapingDate(type, svcmod);
+
+				if (tableData != null && !"No characteristic".equals(tableData)) {
+					this.addDebug("addCharacteristic for type="+type+" value=" +tableData );
+					cMaint.addCharacteristic(type, tableData);
+				}else {
+					this.addDebug("addCharacteristic for type="+type+" value=" +"" );
+					cMaint.addCharacteristic(type, "");
+				}
+				cMaint.execute();
+				this.addDebug(cMaint.createLogEntry());
+				if (cMaint.getRfcrc() == 0) {
+					this.addOutput(cMaint.getRFCName() + " called successfully!");
+				} else {
+					this.addOutput(cMaint.getRFCName() + " called  faild!");
+					this.addOutput(cMaint.getError_text());
+				}
+
+
+				cMaint.execute(); this.addDebug(cMaint.createLogEntry()); if
+				(cMaint.getRfcrc() == 0) { this.addOutput(cMaint.getRFCName() +
+						" called successfully!"); } else { this.addOutput(cMaint.getRFCName() +
+						" called  faild!"); this.addOutput(cMaint.getError_text()); }
+
+				class_name = "MM_FIELDS";
+				cMaint = new RdhClassificationMaint(obj_id, class_name, class_type, obj_id);
+
+				if ("Yes".equals(svcmod.getSOPRELEVANT())) {
+					type = "MM_SOP_IND";
+					this.addDebug("addCharacteristic for type="+type+" value=" +"X" );
+					cMaint.addCharacteristic(type, "X");
+				}
+				type = "MM_TASK_TYPE";
+				this.addDebug("addCharacteristic for type="+type+" value=" +svcmod.getSOPTASKTYPE() );
+				cMaint.addCharacteristic(type, svcmod.getSOPTASKTYPE());
+				type = "MM_OPPORTUNITY_CODE";
+				this.addDebug("addCharacteristic for type="+type+" value=" +svcmod.getWWOCCODE() );
+				cMaint.addCharacteristic(type, svcmod.getWWOCCODE());
+				cMaint.execute();
+				this.addDebug(cMaint.createLogEntry());
+
+				if (cMaint.getRfcrc() == 0) {
+					this.addOutput(cMaint.getRFCName() + " called successfully!");
+					this.addOutput(cMaint.getError_text());
+				} else {
+					this.addOutput(cMaint.getRFCName() + " called  faild!");
+					this.addOutput(cMaint.getError_text());
+				}
+				/*
+					 cMaint.execute(); this.addDebug(cMaint.createLogEntry()); if
+					  (cMaint.getRfcrc() == 0) { this.addOutput(cMaint.getRFCName() +
+					 " called successfully!"); this.addOutput(cMaint.getError_text()); } else {
+					 this.addOutput(cMaint.getRFCName() + " called  faild!");
+					  this.addOutput(cMaint.getError_text()); }
 					 */
-					/*if (svcmod.hasProds()) {
-						RdhTssMatChar chart = new RdhTssMatChar(svcmod);
-						this.addDebug("Calling " + chart.getRFCName());
-						chart.execute();
-						this.addDebug(chart.createLogEntry());
-						if (chart.getRfcrc() == 0) {
-							this.addOutput(chart.getRFCName() + " called successfully!");
-							this.addOutput(chart.getError_text());
-						} else {
-							this.addOutput(chart.getRFCName() + " called  faild!");
-							this.addOutput(chart.getError_text());
-						}
+				if (svcmod.hasProds()) {
+					RdhTssMatChar chart = new RdhTssMatChar(svcmod);
+					this.addDebug("Calling " + chart.getRFCName());
+					chart.execute();
+					this.addDebug(chart.createLogEntry());
+					if (chart.getRfcrc() == 0) {
+						this.addOutput(chart.getRFCName() + " called successfully!");
+						this.addOutput(chart.getError_text());
+					} else {
+						this.addOutput(chart.getRFCName() + " called  faild!");
+						this.addOutput(chart.getError_text());
 					}
-			*/
-				
+				}
+
+
 				UpdateParkStatus updateParkStatus = new UpdateParkStatus("MD_TSS_IERP", svcmod.getMACHTYPE() + svcmod.getMODEL());
 				this.addDebug("Calling "+updateParkStatus.getRFCName());
 				updateParkStatus.execute();
@@ -269,33 +269,33 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 					this.addOutput(updateParkStatus.getError_text());
 				}
 				this.addDebug("Check if RdhTssFcProd can run:");
-				
-				
-			/*	RdhTssFcProd rdhTssFcProd = new RdhTssFcProd(svcmod);
+
+
+				RdhTssFcProd rdhTssFcProd = new RdhTssFcProd(svcmod);
 				this.addDebug("Can run:"+rdhTssFcProd.canRun());
 				if(rdhTssFcProd.canRun()) {
-				this.addDebug("Calling "+rdhTssFcProd.getRFCName());
-				rdhTssFcProd.execute();
-				this.addDebug(rdhTssFcProd.createLogEntry());
+					this.addDebug("Calling "+rdhTssFcProd.getRFCName());
+					rdhTssFcProd.execute();
+					this.addDebug(rdhTssFcProd.createLogEntry());
 
-				if (rdhTssFcProd.getRfcrc() == 0) {
-					this.addOutput(rdhTssFcProd.getRFCName() + " called successfully!");
-					this.addOutput(rdhTssFcProd.getError_text());
-				} else {
-					this.addOutput(rdhTssFcProd.getRFCName() + " called  faild!");
-					this.addOutput(rdhTssFcProd.getError_text());
-				}
+					if (rdhTssFcProd.getRfcrc() == 0) {
+						this.addOutput(rdhTssFcProd.getRFCName() + " called successfully!");
+						this.addOutput(rdhTssFcProd.getError_text());
+					} else {
+						this.addOutput(rdhTssFcProd.getRFCName() + " called  faild!");
+						this.addOutput(rdhTssFcProd.getError_text());
+					}
 				}else {
 					this.addDebug("skip "+rdhTssFcProd.getRFCName());
-					
-				}*/
+
+				}
 			} else {
 				this.addOutput("XML file not exist in cache,RFC caller not called!");
 				//return;
 			}
-			
-			
-			
+
+
+
 			// exeFtpShell(ffPathName);
 			// ftpFile();
 			/*
@@ -323,7 +323,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 			logError(exBuf.getBuffer().toString());
 			// was an error make sure user gets report
 			setCreateDGEntity(true);
-			
+
 			// sentFile=exeFtpShell(ffPathName);
 		} finally {
 			StringBuffer sb = new StringBuffer();
@@ -340,18 +340,18 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 			println(EACustom.getDocTypeHtml()); // Output the doctype and html
 			println(rptSb.toString()); // Output the Report
 			printDGSubmitString();
-			 if(!isReadOnly()) {
-	                clearSoftLock();
-	            }
+			if(!isReadOnly()) {
+				clearSoftLock();
+			}
 			println(EACustom.getTOUDiv());
 			buildReportFooter(); // Print </html>
 		}
 	}
 
-	
 
 
-	
+
+
 
 	/*
 	 * Get Name based on navigation attributes for root entity
@@ -375,7 +375,7 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 		if (metaList == null) {
 			EntityGroup eg = new EntityGroup(null, m_db, m_prof, theItem.getEntityType(), "Navigate");
 			metaList = eg.getMetaAttribute(); // iterator does not maintain
-												// navigate order
+			// navigate order
 			metaTbl.put(theItem.getEntityType(), metaList);
 		}
 		for (int ii = 0; ii < metaList.size(); ii++) {
@@ -557,83 +557,83 @@ public class SVCMODIERPABRSTATUS extends PokBaseABR {
 		// MM_PROFIT_CENTER
 		return value;
 	}
-	
-	 /********************************************************************************
-     * Convert string into valid html.  Special HTML characters are converted.
-     *
-     * @param txt    String to convert
-     * @return String
-     */
-    protected static String convertToHTML(String txt)
-    {
-        String retVal="";
-        StringBuffer htmlSB = new StringBuffer();
-        StringCharacterIterator sci = null;
-        char ch = ' ';
-        if (txt != null) {
-            sci = new StringCharacterIterator(txt);
-            ch = sci.first();
-            while(ch != CharacterIterator.DONE)
-            {
-                switch(ch)
-                {
-                case '<':
-                    htmlSB.append("&lt;");
-                break;
-                case '>':
-                    htmlSB.append("&gt;");
-                    break;
-                case '"':
-                    // double quotation marks could be saved as &quot; also. this will be &#34;
-                    // this should be included too, but left out to be consistent with west coast
-                    htmlSB.append("&quot;");
-                    break;
-                case '\'':
-                    //IE6 doesn't support &apos; to convert single quotation marks,we can use &#39; instead
-                    htmlSB.append("&#"+((int)ch)+";");
-                    break;
-                    //case '&': 
-                    // ignore entity references such as &lt; if user typed it, user will see it
-                    // could be saved as &amp; also. this will be &#38;
-                    //htmlSB.append("&#"+((int)ch)+";");
-                    //  htmlSB.append("&amp;");
-                    //    break;
-                default:
-                    htmlSB.append(ch);
-                break;
-                }
-                ch = sci.next();
-            }
-            retVal = htmlSB.toString();
-        }
 
-        return retVal;
-    }
-    
-	 protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
+	/********************************************************************************
+	 * Convert string into valid html.  Special HTML characters are converted.
+	 *
+	 * @param txt    String to convert
+	 * @return String
+	 */
+	protected static String convertToHTML(String txt)
+	{
+		String retVal="";
+		StringBuffer htmlSB = new StringBuffer();
+		StringCharacterIterator sci = null;
+		char ch = ' ';
+		if (txt != null) {
+			sci = new StringCharacterIterator(txt);
+			ch = sci.first();
+			while(ch != CharacterIterator.DONE)
+			{
+				switch(ch)
+				{
+					case '<':
+						htmlSB.append("&lt;");
+						break;
+					case '>':
+						htmlSB.append("&gt;");
+						break;
+					case '"':
+						// double quotation marks could be saved as &quot; also. this will be &#34;
+						// this should be included too, but left out to be consistent with west coast
+						htmlSB.append("&quot;");
+						break;
+					case '\'':
+						//IE6 doesn't support &apos; to convert single quotation marks,we can use &#39; instead
+						htmlSB.append("&#"+((int)ch)+";");
+						break;
+					//case '&':
+					// ignore entity references such as &lt; if user typed it, user will see it
+					// could be saved as &amp; also. this will be &#38;
+					//htmlSB.append("&#"+((int)ch)+";");
+					//  htmlSB.append("&amp;");
+					//    break;
+					default:
+						htmlSB.append(ch);
+						break;
+				}
+				ch = sci.next();
+			}
+			retVal = htmlSB.toString();
+		}
+
+		return retVal;
+	}
+
+	protected void addOutput(String msg) { rptSb.append("<p>"+msg+"</p>"+NEWLINE);}
 
 
-		/**********************************
-	     * add debug info as html comment
-	     *    EBUG_ERR = 0;
-	          EBUG_WARN = 1;
-	          EBUG_INFO = 2;
-	          EBUG_DETAIL = 3;
-	          EBUG_SPEW = 4
-	     */
-	   
+	/**********************************
+	 * add debug info as html comment
+	 *    EBUG_ERR = 0;
+	 EBUG_WARN = 1;
+	 EBUG_INFO = 2;
+	 EBUG_DETAIL = 3;
+	 EBUG_SPEW = 4
+	 */
+
 	protected void addDebug(String msg) {
 		if (D.EBUG_DETAIL <= abr_debuglvl) {
-		rptSb.append("<!-- " + msg + " -->" + NEWLINE);
+			rptSb.append("<!-- " + msg + " -->" + NEWLINE);
 		}
 	}
-	 /**********************************
-     * add error info and fail abr
-     */
-    protected void addError(String msg) {
-        addOutput(msg);
-        setReturnCode(FAIL);
-    }
+	/**********************************
+	 * add error info and fail abr
+	 */
+	protected void addError(String msg) {
+		addOutput(msg);
+		setReturnCode(FAIL);
+	}
 
-	
+
 }
